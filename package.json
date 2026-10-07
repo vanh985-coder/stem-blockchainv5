@@ -1,0 +1,22 @@
+{
+  "name": "so-chung",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@12.4.2",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev:hub": "pnpm --filter @so-chung/hub dev",
+    "dev:lang-giay": "pnpm --filter @so-chung/lang-giay dev",
+    "dev:lang-det": "pnpm --filter @so-chung/lang-det dev",
+    "dev:lang-khac-dau": "pnpm --filter @so-chung/lang-khac-dau dev",
+    "dev:lang-bac": "pnpm --filter @so-chung/lang-bac dev",
+    "test": "vitest run",
+    "typecheck": "pnpm -r --workspace-concurrency=1 typecheck",
+    "build": "pnpm -r --filter \"./apps/*\" build"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,30 @@
+# Đồ họa gốc (~600 MB) không đưa lên Git. KHÔNG bỏ qua assets-build/.
+assets/
+
+# Bí mật
+.env
+.env.local
+.env.*.local
+
+# Build, thư viện
+node_modules
+dist
+*.tsbuildinfo
+
+# Giai đoạn 1 (mã tham chiếu để chuyển giao diện)
+_giai-doan-1/node_modules/
+_giai-doan-1/dist/
+_giai-doan-1/.env
+_giai-doan-1/.env.*
+_giai-doan-1/**/node_modules/
+_giai-doan-1/**/dist/
+_giai-doan-1/**/.env
+_giai-doan-1/**/.env.*
+
+# Khác
+.DS_Store
+Thumbs.db
+.vercel
+
+# Vitest
+.vitest/
