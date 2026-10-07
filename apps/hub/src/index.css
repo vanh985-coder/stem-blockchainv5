@@ -1,1 +1,3 @@
 @import "tailwindcss";
+/* Tailwind phải quét cả class nằm trong packages/ (gói dùng chung và gói làng) */
+@source "../../../packages";

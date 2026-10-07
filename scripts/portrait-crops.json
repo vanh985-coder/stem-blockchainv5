@@ -1,0 +1,15 @@
+{
+  "_ghi_chu": "Khung cắt chân dung từ assets/source/characters/<nguon>.jpg. cx, cy = tâm khung (tỉ lệ 0–1 theo chiều ngang, chiều dọc ảnh). size = cạnh khung vuông (tỉ lệ 0–1 theo CHIỀU CAO ảnh). Chỉnh tay rồi chạy: pnpm crop-portraits",
+  "crops": {
+    "hoc-sinh-nam": { "nguon": "hoc-sinh-nam", "cx": 0.5, "cy": 0.2, "size": 0.34 },
+    "ti": { "nguon": "ti", "cx": 0.5, "cy": 0.19, "size": 0.34 },
+    "bac-an": { "nguon": "bac-an", "cx": 0.5, "cy": 0.21, "size": 0.38 },
+    "cu-binh": { "nguon": "cu-binh", "cx": 0.5, "cy": 0.22, "size": 0.38 },
+    "co-chi": { "nguon": "co-chi", "cx": 0.5, "cy": 0.22, "size": 0.38 },
+    "chu-dung": { "nguon": "chu-dung", "cx": 0.5, "cy": 0.18, "size": 0.32 },
+    "thay-linh": { "nguon": "thay-linh", "cx": 0.5, "cy": 0.19, "size": 0.34 },
+    "lai-buon": { "nguon": "lai-buon", "cx": 0.5, "cy": 0.19, "size": 0.36 },
+    "ba-cu": { "nguon": "dan-lang-ba-cu", "cx": 0.5, "cy": 0.27, "size": 0.44 },
+    "nong-dan": { "nguon": "dan-lang-nong-dan", "cx": 0.5, "cy": 0.23, "size": 0.4 }
+  }
+}

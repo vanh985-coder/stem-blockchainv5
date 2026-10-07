@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "packageManager": "pnpm@12.4.2",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev:hub": "pnpm --filter @so-chung/hub dev",
     "dev:lang-giay": "pnpm --filter @so-chung/lang-giay dev",
@@ -13,9 +15,13 @@
     "dev:lang-bac": "pnpm --filter @so-chung/lang-bac dev",
     "test": "vitest run",
     "typecheck": "pnpm -r --workspace-concurrency=1 typecheck",
-    "build": "pnpm -r --filter \"./apps/*\" build"
+    "build": "pnpm -r --filter \"./apps/*\" build",
+    "crop-portraits": "node scripts/crop-portraits.mjs",
+    "assets:build": "node scripts/assets-build.mjs",
+    "dev:assets": "node scripts/dev-assets.mjs"
   },
   "devDependencies": {
+    "sharp": "^0.35.5",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

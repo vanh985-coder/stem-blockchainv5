@@ -155,7 +155,7 @@ export interface VillageModule {
 **Dung lượng mục tiêu sau build:**
 - Mỗi nhân vật ≤ 2,5 MB; mỗi đồ vật ≤ 1,5 MB; mỗi ảnh nền ≤ 400 KB.
 - Tổng cả bộ khoảng 40–60 MB, tải theo từng cảnh.
-
+File trong assets-build/ mang mã băm nội dung trong tên (ten.<hash8>.webp); manifest.json ánh xạ đường dẫn gốc sang tên này và có Cache-Control: no-cache.
 ## 6. Biến môi trường
 
 | Biến | Ví dụ | Ghi chú |

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Link, Route, Routes } from 'react-router';
 import { URLS, levelUrl, type VillageId } from '@so-chung/core';
 
@@ -7,6 +8,9 @@ const MAN_BAI_HOC: { id: VillageId; ten: string; man: number; bai: number }[] = 
   { id: 'lang-khac-dau', ten: 'Làng Khắc Dấu', man: 7, bai: 3 },
   { id: 'lang-bac', ten: 'Làng Bạc', man: 10, bai: 4 },
 ];
+
+// Trang kiểm tra đồ họa: chỉ có khi chạy dev (không vào bản build).
+const DevAssets = import.meta.env.DEV ? lazy(() => import('./DevAssets')) : null;
 
 function TrangChu() {
   return (
@@ -52,6 +56,16 @@ export function App() {
     <Routes>
       <Route path="/" element={<TrangChu />} />
       <Route path="/ban-do" element={<BanDo />} />
+      {DevAssets && (
+        <Route
+          path="/dev/assets"
+          element={
+            <Suspense fallback={<p className="p-6">Đang tải…</p>}>
+              <DevAssets />
+            </Suspense>
+          }
+        />
+      )}
       <Route path="*" element={<TrangChu />} />
     </Routes>
   );

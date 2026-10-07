@@ -1,5 +1,5 @@
 # Đồ họa gốc (~600 MB) không đưa lên Git. KHÔNG bỏ qua assets-build/.
-assets/
+/assets/
 
 # Bí mật
 .env
@@ -28,3 +28,6 @@ Thumbs.db
 
 # Vitest
 .vitest/
+
+# Ảnh soi bằng mắt (không commit)
+assets-build/_preview/

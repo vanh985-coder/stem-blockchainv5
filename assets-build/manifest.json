@@ -1,0 +1,542 @@
+{
+  "scenes/bai-hoc-lang-bac": {
+    "file": "scenes/bai-hoc-lang-bac.2f602809.webp",
+    "bytes": 100844,
+    "width": 1376,
+    "height": 768
+  },
+  "scenes/bai-hoc-lang-det": {
+    "file": "scenes/bai-hoc-lang-det.dcf47da8.webp",
+    "bytes": 127424,
+    "width": 1376,
+    "height": 768
+  },
+  "scenes/bai-hoc-lang-giay": {
+    "file": "scenes/bai-hoc-lang-giay.f18abe56.webp",
+    "bytes": 139322,
+    "width": 1376,
+    "height": 768
+  },
+  "scenes/bai-hoc-lang-khac-dau": {
+    "file": "scenes/bai-hoc-lang-khac-dau.a3113e45.webp",
+    "bytes": 144898,
+    "width": 1376,
+    "height": 768
+  },
+  "scenes/man-03-xuong-giay": {
+    "file": "scenes/man-03-xuong-giay.a9301b58.webp",
+    "bytes": 112532,
+    "width": 1376,
+    "height": 768
+  },
+  "scenes/man-05-san-det": {
+    "file": "scenes/man-05-san-det.907f6711.webp",
+    "bytes": 101238,
+    "width": 1376,
+    "height": 768
+  },
+  "scenes/man-06-doi-xa": {
+    "file": "scenes/man-06-doi-xa.0672b947.webp",
+    "bytes": 203058,
+    "width": 1881,
+    "height": 358
+  },
+  "scenes/man-06-tre-gan": {
+    "file": "scenes/man-06-tre-gan.454f873c.webp",
+    "bytes": 281442,
+    "width": 1881,
+    "height": 369
+  },
+  "scenes/man-06-troi": {
+    "file": "scenes/man-06-troi.22665682.webp",
+    "bytes": 108016,
+    "width": 1376,
+    "height": 768
+  },
+  "scenes/man-08-kho-dau": {
+    "file": "scenes/man-08-kho-dau.35afa5ce.webp",
+    "bytes": 86102,
+    "width": 1376,
+    "height": 768
+  },
+  "scenes/man-09-duong-lang": {
+    "file": "scenes/man-09-duong-lang.92c6ca63.webp",
+    "bytes": 149020,
+    "width": 1376,
+    "height": 768
+  },
+  "scenes/man-11-goc-da": {
+    "file": "scenes/man-11-goc-da.9304b455.webp",
+    "bytes": 54502,
+    "width": 1376,
+    "height": 768
+  },
+  "sprites/man-03-ghep-so/ro-trang-gia": {
+    "file": "sprites/man-03-ghep-so/ro-trang-gia.53006a18.webp",
+    "bytes": 113470,
+    "width": 1024,
+    "height": 559
+  },
+  "sprites/man-05-dap-ti/chuot-giay-doi-lan": {
+    "file": "sprites/man-05-dap-ti/chuot-giay-doi-lan.5d0a43bc.webp",
+    "bytes": 95250,
+    "width": 1024,
+    "height": 559
+  },
+  "sprites/man-05-dap-ti/chuot-giay-nhanh": {
+    "file": "sprites/man-05-dap-ti/chuot-giay-nhanh.dc094019.webp",
+    "bytes": 103084,
+    "width": 1024,
+    "height": 559
+  },
+  "sprites/man-05-dap-ti/chuot-giay-thuong": {
+    "file": "sprites/man-05-dap-ti/chuot-giay-thuong.448e7acc.webp",
+    "bytes": 85152,
+    "width": 1024,
+    "height": 559
+  },
+  "sprites/man-05-dap-ti/chuot-giay-to": {
+    "file": "sprites/man-05-dap-ti/chuot-giay-to.31ee6dd6.webp",
+    "bytes": 107686,
+    "width": 1024,
+    "height": 559
+  },
+  "sprites/man-05-dap-ti/vet-muc": {
+    "file": "sprites/man-05-dap-ti/vet-muc.a59d1edf.webp",
+    "bytes": 75446,
+    "width": 1024,
+    "height": 559
+  },
+  "sprites/man-06-dieu/cong-lang-xa": {
+    "file": "sprites/man-06-dieu/cong-lang-xa.53f06056.webp",
+    "bytes": 87882,
+    "width": 1024,
+    "height": 559
+  },
+  "sprites/man-06-dieu/cot-tre": {
+    "file": "sprites/man-06-dieu/cot-tre.a046e0a0.webp",
+    "bytes": 13390,
+    "width": 1024,
+    "height": 559
+  },
+  "sprites/man-06-dieu/dieu": {
+    "file": "sprites/man-06-dieu/dieu.daa2bbdf.webp",
+    "bytes": 104464,
+    "width": 1024,
+    "height": 572
+  },
+  "sprites/man-06-dieu/dieu-den": {
+    "file": "sprites/man-06-dieu/dieu-den.3cd950f4.webp",
+    "bytes": 103494,
+    "width": 1024,
+    "height": 572
+  },
+  "sprites/man-09-chua-ga/ga-benh": {
+    "file": "sprites/man-09-chua-ga/ga-benh.046f2ad6.webp",
+    "bytes": 121816,
+    "width": 1024,
+    "height": 572
+  },
+  "sprites/man-09-chua-ga/ga-khoe": {
+    "file": "sprites/man-09-chua-ga/ga-khoe.161a1b55.webp",
+    "bytes": 9362,
+    "width": 1024,
+    "height": 572
+  },
+  "sprites/man-09-chua-ga/ga-trum": {
+    "file": "sprites/man-09-chua-ga/ga-trum.1ce44821.webp",
+    "bytes": 118744,
+    "width": 1024,
+    "height": 572
+  },
+  "sprites/man-09-chua-ga/na-cao-su": {
+    "file": "sprites/man-09-chua-ga/na-cao-su.656d9975.webp",
+    "bytes": 91948,
+    "width": 1024,
+    "height": 559
+  },
+  "sprites/man-11-ghep-la/cay-ghep-la": {
+    "file": "sprites/man-11-ghep-la/cay-ghep-la.8b303f5d.webp",
+    "bytes": 64898,
+    "width": 1024,
+    "height": 559
+  },
+  "sprites/man-12-leo-cay/canh-ngang": {
+    "file": "sprites/man-12-leo-cay/canh-ngang.adba56a1.webp",
+    "bytes": 111796,
+    "width": 1024,
+    "height": 559
+  },
+  "sprites/man-12-leo-cay/goc-cay": {
+    "file": "sprites/man-12-leo-cay/goc-cay.608c7443.webp",
+    "bytes": 90282,
+    "width": 1024,
+    "height": 572
+  },
+  "sprites/man-12-leo-cay/ngon-cay": {
+    "file": "sprites/man-12-leo-cay/ngon-cay.72529c8a.webp",
+    "bytes": 91950,
+    "width": 1024,
+    "height": 572
+  },
+  "sprites/man-12-leo-cay/tay-nam": {
+    "file": "sprites/man-12-leo-cay/tay-nam.a55daddb.webp",
+    "bytes": 107370,
+    "width": 1024,
+    "height": 559
+  },
+  "sprites/man-12-leo-cay/than-cay": {
+    "file": "sprites/man-12-leo-cay/than-cay.7edaaa51.webp",
+    "bytes": 85236,
+    "width": 1024,
+    "height": 572
+  },
+  "story/01-ngu-guc": {
+    "file": "story/01-ngu-guc.441cf34e.webp",
+    "bytes": 37736,
+    "width": 1408,
+    "height": 768
+  },
+  "story/02-cuon-vo-sang": {
+    "file": "story/02-cuon-vo-sang.734c9cf0.webp",
+    "bytes": 26052,
+    "width": 1408,
+    "height": 768
+  },
+  "story/03-cho-phien": {
+    "file": "story/03-cho-phien.65d59064.webp",
+    "bytes": 137604,
+    "width": 1408,
+    "height": 768
+  },
+  "story/04-gap-bi": {
+    "file": "story/04-gap-bi.c3275358.webp",
+    "bytes": 242188,
+    "width": 1920,
+    "height": 1072
+  },
+  "story/05-ti-chay": {
+    "file": "story/05-ti-chay.b4499314.webp",
+    "bytes": 158308,
+    "width": 1408,
+    "height": 768
+  },
+  "story/06-lang-giay": {
+    "file": "story/06-lang-giay.493a1834.webp",
+    "bytes": 109970,
+    "width": 1408,
+    "height": 768
+  },
+  "story/07-lang-det": {
+    "file": "story/07-lang-det.9dffe50d.webp",
+    "bytes": 76308,
+    "width": 1408,
+    "height": 768
+  },
+  "story/08-lang-khac-dau": {
+    "file": "story/08-lang-khac-dau.e5031674.webp",
+    "bytes": 33366,
+    "width": 1408,
+    "height": 768
+  },
+  "story/09-lang-bac": {
+    "file": "story/09-lang-bac.6894f418.webp",
+    "bytes": 119450,
+    "width": 1408,
+    "height": 768
+  },
+  "story/10-ti-tren-cay": {
+    "file": "story/10-ti-tren-cay.374da01d.webp",
+    "bytes": 47078,
+    "width": 1408,
+    "height": 768
+  },
+  "story/11-ti-hoi-cai": {
+    "file": "story/11-ti-hoi-cai.1e38a7b8.webp",
+    "bytes": 35642,
+    "width": 1408,
+    "height": 768
+  },
+  "story/12-hoi-lang": {
+    "file": "story/12-hoi-lang.d468d6d0.webp",
+    "bytes": 190440,
+    "width": 1920,
+    "height": 1072
+  },
+  "story/13-tinh-giac": {
+    "file": "story/13-tinh-giac.2cf3c23c.webp",
+    "bytes": 27810,
+    "width": 1408,
+    "height": 768
+  },
+  "story/14-gio-tay": {
+    "file": "story/14-gio-tay.cd233c1e.webp",
+    "bytes": 34002,
+    "width": 1408,
+    "height": 768
+  },
+  "ui/ban-do": {
+    "file": "ui/ban-do.5f8c6320.webp",
+    "bytes": 392834,
+    "width": 1920,
+    "height": 1047
+  },
+  "ui/bang-khen-khung": {
+    "file": "ui/bang-khen-khung.b0bc0881.webp",
+    "bytes": 79876,
+    "width": 1024,
+    "height": 559
+  },
+  "ui/cards/the-khuon-rieng": {
+    "file": "ui/cards/the-khuon-rieng.d93dc201.webp",
+    "bytes": 181332,
+    "width": 1021,
+    "height": 1024
+  },
+  "ui/cards/the-mat-sau": {
+    "file": "ui/cards/the-mat-sau.8d3cfdf0.webp",
+    "bytes": 205280,
+    "width": 1021,
+    "height": 1024
+  },
+  "ui/cards/the-mau-cong-khai": {
+    "file": "ui/cards/the-mau-cong-khai.db857011.webp",
+    "bytes": 178096,
+    "width": 1021,
+    "height": 1024
+  },
+  "ui/icons/guoc-moc": {
+    "file": "ui/icons/guoc-moc.20c90a0b.webp",
+    "bytes": 9784,
+    "width": 256,
+    "height": 250
+  },
+  "ui/icons/ngoi-sao": {
+    "file": "ui/icons/ngoi-sao.a366c6e3.webp",
+    "bytes": 4564,
+    "width": 256,
+    "height": 140
+  },
+  "ui/icons/non-la": {
+    "file": "ui/icons/non-la.c153f9d3.webp",
+    "bytes": 10238,
+    "width": 256,
+    "height": 256
+  },
+  "ui/icons/tien-dong": {
+    "file": "ui/icons/tien-dong.2f90dc89.webp",
+    "bytes": 6924,
+    "width": 256,
+    "height": 140
+  },
+  "ui/icons/tim": {
+    "file": "ui/icons/tim.4b74599d.webp",
+    "bytes": 1562,
+    "width": 256,
+    "height": 140
+  },
+  "ui/icons/trang-vang": {
+    "file": "ui/icons/trang-vang.7243205b.webp",
+    "bytes": 3610,
+    "width": 256,
+    "height": 140
+  },
+  "ui/icons/tui-tien": {
+    "file": "ui/icons/tui-tien.74527a10.webp",
+    "bytes": 20938,
+    "width": 256,
+    "height": 256
+  },
+  "ui/logo-art": {
+    "file": "ui/logo-art.69db6c50.webp",
+    "bytes": 120846,
+    "width": 1024,
+    "height": 768
+  },
+  "ui/man-hinh-tai": {
+    "file": "ui/man-hinh-tai.7eb3f951.webp",
+    "bytes": 302804,
+    "width": 1448,
+    "height": 1086
+  },
+  "ui/portraits/ba-cu": {
+    "file": "ui/portraits/ba-cu.ae7d9a11.webp",
+    "bytes": 13598,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/bac-an": {
+    "file": "ui/portraits/bac-an.e22c0033.webp",
+    "bytes": 13704,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/chu-dung": {
+    "file": "ui/portraits/chu-dung.0c6994c9.webp",
+    "bytes": 7320,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/co-chi": {
+    "file": "ui/portraits/co-chi.ea5f4246.webp",
+    "bytes": 7974,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/cu-binh": {
+    "file": "ui/portraits/cu-binh.f2146be3.webp",
+    "bytes": 8204,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/giang": {
+    "file": "ui/portraits/giang.47122ea4.webp",
+    "bytes": 18002,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/hoa": {
+    "file": "ui/portraits/hoa.8fb1232c.webp",
+    "bytes": 16832,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/hoc-sinh-nam": {
+    "file": "ui/portraits/hoc-sinh-nam.a75be54f.webp",
+    "bytes": 7368,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/khang": {
+    "file": "ui/portraits/khang.60afb5b6.webp",
+    "bytes": 12156,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/lai-buon": {
+    "file": "ui/portraits/lai-buon.762516e4.webp",
+    "bytes": 8814,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/lan": {
+    "file": "ui/portraits/lan.d00d3925.webp",
+    "bytes": 11308,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/minh": {
+    "file": "ui/portraits/minh.237e5e88.webp",
+    "bytes": 13294,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/nong-dan": {
+    "file": "ui/portraits/nong-dan.2777d21d.webp",
+    "bytes": 16232,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/thay-linh": {
+    "file": "ui/portraits/thay-linh.cc844b33.webp",
+    "bytes": 12544,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/ti": {
+    "file": "ui/portraits/ti.e7b1a24f.webp",
+    "bytes": 8004,
+    "width": 512,
+    "height": 512
+  },
+  "ui/textures/duong-dat": {
+    "file": "ui/textures/duong-dat.98e20495.webp",
+    "bytes": 178774,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/textures/giay-do": {
+    "file": "ui/textures/giay-do.f9508754.webp",
+    "bytes": 174442,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/textures/go": {
+    "file": "ui/textures/go.9d05c144.webp",
+    "bytes": 102044,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/textures/san-gach": {
+    "file": "ui/textures/san-gach.42b2e540.webp",
+    "bytes": 241972,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/textures/tuong-da-ong": {
+    "file": "ui/textures/tuong-da-ong.5e855454.webp",
+    "bytes": 144134,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/textures/vach-tre": {
+    "file": "ui/textures/vach-tre.2776cde6.webp",
+    "bytes": 217006,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/tiles/la-bang": {
+    "file": "ui/tiles/la-bang.807211b9.webp",
+    "bytes": 25148,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/tiles/la-chuoi": {
+    "file": "ui/tiles/la-chuoi.45b465f6.webp",
+    "bytes": 22730,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/tiles/la-da": {
+    "file": "ui/tiles/la-da.92d2c7fc.webp",
+    "bytes": 21860,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/tiles/la-gia": {
+    "file": "ui/tiles/la-gia.cbd959a9.webp",
+    "bytes": 12122,
+    "width": 1024,
+    "height": 559
+  },
+  "ui/tiles/la-sen": {
+    "file": "ui/tiles/la-sen.c5b746d4.webp",
+    "bytes": 19820,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/tiles/la-trau": {
+    "file": "ui/tiles/la-trau.5f41180a.webp",
+    "bytes": 21388,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/tiles/la-tre": {
+    "file": "ui/tiles/la-tre.e6641fa3.webp",
+    "bytes": 19928,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/tiles/o-gio": {
+    "file": "ui/tiles/o-gio.89a17fef.webp",
+    "bytes": 29774,
+    "width": 1024,
+    "height": 1024
+  },
+  "ui/tiles/o-hoa": {
+    "file": "ui/tiles/o-hoa.111213e1.webp",
+    "bytes": 38200,
+    "width": 1024,
+    "height": 1024
+  }
+}
