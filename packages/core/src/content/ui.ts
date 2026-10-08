@@ -232,7 +232,7 @@ export const ui = {
     ],
   },
 
-  /** Lưu tiến độ, chơi thử, bản đồ tạm */
+  /** Lưu tiến độ, chơi thử, trang tạm của màn bài học */
   tienDo: {
     dangLuu: 'Đang lưu…',
     daLuu: 'Đã lưu.',
@@ -249,10 +249,6 @@ export const ui = {
     /** Nút thử ở trang tạm của màn bài học */
     gaLapXongMan: 'Giả lập xong màn (3 sao)',
     nhanXu: 'Em nhận được {so} xu.',
-    /** Số xu hiện ở bản đồ tạm */
-    xu: 'Xu: {so}',
-    /** Dòng ở bản đồ tạm, kèm trạng thái mở khóa */
-    manSo: 'Màn {so}: {man}',
   },
 
   /** Trang chủ "/" (spec 04 mục 1) */
@@ -286,7 +282,7 @@ export const ui = {
 
   /** Bản đồ /ban-do (spec 04 mục 7) */
   banDo: {
-    tieuDe: 'Bản đồ',
+    /** Nút ở góc trên bản đồ */
     hoSo: 'Hồ sơ',
     /** Gợi ý khi chưa chọn làng */
     chonLang: 'Bấm vào một làng để xem các màn.',
@@ -300,8 +296,7 @@ export const ui = {
     trangChuaNhan: 'Chưa nhận Trang Sổ Vàng',
     /** Nhãn cho người dùng đọc màn hình, mỗi chấm một màn: {man} tên màn */
     nhanCham: '{man}: {trangThai}',
-    veTrangChu: 'Về trang chủ',
-    /** Số sao trong ô Trang Sổ Vàng ở góc trên */
+    /** Tên ô Trang Sổ Vàng ở góc trên (đọc cho người dùng đọc màn hình) */
     trangSo: 'Trang Sổ Vàng {so}',
   },
 
@@ -324,16 +319,6 @@ export const ui = {
     tat: 'Tắt',
   },
 
-  /** Trang chủ tạm và bản đồ tạm ở web chính */
-  hub: {
-    tenGame: 'Giấc mơ Sổ Chung',
-    trangChuTam: 'Trang chủ tạm.',
-    denBanDo: 'Đến bản đồ',
-    banDoTam: 'Bản đồ (tạm)',
-    /** Mỗi dòng ở bản đồ tạm: {lang} tên làng, {bai} số bài, {man} số màn */
-    dongBanDo: '{lang} — Bài học {bai} (màn {man})',
-    veTrangChu: 'Về trang chủ',
-  },
 
   /** Chữ ở các trang chỉ có khi chạy dev */
   dev: {
@@ -379,7 +364,6 @@ export const ui = {
     sao: 'Sao',
     caiDat: 'SettingsPanel',
     hangIcon: 'Hàng 7 icon',
-    chuyenSang: 'Chuyển sang:',
     quizTieuDe: 'QuizCard (4 câu Bài 1)',
     quizCau: 'Câu {so}/{max}',
     quizKetQua: 'Đã trả lời đúng {so}/{max} câu.',
