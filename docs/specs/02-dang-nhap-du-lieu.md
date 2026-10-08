@@ -152,8 +152,9 @@ begin
   insert into profiles (id, display_name, username)
   values (
     new.id,
-    left(coalesce(new.raw_user_meta_data->>'display_name',
-                  new.raw_user_meta_data->>'full_name', 'Học sinh'), 40),
+    left(coalesce(nullif(trim(new.raw_user_meta_data->>'display_name'), ''),
+                  nullif(trim(new.raw_user_meta_data->>'full_name'), ''),
+                  'Học sinh'), 40),
     new.raw_user_meta_data->>'username'
   );
   insert into game_state (user_id) values (new.id);
@@ -164,10 +165,13 @@ create trigger on_auth_user_created after insert on auth.users
 for each row execute function public.handle_new_user();
 
 -- ===== Không cho tự đổi vai trò hoặc tên đăng nhập =====
+-- auth.uid() rỗng = sửa từ Table Editor/SQL Editor (quyền chủ dự án) → cho phép.
+-- Người dùng gọi qua API luôn có auth.uid(); RLS đã chặn khách chưa đăng nhập.
 create or replace function public.protect_profile() returns trigger
 language plpgsql as $$
 begin
-  if (new.role is distinct from old.role or new.username is distinct from old.username)
+  if auth.uid() is not null
+     and (new.role is distinct from old.role or new.username is distinct from old.username)
      and coalesce(public.my_role(), '') <> 'admin' then
     raise exception 'Không được đổi vai trò hoặc tên đăng nhập';
   end if;
