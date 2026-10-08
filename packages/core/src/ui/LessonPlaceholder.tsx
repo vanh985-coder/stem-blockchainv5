@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { HUB_MAP_URL } from '../config/urls';
 import { fmt } from '../content/characters';
 import { ui } from '../content/ui';
+import { AccountBar } from '../auth/AccountBar';
 import { Button } from './Button';
 import { Panel } from './Panel';
 
@@ -12,6 +13,7 @@ export function LessonPlaceholder({ lesson, children }: { lesson: number; childr
       <Panel className="w-full max-w-md space-y-4">
         <h1 className="text-2xl">{fmt(ui.trangTam.tieuDe, { so: lesson })}</h1>
         {children}
+        <AccountBar />
         <Button onClick={() => window.location.assign(HUB_MAP_URL)}>{ui.chung.veBanDo}</Button>
       </Panel>
     </main>

@@ -162,6 +162,7 @@ File trong assets-build/ mang mã băm nội dung trong tên (ten.<hash8>.webp);
 |---|---|---|
 | `VITE_SUPABASE_URL` | `https://xxxx.supabase.co` | Spec 02 |
 | `VITE_SUPABASE_ANON_KEY` | `eyJ…` | Khóa công khai, được phép để ở frontend |
+| `VITE_USERNAME_EMAIL_DOMAIN` | `hs.ten-mien.vn` | Spec 02: tên miền email nội bộ của tài khoản tên đăng nhập (`<ten>@…`); học sinh không thấy, không gửi email |
 | `VITE_ASSETS_URL` | `https://assets.ten-mien.vn` | Lúc dev: `http://localhost:5180` |
 | `VITE_HUB_URL` | `https://ten-mien.vn` | |
 | `VITE_COOKIE_DOMAIN` | `.ten-mien.vn` | Để trống khi chạy localhost |

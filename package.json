@@ -19,9 +19,11 @@
     "crop-portraits": "node scripts/crop-portraits.mjs",
     "assets:build": "node scripts/assets-build.mjs",
     "dev:assets": "node scripts/dev-assets.mjs",
-    "check:text": "node scripts/check-text.mjs"
+    "check:text": "node scripts/check-text.mjs",
+    "rls:check": "node scripts/rls-check.mjs"
   },
   "devDependencies": {
+    "@supabase/supabase-js": "^2.117.2",
     "sharp": "^0.35.5",
     "typescript": "catalog:",
     "vitest": "catalog:"

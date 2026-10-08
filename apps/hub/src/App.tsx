@@ -1,6 +1,6 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router';
-import { Button, Panel, URLS, fmt, levelUrl, ui, type VillageId } from '@so-chung/core';
+import { AccountBar, Button, Panel, accountRoutes, URLS, fmt, levelUrl, ui, type VillageId } from '@so-chung/core';
 
 const MAN_BAI_HOC: { id: VillageId; man: number; bai: number }[] = [
   { id: 'lang-giay', man: 1, bai: 1 },
@@ -21,6 +21,7 @@ function TrangChu() {
         <h1 className="text-3xl">{ui.hub.tenGame}</h1>
         <p>{ui.hub.trangChuTam}</p>
         <Button onClick={() => navigate('/ban-do')}>{ui.hub.denBanDo}</Button>
+        <AccountBar />
       </Panel>
     </main>
   );
@@ -43,6 +44,7 @@ function BanDo() {
             </li>
           ))}
         </ul>
+        <AccountBar className="justify-start" />
         <Link to="/" className="inline-block min-h-11 py-2 underline">
           {ui.hub.veTrangChu}
         </Link>
@@ -64,6 +66,9 @@ export function App() {
     <Routes>
       <Route path="/" element={<TrangChu />} />
       <Route path="/ban-do" element={<BanDo />} />
+      {accountRoutes.map((r) => (
+        <Route key={r.path} path={r.path} element={r.element} />
+      ))}
       {DevAssets && <Route path="/dev/assets" element={<Lazy page={DevAssets} />} />}
       {DevUi && <Route path="/dev/ui" element={<Lazy page={DevUi} />} />}
       <Route path="*" element={<TrangChu />} />

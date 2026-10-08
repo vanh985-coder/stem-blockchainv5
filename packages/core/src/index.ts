@@ -46,3 +46,30 @@ export { LEVELS, VILLAGE_ORDER, levelById, levelsOfVillage } from './content/lev
 export type { LevelDef, LevelKind, LevelStatus } from './content/levels';
 export { computeUnlock } from './progress/unlock';
 export type { LevelState, LevelUnlock, UnlockInput, UnlockResult } from './progress/unlock';
+export { AuthProvider, useAuth } from './auth/AuthProvider';
+export type { AuthState, Profile, Role } from './auth/AuthProvider';
+export { accountRoutes } from './auth/routes';
+export { AccountBar } from './auth/AccountBar';
+export {
+  signUpUsername,
+  signInUsername,
+  signInGoogle,
+  signOut,
+  updateDisplayName,
+  joinClass,
+  setBeforeSignOut,
+} from './auth/api';
+export type { AuthResult, BeforeSignOutHook } from './auth/api';
+export { mapAuthError } from './auth/errors';
+export type { AuthErrorContext } from './auth/errors';
+export {
+  validateUsername,
+  validateDisplayName,
+  validatePassword,
+  normalizeUsername,
+  cleanDisplayName,
+  usernameToEmail,
+} from './auth/validate';
+export type { ValidationResult } from './auth/validate';
+export { readAuthConfig, AUTH_CONFIG } from './auth/config';
+export { safeNext, loginPathFor } from './auth/redirect';

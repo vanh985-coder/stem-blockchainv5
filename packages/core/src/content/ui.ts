@@ -107,6 +107,131 @@ export const ui = {
     trangSoVang: 'Trang Sổ Vàng: {so}/{max}',
   },
 
+  /** Đăng nhập, đăng ký, hồ sơ, quyền riêng tư */
+  auth: {
+    /** Hiện khi thiếu cấu hình Supabase: các nút đăng nhập báo câu này */
+    chuaCauHinh: 'Đăng nhập chưa cấu hình trên bản này. Em chơi thử không cần tài khoản trước nhé.',
+    /** Thông báo lỗi do cơ sở dữ liệu ném ra (hàm join_class trong 0001_init.sql). Phải khớp NGUYÊN VĂN với SQL; không hiện ra màn hình. */
+    loiMayChu: {
+      maLopSai: 'Mã lớp không đúng',
+      canDangNhap: 'Cần đăng nhập',
+    },
+    /** Các thông báo lỗi (xem mapAuthError) */
+    loi: {
+      tenDaCo: 'Tên đăng nhập này đã có người dùng. Em thử tên khác nhé.',
+      saiDangNhap: 'Sai tên đăng nhập hoặc mật khẩu. Quên mật khẩu thì nhờ thầy cô đặt lại.',
+      mang: 'Không kết nối được mạng. Em kiểm tra mạng rồi thử lại nhé.',
+      maLopSai: 'Mã lớp không đúng. Em hỏi lại thầy cô mã gồm 6 ký tự nhé.',
+      canDangNhap: 'Em cần đăng nhập trước nhé.',
+      chung: 'Có lỗi xảy ra. Em thử lại sau một lát nhé.',
+    },
+    /** Nhắc em nhập sai ở ô nhập */
+    kiemTra: {
+      tenDangNhap: 'Tên đăng nhập gồm 3 đến 20 ký tự, chỉ dùng chữ thường a-z, số 0-9 và dấu gạch dưới _.',
+      tenHienThi: 'Tên hiển thị dài từ 1 đến 40 ký tự.',
+      matKhau: 'Mật khẩu phải có ít nhất 8 ký tự.',
+      matKhauKhongKhop: 'Hai mật khẩu chưa giống nhau.',
+      chuaDocQuyenRiengTu: 'Em cần đọc Quyền riêng tư rồi tích vào ô đồng ý.',
+      maLopRong: 'Em nhập mã lớp (6 ký tự) nhé.',
+    },
+    dangXuLy: 'Đang xử lý…',
+    dangKiemTra: 'Đang kiểm tra tài khoản…',
+    veBanDo: 'Về bản đồ',
+    dangNhap: {
+      tieuDe: 'Đăng nhập',
+      google: 'Đăng nhập bằng Google',
+      hoac: 'hoặc',
+      tenDangNhap: 'Tên đăng nhập',
+      matKhau: 'Mật khẩu',
+      nut: 'Đăng nhập',
+      taoTaiKhoan: 'Tạo tài khoản',
+      choiThu: 'Chơi thử không cần tài khoản',
+    },
+    dangKy: {
+      tieuDe: 'Tạo tài khoản',
+      tenDangNhap: 'Tên đăng nhập',
+      tenDangNhapGoiY: 'Chữ thường không dấu, số và dấu _ (3 đến 20 ký tự).',
+      tenHienThi: 'Tên hiển thị',
+      tenHienThiGoiY: 'Tên các bạn sẽ thấy, được dùng chữ có dấu.',
+      matKhau: 'Mật khẩu',
+      matKhauGoiY: 'Ít nhất 8 ký tự.',
+      nhapLai: 'Nhập lại mật khẩu',
+      daDoc: 'Tôi đã đọc ',
+      quyenRiengTu: 'Quyền riêng tư',
+      nut: 'Tạo tài khoản',
+      daCoTaiKhoan: 'Em đã có tài khoản?',
+      dangNhap: 'Đăng nhập',
+    },
+    hoSo: {
+      tieuDe: 'Hồ sơ của em',
+      tenHienThi: 'Tên hiển thị',
+      luuTen: 'Lưu tên',
+      daLuuTen: 'Đã lưu tên mới.',
+      tenDangNhap: 'Tên đăng nhập:',
+      vaiTro: 'Vai trò:',
+      vaiTroHocSinh: 'Học sinh',
+      vaiTroGiaoVien: 'Giáo viên',
+      vaiTroQuanTri: 'Quản trị',
+      maLop: 'Nhập mã lớp',
+      vaoLop: 'Vào lớp',
+      daVaoLop: 'Em đã vào lớp rồi nhé.',
+      dangXuat: 'Đăng xuất',
+      canDangNhap: 'Em cần đăng nhập để xem hồ sơ.',
+      denDangNhap: 'Đến trang đăng nhập',
+      khongTaiDuocHoSo: 'Chưa tải được hồ sơ của em. Em tải lại trang thử nhé.',
+    },
+    /** Thanh nhỏ ở các trang tạm: đăng nhập hay đang đăng nhập */
+    thanh: {
+      dangNhap: 'Đăng nhập',
+      chao: 'Chào {ten}',
+      hoSo: 'Hồ sơ',
+    },
+  },
+
+  /** Trang Quyền riêng tư (spec 02 mục 6) */
+  quyenRiengTu: {
+    tieuDe: 'Quyền riêng tư',
+    gioiThieu: 'Game chỉ giữ những thứ cần thiết để em chơi tiếp được và để thầy cô biết em học đến đâu.',
+    email: 'vietanhhpts123@gmail.com',
+    muc: [
+      {
+        tieuDe: 'Game lưu những gì?',
+        y: [
+          'Tên hiển thị của em.',
+          'Tên đăng nhập, hoặc email Google nếu em đăng nhập bằng Google.',
+          'Tiến độ chơi và câu trả lời trắc nghiệm.',
+        ],
+      },
+      {
+        tieuDe: 'Lưu để làm gì?',
+        y: ['Để em chơi tiếp được ở lần sau, ở bất cứ máy nào.', 'Để thầy cô biết em đã học đến đâu.'],
+      },
+      {
+        tieuDe: 'Ai xem được?',
+        y: [
+          'Em xem được dữ liệu của chính em.',
+          'Thầy cô chỉ thấy tên hiển thị và tiến độ của các em trong lớp mình, không thấy email.',
+          'Người khác không xem được.',
+        ],
+      },
+      {
+        tieuDe: 'Game không hỏi gì?',
+        y: [
+          'Game không hỏi ngày sinh, số điện thoại, trường học hay ảnh của em.',
+          'Game không có quảng cáo và không dùng công cụ theo dõi nào.',
+        ],
+      },
+      {
+        tieuDe: 'Em chơi thử không cần tài khoản?',
+        y: ['Được. Khi đó tiến độ chỉ lưu trên máy của em, không gửi đi đâu.'],
+      },
+      {
+        tieuDe: 'Em muốn xóa tài khoản?',
+        y: ['Em nhờ thầy cô, hoặc gửi thư cho nhóm làm game theo địa chỉ này:'],
+      },
+    ],
+  },
+
   /** Bảng cài đặt */
   caiDat: {
     tieuDe: 'Cài đặt',
