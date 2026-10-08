@@ -1,13 +1,20 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router';
-import { AccountBar, Button, Panel, accountRoutes, URLS, fmt, levelUrl, ui, type VillageId } from '@so-chung/core';
-
-const MAN_BAI_HOC: { id: VillageId; man: number; bai: number }[] = [
-  { id: 'lang-giay', man: 1, bai: 1 },
-  { id: 'lang-det', man: 4, bai: 2 },
-  { id: 'lang-khac-dau', man: 7, bai: 3 },
-  { id: 'lang-bac', man: 10, bai: 4 },
-];
+import {
+  AccountBar,
+  Button,
+  GuestBar,
+  LEVELS,
+  Panel,
+  URLS,
+  VILLAGE_ORDER,
+  accountRoutes,
+  fmt,
+  levelById,
+  levelUrl,
+  ui,
+  useProgress,
+} from '@so-chung/core';
 
 // Trang kiểm tra: chỉ có khi chạy dev (không vào bản build).
 const DevAssets = import.meta.env.DEV ? lazy(() => import('./DevAssets')) : null;
@@ -27,29 +34,75 @@ function TrangChu() {
   );
 }
 
+const STATE_TEXT = {
+  locked: ui.moKhoa.khoa,
+  open: ui.moKhoa.mo,
+  done: ui.moKhoa.xong,
+  'coming-soon': ui.moKhoa.sapRaMat,
+} as const;
+const STATE_ICON = { locked: '🔒', open: '▶', done: '✓', 'coming-soon': '⏳' } as const;
+
 function BanDo() {
+  const { unlock, coins, goldenPages } = useProgress();
   return (
-    <main className="p-4">
-      <Panel className="mx-auto max-w-md space-y-4">
-        <h1 className="text-2xl">{ui.hub.banDoTam}</h1>
-        <ul className="space-y-3">
-          {MAN_BAI_HOC.map((m) => (
-            <li key={m.id}>
-              <a
-                href={levelUrl(URLS, m.id, m.man)}
-                className="block min-h-11 rounded-nut border-2 border-nau-go bg-giay px-4 py-3 font-display text-lg font-extrabold focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim"
-              >
-                {fmt(ui.hub.dongBanDo, { lang: ui.lang[m.id], bai: m.bai, man: m.man })}
-              </a>
-            </li>
-          ))}
-        </ul>
-        <AccountBar className="justify-start" />
-        <Link to="/" className="inline-block min-h-11 py-2 underline">
-          {ui.hub.veTrangChu}
-        </Link>
-      </Panel>
-    </main>
+    <>
+      <GuestBar />
+      <main className="p-4">
+        <Panel className="mx-auto max-w-lg space-y-4">
+          <h1 className="text-2xl">{ui.hub.banDoTam}</h1>
+          <p className="flex flex-wrap gap-x-6 font-display text-lg font-extrabold">
+            <span>{fmt(ui.moKhoa.trangSoVang, { so: goldenPages, max: VILLAGE_ORDER.length })}</span>
+            <span>{fmt(ui.tienDo.xu, { so: coins })}</span>
+          </p>
+          <ul className="space-y-2">
+            {unlock.levels.map((u) => {
+              const def = LEVELS.find((l) => l.id === u.id)!;
+              const blocker = u.lockedBy ? levelById(u.lockedBy) : undefined;
+              const playable = def.kind === 'lesson' && (u.state === 'open' || u.state === 'done');
+              const inner = (
+                <>
+                  <span className="flex flex-wrap items-center gap-x-3">
+                    <span className="min-w-0 flex-1">
+                      {fmt(ui.tienDo.manSo, { so: def.id, man: fmt(def.ten) })}
+                      <span className="block text-sm font-normal text-nau-go-dam">{ui.lang[def.lang]}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full border-2 border-nau-go px-2 py-0.5 text-sm font-bold">
+                      <span aria-hidden="true">{STATE_ICON[u.state]}</span>
+                      {STATE_TEXT[u.state]}
+                    </span>
+                  </span>
+                  {blocker && (
+                    <span className="mt-1 block text-sm font-normal text-nau-go-dam">
+                      {fmt(ui.moKhoa.hoanThanh, { so: blocker.id, man: fmt(blocker.ten) })}
+                    </span>
+                  )}
+                </>
+              );
+              const cls =
+                'block min-h-11 rounded-nut border-2 border-nau-go bg-giay px-4 py-3 font-display text-lg font-extrabold';
+              return (
+                <li key={u.id}>
+                  {playable ? (
+                    <a
+                      href={levelUrl(URLS, def.lang, def.id)}
+                      className={`${cls} focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim`}
+                    >
+                      {inner}
+                    </a>
+                  ) : (
+                    <div className={`${cls} opacity-75`}>{inner}</div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          <AccountBar className="justify-start" />
+          <Link to="/" className="inline-block min-h-11 py-2 underline">
+            {ui.hub.veTrangChu}
+          </Link>
+        </Panel>
+      </main>
+    </>
   );
 }
 

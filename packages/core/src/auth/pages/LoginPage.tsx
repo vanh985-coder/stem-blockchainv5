@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { Button } from '../../ui/Button';
 import { signInGoogle, signInUsername } from '../api';
+import { useProgress } from '../../progress/ProgressProvider';
 import { useAuth } from '../AuthProvider';
 import { safeNext } from '../redirect';
 import { normalizeUsername, validatePassword, validateUsername } from '../validate';
@@ -11,6 +12,7 @@ export default function LoginPage() {
   const { session, loading, configured } = useAuth();
   const goAfterLogin = useGoAfterLogin();
   const navigate = useNavigate();
+  const { startGuest } = useProgress();
   const [params] = useSearchParams();
   const next = safeNext(params.get('next'));
   const [username, setUsername] = useState('');
@@ -85,7 +87,11 @@ export default function LoginPage() {
         >
           {t.dangNhap.taoTaiKhoan}
         </Link>
-        <button type="button" onClick={() => goToMap(navigate)} className="inline-flex min-h-11 cursor-pointer items-center font-semibold underline">
+        <button type="button" onClick={() => {
+            startGuest();
+            goToMap(navigate);
+          }}
+          className="inline-flex min-h-11 cursor-pointer items-center font-semibold underline">
           {t.dangNhap.choiThu}
         </button>
       </div>

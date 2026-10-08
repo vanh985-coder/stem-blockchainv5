@@ -73,3 +73,11 @@ export {
 export type { ValidationResult } from './auth/validate';
 export { readAuthConfig, AUTH_CONFIG } from './auth/config';
 export { safeNext, loginPathFor } from './auth/redirect';
+export { ProgressProvider, useProgress } from './progress/ProgressProvider';
+export type { ProgressState } from './progress/ProgressProvider';
+export { GuestBar } from './ui/GuestBar';
+export { progressManager } from './progress/singleton';
+export { mergeProgress } from './progress/merge';
+export { recordLevelResult, doneLevels, withGoldenPages, unlockOf } from './progress/record';
+export { encodeProgress, decodeProgress } from './progress/compact';
+export type { Progress, LevelProgress, GameState, LevelResult, Stars as StarMap } from './progress/types';

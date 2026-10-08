@@ -232,6 +232,29 @@ export const ui = {
     ],
   },
 
+  /** Lưu tiến độ, chơi thử, bản đồ tạm */
+  tienDo: {
+    dangLuu: 'Đang lưu…',
+    daLuu: 'Đã lưu.',
+    /** Hiện khi chưa gửi được lên máy chủ (mất mạng hoặc chậm quá 5 giây) */
+    chuaGuiDuoc: 'Chưa gửi được lên máy chủ. Tiến độ vẫn được giữ và sẽ tự gửi khi có mạng.',
+    /** Thanh trên cùng khi chơi thử */
+    choiThu: 'Em đang chơi thử, tiến độ chỉ lưu trên máy này',
+    dangNhapDeLuu: 'Đăng nhập để lưu',
+    /** Hỏi gộp sau khi đăng nhập, nếu máy có tiến độ chơi thử */
+    hoiGop:
+      'Trên máy này có tiến độ chơi thử. Gộp vào tài khoản của em không? Nếu đây không phải tiến độ của em, chọn Không gộp.',
+    gop: 'Gộp',
+    khongGop: 'Không gộp',
+    /** Nút thử ở trang tạm của màn bài học */
+    gaLapXongMan: 'Giả lập xong màn (3 sao)',
+    nhanXu: 'Em nhận được {so} xu.',
+    /** Số xu hiện ở bản đồ tạm */
+    xu: 'Xu: {so}',
+    /** Dòng ở bản đồ tạm, kèm trạng thái mở khóa */
+    manSo: 'Màn {so}: {man}',
+  },
+
   /** Bảng cài đặt */
   caiDat: {
     tieuDe: 'Cài đặt',

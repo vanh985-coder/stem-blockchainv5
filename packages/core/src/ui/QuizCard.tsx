@@ -16,13 +16,15 @@ export interface QuizCardProps {
   continueLabel?: string;
   /** Biến cho fmt(), ví dụ { ten: 'Lan' } */
   vars?: FmtVars;
+  /** Màn đang hỏi (1 đến 12), ghi vào quiz_answers; 0 hoặc không có = thử thách cuối */
+  levelId?: number;
   /** Ví dụ "Câu 2/4", hiện phía trên câu hỏi */
   caption?: string;
   className?: string;
 }
 
 /** Thẻ câu hỏi: đáp án là nút (bấm bằng chuột, chạm hoặc bàn phím). Đúng/sai có biểu tượng và chữ, không chỉ màu. */
-export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, caption, className = '' }: QuizCardProps) {
+export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, caption, levelId, className = '' }: QuizCardProps) {
   const [chosen, setChosen] = useState<number | null>(null);
   const titleId = useId();
   const answered = chosen !== null;
@@ -39,7 +41,7 @@ export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, 
     setChosen(index);
     if (ok) sound.playCorrect();
     else sound.playWrong();
-    void recordAnswer({ questionId: question.id, correct: ok, chosenIndex: index });
+    void recordAnswer({ questionId: question.id, correct: ok, chosenIndex: index, levelId });
     onAnswer(ok, question.id);
   };
 
