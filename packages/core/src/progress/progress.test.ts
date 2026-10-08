@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { LEVELS, type LevelStatus } from '../content/levels';
-import { decodePending, decodeProgress, encodePending, encodeProgress } from './compact';
+import { PENDING_MAX_BYTES, decodePendingMap, decodeProgress, encodePendingMap, encodeProgress } from './compact';
 import { buildCookie, buildCookieRemoval, readCookie } from './cookies';
 import { mergeProgress } from './merge';
 import { doneLevels, recordLevelResult, unlockOf, withGoldenPages } from './record';
@@ -30,16 +30,24 @@ describe('mergeProgress (bảng gộp spec 02 mục 4)', () => {
     expect(m.played).toBe(true);
   });
 
-  it('coins lấy bản có updated_at lớn hơn thắng; golden_pages lấy lớn hơn', () => {
+  it('coins lấy giá trị lớn hơn; data lấy bản có updated_at mới hơn; golden_pages lấy lớn hơn', () => {
     const local = progressWith({ game: { goldenPages: 2, coins: 10, data: { a: 1 }, updatedAt: 100 } });
     const remote = progressWith({ game: { goldenPages: 1, coins: 70, data: { b: 2 }, updatedAt: 200 } });
-    const m = mergeProgress(local, remote).game;
-    expect(m).toEqual({ goldenPages: 2, coins: 70, data: { b: 2 }, updatedAt: 200 });
-    const m2 = mergeProgress(
-      progressWith({ game: { goldenPages: 0, coins: 90, data: {}, updatedAt: 300 } }),
-      remote,
-    ).game;
-    expect(m2.coins).toBe(90);
+    expect(mergeProgress(local, remote).game).toEqual({ goldenPages: 2, coins: 70, data: { b: 2 }, updatedAt: 200 });
+    const newerButSmaller = progressWith({ game: { goldenPages: 0, coins: 5, data: { c: 3 }, updatedAt: 300 } });
+    const m2 = mergeProgress(newerButSmaller, remote).game;
+    expect(m2.coins).toBe(70); // bản mới hơn nhưng ít xu hơn: không làm mất xu
+    expect(m2.data).toEqual({ c: 3 }); // data thì vẫn theo bản mới hơn
+  });
+
+  it('máy A có 90 xu lúc t1; máy B có 0 xu nhưng golden_pages tăng lúc t2 > t1: gộp ra 90 xu và golden_pages theo max', () => {
+    const a = progressWith({ game: { goldenPages: 0, coins: 90, data: {}, updatedAt: 1000 } });
+    const b = progressWith({ game: { goldenPages: 1, coins: 0, data: {}, updatedAt: 2000 } });
+    for (const [x, y] of [[a, b], [b, a]] as const) {
+      const g = mergeProgress(x, y).game;
+      expect(g.coins).toBe(90);
+      expect(g.goldenPages).toBe(1);
+    }
   });
 
   it('best_score lấy max; màn chỉ có ở một phía được giữ; không sửa đầu vào', () => {
@@ -192,7 +200,7 @@ describe('cookie dạng gọn', () => {
     expect(raw.length).toBeLessThan(1024);
     expect(encodeURIComponent(raw).length).toBeLessThan(1024);
     expect(buildCookie('sc_guest', raw).length).toBeLessThan(1024);
-    const pending = encodePending(p, '3f2b8c1e-0000-4000-8000-123456789abc');
+    const pending = encodePendingMap({ '3f2b8c1e-0000-4000-8000-123456789abc': { progress: p, t: T0 } });
     expect(encodeURIComponent(pending).length).toBeLessThan(1024);
   });
 
@@ -211,14 +219,42 @@ describe('cookie dạng gọn', () => {
     expect(p.game.coins).toBe(0);
   });
 
-  it('sc_pending: giữ chủ; thiếu chủ hoặc sai phiên bản thì null', () => {
+  it('sc_pending dạng map: giữ từng chủ; chuỗi hỏng thì map rỗng, mục hỏng bị bỏ qua', () => {
     const p = recordLevelResult(emptyProgress(), 4, { stars: { de: 1, tb: 1, kho: 1 } }, T0).progress;
-    const d = decodePending(encodePending(p, 'user-b'));
-    expect(d?.owner).toBe('user-b');
-    expect(d?.progress.levels[4].completed).toBe(true);
-    expect(decodePending(encodeProgress(p))).toBeNull();
-    expect(decodePending('hong')).toBeNull();
-    expect(decodePending(null)).toBeNull();
+    const raw = encodePendingMap({ 'user-b': { progress: p, t: 5 }, 'user-c': { progress: emptyProgress(), t: 9 } });
+    const d = decodePendingMap(raw);
+    expect(Object.keys(d).sort()).toEqual(['user-b', 'user-c']);
+    expect(d['user-b'].progress.levels[4].completed).toBe(true);
+    expect(d['user-b'].t).toBe(5);
+    expect(decodePendingMap(encodeProgress(p))).toEqual({}); // dạng cũ (không phải map)
+    for (const bad of ['hong', null, undefined, '', '[]', 'null', '{"u":1}', '{"u":{"v":2,"lv":{}}}']) {
+      expect(decodePendingMap(bad as string), String(bad)).toEqual({});
+    }
+    expect(Object.keys(decodePendingMap('{"ok":' + encodeProgress(p) + ',"xau":{"v":9}}'))).toEqual(['ok']);
+  });
+
+  it('sc_pending quá 3 KB thì bỏ bản cũ nhất, giữ bản mới nhất', () => {
+    const full = (): Progress => {
+      let p = emptyProgress();
+      for (const l of LEVELS) {
+        p = recordLevelResult(
+          p,
+          l.id,
+          l.kind === 'lesson' ? { stars: { de: 3, tb: 3, kho: 3 } } : { stars: { game: 3 }, score: 99999, completed: true },
+          T0,
+        ).progress;
+      }
+      return p;
+    };
+    const entries: Record<string, { progress: Progress; t: number }> = {};
+    for (let i = 0; i < 8; i++) entries[`aaaaaaaa-0000-4000-8000-00000000000${i}`] = { progress: full(), t: 1000 + i };
+    const raw = encodePendingMap(entries);
+    expect(encodeURIComponent(raw).length).toBeLessThanOrEqual(PENDING_MAX_BYTES);
+    const kept = Object.keys(decodePendingMap(raw));
+    expect(kept.length).toBeGreaterThan(0);
+    expect(kept.length).toBeLessThan(8);
+    expect(kept).toContain('aaaaaaaa-0000-4000-8000-000000000007'); // mới nhất còn
+    expect(kept).not.toContain('aaaaaaaa-0000-4000-8000-000000000000'); // cũ nhất bị bỏ
   });
 });
 

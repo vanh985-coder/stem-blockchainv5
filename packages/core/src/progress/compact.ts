@@ -80,14 +80,49 @@ function parseShape(raw: string | null | undefined): CompactShape | null {
   }
 }
 
-/** Bản tóm tắt chờ đẩy (cookie sc_pending): giống dạng gọn, thêm "o" = userId của chủ. */
-export function encodePending(p: Progress, owner: string, levels: readonly LevelDef[] = LEVELS): string {
-  return JSON.stringify({ ...toShape(p, levels), o: owner });
+/** Một phần chờ đẩy trong sc_pending: tiến độ tóm tắt của một người, và lúc ghi (để bỏ bản cũ nhất khi cookie quá lớn). */
+export interface PendingEntry {
+  progress: Progress;
+  /** Lúc ghi, mili giây */
+  t: number;
 }
 
-/** Đọc sc_pending: trả chủ và tiến độ; hỏng thì null. */
-export function decodePending(raw: string | null | undefined, levels: readonly LevelDef[] = LEVELS): { owner: string; progress: Progress } | null {
-  const s = parseShape(raw);
-  if (!s || !s.o) return null;
-  return { owner: s.o, progress: fromShape(s, levels) };
+/** Cookie sc_pending không được vượt 3 KB (sau khi mã hóa %): vượt thì bỏ bản cũ nhất. */
+export const PENDING_MAX_BYTES = 3072;
+
+/**
+ * sc_pending dạng map { "<userId>": bản tóm tắt gọn + "t" }. Nhiều học sinh dùng chung máy không ghi đè lên nhau.
+ * Mục hỏng bị bỏ qua; cả chuỗi hỏng thì trả map rỗng.
+ */
+export function decodePendingMap(raw: string | null | undefined, levels: readonly LevelDef[] = LEVELS): Record<string, PendingEntry> {
+  const out: Record<string, PendingEntry> = {};
+  if (!raw) return out;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return out;
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return out;
+  for (const [owner, value] of Object.entries(parsed as Record<string, unknown>)) {
+    const shape = parseShape(JSON.stringify(value));
+    if (!shape) continue;
+    const t = (value as { t?: unknown }).t;
+    out[owner] = { progress: fromShape(shape, levels), t: int(t) };
+  }
+  return out;
+}
+
+/** Map thành chuỗi. Quá 3 KB thì bỏ lần lượt bản cũ nhất (không bỏ bản mới nhất). */
+export function encodePendingMap(
+  entries: Record<string, PendingEntry>,
+  levels: readonly LevelDef[] = LEVELS,
+  maxBytes: number = PENDING_MAX_BYTES,
+): string {
+  const owners = Object.keys(entries).sort((a, b) => entries[a].t - entries[b].t); // cũ nhất trước
+  const build = (list: string[]) =>
+    JSON.stringify(Object.fromEntries(list.map((o) => [o, { ...toShape(entries[o].progress, levels), t: entries[o].t }])));
+  let list = owners;
+  while (list.length > 1 && encodeURIComponent(build(list)).length > maxBytes) list = list.slice(1);
+  return build(list);
 }

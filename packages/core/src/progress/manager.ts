@@ -1,4 +1,4 @@
-import { decodePending, decodeProgress, encodePending, encodeProgress } from './compact';
+import { decodePendingMap, decodeProgress, encodePendingMap, encodeProgress } from './compact';
 import { GUEST_COOKIE, PENDING_COOKIE } from './cookies';
 import { mergeProgress, sameGame, sameLevel } from './merge';
 import { recordLevelResult, unlockOf, withGoldenPages, type ProgressOptions } from './record';
@@ -149,8 +149,8 @@ export class ProgressManager {
     this.mode = 'user';
     this.progress = this.loadLocal(userId);
     // sc_pending chỉ dùng nếu đúng chủ
-    const pending = decodePending(this.deps.cookies.get(PENDING_COOKIE), this.opts.levels);
-    if (pending && pending.owner === userId) {
+    const pending = this.readPendingMap()[userId];
+    if (pending) {
       this.progress = mergeProgress(this.progress, pending.progress);
       this.pendingMerged = true;
     }
@@ -246,11 +246,31 @@ export class ProgressManager {
     if (this.userId !== userId) return true;
     this.remoteCopy = mergeProgress(base, snapshot);
     if (this.pendingMerged) {
-      const p = decodePending(this.deps.cookies.get(PENDING_COOKIE), this.opts.levels);
-      if (p && p.owner === userId) this.deps.cookies.remove(PENDING_COOKIE);
+      this.removePending(userId);
       this.pendingMerged = false;
     }
     return true;
+  }
+
+  // ---------- sc_pending: map { userId: bản tóm tắt } ----------
+  private readPendingMap() {
+    return decodePendingMap(this.deps.cookies.get(PENDING_COOKIE), this.opts.levels);
+  }
+
+  /** Ghi phần chưa lưu của một người, giữ nguyên phần của người khác. Quá 3 KB thì bỏ bản cũ nhất. */
+  private writePending(userId: string): void {
+    const map = this.readPendingMap();
+    map[userId] = { progress: this.progress, t: this.now() };
+    this.deps.cookies.set(PENDING_COOKIE, encodePendingMap(map, this.opts.levels));
+  }
+
+  /** Xóa phần của đúng người này; phần của người khác giữ nguyên. Hết phần nào thì xóa hẳn cookie. */
+  private removePending(userId: string): void {
+    const map = this.readPendingMap();
+    if (!(userId in map)) return;
+    delete map[userId];
+    if (Object.keys(map).length === 0) this.deps.cookies.remove(PENDING_COOKIE);
+    else this.deps.cookies.set(PENDING_COOKIE, encodePendingMap(map, this.opts.levels));
   }
 
   // ---------- khi chơi ----------
@@ -280,12 +300,11 @@ export class ProgressManager {
     this.saving = false;
     if (result === true) {
       // Đã lên server đủ: bản tóm tắt sc_pending của chính người này (nếu còn) không cần nữa.
-      const p = decodePending(this.deps.cookies.get(PENDING_COOKIE), this.opts.levels);
-      if (p && p.owner === userId) this.deps.cookies.remove(PENDING_COOKIE);
+      this.removePending(userId);
       this.emit();
       return 'saved';
     }
-    this.deps.cookies.set(PENDING_COOKIE, encodePending(this.progress, userId, this.opts.levels));
+    this.writePending(userId);
     this.emit();
     return 'pending';
   }
@@ -336,10 +355,14 @@ export class ProgressManager {
     const userId = this.userId;
     if (this.mode !== 'user' || !userId) return;
     this.cancelTimer();
-    await withTimeout(this.flush(), SIGN_OUT_FLUSH_MS);
+    const flushed = await withTimeout(this.flush(), SIGN_OUT_FLUSH_MS);
+    if (flushed === true) {
+      this.removePending(userId); // đã lên server đủ, không còn gì chờ
+    } else if (hasProgress(this.progress)) {
+      // Chưa đẩy xong (mất mạng): giữ phần chưa lưu trong sc_pending của người này trước khi xóa localStorage.
+      this.writePending(userId);
+    }
     this.deps.store.remove(userKey(userId));
-    const pending = decodePending(this.deps.cookies.get(PENDING_COOKIE), this.opts.levels);
-    if (pending && pending.owner === userId) this.deps.cookies.remove(PENDING_COOKIE);
     this.userId = null;
     this.mode = 'loading';
     this.progress = emptyProgress();

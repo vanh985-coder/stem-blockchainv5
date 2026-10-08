@@ -19,12 +19,13 @@ export function mergeLevel(a: LevelProgress, b: LevelProgress): LevelProgress {
 }
 
 export function mergeGame(local: GameState, remote: GameState): GameState {
-  // coins và data: lấy nguyên bản có updatedAt mới hơn (bằng nhau thì lấy bản của server).
+  // data: lấy nguyên bản có updatedAt mới hơn (bằng nhau thì lấy bản của server).
+  // coins: lấy giá trị lớn hơn (xu chỉ tăng, chưa có chỗ tiêu). Nếu sau này có cửa hàng thì phải xem lại.
   const localNewer = local.updatedAt > remote.updatedAt;
   const winner = localNewer ? local : remote;
   return {
     goldenPages: Math.max(local.goldenPages, remote.goldenPages),
-    coins: winner.coins,
+    coins: Math.max(local.coins, remote.coins),
     data: winner.data,
     updatedAt: Math.max(local.updatedAt, remote.updatedAt),
   };
@@ -35,7 +36,7 @@ export function mergeGame(local: GameState, remote: GameState): GameState {
  * - sao từng trạm, best_score: lấy giá trị lớn hơn;
  * - played, completed: bên nào true thì true;
  * - golden_pages: lấy giá trị lớn hơn;
- * - coins, data: lấy bản có updated_at mới hơn.
+ * - coins: lấy giá trị lớn hơn; data: lấy bản có updated_at mới hơn.
  * Không sửa dữ liệu đầu vào.
  */
 export function mergeProgress(local: Progress, remote: Progress): Progress {

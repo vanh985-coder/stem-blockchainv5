@@ -280,10 +280,12 @@ Chưa kéo về xong thì không đẩy gì lên.
 **Xong một màn thì lưu ngay, không đợi 2 giây:**
 - Hiện "Đang lưu…", đẩy lên server, **chờ xong** mới cho bấm "Về bản đồ", "Về chợ" hay "Về làng".
 - Quá 5 giây hoặc mất mạng: ghi bản tóm tắt tiến độ vào cookie `sc_pending` (tên miền cha `VITE_COOKIE_DOMAIN`), rồi mới cho rời trang. Trang nào mở ra cũng đọc `sc_pending`, đẩy lên khi có mạng, xong thì xóa.
+- **`sc_pending` có dạng map** `{"<userId>": bản tóm tắt}`, để nhiều học sinh dùng chung máy không ghi đè lên nhau. Cookie vượt 3 KB thì bỏ bản cũ nhất.
+- Chỉ đẩy và xóa phần có `userId` trùng người đang đăng nhập; phần của người khác giữ nguyên.
 
 **Tiến độ chơi thử lưu trong cookie `sc_guest`** trên tên miền cha, **không** dùng `localStorage`, để bản đồ ở hub đọc được tiến độ chơi ở làng.
 - **Dạng gọn:** `{"v":1,"lv":{"1":[1,1,3,2,1]},"gp":1,"c":40}`, gồm: đã chơi, xong, sao ba trạm (hoặc mốc điểm), Trang Sổ Vàng, xu. Cả 12 màn dưới 1 KB, dưới giới hạn 4 KB của cookie.
-- **Thuộc tính cookie:** `Path=/; SameSite=Lax; Secure`; giữ 180 ngày.
+- **Thuộc tính cookie:** `Path=/; SameSite=Lax; Secure khi chạy https`; giữ 180 ngày.
 - Mọi quy tắc "tách theo chủ" ở trên áp dụng y nguyên. Khi đăng nhập thì hỏi gộp; gộp hay không đều xóa `sc_guest`.
 - **Đường lui:** nếu chưa kịp làm phần cookie, ẩn nút "Chơi thử" ở mốc 1 (trên lớp học sinh đều đăng nhập).
 
@@ -294,7 +296,8 @@ Chưa kéo về xong thì không đẩy gì lên.
 | Sao từng trạm, `best_score` | Lấy giá trị lớn hơn |
 | `played`, `completed` | Bên nào là `true` thì lấy `true` |
 | `golden_pages` | Lấy giá trị lớn hơn |
-| `coins`, `data` | Lấy bản có `updated_at` mới hơn |
+| `coins` | Lấy giá trị lớn hơn (xu chỉ tăng, không có chỗ tiêu; nếu sau này có cửa hàng thì xem lại) |
+| `data` | Lấy bản có `updated_at` mới hơn |
 
 **Chơi thử rồi mới đăng nhập:**
 - **Không tự gộp.** Nếu cookie `sc_guest` có tiến độ, hỏi: "Trên máy này có tiến độ chơi thử. Gộp vào tài khoản của em không? Nếu đây không phải tiến độ của em, chọn Không gộp."
@@ -302,7 +305,7 @@ Chưa kéo về xong thì không đẩy gì lên.
 - **Không gộp:** xóa bản chơi thử.
 - Cả hai trường hợp đều xóa bản chơi thử, để học sinh sau ngồi cùng máy không bị hỏi lại.
 
-**Đăng xuất:** xóa `sochung.v3.u.<userId>` trên máy, rồi mới thoát phiên.
+**Đăng xuất:** cố đẩy nốt thay đổi đang chờ (tối đa 3 giây). Nếu vẫn chưa đẩy xong (mất mạng), ghi phần chưa lưu vào `sc_pending` (phần của đúng người này). Sau đó xóa `sochung.v3.u.<userId>` trên máy, rồi mới thoát phiên. Lần đăng nhập sau của người đó, có mạng, sẽ đẩy phần trong `sc_pending` lên rồi xóa.
 
 **Câu trả lời trắc nghiệm:** mỗi câu ghi một dòng vào `quiz_answers` (chơi thử thì không ghi).
 
@@ -339,7 +342,7 @@ Học sinh THPT phần lớn chưa đủ 18 tuổi, nên **thu ít dữ liệu n
 | Có bản chơi thử, B đăng nhập, chọn "Không gộp" | Tiến độ của B không đổi; bản chơi thử bị xóa |
 | Có bản chơi thử, chọn "Gộp" | Tiến độ được gộp vào; bản chơi thử bị xóa |
 | Đăng xuất | `sochung.v3.u.<id>` không còn |
-| Mở app, server có `coins` mới hơn bản trên máy | Lấy theo server; không đẩy bản cũ đè lên |
+| Mở app, server có `coins` lớn hơn bản trên máy | Lấy theo server; không đẩy bản cũ đè lên |
 
 - **`mergeProgress`:**
 
@@ -347,7 +350,7 @@ Học sinh THPT phần lớn chưa đủ 18 tuổi, nên **thu ít dữ liệu n
 |---|---|
 | Sao `{de:2}` gộp với `{de:3, tb:1}` | `{de:3, tb:1}` |
 | `completed` false gộp với true | `true` |
-| `coins` lấy bản mới hơn | Bản có `updated_at` lớn hơn thắng |
+| `coins` lấy giá trị lớn hơn | Máy A có 90 xu lúc t1; máy B có 0 xu nhưng `golden_pages` tăng lúc t2 > t1: gộp ra 90 xu, `golden_pages` theo max |
 
 - **Thử RLS** (ghi kết quả vào phần tóm tắt cuối):
   1. Học sinh A không đọc được tiến độ của học sinh B.

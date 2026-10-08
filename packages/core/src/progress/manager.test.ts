@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { decodePending, decodeProgress, encodePending, encodeProgress } from './compact';
+import { decodePendingMap, decodeProgress, encodePendingMap, encodeProgress } from './compact';
 import { GUEST_COOKIE, PENDING_COOKIE } from './cookies';
 import {
   ProgressManager,
@@ -80,6 +80,9 @@ function setup() {
 }
 
 const lesson = (m: ProgressManager, id = 1) => m.record(id, { stars: { de: 3, tb: 3, kho: 3 } });
+const pendingOf = (cookies: FakeCookies) => decodePendingMap(cookies.get(PENDING_COOKIE));
+const putPending = (cookies: FakeCookies, owner: string, p: Progress, t = T0) =>
+  cookies.set(PENDING_COOKIE, encodePendingMap({ ...pendingOf(cookies), [owner]: { progress: p, t } }));
 const A = 'aaaaaaaa-0000-4000-8000-000000000001';
 const B = 'bbbbbbbb-0000-4000-8000-000000000002';
 
@@ -168,30 +171,88 @@ describe('Tách dữ liệu theo chủ (bảng spec 02, phần Test)', () => {
     expect(remote.account(B).levels[4].stars).toEqual({ de: 2, tb: 2, kho: 2 });
   });
 
-  it('4. đăng xuất: sochung.v3.u.<id> không còn (và sc_pending của người đó)', async () => {
-    const { remote, store, cookies, make } = setup();
+  it('4. đăng xuất: sochung.v3.u.<id> không còn', async () => {
+    const { store, cookies, make } = setup();
     const m = make();
     await m.setUser(A);
     lesson(m);
     expect(store.get(userKey(A))).not.toBeNull();
     expect(JSON.parse(store.get(userKey(A))!).owner).toBe(A);
-    remote.online = false;
-    expect(await m.saveNow()).toBe('pending');
-    expect(cookies.get(PENDING_COOKIE)).not.toBeNull();
+    expect(await m.saveNow()).toBe('saved'); // có mạng: đã lên server
     await m.prepareSignOut();
     expect(store.get(userKey(A))).toBeNull();
-    expect(cookies.get(PENDING_COOKIE)).toBeNull();
+    expect(cookies.get(PENDING_COOKIE)).toBeNull(); // không còn gì chờ
     expect(m.getSnapshot().userId).toBeNull();
   });
 
-  it('4b. đăng xuất không xóa sc_pending của người khác', async () => {
+  it('4b. đăng xuất không xóa phần sc_pending của người khác', async () => {
     const { store, cookies, make } = setup();
-    cookies.set(PENDING_COOKIE, encodePending(recordLevelResult(emptyProgress(), 1, { stars: { de: 3 } }, T0).progress, B));
+    putPending(cookies, B, recordLevelResult(emptyProgress(), 1, { stars: { de: 3 } }, T0).progress);
     const m = make();
     await m.setUser(A);
     await m.prepareSignOut();
-    expect(cookies.get(PENDING_COOKIE)).not.toBeNull();
+    expect(Object.keys(pendingOf(cookies))).toEqual([B]);
     expect(store.get(userKey(A))).toBeNull();
+  });
+
+  it('4c. đăng xuất lúc mất mạng: phần chưa lưu của A nằm trong sc_pending trước khi xóa localStorage', async () => {
+    const { remote, store, cookies, make } = setup();
+    const m = make();
+    await m.setUser(A);
+    remote.online = false;
+    lesson(m, 4); // chưa đẩy được
+    await m.prepareSignOut();
+    expect(store.get(userKey(A))).toBeNull();
+    const map = pendingOf(cookies);
+    expect(Object.keys(map)).toEqual([A]);
+    expect(map[A].progress.levels[4].completed).toBe(true);
+  });
+
+  it('4d. A đăng xuất lúc mất mạng, B đăng nhập: phần của A không đẩy lên B, cũng không bị xóa; A đăng nhập lại có mạng thì đẩy lên rồi xóa', async () => {
+    const { remote, cookies, make } = setup();
+    const mA = make();
+    await mA.setUser(A);
+    remote.online = false;
+    lesson(mA, 4);
+    await mA.prepareSignOut();
+    expect(Object.keys(pendingOf(cookies))).toEqual([A]);
+
+    // B dùng máy (có mạng)
+    remote.online = true;
+    const mB = make();
+    await mB.setUser(B);
+    mB.record(1, { stars: { de: 1 } });
+    await mB.saveNow();
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(remote.account(B).levels[4]).toBeUndefined();
+    expect(remote.levelPushes.filter((p) => p.userId === B).every((p) => p.levelId === 1)).toBe(true);
+    expect(Object.keys(pendingOf(cookies))).toEqual([A]); // phần của A còn nguyên, B không đụng vào
+    await mB.prepareSignOut();
+    expect(Object.keys(pendingOf(cookies))).toEqual([A]);
+
+    // A đăng nhập lại, có mạng
+    const mA2 = make();
+    await mA2.setUser(A);
+    await vi.advanceTimersByTimeAsync(100);
+    expect(remote.account(A).levels[4].completed).toBe(true);
+    expect(cookies.get(PENDING_COOKIE)).toBeNull();
+  });
+
+  it('4e. nhiều học sinh chung máy: ghi sc_pending không ghi đè lên nhau', async () => {
+    const { remote, cookies, make } = setup();
+    remote.online = false;
+    const mA = make();
+    await mA.setUser(A);
+    lesson(mA, 1);
+    expect(await mA.saveNow()).toBe('pending');
+    const mB = make();
+    await mB.setUser(B);
+    lesson(mB, 4);
+    expect(await mB.saveNow()).toBe('pending');
+    const map = pendingOf(cookies);
+    expect(Object.keys(map).sort()).toEqual([A, B].sort());
+    expect(map[A].progress.levels[1].completed).toBe(true);
+    expect(map[B].progress.levels[4].completed).toBe(true);
   });
 
   it('5. mở app, server có coins mới hơn bản trên máy: lấy theo server; không đẩy bản cũ đè lên', async () => {
@@ -304,8 +365,7 @@ describe('saveNow và sc_pending', () => {
     remote.online = false;
     lesson(m, 4);
     expect(await m.saveNow()).toBe('pending');
-    const pending = decodePending(cookies.get(PENDING_COOKIE));
-    expect(pending?.owner).toBe(A);
+    const pending = pendingOf(cookies)[A];
     expect(pending?.progress.levels[4].completed).toBe(true);
 
     // mở trang mới (máy khác nguồn: không có localStorage), đã có mạng
@@ -319,7 +379,7 @@ describe('saveNow và sc_pending', () => {
 
   it('sc_pending của chủ khác: không đọc, không đẩy, không xóa', async () => {
     const { remote, cookies, make } = setup();
-    cookies.set(PENDING_COOKIE, encodePending(recordLevelResult(emptyProgress(), 4, { stars: { de: 3, tb: 3, kho: 3 } }, T0).progress, A));
+    putPending(cookies, A, recordLevelResult(emptyProgress(), 4, { stars: { de: 3, tb: 3, kho: 3 } }, T0).progress);
     const m = make();
     await m.setUser(B);
     await vi.advanceTimersByTimeAsync(10_000);
@@ -347,7 +407,7 @@ describe('saveNow và sc_pending', () => {
     await m.setUser(A);
     lesson(m);
     expect(await m.saveNow()).toBe('pending');
-    expect(decodePending(cookies.get(PENDING_COOKIE))?.owner).toBe(A);
+    expect(Object.keys(pendingOf(cookies))).toEqual([A]);
     expect(remote.levelPushes).toEqual([]);
   });
 });
