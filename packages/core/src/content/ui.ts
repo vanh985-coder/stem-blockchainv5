@@ -241,6 +241,9 @@ export const ui = {
     /** Thanh trên cùng khi chơi thử */
     choiThu: 'Em đang chơi thử, tiến độ chỉ lưu trên máy này',
     dangNhapDeLuu: 'Đăng nhập để lưu',
+    /** Bản ngắn cho màn hình hẹp (thanh chơi thử còn một dòng) */
+    choiThuNgan: 'Đang chơi thử',
+    dangNhapNgan: 'Đăng nhập',
     /** Hỏi gộp sau khi đăng nhập, nếu máy có tiến độ chơi thử */
     hoiGop:
       'Trên máy này có tiến độ chơi thử. Gộp vào tài khoản của em không? Nếu đây không phải tiến độ của em, chọn Không gộp.',
@@ -339,6 +342,10 @@ export const ui = {
     tramDaXong: 'Trạm {tenTram}: đã xong, {sao} sao',
     tramDangLam: 'Trạm {tenTram}: đang làm',
     tramChuaToi: 'Trạm {tenTram}: chưa tới',
+    /** Trạm đã mở (trạm trước đã có sao) nhưng em chưa làm: bấm để vào */
+    tramMo: 'Trạm {tenTram}: đã mở, bấm để vào',
+    /** Trạm chưa mở: phải làm trạm liền trước trước */
+    tramKhoa: 'Trạm {tenTram}: chưa mở, cần xong trạm trước',
     /** Tên danh sách 3 trạm (đọc cho người dùng đọc màn hình) */
     cacTram: 'Các trạm của bài',
     emCoBiet: 'Em có biết?',

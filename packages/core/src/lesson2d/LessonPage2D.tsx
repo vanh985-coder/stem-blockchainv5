@@ -15,7 +15,7 @@ import { LevelIntro } from '../ui/LevelIntro';
 import { Panel } from '../ui/Panel';
 import { Stars } from '../ui/Stars';
 import type { VillageId } from '../village';
-import { dialogueFor, goldenPageAwarded, lessonStars, momentBeforeStation } from './flow';
+import { dialogueFor, finalLessonStars, goldenPageAwarded, momentBeforeStation, startStationIndex, stationOpen } from './flow';
 import { GoldenPageScene } from './GoldenPageScene';
 import { STATION_ORDER, type LessonContent, type StationId, type StationResult } from './types';
 
@@ -57,16 +57,17 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   const { progress, record, saveNow, saving, goldenPages } = useProgress();
   const manifest = useManifest();
 
-  const [stage, setStage] = useState<Stage>({ kind: 'dialogue', idx: 0 });
+  // Vào lại màn: bắt đầu ở trạm đầu tiên chưa có sao (đã xong cả 3 thì ở trạm Dễ).
+  const [stage, setStage] = useState<Stage>(() => ({ kind: 'dialogue', idx: startStationIndex(progress.levels[levelId]?.stars ?? {}) }));
   const [attempt, setAttempt] = useState(0);
   const [showCards, setShowCards] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
   const [awardNow, setAwardNow] = useState(false);
 
   // Dữ liệu của lần học này: số xu nhận được, thời gian, sao từng trạm, số Trang Sổ Vàng trước khi học.
-  const run = useRef({ coins: 0, timeMs: 0, stars: {} as Partial<Record<StationId, number>>, goldenBefore: goldenPages });
-
   const saved = progress.levels[levelId]?.stars ?? {};
+  // `base`: sao đã có trước lần học này (để tính sao chung của bài khi chỉ học lại một vài trạm).
+  const run = useRef({ coins: 0, timeMs: 0, stars: {} as Partial<Record<StationId, number>>, base: saved as Partial<Record<StationId, number>>, goldenBefore: goldenPages });
   const bg = useMemo(() => (manifest ? asset(background) : null), [manifest, background]);
 
   // Mỗi lần đổi bước thì cuộn lên đầu trang.
@@ -74,6 +75,15 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [stageKey]);
+
+  // Bài không có lời ở thời điểm này (ví dụ Bài 2 không có lời trước trạm Trung bình) thì đi thẳng bước kế.
+  useEffect(() => {
+    if (stage.kind === 'dialogue' && dialogueFor(content.dialogue, momentBeforeStation(stage.idx)).length === 0) {
+      setStage({ kind: 'intro', idx: stage.idx });
+    } else if (stage.kind === 'outro' && dialogueFor(content.dialogue, 'cuoiBai').length === 0) {
+      setStage({ kind: 'complete' });
+    }
+  }, [stage, content.dialogue]);
 
   // Xong trạm thứ 3: lưu ngay, chờ xong mới đi tiếp ("Đang lưu…").
   const savingStarted = useRef(-1);
@@ -89,11 +99,26 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
     })();
   }, [stage.kind, attempt, saveNow, villageIndex]);
 
-  const restart = () => {
-    run.current = { coins: 0, timeMs: 0, stars: {}, goldenBefore: progressManager.getSnapshot().progress.game.goldenPages };
+  /** Bắt đầu một lần học mới từ trạm `idx` (Chơi lại, hoặc chọn trạm trên thanh trên). */
+  const startAt = (idx: number) => {
+    const snap = progressManager.getSnapshot().progress;
+    run.current = { coins: 0, timeMs: 0, stars: {}, base: snap.levels[levelId]?.stars ?? {}, goldenBefore: snap.game.goldenPages };
     setAttempt((a) => a + 1);
     setAwardNow(false);
-    setStage({ kind: 'dialogue', idx: 0 });
+    setStage({ kind: 'dialogue', idx });
+  };
+  const restart = () => startAt(startStationIndex(progressManager.getSnapshot().progress.levels[levelId]?.stars ?? {}));
+
+  // Đang làm dở hoặc đang xem kết quả trạm thì được chọn trạm khác; lúc lưu, nói lời kết, nhận trang thì không.
+  const canPick = stage.kind === 'dialogue' || stage.kind === 'intro' || stage.kind === 'play' || stage.kind === 'stationDone' || stage.kind === 'complete';
+  const pickStation = (i: number) => {
+    if (!canPick || !stationOpen(saved, i)) return;
+    if (stage.kind === 'complete') startAt(i);
+    else {
+      // Giữ nguyên lần học đang chạy (xu, thời gian), chỉ đổi trạm và dựng lại trạm từ đầu.
+      setAttempt((a) => a + 1);
+      setStage({ kind: 'dialogue', idx: i });
+    }
   };
 
   const onStationComplete = (idx: number, r: StationResult) => {
@@ -110,13 +135,10 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
 
   let body: ReactNode = null;
   if (stage.kind === 'dialogue') {
-    body = (
+    const turns = dialogueFor(content.dialogue, momentBeforeStation(stage.idx));
+    body = turns.length === 0 ? null : (
       <div className="mx-auto w-full max-w-2xl">
-        <DialogueBox
-          key={`d${attempt}-${stage.idx}`}
-          turns={dialogueFor(content.dialogue, momentBeforeStation(stage.idx))}
-          onFinish={() => setStage({ kind: 'intro', idx: stage.idx })}
-        />
+        <DialogueBox key={`d${attempt}-${stage.idx}`} turns={turns} onFinish={() => setStage({ kind: 'intro', idx: stage.idx })} />
       </div>
     );
   } else if (stage.kind === 'intro') {
@@ -167,16 +189,17 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
       </Panel>
     );
   } else if (stage.kind === 'outro') {
-    body = (
+    const turns = dialogueFor(content.dialogue, 'cuoiBai');
+    body = turns.length === 0 ? null : (
       <div className="mx-auto w-full max-w-2xl">
-        <DialogueBox key={`o${attempt}`} turns={dialogueFor(content.dialogue, 'cuoiBai')} onFinish={() => setStage({ kind: 'complete' })} />
+        <DialogueBox key={`o${attempt}`} turns={turns} onFinish={() => setStage({ kind: 'complete' })} />
       </div>
     );
   } else if (stage.kind === 'complete') {
     body = (
       <>
         <LevelComplete
-          stars={lessonStars(run.current.stars)}
+          stars={finalLessonStars(run.current.base, run.current.stars)}
           coinsEarned={run.current.coins}
           timeSpentSec={Math.round(run.current.timeMs / 1000)}
           keyTakeaway={fmt(content.keyTakeaway)}
@@ -204,48 +227,78 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   return (
     <div className="min-h-screen bg-giay bg-cover bg-center" style={bg ? { backgroundImage: `url("${bg}")` } : undefined}>
       <div className="min-h-screen bg-giay/55">
-        <GuestBar />
-        <header className="mx-auto flex w-full max-w-4xl flex-wrap items-center gap-x-3 gap-y-2 p-2 sm:p-3">
-          <div className="min-w-0 flex-1 basis-full sm:basis-auto">
-            <h1 className="truncate font-display text-xl font-extrabold sm:text-2xl">{level ? fmt(level.ten) : ''}</h1>
+        <GuestBar compact />
+        <header className="mx-auto flex w-full max-w-4xl flex-wrap items-center gap-x-3 gap-y-2 p-2 sm:p-3 max-[480px]:flex-nowrap max-[480px]:gap-1.5 max-[480px]:px-2 max-[480px]:py-1">
+          <div className="min-w-0 flex-1 basis-full sm:basis-auto max-[480px]:basis-0">
+            <h1 className="truncate font-display text-xl font-extrabold sm:text-2xl max-[480px]:line-clamp-2 max-[480px]:whitespace-normal max-[480px]:text-[0.8125rem] max-[480px]:leading-tight">
+              {level ? fmt(level.ten) : ''}
+            </h1>
           </div>
-          <ol className="flex flex-1 items-stretch justify-center gap-1.5 sm:justify-start" aria-label={ui.baiHoc.cacTram}>
+          <ol className="flex flex-1 items-stretch justify-center gap-1.5 sm:justify-start max-[480px]:flex-none max-[480px]:gap-0.5" aria-label={ui.baiHoc.cacTram}>
             {STATION_ORDER.map((id, i) => {
               const n = saved[id] ?? 0;
               const current = currentIdx === i && stage.kind !== 'complete';
-              const label =
-                n > 0 && !current
+              const open = stationOpen(saved, i);
+              const label = current
+                ? fmt(ui.baiHoc.tramDangLam, { tenTram: TEN_TRAM[id] })
+                : n > 0
                   ? fmt(ui.baiHoc.tramDaXong, { tenTram: TEN_TRAM[id], sao: n })
-                  : current
-                    ? fmt(ui.baiHoc.tramDangLam, { tenTram: TEN_TRAM[id] })
-                    : fmt(ui.baiHoc.tramChuaToi, { tenTram: TEN_TRAM[id] });
+                  : open
+                    ? fmt(ui.baiHoc.tramMo, { tenTram: TEN_TRAM[id] })
+                    : fmt(ui.baiHoc.tramKhoa, { tenTram: TEN_TRAM[id] });
+              const icon = current ? '▶' : n > 0 ? '✓' : open ? '' : '🔒';
               return (
-                <li
-                  key={id}
-                  aria-label={label}
-                  aria-current={current ? 'step' : undefined}
-                  className={`flex min-w-[5.5rem] flex-1 flex-col items-center rounded-nut border-2 px-2 py-1 text-center sm:flex-none ${
-                    current ? 'border-muc-tim bg-muc-tim/15' : n > 0 ? 'border-xanh-la-dam bg-giay/90' : 'border-dashed border-nau-go bg-giay/70'
-                  }`}
-                >
-                  <span className="font-display text-sm font-extrabold leading-tight">
-                    <span aria-hidden="true">{current ? '▶ ' : n > 0 ? '✓ ' : ''}</span>
-                    {TEN_TRAM[id]}
-                  </span>
-                  <Stars earned={n} size="sm" />
+                <li key={id} className="flex min-[480px]:min-w-[5.5rem] min-[480px]:flex-1 sm:flex-none">
+                  <button
+                    type="button"
+                    aria-label={label}
+                    aria-current={current ? 'step' : undefined}
+                    disabled={!open || !canPick}
+                    onClick={() => pickStation(i)}
+                    className={`flex min-h-11 w-full flex-col items-center justify-center rounded-nut border-2 px-2 py-1 text-center focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim max-[480px]:min-w-0 max-[480px]:px-0.5 max-[480px]:py-0.5 ${
+                      current
+                        ? 'border-muc-tim bg-muc-tim/15'
+                        : n > 0
+                          ? 'border-xanh-la-dam bg-giay/90'
+                          : open
+                            ? 'border-nau-go bg-giay/90'
+                            : 'border-dashed border-nau-go bg-giay/70'
+                    } ${open && canPick && !current ? 'cursor-pointer' : 'cursor-default'}`}
+                  >
+                    <span className="font-display text-sm font-extrabold leading-tight">
+                      <span aria-hidden="true" className="max-[480px]:block max-[480px]:h-4 max-[480px]:text-xs max-[480px]:leading-4">
+                        {icon}
+                        <span className="min-[480px]:hidden">{icon ? '' : ' '}</span>
+                      </span>
+                      <span className="max-[480px]:hidden">
+                        {icon ? ' ' : ''}
+                        {TEN_TRAM[id]}
+                      </span>
+                    </span>
+                    <span className="max-[480px]:hidden">
+                      <Stars earned={n} size="sm" />
+                    </span>
+                    <span className="hidden max-[480px]:block">
+                      <Stars earned={n} size="xs" />
+                    </span>
+                  </button>
                 </li>
               );
             })}
           </ol>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 max-[480px]:gap-1">
             {content.emCoBiet.length > 0 && (
-              <Button variant="secondary" size="sm" onClick={() => setShowCards(true)}>
-                {ui.baiHoc.emCoBiet}
-              </Button>
+              <>
+                <Button variant="secondary" size="sm" className="max-[480px]:hidden" onClick={() => setShowCards(true)}>
+                  {ui.baiHoc.emCoBiet}
+                </Button>
+                <IconButton label={ui.baiHoc.emCoBiet} icon="💡" onClick={() => setShowCards(true)} />
+              </>
             )}
-            <Button variant="secondary" size="sm" disabled={saving} onClick={goMap}>
+            <Button variant="secondary" size="sm" className="max-[480px]:hidden" disabled={saving} onClick={goMap}>
               {ui.baiHoc.veBanDo}
             </Button>
+            <IconButton label={ui.baiHoc.veBanDo} icon="🗺️" disabled={saving} onClick={goMap} />
           </div>
         </header>
 
@@ -254,6 +307,22 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
 
       {showCards && <CardsDialog cards={content.emCoBiet} onClose={() => setShowCards(false)} />}
     </div>
+  );
+}
+
+/** Nút biểu tượng cho màn hình hẹp (dưới 480px): vùng bấm 44px, có nhãn đọc cho người dùng đọc màn hình. */
+function IconButton({ label, icon, onClick, disabled }: { label: string; icon: string; onClick: () => void; disabled?: boolean }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      disabled={disabled}
+      onClick={onClick}
+      className="hidden size-11 shrink-0 cursor-pointer place-items-center rounded-nut border-2 border-nau-go bg-giay text-xl shadow-[0_3px_0_0_var(--color-nau-go)] active:translate-y-[2px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim max-[480px]:grid"
+    >
+      <span aria-hidden="true">{icon}</span>
+    </button>
   );
 }
 

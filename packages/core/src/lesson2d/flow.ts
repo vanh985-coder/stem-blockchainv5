@@ -46,3 +46,28 @@ export function applyStationResult(
 ): { progress: Progress; coinsEarned: number } {
   return recordLevelResult(progress, levelId, { stars: { [station]: stars } as Stars }, now, opts);
 }
+
+type SavedStars = Partial<Record<StationId, number>>;
+
+/** Hàm thuần: trạm bắt đầu khi vào lại màn = trạm đầu tiên chưa có sao; đã xong cả 3 thì bắt đầu ở trạm Dễ (0). */
+export function startStationIndex(saved: SavedStars): number {
+  const i = STATION_ORDER.findIndex((id) => (saved[id] ?? 0) <= 0);
+  return i === -1 ? 0 : i;
+}
+
+/**
+ * Hàm thuần: trạm thứ index có bấm chọn được không?
+ * Trạm Dễ luôn mở. Trạm khác mở khi chính nó đã có sao hoặc trạm liền trước đã có sao.
+ */
+export function stationOpen(saved: SavedStars, index: number): boolean {
+  if (index < 0 || index >= STATION_ORDER.length) return false;
+  if (index === 0) return true;
+  return (saved[STATION_ORDER[index]] ?? 0) > 0 || (saved[STATION_ORDER[index - 1]] ?? 0) > 0;
+}
+
+/** Hàm thuần: sao của cả bài khi xong, gộp sao lần học này với sao đã có từ trước (trạm không học lần này lấy sao cũ). */
+export function finalLessonStars(base: SavedStars, thisRun: SavedStars): 1 | 2 | 3 {
+  const merged: SavedStars = {};
+  for (const id of STATION_ORDER) merged[id] = thisRun[id] ?? base[id] ?? 0;
+  return lessonStars(merged);
+}

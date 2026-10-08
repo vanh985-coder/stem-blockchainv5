@@ -4,7 +4,16 @@ import { GUEST_COOKIE } from '../progress/cookies';
 import { ProgressManager, type CookieJar, type KeyValueStore, type RemoteApi } from '../progress/manager';
 import { doneLevels } from '../progress/record';
 import { emptyProgress } from '../progress/types';
-import { applyStationResult, dialogueFor, goldenPageAwarded, lessonStars, momentBeforeStation } from './flow';
+import {
+  applyStationResult,
+  dialogueFor,
+  finalLessonStars,
+  goldenPageAwarded,
+  lessonStars,
+  momentBeforeStation,
+  startStationIndex,
+  stationOpen,
+} from './flow';
 import type { LessonDialogue } from './types';
 
 const T0 = 1_700_000_000_000;
@@ -128,5 +137,39 @@ describe('ghi tiến độ từng trạm', () => {
     // học lại trạm Dễ với cùng sao: không cộng xu
     expect(m2.record(1, { stars: { de: 3 } }).coinsEarned).toBe(0);
     expect(m2.getSnapshot().progress.game.coins).toBe(30);
+  });
+});
+
+describe('chọn trạm khi vào lại màn', () => {
+  it('bắt đầu ở trạm đầu tiên chưa có sao; xong cả 3 thì ở trạm Dễ', () => {
+    expect(startStationIndex({})).toBe(0);
+    expect(startStationIndex({ de: 2 })).toBe(1);
+    expect(startStationIndex({ de: 3, tb: 1 })).toBe(2);
+    expect(startStationIndex({ de: 3, tb: 3, kho: 1 })).toBe(0);
+    expect(startStationIndex({ de: 0, tb: 3 })).toBe(0); // trạm Dễ chưa có sao
+    expect(startStationIndex({ de: 1, tb: 0, kho: 3 })).toBe(1);
+  });
+
+  it('trạm bấm được khi chính nó đã có sao hoặc trạm liền trước đã có sao', () => {
+    expect(stationOpen({}, 0)).toBe(true);
+    expect(stationOpen({}, 1)).toBe(false);
+    expect(stationOpen({}, 2)).toBe(false);
+    expect(stationOpen({ de: 1 }, 1)).toBe(true);
+    expect(stationOpen({ de: 1 }, 2)).toBe(false); // tb chưa có sao
+    expect(stationOpen({ de: 1, tb: 2 }, 2)).toBe(true);
+    expect(stationOpen({ tb: 2 }, 1)).toBe(true); // chính nó đã có sao
+    expect(stationOpen({ kho: 1 }, 2)).toBe(true); // chính nó đã có sao dù tb chưa có
+    expect(stationOpen({ de: 3, tb: 3, kho: 3 }, 0)).toBe(true);
+  });
+
+  it('chỉ số ngoài khoảng thì không mở', () => {
+    expect(stationOpen({ de: 3 }, 3)).toBe(false);
+    expect(stationOpen({ de: 3 }, -1)).toBe(false);
+  });
+
+  it('sao cả bài gộp sao cũ với sao lần này', () => {
+    expect(finalLessonStars({ de: 3, tb: 3, kho: 3 }, { kho: 1 })).toBe(2); // (3+3+1)/3 = 2,33 → 2
+    expect(finalLessonStars({ de: 3, tb: 3 }, { kho: 3 })).toBe(3);
+    expect(finalLessonStars({}, { de: 1, tb: 1, kho: 1 })).toBe(1);
   });
 });
