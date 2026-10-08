@@ -11,12 +11,13 @@ const SCAN_DIRS = ['apps', 'packages'];
 const SKIP_DIR_NAMES = new Set(['node_modules', 'dist', '.vite']);
 const IGNORE = [
   /^packages\/core\/src\/content\//, // nơi chứa chữ
-  /^packages\/core\/src\/lessons\/[^/]+\/content\.ts$/, // nội dung bài (đã có sẵn từ giai đoạn 1)
+  // Bài 1 đã chuyển chữ sang content/lessons/bai-1.ts nên không còn ngoại lệ; Bài 2–4 chưa chuyển.
+  /^packages\/core\/src\/lessons\/bai-[234]\/content\.ts$/, // nội dung bài (đã có sẵn từ giai đoạn 1)
   /^packages\/core\/src\/lessons\/[^/]+\/tests\.ts$/, // dữ liệu test
   /\.test\.tsx?$/, // test vitest
   // Ngoại lệ tạm (spec 03 mục 7): chuỗi dữ liệu và lời phản hồi nằm trong logic Bài 2–4, chép nguyên từ giai đoạn 1.
   // Sẽ chuyển sang content/ khi chuyển từng bài; sau đó xóa hai dòng dưới.
-  /^packages\/core\/src\/lessons\/[^/]+\/(logic|bots)\.ts$/,
+  /^packages\/core\/src\/lessons\/bai-[234]\/(logic|bots)\.ts$/,
   /^packages\/core\/src\/lib\/rng\.ts$/, // thông báo lỗi cho lập trình viên
   /^_giai-doan-1\//,
 ];
