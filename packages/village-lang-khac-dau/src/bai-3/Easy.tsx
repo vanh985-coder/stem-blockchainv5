@@ -11,6 +11,7 @@ import {
   useAuth,
   useTapOrDrag,
   type StationResult,
+  rich,
 } from '@so-chung/core';
 import { bai3Texts } from '@so-chung/core/content/lessons/bai-3';
 import { GAME_CONFIG } from '@so-chung/core/config/gameConfig';
@@ -20,7 +21,7 @@ import { DanhBa } from './DanhBa';
 import { TheGiaoDich } from './TheGiaoDich';
 import { portraitOf, tenNhan, type PersonId } from './nguoi';
 
-const T = bai3Texts.easy;
+const T = bai3Texts.tramDe;
 
 // 5 bạn trong Phần 2
 const FRIENDS_PART2: { id: PersonId; priv: number; expectedPub: number }[] = [
@@ -42,7 +43,7 @@ const MachinePart1Slot: React.FC<{
   return (
     <DroppableSlot
       id="slot-machine-easy"
-      placeholder={T.t01}
+      placeholder={T.keoTheGiaoDichVao}
       className="mt-3.5 p-3.5 !bg-[#1C182B] !border-white/20 rounded-[16px] min-h-[76px]"
     >
       <div className="flex flex-col items-center justify-center gap-2 w-full">
@@ -54,7 +55,7 @@ const MachinePart1Slot: React.FC<{
               e.stopPropagation();
               onScanMy();
             }}
-          >{T.t02}</Button>
+          >{T.thaVaoMayXacMinh}</Button>
         )}
         {step === 'ti_fraud_ready' && (
           <Button
@@ -64,11 +65,11 @@ const MachinePart1Slot: React.FC<{
               e.stopPropagation();
               onScanTi();
             }}
-          >{fmt(T.t03)}</Button>
+          >{fmt(T.choTheCuaVaoMay)}</Button>
         )}
         {(step === 'signed' || step === 'ti_fraud_ready') && (
           <span className="text-sm text-[#A69EBF]">
-            {selectedId ? T.t04 : T.t05}
+            {selectedId ? T.chamDeDatTheVao : T.hoacKeoThaTheVao}
           </span>
         )}
       </div>
@@ -105,14 +106,14 @@ const FriendSlotDroppable: React.FC<{
           ? '!bg-xanh-la-dam !text-white !border-xanh-la-dam'
           : assigned !== null
           ? '!bg-muc-tim !text-white !border-muc-tim hover:brightness-110 cursor-pointer shadow-xs'
-          : 'border-dashed border-nau-go/40 bg-white/60 text-[#A69EBF]'
+          : 'border-dashed border-nau-go/40 bg-white/60 text-nau-go-dam'
       }`}
     >
       {assigned !== null ? (
         <div
           onClick={handleChildClick}
           className="w-full h-full flex items-center justify-center select-none"
-          title={isLocked ? undefined : T.t06}
+          title={isLocked ? undefined : T.chamDeGoTheVe}
         >
           {assigned}
         </div>
@@ -140,9 +141,9 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
   const [selectedTxIdx, setSelectedTxIdx] = useState<number>(0);
   const sampleMessages = useMemo(
     () => [
-      T.t07,
-      T.t08,
-      T.t09,
+      T.chuyen3XuChoAn,
+      T.chuyen5XuChoBinh,
+      T.chuyen7XuChoChi,
     ],
     []
   );
@@ -225,7 +226,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
   const handleStartTiScenario = () => {
     sound.playClick();
     // Tí ký lén bằng khóa riêng 13 của Tí
-    const fakeMsg = fmt(T.t10, { myName });
+    const fakeMsg = fmt(T.chuyen50XuTuCho, { myName });
     const sig = signUnique(13, fakeMsg, DIRECTORY_KEYS, rngRef.current);
     setTiSig(sig);
     setP1Step('ti_fraud_ready');
@@ -321,7 +322,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
     setAccumK(nextK);
     setAccumHistory((prev) => [
       ...prev,
-      fmt(T.t11, { nextN, nextK }),
+      fmt(T.bamLanKhoaRiengRa, { nextN, nextK }),
     ]);
   };
 
@@ -388,7 +389,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
     if (hasMistake) {
       sound.playWrong();
       setMistakes((m) => m + 1);
-      setHintMessage(T.t12);
+      setHintMessage(T.goiY5XNhan);
       setCardsPool((pool) => [...pool, ...returnedCards]);
       setMatches({ ...matches });
     } else {
@@ -408,7 +409,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
         stars: earnedStars,
         timeMs,
         learned:
-          T.t13,
+          T.khoaRiengTaoRaChu,
       });
     }
   };
@@ -422,10 +423,10 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
             {part}
           </span>
           <span className="font-display font-extrabold text-sm sm:text-base text-chu">
-            {part === 1 ? T.t14 : T.t15}
+            {part === 1 ? T.phan1KyGiaoDich : T.phan2GhepCapKhoa}
           </span>
         </div>
-        <span className="text-sm font-bold text-muc-tim-dam bg-muc-tim/10 px-2.5 py-1 rounded-full">{T.t16}</span>
+        <span className="text-sm font-bold text-muc-tim-dam bg-muc-tim/10 px-2.5 py-1 rounded-full">{T.tramDe}</span>
       </div>
 
       {/* ======================================================================= */}
@@ -438,8 +439,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
             <Card variant="paper" className="p-4 sm:p-5 border-2 border-muc-tim/30 bg-white/70 space-y-3.5">
               {/* Tầng a: Công thức tổng quát, chữ to, nổi bật */}
               <div className="text-center p-3.5 bg-white/60 rounded-[14px] border-2 border-muc-tim/30">
-                <div className="font-display font-extrabold text-lg sm:text-2xl text-muc-tim-dam tracking-wide">{T.t17}<sup>{T.t18}</sup> mod p
-                </div>
+                <div className="font-display font-extrabold text-lg sm:text-2xl text-muc-tim-dam tracking-wide">{rich(T.khoaCongKhaiGKhoa)}</div>
               </div>
 
               {/* Tầng b: Giải thích từng tham số, mỗi dòng một ý */}
@@ -447,30 +447,30 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                 <ul className="space-y-1">
                   <li className="flex items-start gap-2">
                     <span className="text-muc-tim-dam font-bold">•</span>
-                    <span>{T.t19}</span>
+                    <span>{T.g5SoGocCa}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-muc-tim-dam font-bold">•</span>
-                    <span>{T.t20}</span>
+                    <span>{T.p23SoChiaLay}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-muc-tim-dam font-bold">•</span>
-                    <span>{T.t21}</span>
+                    <span>{T.khoaRiengSoBiMat}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-muc-tim-dam font-bold">•</span>
-                    <span>{T.t22}</span>
+                    <span>{T.mod23LayPhanDu}</span>
                   </li>
                 </ul>
               </div>
 
               {/* Tầng c: Ví dụ cụ thể thay số, viết rõ từng bước */}
               <div className="p-3 bg-vang/15 rounded-[12px] border border-vang/60 text-sm sm:text-sm text-nau-go-dam space-y-1">
-                <p className="leading-relaxed">{T.t23}<sup>3</sup>{T.t24}</p>
+                <p className="leading-relaxed">{rich(T.banNaoCoKhoaRieng)}</p>
               </div>
 
               {/* Cuối khối */}
-              <p className="text-sm sm:text-sm text-nau-go-dam italic leading-relaxed pt-1 border-t border-giay">{T.t25}</p>
+              <p className="text-sm sm:text-sm text-nau-go-dam italic leading-relaxed pt-1 border-t border-giay">{T.khoaRiengCuaEmLa}</p>
             </Card>
 
             {/* Cặp khóa của Em: Két sắt & Thẻ tên */}
@@ -480,19 +480,19 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center gap-2.5">
                     <span className="text-2xl">🔐</span>
-                    <div className="font-display font-extrabold text-base text-nau-go-dam">{fmt(T.t26, { myName })}</div>
+                    <div className="font-display font-extrabold text-base text-nau-go-dam">{fmt(T.ketSatBiMatCua, { myName })}</div>
                   </div>
                   <button
                     type="button"
                     onClick={() => setShowPrivateKey(!showPrivateKey)}
                     className="text-sm font-bold text-nau-go-dam bg-white/70 px-3 py-1.5 rounded-full border border-vang/60 hover:bg-vang/25 transition-colors cursor-pointer min-h-[32px] flex items-center"
                   >
-                    {showPrivateKey ? T.t27 : T.t28}
+                    {showPrivateKey ? T.anKhoa : T.moXem}
                   </button>
                 </div>
-                <p className="text-sm sm:text-sm text-nau-go-dam mb-3.5 leading-relaxed">{T.t29}<strong>{T.t31}</strong>{T.t30}</p>
+                <p className="text-sm sm:text-sm text-nau-go-dam mb-3.5 leading-relaxed">{rich(T.chiMotMinhEmGiu)}</p>
                 <div className="flex items-center justify-between bg-white/70 p-3 rounded-[14px] border border-vang/60">
-                  <span className="text-sm sm:text-sm font-bold text-nau-go-dam">{T.t32}</span>
+                  <span className="text-sm sm:text-sm font-bold text-nau-go-dam">{T.khoaRieng}</span>
                   <span className="font-mono font-extrabold text-xl text-vang-dam">
                     {showPrivateKey ? '12' : '••••'}
                   </span>
@@ -504,15 +504,15 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="flex items-center gap-2.5">
                     <span className="text-2xl">🏷️</span>
-                    <div className="font-display font-extrabold text-base text-muc-tim-dam">{fmt(T.t33, { myName })}</div>
+                    <div className="font-display font-extrabold text-base text-muc-tim-dam">{fmt(T.theTenCongKhaiCua, { myName })}</div>
                   </div>
                   <span className="text-sm font-bold text-muc-tim-dam bg-white/70 px-2.5 py-1 rounded-full border border-muc-tim/30">
                     5¹² mod 23
                   </span>
                 </div>
-                <p className="text-sm sm:text-sm text-muc-tim-dam mb-3.5 leading-relaxed">{T.t34}<strong>{T.t36}</strong>{T.t35}</p>
+                <p className="text-sm sm:text-sm text-muc-tim-dam mb-3.5 leading-relaxed">{rich(T.aiCungBietKhoaNay)}</p>
                 <div className="flex items-center justify-between bg-white/70 p-3 rounded-[14px] border border-muc-tim/30">
-                  <span className="text-sm sm:text-sm font-bold text-nau-go-dam">{T.t37}</span>
+                  <span className="text-sm sm:text-sm font-bold text-nau-go-dam">{T.khoaCongKhai}</span>
                   <span className="font-mono font-extrabold text-xl text-muc-tim-dam">18</span>
                 </div>
               </Card>
@@ -522,9 +522,8 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
             {p1Step === 'initial' && (
               <Card variant="paper" className="p-5 sm:p-6 rounded-[18px]">
                 <h4 className="font-display font-extrabold text-base sm:text-lg text-chu mb-2 flex items-center gap-2">
-                  <span>📝</span>{T.t38}</h4>
-                <p className="text-sm sm:text-sm text-nau-go-dam mb-4 leading-relaxed">{T.t39}<strong>{T.t40}</strong>.
-                </p>
+                  <span>📝</span>{' '}{T.buoc1ChonGiaoDich}</h4>
+                <p className="text-sm sm:text-sm text-nau-go-dam mb-4 leading-relaxed">{rich(T.chonMotGiaoDichMau)}</p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                   {sampleMessages.map((msg, idx) => (
@@ -539,7 +538,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                         p-3.5 sm:p-4 rounded-[14px] border-2 text-left font-display font-bold text-sm sm:text-base transition-all cursor-pointer min-h-[52px]
                         ${
                           selectedTxIdx === idx
-                            ? 'border-muc-tim bg-muc-tim/60 text-muc-tim-dam'
+                            ? 'border-muc-tim bg-muc-tim/10 text-muc-tim-dam'
                             : 'border-nau-go/30 bg-white/70 hover:border-nau-go/40 text-chu'
                         }
                       `}
@@ -549,7 +548,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                   ))}
                 </div>
 
-                <Button variant="primary" size="md" onClick={handleSign}>{T.t41}</Button>
+                <Button variant="primary" size="md" onClick={handleSign}>{T.kyBangKhoaRiengCua}</Button>
               </Card>
             )}
 
@@ -560,7 +559,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                   {/* Thẻ giao dịch của Em */}
                   {mySig && (
                     <div>
-                      <div className="text-sm font-bold text-muc-tim-dam mb-2">{fmt(T.t42, { myName })}</div>
+                      <div className="text-sm font-bold text-muc-tim-dam mb-2">{fmt(T.theGiaoDichDaKy, { myName })}</div>
                       <DraggableCard id="tx-my-signed" disabled={p1Step !== 'signed'}>
                         <TheGiaoDich
                           senderId="em"
@@ -570,7 +569,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                           onExplainSig={() => setShowSigModal(true)}
                         />
                       </DraggableCard>
-                      <p className="text-sm text-nau-go-dam mt-2 italic text-center sm:text-left">{T.t43}</p>
+                      <p className="text-sm text-nau-go-dam mt-2 italic text-center sm:text-left">{T.doiMotChuTrongNoi}</p>
                     </div>
                   )}
 
@@ -578,7 +577,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                   <div className="bg-chu text-white rounded-[20px] p-5 border-2 border-[#1E1B2E] flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3.5">
-                        <span className="font-display font-extrabold text-base">{T.t44}</span>
+                        <span className="font-display font-extrabold text-base">{T.mayXacMinh}</span>
                         <div className="flex items-center gap-1.5 bg-[#1C182B] px-3 py-1.5 rounded-full">
                           <div
                             className={`w-3 h-3 rounded-full ${
@@ -590,12 +589,12 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                             }`}
                           />
                           <span className="text-sm text-violet-200">
-                            {p1Led === 'scanning' ? T.t45 : p1Led === 'green' ? T.t46 : T.t47}
+                            {p1Led === 'scanning' ? T.dangQuet : p1Led === 'green' ? T.khop : T.sanSang}
                           </span>
                         </div>
                       </div>
 
-                      <p className="text-sm sm:text-sm text-[#A69EBF] mb-3.5 leading-relaxed">{T.t48}</p>
+                      <p className="text-sm sm:text-sm text-[#A69EBF] mb-3.5 leading-relaxed">{T.maySeTraDanhBa}</p>
 
                       {p1Step === 'signed' && (
                         <MachinePart1Slot
@@ -607,15 +606,15 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
 
                       {p1Step === 'verified_my' && (
                         <div className="p-3.5 bg-xanh-la-dam/20 border border-xanh-la-dam rounded-[14px] text-sm sm:text-sm space-y-1">
-                          <div className="font-bold text-[#4ADE80] text-sm sm:text-base">{T.t49}</div>
-                          <div>{fmt(T.t50, { myName })}</div>
+                          <div className="font-bold text-[#4ADE80] text-sm sm:text-base">{T.chuKyChinhChu}</div>
+                          <div>{fmt(T.khopHoanHaoVoiKhoa, { myName })}</div>
                         </div>
                       )}
                     </div>
 
                     {p1Step === 'verified_my' && (
                       <div className="mt-4 pt-3 border-t border-white/10">
-                        <Button variant="danger" size="md" onClick={handleStartTiScenario}>{fmt(T.t51)}</Button>
+                        <Button variant="danger" size="md" onClick={handleStartTiScenario}>{fmt(T.tiepTheoXemGianLan)}</Button>
                       </div>
                     )}
                   </div>
@@ -632,21 +631,21 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                 <Card variant="paper" className="p-4 sm:p-5 bg-do-son/10 border-2 border-[#FCA5A5] rounded-[18px]">
                   <div className="flex items-center gap-2 mb-2">
                     <Avatar portrait={portraitOf("ti")} size="sm" />
-                    <div className="font-display font-extrabold text-base sm:text-lg text-do-son-dam">{fmt(T.t52, { myName })}</div>
+                    <div className="font-display font-extrabold text-base sm:text-lg text-do-son-dam">{fmt(T.dinhMaoDanh, { myName })}</div>
                   </div>
-                  <p className="text-sm sm:text-sm text-[#7F1D1D] leading-relaxed">{fmt(T.t53)}<em>{fmt(T.t56, { myName })}</em>{fmt(T.t54)}<strong>{T.t57}</strong>{fmt(T.t55)}</p>
+                  <p className="text-sm sm:text-sm text-[#7F1D1D] leading-relaxed">{rich(T.lenVietGiaoDichChuyen, { myName })}</p>
                 </Card>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {/* Thẻ gian lận */}
                   {tiSig && (
                     <div>
-                      <div className="text-sm font-bold text-do-son-dam mb-2">{fmt(T.t58)}</div>
+                      <div className="text-sm font-bold text-do-son-dam mb-2">{fmt(T.theGianLanDoTao)}</div>
                       <DraggableCard id="tx-ti-fraud" disabled={p1Step !== 'ti_fraud_ready'}>
                         <TheGiaoDich
                           senderId="em"
-                          senderName={fmt(T.t59, { myName })}
-                          message={fmt(T.t10, { myName })}
+                          senderName={fmt(T.biMaoDanh, { myName })}
+                          message={fmt(T.chuyen50XuTuCho, { myName })}
                           sig={tiSig}
                           onExplainSig={() => setShowSigModal(true)}
                         />
@@ -658,7 +657,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                   <div className="bg-chu text-white rounded-[20px] p-5 border-2 border-[#1E1B2E] flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3.5">
-                        <span className="font-display font-extrabold text-base">{T.t44}</span>
+                        <span className="font-display font-extrabold text-base">{T.mayXacMinh}</span>
                         <div className="flex items-center gap-1.5 bg-[#1C182B] px-3 py-1.5 rounded-full">
                           <div
                             className={`w-3 h-3 rounded-full ${
@@ -670,7 +669,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                             }`}
                           />
                           <span className="text-sm text-violet-200">
-                            {p1Led === 'scanning' ? T.t45 : p1Led === 'red' ? T.t60 : T.t47}
+                            {p1Led === 'scanning' ? T.dangQuet : p1Led === 'red' ? T.baoDong : T.sanSang}
                           </span>
                         </div>
                       </div>
@@ -685,9 +684,8 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
 
                       {p1Step === 'ti_detected' && (
                         <div className="p-3.5 bg-do-son/20 border border-do-son rounded-[14px] text-sm sm:text-sm space-y-1">
-                          <div className="font-bold text-[#FF8787] text-sm sm:text-base">{T.t61}</div>
-                          <div className="text-violet-200">{T.t62}<strong className="text-white">{T.t64}</strong>{fmt(T.t63, { myName })}<strong className="text-vang">{fmt(T.t65)}</strong>!
-                          </div>
+                          <div className="font-bold text-[#FF8787] text-sm sm:text-base">{T.phatHienGianLan}</div>
+                          <div className="text-violet-200">{rich(T.chuKyTrenTheKhong, { myName })}</div>
                         </div>
                       )}
                     </div>
@@ -701,7 +699,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                             sound.playClick();
                             setPart(2);
                           }}
-                        >{T.t66}</Button>
+                        >{T.sangPhan2GhepCap}</Button>
                       </div>
                     )}
                   </div>
@@ -723,10 +721,8 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
           <div className="space-y-8">
             <Card variant="paper" className="p-5 rounded-[18px]">
               <h4 className="font-display font-extrabold text-base sm:text-lg text-chu mb-2 flex items-center gap-2">
-                <span>🎯</span>{T.t67}</h4>
-              <p className="text-sm sm:text-sm text-nau-go-dam leading-relaxed">{T.t68}<strong>{T.t71}</strong>{T.t69}<span className="font-mono font-bold text-muc-tim-dam bg-muc-tim/10 px-2.5 py-1 rounded-[8px]">
-                  5^x mod 23
-                </span>{T.t70}</p>
+                <span>🎯</span>{' '}{T.nhiemVuTimKhoaCong}</h4>
+              <p className="text-sm sm:text-sm text-nau-go-dam leading-relaxed">{rich(T.moiBanCoMotKhoa)}</p>
             </Card>
 
             {hintMessage && (
@@ -761,8 +757,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                         <div className="font-display font-extrabold text-base text-chu">
                           {tenNhan(friend.id)}
                         </div>
-                        <div className="text-sm text-nau-go-dam">{T.t72}<span className="font-mono font-bold text-sm text-chu">{friend.priv}</span>
-                          <span className="text-[#A69EBF] text-sm"> (5^{friend.priv} mod 23)</span>
+                        <div className="text-sm text-nau-go-dam">{rich(T.khoaRieng2, { priv: friend.priv })}<span className="text-nau-go-dam text-sm"> (5^{friend.priv} mod 23)</span>
                         </div>
                       </div>
                     </div>
@@ -782,8 +777,8 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
             {/* Kho thẻ khóa công khai bên dưới */}
             <div className="p-5 bg-white/70 rounded-[18px] border-2 border-nau-go/30">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5 pb-2.5 border-b border-giay">
-                <span className="text-sm sm:text-sm font-bold text-nau-go-dam">{T.t73}</span>
-                <span className="text-sm sm:text-sm text-muc-tim-dam font-medium">{T.t74}</span>
+                <span className="text-sm sm:text-sm font-bold text-nau-go-dam">{T.khoTheKhoaCongKhai}</span>
+                <span className="text-sm sm:text-sm text-muc-tim-dam font-medium">{T.keoTheHoacChamChon}</span>
               </div>
 
               <div className="flex flex-wrap gap-3 mb-5">
@@ -797,12 +792,12 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                   </DraggableCard>
                 ))}
                 {cardsPool.length === 0 && (
-                  <div className="text-sm sm:text-sm text-nau-go-dam italic py-2">{T.t75}</div>
+                  <div className="text-sm sm:text-sm text-nau-go-dam italic py-2">{T.daGanHetCacThe}</div>
                 )}
               </div>
 
               <div className="flex justify-end">
-                <Button variant="primary" size="md" onClick={handleCheckPart2}>{T.t76}</Button>
+                <Button variant="primary" size="md" onClick={handleCheckPart2}>{T.kiemTraKetQua}</Button>
               </div>
             </div>
 
@@ -813,9 +808,9 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                 <div>
                   <div className="flex items-center gap-2 text-muc-tim-dam font-bold text-sm sm:text-base">
                     <span className="text-lg">🧮</span>
-                    <span>{T.t77}</span>
+                    <span>{T.mayTinhNhanhMod23}</span>
                   </div>
-                  <p className="text-sm text-nau-go-dam mt-1.5 leading-relaxed">{T.t78}</p>
+                  <p className="text-sm text-nau-go-dam mt-1.5 leading-relaxed">{T.nhapHaiSoDeNhan}</p>
                 </div>
 
                 <div className="flex items-center gap-2 font-mono flex-wrap">
@@ -844,17 +839,16 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                 <div>
                   <div className="flex items-center gap-2 text-muc-tim-dam font-bold mb-1 text-sm sm:text-base">
                     <span className="text-lg">⚡</span>
-                    <span>{T.t79}</span>
+                    <span>{T.nhanDon5}</span>
                   </div>
-                  <p className="text-sm text-nau-go-dam leading-relaxed">{T.t80}</p>
+                  <p className="text-sm text-nau-go-dam leading-relaxed">{T.moiLanBam5La}</p>
                 </div>
 
                 <div className="font-mono text-sm sm:text-sm text-chu bg-white/70 p-2.5 rounded-[10px] border border-muc-tim/10">
                   {accumN === 0 ? (
-                    <span className="text-nau-go-dam">{T.t81}</span>
+                    <span className="text-nau-go-dam">{T.daBam0LanBat}</span>
                   ) : (
-                    <span>{T.t82}<strong className="text-muc-tim-dam">{accumN}</strong>{T.t83}<strong className="text-muc-tim-dam">{accumN}</strong>{T.t84}<strong className="text-muc-tim-dam">{accumK}</strong>
-                    </span>
+                    <span>{rich(T.daBamLanKhoaCong, { accumN, accumK })}</span>
                   )}
                 </div>
 
@@ -863,14 +857,14 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                     <Button variant="primary" size="sm" onClick={handleAccumMultiply}>
                       × 5
                     </Button>
-                    <Button variant="secondary" size="sm" onClick={handleAccumReset}>{T.t85}</Button>
+                    <Button variant="secondary" size="sm" onClick={handleAccumReset}>{T.veDau}</Button>
                   </div>
-                  <p className="text-sm text-nau-go-dam italic">{T.t86}</p>
+                  <p className="text-sm text-nau-go-dam italic">{T.muonTimKhoaCongKhai}</p>
                 </div>
 
                 {accumHistory.length > 0 && (
                   <div className="pt-2.5 border-t border-muc-tim/10">
-                    <div className="text-sm text-nau-go-dam font-semibold mb-1.5">{T.t87}</div>
+                    <div className="text-sm text-nau-go-dam font-semibold mb-1.5">{T.lichSuToiDa6}</div>
                     <div className="max-h-24 overflow-y-auto space-y-1 font-mono text-sm text-muc-tim-dam pr-1">
                       {accumHistory.slice(-6).map((item, idx) => (
                         <div key={idx} className="bg-white/70 px-2.5 py-1 rounded-[8px] border border-muc-tim/10">
@@ -891,7 +885,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={T.t88}
+          aria-label={T.chuKyGomHaiCon}
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-chu/60 backdrop-blur-sm animate-fadeIn"
           onClick={() => {
             sound.playClick();
@@ -904,7 +898,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
           >
             {/* Header */}
             <div className="flex items-center justify-between pb-4 border-b border-muc-tim/15">
-              <h3 className="font-display font-bold text-xl text-chu">{T.t88}</h3>
+              <h3 className="font-display font-bold text-xl text-chu">{T.chuKyGomHaiCon}</h3>
               <button
                 type="button"
                 onClick={() => {
@@ -912,7 +906,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                   setShowSigModal(false);
                 }}
                 className="w-10 h-10 rounded-full bg-giay border border-nau-go/30 text-nau-go-dam hover:text-chu hover:bg-muc-tim/15 flex items-center justify-center transition-colors cursor-pointer"
-                aria-label={T.t89}
+                aria-label={T.dongHopThoai}
               >
                 ✕
               </button>
@@ -920,31 +914,29 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
 
             {/* Body */}
             <div className="mt-5 space-y-4 text-[18px] leading-[1.7] text-chu">
-              <p>{T.t90}<span className="font-mono font-bold text-muc-tim-dam">r</span>{T.t91}<span className="font-mono font-bold text-muc-tim-dam">s</span>{T.t92}</p>
+              <p>{rich(T.chuKyCuaEmKhong)}</p>
 
               {/* Khối ví dụ (nền nhạt, chữ mono cho các số) */}
               <div className="p-4 sm:p-5 bg-white/60 rounded-[16px] border border-muc-tim/30 space-y-2.5">
-                <div className="font-bold text-chu">{T.t93}</div>
+                <div className="font-bold text-chu">{T.viDuEmKyCau}</div>
                 <div className="space-y-1.5 text-[18px] leading-[1.7]">
-                  <p>{T.t94}<span className="font-mono font-bold text-muc-tim-dam">5</span>.
-                  </p>
-                  <p>{T.t95}<span className="font-mono font-bold text-muc-tim-dam">5</span>{T.t96}<span className="font-mono font-bold text-muc-tim-dam">r = 20</span>{T.t97}</p>
-                  <p>{T.t98}<span className="font-mono font-bold text-vang-dam">12</span>{T.t99}<span className="font-mono font-bold text-muc-tim-dam">s = 1</span>.
-                  </p>
-                  <p>{T.t100}<span className="font-mono font-bold text-muc-tim-dam">(r: 20, s: 1)</span>{T.t101}</p>
+                  <p>{rich(T.so1MayBocMotSo)}</p>
+                  <p>{rich(T.so2TuSo5Do)}</p>
+                  <p>{rich(T.so3MayTronKhoaRieng)}</p>
+                  <p>{rich(T.so4ChuKyLaR)}</p>
                 </div>
               </div>
 
               {/* Khối "Vì sao không ai giả được" */}
               <div className="space-y-2">
-                <div className="font-bold text-chu">{T.t102}</div>
-                <p>{T.t103}<span className="font-mono font-bold text-muc-tim-dam">18</span>{T.t104}<span className="font-mono font-bold text-muc-tim-dam">r</span>{T.t91}<span className="font-mono font-bold text-muc-tim-dam">s</span>{T.t105}</p>
-                <p>{T.t106}<span className="font-mono font-bold text-vang-dam">12</span>{T.t107}<span className="font-mono font-bold text-muc-tim-dam">s</span>{T.t108}<span className="font-mono font-bold text-muc-tim-dam">18</span>{T.t109}</p>
-                <p>{T.t110}</p>
+                <div className="font-bold text-chu">{T.viSaoKhongAiGia}</div>
+                <p>{rich(T.nguoiNhanLayKhoaCong)}</p>
+                <p>{rich(T.keMaoDanhKhongCo)}</p>
+                <p>{T.doiMotChuTrongNoi2}</p>
               </div>
 
               {/* Dòng cuối, chữ nghiêng */}
-              <p className="italic text-nau-go-dam">{T.t111}</p>
+              <p className="italic text-nau-go-dam">{T.emKhongPhaiTuTinh}</p>
 
               {/* Nút đóng "Đã hiểu" */}
               <div className="mt-6 flex justify-end">
@@ -955,7 +947,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                     sound.playClick();
                     setShowSigModal(false);
                   }}
-                >{T.t112}</Button>
+                >{T.daHieu}</Button>
               </div>
             </div>
           </div>

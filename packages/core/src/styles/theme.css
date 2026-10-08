@@ -152,3 +152,9 @@ html[data-reduce-motion='true'] *::after {
   to { opacity: 1; transform: translateY(-18px) scale(1.1); }
 }
 .animate-score-pop { animation: score-pop 0.4s ease-out both; }
+
+/* Chỉ số trên (ví dụ 5^x) giữ cỡ chữ bằng chữ xung quanh để vẫn đọc được ở màn hình nhỏ */
+sup {
+  font-size: 1em;
+  line-height: 0;
+}

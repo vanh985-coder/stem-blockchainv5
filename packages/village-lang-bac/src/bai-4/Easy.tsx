@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { Avatar, Button, Card, FeedbackSheet, NumberInput, ProgressBar, fmt, sound, starsFromMistakes, type StationResult } from '@so-chung/core';
+import { Avatar, Button, Card, FeedbackSheet, NumberInput, ProgressBar, fmt, sound, starsFromMistakes, type StationResult, rich } from '@so-chung/core';
 import { bai4Texts } from '@so-chung/core/content/lessons/bai-4';
 import { GAME_CONFIG } from '@so-chung/core/config/gameConfig';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { generateEasy, combine, type EasyTx } from '@so-chung/core/lessons/bai-4/logic';
 import { portraitOf } from './nguoi';
 
-const T = bai4Texts.easy;
+const T = bai4Texts.tramDe;
 
 export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; onFail?: (tip: string) => void }) {
   const startTimeRef = useRef<number>(Date.now());
@@ -71,7 +71,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
     if (inputValue === null || inputValue < 10 || inputValue > 99) {
       sound.playWrong();
       setMistakes((prev) => prev + 1);
-      setInputError(T.t01);
+      setInputError(T.vuiLongNhapMotSo);
       return;
     }
 
@@ -107,7 +107,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
             onComplete({
               stars,
               timeMs,
-              learned: T.t02,
+              learned: T.ghepHaiGiaoDichThi,
             });
           }
         }, 500);
@@ -125,20 +125,20 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
         setFeedback({
           isOpen: true,
           isCorrect: false,
-          title: T.t03,
-          whatHappened: fmt(T.t04, { inputValue }),
-          whyHappened: fmt(T.t05, { value: txA.value, value2: txB.value, expectedValue, so4: txB.value * 10 + txA.value }),
-          howToFix: fmt(T.t06, { value: txA.value, value2: txB.value }),
+          title: T.bayThuTu,
+          whatHappened: fmt(T.emDaGhepNguocThu, { inputValue }),
+          whyHappened: fmt(T.giaiThichT21, { value: txA.value, value2: txB.value, expectedValue, so4: txB.value * 10 + txA.value }),
+          howToFix: fmt(T.laySoCuaGiaoDich, { value: txA.value, value2: txB.value }),
         });
       } else {
         // Gợi ý ba tầng chuẩn mực
         setFeedback({
           isOpen: true,
           isCorrect: false,
-          title: T.t07,
-          whatHappened: fmt(T.t08, { inputValue, pairLabel }),
-          whyHappened: T.t09,
-          howToFix: fmt(T.t10, { pairLabel, id: txA.id, id2: txB.id, value: txA.value, value2: txB.value, expectedValue }),
+          title: T.chuaChinhXac,
+          whatHappened: fmt(T.ketQuaChuaDungCho, { inputValue, pairLabel }),
+          whyHappened: T.congThucGhepCapTong,
+          howToFix: fmt(T.congThucTheSoCapGhep, { pairLabel, id: txA.id, id2: txB.id, value: txA.value, value2: txB.value, expectedValue }),
         });
       }
     }
@@ -159,8 +159,8 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
     <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-200">
       <div className="space-y-1">
         <div className="flex justify-between text-sm text-nau-go-dam font-semibold">
-          <span>{T.t16}</span>
-          <span>{fmt(T.t17, { so: currentIndex + 1, so2: questions.length })}</span>
+          <span>{T.tienDoGhepCap}</span>
+          <span>{fmt(T.cauHoi, { so: currentIndex + 1, so2: questions.length })}</span>
         </div>
         <ProgressBar
           current={currentIndex + 1}
@@ -173,9 +173,9 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
         <div className="flex items-center justify-between mb-3 border-b border-nau-go/30 pb-2">
           <div className="flex items-center gap-2">
             <span className="text-lg">📋</span>
-            <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{T.t18}</h3>
+            <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{T.bangGiaoDich}</h3>
           </div>
-          <span className="text-sm text-nau-go-dam">{T.t19}</span>
+          <span className="text-sm text-nau-go-dam">{T.bangTraCuuGiaTri}</span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -194,7 +194,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                   {tx.id}
                 </span>
               </div>
-              <div className="text-xs text-nau-go-dam font-medium truncate w-full">
+              <div className="text-sm text-nau-go-dam font-medium truncate w-full">
                 {tx.name} {tx.item}
               </div>
               <div className="font-display font-extrabold text-base text-chu mt-1 bg-giay px-2 py-0.5 rounded-[6px]">
@@ -207,15 +207,15 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
 
       {/* Khu vực ghép thẻ */}
       <Card className="p-6 sm:p-8 flex flex-col items-center text-center relative overflow-hidden">
-        <div className="text-sm font-bold text-muc-tim-dam uppercase tracking-wider mb-2">{fmt(T.t20, { so: currentIndex + 1, pairLabel })}</div>
-        <p className="text-sm text-nau-go-dam mb-6">{T.t21}<code className="bg-white/60 text-muc-tim-dam px-1.5 py-0.5 rounded border border-muc-tim/10 font-mono">T_ab = T_a × 10 + T_b</code>
+        <div className="text-sm font-bold text-muc-tim-dam uppercase tracking-wider mb-2">{fmt(T.cauGhepCap, { so: currentIndex + 1, pairLabel })}</div>
+        <p className="text-sm text-nau-go-dam mb-6">{T.hayGhepGiaTriCua}{' '}<code className="bg-white/60 text-muc-tim-dam px-1.5 py-0.5 rounded border border-muc-tim/10 font-mono">{rich(T.congThucGhepCap)}</code>
         </p>
 
         {/* Khung hiển thị hai thẻ trượt vào nhau */}
         <div className="min-h-[120px] flex items-center justify-center relative w-full mb-6">
           {mergedCard ? (
             <div className="animate-in zoom-in-95 duration-200 p-4 rounded-[16px] border-2 border-xanh-la-dam bg-xanh-la/10 flex flex-col items-center min-w-[140px]">
-              <span className="text-sm font-bold text-xanh-la-dam uppercase">{fmt(T.t22, { label: mergedCard.label })}</span>
+              <span className="text-sm font-bold text-xanh-la-dam uppercase">{fmt(T.theGop, { label: mergedCard.label })}</span>
               <span className="font-display font-extrabold text-3xl text-xanh-la-dam mt-1">
                 {mergedCard.value}
               </span>
@@ -244,7 +244,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
 
               {/* Dấu ghép */}
               <div
-                className={`font-display font-extrabold text-xl text-[#A69EBF] transition-opacity duration-300 ${
+                className={`font-display font-extrabold text-xl text-nau-go-dam transition-opacity duration-300 ${
                   isMerging ? 'opacity-0' : 'opacity-100'
                 }`}
               >
@@ -303,7 +303,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
             fullWidth
             onClick={handleCheck}
             disabled={isMerging}
-          >{T.t23}</Button>
+          >{T.ghepGiaoDich}</Button>
         </div>
       </Card>
 
@@ -318,7 +318,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
         onContinue={() => {
           setFeedback((prev) => ({ ...prev, isOpen: false }));
         }}
-        continueLabel={T.t24}
+        continueLabel={T.thuLai}
       />
     </div>
   );

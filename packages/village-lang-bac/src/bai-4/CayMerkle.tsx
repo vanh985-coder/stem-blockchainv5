@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { bai4Texts } from '@so-chung/core/content/lessons/bai-4';
 import { formatNumber } from '@so-chung/core/lib/format';
 
-const T = bai4Texts.caymerkle;
+const T = bai4Texts.cayMerkle;
 
 export type CellStatus = 'trong' | 'dung' | 'sai' | 'doi-mau' | 'mo-nhap';
 
@@ -150,7 +150,7 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
 
   // Tạo nhãn mặc định cho nút
   const getNodeLabel = (lvl: number, idx: number): string => {
-    if (lvl === numLevels - 1) return T.t01;
+    if (lvl === numLevels - 1) return T.goc;
     if (lvl === 0) {
       if (leafLabels && leafLabels[idx]) return leafLabels[idx];
       return `T${idx + 1}`;
@@ -174,7 +174,7 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
       {isEightLeaves && (
         <div className="sm:hidden text-sm text-nau-go-dam font-medium flex items-center gap-1 mb-2 bg-giay px-3 py-1 rounded-full border border-nau-go/30">
           <span>👉</span>
-          <span>{T.t02}</span>
+          <span>{T.vuotNgangDeXemCa}</span>
         </div>
       )}
 
@@ -275,14 +275,14 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
                         : status === 'mo-nhap'
                         ? 'border-muc-tim bg-white/70 ring-2 ring-muc-tim/30 animate-bounce-subtle'
                         : val === null
-                        ? 'border-dashed border-nau-go/40 bg-giay text-[#A69EBF]'
+                        ? 'border-dashed border-nau-go/40 bg-giay text-nau-go-dam'
                         : 'border-nau-go/30 text-chu'
                     }
                     ${isHighlight ? 'ring-4 ring-vang' : ''}
                   `}
                 >
                   <span
-                    className={`text-xs font-bold uppercase tracking-wider ${
+                    className={`text-sm font-bold uppercase tracking-wider ${
                       isRoot ? 'text-muc-tim-dam' : 'text-nau-go-dam'
                     }`}
                   >
@@ -291,7 +291,7 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
                   <span
                     className={`font-display font-extrabold text-sm sm:text-base leading-none mt-0.5 ${
                       val === null
-                        ? 'text-[#A69EBF]'
+                        ? 'text-nau-go-dam'
                         : status === 'doi-mau' || isPath
                         ? 'text-do-son-dam'
                         : isRoot

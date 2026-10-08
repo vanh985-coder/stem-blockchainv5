@@ -4,7 +4,7 @@ import { bai3Texts } from '@so-chung/core/content/lessons/bai-3';
 import { PEOPLE, DIRECTORY_KEYS } from '@so-chung/core/lessons/bai-3/logic';
 import { portraitOf, tenNhan } from './nguoi';
 
-const T = bai3Texts.danhba;
+const T = bai3Texts.danhBa;
 
 export interface DanhBaProps {
   highlightIndex?: number | null;
@@ -37,11 +37,11 @@ export const DanhBa: React.FC<DanhBaProps> = ({
         <div className="flex items-center gap-2.5">
           <span className="text-xl">📖</span>
           <div>
-            <h3 className="font-display font-extrabold text-base sm:text-lg text-chu leading-tight">{T.t01}</h3>
-            <p className="text-sm text-nau-go-dam">{T.t02}</p>
+            <h3 className="font-display font-extrabold text-base sm:text-lg text-chu leading-tight">{T.danhBaKhoaCongKhai}</h3>
+            <p className="text-sm text-nau-go-dam">{T.moiNguoiDeuXemVa}</p>
           </div>
         </div>
-        <span className="px-2.5 py-1 rounded-full text-sm font-bold bg-muc-tim/10 text-muc-tim-dam shrink-0">{T.t03}</span>
+        <span className="px-2.5 py-1 rounded-full text-sm font-bold bg-muc-tim/10 text-muc-tim-dam shrink-0">{T.congKhai}</span>
       </div>
 
       <div className={`grid ${compact ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'} gap-3`}>
@@ -62,7 +62,7 @@ export const DanhBa: React.FC<DanhBaProps> = ({
                 flex items-center justify-between p-2.5 sm:p-3 rounded-[14px] border-2 transition-all duration-150 min-h-[56px]
                 ${
                   isSelected
-                    ? 'border-muc-tim bg-muc-tim/50 ring-2 ring-muc-tim/40 shadow-xs'
+                    ? 'border-muc-tim bg-muc-tim/10 ring-2 ring-muc-tim/40 shadow-xs'
                     : isHighlighted
                     ? 'border-muc-tim bg-muc-tim/5 ring-2 ring-muc-tim/30 animate-pulse'
                     : 'border-giay bg-white/60 hover:border-nau-go/40'
@@ -76,7 +76,7 @@ export const DanhBa: React.FC<DanhBaProps> = ({
                   <div className="font-display font-bold text-sm text-chu truncate">
                     {tenNhan(person.id, userName)}
                   </div>
-                  <div className="text-sm text-nau-go-dam">{T.t07}</div>
+                  <div className="text-sm text-nau-go-dam">{T.khoaCongKhai}</div>
                 </div>
               </div>
 
@@ -94,7 +94,7 @@ export const DanhBa: React.FC<DanhBaProps> = ({
                           : 'bg-white/70 text-muc-tim-dam border-nau-go/30 hover:border-muc-tim shadow-xs'
                       }
                     `}
-                    title={T.t08}
+                    title={T.keoHoacChamDeDua}
                   >
                     {person.publicKey}
                   </div>

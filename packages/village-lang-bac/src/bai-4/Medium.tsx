@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { Avatar, Button, Card, FeedbackSheet, NumberInput, fmt, sound, starsFromMistakes, type StationResult } from '@so-chung/core';
+import { Avatar, Button, Card, FeedbackSheet, NumberInput, fmt, sound, starsFromMistakes, type StationResult, rich } from '@so-chung/core';
 import { bai4Texts } from '@so-chung/core/content/lessons/bai-4';
 import { GAME_CONFIG } from '@so-chung/core/config/gameConfig';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
@@ -7,7 +7,7 @@ import { buildTree, pathToRoot, generateMedium, DEFAULT_EASY_TXS, type EasyTx } 
 import { CayMerkle, type CellStatus } from './CayMerkle';
 import { portraitOf } from './nguoi';
 
-const T = bai4Texts.medium;
+const T = bai4Texts.tramTb;
 
 type MediumPhase = 'phase_a' | 'phase_b' | 'phase_c';
 
@@ -58,33 +58,33 @@ export function Medium({
     switch (stepA) {
       case 0:
         return {
-          title: T.t01,
-          desc: T.t02,
-          calc: T.t03,
+          title: T.buoc1BatDauTu,
+          desc: T.hangDuoiCungLa4,
+          calc: T.bonLaODayCay,
         };
       case 1:
         return {
-          title: T.t04,
-          desc: T.t05,
+          title: T.buoc2GhepCapT1,
+          desc: T.haiGiaoDichDauTien,
           calc: `T12 = T1 × 10 + T2 = ${partALeaves[0]} × 10 + ${partALeaves[1]} = ${partATree[1][0]}`,
         };
       case 2:
         return {
-          title: T.t06,
-          desc: T.t07,
+          title: T.buoc3GhepCapT3,
+          desc: T.haiGiaoDichTiepTheo,
           calc: `T34 = T3 × 10 + T4 = ${partALeaves[2]} × 10 + ${partALeaves[3]} = ${partATree[1][1]}`,
         };
       case 3:
         return {
-          title: T.t08,
-          desc: T.t09,
-          calc: fmt(T.t10, { so: partATree[1][0], so2: partATree[1][1], so3: partATree[2][0] }),
+          title: T.buoc4GhepLenGoc,
+          desc: T.haiNhanhT12VaT34,
+          calc: fmt(T.congThucGocKhiXem, { so: partATree[1][0], so2: partATree[1][1], so3: partATree[2][0] }),
         };
       default:
         return {
-          title: T.t11,
-          desc: T.t12,
-          calc: T.t13,
+          title: T.buoc5ConSoDai,
+          desc: T.gocMerkle422GoiGon,
+          calc: T.daHoanThanhDungCay,
         };
     }
   }, [stepA, partALeaves, partATree]);
@@ -168,7 +168,7 @@ export function Medium({
     if (inputVal === null || inputVal <= 0) {
       sound.playWrong();
       setMistakesB((prev) => prev + 1);
-      setInputError(T.t14);
+      setInputError(T.vuiLongNhapMotSo);
       return;
     }
 
@@ -185,7 +185,7 @@ export function Medium({
       hintFormula = `T34 = T3 × 10 + T4 = ${partBLeaves[2]} × 10 + ${partBLeaves[3]}`;
     } else if (selectedSlot === 'root') {
       expected = partBTree[2][0];
-      hintFormula = fmt(T.t15, { so: partBTree[1][0], so2: partBTree[1][1] });
+      hintFormula = fmt(T.congThucGocKhiNhap, { so: partBTree[1][0], so2: partBTree[1][1] });
     }
 
     if (inputVal === expected) {
@@ -200,10 +200,10 @@ export function Medium({
       setFeedback({
         isOpen: true,
         isCorrect: false,
-        title: T.t16,
-        whatHappened: fmt(T.t17, { inputVal, so2: selectedSlot.toUpperCase() }),
-        whyHappened: T.t18,
-        howToFix: fmt(T.t19, { hintFormula, expected }),
+        title: T.chuaChinhXac,
+        whatHappened: fmt(T.giaTriChuaDungCho, { inputVal, so2: selectedSlot.toUpperCase() }),
+        whyHappened: T.hayKiemTraLaiPhep,
+        howToFix: fmt(T.congThucDaTheSo, { hintFormula, expected }),
       });
     }
   }, [selectedSlot, inputVal, partBTree, partBLeaves]);
@@ -311,7 +311,7 @@ export function Medium({
               ? 'bg-muc-tim text-white shadow-xs'
               : 'text-nau-go-dam hover:bg-giay'
           }`}
-        >{T.t25}</button>
+        >{T.tabXemDungCay}</button>
         <button
           type="button"
           onClick={() => setPhase('phase_b')}
@@ -320,7 +320,7 @@ export function Medium({
               ? 'bg-muc-tim text-white shadow-xs'
               : 'text-nau-go-dam hover:bg-giay'
           }`}
-        >{T.t26}</button>
+        >{T.tabTuXayCay}</button>
         <button
           type="button"
           onClick={() => {
@@ -332,9 +332,9 @@ export function Medium({
               ? 'bg-muc-tim text-white shadow-xs cursor-pointer'
               : isRootSolved
               ? 'text-nau-go-dam hover:bg-giay cursor-pointer'
-              : 'text-[#A69EBF] opacity-50 cursor-not-allowed'
+              : 'text-nau-go-dam cursor-not-allowed'
           }`}
-        >{T.t27}</button>
+        >{T.tabKhamPha}</button>
       </div>
 
       {/* ========================================================= */}
@@ -343,7 +343,7 @@ export function Medium({
       {phase === 'phase_a' && (
         <Card className="p-6 sm:p-8 space-y-6">
           <div className="text-center space-y-1">
-            <span className="text-sm font-bold text-muc-tim-dam uppercase tracking-wider">{fmt(T.t28, { so: stepA + 1 })}</span>
+            <span className="text-sm font-bold text-muc-tim-dam uppercase tracking-wider">{fmt(T.hoatCanhDungCayBuoc, { so: stepA + 1 })}</span>
             <h3 className="first-letter:uppercase font-display font-extrabold text-xl sm:text-2xl text-chu">
               {stepAInfo.title}
             </h3>
@@ -355,12 +355,12 @@ export function Medium({
           {/* Cây Merkle SVG */}
           <CayMerkle
             treeValues={currentTreeA}
-            caption={T.t29}
+            caption={T.cayMerkle4GiaoDich}
           />
 
           {/* Hộp hiển thị phép tính đã thế số */}
           <div className="p-4 rounded-[14px] bg-white/60 border border-muc-tim/10 text-center">
-            <div className="text-sm text-nau-go-dam font-semibold mb-1">{T.t30}</div>
+            <div className="text-sm text-nau-go-dam font-semibold mb-1">{T.phepTinhTuongUng}</div>
             <div className="font-display font-bold text-base sm:text-lg text-muc-tim-dam">
               {stepAInfo.calc}
             </div>
@@ -373,7 +373,7 @@ export function Medium({
               size="sm"
               disabled={stepA === 0}
               onClick={() => setStepA((prev) => Math.max(0, prev - 1))}
-            >{T.t31}</Button>
+            >{T.quayLai}</Button>
 
             {stepA < 4 ? (
               <Button
@@ -383,7 +383,7 @@ export function Medium({
                   sound.playClick();
                   setStepA((prev) => prev + 1);
                 }}
-              >{T.t32}</Button>
+              >{T.tiepTheo}</Button>
             ) : (
               <Button
                 variant="primary"
@@ -392,7 +392,7 @@ export function Medium({
                   sound.playClick();
                   setPhase('phase_b');
                 }}
-              >{T.t33}</Button>
+              >{T.tuEmXayCay}</Button>
             )}
           </div>
         </Card>
@@ -404,9 +404,9 @@ export function Medium({
       {phase === 'phase_b' && (
         <Card className="p-6 sm:p-8 space-y-6">
           <div className="text-center space-y-1">
-            <span className="text-sm font-bold text-muc-tim-dam uppercase tracking-wider">{T.t34}</span>
-            <h3 className="first-letter:uppercase font-display font-extrabold text-xl sm:text-2xl text-chu">{T.t35}</h3>
-            <p className="text-sm text-nau-go-dam max-w-md mx-auto">{T.t36}</p>
+            <span className="text-sm font-bold text-muc-tim-dam uppercase tracking-wider">{T.thuThachTuXayCay}</span>
+            <h3 className="first-letter:uppercase font-display font-extrabold text-xl sm:text-2xl text-chu">{T.nhapKetQuaTuCac}</h3>
+            <p className="text-sm text-nau-go-dam max-w-md mx-auto">{T.chonOCanTinhRoi}</p>
           </div>
 
           {/* Cây Merkle SVG */}
@@ -421,14 +421,14 @@ export function Medium({
               } else if (lvl === 2 && idx === 0) {
                 if (!isChildrenReady) {
                   sound.playWrong();
-                  setLockedNotice(T.t37);
+                  setLockedNotice(T.canT12VaT34Truoc);
                   setTimeout(() => setLockedNotice(null), 2500);
                 } else if (!isRootSolved) {
                   setSelectedSlot('root');
                 }
               }
             }}
-            caption={T.t38}
+            caption={T.chamVaoODeChon}
           />
 
           {/* Thông báo nếu bấm vào ô gốc bị khóa */}
@@ -441,7 +441,7 @@ export function Medium({
           {/* Khu vực nhập số cho ô đang chọn */}
           {!isRootSolved ? (
             <div className="p-4 rounded-[16px] bg-white/60 border border-muc-tim/10 flex flex-col items-center gap-3">
-              <div className="text-sm font-bold text-muc-tim-dam uppercase">{fmt(T.t40, { so: selectedSlot === 'root' ? T.t39 : selectedSlot?.toUpperCase() })}</div>
+              <div className="text-sm font-bold text-muc-tim-dam uppercase">{fmt(T.dangNhapChoO, { so: selectedSlot === 'root' ? T.goc : selectedSlot?.toUpperCase() })}</div>
 
               <div className="flex items-center gap-2">
                 <NumberInput
@@ -453,23 +453,23 @@ export function Medium({
                   min={1}
                   max={999999}
                   showButtons={false}
-                  placeholder={T.t41}
+                  placeholder={T.nhapKetQua}
                   error={inputError}
                   onEnter={handleCheckPartB}
                   autoFocus
                   className="w-36 text-center"
                 />
-                <Button variant="primary" size="md" onClick={handleCheckPartB}>{T.t42}</Button>
+                <Button variant="primary" size="md" onClick={handleCheckPartB}>{T.xacNhan}</Button>
               </div>
 
               {selectedSlot === 'root' && !isChildrenReady && (
-                <span className="text-sm text-do-son-dam font-medium">{T.t37}</span>
+                <span className="text-sm text-do-son-dam font-medium">{T.canT12VaT34Truoc}</span>
               )}
             </div>
           ) : (
             <div className="p-4 rounded-[16px] bg-xanh-la/10 border-2 border-xanh-la-dam text-center space-y-3 animate-in zoom-in-95 duration-200">
-              <div className="font-display font-extrabold text-lg text-xanh-la-dam">{T.t43}</div>
-              <p className="text-sm text-chu">{T.t44}</p>
+              <div className="font-display font-extrabold text-lg text-xanh-la-dam">{T.xuatSacEmDaHoan}</div>
+              <p className="text-sm text-chu">{T.hayTiepTucDeXem}</p>
               <Button
                 variant="primary"
                 size="md"
@@ -477,7 +477,7 @@ export function Medium({
                   sound.playClick();
                   setPhase('phase_c');
                 }}
-              >{T.t45}</Button>
+              >{T.khamPhaKhoanhKhacA}</Button>
             </div>
           )}
         </Card>
@@ -489,15 +489,14 @@ export function Medium({
       {phase === 'phase_c' && (
         <Card className="p-6 sm:p-8 space-y-6">
           <div className="text-center space-y-1">
-            <span className="text-sm font-bold text-do-son-dam uppercase tracking-wider">{T.t46}</span>
-            <h3 className="first-letter:uppercase font-display font-extrabold text-xl sm:text-2xl text-chu">{T.t47}</h3>
+            <span className="text-sm font-bold text-do-son-dam uppercase tracking-wider">{T.khoanhKhacARaThe}</span>
+            <h3 className="first-letter:uppercase font-display font-extrabold text-xl sm:text-2xl text-chu">{T.chiDoi1GiaoDich}</h3>
           </div>
 
           {/* Diễn biến câu chuyện với Cáo Tí */}
           <div className="p-4 rounded-[16px] bg-do-son/10 border border-do-son/30 flex items-center gap-3">
             <Avatar portrait={portraitOf("ti")} size="md" />
-            <div className="text-sm sm:text-sm text-chu leading-snug">
-              <span className="font-bold text-do-son-dam">{fmt(T.t51)}</span>{T.t48}<b className="text-chu">{partBLeaves[tamperedLeafIndex]}</b>{T.t49}<b className="text-do-son-dam">{tamperedNewValue}</b>{T.t50}</div>
+            <div className="text-sm sm:text-sm text-chu leading-snug">{rich(T.tinhNghichToVuaLen, { so: partBLeaves[tamperedLeafIndex], tamperedNewValue })}</div>
           </div>
 
           {/* Cây Merkle đổi màu lan truyền */}
@@ -505,7 +504,7 @@ export function Medium({
             treeValues={currentTreeC}
             cellStatuses={cellStatusesC}
             highlightPath={tamperStep >= 0 ? tamperPath.slice(0, tamperStep + 1) : []}
-            caption={T.t52}
+            caption={T.cacOMauDoLan}
           />
 
           {/* Nút hành động */}
@@ -516,9 +515,9 @@ export function Medium({
                 size="lg"
                 onClick={startTamperAnimation}
                 disabled={isTampering}
-              >{T.t55}</Button>
+              >{T.suaGiaoDichXemGoc}</Button>
             ) : tamperStep < 2 ? (
-              <Button variant="secondary" size="md" disabled>{T.t56}</Button>
+              <Button variant="secondary" size="md" disabled>{T.dangLanTruyenDoiGia}</Button>
             ) : (
               <Button
                 variant="primary"
@@ -532,10 +531,10 @@ export function Medium({
                     stars,
                     timeMs,
                     learned:
-                      T.t58,
+                      T.doiMotGiaoDichThi,
                   });
                 }}
-              >{T.t57}</Button>
+              >{T.hoanThanhManHoc}</Button>
             )}
           </div>
         </Card>
@@ -552,7 +551,7 @@ export function Medium({
         onContinue={() => {
           setFeedback((prev) => ({ ...prev, isOpen: false }));
         }}
-        continueLabel={T.t59}
+        continueLabel={T.thuLai}
       />
     </div>
   );

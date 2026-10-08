@@ -28,5 +28,9 @@
     "@supabase/supabase-js": "^2.117.2",
     "canvas-confetti": "^1.9.4",
     "motion": "^14.0.0"
-  }
+  },
+  "sideEffects": [
+    "./src/styles/fonts.ts",
+    "*.css"
+  ]
 }

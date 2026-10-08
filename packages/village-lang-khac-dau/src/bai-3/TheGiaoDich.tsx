@@ -4,7 +4,7 @@ import { bai3Texts } from '@so-chung/core/content/lessons/bai-3';
 import type { Signature } from '@so-chung/core/lessons/bai-3/logic';
 import { portraitOf, tenNhan } from './nguoi';
 
-const T = bai3Texts.thegiaodich;
+const T = bai3Texts.theGiaoDich;
 
 export interface TheGiaoDichProps {
   id?: string;
@@ -73,7 +73,7 @@ export const TheGiaoDich: React.FC<TheGiaoDichProps> = ({
               <div className="flex items-center gap-2.5">
                 <Avatar portrait={portraitOf(senderId)} size="sm" />
                 <div>
-                  <div className="text-sm text-nau-go-dam font-medium">{T.t04}</div>
+                  <div className="text-sm text-nau-go-dam font-medium">{T.nguoiGui}</div>
                   <div className="font-display font-extrabold text-base text-chu">
                     {getSenderDisplay()}
                   </div>
@@ -97,14 +97,14 @@ export const TheGiaoDich: React.FC<TheGiaoDichProps> = ({
                     }
                   `}
                 >
-                  {isSelected ? T.t05 : T.t06}
+                  {isSelected ? T.dangTrongMay : T.duaVaoMay}
                 </button>
               )}
             </div>
 
             {/* Nội dung giao dịch */}
             <div className="p-3.5 bg-white/60 rounded-[14px] border border-muc-tim/10 mb-3.5">
-              <div className="text-sm text-nau-go-dam font-semibold mb-1">{T.t07}</div>
+              <div className="text-sm text-nau-go-dam font-semibold mb-1">{T.noiDung}</div>
               <div className="font-display font-extrabold text-lg text-chu leading-snug">
                 {message}
               </div>
@@ -117,7 +117,7 @@ export const TheGiaoDich: React.FC<TheGiaoDichProps> = ({
                   <span className="w-6 h-6 rounded-full border border-muc-tim text-muc-tim-dam flex items-center justify-center text-sm font-bold shrink-0">
                     ✍️
                   </span>
-                  <span className="text-sm sm:text-sm font-bold text-muc-tim-dam">{T.t08}</span>
+                  <span className="text-sm sm:text-sm font-bold text-muc-tim-dam">{T.chuKySo}</span>
                 </div>
                 <div className="font-mono font-bold text-base text-muc-tim-dam">
                   (r: {sig.r}, s: {sig.s})
@@ -136,7 +136,7 @@ export const TheGiaoDich: React.FC<TheGiaoDichProps> = ({
                     className="inline-flex items-center gap-1.5 text-sm font-bold text-muc-tim-dam hover:text-muc-tim-dam underline underline-offset-2 decoration-muc-tim-dam/60 hover:decoration-muc-tim-dam px-2.5 py-1 rounded-[8px] border border-muc-tim/30 bg-white/70 hover:bg-white/60 transition-all cursor-pointer shadow-xs min-h-[36px]"
                   >
                     <span>💡</span>
-                    <span>{T.t09}</span>
+                    <span>{T.rVaSLaGi}</span>
                   </button>
                 </div>
               )}
@@ -150,7 +150,7 @@ export const TheGiaoDich: React.FC<TheGiaoDichProps> = ({
             <div className="flex items-center gap-2.5">
               <Avatar portrait={portraitOf(senderId)} size="sm" />
               <div>
-                <div className="text-sm text-nau-go-dam font-medium">{T.t04}</div>
+                <div className="text-sm text-nau-go-dam font-medium">{T.nguoiGui}</div>
                 <div className="font-display font-extrabold text-base text-chu">
                   {getSenderDisplay()}
                 </div>
@@ -173,14 +173,14 @@ export const TheGiaoDich: React.FC<TheGiaoDichProps> = ({
                   }
                 `}
               >
-                {isSelected ? T.t05 : T.t06}
+                {isSelected ? T.dangTrongMay : T.duaVaoMay}
               </button>
             )}
           </div>
 
           {/* Nội dung giao dịch */}
           <div className="p-3.5 bg-white/60 rounded-[14px] border border-muc-tim/10 mb-3.5">
-            <div className="text-sm text-nau-go-dam font-semibold mb-1">{T.t07}</div>
+            <div className="text-sm text-nau-go-dam font-semibold mb-1">{T.noiDung}</div>
             <div className="font-display font-extrabold text-lg text-chu leading-snug">
               {message}
             </div>
@@ -193,7 +193,7 @@ export const TheGiaoDich: React.FC<TheGiaoDichProps> = ({
                 <span className="w-6 h-6 rounded-full border border-muc-tim text-muc-tim-dam flex items-center justify-center text-sm font-bold shrink-0">
                   ✍️
                 </span>
-                <span className="text-sm sm:text-sm font-bold text-muc-tim-dam">{T.t08}</span>
+                <span className="text-sm sm:text-sm font-bold text-muc-tim-dam">{T.chuKySo}</span>
               </div>
               <div className="font-mono font-bold text-base text-muc-tim-dam">
                 (r: {sig.r}, s: {sig.s})
@@ -212,7 +212,7 @@ export const TheGiaoDich: React.FC<TheGiaoDichProps> = ({
                   className="inline-flex items-center gap-1.5 text-sm font-bold text-muc-tim-dam hover:text-muc-tim-dam underline underline-offset-2 decoration-muc-tim-dam/60 hover:decoration-muc-tim-dam px-2.5 py-1 rounded-[8px] border border-muc-tim/30 bg-white/70 hover:bg-white/60 transition-all cursor-pointer shadow-xs min-h-[36px]"
                 >
                   <span>💡</span>
-                  <span>{T.t09}</span>
+                  <span>{T.rVaSLaGi}</span>
                 </button>
               </div>
             )}
@@ -225,12 +225,12 @@ export const TheGiaoDich: React.FC<TheGiaoDichProps> = ({
         <div className="p-3 bg-vang/15 rounded-[14px] border border-vang/60 flex flex-wrap items-center justify-between gap-2.5 mb-3.5 mt-2.5">
           <div className="flex items-center gap-2 text-sm text-nau-go-dam">
             <span className="text-base">📎</span>
-            <span className="font-medium">{T.t10}</span>
+            <span className="font-medium">{T.khoaDinhKem}</span>
             {enableDrag ? (
               <DraggableCard id={`attached-key-${attachedKey}`} className="inline-block">
                 <span
                   className="inline-flex items-center justify-center min-h-[40px] px-3 font-mono font-extrabold text-xl text-nau-go-dam bg-white/70 rounded-[10px] border-2 border-vang/60 cursor-grab active:cursor-grabbing hover:border-vang-dam shadow-xs"
-                  title={T.t11}
+                  title={T.keoHoacChamDeDua}
                 >
                   {attachedKey}
                 </span>
@@ -251,7 +251,7 @@ export const TheGiaoDich: React.FC<TheGiaoDichProps> = ({
                 onSelectAttachedKey(attachedKey);
               }}
               className="min-h-[40px] px-3.5 text-sm font-bold bg-vang-dam text-white rounded-[10px] hover:bg-vang-dam transition-colors flex items-center justify-center cursor-pointer shadow-xs"
-            >{T.t12}</button>
+            >{T.thuKhoaNay}</button>
           )}
         </div>
       )}
@@ -272,7 +272,7 @@ export const TheGiaoDich: React.FC<TheGiaoDichProps> = ({
               }
             `}
           >
-            <span className="text-lg">✅</span>{T.t13}</button>
+            <span className="text-lg">✅</span>{' '}{T.that}</button>
           <button
             type="button"
             onPointerDown={(e) => e.stopPropagation()}
@@ -281,12 +281,12 @@ export const TheGiaoDich: React.FC<TheGiaoDichProps> = ({
               flex-1 min-h-[44px] py-2 px-3 rounded-[12px] border-2 font-display font-bold text-base flex items-center justify-center gap-2 transition-all cursor-pointer
               ${
                 decision === 'fake'
-                  ? 'bg-do-son text-white border-do-son'
+                  ? 'bg-do-son-dam text-white border-do-son-dam'
                   : 'bg-white/70 text-do-son-dam border-do-son/40 hover:bg-do-son/10'
               }
             `}
           >
-            <span className="text-lg">❌</span>{T.t14}</button>
+            <span className="text-lg">❌</span>{' '}{T.gia}</button>
         </div>
       )}
     </div>

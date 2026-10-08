@@ -22,5 +22,6 @@
     "react-router": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:"
-  }
+  },
+  "sideEffects": false
 }

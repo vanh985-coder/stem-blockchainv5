@@ -13,6 +13,15 @@ Mọi chữ người chơi nhìn thấy nằm trong thư mục này (`packages/c
    - `{so}`, `{diem}`…: con số do game điền.
 4. Sửa xong chạy `pnpm test` và `pnpm check:text`, rồi mở trang xem lại.
 
+## Chữ đậm, nghiêng, chỉ số trên trong bài học
+Ở `lessons/bai-3.ts` và `lessons/bai-4.ts`, mỗi câu là một chuỗi trọn vẹn. Chỗ cần nhấn mạnh đánh dấu ngay trong câu:
+- `**chữ đậm**`: ví dụ `Chỉ một mình em giữ, dùng để **ký tên**.`
+- `~~chữ nghiêng~~`
+- `^^chỉ số trên^^`: ví dụ `5^^x^^ mod 23` hiện là 5 mũ x.
+
+Khóa đặt theo trạm rồi tới nội dung câu, ví dụ `tramTb.khoaDinhKemLaDo` là câu nói về khóa đính kèm ở trạm Trung bình.
+Chuỗi nhóm `chuyen…xuCho…` ("Chuyển 3 xu cho An") là nội dung được ký; đổi một chữ thì chữ ký đổi theo, nên đừng sửa.
+
 ## Đổi tên nhân vật phản diện
 Mở `characters.ts`, sửa đúng một dòng:
 

@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { Button, Card, DraggableCard, DroppableSlot, FeedbackSheet, TapOrDragContainer, fmt, sound, type StationResult } from '@so-chung/core';
+import { Button, Card, DraggableCard, DroppableSlot, FeedbackSheet, TapOrDragContainer, fmt, sound, type StationResult, rich } from '@so-chung/core';
 import { bai4Texts } from '@so-chung/core/content/lessons/bai-4';
 import { formatNumber } from '@so-chung/core/lib/format';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { generateHard, type CellCoord, type HardTx } from '@so-chung/core/lessons/bai-4/logic';
 import { CayMerkle } from './CayMerkle';
 
-const T = bai4Texts.hard;
+const T = bai4Texts.tramKho;
 
 export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; onFail?: (tip: string) => void }) {
   const startTimeRef = useRef<number>(Date.now());
@@ -135,7 +135,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
     );
     if (unfilled.length > 0) {
       sound.playWrong();
-      setNotice(fmt(T.t01, { so: unfilled.length }));
+      setNotice(fmt(T.emHayXepDuO, { so: unfilled.length }));
       setTimeout(() => setNotice(null), 3000);
       return;
     }
@@ -173,20 +173,20 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
           if (placedVal === reverseVal || isDistractor) {
             const nodeLabel =
               h.level === 3
-                ? T.t02
+                ? T.goc
                 : h.level === 2
                 ? `T${h.index * 4 + 1}-${h.index * 4 + 4}`
                 : `T${h.index * 2 + 1}${h.index * 2 + 2}`;
             wrongExplanations.push(
-              fmt(T.t03, { nodeLabel, rightVal, leftVal, reverseVal })
+              fmt(T.emDangGhepNguocThu, { nodeLabel, rightVal, leftVal, reverseVal })
             );
           } else {
             wrongExplanations.push(
-              fmt(T.t04, { level: h.level, placedVal: placedVal ?? '' })
+              fmt(T.oTangGiaTriChua, { level: h.level, placedVal: placedVal ?? '' })
             );
           }
         } else {
-          wrongExplanations.push(fmt(T.t05, { so: h.index + 1, placedVal: placedVal ?? '' }));
+          wrongExplanations.push(fmt(T.laGiaTriChuaDung, { so: h.index + 1, placedVal: placedVal ?? '' }));
         }
       }
     }
@@ -207,7 +207,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
           stars,
           timeMs,
           learned:
-            T.t06,
+            T.cayMerkleGoiNhieuGiao,
         });
       }, 500);
     } else {
@@ -227,11 +227,11 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
       setFeedback({
         isOpen: true,
         isCorrect: false,
-        title: T.t07,
-        whatHappened: fmt(T.t08, { so: wrongSlotKeys.length }),
+        title: T.coManhGhepChuaDung,
+        whatHappened: fmt(T.coManhGhepChuaDung2, { so: wrongSlotKeys.length }),
         whyHappened: wrongExplanations.slice(0, 2).join(' '),
         howToFix:
-          T.t09,
+          T.hayTinhCanThanTu,
       });
     }
   }, [hidden, placedPieces, checkCount, lockedSlots, tree, onComplete]);
@@ -263,7 +263,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
         // Ô đã khóa đúng
         return (
           <div className="w-full h-full rounded-[14px] border-2 border-xanh-la-dam bg-xanh-la/10 text-xanh-la-dam flex flex-col items-center justify-center">
-            <span className="text-xs font-bold uppercase text-xanh-la-dam leading-none">{T.t10}</span>
+            <span className="text-sm font-bold uppercase text-xanh-la-dam leading-none">{T.dung}</span>
             <span className="font-display font-extrabold text-sm sm:text-base leading-none mt-0.5">
               {formatNumber(val)}
             </span>
@@ -287,13 +287,13 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
               id={`piece-${val}`}
               className="w-full h-full flex flex-col items-center justify-center cursor-grab active:cursor-grabbing p-1"
             >
-              <span className="text-[9px] font-bold text-muc-tim-dam uppercase leading-none">{T.t11}</span>
+              <span className="text-sm font-bold text-muc-tim-dam uppercase leading-none">{T.daDat}</span>
               <span className="font-display font-extrabold text-sm sm:text-base text-muc-tim-dam leading-none mt-0.5">
                 {formatNumber(val)}
               </span>
             </DraggableCard>
           ) : (
-            <span className="font-display font-bold text-sm text-[#A69EBF]">
+            <span className="font-display font-bold text-sm text-nau-go-dam">
               ?
             </span>
           )}
@@ -311,9 +311,9 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-3 border-b border-nau-go/30 pb-2">
             <div className="flex items-center gap-2">
               <span className="text-lg">📋</span>
-              <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{T.t17}</h3>
+              <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{T.bang8GiaoDichGoc}</h3>
             </div>
-            <span className="text-sm text-nau-go-dam">{T.t18}</span>
+            <span className="text-sm text-nau-go-dam">{T.bangTraCuuGiaTri}</span>
           </div>
 
           <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
@@ -325,7 +325,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
                 <span className="font-display font-extrabold text-sm text-muc-tim-dam">
                   {tx.id}
                 </span>
-                <span className="text-xs text-nau-go-dam font-medium truncate w-full">
+                <span className="text-sm text-nau-go-dam font-medium truncate w-full">
                   {tx.name}
                 </span>
                 <span className="font-display font-bold text-sm text-chu mt-0.5 bg-giay px-1.5 rounded">
@@ -340,13 +340,12 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
         <Card className="p-4 sm:p-6 space-y-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 border-b border-nau-go/30 pb-3">
             <div>
-              <h3 className="first-letter:uppercase font-display font-extrabold text-lg text-chu">{T.t19}</h3>
-              <p className="text-sm text-nau-go-dam">{T.t20}</p>
+              <h3 className="first-letter:uppercase font-display font-extrabold text-lg text-chu">{T.cayMerkle8GiaoDich}</h3>
+              <p className="text-sm text-nau-go-dam">{T.keoHoacChamManhTu}</p>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-sm text-nau-go-dam font-semibold">{T.t21}<b className="text-muc-tim-dam">{checkCount}</b>
-              </span>
+              <span className="text-sm text-nau-go-dam font-semibold">{rich(T.luotKiemTra, { checkCount })}</span>
             </div>
           </div>
 
@@ -354,7 +353,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
           <CayMerkle
             treeValues={displayTreeValues}
             renderSlot={renderCustomSlot}
-            caption={T.t22}
+            caption={T.vuotNgangDeXemDu}
           />
 
           {/* Cảnh báo chưa điền đủ */}
@@ -371,7 +370,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
               size="lg"
               onClick={handleCheck}
               className="min-w-[200px]"
-            >{T.t23}</Button>
+            >{T.kiemTraCayMerkle}</Button>
           </div>
         </Card>
 
@@ -380,19 +379,19 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-nau-go/30 pb-2">
             <div className="flex items-center gap-2">
               <span className="text-lg">🧩</span>
-              <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{fmt(T.t24, { so: availableTrayPieces.length, so2: trayPieces.length })}</h3>
+              <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{fmt(T.khayManhGhepManh, { so: availableTrayPieces.length, so2: trayPieces.length })}</h3>
             </div>
-            <span className="text-sm text-nau-go-dam">{T.t25}</span>
+            <span className="text-sm text-nau-go-dam">{T.chua6GiaTriDung}</span>
           </div>
 
           {/* Vùng thả về khay (DroppableSlot tray-zone) */}
           <DroppableSlot
             id="tray-zone"
-            placeholder={T.t26}
+            placeholder={T.thaManhVeKhayTai}
             className="!p-3 !bg-white/60 !border-dashed !border-muc-tim/30 min-h-[90px]"
           >
             {availableTrayPieces.length === 0 ? (
-              <span className="text-sm text-nau-go-dam italic">{T.t27}</span>
+              <span className="text-sm text-nau-go-dam italic">{T.tatCaManhGhepDa}</span>
             ) : (
               <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 w-full">
                 {availableTrayPieces.map((pieceVal) => (
@@ -422,7 +421,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
           onContinue={() => {
             setFeedback((prev) => ({ ...prev, isOpen: false }));
           }}
-          continueLabel={T.t28}
+          continueLabel={T.thuLai}
         />
       </div>
     </TapOrDragContainer>

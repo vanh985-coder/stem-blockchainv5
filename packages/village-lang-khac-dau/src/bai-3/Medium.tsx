@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
-import { Button, FeedbackSheet, Modal, TapOrDragContainer, fmt, sound, useAuth, type StationResult } from '@so-chung/core';
+import { Button, FeedbackSheet, Modal, TapOrDragContainer, fmt, sound, useAuth, type StationResult, rich } from '@so-chung/core';
 import { bai3Texts } from '@so-chung/core/content/lessons/bai-3';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { generateMedium, verify, PEOPLE, STRANGER, type MediumTx } from '@so-chung/core/lessons/bai-3/logic';
@@ -8,7 +8,7 @@ import { TheGiaoDich } from './TheGiaoDich';
 import { MayXacMinh, type MayXacMinhResult } from './MayXacMinh';
 import { tenNhan } from './nguoi';
 
-const T = bai3Texts.medium;
+const T = bai3Texts.tramTb;
 
 export function Medium({ onComplete }: { onComplete: (r: StationResult) => void; onFail?: (tip: string) => void }) {
   const { profile } = useAuth();
@@ -114,7 +114,7 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
       if (person) {
         ownerName = tenNhan(person.id, myName);
       } else if (slot1Key === STRANGER.publicKey) {
-        ownerName = T.t04;
+        ownerName = T.khoaLaKhongCoTrong;
       }
 
       if (isValid) {
@@ -165,10 +165,10 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
       setFeedback({
         isOpen: true,
         isCorrect: true,
-        whatHappened: T.t05,
+        whatHappened: T.xuatSacEmDaTham,
         whyHappened:
-          T.t06,
-        howToFix: T.t07,
+          T.emDaBietDoiChieu,
+        howToFix: T.dayChinhLaNguyenLy,
       });
 
       setTimeout(() => {
@@ -176,7 +176,7 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
           stars,
           timeMs,
           learned:
-            T.t08,
+            T.khongBaoGioTinKhoa,
         });
       }, 1200);
     } else {
@@ -189,11 +189,11 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
       setFeedback({
         isOpen: true,
         isCorrect: false,
-        whatHappened: fmt(T.t09, { so: wrongTxs.length, wrongNames }),
+        whatHappened: fmt(T.coGiaoDichThamDinh, { so: wrongTxs.length, wrongNames }),
         whyHappened:
-          T.t10,
+          T.keMaoDanhCoThe,
         howToFix:
-          T.t11,
+          T.hayBamThuLaiThu,
       });
     }
   };
@@ -218,11 +218,11 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
       <div className="bg-white/70 rounded-[18px] border-2 border-nau-go/30 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="px-2.5 py-0.5 rounded-full text-sm font-bold bg-muc-tim/10 text-muc-tim-dam">{T.t18}</span>
-            <span className="text-sm text-nau-go-dam">{fmt(T.t19, { attempts })}</span>
+            <span className="px-2.5 py-0.5 rounded-full text-sm font-bold bg-muc-tim/10 text-muc-tim-dam">{T.tramTrungBinh}</span>
+            <span className="text-sm text-nau-go-dam">{fmt(T.lanThu, { attempts })}</span>
           </div>
-          <h3 className="font-display font-extrabold text-lg sm:text-xl text-chu">{T.t20}</h3>
-          <p className="text-sm text-nau-go-dam mt-0.5">{T.t21}</p>
+          <h3 className="font-display font-extrabold text-lg sm:text-xl text-chu">{T.thamDinh4GiaoDich}</h3>
+          <p className="text-sm text-nau-go-dam mt-0.5">{T.dungMayXacMinhDe}</p>
         </div>
 
         <Button
@@ -231,7 +231,7 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
           disabled={!isReadyToSubmit}
           onClick={handleSubmit}
           className="shrink-0 w-full sm:w-auto"
-        >{T.t22}</Button>
+        >{T.nopKetQuaThamDinh}</Button>
       </div>
 
       {/* Cảnh báo popup lần đầu bấm khóa đính kèm */}
@@ -239,14 +239,14 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
         <div className="p-4 bg-vang/15 rounded-[16px] border-2 border-vang/60 text-sm sm:text-sm text-nau-go-dam space-y-1.5 animate-fadeIn">
           <div className="flex items-center justify-between">
             <div className="font-bold flex items-center gap-1.5 text-sm sm:text-base text-nau-go-dam">
-              <span>⚠️</span>{T.t23}</div>
+              <span>⚠️</span>{' '}{T.luuYQuanTrongVe}</div>
             <button
               type="button"
               onClick={() => setShowWarningModal(false)}
               className="text-nau-go-dam font-bold hover:text-black px-2 py-0.5 cursor-pointer"
-            >{T.t24}</button>
+            >{T.daHieu}</button>
           </div>
-          <p className="leading-relaxed">{T.t25}<strong>{T.t28}</strong>{T.t26}<strong>{T.t29}</strong>{T.t27}</p>
+          <p className="leading-relaxed">{rich(T.khoaDinhKemLaDo)}</p>
         </div>
       )}
 
@@ -294,7 +294,7 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
                 setShowHowToUseModal(true);
               }}
             />
-            <p className="text-sm text-nau-go-dam text-center font-medium">{T.t30}</p>
+            <p className="text-sm text-nau-go-dam text-center font-medium">{T.keoHoacChamChon1}</p>
           </div>
         </div>
 
@@ -302,8 +302,8 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-display font-extrabold text-base sm:text-lg text-chu flex items-center gap-2">
-              <span>📋</span>{T.t31}</h4>
-            <span className="text-sm sm:text-sm text-nau-go-dam">{fmt(T.t32, { so: Object.values(decisions).filter(Boolean).length })}</span>
+              <span>📋</span>{' '}{T.so4TheGiaoDichCan}</h4>
+            <span className="text-sm sm:text-sm text-nau-go-dam">{fmt(T.daChon4, { so: Object.values(decisions).filter(Boolean).length })}</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -340,33 +340,30 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
       <Modal
         isOpen={showHowToUseModal}
         onClose={() => setShowHowToUseModal(false)}
-        title={T.t33}
+        title={T.mayXacMinhChuKy}
         maxWidth="md"
       >
         <div className="space-y-4 text-sm text-chu">
           <div className="bg-giay p-4 rounded-[16px] border border-nau-go/30 space-y-2.5">
             <div className="flex items-start gap-2.5">
               <span className="text-base shrink-0">1️⃣</span>
-              <p className="leading-relaxed">{T.t34}<strong>{T.t37}</strong>{T.t35}<strong>{T.t38}</strong>{T.t36}<strong>{T.t39}</strong>.
-              </p>
+              <p className="leading-relaxed">{rich(T.dua1KhoaVa1)}</p>
             </div>
             <div className="flex items-start gap-2.5">
               <span className="text-base shrink-0">🟢</span>
-              <p className="leading-relaxed">
-                <strong>{T.t41}</strong>{T.t40}</p>
+              <p className="leading-relaxed">{rich(T.denXanhChuKyTren)}</p>
             </div>
             <div className="flex items-start gap-2.5">
               <span className="text-base shrink-0">🔴</span>
-              <p className="leading-relaxed">
-                <strong>{T.t43}</strong>{T.t42}</p>
+              <p className="leading-relaxed">{rich(T.denDoChuKyKhong)}</p>
             </div>
           </div>
 
           <div className="p-3.5 bg-vang/15 rounded-[16px] border-2 border-vang/60 text-nau-go-dam space-y-1.5">
             <div className="font-bold flex items-center gap-1.5 text-sm text-nau-go-dam">
-              <span>⚠️</span>{T.t44}</div>
-            <p className="leading-relaxed text-sm sm:text-sm">{T.t45}<strong>{T.t47}</strong>{T.t46}</p>
-            <p className="leading-relaxed text-sm sm:text-sm font-semibold">{T.t48}</p>
+              <span>⚠️</span>{' '}{T.quanTrong}</div>
+            <p className="leading-relaxed text-sm sm:text-sm">{rich(T.mayKhongPhanBietThe)}</p>
+            <p className="leading-relaxed text-sm sm:text-sm font-semibold">{T.viecChonKhoaNaoDe}</p>
           </div>
 
           <Button
@@ -374,7 +371,7 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
             size="md"
             fullWidth
             onClick={() => setShowHowToUseModal(false)}
-          >{T.t49}</Button>
+          >{T.daHieu2}</Button>
         </div>
       </Modal>
 
@@ -385,7 +382,7 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
         whatHappened={feedback.whatHappened}
         whyHappened={feedback.whyHappened}
         howToFix={feedback.howToFix}
-        continueLabel={feedback.isCorrect ? T.t50 : T.t51}
+        continueLabel={feedback.isCorrect ? T.tuyetVoi : T.thuLaiVongMoi}
         onContinue={() => {
           if (feedback.isCorrect) {
             setFeedback((f) => ({ ...f, isOpen: false }));

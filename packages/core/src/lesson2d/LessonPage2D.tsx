@@ -259,7 +259,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
         <GuestBar compact />
         <header className="mx-auto flex w-full max-w-4xl flex-wrap items-center gap-x-3 gap-y-2 p-2 sm:p-3 max-[480px]:flex-nowrap max-[480px]:gap-1.5 max-[480px]:px-2 max-[480px]:py-1">
           <div className="min-w-0 flex-1 basis-full sm:basis-auto max-[480px]:basis-0">
-            <h1 className="truncate font-display text-xl font-extrabold sm:text-2xl max-[480px]:line-clamp-2 max-[480px]:whitespace-normal max-[480px]:text-[0.8125rem] max-[480px]:leading-tight">
+            <h1 className="truncate font-display text-xl font-extrabold sm:text-2xl max-[480px]:line-clamp-2 max-[480px]:whitespace-normal max-[480px]:text-sm max-[480px]:leading-tight">
               {level ? fmt(level.ten) : ''}
             </h1>
           </div>

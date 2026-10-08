@@ -24,6 +24,7 @@ export { Panel } from './ui/Panel';
 export { PortraitFrame } from './ui/PortraitFrame';
 export { Hearts } from './ui/Hearts';
 export { Card } from './ui/Card';
+export { rich } from './ui/rich';
 export { ProgressBar } from './ui/ProgressBar';
 export { Modal } from './ui/Modal';
 export { Avatar } from './ui/Avatar';

@@ -15,6 +15,15 @@ function allStrings(node: unknown, path = 'bai3', out: [string, string][] = []):
 describe('content/lessons/bai-3.ts', () => {
   const strings = [...allStrings(bai3Lesson, 'lesson'), ...allStrings(bai3Texts, 'texts')];
 
+  it('khóa có tên theo trạm và nội dung (không còn t01, t02…), chuỗi không thừa khoảng trắng đầu cuối', () => {
+    for (const [group, items] of Object.entries(bai3Texts)) {
+      for (const [key, text] of Object.entries(items as Record<string, string>)) {
+        expect(key, `${group}.${key}`).not.toMatch(/^t\d+$/);
+        if (key !== 'khoaKiemTra' && key !== 'ketLuan') expect(text, `${group}.${key}`).toBe(text.trim());
+      }
+    }
+  });
+
   it('có chữ và không câu nào rỗng', () => {
     expect(strings.length).toBeGreaterThan(150);
     for (const [path, s] of strings) expect(s.trim(), path).not.toBe('');

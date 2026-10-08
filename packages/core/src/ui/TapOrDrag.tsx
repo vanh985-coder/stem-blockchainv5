@@ -113,7 +113,7 @@ export function DraggableCard({ id, disabled = false, children, className = '' }
         'touch-none select-none transition-shadow cursor-grab active:cursor-grabbing',
         isDragging ? 'z-50 scale-105 opacity-80 shadow-[0_6px_0_0_var(--color-nau-go)]' : '',
         isSelected ? 'ring-4 ring-muc-tim ring-offset-2' : '',
-        disabled ? 'cursor-not-allowed opacity-50' : '',
+        disabled ? 'cursor-default' : '',
         'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim',
         className,
       ].join(' ')}

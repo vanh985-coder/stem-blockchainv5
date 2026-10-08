@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button, DroppableSlot, fmt } from '@so-chung/core';
+import { Button, DroppableSlot, fmt, rich } from '@so-chung/core';
 import { bai3Texts } from '@so-chung/core/content/lessons/bai-3';
 
-const T = bai3Texts.mayxacminh;
+const T = bai3Texts.mayXacMinh;
 
 export interface MayXacMinhResult {
   valid: boolean;
@@ -66,16 +66,16 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
           <span className="text-2xl">⚙️</span>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-display font-extrabold text-base sm:text-lg tracking-wide text-white">{T.t01}</h3>
+              <h3 className="font-display font-extrabold text-base sm:text-lg tracking-wide text-white">{T.mayXacMinhChuKy}</h3>
               {onHowToUse && (
                 <button
                   type="button"
                   onClick={onHowToUse}
                   className="px-2.5 py-1 rounded-full text-sm font-semibold text-violet-200 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all cursor-pointer min-h-[32px] flex items-center"
-                >{T.t02}</button>
+                >{T.cachDungMay}</button>
               )}
             </div>
-            <p className="text-sm text-[#A69EBF]">{T.t03}</p>
+            <p className="text-sm text-[#A69EBF]">{T.coCheKiemTraToan}</p>
           </div>
         </div>
 
@@ -88,7 +88,7 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
                 ? 'bg-vang shadow-[0_0_8px_#FFC21A]'
                 : 'bg-[#554E6D]'
             }`}
-            title={T.t04}
+            title={T.denCho}
           />
           {/* Đèn xanh/hợp lệ */}
           <div
@@ -97,7 +97,7 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
                 ? 'bg-xanh-la-dam shadow-[0_0_10px_#1FAF5A]'
                 : 'bg-[#1C4D2E]'
             }`}
-            title={T.t05}
+            title={T.denHopLe}
           />
           {/* Đèn đỏ/không khớp */}
           <div
@@ -106,7 +106,7 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
                 ? 'bg-do-son shadow-[0_0_10px_#E5484D]'
                 : 'bg-[#521C22]'
             }`}
-            title={T.t06}
+            title={T.denKhongHopLe}
           />
         </div>
       </div>
@@ -117,11 +117,11 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
         {droppable ? (
           <DroppableSlot
             id="slot-key"
-            placeholder={T.t07}
+            placeholder={T.keoKhoaVaoDay}
             className="!bg-[#1C182B] !border-white/10 rounded-[16px] p-3.5 sm:p-4 flex flex-col justify-between min-h-[115px] !items-stretch"
           >
             <div className="flex items-center justify-between text-sm text-[#A69EBF] font-bold mb-2">
-              <span>{T.t08}</span>
+              <span>{T.khe1KhoaCongKhai}</span>
               {slot1Key !== null && onClearSlot1 && !isVerifying && (
                 <button
                   type="button"
@@ -129,46 +129,46 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
                     e.stopPropagation();
                     onClearSlot1();
                   }}
-                  className="text-do-son-dam hover:text-white text-sm px-2 py-0.5 rounded min-h-[32px] flex items-center cursor-pointer font-bold"
-                  title={T.t10}
-                >{T.t09}</button>
+                  className="text-red-300 hover:text-white text-sm px-2 py-0.5 rounded min-h-[32px] flex items-center cursor-pointer font-bold"
+                  title={T.goKhoa}
+                >{T.go}</button>
               )}
             </div>
 
             {slot1Key !== null ? (
               <div className="flex items-center justify-between bg-muc-tim text-white p-2.5 rounded-[12px] border border-[#7B61FF]">
-                <span className="font-medium text-sm">{T.t11}</span>
+                <span className="font-medium text-sm">{T.khoaNap}</span>
                 <span className="font-mono font-extrabold text-xl px-3 py-1 bg-white/20 rounded-[8px]">
                   {slot1Key}
                 </span>
               </div>
             ) : (
-              <div className="border border-dashed border-white/20 rounded-[12px] p-3 text-center text-sm sm:text-sm text-[#8A82A5] my-auto">{T.t12}</div>
+              <div className="border border-dashed border-white/20 rounded-[12px] p-3 text-center text-sm sm:text-sm text-[#8A82A5] my-auto">{T.chuaNapKhoaKeoTu}</div>
             )}
           </DroppableSlot>
         ) : (
           <div className="bg-[#1C182B] rounded-[16px] p-3.5 sm:p-4 border border-white/10 flex flex-col justify-between min-h-[115px]">
             <div className="flex items-center justify-between text-sm text-[#A69EBF] font-bold mb-2">
-              <span>{T.t08}</span>
+              <span>{T.khe1KhoaCongKhai}</span>
               {slot1Key !== null && onClearSlot1 && !isVerifying && (
                 <button
                   type="button"
                   onClick={onClearSlot1}
-                  className="text-do-son-dam hover:text-white text-sm px-2 py-0.5 rounded min-h-[32px] flex items-center cursor-pointer font-bold"
-                  title={T.t10}
-                >{T.t09}</button>
+                  className="text-red-300 hover:text-white text-sm px-2 py-0.5 rounded min-h-[32px] flex items-center cursor-pointer font-bold"
+                  title={T.goKhoa}
+                >{T.go}</button>
               )}
             </div>
 
             {slot1Key !== null ? (
               <div className="flex items-center justify-between bg-muc-tim text-white p-2.5 rounded-[12px] border border-[#7B61FF]">
-                <span className="font-medium text-sm">{T.t11}</span>
+                <span className="font-medium text-sm">{T.khoaNap}</span>
                 <span className="font-mono font-extrabold text-xl px-3 py-1 bg-white/20 rounded-[8px]">
                   {slot1Key}
                 </span>
               </div>
             ) : (
-              <div className="border border-dashed border-white/20 rounded-[12px] p-3 text-center text-sm sm:text-sm text-[#8A82A5] my-auto">{T.t13}</div>
+              <div className="border border-dashed border-white/20 rounded-[12px] p-3 text-center text-sm sm:text-sm text-[#8A82A5] my-auto">{T.chuaNapKhoaChonTu}</div>
             )}
           </div>
         )}
@@ -177,11 +177,11 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
         {droppable ? (
           <DroppableSlot
             id="slot-tx"
-            placeholder={T.t14}
+            placeholder={T.keoTheGiaoDichVao}
             className="!bg-[#1C182B] !border-white/10 rounded-[16px] p-3.5 sm:p-4 flex flex-col justify-between min-h-[115px] !items-stretch"
           >
             <div className="flex items-center justify-between text-sm text-[#A69EBF] font-bold mb-2">
-              <span>{T.t15}</span>
+              <span>{T.khe2GiaoDich}</span>
               {slot2Tx && onClearSlot2 && !isVerifying && (
                 <button
                   type="button"
@@ -189,50 +189,50 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
                     e.stopPropagation();
                     onClearSlot2();
                   }}
-                  className="text-do-son-dam hover:text-white text-sm px-2 py-0.5 rounded min-h-[32px] flex items-center cursor-pointer font-bold"
-                  title={T.t16}
-                >{T.t09}</button>
+                  className="text-red-300 hover:text-white text-sm px-2 py-0.5 rounded min-h-[32px] flex items-center cursor-pointer font-bold"
+                  title={T.goThe}
+                >{T.go}</button>
               )}
             </div>
 
             {slot2Tx ? (
               <div className="bg-[#2D2644] p-2.5 rounded-[12px] border border-white/15 text-sm sm:text-sm">
                 <div className="font-display font-extrabold text-white text-sm sm:text-base truncate">
-                  {slot2Tx.senderName || T.t17}
+                  {slot2Tx.senderName || T.giaoDich}
                 </div>
                 <div className="text-sm sm:text-sm text-violet-200 truncate mt-0.5">
                   "{slot2Tx.message}"
                 </div>
               </div>
             ) : (
-              <div className="border border-dashed border-white/20 rounded-[12px] p-3 text-center text-sm sm:text-sm text-[#8A82A5] my-auto">{T.t18}</div>
+              <div className="border border-dashed border-white/20 rounded-[12px] p-3 text-center text-sm sm:text-sm text-[#8A82A5] my-auto">{T.chuaNapTheGiaoDich}</div>
             )}
           </DroppableSlot>
         ) : (
           <div className="bg-[#1C182B] rounded-[16px] p-3.5 sm:p-4 border border-white/10 flex flex-col justify-between min-h-[115px]">
             <div className="flex items-center justify-between text-sm text-[#A69EBF] font-bold mb-2">
-              <span>{T.t15}</span>
+              <span>{T.khe2GiaoDich}</span>
               {slot2Tx && onClearSlot2 && !isVerifying && (
                 <button
                   type="button"
                   onClick={onClearSlot2}
-                  className="text-do-son-dam hover:text-white text-sm px-2 py-0.5 rounded min-h-[32px] flex items-center cursor-pointer font-bold"
-                  title={T.t16}
-                >{T.t09}</button>
+                  className="text-red-300 hover:text-white text-sm px-2 py-0.5 rounded min-h-[32px] flex items-center cursor-pointer font-bold"
+                  title={T.goThe}
+                >{T.go}</button>
               )}
             </div>
 
             {slot2Tx ? (
               <div className="bg-[#2D2644] p-2.5 rounded-[12px] border border-white/15 text-sm sm:text-sm">
                 <div className="font-display font-extrabold text-white text-sm sm:text-base truncate">
-                  {slot2Tx.senderName || T.t17}
+                  {slot2Tx.senderName || T.giaoDich}
                 </div>
                 <div className="text-sm sm:text-sm text-violet-200 truncate mt-0.5">
                   "{slot2Tx.message}"
                 </div>
               </div>
             ) : (
-              <div className="border border-dashed border-white/20 rounded-[12px] p-3 text-center text-sm sm:text-sm text-[#8A82A5] my-auto">{T.t19}</div>
+              <div className="border border-dashed border-white/20 rounded-[12px] p-3 text-center text-sm sm:text-sm text-[#8A82A5] my-auto">{T.chuaNapTheGiaoDich2}</div>
             )}
           </div>
         )}
@@ -265,8 +265,8 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
           </div>
           <div className="text-sm sm:text-sm text-[#A69EBF]">
             {isVerifying
-              ? T.t20
-              : T.t21}
+              ? T.dangTinhToanKiemTra
+              : T.sanSangThamDinhChu}
           </div>
         </div>
 
@@ -277,7 +277,7 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
             disabled={!slot1Key || !slot2Tx || isVerifying}
             onClick={onVerify}
             className="w-full sm:w-auto"
-          >{T.t22}</Button>
+          >{T.kiemTraChuKy}</Button>
         )}
       </div>
 
@@ -285,8 +285,8 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
       {result && (
         <div className="mt-4 pt-3.5 border-t border-dashed border-white/20 animate-fadeIn">
           <div className="text-sm font-mono tracking-wider text-[#A69EBF] mb-2 flex items-center justify-between">
-            <span>{T.t23}</span>
-            <span>{fmt(T.t24, { testedKey: result.testedKey })}</span>
+            <span>{T.phieuKetQuaThamDinh}</span>
+            <span>{fmt(T.ma, { testedKey: result.testedKey })}</span>
           </div>
 
           <div
@@ -302,24 +302,24 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
             <div className="flex items-center gap-2 font-extrabold text-base sm:text-lg mb-2">
               <span>{result.valid ? '✓' : '✗'}</span>
               <span className={result.valid ? 'text-[#4ADE80]' : 'text-[#FF8787]'}>
-                {result.valid ? T.t25 : T.t26}
+                {result.valid ? T.chuKyHopLe : T.chuKyKhongHopLe}
               </span>
             </div>
 
             <div className="text-sm sm:text-sm text-violet-200 space-y-1.5">
               <div>
-                <span className="text-[#A69EBF]">{T.t27}</span>
+                <span className="text-[#A69EBF]">{T.khoaKiemTra}</span>
                 <span className="font-mono font-bold text-base text-white">{result.testedKey}</span>
                 {result.ownerName && (
                   <span className="text-vang"> ({result.ownerName})</span>
                 )}
               </div>
               <div>
-                <span className="text-[#A69EBF]">{T.t28}</span>
+                <span className="text-[#A69EBF]">{T.ketLuan}</span>
                 {result.valid ? (
-                  <span>{T.t29}<strong className="text-[#4ADE80]">{T.t31}</strong>{fmt(T.t30, { testedKey: result.testedKey })}</span>
+                  <span>{rich(T.chuKyNayDungLa, { testedKey: result.testedKey })}</span>
                 ) : (
-                  <span>{T.t29}<strong className="text-[#FF8787]">{T.t33}</strong>{fmt(T.t32, { testedKey: result.testedKey })}</span>
+                  <span>{rich(T.chuKyNayKhongKhop, { testedKey: result.testedKey })}</span>
                 )}
               </div>
             </div>
