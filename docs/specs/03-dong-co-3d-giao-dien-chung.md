@@ -248,18 +248,50 @@ Dùng ở mọi chỗ có lựa chọn: câu hỏi, Đồng ý/Từ chối, lự
 | Đã có Trang Sổ Vàng 1, sau đó màn 3 đổi sang `ready` | Vẫn giữ trang; màn 3 mở để chơi |
 | Màn 11 là `coming-soon`, màn 12 là `ready`; xong màn 10 | Màn 12 mở |
 
-## 7. Âm thanh
+## 7. Mọi chữ hiển thị nằm trong một thư mục (`packages/core/src/content/`)
+
+**Quy tắc bắt buộc:** **không viết chữ tiếng Việt hiển thị thẳng trong component.** Mọi chữ người chơi nhìn thấy đều lấy từ thư mục này. Như vậy người dùng tự sửa câu chữ mà không phải đụng vào code.
+
+| File | Chứa gì |
+|---|---|
+| `characters.ts` | Tên hiển thị các nhân vật, kể cả `phanDien` |
+| `story.ts` | Lời 14 ảnh truyện (spec 04 mục 2) |
+| `dialogues.ts` | Mọi lời thoại của người dẫn, Bi, `{phanDien}` và dân làng. Chia theo nơi và thời điểm, ví dụ `langGiay.moDau`, `langGiay.truocTramTB`, `cho.biNhacNhiemVu`, `caoTrao.tiHoiCai` |
+| `lessons/bai-1.ts` … `bai-4.ts` | Nội dung 4 bài học: hướng dẫn từng trạm, gợi ý, phản hồi đúng/sai, "Em có biết?" |
+| `games.ts` | Tên từng game, luật 2–3 dòng ở thẻ bắt đầu, lời trong game (ví dụ "Ui da!", "Trượt rồi!", "Ngõ cụt!"), tên các mốc điểm |
+| `questions.ts` | Ngân hàng câu hỏi (spec 03 mục 5) |
+| `ui.ts` | Chữ trên nút, nhãn, menu, cài đặt, thông báo, lỗi (ví dụ "Đang lưu…", "Sắp ra mắt", "Sai tên đăng nhập hoặc mật khẩu…"), trang giáo viên, trang quyền riêng tư |
+
+**Cách viết:**
+- Mỗi câu là một cặp **khóa: "chữ"**, có chú thích ngắn cho biết câu đó hiện ở đâu.
+- **Chỗ giữ tên** chỉ dùng 3 loại: `{ten}` (tên học sinh), `{Ten}` (tên học sinh viết hoa chữ đầu), `{phanDien}`. Ngoài ra có chỗ giữ số, như `{so}`, `{diem}`.
+
+**File hướng dẫn `content/HUONG-DAN-SUA-CHU.md`** (viết cho người không rành code):
+- Chỉ sửa chữ nằm giữa hai dấu ngoặc kép.
+- Giữ nguyên các chỗ giữ tên như `{ten}`, `{phanDien}`.
+- Sửa xong chạy `pnpm test`, rồi mở trang xem lại.
+
+**Test `content.test.ts`:**
+- Không có câu nào rỗng.
+- Chỉ dùng các chỗ giữ tên hợp lệ.
+- Mọi khóa mà code gọi tới đều có trong `content/`.
+
+**Kiểm tra tự động:** script `pnpm check:text` báo lỗi nếu tìm thấy chữ có dấu tiếng Việt trong file `.tsx` nằm ngoài thư mục `content/`.
+
+**Ngoại lệ:** chuỗi dữ liệu dùng trong logic và test, ví dụ thông điệp được ký "Chuyển 3 xu cho An" ở Bài 3, vẫn nằm trong logic của bài và không được sửa (spec 01 mục 3).
+
+## 8. Âm thanh
 
 Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút tắt.
 
-## 8. Hiệu năng
+## 9. Hiệu năng
 
 - **Dung lượng:** trang đầu ≤ 150 KB JS. Lõi 3D chỉ tải khi vào cảnh 3D. Mỗi màn tải riêng.
 - **Bộ nhớ:** texture nhân vật đã được thu nhỏ khi build (spec 01). Nếu lúc chạy còn thấy texture lớn hơn 2048, ghi cảnh báo.
 - **Tốc độ:** mức Thấp ≥ 30fps trên điện thoại tầm trung.
 - **Code:** không tạo object mới trong `useFrame`; rời cảnh thì dispose.
 
-## 9. Trang thử
+## 10. Trang thử
 
 **`/dev/3d`:**
 - Chọn từng model trong manifest để xem.
@@ -280,4 +312,5 @@ Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút
 - [ ] `/dev/portraits` xuất được 11 ảnh chân dung rõ mặt.
 - [ ] `Scene25D` hiện nền, hình rời và nhân vật 3D đúng lớp, co giãn đúng 16:9.
 - [ ] Đổi tên `phanDien` trong `characters.ts` thì đổi ở mọi lời thoại và câu hỏi.
+- [ ] `pnpm check:text` không báo chữ hiển thị nào nằm ngoài `content/`; có file `HUONG-DAN-SUA-CHU.md`.
 - [ ] Test va chạm và `unlock.ts` ✅. Mức Thấp ≥ 30fps.

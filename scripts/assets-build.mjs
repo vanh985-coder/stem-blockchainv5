@@ -15,8 +15,8 @@ const SKIP_DIRS = new Set(['concept', 'source', 'models']);
 const WARN_BYTES = 400 * 1024;
 const CONCURRENCY = 4;
 
-// Đổi số này khi đổi quy tắc nén, để mọi ảnh được nén lại.
-const RULES_VERSION = 1;
+// Sửa chính file script này thì mọi ảnh được nén lại (mã băm của script nằm trong chữ ký cache).
+const SCRIPT_HASH = createHash('sha256').update(await readFile(fileURLToPath(import.meta.url))).digest('hex').slice(0, 12);
 
 /** Quy tắc nén theo đường dẫn không đuôi (dấu /). Trả null nếu chưa có quy tắc. */
 function classify(key) {
@@ -31,7 +31,7 @@ function classify(key) {
   ) {
     return { kind: 'hinh-roi', box: 1024, quality: 85 };
   }
-  if (key.startsWith('ui/icons/')) return { kind: 'icon', box: 256, quality: 85 };
+  if (key.startsWith('ui/icons/')) return { kind: 'icon', box: 256, quality: 85, cutout: true };
   if (key.startsWith('ui/portraits/')) return { kind: 'chan-dung', exact: 512, quality: 85 };
   return null;
 }
@@ -50,7 +50,131 @@ async function walk(dir, rel = '') {
 
 const sha = (buf, n = 16) => createHash('sha256').update(buf).digest('hex').slice(0, n);
 
+
+// ---------------------------------------------------------------------------
+// Icon: tách nền liền khối (loang màu từ 4 góc), cắt sát hình, đệm thành hình vuông trong suốt.
+const FLOOD_TOLERANCE = 28; // sai số tối đa của từng kênh màu so với màu nền ở góc
+const ICON_MARGIN = 4;
+
+/** Đánh dấu nền: loang từ 4 góc qua các điểm ảnh có màu gần màu của một trong 4 góc. Trả về mask (1 = nền). */
+function floodBackground(data, w, h) {
+  const seeds = [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]].map(([x, y]) => {
+    const o = (y * w + x) * 4;
+    return [data[o], data[o + 1], data[o + 2]];
+  });
+  const near = (o) => {
+    for (const [r, g, b] of seeds) {
+      if (Math.abs(data[o] - r) <= FLOOD_TOLERANCE && Math.abs(data[o + 1] - g) <= FLOOD_TOLERANCE && Math.abs(data[o + 2] - b) <= FLOOD_TOLERANCE) return true;
+    }
+    return false;
+  };
+  const mask = new Uint8Array(w * h);
+  const stack = new Int32Array(w * h);
+  let sp = 0;
+  for (const [x, y] of [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]]) {
+    const i = y * w + x;
+    if (!mask[i] && near(i * 4)) {
+      mask[i] = 1;
+      stack[sp++] = i;
+    }
+  }
+  while (sp > 0) {
+    const i = stack[--sp];
+    const x = i % w;
+    const y = (i - x) / w;
+    const nb = [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, y > 0 ? i - w : -1, y < h - 1 ? i + w : -1];
+    for (const j of nb) {
+      if (j >= 0 && !mask[j] && near(j * 4)) {
+        mask[j] = 1;
+        stack[sp++] = j;
+      }
+    }
+  }
+  return mask;
+}
+
+/** Thu hẹp phần đặc 1px (bỏ viền sáng còn sót của nền) rồi làm mềm viền alpha 1px. */
+async function softenAlpha(rgba, w, h) {
+  const a = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) a[i] = rgba[i * 4 + 3];
+  const eroded = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = y * w + x;
+      let m = a[i];
+      if (x > 0) m = Math.min(m, a[i - 1]);
+      if (x < w - 1) m = Math.min(m, a[i + 1]);
+      if (y > 0) m = Math.min(m, a[i - w]);
+      if (y < h - 1) m = Math.min(m, a[i + w]);
+      eroded[i] = m;
+    }
+  }
+  const blurred = await sharp(eroded, { raw: { width: w, height: h, channels: 1 } }).blur(0.8).extractChannel(0).raw().toBuffer();
+  for (let i = 0; i < w * h; i++) rgba[i * 4 + 3] = blurred[i];
+}
+
+async function encodeIcon(file, rule) {
+  const { data, info } = await sharp(file).rotate().ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { width: w, height: h } = info;
+  const corners = [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]];
+  const alreadyCut = corners.every(([x, y]) => data[(y * w + x) * 4 + 3] < 16);
+  if (!alreadyCut) {
+    const mask = floodBackground(data, w, h);
+    for (let i = 0; i < w * h; i++) if (mask[i]) data[i * 4 + 3] = 0;
+  }
+  // Cắt sát hình
+  let minX = w, minY = h, maxX = -1, maxY = -1;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      if (data[(y * w + x) * 4 + 3] >= 16) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+  if (maxX < 0) throw new Error(`Icon ${file}: không còn hình sau khi tách nền`);
+  const fit = rule.box - 2 * ICON_MARGIN;
+  const { data: small, info: si } = await sharp(data, { raw: { width: w, height: h, channels: 4 } })
+    .extract({ left: minX, top: minY, width: maxX - minX + 1, height: maxY - minY + 1 })
+    .resize({ width: fit, height: fit, fit: 'inside', withoutEnlargement: true })
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  if (!alreadyCut) await softenAlpha(small, si.width, si.height);
+  // Đệm thành hình vuông trong suốt
+  const side = Math.max(si.width, si.height) + 2 * ICON_MARGIN;
+  const left = Math.floor((side - si.width) / 2);
+  const top = Math.floor((side - si.height) / 2);
+  return sharp(small, { raw: { width: si.width, height: si.height, channels: 4 } })
+    .extend({ top, bottom: side - si.height - top, left, right: side - si.width - left, background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .webp({ quality: rule.quality, alphaQuality: 100, effort: 5 })
+    .toBuffer({ resolveWithObject: true });
+}
+
+/** Ảnh xem trước các icon trên nền caro, để soi bằng mắt. */
+async function writeIconPreview(manifest) {
+  const keys = Object.keys(manifest).filter((k) => k.startsWith('ui/icons/')).sort();
+  if (!keys.length) return;
+  const cell = 256;
+  const cols = 4;
+  const rows = Math.ceil(keys.length / cols);
+  const check = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${cols * cell}" height="${rows * cell}">` +
+      `<defs><pattern id="c" width="32" height="32" patternUnits="userSpaceOnUse"><rect width="32" height="32" fill="#e6e6e6"/>` +
+      `<rect width="16" height="16" fill="#bdbdbd"/><rect x="16" y="16" width="16" height="16" fill="#bdbdbd"/></pattern></defs>` +
+      `<rect width="100%" height="100%" fill="url(#c)"/></svg>`,
+  );
+  const layers = [];
+  for (const [i, k] of keys.entries()) {
+    layers.push({ input: path.join(OUT, manifest[k].file), left: (i % cols) * cell + Math.floor((cell - manifest[k].width) / 2), top: Math.floor(i / cols) * cell + Math.floor((cell - manifest[k].height) / 2) });
+  }
+  await mkdir(path.join(OUT, '_preview'), { recursive: true });
+  await sharp(check).composite(layers).webp({ quality: 90 }).toFile(path.join(OUT, '_preview', 'icons.webp'));
+}
+
 async function encode(file, rule) {
+  if (rule.cutout) return encodeIcon(file, rule);
   let img = sharp(file).rotate();
   if (rule.maxWidth) img = img.resize({ width: rule.maxWidth, withoutEnlargement: true });
   else if (rule.box) img = img.resize({ width: rule.box, height: rule.box, fit: 'inside', withoutEnlargement: true });
@@ -103,7 +227,7 @@ const bigFiles = [];
 await pool(jobs, CONCURRENCY, async ({ rel, key, rule }) => {
   const srcPath = path.join(SRC, rel);
   const srcHash = sha(await readFile(srcPath));
-  const sig = `${RULES_VERSION}:${JSON.stringify(rule)}:${srcHash}`;
+  const sig = `${SCRIPT_HASH}:${JSON.stringify(rule)}:${srcHash}`;
   const hit = cache[key];
   let entry;
   if (hit && hit.sig === sig) {
@@ -155,6 +279,7 @@ await pruneEmpty(OUT);
 const sorted = Object.fromEntries(Object.entries(manifest).sort(([a], [b]) => (a < b ? -1 : 1)));
 await writeFile(path.join(OUT, 'manifest.json'), JSON.stringify(sorted, null, 2) + '\n');
 await writeFile(CACHE_FILE, JSON.stringify(newCache, null, 2) + '\n');
+await writeIconPreview(manifest);
 
 // ---------------------------------------------------------------------------
 const byKind = {};

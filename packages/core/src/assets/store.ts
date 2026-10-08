@@ -1,4 +1,7 @@
 import { useEffect, useSyncExternalStore } from 'react';
+import { fmt } from '../content/characters';
+import { ui } from '../content/ui';
+import { devWarn } from '../lib/dev';
 import { lookupAsset, resolveAssetsUrl, type Manifest } from './manifest';
 
 export const ASSETS_URL = resolveAssetsUrl(import.meta.env.VITE_ASSETS_URL);
@@ -6,14 +9,6 @@ export const ASSETS_URL = resolveAssetsUrl(import.meta.env.VITE_ASSETS_URL);
 let manifest: Manifest | null = null;
 let loading: Promise<Manifest> | null = null;
 const listeners = new Set<() => void>();
-
-const warned = new Set<string>();
-/** Chỉ cảnh báo ở chế độ dev, mỗi nội dung một lần. */
-export function devWarn(message: string): void {
-  if (!import.meta.env.DEV || warned.has(message)) return;
-  warned.add(message);
-  console.warn(`[assets] ${message}`);
-}
 
 /** Tải manifest một lần. Lỗi mạng hoặc thiếu file thì coi như manifest rỗng (mọi ảnh dùng hình thay thế). */
 export function loadManifest(): Promise<Manifest> {
@@ -23,7 +18,7 @@ export function loadManifest(): Promise<Manifest> {
       return r.json() as Promise<Manifest>;
     })
     .catch((e: unknown) => {
-      devWarn(`Không tải được ${ASSETS_URL}/manifest.json (${String(e)}). Đã chạy pnpm dev:assets chưa?`);
+      devWarn(fmt(ui.dev.manifestLoi, { path: `${ASSETS_URL}/manifest.json`, loi: String(e) }));
       return {} as Manifest;
     })
     .then((m) => {

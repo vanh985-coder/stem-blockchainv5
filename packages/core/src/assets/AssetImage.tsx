@@ -1,6 +1,9 @@
 import { useState, type CSSProperties, type ImgHTMLAttributes } from 'react';
 import { lookupAsset } from './manifest';
-import { ASSETS_URL, devWarn, useManifest } from './store';
+import { fmt } from '../content/characters';
+import { ui } from '../content/ui';
+import { devWarn } from '../lib/dev';
+import { ASSETS_URL, useManifest } from './store';
 
 /** Màu ổn định theo đường dẫn, dùng cho ô thay thế. */
 function placeholderColor(path: string): string {
@@ -21,7 +24,7 @@ export function AssetImage({ path, alt, className, style, ...rest }: AssetImageP
   const src = failed ? null : lookupAsset(manifest, ASSETS_URL, path);
 
   if (!src) {
-    if (manifest && !failed) devWarn(`Thiếu ảnh "${path}" trong manifest`);
+    if (manifest && !failed) devWarn(fmt(ui.dev.thieuAnh, { path }));
     const box: CSSProperties = { background: placeholderColor(path), ...style };
     return <div role="img" aria-label={alt} className={className} style={box} />;
   }
@@ -33,7 +36,7 @@ export function AssetImage({ path, alt, className, style, ...rest }: AssetImageP
       className={className}
       style={style}
       onError={() => {
-        devWarn(`Không tải được ảnh "${path}" (${src})`);
+        devWarn(fmt(ui.dev.anhLoi, { path, src }));
         setFailed(true);
       }}
     />

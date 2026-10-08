@@ -306,44 +306,44 @@
     "height": 1024
   },
   "ui/icons/guoc-moc": {
-    "file": "ui/icons/guoc-moc.20c90a0b.webp",
-    "bytes": 9784,
+    "file": "ui/icons/guoc-moc.764c3ddb.webp",
+    "bytes": 16948,
     "width": 256,
-    "height": 250
+    "height": 256
   },
   "ui/icons/ngoi-sao": {
-    "file": "ui/icons/ngoi-sao.a366c6e3.webp",
-    "bytes": 4564,
+    "file": "ui/icons/ngoi-sao.53689a4c.webp",
+    "bytes": 11758,
     "width": 256,
-    "height": 140
+    "height": 256
   },
   "ui/icons/non-la": {
-    "file": "ui/icons/non-la.c153f9d3.webp",
-    "bytes": 10238,
+    "file": "ui/icons/non-la.862423e6.webp",
+    "bytes": 16020,
     "width": 256,
     "height": 256
   },
   "ui/icons/tien-dong": {
-    "file": "ui/icons/tien-dong.2f90dc89.webp",
-    "bytes": 6924,
+    "file": "ui/icons/tien-dong.a1766e1c.webp",
+    "bytes": 20112,
     "width": 256,
-    "height": 140
+    "height": 256
   },
   "ui/icons/tim": {
-    "file": "ui/icons/tim.4b74599d.webp",
-    "bytes": 1562,
+    "file": "ui/icons/tim.6b7370c5.webp",
+    "bytes": 8084,
     "width": 256,
-    "height": 140
+    "height": 256
   },
   "ui/icons/trang-vang": {
-    "file": "ui/icons/trang-vang.7243205b.webp",
-    "bytes": 3610,
+    "file": "ui/icons/trang-vang.1901e241.webp",
+    "bytes": 8096,
     "width": 256,
-    "height": 140
+    "height": 256
   },
   "ui/icons/tui-tien": {
-    "file": "ui/icons/tui-tien.74527a10.webp",
-    "bytes": 20938,
+    "file": "ui/icons/tui-tien.8e52d8c1.webp",
+    "bytes": 10168,
     "width": 256,
     "height": 256
   },

@@ -1,0 +1,64 @@
+/*
+ * Chủ đề giao diện chung cho cả 5 app (spec 03 mục 1).
+ * Mỗi app: @import "tailwindcss"; rồi @import file này.
+ */
+
+@theme {
+  /* 7 màu của bảng mục 1 */
+  --color-muc-tim: #5b3fd6; /* Bi, Trang Sổ Vàng, điểm nhấn */
+  --color-xanh-la: #3fa34d; /* Đúng, nút chính */
+  --color-do-son: #d94a38; /* Sai */
+  --color-vang: #f2b33d; /* Sao, xu */
+  --color-nau-go: #8a5a3b; /* Viền, chữ phụ */
+  --color-giay: #f6ebd3; /* Nền bảng */
+  --color-chu: #3b2a20; /* Chữ chính */
+
+  /* Bóng đổ của nút 3D: cùng màu nhưng tối hơn */
+  --color-muc-tim-dam: color-mix(in oklab, var(--color-muc-tim) 70%, black);
+  --color-xanh-la-dam: color-mix(in oklab, var(--color-xanh-la) 65%, black);
+  --color-do-son-dam: color-mix(in oklab, var(--color-do-son) 70%, black);
+  --color-vang-dam: color-mix(in oklab, var(--color-vang) 70%, black);
+  --color-nau-go-dam: color-mix(in oklab, var(--color-nau-go) 70%, black);
+
+  --font-display: 'Baloo 2', 'Be Vietnam Pro', system-ui, sans-serif;
+  --font-body: 'Be Vietnam Pro', system-ui, sans-serif;
+
+  --radius-nut: 16px;
+  --radius-bang: 20px;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-body);
+    color: var(--color-chu);
+    background-color: var(--color-giay);
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    margin: 0;
+    min-height: 100vh;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    line-height: 1.2;
+  }
+}
+
+/* Cài đặt "Chữ to": tăng cỡ chữ gốc khoảng 15% (mọi cỡ chữ Tailwind tính theo rem nên tăng theo). */
+html[data-large-text='true'] {
+  font-size: 115%;
+}
+
+/* Cài đặt "Giảm chuyển động": tắt hiệu ứng chuyển động trong toàn app. */
+html[data-reduce-motion='true'] *,
+html[data-reduce-motion='true'] *::before,
+html[data-reduce-motion='true'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}

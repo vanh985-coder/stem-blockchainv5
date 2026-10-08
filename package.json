@@ -18,7 +18,8 @@
     "build": "pnpm -r --filter \"./apps/*\" build",
     "crop-portraits": "node scripts/crop-portraits.mjs",
     "assets:build": "node scripts/assets-build.mjs",
-    "dev:assets": "node scripts/dev-assets.mjs"
+    "dev:assets": "node scripts/dev-assets.mjs",
+    "check:text": "node scripts/check-text.mjs"
   },
   "devDependencies": {
     "sharp": "^0.35.5",

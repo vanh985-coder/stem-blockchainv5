@@ -7,7 +7,7 @@ Game phiêu lưu 3D trên web dạy blockchain cho học sinh THPT: 12 màn ở 
 - Luật và số liệu của 4 bài học: spec giai đoạn 1 trong `docs/specs/giai-doan-1/`.
 
 ## Lệnh
-- `pnpm install` · `pnpm test` · `pnpm build`
+- `pnpm install` · `pnpm test` · `pnpm build` · `pnpm check:text` · `pnpm crop-portraits`
 - `pnpm dev:hub` (5173), `pnpm dev:lang-giay` (5174), `pnpm dev:lang-det` (5175), `pnpm dev:lang-khac-dau` (5176), `pnpm dev:lang-bac` (5177), `pnpm dev:assets` (5180)
 - `pnpm assets:build`: nén đồ họa vào `assets-build/` và tạo `manifest.json`
 
@@ -30,6 +30,7 @@ Game phiêu lưu 3D trên web dạy blockchain cho học sinh THPT: 12 màn ở 
 - Dùng lại logic có sẵn trong `packages/core/src/lessons/`. KHÔNG viết lại công thức.
 - Mọi hàm logic game là hàm thuần, có test vitest. `pnpm test` phải xanh trước khi báo xong.
 - Chữ trên giao diện là tiếng Việt có dấu, xưng "em" với học sinh. Không có chữ trong ảnh.
+- MỌI chữ hiển thị (lời thoại, nút, thông báo, nội dung bài) nằm trong packages/core/src/content/. Không viết chữ tiếng Việt thẳng trong component. `pnpm check:text` phải sạch.
 - Đồ họa tải theo `manifest.json` từ `VITE_ASSETS_URL`. Thiếu file thì hiện hình thay thế, không được lỗi trang.
 - Hiệu năng: mức chất lượng Thấp ≥ 30fps trên điện thoại tầm trung; không tạo object mới trong `useFrame`; rời cảnh thì dispose.
 - Supabase: chỉ dùng anon key ở frontend. Thay đổi cơ sở dữ liệu viết thành file migration mới. Không tắt RLS.

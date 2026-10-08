@@ -1,6 +1,6 @@
-import { ASSETS_URL, AssetImage, PORTRAIT_IDS, Portrait, useManifest } from '@so-chung/core';
+import { ASSETS_URL, AssetImage, PORTRAIT_IDS, Portrait, fmt, ui, useManifest } from '@so-chung/core';
 
-const kb = (b: number) => `${(b / 1024).toFixed(1)} KB`;
+const kb = (b: number) => (b / 1024).toFixed(1);
 
 /** Trang kiểm tra đồ họa, chỉ có khi chạy dev. */
 export default function DevAssets() {
@@ -9,16 +9,16 @@ export default function DevAssets() {
   const total = entries.reduce((s, [, m]) => s + m.bytes, 0);
 
   return (
-    <main className="p-4 space-y-6">
-      <h1 className="text-xl font-bold">Đồ họa (dev)</h1>
+    <main className="space-y-6 p-4">
+      <h1 className="text-xl">{ui.dev.dodoHoaTieuDe}</h1>
       <p className="text-sm">
-        Nguồn: <code>{ASSETS_URL}/manifest.json</code> —{' '}
-        {manifest ? `${entries.length} ảnh, ${kb(total)}` : 'đang tải…'}
-        {manifest && entries.length === 0 && ' (manifest trống hoặc không tải được, kiểm tra pnpm dev:assets)'}
+        {ui.dev.nguon} <code>{ASSETS_URL}/manifest.json</code> —{' '}
+        {manifest ? fmt(ui.dev.anhVaDungLuong, { so: entries.length, xp: kb(total) }) : ui.dev.dangTai}
+        {manifest && entries.length === 0 && ui.dev.manifestTrong}
       </p>
 
       <section>
-        <h2 className="font-semibold mb-2">Chân dung ({PORTRAIT_IDS.length}: 10 ảnh + Bi)</h2>
+        <h2 className="mb-2 text-lg">{ui.dev.chanDung}</h2>
         <div className="flex flex-wrap gap-3">
           {PORTRAIT_IDS.map((id) => (
             <figure key={id} className="text-center text-xs">
@@ -30,20 +30,15 @@ export default function DevAssets() {
       </section>
 
       <section>
-        <h2 className="font-semibold mb-2">Mọi ảnh trong manifest</h2>
+        <h2 className="mb-2 text-lg">{ui.dev.moiAnh}</h2>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3">
           {entries.map(([key, m]) => (
-            <figure key={key} className="text-xs break-all">
-              <AssetImage
-                path={key}
-                alt={key}
-                loading="lazy"
-                className="w-full h-28 object-contain bg-stone-200"
-              />
+            <figure key={key} className="break-all text-xs">
+              <AssetImage path={key} alt={key} loading="lazy" className="h-28 w-full bg-stone-200 object-contain" />
               <figcaption>
                 {key}
                 <br />
-                {m.width}×{m.height} · {kb(m.bytes)}
+                {m.width}×{m.height} · {kb(m.bytes)} KB
               </figcaption>
             </figure>
           ))}
