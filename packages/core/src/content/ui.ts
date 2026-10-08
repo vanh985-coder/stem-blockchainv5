@@ -255,6 +255,62 @@ export const ui = {
     manSo: 'Màn {so}: {man}',
   },
 
+  /** Trang chủ "/" (spec 04 mục 1) */
+  trangChu: {
+    tenGame: 'Giấc mơ Sổ Chung',
+    gioiThieu: 'Mơ về Đại Việt thế kỷ XVI, học bí quyết giữ sổ để tỉnh giấc.',
+    dangNhapDeChoi: 'Đăng nhập để chơi',
+    choiThu: 'Chơi thử',
+    choiTiep: 'Chơi tiếp',
+    /** Đã đăng nhập: lời chào kèm tên hiển thị */
+    chao: 'Chào {ten}!',
+    docTruyen: 'Đọc truyện',
+    hoSo: 'Hồ sơ',
+    quyenRiengTu: 'Quyền riêng tư',
+    trangGiaoVien: 'Trang giáo viên',
+  },
+
+  /** Trang tạm /giao-vien (làm ở bước sau) */
+  giaoVien: {
+    tieuDe: 'Trang giáo viên',
+    dangLam: 'Đang làm',
+    veTrangChu: 'Về trang chủ',
+  },
+
+  /** Trang cốt truyện /truyen (spec 04 mục 2) */
+  truyen: {
+    tieuDe: 'Cốt truyện',
+    batDauHanhTrinh: 'Bắt đầu hành trình',
+    veTrangChu: 'Về trang chủ',
+  },
+
+  /** Bản đồ /ban-do (spec 04 mục 7) */
+  banDo: {
+    tieuDe: 'Bản đồ',
+    hoSo: 'Hồ sơ',
+    /** Gợi ý khi chưa chọn làng */
+    chonLang: 'Bấm vào một làng để xem các màn.',
+    dong: 'Đóng',
+    vao: 'Vào',
+    /** Sao đã đạt trên tổng sao của màn */
+    soSao: '{earned}/{max} sao',
+    manBaiHoc: 'Bài học',
+    manGame: 'Game',
+    trangDaNhan: 'Đã nhận Trang Sổ Vàng',
+    trangChuaNhan: 'Chưa nhận Trang Sổ Vàng',
+    /** Nhãn cho người dùng đọc màn hình, mỗi chấm một màn: {man} tên màn */
+    nhanCham: '{man}: {trangThai}',
+    veTrangChu: 'Về trang chủ',
+    /** Số sao trong ô Trang Sổ Vàng ở góc trên */
+    trangSo: 'Trang Sổ Vàng {so}',
+  },
+
+  /** Màn bị khóa mà em gõ thẳng đường dẫn vào */
+  manKhoa: {
+    tieuDe: 'Màn này đang khóa',
+    veBanDo: 'Về bản đồ',
+  },
+
   /** Bảng cài đặt */
   caiDat: {
     tieuDe: 'Cài đặt',
@@ -337,6 +393,12 @@ export const ui = {
     moKhoaStatusReady: 'ready',
     moKhoaStatusSoon: 'coming-soon',
     moKhoaDaLuu: 'Trang Sổ Vàng đã lưu (không bao giờ bị thu lại): {so}',
+    hotspotTieuDe: 'Căn 4 điểm làng trên bản đồ (dev)',
+    hotspotHuongDan: 'Kéo từng điểm tới đúng chỗ trên ảnh. Bấm "Chép", rồi dán đè vào packages/core/src/content/banDoHotspots.ts.',
+    hotspotChep: 'Chép',
+    hotspotDaChep: 'Đã chép. Dán vào banDoHotspots.ts.',
+    hotspotKhongChepDuoc: 'Không chép tự động được. Em bôi đen đoạn bên dưới rồi chép tay.',
+    hotspotToaDo: '{lang}: x = {x}%, y = {y}%',
     /** Cảnh báo ở console khi chạy dev */
     thieuAnh: 'Thiếu ảnh "{path}" trong manifest',
     anhLoi: 'Không tải được ảnh "{path}" ({src})',

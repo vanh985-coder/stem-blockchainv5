@@ -17,6 +17,8 @@ export interface ProgressState {
   /** Trạng thái mở khóa 12 màn (giáo viên/admin mở hết) */
   unlock: UnlockResult;
   saving: boolean;
+  /** Đã kéo xong tiến độ từ máy chủ (chỉ có nghĩa khi đã đăng nhập) */
+  synced: boolean;
   /** Ghi kết quả một màn; trả số xu vừa nhận */
   record: (levelId: number, result: LevelResult) => { coinsEarned: number };
   /** Xong một màn: đẩy ngay, chờ xong mới cho rời trang */
@@ -56,6 +58,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       goldenPages: unlock.goldenPages,
       unlock,
       saving: snap.saving,
+      synced: snap.synced,
       record,
       saveNow,
       startGuest,
@@ -78,6 +81,7 @@ const FALLBACK: ProgressState = {
   goldenPages: 0,
   unlock: progressManager.unlock(),
   saving: false,
+  synced: false,
   record: () => ({ coinsEarned: 0 }),
   saveNow: async () => 'saved',
   startGuest: () => {},
