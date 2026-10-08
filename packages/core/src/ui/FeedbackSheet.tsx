@@ -80,7 +80,7 @@ export function FeedbackSheet({
           <div className="space-y-2 text-base">
             <p className="font-semibold leading-snug">{whatHappened}</p>
             {whyHappened && (
-              <p className="leading-relaxed">
+              <p className="whitespace-pre-line leading-relaxed">
                 <span className="font-bold">{ui.phanHoi.nhanViSao}</span>
                 {whyHappened}
               </p>

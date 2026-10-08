@@ -55,8 +55,8 @@ export const ui = {
   /** Màn giới thiệu mỗi thử thách (LevelIntro) */
   gioiThieu: {
     batDau: 'Bắt đầu',
-    /** {muc} là tên mức: Dễ, Vừa, Khó */
-    muc: 'Mức: {muc}',
+    /** {muc} là tên trạm: Dễ, Trung bình, Khó */
+    muc: 'Trạm: {muc}',
     mucTieu: 'Mục tiêu của em:',
     meoTuBi: 'Mẹo từ Bi: ',
   },
@@ -298,6 +298,65 @@ export const ui = {
     nhanCham: '{man}: {trangThai}',
     /** Tên ô Trang Sổ Vàng ở góc trên (đọc cho người dùng đọc màn hình) */
     trangSo: 'Trang Sổ Vàng {so}',
+  },
+
+  /** Thẻ trang sổ (TrangSo) và mắt xích (MatXich) */
+  trangSo: {
+    bia: 'Trang bìa',
+    trang: 'Trang {n}',
+    sai: '✗ Sai lệch',
+    saiNhan: 'Sai lệch',
+    phaiTinhLai: 'Sẽ phải tính lại',
+    hopLe: '✓ Hợp lệ',
+    hopLeNhan: 'Hợp lệ',
+    maTrangTruoc: 'Mã trang trước',
+    noiDung: 'Nội dung',
+    maTrang: 'Mã trang',
+    dangTinh: 'Đang tính...',
+  },
+  matXich: {
+    hopLe: 'Mắt xích hợp lệ',
+    gay: 'Mắt xích gãy',
+    binhThuong: 'Mắt xích bình thường',
+  },
+
+  /** Ô nhập số và câu hỏi suy ngẫm */
+  nhapSo: {
+    giam: 'Giảm một đơn vị',
+    tang: 'Tăng một đơn vị',
+  },
+  suyNgam: {
+    tieuDe: 'Câu hỏi suy ngẫm',
+    chot: 'Chốt lựa chọn',
+    gocNhin: 'Góc nhìn mở rộng: ',
+  },
+
+  /** Khung trang bài học 2D (LessonPage2D) */
+  baiHoc: {
+    /** Tên 3 trạm */
+    tram: { de: 'Dễ', tb: 'Trung bình', kho: 'Khó' },
+    /** Nhãn đọc cho người dùng đọc màn hình: {tenTram}, {sao} */
+    tramDaXong: 'Trạm {tenTram}: đã xong, {sao} sao',
+    tramDangLam: 'Trạm {tenTram}: đang làm',
+    tramChuaToi: 'Trạm {tenTram}: chưa tới',
+    /** Tên danh sách 3 trạm (đọc cho người dùng đọc màn hình) */
+    cacTram: 'Các trạm của bài',
+    emCoBiet: 'Em có biết?',
+    dong: 'Đóng',
+    truoc: 'Trước',
+    sau: 'Tiếp',
+    /** Thẻ "Em có biết?" thứ {n} trên {tong} */
+    theSo: 'Thẻ {n}/{tong}',
+    tramTiepTheo: 'Trạm tiếp theo',
+    xongBai: 'Xong bài',
+    dieuVuaHoc: 'Điều em vừa học',
+    nhanTrang: 'Nhận Trang Sổ Vàng',
+    /** Dòng ghi sao đã đạt của trạm: {tenTram}, {sao} */
+    saoTram: 'Trạm {tenTram}: {sao} sao',
+    xuTram: 'Xu nhận ở trạm này: {so}',
+    /** Cảnh trao Trang Sổ Vàng */
+    trangDangBay: 'Trang Sổ Vàng đang bay vào sổ của em',
+    veBanDo: 'Về bản đồ',
   },
 
   /** Màn bị khóa mà em gõ thẳng đường dẫn vào */

@@ -9,6 +9,8 @@ export interface DialogueTurn {
   characterId: CharacterId;
   /** Lời thoại; đi qua fmt() nên được dùng {ten}, {phanDien}… */
   text: string;
+  /** Chân dung phụ kèm một câu ngắn, ví dụ {phanDien} cười "Hì hì!" */
+  aside?: { characterId: CharacterId; text: string };
 }
 
 export interface DialogueBoxProps {
@@ -66,6 +68,15 @@ export function DialogueBox({ turns, onFinish, onSkip, vars, className = '' }: D
           <p aria-live="polite" className="mt-1 text-base leading-relaxed sm:text-lg">
             {fmt(turn.text, vars)}
           </p>
+          {turn.aside && (
+            <div className="mt-3 flex items-center gap-2" aria-live="polite">
+              <PortraitFrame portrait={CHARACTERS[turn.aside.characterId].portrait} size={56} />
+              <p className="rounded-2xl border-2 border-nau-go bg-white/70 px-3 py-1.5 font-display text-lg font-extrabold">
+                <span className="sr-only">{speakerLabel(turn.aside.characterId, vars)}: </span>
+                {fmt(turn.aside.text, vars)}
+              </p>
+            </div>
+          )}
         </div>
       </div>
       <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
