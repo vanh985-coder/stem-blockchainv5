@@ -26,7 +26,8 @@ export interface AuthState {
   refreshProfile: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthState>({
+/** Chỉ để test: dựng AuthContext giả (hồ sơ học sinh, giáo viên, admin…). Code thường dùng useAuth(). */
+export const AuthContext = createContext<AuthState>({
   configured: AUTH_CONFIG.configured,
   loading: false,
   profileLoading: false,
@@ -34,6 +35,9 @@ const AuthContext = createContext<AuthState>({
   profile: null,
   refreshProfile: async () => {},
 });
+
+/** Tối thiểu giữa hai lần tự đọc lại hồ sơ khi quay lại tab. */
+const REFRESH_MIN_MS = 10_000;
 
 async function fetchProfile(userId: string): Promise<Profile | null> {
   const supabase = await getSupabase();
@@ -57,7 +61,8 @@ async function fetchProfile(userId: string): Promise<Profile | null> {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [profileLoading, setProfileLoading] = useState(false);
+  // userId mà việc đọc hồ sơ đã xong (kể cả khi đọc thất bại). Có phiên mà chưa xong = đang tải hồ sơ.
+  const [profileDoneFor, setProfileDoneFor] = useState<string | null>(null);
   const [loading, setLoading] = useState(() => AUTH_CONFIG.configured && mayHaveSession());
 
   useEffect(() => {
@@ -90,6 +95,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const userId = session?.user.id ?? null;
 
+  // Có phiên mà hồ sơ chưa đọc xong thì coi là đang tải. Tính từ userId nên không có khoảng hở giữa
+  // lúc có phiên và lúc bắt đầu đọc (khoảng hở đó từng làm /giao-vien đẩy admin về trang chủ).
+  const profileLoading = userId !== null && profileDoneFor !== userId;
+
   const refreshProfile = useCallback(async () => {
     if (!userId) {
       setProfile(null);
@@ -102,17 +111,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     if (!userId) {
       setProfile(null);
-      setProfileLoading(false);
+      setProfileDoneFor(null);
       return;
     }
-    setProfileLoading(true);
     void fetchProfile(userId).then((p) => {
       if (cancelled) return;
       setProfile(p);
-      setProfileLoading(false);
+      setProfileDoneFor(userId);
     });
     return () => {
       cancelled = true;
+    };
+  }, [userId]);
+
+  // Vai trò có thể đổi sau khi đăng nhập (admin đổi trong Table Editor): đọc lại hồ sơ khi em quay lại tab.
+  useEffect(() => {
+    if (!userId) return;
+    let last = Date.now();
+    const again = () => {
+      if (document.visibilityState === 'hidden' || Date.now() - last < REFRESH_MIN_MS) return;
+      last = Date.now();
+      void fetchProfile(userId).then((p) => {
+        if (p) setProfile(p); // đọc lỗi thì giữ hồ sơ cũ
+      });
+    };
+    document.addEventListener('visibilitychange', again);
+    window.addEventListener('focus', again);
+    return () => {
+      document.removeEventListener('visibilitychange', again);
+      window.removeEventListener('focus', again);
     };
   }, [userId]);
 

@@ -5,6 +5,7 @@ import {
   Panel,
   VILLAGE_ORDER,
   asset,
+  canSeeTeacherPage,
   fmt,
   loginPathFor,
   ui,
@@ -38,7 +39,7 @@ export function Home() {
   const navigate = useNavigate();
   const { session, profile, loading } = useAuth();
   const { startGuest, goldenPages } = useProgress();
-  const isTeacher = profile?.role === 'teacher' || profile?.role === 'admin';
+  const isTeacher = canSeeTeacherPage(profile?.role);
 
   return (
     <>

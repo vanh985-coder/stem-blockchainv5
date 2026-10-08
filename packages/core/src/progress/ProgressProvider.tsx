@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from 'react';
 import { useAuth } from '../auth/AuthProvider';
+import { canSeeTeacherPage } from '../auth/roles';
 import { ui } from '../content/ui';
 import { Button } from '../ui/Button';
 import { Panel } from '../ui/Panel';
@@ -27,7 +28,8 @@ export interface ProgressState {
   startGuest: () => void;
 }
 
-const ProgressContext = createContext<ProgressState | null>(null);
+/** Chỉ để test: dựng ProgressContext giả. */
+export const ProgressContext = createContext<ProgressState | null>(null);
 
 /**
  * Nối tiến độ với tài khoản: chờ biết ai đang dùng (đã đăng nhập hay chơi thử) rồi mới đọc dữ liệu.
@@ -43,7 +45,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     void progressManager.setUser(userId);
   }, [loading, userId]);
 
-  const isTeacher = profile?.role === 'teacher' || profile?.role === 'admin';
+  const isTeacher = canSeeTeacherPage(profile?.role);
   const unlock = useMemo(() => progressManager.unlock(isTeacher), [snap.progress, isTeacher]);
 
   const record = useCallback((levelId: number, result: LevelResult) => progressManager.record(levelId, result), []);

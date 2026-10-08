@@ -46,7 +46,8 @@ export { LEVELS, VILLAGE_ORDER, levelById, levelsOfVillage } from './content/lev
 export type { LevelDef, LevelKind, LevelStatus } from './content/levels';
 export { computeUnlock } from './progress/unlock';
 export type { LevelState, LevelUnlock, UnlockInput, UnlockResult } from './progress/unlock';
-export { AuthProvider, useAuth } from './auth/AuthProvider';
+export { AuthProvider, AuthContext, useAuth } from './auth/AuthProvider';
+export { canSeeTeacherPage } from './auth/roles';
 export type { AuthState, Profile, Role } from './auth/AuthProvider';
 export { accountRoutes } from './auth/routes';
 export { AccountBar } from './auth/AccountBar';
@@ -73,7 +74,7 @@ export {
 export type { ValidationResult } from './auth/validate';
 export { readAuthConfig, AUTH_CONFIG } from './auth/config';
 export { safeNext, loginPathFor } from './auth/redirect';
-export { ProgressProvider, useProgress } from './progress/ProgressProvider';
+export { ProgressProvider, ProgressContext, useProgress } from './progress/ProgressProvider';
 export type { ProgressState } from './progress/ProgressProvider';
 export { GuestBar } from './ui/GuestBar';
 export { progressManager } from './progress/singleton';
