@@ -1,6 +1,8 @@
 import { pageCode } from '../../lib/chain';
 import { GAME_CONFIG } from '../../config/gameConfig';
 import { createMulberry32 } from '../../lib/rng';
+import { fmt, phanDien } from '../../content/characters';
+import { bai2Logic } from '../../content/lessons/bai-2';
 
 export type PlayerId = 'em' | 'binh' | 'chi' | 'ti';
 export type Truth = 'valid' | 'cheat' | 'miscalc';
@@ -195,7 +197,7 @@ export function makeCheatPage(
   lastCode: number,
   content: number,
   rng: () => number,
-  creatorName: string = 'Tí'
+  creatorName: string = phanDien
 ): { prevCode: number; content: number; code: number; note?: string; type: 'A' | 'B' } {
   if (rng() < 0.5) {
     let prevCode = Math.floor(rng() * 100);
@@ -218,7 +220,7 @@ export function makeCheatPage(
       prevCode: lastCode,
       content,
       code,
-      note: `Thưởng thêm cho ${creatorName}`,
+      note: fmt(bai2Logic.thuongThem, { nguoi: creatorName }),
       type: 'B',
     };
   }
@@ -315,7 +317,7 @@ export function simulateGames(
         const decision = tiDecide({ isFirstTurn, beliefs, rng, cfg });
         if (decision.cheat) {
           truth = 'cheat';
-          const p = makeCheatPage(lastCode, content, rng, 'Tí');
+          const p = makeCheatPage(lastCode, content, rng, phanDien);
           proposalCode = p.code;
         } else {
           truth = 'valid';
@@ -428,31 +430,32 @@ export function summarizePlayer(history: HistoryItem[], id: PlayerId, name: stri
     }
   }
 
+  const T = bai2Logic.tomTat;
   if (totalCreationRounds === 0) {
-    return `${name} không tạo trang: bỏ phiếu ${signed(voteNet)}.`;
+    return fmt(T.khongTaoTrang, { nguoi: name, phieu: signed(voteNet) });
   }
 
   const parts: string[] = [];
   if (validCount > 0) {
-    parts.push(`làm thật ${validCount} lượt`);
+    parts.push(fmt(T.lamThat, { n: validCount }));
   }
   if (cheatCount > 0) {
     const details: string[] = [];
-    if (cheatBiBatCount > 0) details.push(`bị bắt ${cheatBiBatCount}`);
-    if (cheatLotCount > 0) details.push(`lọt ${cheatLotCount}`);
+    if (cheatBiBatCount > 0) details.push(fmt(T.biBat, { n: cheatBiBatCount }));
+    if (cheatLotCount > 0) details.push(fmt(T.lot, { n: cheatLotCount }));
     if (details.length > 0) {
-      parts.push(`gian ${cheatCount} lần (${details.join(', ')})`);
+      parts.push(fmt(T.gian, { n: cheatCount, chiTiet: details.join(', ') }));
     } else {
-      parts.push(`gian ${cheatCount} lần`);
+      parts.push(fmt(T.gianTron, { n: cheatCount }));
     }
   }
   if (miscalcCount > 0) {
-    parts.push(`tính nhầm ${miscalcCount} lần`);
+    parts.push(fmt(T.tinhNham, { n: miscalcCount }));
   }
   if (skippedCount > 0) {
-    parts.push(`bỏ lượt ${skippedCount} lần`);
+    parts.push(fmt(T.boLuot, { n: skippedCount }));
   }
 
-  return `${name} ${parts.join(', ')}: tạo trang ${signed(creatorNet)}, bỏ phiếu ${signed(voteNet)}.`;
+  return fmt(T.tong, { nguoi: name, cacPhan: parts.join(', '), tao: signed(creatorNet), phieu: signed(voteNet) });
 }
 

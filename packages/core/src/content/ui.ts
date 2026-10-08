@@ -366,6 +366,21 @@ export const ui = {
     veBanDo: 'Về bản đồ',
   },
 
+  /** Tim (số lượt sai còn được phép) */
+  tim: {
+    /** {so} tim còn lại trên {max} */
+    nhan: 'Còn {so} trên {max} tim',
+  },
+
+  /** Màn hết tim (LevelFailed) */
+  hetTim: {
+    tieuDe: 'Hết tim mất rồi!',
+    loiDongVien: 'Đừng nản lòng nhé, mỗi lần thử là một lần hiểu sâu hơn về blockchain!',
+    meoTieuDe: 'Mẹo cho lượt chơi sau',
+    thuLai: 'Thử lại',
+    veBanDo: 'Về bản đồ',
+  },
+
   /** Màn bị khóa mà em gõ thẳng đường dẫn vào */
   manKhoa: {
     tieuDe: 'Màn này đang khóa',

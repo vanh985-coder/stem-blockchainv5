@@ -11,6 +11,7 @@ import { Button } from '../ui/Button';
 import { DialogueBox } from '../ui/DialogueBox';
 import { GuestBar } from '../ui/GuestBar';
 import { LevelComplete } from '../ui/LevelComplete';
+import { LevelFailed } from '../ui/LevelFailed';
 import { LevelIntro } from '../ui/LevelIntro';
 import { Panel } from '../ui/Panel';
 import { Stars } from '../ui/Stars';
@@ -20,8 +21,11 @@ import { GoldenPageScene } from './GoldenPageScene';
 import { STATION_ORDER, type LessonContent, type StationId, type StationResult } from './types';
 
 export interface StationDef {
-  /** Dựng nội dung trạm; trạm gọi onComplete khi làm xong */
-  render: (p: { onComplete: (r: StationResult) => void }) => ReactNode;
+  /**
+   * Dựng nội dung trạm. Trạm gọi onComplete khi làm xong; trạm có tim thì gọi onFail(mẹo) khi hết tim
+   * (hiện màn "Hết tim mất rồi!" với nút "Thử lại" làm lại trạm đó).
+   */
+  render: (p: { onComplete: (r: StationResult) => void; onFail: (tip: string) => void }) => ReactNode;
 }
 
 export interface LessonPage2DProps {
@@ -38,6 +42,7 @@ type Stage =
   | { kind: 'dialogue'; idx: number }
   | { kind: 'intro'; idx: number }
   | { kind: 'play'; idx: number }
+  | { kind: 'failed'; idx: number; tip: string }
   | { kind: 'stationDone'; idx: number; result: StationResult; coins: number }
   | { kind: 'saving' }
   | { kind: 'outro' }
@@ -110,7 +115,8 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   const restart = () => startAt(startStationIndex(progressManager.getSnapshot().progress.levels[levelId]?.stars ?? {}));
 
   // Đang làm dở hoặc đang xem kết quả trạm thì được chọn trạm khác; lúc lưu, nói lời kết, nhận trang thì không.
-  const canPick = stage.kind === 'dialogue' || stage.kind === 'intro' || stage.kind === 'play' || stage.kind === 'stationDone' || stage.kind === 'complete';
+  const canPick =
+    stage.kind === 'dialogue' || stage.kind === 'intro' || stage.kind === 'play' || stage.kind === 'failed' || stage.kind === 'stationDone' || stage.kind === 'complete';
   const pickStation = (i: number) => {
     if (!canPick || !stationOpen(saved, i)) return;
     if (stage.kind === 'complete') startAt(i);
@@ -155,7 +161,26 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
     );
   } else if (stage.kind === 'play') {
     const id = STATION_ORDER[stage.idx];
-    body = <Panel className="p-2 sm:p-6" key={`p${attempt}-${id}`}>{stations[id].render({ onComplete: (r) => onStationComplete(stage.idx, r) })}</Panel>;
+    body = (
+      <Panel className="p-2 sm:p-6" key={`p${attempt}-${id}`}>
+        {stations[id].render({
+          onComplete: (r) => onStationComplete(stage.idx, r),
+          onFail: (tip) => setStage({ kind: 'failed', idx: stage.idx, tip }),
+        })}
+      </Panel>
+    );
+  } else if (stage.kind === 'failed') {
+    body = (
+      <LevelFailed
+        tip={stage.tip}
+        onRetry={() => {
+          // Làm lại đúng trạm đó từ đầu (dựng lại đề mới)
+          setAttempt((a) => a + 1);
+          setStage({ kind: 'play', idx: stage.idx });
+        }}
+        onExit={goMap}
+      />
+    );
   } else if (stage.kind === 'stationDone') {
     const id = STATION_ORDER[stage.idx];
     const last = stage.idx === STATION_ORDER.length - 1;
@@ -223,6 +248,8 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   }
 
   const currentIdx = 'idx' in stage ? stage.idx : stage.kind === 'saving' ? 2 : -1;
+  // Thẻ riêng của trạm Khó chỉ hiện khi em đang ở trạm Khó.
+  const onHard = currentIdx === STATION_ORDER.length - 1 && stage.kind !== 'complete';
 
   return (
     <div className="min-h-screen bg-giay bg-cover bg-center" style={bg ? { backgroundImage: `url("${bg}")` } : undefined}>
@@ -305,7 +332,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
         <main className="mx-auto w-full max-w-4xl px-1 pb-10 pt-2 sm:px-3">{body}</main>
       </div>
 
-      {showCards && <CardsDialog cards={content.emCoBiet} onClose={() => setShowCards(false)} />}
+      {showCards && <CardsDialog cards={onHard ? [...content.emCoBiet, ...(content.emCoBietKho ?? [])] : content.emCoBiet} onClose={() => setShowCards(false)} />}
     </div>
   );
 }

@@ -145,3 +145,10 @@ html[data-reduce-motion='true'] *::after {
   100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
 }
 .animate-golden-fly { animation: golden-fly 1.4s cubic-bezier(0.22, 0.9, 0.3, 1) both; }
+
+/* Điểm cọc bay lên từ ô người chơi (+10, −30…) */
+@keyframes score-pop {
+  from { opacity: 0; transform: translateY(10px) scale(0.8); }
+  to { opacity: 1; transform: translateY(-18px) scale(1.1); }
+}
+.animate-score-pop { animation: score-pop 0.4s ease-out both; }

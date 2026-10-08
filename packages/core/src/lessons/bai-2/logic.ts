@@ -1,6 +1,8 @@
 import { pageCode, buildChain, isSafeDelta } from '../../lib/chain';
 import { GAME_CONFIG } from '../../config/gameConfig';
 import { formatNumber } from '../../lib/format';
+import { fmt } from '../../content/characters';
+import { bai2Logic } from '../../content/lessons/bai-2';
 
 export type Proposal = {
   prevCode: number;
@@ -37,13 +39,18 @@ export function isValidProposal(myLastCode: number, p: Proposal): ProposalStatus
 export function explainCheck(myLastCode: number, p: Proposal): string {
   const status = isValidProposal(myLastCode, p);
   if (status === 'prev-mismatch') {
-    return `Mã trang trước ghi là ${formatNumber(p.prevCode)}, nhưng trang cuối trong sổ của em là ${formatNumber(myLastCode)}, không khớp, nên Từ chối.`;
+    return fmt(bai2Logic.truocKhongKhop, { truoc: formatNumber(p.prevCode), cuoi: formatNumber(myLastCode) });
   }
   const correct = pageCode(p.prevCode, p.content);
   if (status === 'wrong-code') {
-    return `(${formatNumber(p.prevCode)} × 2 + ${formatNumber(p.content)}) mod 100 = ${formatNumber(correct)}, không khớp với ${formatNumber(p.code)}, nên Từ chối.`;
+    return fmt(bai2Logic.maSai, {
+      truoc: formatNumber(p.prevCode),
+      nd: formatNumber(p.content),
+      dung: formatNumber(correct),
+      ma: formatNumber(p.code),
+    });
   }
-  return `(${formatNumber(p.prevCode)} × 2 + ${formatNumber(p.content)}) mod 100 = ${formatNumber(p.code)}, khớp với ${formatNumber(p.code)}, nên Đồng ý.`;
+  return fmt(bai2Logic.maDung, { truoc: formatNumber(p.prevCode), nd: formatNumber(p.content), ma: formatNumber(p.code) });
 }
 
 /**

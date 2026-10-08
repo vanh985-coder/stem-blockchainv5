@@ -38,4 +38,6 @@ export interface LessonContent {
   /** "Điều em vừa học" ở màn hoàn thành cả bài */
   keyTakeaway: string;
   emCoBiet: StoryCard[];
+  /** Thẻ "Em có biết?" chỉ hiện khi đang ở trạm Khó (Bài 2: Đặt cọc) */
+  emCoBietKho?: StoryCard[];
 }
