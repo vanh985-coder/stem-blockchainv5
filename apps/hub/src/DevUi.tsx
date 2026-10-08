@@ -14,6 +14,7 @@ import {
   ui,
   type DialogueTurn,
 } from '@so-chung/core';
+import { QuizDemo, UnlockDemo } from './DevUiQuiz';
 
 const ICONS = ['ngoi-sao', 'trang-vang', 'tien-dong', 'tim', 'non-la', 'guoc-moc', 'tui-tien'] as const;
 
@@ -136,7 +137,7 @@ export default function DevUi() {
       <Section title={ui.dev.hoanThanh}>
         <LevelComplete
           stars={2}
-          xpGained={20}
+          coinsEarned={20}
           timeSpentSec={95}
           keyTakeaway={ui.dev.hoanThanhDieuHoc}
           reflectionQuestion={{
@@ -146,6 +147,14 @@ export default function DevUi() {
           onPlayAgain={() => {}}
           onNextLevel={() => {}}
         />
+      </Section>
+
+      <Section title={ui.dev.quizTieuDe}>
+        <QuizDemo />
+      </Section>
+
+      <Section title={ui.dev.moKhoaTieuDe}>
+        <UnlockDemo />
       </Section>
 
       <Section title={ui.dev.sao}>

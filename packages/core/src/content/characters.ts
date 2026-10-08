@@ -55,7 +55,7 @@ export function characterNames(table: Record<CharacterId, CharacterInfo> = CHARA
 }
 
 /** Chỗ giữ số và chữ khác mà lời thoại, nhãn được phép dùng (ngoài {ten}, {Ten} và tên nhân vật). */
-export const EXTRA_VARS = ['so', 'diem', 'xp', 'muc', 'earned', 'max', 'bai', 'man', 'lang', 'path', 'src', 'loi'] as const;
+export const EXTRA_VARS = ['so', 'diem', 'kb', 'muc', 'earned', 'max', 'bai', 'man', 'lang', 'path', 'src', 'loi'] as const;
 
 export type FmtVars = { ten?: string } & Record<string, string | number | undefined>;
 

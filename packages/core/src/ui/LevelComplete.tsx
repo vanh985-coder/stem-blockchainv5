@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { sound } from '../audio/sound';
 import { ui } from '../content/ui';
-import { formatTime, formatXP } from '../lib/format';
+import { AssetImage } from '../assets/AssetImage';
+import { fmt } from '../content/characters';
+import { formatNumber, formatTime } from '../lib/format';
 import { useSettings } from '../settings/SettingsProvider';
 import { Button } from './Button';
 import { Panel } from './Panel';
@@ -10,7 +12,8 @@ import { Stars } from './Stars';
 
 export interface LevelCompleteProps {
   stars: number; // 1..3
-  xpGained: number;
+  /** Số xu nhận được (cách tính: mỗi sao mới 10 xu, làm ở bước sau; ở đây chỉ hiển thị) */
+  coinsEarned: number;
   timeSpentSec?: number;
   keyTakeaway: string; // "Điều em vừa học"
   reflectionQuestion?: {
@@ -28,7 +31,7 @@ export interface LevelCompleteProps {
 /** Màn hoàn thành thử thách: sao, kinh nghiệm, điều vừa học, câu hỏi suy ngẫm. */
 export function LevelComplete({
   stars,
-  xpGained,
+  coinsEarned,
   timeSpentSec,
   keyTakeaway,
   reflectionQuestion,
@@ -81,9 +84,12 @@ export function LevelComplete({
         <div className="my-6 grid grid-cols-2 gap-3 sm:gap-4">
           <div className="rounded-2xl border-2 border-nau-go bg-white/70 p-4">
             <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-nau-go-dam">
-              {ui.hoanThanh.kinhNghiem}
+              {ui.hoanThanh.xuNhan}
             </span>
-            <span className="font-display text-2xl font-extrabold text-xanh-la-dam">{formatXP(xpGained)}</span>
+            <span className="flex items-center justify-center gap-2 font-display text-2xl font-extrabold text-nau-go-dam">
+              <AssetImage path="ui/icons/tien-dong" alt="" className="size-8 object-contain" />
+              {fmt(ui.hoanThanh.soXu, { so: formatNumber(coinsEarned) })}
+            </span>
           </div>
           <div className="rounded-2xl border-2 border-nau-go bg-white/70 p-4">
             <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-nau-go-dam">

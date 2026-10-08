@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { sound } from '../audio/sound';
 import { SETTINGS_KEY, parseStored, resolveSettings, serializeStored, type Settings, type StoredSettings } from './settings';
 
 interface SettingsContextValue {
@@ -8,7 +9,7 @@ interface SettingsContextValue {
 }
 
 const DEFAULT_VALUE: SettingsContextValue = {
-  settings: { reducedMotion: false, largeText: false },
+  settings: { reducedMotion: false, largeText: false, soundEnabled: true },
   update: () => {},
 };
 
@@ -51,6 +52,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     applyToDocument(settings);
+    sound.setEnabled(settings.soundEnabled);
   }, [settings]);
 
   const update = useCallback((patch: Partial<Settings>) => {

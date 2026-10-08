@@ -65,7 +65,10 @@ export const ui = {
   hoanThanh: {
     tieuDe: 'Hoàn thành xuất sắc!',
     loiKhen: 'Em đã vượt qua thử thách này một cách tuyệt vời!',
-    kinhNghiem: 'Kinh nghiệm',
+    /** Ô xu ở màn hoàn thành */
+    xuNhan: 'Xu nhận được',
+    /** Số xu nhận được, {so} là số xu */
+    soXu: '+{so}',
     thoiGian: 'Thời gian hoàn thành',
     dieuVuaHoc: 'Điều em vừa học',
     cauHoiSuyNgam: 'Câu hỏi suy ngẫm',
@@ -79,6 +82,31 @@ export const ui = {
     tenIcon: 'Sao',
   },
 
+  /** Thẻ câu hỏi ôn tập (QuizCard) */
+  quiz: {
+    dungRoi: 'Đúng rồi!',
+    chuaDung: 'Chưa đúng',
+    /** Nhãn cạnh đáp án đúng sau khi trả lời */
+    dapAnDung: 'Đáp án đúng',
+    /** Nhãn cạnh đáp án em đã chọn sai */
+    emChon: 'Em chọn',
+    dapAnDungLa: 'Đáp án đúng là:',
+    giaiThich: 'Giải thích: ',
+    cauTiep: 'Câu tiếp theo',
+  },
+
+  /** Trạng thái mở khóa từng màn (biển gỗ, bản đồ) */
+  moKhoa: {
+    khoa: 'Khóa',
+    mo: 'Mở',
+    xong: 'Xong',
+    sapRaMat: 'Sắp ra mắt',
+    /** Lý do khóa: {so} là số màn cần hoàn thành, {man} là tên màn đó */
+    hoanThanh: 'Hoàn thành màn {so} ({man}) để mở',
+    /** Số Trang Sổ Vàng đã có, {so} trên {max} */
+    trangSoVang: 'Trang Sổ Vàng: {so}/{max}',
+  },
+
   /** Bảng cài đặt */
   caiDat: {
     tieuDe: 'Cài đặt',
@@ -86,6 +114,8 @@ export const ui = {
     giamChuyenDongGhiChu: 'Tắt hiệu ứng chuyển động trong toàn bộ trò chơi.',
     chuTo: 'Chữ to',
     chuToGhiChu: 'Tăng cỡ chữ lên khoảng 15%.',
+    amThanh: 'Âm thanh',
+    amThanhGhiChu: 'Tiếng bấm nút, tiếng đúng sai và tiếng chúc mừng.',
     bat: 'Bật',
     tat: 'Tắt',
   },
@@ -105,7 +135,7 @@ export const ui = {
   dev: {
     dodoHoaTieuDe: 'Đồ họa (dev)',
     nguon: 'Nguồn:',
-    anhVaDungLuong: '{so} ảnh, {xp} KB',
+    anhVaDungLuong: '{so} ảnh, {kb} KB',
     dangTai: 'đang tải…',
     manifestTrong: ' (manifest trống hoặc không tải được, kiểm tra pnpm dev:assets)',
     chanDung: 'Chân dung (11: 10 ảnh + Bi)',
@@ -146,6 +176,19 @@ export const ui = {
     caiDat: 'SettingsPanel',
     hangIcon: 'Hàng 7 icon',
     chuyenSang: 'Chuyển sang:',
+    quizTieuDe: 'QuizCard (4 câu Bài 1)',
+    quizCau: 'Câu {so}/{max}',
+    quizKetQua: 'Đã trả lời đúng {so}/{max} câu.',
+    quizLamLai: 'Làm lại 4 câu khác',
+    moKhoaTieuDe: 'Mở khóa 12 màn (unlock.ts)',
+    moKhoaGiaoVien: 'Tài khoản giáo viên',
+    moKhoaDatLai: 'Đặt lại tiến độ',
+    moKhoaXongMan: 'Xong màn {so}',
+    moKhoaBoXong: 'Bỏ xong màn {so}',
+    moKhoaDoiStatus: 'Đổi trạng thái màn {so}',
+    moKhoaStatusReady: 'ready',
+    moKhoaStatusSoon: 'coming-soon',
+    moKhoaDaLuu: 'Trang Sổ Vàng đã lưu (không bao giờ bị thu lại): {so}',
     /** Cảnh báo ở console khi chạy dev */
     thieuAnh: 'Thiếu ảnh "{path}" trong manifest',
     anhLoi: 'Không tải được ảnh "{path}" ({src})',

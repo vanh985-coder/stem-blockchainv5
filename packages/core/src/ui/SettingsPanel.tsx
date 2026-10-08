@@ -63,6 +63,12 @@ export function SettingsPanel({ className = '' }: { className?: string }) {
         onChange={(v) => update({ reducedMotion: v })}
       />
       <SwitchRow
+        label={ui.caiDat.amThanh}
+        hint={ui.caiDat.amThanhGhiChu}
+        checked={settings.soundEnabled}
+        onChange={(v) => update({ soundEnabled: v })}
+      />
+      <SwitchRow
         label={ui.caiDat.chuTo}
         hint={ui.caiDat.chuToGhiChu}
         checked={settings.largeText}

@@ -4,6 +4,8 @@ export const SETTINGS_KEY = 'sochung.v3.settings';
 export interface Settings {
   reducedMotion: boolean;
   largeText: boolean;
+  /** Âm thanh (tiếng bấm, đúng/sai, chúc mừng) */
+  soundEnabled: boolean;
 }
 
 /** Những gì người dùng đã chọn rõ ràng. Mục nào chưa chọn thì không có. */
@@ -19,6 +21,7 @@ export function parseStored(raw: string | null | undefined): StoredSettings {
     const out: StoredSettings = {};
     if (typeof o.reducedMotion === 'boolean') out.reducedMotion = o.reducedMotion;
     if (typeof o.largeText === 'boolean') out.largeText = o.largeText;
+    if (typeof o.soundEnabled === 'boolean') out.soundEnabled = o.soundEnabled;
     return out;
   } catch {
     return {};
@@ -30,6 +33,7 @@ export function resolveSettings(stored: StoredSettings, prefersReducedMotion: bo
   return {
     reducedMotion: stored.reducedMotion ?? prefersReducedMotion,
     largeText: stored.largeText ?? false,
+    soundEnabled: stored.soundEnabled ?? true,
   };
 }
 

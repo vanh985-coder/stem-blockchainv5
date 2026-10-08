@@ -62,11 +62,3 @@ export function formatTime(seconds: number): string {
   const secs = s % 60;
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
-
-/**
- * Định dạng điểm XP hiển thị
- * Ví dụ: 15 -> "+15 XP"
- */
-export function formatXP(xp: number): string {
-  return `+${formatNumber(xp)} XP`;
-}

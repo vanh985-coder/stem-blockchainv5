@@ -8,17 +8,7 @@ class SoundManager {
   private ctx: AudioContext | null = null;
   private enabled: boolean = true;
 
-  constructor() {
-    // Đọc trạng thái âm thanh đã lưu nếu có
-    try {
-      const stored = localStorage.getItem('sochung.sound_enabled');
-      if (stored !== null) {
-        this.enabled = stored === 'true';
-      }
-    } catch {
-      // Bỏ qua lỗi localStorage
-    }
-  }
+  // Bật/tắt do SettingsProvider đặt (khóa sochung.v3.settings); không tự lưu riêng.
 
   /**
    * Khởi tạo AudioContext an toàn sau cử chỉ người dùng
@@ -46,11 +36,6 @@ class SoundManager {
 
   public setEnabled(enabled: boolean): void {
     this.enabled = enabled;
-    try {
-      localStorage.setItem('sochung.sound_enabled', String(enabled));
-    } catch {
-      // Bỏ qua
-    }
   }
 
   public toggle(): boolean {

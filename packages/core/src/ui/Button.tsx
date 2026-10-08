@@ -14,9 +14,10 @@ export interface ButtonProps extends ComponentProps<'button'> {
   rightIcon?: ReactNode;
 }
 
-// Cao tối thiểu 52px; cỡ nhỏ vẫn giữ vùng bấm 44px. Chữ to đủ để màu chữ đạt tỉ lệ tương phản cho chữ lớn.
+// Cao tối thiểu 52px (cỡ nhỏ vẫn giữ vùng bấm 44px). Mọi cỡ dùng chữ đậm từ 19px trở lên để được tính là chữ lớn
+// (WCAG: ngưỡng tương phản 3:1), vì chữ trắng trên xanh-la #3FA34D chỉ đạt khoảng 3,1:1.
 const SIZE: Record<ButtonSize, string> = {
-  sm: 'min-h-11 px-4 text-lg',
+  sm: 'min-h-11 px-4 text-[1.1875rem]',
   md: 'min-h-[52px] px-6 text-xl',
   lg: 'min-h-[60px] px-8 text-2xl',
 };

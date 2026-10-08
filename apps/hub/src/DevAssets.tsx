@@ -13,7 +13,7 @@ export default function DevAssets() {
       <h1 className="text-xl">{ui.dev.dodoHoaTieuDe}</h1>
       <p className="text-sm">
         {ui.dev.nguon} <code>{ASSETS_URL}/manifest.json</code> —{' '}
-        {manifest ? fmt(ui.dev.anhVaDungLuong, { so: entries.length, xp: kb(total) }) : ui.dev.dangTai}
+        {manifest ? fmt(ui.dev.anhVaDungLuong, { so: entries.length, kb: kb(total) }) : ui.dev.dangTai}
         {manifest && entries.length === 0 && ui.dev.manifestTrong}
       </p>
 
