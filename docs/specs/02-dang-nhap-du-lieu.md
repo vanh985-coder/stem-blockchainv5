@@ -258,10 +258,10 @@ create policy qa_select on public.quiz_answers for select
 
 **Dữ liệu trên máy luôn ghi rõ của ai.** Đây là bắt buộc, vì máy ở phòng máy trường có nhiều học sinh dùng chung.
 
-**Key lưu trong `localStorage`:**
-- Chơi thử: `sochung.v3.guest`.
+**Key lưu trong `localStorage` (chỉ cho tài khoản đăng nhập):**
 - Tài khoản: `sochung.v3.u.<userId>`.
-- Mỗi bản lưu ghi thêm trường `owner` (`"guest"` hoặc `userId`). Code **không bao giờ** đọc hay đẩy dữ liệu của chủ khác.
+- Mỗi bản lưu ghi thêm trường `owner` (= `userId`). Code **không bao giờ** đọc hay đẩy dữ liệu của chủ khác.
+- Tiến độ chơi thử **không** nằm ở `localStorage`, mà ở cookie `sc_guest` (xem bên dưới).
 
 **Khi mở app (đã đăng nhập):**
 1. **Kéo về trước:** tải `level_progress` và `game_state` của tài khoản từ Supabase.
@@ -297,7 +297,7 @@ Chưa kéo về xong thì không đẩy gì lên.
 | `coins`, `data` | Lấy bản có `updated_at` mới hơn |
 
 **Chơi thử rồi mới đăng nhập:**
-- **Không tự gộp.** Nếu `sochung.v3.guest` có tiến độ, hỏi: "Trên máy này có tiến độ chơi thử. Gộp vào tài khoản của em không? Nếu đây không phải tiến độ của em, chọn Không gộp."
+- **Không tự gộp.** Nếu cookie `sc_guest` có tiến độ, hỏi: "Trên máy này có tiến độ chơi thử. Gộp vào tài khoản của em không? Nếu đây không phải tiến độ của em, chọn Không gộp."
 - **Gộp:** gộp vào tài khoản, rồi xóa bản chơi thử.
 - **Không gộp:** xóa bản chơi thử.
 - Cả hai trường hợp đều xóa bản chơi thử, để học sinh sau ngồi cùng máy không bị hỏi lại.
