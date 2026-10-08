@@ -61,7 +61,8 @@ export function GoldenPageScene({
       {!talked ? (
         <DialogueBox turns={award.loi} onFinish={() => setTalked(true)} />
       ) : (
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-3">
+          {award.ghiChuCuoi && <p className="text-center font-display text-2xl font-extrabold">{award.ghiChuCuoi}</p>}
           <Button size="lg" autoFocus onClick={onLeave}>
             {ui.baiHoc.veBanDo}
           </Button>

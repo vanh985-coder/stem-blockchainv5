@@ -35,6 +35,17 @@
 | **Khi {phanDien} tráo giao dịch** | "Thấy chưa, chỉ đổi một lá mà con số đổi lan lên tận gốc." |
 | **Cuối bài** | "Nhờ số gốc, cả làng chỉ cần so một con số là biết sổ có bị sửa hay không." |
 
+Lời "Khi {phanDien} tráo giao dịch" hiện giữa lúc làm trạm Trung bình, ngay khi gốc đổi (trạm gọi `onTwist()`; `LessonPage2D` mở hộp thoại thầy Linh đè lên trạm, bấm "Tiếp" để đóng). Trạm Trung bình và trạm Khó không có lời trước trạm.
+
+### Ở mốc 1
+
+Cao trào (mốc 3) và hội làng (mốc 4) chưa có, nên ngay sau màn 10 chỉ có cảnh trao trang đơn giản, qua `LessonPage2D`:
+- Dòng chú thích: "Thầy Linh trao Trang Sổ Vàng thứ tư." Trang giấy vàng bay vào ô thứ tư (bỏ hiệu ứng bay khi bật "Giảm chuyển động").
+- Bi nói: "Đủ 4 trang rồi! Cả làng đang mở hội."
+- Dòng "Hội làng sắp mở", rồi nút **"Về bản đồ"**.
+- Trang Sổ Vàng thứ tư được trao một lần, ngay khi xong màn 10 (màn 11, 12 còn `coming-soon`). Học lại thì không trao nữa.
+- Từ mốc 3: cao trào thay cho cảnh này, và Trang Sổ Vàng thứ tư chỉ trao sau cao trào.
+
 ## Màn 11 — Game phụ 1: "Ghép lá cây sổ" (kiểu Candy Crush)
 
 Logic đặt trong `match3Logic.ts` (hàm thuần, có test).

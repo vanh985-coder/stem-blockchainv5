@@ -1,7 +1,6 @@
 export type { VillageModule, VillageId } from './village';
 export { URLS, HUB_MAP_URL, VILLAGE_IDS, resolveUrls, levelUrl, hubMapUrl } from './config/urls';
 export type { AppUrls, UrlEnv } from './config/urls';
-export { LessonPlaceholder } from './ui/LessonPlaceholder';
 export { VillageApp } from './ui/VillageApp';
 export { ExternalRedirect } from './ui/ExternalRedirect';
 export { lazyRoute } from './ui/lazyRoute';
@@ -25,6 +24,7 @@ export { Panel } from './ui/Panel';
 export { PortraitFrame } from './ui/PortraitFrame';
 export { Hearts } from './ui/Hearts';
 export { Card } from './ui/Card';
+export { ProgressBar } from './ui/ProgressBar';
 export { Modal } from './ui/Modal';
 export { Avatar } from './ui/Avatar';
 export { TapOrDragContainer, DraggableCard, DroppableSlot, useTapOrDrag } from './ui/TapOrDrag';

@@ -25,7 +25,7 @@ export interface StationDef {
    * Dựng nội dung trạm. Trạm gọi onComplete khi làm xong; trạm có tim thì gọi onFail(mẹo) khi hết tim
    * (hiện màn "Hết tim mất rồi!" với nút "Thử lại" làm lại trạm đó).
    */
-  render: (p: { onComplete: (r: StationResult) => void; onFail: (tip: string) => void }) => ReactNode;
+  render: (p: { onComplete: (r: StationResult) => void; onFail: (tip: string) => void; onTwist: () => void }) => ReactNode;
 }
 
 export interface LessonPage2DProps {
@@ -68,6 +68,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   const [showCards, setShowCards] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
   const [awardNow, setAwardNow] = useState(false);
+  const [twistOpen, setTwistOpen] = useState(false);
 
   // Dữ liệu của lần học này: số xu nhận được, thời gian, sao từng trạm, số Trang Sổ Vàng trước khi học.
   const saved = progress.levels[levelId]?.stars ?? {};
@@ -166,6 +167,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
         {stations[id].render({
           onComplete: (r) => onStationComplete(stage.idx, r),
           onFail: (tip) => setStage({ kind: 'failed', idx: stage.idx, tip }),
+          onTwist: () => setTwistOpen(true),
         })}
       </Panel>
     );
@@ -332,6 +334,13 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
         <main className="mx-auto w-full max-w-4xl px-1 pb-10 pt-2 sm:px-3">{body}</main>
       </div>
 
+      {twistOpen && content.twist && content.twist.length > 0 && (
+        <div className="fixed inset-0 z-40 flex items-end justify-center bg-chu/30 p-3 sm:items-center">
+          <div className="w-full max-w-2xl">
+            <DialogueBox key={`t${attempt}`} turns={content.twist} onFinish={() => setTwistOpen(false)} />
+          </div>
+        </div>
+      )}
       {showCards && <CardsDialog cards={onHard ? [...content.emCoBiet, ...(content.emCoBietKho ?? [])] : content.emCoBiet} onClose={() => setShowCards(false)} />}
     </div>
   );

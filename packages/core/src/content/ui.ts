@@ -22,12 +22,6 @@ export const ui = {
     'lang-bac': 'Làng Bạc',
   },
 
-  /** Trang tạm của màn bài học (trước khi chuyển bài thật) */
-  trangTam: {
-    /** Tiêu đề trang tạm, {so} là số bài */
-    tieuDe: 'Bài học {so} — đang chuyển',
-  },
-
   /** Màn hình chuyển hướng về bản đồ */
   chuyenHuong: {
     truoc: 'Đang chuyển về bản đồ… Nếu chưa tự chuyển, em bấm',
@@ -235,7 +229,6 @@ export const ui = {
   /** Lưu tiến độ, chơi thử, trang tạm của màn bài học */
   tienDo: {
     dangLuu: 'Đang lưu…',
-    daLuu: 'Đã lưu.',
     /** Hiện khi chưa gửi được lên máy chủ (mất mạng hoặc chậm quá 5 giây) */
     chuaGuiDuoc: 'Chưa gửi được lên máy chủ. Tiến độ vẫn được giữ và sẽ tự gửi khi có mạng.',
     /** Thanh trên cùng khi chơi thử */
@@ -249,9 +242,6 @@ export const ui = {
       'Trên máy này có tiến độ chơi thử. Gộp vào tài khoản của em không? Nếu đây không phải tiến độ của em, chọn Không gộp.',
     gop: 'Gộp',
     khongGop: 'Không gộp',
-    /** Nút thử ở trang tạm của màn bài học */
-    gaLapXongMan: 'Giả lập xong màn (3 sao)',
-    nhanXu: 'Em nhận được {so} xu.',
   },
 
   /** Trang chủ "/" (spec 04 mục 1) */

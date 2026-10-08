@@ -1,5 +1,7 @@
 import { randInt, shuffle, chooseOne } from '../../lib/rng';
 import { GAME_CONFIG } from '../../config/gameConfig';
+import { capitalize, fmt } from '../../content/characters';
+import { bai4Data } from '../../content/lessons/bai-4';
 
 export interface EasyTx {
   id: 'T1' | 'T2' | 'T3' | 'T4';
@@ -65,12 +67,17 @@ export function pathToRoot(leafIndex: number, levels: number): CellCoord[] {
   return path;
 }
 
-export const DEFAULT_EASY_TXS: EasyTx[] = [
-  { id: 'T1', name: 'An', character: 'an', item: 'quyển sách', value: 3 },
-  { id: 'T2', name: 'Bình', character: 'binh', item: 'cây bút', value: 7 },
-  { id: 'T3', name: 'Chi', character: 'chi', item: 'vở', value: 5 },
-  { id: 'T4', name: 'Dũng', character: 'dung', item: 'thước', value: 2 },
-];
+/** Tên hiển thị viết hoa chữ đầu, ví dụ "Bác An" (tên và món đồ nằm ở content/lessons/bai-4.ts) */
+const nameOf = (raw: string) => capitalize(fmt(raw));
+const EASY_CHARACTERS = ['an', 'binh', 'chi', 'dung'] as const;
+
+export const DEFAULT_EASY_TXS: EasyTx[] = bai4Data.easy.map((p, i) => ({
+  id: `T${i + 1}` as EasyTx['id'],
+  name: nameOf(p.name),
+  character: EASY_CHARACTERS[i],
+  item: p.item,
+  value: [3, 7, 5, 2][i],
+}));
 
 /**
  * Sinh đề cho Mức Dễ: 4 giao dịch và 5 câu hỏi nhanh theo đúng thứ tự.
@@ -133,16 +140,7 @@ export function generateMedium(rng: () => number = Math.random): {
   return { txs, tamperedLeafIndex, tamperedNewValue };
 }
 
-export const HARD_PEOPLE: Array<{ name: string; item: string }> = [
-  { name: 'An', item: 'quyển sách' },
-  { name: 'Bình', item: 'cây bút' },
-  { name: 'Chi', item: 'vở ô ly' },
-  { name: 'Dũng', item: 'thước kẻ' },
-  { name: 'Giang', item: 'ba lô' },
-  { name: 'Hoa', item: 'compa' },
-  { name: 'Khang', item: 'hộp bút' },
-  { name: 'Linh', item: 'bảng con' },
-];
+export const HARD_PEOPLE: Array<{ name: string; item: string }> = bai4Data.hard.map((p) => ({ name: nameOf(p.name), item: p.item }));
 
 export interface HardChallenge {
   txs: HardTx[];

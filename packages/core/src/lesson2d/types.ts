@@ -15,6 +15,8 @@ export type LessonDialogue = Record<Moment, DialogueTurn[]>;
 export interface GoldenAward {
   chuThich: string;
   loi: DialogueTurn[];
+  /** Dòng chữ hiện sau lời người dẫn, trên nút "Về bản đồ" (ví dụ "Hội làng sắp mở") */
+  ghiChuCuoi?: string;
 }
 
 /** Chữ giới thiệu một trạm (LevelIntro). */
@@ -38,6 +40,11 @@ export interface LessonContent {
   /** "Điều em vừa học" ở màn hoàn thành cả bài */
   keyTakeaway: string;
   emCoBiet: StoryCard[];
+  /**
+   * Lời người dẫn khi xảy ra "khoảnh khắc đổi" giữa lúc đang làm (Bài 4: {phanDien} tráo giao dịch).
+   * Trạm gọi onTwist() thì khung hiện hộp thoại này đè lên trạm, bấm "Tiếp" để đóng.
+   */
+  twist?: DialogueTurn[];
   /** Thẻ "Em có biết?" chỉ hiện khi đang ở trạm Khó (Bài 2: Đặt cọc) */
   emCoBietKho?: StoryCard[];
 }
