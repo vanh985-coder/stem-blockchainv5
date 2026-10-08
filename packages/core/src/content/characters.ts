@@ -55,7 +55,7 @@ export function characterNames(table: Record<CharacterId, CharacterInfo> = CHARA
 }
 
 /** Chỗ giữ số và chữ khác mà lời thoại, nhãn được phép dùng (ngoài {ten}, {Ten} và tên nhân vật). */
-export const EXTRA_VARS = ['so', 'diem', 'kb', 'muc', 'earned', 'max', 'bai', 'man', 'lang', 'path', 'src', 'loi', 'trangThai', 'x', 'y', 'n', 'truoc', 'nd', 'ma', 'gapDoi', 'tong', 's', 'sau', 'k', 'tram', 'tenTram', 'sao', 'nguoi', 'phieu', 'chiTiet', 'cacPhan', 'tao', 'cuoi', 'dung', 'cu', 'moi', 'luot'] as const;
+export const EXTRA_VARS = ['so', 'diem', 'kb', 'muc', 'earned', 'max', 'bai', 'man', 'lang', 'path', 'src', 'loi', 'trangThai', 'x', 'y', 'n', 'truoc', 'nd', 'ma', 'gapDoi', 'tong', 's', 'sau', 'k', 'tram', 'tenTram', 'sao', 'nguoi', 'phieu', 'chiTiet', 'cacPhan', 'tao', 'cuoi', 'dung', 'cu', 'moi', 'luot', 'so2', 'so3', 'myName', 'nextN', 'nextK', 'wrongNames', 'attempts', 'secs', 'm', 'days', 'wrongExplanation', 'testedKey', 'supercomputerTriesPerSec', 'supercomputerYears', 'smartSteps', 'smartYears', 'universeMultiplier'] as const;
 
 export type FmtVars = { ten?: string } & Record<string, string | number | undefined>;
 

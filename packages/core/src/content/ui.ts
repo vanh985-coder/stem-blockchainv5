@@ -366,6 +366,19 @@ export const ui = {
     veBanDo: 'Về bản đồ',
   },
 
+  /** Hộp thoại chung (Modal) */
+  hopThoai: {
+    macDinh: 'Hộp thoại',
+    dong: 'Đóng hộp thoại',
+  },
+
+  /** Thẻ kéo thả hoặc chạm chọn (TapOrDrag) */
+  keoTha: {
+    oDatThe: 'Ô đặt thẻ',
+    chamDeDat: 'Chạm để đặt vào đây',
+    keoHoacCham: 'Kéo hoặc chạm đặt vào đây',
+  },
+
   /** Tim (số lượt sai còn được phép) */
   tim: {
     /** {so} tim còn lại trên {max} */

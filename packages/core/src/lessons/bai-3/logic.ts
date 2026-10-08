@@ -1,4 +1,7 @@
 // Logic toán và các hàm tạo đề cho Bài 3: Khóa riêng & khóa công khai
+import { fmt } from '../../content/characters';
+import { bai3Logic } from '../../content/lessons/bai-3';
+
 // Hàm thuần túy, không import React. Mọi hàm ngẫu nhiên nhận rng: () => number
 
 export const P = 23, G = 5, Q = 22;
@@ -106,7 +109,7 @@ export function generateMedium(rng: () => number, userName: string): MediumTx[] 
 
   return senders.map((senderId, idx) => {
     const amount = 1 + Math.floor(rng() * 20); // 1..20
-    const message = `Chuyển ${amount} xu cho ${userName || 'Em'}`;
+    const message = fmt(bai3Logic.thongDiep, { n: amount, nguoi: userName || 'Em' });
     const isFake = fakeFlags[idx];
 
     if (isFake) {
@@ -178,13 +181,5 @@ export function stepBrute(state: BruteState, budget: number): BruteState {
   return { p, g, target, x, cur, tries, found: null };
 }
 
-// Hằng số ước tính lý thuyết (dùng hiển thị ở Mức Khó)
-export const ESTIMATES = {
-  totalPossibilities: '1,16 × 10^77',
-  supercomputerTriesPerSec: '10^18',
-  supercomputerYears: '3,7 × 10^51',
-  smartSteps: '2^128',
-  smartYears: '1,1 × 10^13',
-  universeAgeYears: '13,8 tỷ',
-  universeMultiplier: 780,
-} as const;
+// Hằng số ước tính lý thuyết (dùng hiển thị ở Mức Khó); chữ nằm trong content/lessons/bai-3.ts
+export const ESTIMATES = bai3Logic.uocTinh;
