@@ -259,13 +259,6 @@ export const ui = {
     trangGiaoVien: 'Trang giáo viên',
   },
 
-  /** Trang tạm /giao-vien (làm ở bước sau) */
-  giaoVien: {
-    tieuDe: 'Trang giáo viên',
-    dangLam: 'Đang làm',
-    veTrangChu: 'Về trang chủ',
-  },
-
   /** Trang cốt truyện /truyen (spec 04 mục 2) */
   truyen: {
     tieuDe: 'Cốt truyện',

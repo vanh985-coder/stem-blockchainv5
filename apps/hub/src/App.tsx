@@ -28,6 +28,7 @@ export function App() {
       <Route path="/truyen" element={<Lazy page={Story} />} />
       <Route path="/ban-do" element={<Lazy page={BanDo} />} />
       <Route path="/giao-vien" element={<Lazy page={Teacher} />} />
+      <Route path="/giao-vien/:classId" element={<Lazy page={Teacher} />} />
       {accountRoutes.map((r) => (
         <Route key={r.path} path={r.path} element={r.element} />
       ))}

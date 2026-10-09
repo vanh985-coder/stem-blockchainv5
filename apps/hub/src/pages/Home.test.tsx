@@ -12,6 +12,7 @@ import {
   type ProgressState,
   type Role,
 } from '@so-chung/core';
+import { teacherTexts } from '@so-chung/core/content/teacher';
 import { Home } from './Home';
 import Teacher from './Teacher';
 
@@ -115,18 +116,18 @@ describe('/giao-vien dùng cùng điều kiện', () => {
   it('giáo viên và admin vào được', () => {
     for (const role of ['teacher', 'admin'] as const) {
       const html = render(<Teacher />, authOf({ session, profile: profileOf(role) }));
-      expect(html, role).toContain('Đang làm');
+      expect(html, role).toContain(teacherTexts.lop.tieuDe);
     }
   });
 
   it('học sinh và khách không thấy nội dung (bị chuyển về trang chủ)', () => {
-    expect(render(<Teacher />, authOf({ session, profile: profileOf('student') }))).not.toContain('Đang làm');
-    expect(render(<Teacher />, authOf({}))).not.toContain('Đang làm');
+    expect(render(<Teacher />, authOf({ session, profile: profileOf('student') }))).not.toContain(teacherTexts.lop.tieuDe);
+    expect(render(<Teacher />, authOf({}))).not.toContain(teacherTexts.lop.tieuDe);
   });
 
   it('có phiên nhưng hồ sơ chưa tải xong: chờ, không đẩy admin về trang chủ', () => {
     const html = render(<Teacher />, authOf({ session, profile: null, profileLoading: true }));
     expect(html).toContain('Đang tải');
-    expect(html).not.toContain('Đang làm');
+    expect(html).not.toContain(teacherTexts.lop.tieuDe);
   });
 });

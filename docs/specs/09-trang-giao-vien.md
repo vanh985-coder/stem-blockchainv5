@@ -70,11 +70,13 @@ $$;
 
 **Các bước:**
 1. Đọc người gọi từ token. Nếu không đăng nhập thì trả lỗi 401.
-2. Dùng client có service role, kiểm tra học sinh có thuộc một lớp do người gọi làm giáo viên không. Không thuộc thì trả lỗi 403.
-3. Kiểm tra email của học sinh có đuôi `@hs.ten-mien.vn` không (tức tài khoản tên đăng nhập). Tài khoản Google thì trả lỗi: "Tài khoản Google không có mật khẩu để đặt lại."
+2. Dùng client có service role, kiểm tra người gọi **là admin**, hoặc **là giáo viên của một lớp có học sinh này**. Không thì trả lỗi 403.
+3. Kiểm tra email của học sinh có đuôi `@<tên miền>` không (tức tài khoản tên đăng nhập). **Tên miền đọc từ secret `USERNAME_EMAIL_DOMAIN`** của Edge Function (cùng giá trị với `VITE_USERNAME_EMAIL_DOMAIN`), không viết cứng trong code. Tài khoản Google thì trả lỗi: "Tài khoản Google không có mật khẩu để đặt lại."
 4. `newPassword` phải có ít nhất 8 ký tự.
 5. Gọi `auth.admin.updateUserById(studentId, { password: newPassword })`.
-6. Trả kết quả thành công.
+6. Trả kết quả thành công `{ ok: true }`. Khi lỗi trả `{ ok: false, code, error }`; giao diện dựa vào `code` để hiện câu báo lỗi trong `content/`.
+
+**Khóa service role chỉ dùng trong Edge Function** (biến môi trường `SUPABASE_SERVICE_ROLE_KEY` do Supabase cấp sẵn), không bao giờ có trong `apps/` hay `packages/`. Thiết lập secret: `supabase secrets set USERNAME_EMAIL_DOMAIN=hs.ten-mien.vn`.
 
 **Không ghi mật khẩu vào log.** Triển khai bằng `supabase functions deploy teacher-reset-password`.
 
