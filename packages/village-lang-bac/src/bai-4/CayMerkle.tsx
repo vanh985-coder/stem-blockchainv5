@@ -32,6 +32,8 @@ export interface CayMerkleProps {
   className?: string;
   /** Chú thích bên dưới cây nếu cần */
   caption?: string;
+  /** Hiện gợi ý "vuốt ngang" ở màn hình nhỏ (cây 8 lá luôn hiện) */
+  scrollHint?: boolean;
 }
 
 export const CayMerkle: React.FC<CayMerkleProps> = ({
@@ -44,6 +46,7 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
   highlightPath = [],
   className = '',
   caption,
+  scrollHint = false,
 }) => {
   const numLevels = treeValues.length;
   const numLeaves = treeValues[0]?.length || 4;
@@ -171,7 +174,7 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
   return (
     <div className={`w-full flex flex-col items-center select-none ${className}`}>
       {/* Gợi ý vuốt ngang cho điện thoại màn hình nhỏ */}
-      {isEightLeaves && (
+      {(isEightLeaves || scrollHint) && (
         <div className="sm:hidden text-sm text-nau-go-dam font-medium flex items-center gap-1 mb-2 bg-giay px-3 py-1 rounded-full border border-nau-go/30">
           <span>👉</span>
           <span>{T.vuotNgangDeXemCa}</span>
@@ -179,7 +182,7 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
       )}
 
       {/* Khung cuộn ngang */}
-      <div className="w-full overflow-x-auto pb-4 pt-1 flex justify-center">
+      <div className="w-full overflow-x-auto pb-4 pt-1 flex">
         <div
           style={{ width: canvasWidth, height: canvasHeight }}
           className="relative shrink-0 mx-auto"

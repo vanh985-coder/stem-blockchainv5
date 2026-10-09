@@ -4,6 +4,15 @@ import { bai4Texts } from '@so-chung/core/content/lessons/bai-4';
 import { GAME_CONFIG } from '@so-chung/core/config/gameConfig';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { buildTree, pathToRoot, generateMedium, DEFAULT_EASY_TXS, type EasyTx } from '@so-chung/core/lessons/bai-4/logic';
+import {
+  cellKey,
+  inspectCell,
+  inspectCount,
+  isTamperedLeafHit,
+  shouldShowBiHint,
+  type InspectCell,
+  type InspectState,
+} from '@so-chung/core/lessons/bai-4/inspect';
 import { CayMerkle, type CellStatus } from './CayMerkle';
 import { portraitOf } from './nguoi';
 
@@ -224,10 +233,8 @@ export function Medium({
 
   // Hoạt cảnh lan truyền đổi màu đỏ từ lá lên gốc
   const [tamperStep, setTamperStep] = useState<number>(-1); // -1: chưa đổi, 0: lá, 1: T34, 2: gốc
-  const [isTampering, setIsTampering] = useState<boolean>(false);
 
   const startTamperAnimation = useCallback(() => {
-    setIsTampering(true);
     setTamperStep(0);
     sound.playWrong();
 
@@ -242,11 +249,64 @@ export function Medium({
       timerRef.current = setTimeout(() => {
         setTamperStep(2);
         sound.playWrong();
-        setIsTampering(false);
         onTwist?.();
       }, delay);
     }, delay);
   }, [onTwist]);
+
+  // Phần 3: em soi từng ô (tính lại số rồi so với số đã ghi trong sổ). Soi trúng lá bị sửa thì chạy hiệu ứng đỏ lan lên gốc.
+  const [inspected, setInspected] = useState<InspectState>({});
+  const [found, setFound] = useState(false);
+
+  const handleInspect = (cell: InspectCell) => {
+    if (found || tamperStep >= 0 || inspected[cellKey(cell)]) return;
+    const result = inspectCell(partBTree, tamperedTree, cell);
+    if (result.match) sound.playCorrect();
+    else sound.playWrong();
+    setInspected((prev) => ({ ...prev, [cellKey(cell)]: result }));
+    if (isTamperedLeafHit(cell, tamperedLeafIndex, result)) {
+      setFound(true);
+      timerRef.current = setTimeout(startTamperAnimation, 700);
+    }
+  };
+
+  const cellName = (level: number, index: number) =>
+    level === 2 ? T.goc : level === 1 ? `T${index * 2 + 1}${index * 2 + 2}` : `T${index + 1}`;
+
+  /** Ô soi được: số đã ghi trong sổ, sau khi soi thêm số tính lại và ✓ khớp / ✗ lệch (có chữ, không chỉ màu) */
+  const renderInspectSlot = (level: number, index: number) => {
+    if (tamperStep >= 0) return null;
+    const r = inspected[cellKey({ level, index })];
+    const name = cellName(level, index);
+    const recorded = partBTree[level][index];
+    const tone = r
+      ? r.match
+        ? 'border-xanh-la-dam bg-xanh-la/10 text-xanh-la-dam'
+        : 'border-do-son-dam bg-do-son/10 text-do-son-dam'
+      : 'border-nau-go/50 bg-white/80 text-chu hover:border-muc-tim cursor-pointer';
+    return (
+      <button
+        type="button"
+        onClick={() => handleInspect({ level, index })}
+        aria-disabled={Boolean(r) || found}
+        aria-label={
+          r
+            ? fmt(T.soiNhanKetQua, { nhan: name, so: r.recorded, so2: r.recomputed, ketQua: r.match ? T.soiNhanKhop : T.soiNhanLech })
+            : fmt(T.soiNhanCuaO, { nhan: name, so: recorded })
+        }
+        className={`flex min-h-[76px] w-full min-w-[84px] flex-col items-center justify-center rounded-[14px] border-2 px-1 py-1 text-center font-display text-sm leading-tight focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim ${tone}`}
+      >
+        <span className="font-extrabold uppercase tracking-wide">{name}</span>
+        <span className="font-bold">{fmt(T.soiSo, { so: recorded })}</span>
+        {r && (
+          <>
+            <span className="font-bold">{fmt(T.soiTinhLai, { so: r.recomputed })}</span>
+            <span className="font-extrabold">{r.match ? T.soiKhop : T.soiLech}</span>
+          </>
+        )}
+      </button>
+    );
+  };
 
   // Cây hiển thị ở Phần C
   const currentTreeC = useMemo(() => {
@@ -274,9 +334,11 @@ export function Medium({
 
   // Trạng thái các ô ở Phần C
   const cellStatusesC = useMemo(() => {
-    const s0: CellStatus[] = ['dung', 'dung', 'dung', 'dung'];
-    const s1: CellStatus[] = ['dung', 'dung'];
-    const s2: CellStatus[] = ['dung'];
+    // Trước khi tìm ra lá bị sửa, ô giữ kiểu mặc định (màu do kết quả soi quyết định); khi chạy hiệu ứng, ô ngoài đường đỏ hiện xanh
+    const base: CellStatus | undefined = tamperStep >= 0 ? 'dung' : undefined;
+    const s0: (CellStatus | undefined)[] = [base, base, base, base];
+    const s1: (CellStatus | undefined)[] = [base, base];
+    const s2: (CellStatus | undefined)[] = [base];
 
     if (tamperStep >= 0) s0[tamperedLeafIndex] = 'doi-mau';
     if (tamperStep >= 1) s1[tamperPath[1].index] = 'doi-mau';
@@ -487,56 +549,88 @@ export function Medium({
       {/* PHẦN C: KHOẢNH KHẮC "À RA THẾ" */}
       {/* ========================================================= */}
       {phase === 'phase_c' && (
-        <Card className="p-6 sm:p-8 space-y-6">
+        <Card className="p-3 sm:p-8 space-y-5">
           <div className="text-center space-y-1">
             <span className="text-sm font-bold text-do-son-dam uppercase tracking-wider">{T.khoanhKhacARaThe}</span>
-            <h3 className="first-letter:uppercase font-display font-extrabold text-xl sm:text-2xl text-chu">{T.chiDoi1GiaoDich}</h3>
+            <h3 className="first-letter:uppercase font-display font-extrabold text-xl sm:text-2xl text-chu">{T.giaoDichNaoBiSua}</h3>
           </div>
 
-          {/* Diễn biến câu chuyện với Cáo Tí */}
+          {/* Lời {phanDien}: không nói lá nào bị sửa */}
           <div className="p-4 rounded-[16px] bg-do-son/10 border border-do-son/30 flex items-center gap-3">
-            <Avatar portrait={portraitOf("ti")} size="md" />
-            <div className="text-sm sm:text-sm text-chu leading-snug">{rich(T.tinhNghichToVuaLen, { so: partBLeaves[tamperedLeafIndex], tamperedNewValue })}</div>
+            <Avatar portrait={portraitOf('ti')} size="md" />
+            <div className="text-sm text-chu leading-snug">{rich(T.tinhNghichToVuaLen)}</div>
           </div>
 
-          {/* Cây Merkle đổi màu lan truyền */}
+          {/* Dòng đầu mối: số gốc tính lại không khớp số trong sổ */}
+          <p
+            role="status"
+            className="rounded-[14px] border-2 border-do-son-dam bg-do-son/10 px-3 py-2 text-center font-display text-base text-do-son-dam"
+          >
+            <span aria-hidden="true">≠ </span>
+            {rich(T.tinhLaiSoGoc, { so: tamperedTree[2][0], so2: partBTree[2][0] })}
+          </p>
+
+          {!found && <p className="text-center text-sm text-nau-go-dam">{T.huongDanSoiO}</p>}
+
+          {/* Cây sổ: số đã ghi ở mọi ô; bấm một ô để soi */}
           <CayMerkle
             treeValues={currentTreeC}
             cellStatuses={cellStatusesC}
             highlightPath={tamperStep >= 0 ? tamperPath.slice(0, tamperStep + 1) : []}
-            caption={T.cacOMauDoLan}
+            renderSlot={(level, index) => renderInspectSlot(level, index)}
+            scrollHint
+            caption={T.soiTieuDeCay}
           />
 
+          {/* Bi gợi ý khi em đã soi trúng ô khớp lần thứ 2 */}
+          {shouldShowBiHint(inspected) && !found && (
+            <div role="status" className="flex items-center gap-3 rounded-[16px] border-2 border-muc-tim/40 bg-muc-tim/10 p-3">
+              <Avatar portrait="bi" size="md" />
+              <p className="text-sm font-semibold text-chu">{T.soiBiGoiY}</p>
+            </div>
+          )}
+
+          {found && (
+            <p
+              role="status"
+              className="rounded-[14px] border-2 border-xanh-la-dam bg-xanh-la/10 px-3 py-2 text-center font-display text-base font-extrabold text-xanh-la-dam"
+            >
+              <span aria-hidden="true">✓ </span>
+              {fmt(T.soiTimRaRoi, { so: tamperedLeafIndex + 1, so2: partBLeaves[tamperedLeafIndex], so3: tamperedNewValue })}
+            </p>
+          )}
+
           {/* Nút hành động */}
-          <div className="flex justify-center pt-2">
-            {tamperStep < 0 ? (
-              <Button
-                variant="danger"
-                size="lg"
-                onClick={startTamperAnimation}
-                disabled={isTampering}
-              >{T.suaGiaoDichXemGoc}</Button>
-            ) : tamperStep < 2 ? (
-              <Button variant="secondary" size="md" disabled>{T.dangLanTruyenDoiGia}</Button>
-            ) : (
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => {
-                  const totalMistakes = mistakesB;
-                  const stars = starsFromMistakes(totalMistakes);
-                  const timeMs = Date.now() - startTimeRef.current;
-                  sound.playLevelComplete();
-                  onComplete({
-                    stars,
-                    timeMs,
-                    learned:
-                      T.doiMotGiaoDichThi,
-                  });
-                }}
-              >{T.hoanThanhManHoc}</Button>
-            )}
-          </div>
+          {found && (
+            <div className="flex flex-col items-center gap-3 pt-1">
+              {tamperStep < 2 ? (
+                <Button variant="secondary" size="md" disabled>
+                  {T.dangLanTruyenDoiGia}
+                </Button>
+              ) : (
+                <>
+                  <p className="text-center text-base font-semibold text-chu">{fmt(T.soiTongKet, { so: inspectCount(inspected) })}</p>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    onClick={() => {
+                      const totalMistakes = mistakesB;
+                      const stars = starsFromMistakes(totalMistakes);
+                      const timeMs = Date.now() - startTimeRef.current;
+                      sound.playLevelComplete();
+                      onComplete({
+                        stars,
+                        timeMs,
+                        learned: T.doiMotGiaoDichThi,
+                      });
+                    }}
+                  >
+                    {T.hoanThanhManHoc}
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
         </Card>
       )}
 

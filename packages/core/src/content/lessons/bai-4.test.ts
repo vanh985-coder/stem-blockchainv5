@@ -71,6 +71,20 @@ describe('content/lessons/bai-4.ts', () => {
     expect(bai4Lesson.award.ghiChuCuoi).toBe('Hội làng sắp mở');
   });
 
+  it('phần 3 "Khám phá bí mật": lời {phanDien} không nói lá nào, các câu soi đúng như spec', () => {
+    const t = bai4Texts.tramTb;
+    expect(t.tinhNghichToVuaLen).toBe('**{phanDien} tinh nghịch: **"Tớ vừa lén sửa một giao dịch. Xem có ai nhận ra không nào!"');
+    expect(t.tinhNghichToVuaLen).not.toMatch(/T\d|\{so\}/);
+    expect(t.tinhLaiSoGoc).toBe('Tính lại số gốc: **{so}** ≠ **{so2}** trong sổ');
+    expect(t.soiTimRaRoi).toBe('Em tìm ra rồi! T{so} bị sửa từ {so2} thành {so3}');
+    expect(t.soiTongKet).toBe('Em soi {so} ô. Đi theo nhánh đỏ thì chỉ cần 2 ô mỗi tầng.');
+    expect(t.soiBiGoiY).toBe('Bắt đầu từ gốc, soi 2 ô con, rồi đi theo ô đỏ.');
+    expect(Object.keys(t)).not.toContain('suaGiaoDichXemGoc'); // đã bỏ nút "Sửa giao dịch & xem gốc đổi"
+    // khớp/lệch có icon và chữ, không chỉ màu
+    expect(t.soiKhop).toContain('✓');
+    expect(t.soiLech).toContain('✗');
+  });
+
   it('có 4 thẻ "Em có biết?"', () => {
     expect(bai4Lesson.emCoBiet).toHaveLength(4);
   });

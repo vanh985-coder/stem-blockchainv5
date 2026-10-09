@@ -37,6 +37,19 @@
 
 Lời "Khi {phanDien} tráo giao dịch" hiện giữa lúc làm trạm Trung bình, ngay khi gốc đổi (trạm gọi `onTwist()`; `LessonPage2D` mở hộp thoại thầy Linh đè lên trạm, bấm "Tiếp" để đóng). Trạm Trung bình và trạm Khó không có lời trước trạm.
 
+### Trạm Trung bình, phần 3 "Khám phá bí mật": soi ô tìm giao dịch bị sửa
+
+Thay cho nút "Sửa giao dịch & xem gốc đổi" ở bản cũ. Công thức, số liệu và cách chấm sao (theo lỗi ở phần B) không đổi.
+- {phanDien} nói: "Tớ vừa lén sửa một giao dịch. Xem có ai nhận ra không nào!" (không nói lá nào).
+- Cây hiện **số đã ghi trong sổ** ở mọi ô. Ví dụ lá 6, 3, 2, 1; T12 = 63, T34 = 21, gốc = 651. Giao dịch bị sửa là T3 (2 → 3).
+- Dòng đầu mối: "Tính lại số gốc: 661 ≠ 651 trong sổ".
+- Học sinh bấm (hoặc Enter/Space khi chọn bằng bàn phím) một ô để **soi**: ô hiện số tính lại cạnh số trong sổ. Khớp thì xanh kèm ✓ khớp, lệch thì đỏ kèm ✗ lệch (có icon và chữ, không chỉ màu). Ô đã soi giữ nguyên trạng thái; soi lại ô cũ không đếm thêm.
+- Với ví dụ trên: gốc, T34, T3 lệch; T12, T1, T2, T4 khớp.
+- Soi trúng lá bị sửa: "Em tìm ra rồi! T3 bị sửa từ 2 thành 3", chạy hiệu ứng đỏ lan từ lá lên gốc (như cũ), rồi mới gọi `onTwist` (lời thầy Linh).
+- Cuối phần: "Em soi {so} ô. Đi theo nhánh đỏ thì chỉ cần 2 ô mỗi tầng."
+- Khi em soi trúng ô khớp lần thứ 2, Bi gợi ý: "Bắt đầu từ gốc, soi 2 ô con, rồi đi theo ô đỏ."
+- Logic soi là hàm thuần trong `lessons/bai-4/inspect.ts` (dùng `combine`, `buildTree`), có test.
+
 ### Ở mốc 1
 
 Cao trào (mốc 3) và hội làng (mốc 4) chưa có, nên ngay sau màn 10 chỉ có cảnh trao trang đơn giản, qua `LessonPage2D`:
