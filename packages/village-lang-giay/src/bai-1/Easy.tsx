@@ -162,7 +162,7 @@ export function Easy({
         />
       </div>
 
-      <div className="flex flex-col items-center justify-between gap-4 rounded-bang border-2 border-nau-go/50 bg-white/60 p-4 sm:flex-row">
+      <div className="flex flex-col items-center justify-between gap-4 rounded-bang border-2 border-nau-go/50 bg-white/60 p-4 sm:flex-row min-[1280px]:sticky min-[1280px]:bottom-3 min-[1280px]:z-20 min-[1280px]:bg-giay/95">
         <div className="flex items-center gap-3">
           <PortraitFrame portrait="bi" size={72} />
           <div className="rounded-2xl border-2 border-nau-go/50 bg-giay p-3">

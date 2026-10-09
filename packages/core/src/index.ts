@@ -31,6 +31,7 @@ export { Avatar } from './ui/Avatar';
 export { TapOrDragContainer, DraggableCard, DroppableSlot, useTapOrDrag } from './ui/TapOrDrag';
 export { LevelFailed } from './ui/LevelFailed';
 export { DialogueBox, toVnTurns } from './ui/DialogueBox';
+export { withMoods } from './lesson2d/flow';
 export { VnDialog, PORTRAIT_SIZE_WIDE, PORTRAIT_SIZE_NARROW } from './ui/VnDialog';
 export { NenTrangTri, FLOATERS } from './ui/NenTrangTri';
 export type { VnTurn, VnDialogProps } from './ui/VnDialog';

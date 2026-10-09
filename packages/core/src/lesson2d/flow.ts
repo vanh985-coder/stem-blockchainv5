@@ -14,6 +14,19 @@ export function dialogueFor(dialogue: LessonDialogue, moment: Moment): DialogueT
 }
 
 /**
+ * Hàm thuần: gắn tâm trạng 'vui' cho những lượt người dẫn đang chào, khen hoặc trao Trang Sổ Vàng.
+ * - 'dauBai': chỉ lượt đầu (câu chào đầu bài);
+ * - 'cuoiBai': mọi lượt (lời khen khi em xong bài);
+ * - 'award': mọi lượt (lời trao Trang Sổ Vàng);
+ * - các thời điểm khác (trước Trung bình, trước Khó): giữ nguyên.
+ * Không sửa nội dung bài; trả mảng mới, lượt không đổi thì giữ nguyên đối tượng.
+ */
+export function withMoods(turns: DialogueTurn[], moment: Moment | 'award'): DialogueTurn[] {
+  const happy = (i: number) => moment === 'cuoiBai' || moment === 'award' || (moment === 'dauBai' && i === 0);
+  return turns.map((t, i) => (happy(i) && t.mood === undefined ? { ...t, mood: 'vui' as const } : t));
+}
+
+/**
  * Hàm thuần: có trao Trang Sổ Vàng của làng này không?
  * Chỉ khi số trang đang đứng trước lúc lưu CHƯA tới trang của làng, và sau khi lưu đã tới.
  * Học lại (đã có trang rồi) thì không trao nữa.

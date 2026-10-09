@@ -8,8 +8,13 @@ import {
   STORY,
   VnDialog,
   toVnTurns,
+  withMoods,
   type VnTurn,
 } from '@so-chung/core';
+import { bai1Lesson } from '@so-chung/core/content/lessons/bai-1';
+import { bai2Lesson } from '@so-chung/core/content/lessons/bai-2';
+import { bai3Lesson } from '@so-chung/core/content/lessons/bai-3';
+import { bai4Lesson } from '@so-chung/core/content/lessons/bai-4';
 
 const turns: VnTurn[] = [
   { speaker: 'Bác An', portrait: 'bac-an', text: 'Lời thứ nhất.' },
@@ -115,5 +120,48 @@ describe('NenTrangTri', () => {
   it('tắt khi prefers-reduced-motion (motion-reduce:hidden) và có animation CSS', () => {
     expect(html).toContain('motion-reduce:hidden');
     expect(html).toContain('animate-trang-tri-troi');
+  });
+});
+
+describe('nhân vật "sống" trong VnDialog', () => {
+  it('lượt mới bắt đầu hiện dần: chữ nhìn thấy còn trống, trình đọc màn hình đọc cả câu ngay', () => {
+    const html = renderToStaticMarkup(<VnDialog turns={turns} onFinish={noop} />);
+    const visible = html.match(/data-testid="vn-text"[^>]*>(.*?)<\/p>/)?.[1] ?? '';
+    expect(visible).toContain('class="invisible">Lời thứ nhất.</span>'); // giữ chỗ nhưng chưa hiện
+    expect(visible.replace(/<[^>]*>/g, '').trim()).toBe('Lời thứ nhất.'); // chữ thật nằm trong phần chưa hiện
+    expect(html).toContain('aria-hidden="true" data-testid="vn-text"'); // chữ hiện dần không bị đọc từng chữ
+    expect(html).toMatch(/<p aria-live="polite" class="sr-only">Lời thứ nhất\.<\/p>/); // đọc cả câu
+  });
+
+  it('khi đang hiện lời, chân dung nhún (animate-vn-talk); chưa có ảnh nên giữ khung chân dung', () => {
+    const html = renderToStaticMarkup(<VnDialog turns={turns} onFinish={noop} />);
+    expect(html).toContain('animate-vn-talk');
+  });
+
+  it('lượt không có chân dung (truyện) thì không có hiệu ứng thở hay nhún', () => {
+    const html = renderToStaticMarkup(<VnDialog turns={[{ image: 'story/01-ngu-guc', text: 'Truyện.' }]} onFinish={noop} />);
+    expect(html).not.toContain('animate-vn-talk');
+    expect(html).not.toContain('animate-vn-breathe');
+  });
+
+  it('mood vui đi từ lượt thoại sang hộp thoại', () => {
+    const out = toVnTurns([{ characterId: 'bacAn', text: 'Chào em!', mood: 'vui' }, { characterId: 'bacAn', text: 'Ừ.' }]);
+    expect(out[0].mood).toBe('vui');
+    expect(out[1].mood).toBeUndefined();
+  });
+
+  it('gắn mood vui cho câu chào đầu bài, lời kết bài và lời trao Trang Sổ Vàng của cả 4 bài (nội dung bài không đổi)', () => {
+    for (const lesson of [bai1Lesson, bai2Lesson, bai3Lesson, bai4Lesson]) {
+      const dau = withMoods(lesson.dialogue.dauBai, 'dauBai');
+      expect(dau[0].mood).toBe('vui');
+      expect(dau.slice(1).every((t) => t.mood === undefined)).toBe(true);
+      expect(withMoods(lesson.dialogue.cuoiBai, 'cuoiBai').every((t) => t.mood === 'vui')).toBe(true);
+      expect(withMoods(lesson.award.loi, 'award').every((t) => t.mood === 'vui')).toBe(true);
+      // lời giữa bài (trước Trung bình, trước Khó) không đổi tâm trạng
+      expect(withMoods(lesson.dialogue.truocTb, 'truocTb')).toEqual(lesson.dialogue.truocTb);
+      expect(withMoods(lesson.dialogue.truocKho, 'truocKho')).toEqual(lesson.dialogue.truocKho);
+      // nội dung gốc của bài không bị sửa
+      expect(lesson.dialogue.dauBai[0].mood).toBeUndefined();
+    }
   });
 });

@@ -796,7 +796,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                 )}
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-end min-[1280px]:sticky min-[1280px]:bottom-3 min-[1280px]:z-20">
                 <Button variant="primary" size="md" onClick={handleCheckPart2}>{T.kiemTraKetQua}</Button>
               </div>
             </div>

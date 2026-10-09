@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { CHARACTERS, fmt, speakerLabel, type CharacterId, type FmtVars } from '../content/characters';
 import { VnDialog, type VnTurn } from './VnDialog';
+import type { Mood } from './vnLogic';
 
 export interface DialogueTurn {
   characterId: CharacterId;
@@ -8,6 +9,8 @@ export interface DialogueTurn {
   text: string;
   /** Chân dung phụ kèm một câu ngắn, ví dụ {phanDien} cười "Hì hì!" */
   aside?: { characterId: CharacterId; text: string };
+  /** Tâm trạng: 'vui' thì dùng ảnh cười của người nói nếu có (ui/portraits/<id>-cuoi) */
+  mood?: Mood;
 }
 
 export interface DialogueBoxProps {
@@ -29,6 +32,7 @@ export function toVnTurns(turns: readonly DialogueTurn[], vars?: FmtVars): VnTur
     speaker: speakerLabel(t.characterId, vars),
     portrait: CHARACTERS[t.characterId].portrait,
     text: fmt(t.text, vars),
+    mood: t.mood,
     aside: t.aside
       ? { portrait: CHARACTERS[t.aside.characterId].portrait, speaker: speakerLabel(t.aside.characterId, vars), text: fmt(t.aside.text, vars) }
       : undefined,

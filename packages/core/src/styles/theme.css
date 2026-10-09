@@ -131,12 +131,36 @@ html[data-reduce-motion='true'] *::after {
 }
 .animate-toast-pop { animation: toast-pop 0.25s ease-out forwards; }
 
+/* Trang bài học 2D trên màn hình lớn: phóng cả trang theo cùng một hệ số (zoom) để chữ, ô trang, ô cây và thanh trên
+   to theo tỉ lệ. Từ 1280px (hệ số 1,35): chữ nhãn nhỏ nhất 12px thành ≥ 16px, chữ nội dung 16px thành ≥ 21px, số trong ô ≥ 24px.
+   Dưới 1280px (kể cả điện thoại < 640px) không đổi (--lz = 1). Bảng rộng tối đa khoảng 1200px thấy được:
+   chiều rộng trong trang là 1200px / --lz (xem LessonPage2D). */
+.lesson-zoom {
+  --lz: 1;
+  zoom: var(--lz);
+}
+@media (min-width: 1280px) {
+  .lesson-zoom { --lz: 1.35; }
+}
+
 /* Hộp thoại kiểu truyện tranh: lượt mới hiện lên nhẹ */
 @keyframes vn-in {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-vn-in { animation: vn-in 0.28s ease-out both; }
+
+/* Chân dung trong hộp thoại: thở nhẹ khi chờ, nhún nhẹ khi đang hiện lời */
+@keyframes vn-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+.animate-vn-breathe { animation: vn-breathe 3.6s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes vn-talk {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.animate-vn-talk { animation: vn-talk 0.45s ease-in-out infinite; }
 
 /* Nền trang trí: icon trôi chậm (chỉ dùng transform) */
 @keyframes trang-tri-troi {

@@ -3,9 +3,11 @@ import { AssetImage } from '../assets/AssetImage';
 import { asset, useManifest } from '../assets/store';
 import { fmt } from '../content/characters';
 import { ui } from '../content/ui';
+import { useSettings } from '../settings/SettingsProvider';
 import { Button } from './Button';
 import { Panel } from './Panel';
 import { PortraitFrame } from './PortraitFrame';
+import { glyphs, portraitForMood, revealedCount, splitRevealed, stepOnNext, type Mood } from './vnLogic';
 
 /** Một lượt của hộp thoại. Chữ trong `text`, `speaker` đã đi qua fmt() ở nơi gọi. */
 export interface VnTurn {
@@ -17,6 +19,8 @@ export interface VnTurn {
   image?: string;
   /** Lời. */
   text: string;
+  /** Tâm trạng: 'vui' thì dùng ảnh cười (ui/portraits/<id>-cuoi) nếu manifest có, không có thì giữ ảnh thường. */
+  mood?: Mood;
   /** Chân dung phụ kèm một câu ngắn, ví dụ {phanDien} cười "Hì hì!" */
   aside?: { portrait: string; speaker: string; text: string };
   /** Nội dung thêm dưới lời (ví dụ danh sách nhiệm vụ của làng). */
@@ -84,14 +88,45 @@ export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, ove
   const manifest = useManifest();
   const nextRef = useRef<HTMLButtonElement>(null);
   const handlers = useRef({ next: () => {}, back: () => {}, skip: () => {} });
+  const { settings } = useSettings();
+  const reduced = settings.reducedMotion;
 
   const last = turns.length - 1;
   const turn = turns[Math.min(index, Math.max(last, 0))];
   const isLast = index >= last;
   const asOverlay = overlay ?? background !== undefined;
 
+  // Lời hiện dần từng chữ (khoảng 35 ký tự/giây). Lượt đã xem rồi, hoặc bật "Giảm chuyển động" thì hiện ngay.
+  const turnText = turn?.text ?? '';
+  const total = glyphs(turnText).length;
+  const seen = useRef(new Set<number>());
+  const instant = reduced || seen.current.has(index);
+  const [reveal, setReveal] = useState({ index: -1, count: 0 });
+  const count = instant ? total : reveal.index === index ? Math.min(reveal.count, total) : 0;
+  const typing = count < total;
+
+  useEffect(() => {
+    if (instant || !turnText) return;
+    const start = performance.now();
+    const id = setInterval(() => {
+      const c = revealedCount(performance.now() - start, total);
+      setReveal({ index, count: c });
+      if (c >= total) clearInterval(id);
+    }, 30);
+    return () => clearInterval(id);
+  }, [index, instant, total, turnText]);
+
+  useEffect(() => {
+    if (!typing && turn) seen.current.add(index);
+  }, [typing, index, turn]);
+
   handlers.current = {
-    next: () => (isLast ? onFinish() : setIndex((i) => i + 1)),
+    next: () => {
+      // Chữ chưa hiện hết thì hiện hết ngay; bấm lần nữa mới sang lượt kế.
+      if (stepOnNext(count, total) === 'reveal') return setReveal({ index, count: total });
+      if (isLast) onFinish();
+      else setIndex((i) => i + 1);
+    },
     back: () => setIndex((i) => Math.max(0, i - 1)),
     skip: () => (onSkip ?? onFinish)(),
   };
@@ -138,6 +173,9 @@ export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, ove
   const bgPath = turn.background ?? background;
   const bgUrl = bgPath ? asset(bgPath) : null;
   const imageUrl = turn.image ? asset(turn.image) : null;
+  const portraitId = turn.portrait ? portraitForMood(turn.portrait, turn.mood, manifest) : undefined;
+  const portraitMotion = reduced ? '' : typing ? 'animate-vn-talk' : 'animate-vn-breathe';
+  const { shown, rest } = splitRevealed(turn.text, count);
   const size = wide ? PORTRAIT_SIZE_WIDE : PORTRAIT_SIZE_NARROW;
   const heading = turn.speaker ?? label ?? '';
 
@@ -165,7 +203,9 @@ export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, ove
           </div>
         ) : turn.portrait ? (
           <div className="grid place-items-center border-b-4 border-nau-go bg-gradient-to-b from-muc-tim/15 to-giay/0 px-4 pb-4 pt-12 sm:pt-10">
-            <PortraitFrame portrait={turn.portrait} size={size} />
+            <div className={portraitMotion}>
+              <PortraitFrame portrait={portraitId ?? turn.portrait} size={size} />
+            </div>
           </div>
         ) : (
           <div className="h-12" />
@@ -187,8 +227,13 @@ export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, ove
       {/* Khung lời */}
       <div key={`t${index}`} className="animate-vn-in px-4 pb-2 pt-4 sm:px-8">
         {turn.speaker && <p className="font-display text-xl font-extrabold text-nau-go-dam">{turn.speaker}</p>}
-        <p aria-live="polite" className="mt-1 min-h-[3.5rem] text-base leading-relaxed sm:text-lg">
+        {/* Trình đọc màn hình đọc cả câu ngay; chữ hiện dần chỉ để nhìn (aria-hidden). Phần chưa hiện vẫn giữ chỗ nên khung không nhảy. */}
+        <p aria-live="polite" className="sr-only">
           {turn.text}
+        </p>
+        <p aria-hidden="true" data-testid="vn-text" className="mt-1 min-h-[3.5rem] text-base leading-relaxed sm:text-lg">
+          {shown}
+          <span className="invisible">{rest}</span>
         </p>
         {turn.aside && (
           <div className="mt-3 flex items-center gap-3" aria-live="polite">

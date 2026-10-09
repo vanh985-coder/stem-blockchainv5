@@ -58,9 +58,18 @@ Dùng cho **mọi** hội thoại, truyện và giới thiệu làng trong game.
 - **Chữ lời:** ≥ 18px trên máy tính, ≥ 16px trên điện thoại.
 - **Bàn phím:** → / Enter / Space là tiếp; ← là lùi; Esc là bỏ qua.
 - **Nền phía sau:** ảnh do nơi gọi truyền vào, làm mờ và tối nhẹ, phủ cả màn hình. Không truyền nền thì hộp nằm ngay trong trang (như trong trang bài học, nơi nền là cảnh làng sẵn có).
-- **Hiệu ứng:** lượt mới hiện lên nhẹ; tắt khi bật "Giảm chuyển động".
+- **Hiệu ứng:** lượt mới hiện lên nhẹ.
+- **Nhân vật "sống":** chân dung **thở nhẹ** khi chờ (scale 1 → 1,02, chu kỳ khoảng 3,6 giây) và **nhún nhẹ** khi đang hiện lời; lời **hiện dần từng chữ** (khoảng 35 ký tự/giây). Bấm "Tiếp" (hoặc Enter, Space, →) khi chưa hiện hết thì hiện hết ngay, bấm lần nữa mới sang lượt. Lượt đã xem rồi thì hiện ngay. Trình đọc màn hình đọc cả câu ngay (chữ hiện dần chỉ để nhìn, `aria-hidden`).
+- **Tắt hết** khi bật "Giảm chuyển động" (hoặc `prefers-reduced-motion`): không thở, không nhún, lời hiện ngay.
+- **Tâm trạng (`mood`):** mỗi lượt có thể khai báo `mood: 'vui'`. Nếu manifest có `ui/portraits/<id>-cuoi` thì lượt đó dùng ảnh cười, không có thì giữ ảnh thường. Trong bài học, hàm `withMoods` (lesson2d/flow.ts) gắn `'vui'` cho câu chào đầu bài, lời kết bài (khen) và lời trao Trang Sổ Vàng; lời giữa bài giữ nguyên. Giới thiệu làng: lượt chào đầu cũng 'vui'.
 - **Lượt có thể có:** lời phụ kèm chân dung nhỏ (ví dụ {phanDien} cười "Hì hì!") và phần nội dung thêm (ví dụ danh sách nhiệm vụ của làng). Tải trước ảnh của lượt kế tiếp; ảnh thiếu thì hiện khung trống, không lỗi.
 - **`DialogueBox`** (hội thoại nhân vật trong trang bài học `LessonPage2D`) chỉ là lớp đổi lượt thoại theo nhân vật sang `VnDialog`: chân dung lớn, chữ to; các thời điểm thoại giữ nguyên.
+
+### Trang bài học trên màn hình lớn (`LessonPage2D`, dùng chung 4 bài)
+
+- Từ **1280px** trở lên, cả trang bài học được phóng theo hệ số **1,35** (`.lesson-zoom` trong `theme.css`): bảng bài học rộng tối đa khoảng **1200px** (trước là khoảng 870px), chữ nhãn nhỏ nhất ≥ 16px, chữ nội dung ≥ 18px, số trong ô trang và ô cây ≥ 22px; ô trang, ô cây và thanh trên (ô trạm, nút) to theo.
+- Dưới 1280px (kể cả điện thoại < 640px) giữ nguyên như cũ.
+- Nút kiểm tra chính của vài trạm (Bài 1 trạm Dễ, Bài 3 trạm Dễ, Bài 4 trạm Khó) **dính ở đáy màn hình** từ 1280px để luôn thấy được.
 
 ### Nền trang trí — `NenTrangTri` (`packages/core/src/ui/NenTrangTri.tsx`)
 

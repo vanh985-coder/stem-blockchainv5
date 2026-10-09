@@ -8,6 +8,7 @@ import { Button } from '../ui/Button';
 import { DialogueBox } from '../ui/DialogueBox';
 import { Panel } from '../ui/Panel';
 import type { VillageId } from '../village';
+import { withMoods } from './flow';
 import type { GoldenAward } from './types';
 
 /**
@@ -59,7 +60,7 @@ export function GoldenPageScene({
       </Panel>
 
       {!talked ? (
-        <DialogueBox turns={award.loi} onFinish={() => setTalked(true)} />
+        <DialogueBox turns={withMoods(award.loi, 'award')} onFinish={() => setTalked(true)} />
       ) : (
         <div className="flex flex-col items-center gap-3">
           {award.ghiChuCuoi && <p className="text-center font-display text-2xl font-extrabold">{award.ghiChuCuoi}</p>}

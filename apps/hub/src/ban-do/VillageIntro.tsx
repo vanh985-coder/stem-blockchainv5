@@ -48,7 +48,8 @@ export default function VillageIntro({ village, unlockLevels, onDone }: { villag
     const { guide, turns: lines } = VILLAGE_INTRO[village];
     const base = { speaker: speakerLabel(guide), portrait: CHARACTERS[guide].portrait };
     return [
-      ...lines.map((text) => ({ ...base, text: fmt(text) })),
+      // Lượt đầu là lời chào nên người dẫn tươi cười (nếu có ảnh cười)
+      ...lines.map((text, i) => ({ ...base, text: fmt(text), mood: i === 0 ? ('vui' as const) : undefined })),
       { ...base, text: fmt(T.lanCuoi, { so: goldenPageNumber(village) }), extra: <TaskList village={village} unlockLevels={unlockLevels} /> },
     ];
   }, [village, unlockLevels]);

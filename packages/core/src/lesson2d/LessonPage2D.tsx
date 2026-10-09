@@ -16,7 +16,7 @@ import { LevelIntro } from '../ui/LevelIntro';
 import { Panel } from '../ui/Panel';
 import { Stars } from '../ui/Stars';
 import type { VillageId } from '../village';
-import { dialogueFor, finalLessonStars, goldenPageAwarded, momentBeforeStation, startStationIndex, stationOpen } from './flow';
+import { dialogueFor, finalLessonStars, goldenPageAwarded, momentBeforeStation, startStationIndex, stationOpen, withMoods } from './flow';
 import { GoldenPageScene } from './GoldenPageScene';
 import { STATION_ORDER, type LessonContent, type StationId, type StationResult } from './types';
 
@@ -142,7 +142,8 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
 
   let body: ReactNode = null;
   if (stage.kind === 'dialogue') {
-    const turns = dialogueFor(content.dialogue, momentBeforeStation(stage.idx));
+    const moment = momentBeforeStation(stage.idx);
+    const turns = withMoods(dialogueFor(content.dialogue, moment), moment);
     body = turns.length === 0 ? null : (
       <div className="mx-auto flex w-full max-w-[960px] justify-center">
         <DialogueBox key={`d${attempt}-${stage.idx}`} turns={turns} onFinish={() => setStage({ kind: 'intro', idx: stage.idx })} />
@@ -216,7 +217,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
       </Panel>
     );
   } else if (stage.kind === 'outro') {
-    const turns = dialogueFor(content.dialogue, 'cuoiBai');
+    const turns = withMoods(dialogueFor(content.dialogue, 'cuoiBai'), 'cuoiBai');
     body = turns.length === 0 ? null : (
       <div className="mx-auto flex w-full max-w-[960px] justify-center">
         <DialogueBox key={`o${attempt}`} turns={turns} onFinish={() => setStage({ kind: 'complete' })} />
@@ -254,10 +255,10 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   const onHard = currentIdx === STATION_ORDER.length - 1 && stage.kind !== 'complete';
 
   return (
-    <div className="min-h-screen bg-giay bg-cover bg-center" style={bg ? { backgroundImage: `url("${bg}")` } : undefined}>
-      <div className="min-h-screen bg-giay/55">
+    <div className="lesson-zoom min-h-[calc(100vh/var(--lz))] bg-giay bg-cover bg-center" style={bg ? { backgroundImage: `url("${bg}")` } : undefined}>
+      <div className="min-h-[calc(100vh/var(--lz))] bg-giay/55">
         <GuestBar compact />
-        <header className="mx-auto flex w-full max-w-4xl flex-wrap items-center gap-x-3 gap-y-2 p-2 sm:p-3 max-[480px]:flex-nowrap max-[480px]:gap-1.5 max-[480px]:px-2 max-[480px]:py-1">
+        <header className="mx-auto flex w-full max-w-4xl min-[1280px]:max-w-[calc(1200px/var(--lz))] flex-wrap items-center gap-x-3 gap-y-2 p-2 sm:p-3 max-[480px]:flex-nowrap max-[480px]:gap-1.5 max-[480px]:px-2 max-[480px]:py-1">
           <div className="min-w-0 flex-1 basis-full sm:basis-auto max-[480px]:basis-0">
             <h1 className="truncate font-display text-xl font-extrabold sm:text-2xl max-[480px]:line-clamp-2 max-[480px]:whitespace-normal max-[480px]:text-sm max-[480px]:leading-tight">
               {level ? fmt(level.ten) : ''}
@@ -331,7 +332,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-4xl px-1 pb-10 pt-2 sm:px-3">{body}</main>
+        <main className="mx-auto w-full max-w-4xl min-[1280px]:max-w-[calc(1200px/var(--lz))] px-1 pb-10 pt-2 sm:px-3">{body}</main>
       </div>
 
       {twistOpen && content.twist && content.twist.length > 0 && (
