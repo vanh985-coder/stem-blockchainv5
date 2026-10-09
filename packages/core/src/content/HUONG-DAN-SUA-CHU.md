@@ -34,3 +34,7 @@ Ví dụ đổi thành `'Cuội'`. Mọi lời thoại có `{phanDien}` đổi t
 ## Không được làm
 - Không viết chữ tiếng Việt thẳng vào file `.tsx`. Lệnh `pnpm check:text` sẽ báo lỗi.
 - Không xóa dấu ngoặc nhọn của chỗ giữ tên, không đổi tên bên trong ngoặc nhọn.
+
+## Chuỗi thừa
+
+`pnpm test` có bài kiểm tra `content/unused.test.ts`: mỗi chuỗi trong `ui`, `teacherTexts`, `villageIntroTexts` và `bai1Texts` … `bai4Texts` phải được tham chiếu ở đâu đó trong mã (dạng `.khóa`). Chuỗi thừa thì bài kiểm tra báo tên đầy đủ; xóa chuỗi đó khỏi `content/`. Bảng nào được tra bằng khóa động (ví dụ `ui.lang[id]`) thì thêm vào `DYNAMIC_TABLES` trong file kiểm tra.

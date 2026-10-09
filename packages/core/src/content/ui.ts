@@ -187,7 +187,6 @@ export const ui = {
       daVaoLop: 'Em đã vào lớp rồi nhé.',
       dangXuat: 'Đăng xuất',
       canDangNhap: 'Em cần đăng nhập để xem hồ sơ.',
-      denDangNhap: 'Đến trang đăng nhập',
       khongTaiDuocHoSo: 'Chưa tải được hồ sơ của em. Em tải lại trang thử nhé.',
     },
     /** Thanh nhỏ ở các trang tạm: đăng nhập hay đang đăng nhập */
@@ -341,7 +340,6 @@ export const ui = {
     /** Nhãn đọc cho người dùng đọc màn hình: {tenTram}, {sao} */
     tramDaXong: 'Trạm {tenTram}: đã xong, {sao} sao',
     tramDangLam: 'Trạm {tenTram}: đang làm',
-    tramChuaToi: 'Trạm {tenTram}: chưa tới',
     /** Trạm đã mở (trạm trước đã có sao) nhưng em chưa làm: bấm để vào */
     tramMo: 'Trạm {tenTram}: đã mở, bấm để vào',
     /** Trạm chưa mở: phải làm trạm liền trước trước */
@@ -361,8 +359,6 @@ export const ui = {
     /** Dòng ghi sao đã đạt của trạm: {tenTram}, {sao} */
     saoTram: 'Trạm {tenTram}: {sao} sao',
     xuTram: 'Xu nhận ở trạm này: {so}',
-    /** Cảnh trao Trang Sổ Vàng */
-    trangDangBay: 'Trang Sổ Vàng đang bay vào sổ của em',
     veBanDo: 'Về bản đồ',
   },
 

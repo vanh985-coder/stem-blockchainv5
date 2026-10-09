@@ -100,7 +100,6 @@ export const bai1Texts = {
     congThucThe: '({truoc} × 2 + {nd}) mod 100 = ?',
     /** Dùng khi sai: {ma} là mã em nhập */
     maSai: 'Mã trang {ma} chưa đúng.',
-    congThucSai: 'Công thức: ({truoc} × 2 + {nd}) mod 100.',
   },
 
   de: {

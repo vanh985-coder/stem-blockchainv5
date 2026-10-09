@@ -137,6 +137,7 @@ export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, ove
 
   const bgPath = turn.background ?? background;
   const bgUrl = bgPath ? asset(bgPath) : null;
+  const imageUrl = turn.image ? asset(turn.image) : null;
   const size = wide ? PORTRAIT_SIZE_WIDE : PORTRAIT_SIZE_NARROW;
   const heading = turn.speaker ?? label ?? '';
 
@@ -151,8 +152,16 @@ export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, ove
       {/* Phần trên: ảnh minh họa hoặc chân dung lớn */}
       <div key={`m${index}`} className="animate-vn-in relative">
         {turn.image ? (
-          <div className="aspect-video max-h-[56vh] w-full overflow-hidden border-b-4 border-nau-go bg-giay">
-            <AssetImage path={turn.image} alt={ui.vn.anhNhan} className="size-full object-cover" />
+          // Ảnh luôn hiện trọn (object-contain), không cắt; phần trống hai bên lấp bằng chính ảnh đó làm mờ.
+          <div className="relative aspect-video max-h-[56vh] w-full overflow-hidden border-b-4 border-nau-go bg-chu/20">
+            {imageUrl && (
+              <div
+                aria-hidden="true"
+                className="absolute inset-[-24px] scale-110 bg-cover bg-center opacity-80 blur-xl"
+                style={{ backgroundImage: `url("${imageUrl}")` }}
+              />
+            )}
+            <AssetImage path={turn.image} alt={ui.vn.anhNhan} className="relative size-full object-contain" />
           </div>
         ) : turn.portrait ? (
           <div className="grid place-items-center border-b-4 border-nau-go bg-gradient-to-b from-muc-tim/15 to-giay/0 px-4 pb-4 pt-12 sm:pt-10">

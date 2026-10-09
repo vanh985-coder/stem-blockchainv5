@@ -110,10 +110,8 @@ export const teacherTexts = {
     taiKhoanTen: 'Tài khoản tên đăng nhập',
     datLaiMatKhau: 'Đặt lại mật khẩu',
     xoaKhoiLop: 'Xóa khỏi lớp',
-    xemChiTiet: 'Xem chi tiết',
     chiTiet: 'Chi tiết',
     huy: 'Hủy',
-    googleKhongCoMatKhau: 'Tài khoản Google không có mật khẩu để đặt lại.',
     ghiChuGoogle: 'Đăng nhập bằng Google, không có mật khẩu để đặt lại.',
   },
 

@@ -64,6 +64,8 @@ describe('VnDialog', () => {
     const html = renderToStaticMarkup(<VnDialog turns={[{ image: 'story/01-ngu-guc', text: 'Truyện.' }]} onFinish={noop} />);
     expect(html).toContain('aspect-video');
     expect(html).toContain('Truyện.');
+    expect(html).toContain('object-contain'); // ảnh hiện trọn, không cắt
+    expect(html).not.toContain('object-cover');
   });
 
   it('không có lượt nào thì không vẽ gì', () => {
