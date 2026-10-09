@@ -1,6 +1,6 @@
 import { useId, type ComponentProps, type ReactNode } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { HUB_MAP_URL, URLS } from '../../config/urls';
+import { HUB_MAP_URL, URLS, hubPageUrl } from '../../config/urls';
 import { ui } from '../../content/ui';
 import { Panel } from '../../ui/Panel';
 import { safeNext } from '../redirect';
@@ -80,6 +80,12 @@ export function useGoAfterLogin(): () => void {
 export function goToMap(navigate: ReturnType<typeof useNavigate>): void {
   if (new URL(URLS.hub).origin === location.origin) navigate('/ban-do');
   else location.assign(HUB_MAP_URL);
+}
+
+/** Tới một trang của hub: ở chính hub thì chuyển trong app, ở vỏ làng thì mở trang đó trên hub (VITE_HUB_URL). */
+export function goToHub(navigate: ReturnType<typeof useNavigate>, path: string): void {
+  if (new URL(URLS.hub).origin === location.origin) navigate(path);
+  else location.assign(hubPageUrl(URLS, path));
 }
 
 export const t = ui.auth;

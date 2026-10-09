@@ -51,6 +51,11 @@ export function hubMapUrl(urls: AppUrls): string {
   return `${urls.hub}/ban-do`;
 }
 
+/** Địa chỉ một trang của hub, ví dụ hubPageUrl(urls, '/giao-vien'). Path luôn bắt đầu bằng "/". */
+export function hubPageUrl(urls: AppUrls, path: string): string {
+  return `${urls.hub}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
 // Đọc môi trường thật (Vite thay chuỗi import.meta.env.VITE_* lúc build).
 export const URLS: AppUrls = resolveUrls({
   VITE_HUB_URL: import.meta.env.VITE_HUB_URL,

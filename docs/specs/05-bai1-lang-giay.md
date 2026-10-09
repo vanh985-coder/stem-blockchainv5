@@ -27,6 +27,7 @@
 - Bảng giữa: **dùng lại nguyên bài 1 của web 2D giai đoạn 1**, gồm 3 trạm, logic, gợi ý, chấm sao. Chỉ đổi giao diện theo spec 03 mục 1 (nền giấy dó, màu mới).
 - Góc dưới trái: khung 3D nhỏ có cậu học sinh phản ứng khi chọn đáp án (từ mốc 2; mốc 1 chưa có).
 - Khi chuyển bài cũ, làm theo bảng đổi nội dung ở spec 01 mục 3.
+- **Thay đổi ở trạm Dễ "Xây chuỗi 5 trang":** không còn ô nhập "Nội dung" và nút "Chọn giúp em". Nội dung 5 trang do máy chọn ngẫu nhiên từ 0 đến 99 (hàm `easyRound(seed)` trong `lessons/bai-1/logic.ts`, dùng `lib/rng.ts`; cùng seed thì cùng nội dung) và hiện sẵn, không sửa được. Học sinh chỉ nhập "Mã trang". Công thức `pageCode`, cách chấm sao, gợi ý khi sai và các test cũ không đổi. Câu hướng dẫn của trạm: "Tính mã trang cho từng trang để đóng dấu xác nhận."
 
 **Lời bác An** (hộp thoại có chân dung tự chụp):
 

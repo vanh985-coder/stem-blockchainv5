@@ -12,11 +12,9 @@ import {
   type StationResult,
 } from '@so-chung/core';
 import { bai1Texts } from '@so-chung/core/content/lessons/bai-1';
-import { pageCode, randomGenesis, solutionSteps, type Lesson1Data } from '@so-chung/core/lessons/bai-1/logic';
-import { createMulberry32 } from '@so-chung/core/lib/rng';
+import { easyRound, pageCode, solutionSteps, type Lesson1Data } from '@so-chung/core/lessons/bai-1/logic';
 
 const T = bai1Texts;
-const EMPTY_PAGES = (): ChainPageData[] => Array.from({ length: 5 }, () => ({ content: null, code: null }));
 
 interface Feedback {
   isOpen: boolean;
@@ -25,7 +23,10 @@ interface Feedback {
   howToFix?: string;
 }
 
-/** Trạm Dễ: "Xây chuỗi 5 trang". Giữ nguyên luật, gợi ý và cách chấm sao của giai đoạn 1. */
+/**
+ * Trạm Dễ: "Xây chuỗi 5 trang". Giữ nguyên luật, gợi ý và cách chấm sao của giai đoạn 1.
+ * Nội dung 5 trang do máy chọn ngẫu nhiên (0–99) và hiện sẵn; em chỉ nhập mã trang.
+ */
 export function Easy({
   onComplete,
   onChainBuilt,
@@ -34,38 +35,23 @@ export function Easy({
   /** Báo chuỗi em vừa xây để trạm Trung bình dùng lại */
   onChainBuilt: (data: Lesson1Data) => void;
 }) {
-  const rng = useRef(createMulberry32(Date.now())).current;
   const startTime = useRef(performance.now()).current;
-  const genesisCode = useRef(randomGenesis(rng)).current;
+  const { genesisCode, contents } = useRef(easyRound(Date.now())).current;
 
-  const [pages, setPages] = useState<ChainPageData[]>(EMPTY_PAGES);
+  const [pages, setPages] = useState<ChainPageData[]>(() => contents.map((content) => ({ content, code: null })));
   const [activeIdx, setActiveIdx] = useState(0);
-  const [contentVal, setContentVal] = useState<number | null>(null);
   const [codeVal, setCodeVal] = useState<number | null>(null);
-  const [contentError, setContentError] = useState<string | undefined>();
   const [codeError, setCodeError] = useState<string | undefined>();
   const [mistakes, setMistakes] = useState(0);
   const [pageMistakes, setPageMistakes] = useState(0);
   const [feedback, setFeedback] = useState<Feedback>({ isOpen: false, whatHappened: '' });
 
   const codeRef = useRef<HTMLInputElement>(null);
-  const contentId = useId();
   const codeId = useId();
 
-  // Chọn giúp em một số ngẫu nhiên 0–99
-  const pickRandom = useCallback(() => {
-    sound.playClick();
-    setContentVal(Math.floor(rng() * 100));
-    setContentError(undefined);
-    codeRef.current?.focus();
-  }, [rng]);
-
   const check = useCallback(() => {
+    const content = contents[activeIdx];
     let bad = false;
-    if (contentVal === null || contentVal < 0 || contentVal > 99) {
-      setContentError(T.de.noiDungSai);
-      bad = true;
-    } else setContentError(undefined);
     if (codeVal === null || codeVal < 0 || codeVal > 99) {
       setCodeError(T.de.maSaiKhoang);
       bad = true;
@@ -76,26 +62,24 @@ export function Easy({
     }
 
     const prevCode = activeIdx === 0 ? genesisCode : (pages[activeIdx - 1].code as number);
-    const expected = pageCode(prevCode, contentVal as number);
+    const expected = pageCode(prevCode, content);
 
     if (codeVal === expected) {
       sound.playCorrect();
       const updated = [...pages];
-      updated[activeIdx] = { content: contentVal, code: codeVal };
+      updated[activeIdx] = { content, code: codeVal };
       setPages(updated);
 
       if (activeIdx < 4) {
         setActiveIdx(activeIdx + 1);
-        setContentVal(null);
         setCodeVal(null);
         setPageMistakes(0);
-        setContentError(undefined);
         setCodeError(undefined);
       } else {
         // Xong cả 5 trang: lưu chuỗi cho trạm Trung bình, rồi báo kết quả.
         onChainBuilt({
           genesisCode,
-          contents: updated.map((p) => p.content as number),
+          contents,
           codes: updated.map((p) => p.code as number),
         });
         onComplete({
@@ -109,7 +93,7 @@ export function Easy({
       setMistakes((m) => m + 1);
       const n = pageMistakes + 1;
       setPageMistakes(n);
-      const vars = { ma: codeVal as number, truoc: prevCode, nd: contentVal as number };
+      const vars = { ma: codeVal as number, truoc: prevCode, nd: content };
       if (n === 1) {
         // Sai lần 1: gợi ý công thức đã thế số, chưa có kết quả
         setFeedback({
@@ -120,7 +104,7 @@ export function Easy({
         });
       } else {
         // Sai lần 2 trở đi: lời giải từng bước
-        const steps = solutionSteps(prevCode, contentVal as number);
+        const steps = solutionSteps(prevCode, content);
         const v2 = { ...vars, gapDoi: steps.doubled, tong: steps.sum, ma: steps.code };
         setFeedback({
           isOpen: true,
@@ -130,13 +114,10 @@ export function Easy({
         });
       }
     }
-  }, [contentVal, codeVal, activeIdx, genesisCode, pages, mistakes, pageMistakes, startTime, onChainBuilt, onComplete]);
+  }, [contents, codeVal, activeIdx, genesisCode, pages, mistakes, pageMistakes, startTime, onChainBuilt, onComplete]);
 
   const prevForActive = activeIdx === 0 ? genesisCode : (pages[activeIdx - 1].code ?? 0);
-  const formula =
-    contentVal !== null
-      ? fmt(T.chung.congThucThe, { truoc: prevForActive, nd: contentVal })
-      : fmt(T.chung.congThucChuaCoNoiDung, { truoc: prevForActive });
+  const formula = fmt(T.chung.congThucThe, { truoc: prevForActive, nd: contents[activeIdx] });
 
   return (
     <div className="mx-auto max-w-4xl space-y-5">
@@ -155,36 +136,6 @@ export function Easy({
           activePageIndex={activeIdx}
           isPageConfirmed={(idx) => idx < activeIdx}
           isPageDimmed={(idx) => idx > activeIdx}
-          renderContentSlot={(idx) =>
-            idx !== activeIdx ? undefined : (
-              <div className="flex flex-col items-center gap-1">
-                <NumberInput
-                  className="w-full"
-                  id={contentId}
-                  value={contentVal}
-                  showButtons={false}
-                  placeholder={T.chung.khoangSo}
-                  ariaLabel={fmt(T.de.nhanNoiDung, { n: activeIdx + 1 })}
-                  inputClassName="!h-10 !w-full !text-lg"
-                  onChange={(v) => {
-                    setContentVal(v);
-                    setContentError(undefined);
-                  }}
-                  onEnter={() => codeRef.current?.focus()}
-                  error={contentError}
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={pickRandom}
-                  className="inline-flex min-h-11 cursor-pointer items-center text-sm font-bold text-muc-tim-dam underline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim"
-                >
-                  <span aria-hidden="true">🎲&nbsp;</span>
-                  {T.de.chonGiup}
-                </button>
-              </div>
-            )
-          }
           renderCodeSlot={(idx) =>
             idx !== activeIdx ? undefined : (
               <div className="flex w-full flex-col items-center">
@@ -192,6 +143,7 @@ export function Easy({
                   className="w-full"
                   id={codeId}
                   ref={codeRef}
+                  autoFocus
                   value={codeVal}
                   showButtons={false}
                   placeholder={T.chung.khoangSo}

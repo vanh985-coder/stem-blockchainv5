@@ -1,5 +1,6 @@
 import { pageCode, MOD, buildChain, isSafeDelta } from '../../lib/chain';
 import { GAME_CONFIG } from '../../config/gameConfig';
+import { createMulberry32, randInt } from '../../lib/rng';
 
 export { pageCode, MOD, buildChain, isSafeDelta };
 export type Page = { content: number; code: number };
@@ -39,9 +40,22 @@ export function randomGenesis(rng: () => number): number {
 export function randomContents(n: number, rng: () => number): number[] {
   const arr: number[] = [];
   for (let i = 0; i < n; i++) {
-    arr.push(Math.floor(rng() * 100));
+    arr.push(randInt(0, 99, rng));
   }
   return arr;
+}
+
+/** Số trang của trạm Dễ. */
+export const EASY_PAGES = 5;
+
+/**
+ * Một lượt của trạm Dễ "Xây chuỗi 5 trang": mã trang bìa và nội dung 5 trang (0–99) do máy chọn từ `seed`.
+ * Cùng seed thì cùng kết quả. Học sinh chỉ tính mã trang, không nhập nội dung.
+ */
+export function easyRound(seed: number): { genesisCode: number; contents: number[] } {
+  const rng = createMulberry32(seed);
+  const genesisCode = randomGenesis(rng);
+  return { genesisCode, contents: randomContents(EASY_PAGES, rng) };
 }
 
 // "Còn phải sửa: N" = số trang từ trang lệch đầu tiên tới trang cuối (bằng công thức 1-indexed trong spec).

@@ -4,9 +4,10 @@ import { Button } from '../../ui/Button';
 import { PortraitFrame } from '../../ui/PortraitFrame';
 import { joinClass, signOut, updateDisplayName } from '../api';
 import { useAuth, type Role } from '../AuthProvider';
+import { canSeeTeacherPage } from '../roles';
 import { loginPathFor } from '../redirect';
 import { validateDisplayName } from '../validate';
-import { AccountPage, ErrorNote, Field, InfoNote, goToMap, t } from './shared';
+import { AccountPage, ErrorNote, Field, InfoNote, goToHub, goToMap, t } from './shared';
 
 const ROLE_TEXT: Record<Role, string> = {
   student: t.hoSo.vaiTroHocSinh,
@@ -125,6 +126,14 @@ export default function ProfilePage() {
         <Button variant="secondary" size="sm" onClick={() => goToMap(navigate)}>
           {t.veBanDo}
         </Button>
+        <Button variant="secondary" size="sm" onClick={() => goToHub(navigate, '/')}>
+          {t.veTrangChu}
+        </Button>
+        {canSeeTeacherPage(profile.role) && (
+          <Button variant="secondary" size="sm" onClick={() => goToHub(navigate, '/giao-vien')}>
+            {t.trangGiaoVien}
+          </Button>
+        )}
         <Button variant="danger" size="sm" disabled={busy} onClick={doSignOut}>
           {t.hoSo.dangXuat}
         </Button>

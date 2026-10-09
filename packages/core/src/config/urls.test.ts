@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hubMapUrl, levelUrl, resolveUrls } from './urls';
+import { hubMapUrl, hubPageUrl, levelUrl, resolveUrls } from './urls';
 
 describe('resolveUrls', () => {
   it('không có biến môi trường thì dùng cổng localhost của spec 01 mục 8', () => {
@@ -21,5 +21,14 @@ describe('resolveUrls', () => {
     const u = resolveUrls({ VITE_HUB_URL: 'https://ten-mien.vn', VITE_LANG_BAC_URL: 'https://lang-bac.ten-mien.vn/' });
     expect(hubMapUrl(u)).toBe('https://ten-mien.vn/ban-do');
     expect(levelUrl(u, 'lang-bac', 10)).toBe('https://lang-bac.ten-mien.vn/lang/lang-bac/man/10');
+  });
+});
+
+describe('hubPageUrl', () => {
+  it('ghép địa chỉ hub với đường dẫn trang, không thừa dấu /', () => {
+    const u = resolveUrls({ VITE_HUB_URL: 'https://ten-mien.vn/' });
+    expect(hubPageUrl(u, '/')).toBe('https://ten-mien.vn/');
+    expect(hubPageUrl(u, '/giao-vien')).toBe('https://ten-mien.vn/giao-vien');
+    expect(hubPageUrl(u, 'giao-vien')).toBe('https://ten-mien.vn/giao-vien');
   });
 });

@@ -98,8 +98,6 @@ export const bai1Texts = {
     congThuc: 'Công thức tính mã trang {n}:',
     /** Công thức đã thế số, {truoc} và {nd} là số */
     congThucThe: '({truoc} × 2 + {nd}) mod 100 = ?',
-    /** Khi chưa có nội dung để thế */
-    congThucChuaCoNoiDung: '({truoc} × 2 + nội dung) mod 100 = ?',
     /** Dùng khi sai: {ma} là mã em nhập */
     maSai: 'Mã trang {ma} chưa đúng.',
     congThucSai: 'Công thức: ({truoc} × 2 + {nd}) mod 100.',
@@ -107,15 +105,12 @@ export const bai1Texts = {
 
   de: {
     tieuDe: 'Xây chuỗi 5 trang',
-    huongDan: 'Điền nội dung và tính mã trang tương ứng để đóng dấu xác nhận từng trang.',
+    huongDan: 'Tính mã trang cho từng trang để đóng dấu xác nhận.',
     /** Dòng đang làm tới trang nào */
     dangLam: 'Đang làm:',
     tenTrang: 'Trang {n} / 5',
-    chonGiup: 'Chọn giúp em',
     kiemTra: 'Kiểm tra',
-    noiDungSai: 'Nội dung là số từ 0 đến 99',
     maSaiKhoang: 'Mã trang là số từ 0 đến 99',
-    nhanNoiDung: 'Nội dung trang {n}',
     nhanMaTrang: 'Mã trang {n}',
     /** Sai lần 1: gợi ý công thức đã thế số, chưa có kết quả */
     sai1Chuyen: 'Mã trang {ma} chưa đúng.',

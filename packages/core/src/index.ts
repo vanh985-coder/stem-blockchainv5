@@ -1,5 +1,5 @@
 export type { VillageModule, VillageId } from './village';
-export { URLS, HUB_MAP_URL, VILLAGE_IDS, resolveUrls, levelUrl, hubMapUrl } from './config/urls';
+export { URLS, HUB_MAP_URL, VILLAGE_IDS, resolveUrls, levelUrl, hubMapUrl, hubPageUrl } from './config/urls';
 export type { AppUrls, UrlEnv } from './config/urls';
 export { VillageApp } from './ui/VillageApp';
 export { ExternalRedirect } from './ui/ExternalRedirect';

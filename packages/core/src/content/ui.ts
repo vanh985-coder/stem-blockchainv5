@@ -131,6 +131,8 @@ export const ui = {
     dangXuLy: 'Đang xử lý…',
     dangKiemTra: 'Đang kiểm tra tài khoản…',
     veBanDo: 'Về bản đồ',
+    veTrangChu: 'Trang chủ',
+    trangGiaoVien: 'Trang giáo viên',
     dangNhap: {
       tieuDe: 'Đăng nhập',
       google: 'Đăng nhập bằng Google',
