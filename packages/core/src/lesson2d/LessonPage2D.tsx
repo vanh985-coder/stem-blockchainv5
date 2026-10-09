@@ -144,7 +144,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   if (stage.kind === 'dialogue') {
     const turns = dialogueFor(content.dialogue, momentBeforeStation(stage.idx));
     body = turns.length === 0 ? null : (
-      <div className="mx-auto w-full max-w-2xl">
+      <div className="mx-auto flex w-full max-w-[960px] justify-center">
         <DialogueBox key={`d${attempt}-${stage.idx}`} turns={turns} onFinish={() => setStage({ kind: 'intro', idx: stage.idx })} />
       </div>
     );
@@ -218,7 +218,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   } else if (stage.kind === 'outro') {
     const turns = dialogueFor(content.dialogue, 'cuoiBai');
     body = turns.length === 0 ? null : (
-      <div className="mx-auto w-full max-w-2xl">
+      <div className="mx-auto flex w-full max-w-[960px] justify-center">
         <DialogueBox key={`o${attempt}`} turns={turns} onFinish={() => setStage({ kind: 'complete' })} />
       </div>
     );
@@ -335,8 +335,8 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
       </div>
 
       {twistOpen && content.twist && content.twist.length > 0 && (
-        <div className="fixed inset-0 z-40 flex items-end justify-center bg-chu/30 p-3 sm:items-center">
-          <div className="w-full max-w-2xl">
+        <div className="fixed inset-0 z-40 grid place-items-center overflow-y-auto bg-chu/30 p-3">
+          <div className="flex w-full max-w-[960px] justify-center">
             <DialogueBox key={`t${attempt}`} turns={content.twist} onFinish={() => setTwistOpen(false)} />
           </div>
         </div>

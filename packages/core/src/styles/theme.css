@@ -131,6 +131,21 @@ html[data-reduce-motion='true'] *::after {
 }
 .animate-toast-pop { animation: toast-pop 0.25s ease-out forwards; }
 
+/* Hộp thoại kiểu truyện tranh: lượt mới hiện lên nhẹ */
+@keyframes vn-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-vn-in { animation: vn-in 0.28s ease-out both; }
+
+/* Nền trang trí: icon trôi chậm (chỉ dùng transform) */
+@keyframes trang-tri-troi {
+  0% { transform: translate3d(0, 0, 0) rotate(var(--r0, -8deg)); }
+  50% { transform: translate3d(var(--dx, 14px), var(--dy, -22px), 0) rotate(var(--r1, 10deg)); }
+  100% { transform: translate3d(0, 0, 0) rotate(var(--r0, -8deg)); }
+}
+.animate-trang-tri-troi { animation: trang-tri-troi var(--dur, 22s) ease-in-out infinite; }
+
 /* Trang mới của mạng lưới trượt vào từ bên phải (chỉ dùng transform) */
 @keyframes slide-in-right {
   0% { opacity: 0; transform: translateX(60px); }

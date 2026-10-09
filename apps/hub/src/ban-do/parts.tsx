@@ -43,12 +43,15 @@ export function VillageDetails({
   progress,
   goldenEarned,
   onClose,
+  onReplayIntro,
 }: {
   villageId: LevelDef['lang'];
   unlockLevels: LevelUnlock[];
   progress: Progress;
   goldenEarned: boolean;
   onClose?: () => void;
+  /** Mở lại lời giới thiệu làng */
+  onReplayIntro?: () => void;
 }) {
   const levels = LEVELS.filter((l) => l.lang === villageId);
   return (
@@ -69,6 +72,11 @@ export function VillageDetails({
         />
         {goldenEarned ? ui.banDo.trangDaNhan : ui.banDo.trangChuaNhan}
       </p>
+      {onReplayIntro && (
+        <Button variant="secondary" size="sm" onClick={onReplayIntro}>
+          {ui.banDo.xemLaiGioiThieu}
+        </Button>
+      )}
       <ul className="space-y-2">
         {levels.map((def) => {
           const u = unlockLevels.find((x) => x.id === def.id) ?? { id: def.id, state: 'locked' as const };

@@ -4,6 +4,8 @@ import { mergeProgress, sameGame, sameLevel } from './merge';
 import { recordLevelResult, unlockOf, withGoldenPages, type ProgressOptions } from './record';
 import { emptyProgress, hasProgress, type GameState, type LevelProgress, type LevelResult, type Progress } from './types';
 import type { UnlockResult } from './unlock';
+import { hasSeenIntro, withIntroSeen } from './villageIntro';
+import type { VillageId } from '../village';
 
 /** Nơi lưu trên máy cho tài khoản (localStorage). Thay bằng bản giả trong test. */
 export interface KeyValueStore {
@@ -307,6 +309,18 @@ export class ProgressManager {
     this.writePending(userId);
     this.emit();
     return 'pending';
+  }
+
+  /** Học sinh đã xem giới thiệu một làng: ghi cờ vào game.data (đăng nhập thì đẩy lên server; chơi thử thì vào cookie). */
+  markVillageIntroSeen(village: VillageId): void {
+    if (this.mode === 'loading' || hasSeenIntro(this.progress.game.data, village)) return;
+    this.progress = {
+      ...this.progress,
+      game: { ...this.progress.game, data: withIntroSeen(this.progress.game.data, village), updatedAt: this.now() },
+    };
+    this.persistLocal();
+    this.emit();
+    this.scheduleFlush();
   }
 
   /** Câu trả lời trắc nghiệm: đã đăng nhập thì ghi một dòng quiz_answers; chơi thử thì không ghi. */

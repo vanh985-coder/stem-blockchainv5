@@ -7,6 +7,7 @@ import { Panel } from '../ui/Panel';
 import { type Snapshot, type SaveStatus } from './manager';
 import { progressManager } from './singleton';
 import type { LevelResult } from './types';
+import type { VillageId } from '../village';
 import type { UnlockResult } from './unlock';
 
 export interface ProgressState {
@@ -26,6 +27,8 @@ export interface ProgressState {
   saveNow: () => Promise<SaveStatus>;
   /** Bắt đầu chế độ chơi thử */
   startGuest: () => void;
+  /** Đã xem giới thiệu một làng (ghi cờ: đăng nhập thì lên server, chơi thử thì vào cookie) */
+  markVillageIntroSeen: (village: VillageId) => void;
 }
 
 /** Chỉ để test: dựng ProgressContext giả. */
@@ -51,6 +54,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const record = useCallback((levelId: number, result: LevelResult) => progressManager.record(levelId, result), []);
   const saveNow = useCallback(() => progressManager.saveNow(), []);
   const startGuest = useCallback(() => progressManager.startGuest(), []);
+  const markVillageIntroSeen = useCallback((village: VillageId) => progressManager.markVillageIntroSeen(village), []);
 
   const value = useMemo<ProgressState>(
     () => ({
@@ -64,8 +68,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       record,
       saveNow,
       startGuest,
+      markVillageIntroSeen,
     }),
-    [snap, unlock, record, saveNow, startGuest],
+    [snap, unlock, record, saveNow, startGuest, markVillageIntroSeen],
   );
 
   return (
@@ -87,6 +92,7 @@ const FALLBACK: ProgressState = {
   record: () => ({ coinsEarned: 0 }),
   saveNow: async () => 'saved',
   startGuest: () => {},
+  markVillageIntroSeen: () => {},
 };
 
 export function useProgress(): ProgressState {

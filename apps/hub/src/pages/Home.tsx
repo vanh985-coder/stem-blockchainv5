@@ -2,37 +2,19 @@ import { Link, useNavigate } from 'react-router';
 import {
   AssetImage,
   Button,
+  NenTrangTri,
   Panel,
   VILLAGE_ORDER,
-  asset,
   canSeeTeacherPage,
   fmt,
   loginPathFor,
   ui,
   useAuth,
-  useManifest,
   useProgress,
 } from '@so-chung/core';
 
 const linkCls =
   'inline-flex min-h-11 items-center rounded-nut px-2 font-semibold underline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim';
-
-/** Nền ui/man-hinh-tai, hơi mờ, nằm sau nội dung. */
-function Background() {
-  useManifest();
-  const url = asset('ui/man-hinh-tai');
-  return (
-    <div aria-hidden="true" className="fixed inset-0 -z-10 bg-giay">
-      {url && (
-        <div
-          className="absolute inset-[-8px] bg-cover bg-center opacity-60 blur-[3px]"
-          style={{ backgroundImage: `url("${url}")` }}
-        />
-      )}
-      <div className="absolute inset-0 bg-giay/40" />
-    </div>
-  );
-}
 
 /** Trang chủ "/" (spec 04 mục 1): nhẹ, tải nhanh; nút đổi theo trạng thái đăng nhập. */
 export function Home() {
@@ -43,7 +25,7 @@ export function Home() {
 
   return (
     <>
-      <Background />
+      <NenTrangTri />
       <main className="grid min-h-screen place-items-center p-4 text-center">
         <Panel className="w-full max-w-md space-y-5">
           <AssetImage path="ui/logo-art" alt="" className="mx-auto h-40 w-auto max-w-full object-contain" />

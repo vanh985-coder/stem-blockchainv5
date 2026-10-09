@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import {
   AssetImage,
@@ -9,6 +9,7 @@ import {
   VILLAGE_ORDER,
   fmt,
   levelsOfVillage,
+  shouldShowIntro,
   ui,
   useAuth,
   useManifest,
@@ -16,6 +17,9 @@ import {
   type VillageId,
 } from '@so-chung/core';
 import { LevelDot, STATE_TEXT, VillageDetails } from './parts';
+
+// Lời giới thiệu làng chỉ tải khi cần (lần đầu bấm vào làng, hoặc bấm "Xem lại giới thiệu").
+const VillageIntro = lazy(() => import('./VillageIntro'));
 
 /** Đang ở màn hình rộng (máy tính) hay hẹp (điện thoại). */
 function useWide(): boolean {
@@ -58,8 +62,23 @@ export default function BanDoPage() {
   const wide = useWide();
   const manifest = useManifest();
   const { profile } = useAuth();
-  const { unlock, progress, goldenPages } = useProgress();
+  const { unlock, progress, goldenPages, mode, synced, markVillageIntroSeen } = useProgress();
   const [selected, setSelected] = useState<VillageId | null>(null);
+  const [intro, setIntro] = useState<VillageId | null>(null);
+  // Biết chắc đã xem hay chưa: chơi thử, hoặc đã kéo xong dữ liệu từ máy chủ (tránh hiện lại ở máy khác).
+  const introKnown = mode === 'guest' || (mode === 'user' && synced);
+
+  const pickVillage = (id: VillageId) => {
+    if (selected === id) return setSelected(null);
+    if (introKnown && shouldShowIntro(progress.game.data, id)) return setIntro(id);
+    setSelected(id);
+  };
+  const endIntro = () => {
+    if (!intro) return;
+    markVillageIntroSeen(intro);
+    setSelected(intro);
+    setIntro(null);
+  };
 
   const dim = manifest?.['ui/ban-do'];
   const aspect = dim ? `${dim.width} / ${dim.height}` : '1920 / 1047';
@@ -72,6 +91,7 @@ export default function BanDoPage() {
       progress={progress}
       goldenEarned={VILLAGE_ORDER.indexOf(selected) < goldenPages}
       onClose={wide ? undefined : () => setSelected(null)}
+      onReplayIntro={() => setIntro(selected)}
     />
   );
 
@@ -105,7 +125,7 @@ export default function BanDoPage() {
                 key={id}
                 type="button"
                 aria-pressed={on}
-                onClick={() => setSelected(on ? null : id)}
+                onClick={() => pickVillage(id)}
                 style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
                 className={`absolute min-h-11 min-w-11 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-nut border-4 border-nau-go bg-giay/95 px-2 py-1 text-center shadow-[0_3px_0_0_var(--color-nau-go-dam)] focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim ${on ? 'ring-4 ring-muc-tim' : ''}`}
               >
@@ -148,6 +168,11 @@ export default function BanDoPage() {
         </BottomSheet>
       )}
 
+      {intro && (
+        <Suspense fallback={null}>
+          <VillageIntro village={intro} unlockLevels={unlock.levels} onDone={endIntro} />
+        </Suspense>
+      )}
     </>
   );
 }

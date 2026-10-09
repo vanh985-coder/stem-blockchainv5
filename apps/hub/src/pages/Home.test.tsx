@@ -46,6 +46,7 @@ const progressOf = (goldenPages: number): ProgressState => ({
   record: () => ({ coinsEarned: 0 }),
   saveNow: async () => 'saved',
   startGuest: () => {},
+  markVillageIntroSeen: () => {},
 });
 
 function render(ui: ReactElement, auth: AuthState, golden = 0): string {

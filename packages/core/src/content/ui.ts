@@ -22,6 +22,20 @@ export const ui = {
     'lang-bac': 'Làng Bạc',
   },
 
+  /** Hộp thoại kiểu truyện tranh (VnDialog) */
+  vn: {
+    /** Nút ở góc dưới phải; lượt cuối do nơi gọi đặt tên */
+    tiep: 'Tiếp ›',
+    /** Nút lùi một lượt */
+    lui: '‹',
+    luiNhan: 'Lùi lại một lượt',
+    boQua: 'Bỏ qua',
+    /** Tiến trình, ví dụ 3/14 */
+    tienTrinh: '{x}/{n}',
+    tienTrinhNhan: 'Lượt {x} trên {n}',
+    anhNhan: 'Ảnh minh họa',
+  },
+
   /** Màn hình chuyển hướng về bản đồ */
   chuyenHuong: {
     truoc: 'Đang chuyển về bản đồ… Nếu chưa tự chuyển, em bấm',
@@ -265,7 +279,6 @@ export const ui = {
   truyen: {
     tieuDe: 'Cốt truyện',
     batDauHanhTrinh: 'Bắt đầu hành trình',
-    veTrangChu: 'Về trang chủ',
   },
 
   /** Bản đồ /ban-do (spec 04 mục 7) */
@@ -286,6 +299,8 @@ export const ui = {
     nhanCham: '{man}: {trangThai}',
     /** Tên ô Trang Sổ Vàng ở góc trên (đọc cho người dùng đọc màn hình) */
     trangSo: 'Trang Sổ Vàng {so}',
+    /** Nút trong bảng làng, mở lại lời giới thiệu làng */
+    xemLaiGioiThieu: 'Xem lại giới thiệu',
   },
 
   /** Thẻ trang sổ (TrangSo) và mắt xích (MatXich) */

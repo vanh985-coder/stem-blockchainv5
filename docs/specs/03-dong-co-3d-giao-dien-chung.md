@@ -49,6 +49,27 @@ Mọi thứ trong spec này nằm ở `packages/core`. Hub và 4 gói làng đ�
 
 **Icon:** `ui/icons/` gồm `tien-dong`, `trang-vang`, `tim`, `sao`, `non-la`, `guoc-moc`, `tui-tien`.
 
+### Hộp thoại kiểu visual novel — `VnDialog` (`packages/core/src/ui/VnDialog.tsx`)
+
+Dùng cho **mọi** hội thoại, truyện và giới thiệu làng trong game.
+
+- **Bố cục:** hộp ở giữa màn hình, rộng tối đa **960px**. Phần trên là ảnh minh họa (16:9) hoặc **chân dung lớn** của người nói (≥ 160px trên máy tính, ≥ 112px trên điện thoại); phần dưới là khung lời có **tên người nói**.
+- **Nút:** góc dưới trái hiện tiến trình "x/n"; góc dưới phải là nút xanh **"Tiếp ›"** (lượt cuối đổi thành nút kết thúc do nơi gọi đặt tên, ví dụ "Bắt đầu hành trình"). Góc trên có nút **"‹"** lùi một lượt và nút nhỏ **"Bỏ qua"**.
+- **Chữ lời:** ≥ 18px trên máy tính, ≥ 16px trên điện thoại.
+- **Bàn phím:** → / Enter / Space là tiếp; ← là lùi; Esc là bỏ qua.
+- **Nền phía sau:** ảnh do nơi gọi truyền vào, làm mờ và tối nhẹ, phủ cả màn hình. Không truyền nền thì hộp nằm ngay trong trang (như trong trang bài học, nơi nền là cảnh làng sẵn có).
+- **Hiệu ứng:** lượt mới hiện lên nhẹ; tắt khi bật "Giảm chuyển động".
+- **Lượt có thể có:** lời phụ kèm chân dung nhỏ (ví dụ {phanDien} cười "Hì hì!") và phần nội dung thêm (ví dụ danh sách nhiệm vụ của làng). Tải trước ảnh của lượt kế tiếp; ảnh thiếu thì hiện khung trống, không lỗi.
+- **`DialogueBox`** (hội thoại nhân vật trong trang bài học `LessonPage2D`) chỉ là lớp đổi lượt thoại theo nhân vật sang `VnDialog`: chân dung lớn, chữ to; các thời điểm thoại giữ nguyên.
+
+### Nền trang trí — `NenTrangTri` (`packages/core/src/ui/NenTrangTri.tsx`)
+
+Dùng cho trang chủ, `/ho-so`, `/dang-nhap`, `/dang-ky`, `/quyen-rieng-tu` (qua khung `AccountPage` và trang chủ). **Không dùng** ở trang bài học và trang giáo viên.
+
+- Ảnh mờ (`ui/man-hinh-tai`) cộng 5–8 icon SVG tự vẽ (tờ giấy dó, lá tre, đồng xu) trôi chậm bằng CSS animation, đặt rải ở rìa màn hình.
+- `aria-hidden`, không nhận bấm, nằm dưới mọi bảng; **bảng nội dung vẫn đặc**, tương phản chữ không đổi.
+- Tắt icon khi bật "Giảm chuyển động" hoặc `prefers-reduced-motion` (chỉ còn ảnh mờ).
+
 ## 2. Đồ họa và tải file
 
 **Manifest:**
@@ -199,6 +220,8 @@ Dùng ở mọi chỗ có lựa chọn: câu hỏi, Đồng ý/Từ chối, lự
 - **Máy tính:** rê chuột hoặc focus vào một đáp án thì nhân vật học sinh **quay đầu và người** về phía đáp án đó, kèm tư thế `point`.
 - **Điện thoại:** chạm là chọn. Nhân vật `point` 0,3 giây trước khi hiện kết quả.
 - **Kết quả:** đúng thì `cheer`, sai thì `sad`.
+
+**Hội thoại ở trang bài học 2D** dùng `VnDialog` (mục 1): chân dung lớn của người nói, không còn khung 3D nhỏ chồng lên.
 
 **Ở trang bài học 2D (D), từ mốc 2:** đặt một khung 3D nhỏ (300×300, nền trong suốt) ở góc dưới trái, có nhân vật học sinh để phản ứng như trên. **Mốc 1 chưa có khung này.** Điện thoại yếu hoặc bật "Giảm chuyển động" thì ẩn khung này.
 

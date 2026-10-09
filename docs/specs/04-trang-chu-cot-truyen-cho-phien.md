@@ -11,14 +11,14 @@ Trang 2D, nhẹ, tải nhanh.
   - Chưa đăng nhập: nút chính "Đăng nhập để chơi", nút phụ "Chơi thử".
   - Đã đăng nhập: nút chính "Chơi tiếp", cùng tên học sinh và số Trang Sổ Vàng đã có (0/4). Ở mốc 1, "Chơi tiếp" mở `/ban-do`. Từ mốc 2 thì mở `/cho` (chợ 3D), và trang chủ có thêm liên kết "Bản đồ".
 - **Liên kết:** "Đọc truyện", "Hồ sơ"; với tài khoản giáo viên thêm "Trang giáo viên"; "Quyền riêng tư".
-- **Nền:** ảnh `ui/man-hinh-tai`, hơi mờ.
+- **Nền:** `NenTrangTri` (spec 03 mục 1): ảnh `ui/man-hinh-tai` hơi mờ cùng vài icon trôi chậm; tắt icon khi bật "Giảm chuyển động".
 
 ## 2. Trang cốt truyện `/truyen`
 
-Hiện 14 ảnh trong `assets/story/` (`01-ngu-guc` … `14-gio-tay`) theo kiểu truyện tranh cuộn dọc.
+Hiện 14 ảnh trong `assets/story/` (`01-ngu-guc` … `14-gio-tay`) theo kiểu hộp thoại visual novel (`VnDialog`, bố cục bên dưới).
 
-**Mỗi khung:**
-- Ảnh ngang 16:9.
+**Mỗi lượt:**
+- Ảnh ngang 16:9 ở phần trên.
 - Bên dưới là lời truyện, đặt trên nền giấy dó. Lời truyện lấy ở bảng sau, chép vào `packages/core/src/content/story.ts`:
   - `{ten}` là tên hiển thị của học sinh (chơi thử thì là "em"); `{Ten}` là cùng giá trị đó nhưng viết hoa chữ đầu, dùng khi đứng đầu câu (chơi thử thì là "Em");
   - `{phanDien}` lấy từ `characters.ts`.
@@ -40,12 +40,15 @@ Hiện 14 ảnh trong `assets/story/` (`01-ngu-guc` … `14-gio-tay`) theo kiể
 | 13 | `story/13-tinh-giac` | {Ten} tỉnh giấc. Ở trang cuối cuốn vở có một con dấu tím mà {ten} không nhớ mình đã đóng. |
 | 14 | `story/14-gio-tay` | Cô giáo hỏi: "Vì sao blockchain khó bị sửa lén?" {Ten} giơ tay đầu tiên. |
 
-**Bố cục:**
-- Ảnh hiện dần khi cuộn tới (tôn trọng "Giảm chuyển động").
-- Ảnh tải lười: chỉ tải khi sắp cuộn tới.
-- Trên điện thoại: một cột. Trên máy tính: ảnh rộng tối đa 960px, nằm giữa.
+**Hiển thị:** dùng `VnDialog` (spec 03 mục 1), **14 lượt, mỗi ảnh một lượt**:
+- ảnh truyện (16:9) ở phần trên, lời truyện ở dưới (đi qua `fmt()`); nền phía sau là **chính ảnh đang xem**, làm mờ;
+- "Tiếp ›" (hoặc →, Enter, Space) sang ảnh kế, "‹" (hoặc ←) lùi lại; tiến trình "x/14";
+- ảnh kế tiếp được tải trước; ảnh thiếu thì hiện khung trống kèm lời truyện, không lỗi;
+- "Bỏ qua" (hoặc Esc) đi thẳng vào `/ban-do`.
 
-**Cuối trang:** nút "Bắt đầu hành trình". Ở mốc 1 dẫn vào `/ban-do`; từ mốc 2 dẫn vào `/cho`.
+**Lượt cuối (ảnh 14):** nút kết thúc là **"Bắt đầu hành trình"**. Ở mốc 1 dẫn vào `/ban-do`; từ mốc 2 dẫn vào `/cho`.
+
+Trang `/truyen` tải theo route (không nằm trong trang đầu của hub).
 
 **Tái sử dụng:** cùng bộ ảnh và lời này được dùng lại làm cảnh chuyển trong game:
 - Ảnh 1–5: mở đầu.
@@ -150,6 +153,13 @@ Phần này để trống chỗ, **không làm trong đợt này**.
 - **Bấm "Vào":** mở màn đó trên subdomain của làng.
 - **Góc trên:** 4 ô Trang Sổ Vàng, tên học sinh, nút Hồ sơ.
 
+**Giới thiệu làng (lần đầu bấm vào một làng):**
+- Lần đầu học sinh bấm vào một làng, **trước khi mở bảng làng**, mở `VnDialog` với chân dung lớn của người dẫn và nền là ảnh `scenes/bai-hoc-<làng>` làm mờ. Mỗi làng 2 lượt lời của người dẫn, rồi **lượt cuối chung**: "Làng có 3 nhiệm vụ cho em. Xong cả ba, làng trao em Trang Sổ Vàng thứ {so}.", kèm **danh sách 3 màn** lấy từ `levels.ts` (tên màn, "Bài học" hoặc "Thử thách", trạng thái khóa / mở / xong / sắp ra mắt). Nút ở lượt cuối: "Xem các màn".
+- Người dẫn và lời (chép trong `packages/core/src/content/villageIntro.ts`): Làng Giấy (bác An), Làng Dệt (cụ Bình), Làng Khắc Dấu (chú Dũng), Làng Bạc (thầy Linh).
+- **Cờ đã xem** lưu trong `game_state.data` (khóa `villageIntroSeen`, mỗi làng một cờ); khi hai bên gộp thì hợp cờ của cả hai. Chơi thử thì cờ đi theo cookie khách `sc_guest` (trường `vi`, mỗi làng một bit). Đã xem rồi thì bấm làng mở thẳng bảng làng; chưa biết chắc (đang tải dữ liệu từ máy chủ) thì không hiện.
+- **Hết giới thiệu** (xong hoặc "Bỏ qua") thì mở bảng làng như cũ. Bảng làng có thêm nút **"Xem lại giới thiệu"**.
+- Hàm thuần có test: có hiện giới thiệu không (lần đầu / đã xem) và ghép danh sách nhiệm vụ (`progress/villageIntro.ts`). Phần giới thiệu tải theo route, chỉ khi cần.
+
 **Điện thoại:** bản đồ co theo chiều ngang; bảng danh sách màn hiện thành tấm trượt lên từ dưới.
 
 **Trong game:** menu của chợ 3D và của các làng có mục "Bản đồ" để mở trang này.
@@ -158,7 +168,9 @@ Phần này để trống chỗ, **không làm trong đợt này**.
 
 - [ ] Trang chủ tải nhanh; hiện đúng nút theo trạng thái đăng nhập.
 - [ ] `/ban-do`: 4 làng hiện đúng trạng thái từng màn theo tiến độ; bấm "Vào" mở đúng màn trên subdomain của làng.
-- [ ] `/truyen` hiện đủ 14 khung; ảnh thiếu thì hiện khung trống có lời truyện, không lỗi trang.
+- [ ] Lần đầu bấm một làng thì hiện giới thiệu làng (lượt cuối có danh sách 3 màn); lần sau mở thẳng bảng làng; bảng làng có "Xem lại giới thiệu".
+- [ ] Trang chủ, `/ho-so`, `/dang-nhap`, `/dang-ky`, `/quyen-rieng-tu` có nền trang trí; bật "Giảm chuyển động" thì icon đứng yên (ẩn).
+- [ ] `/truyen` hiện đủ 14 lượt kiểu visual novel (nền là ảnh đang xem làm mờ); ảnh thiếu thì hiện khung trống có lời truyện, không lỗi trang; lượt cuối có nút "Bắt đầu hành trình" dẫn vào `/ban-do`.
 - [ ] `/cho`:
   - cảnh mở đầu chạy đúng và bỏ qua được;
   - chỉ cổng Làng Giấy mở;
