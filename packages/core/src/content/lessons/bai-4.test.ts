@@ -80,12 +80,14 @@ describe('content/lessons/bai-4.ts', () => {
     expect(t.soGocDaGhi).toBe('Sổ ghi số gốc **{so}** — em đã tính đúng ✓');
     expect(t.soGocTinhLai).toBe('{phanDien} sửa một lá, nên tính lại bây giờ ra **{so}**. Hãy tìm lá đã khác so với lúc em dựng cây!');
     expect(t.huongDanSoiO).toBe('Bấm vào một ô để so: số lúc em dựng cây (trong sổ) và số tính lại bây giờ.');
-    expect(t.soiSo).toBe('lúc dựng {so}');
-    expect(t.soiTinhLai).toBe('bây giờ {so}');
     expect(t.soiTieuDeCay).toBe('Số trên ô là số lúc em dựng cây (đã ghi trong sổ).');
     expect(t.soiTimRaRoi).toBe('Em tìm ra rồi! {phanDien} đã sửa {la} từ {cu} thành {moi}.');
     expect(t.soiTongKet).toBe('Em soi {so} ô. Đi theo nhánh đỏ thì chỉ cần 2 ô mỗi tầng.');
-    expect(t.soiBiGoiY).toBe('Bắt đầu từ gốc, soi 2 ô con, rồi đi theo ô đỏ.');
+    expect(Object.keys(t)).not.toContain('soiBiGoiY'); // đã bỏ gợi ý "soi sai 2 lần" của Bi (ô chưa mở bị chặn)
+    expect(Object.keys(t)).not.toContain('soiSo'); // ô chỉ còn tên ô và một số
+    expect(t.soiCayCu).toBe('Cây trong sổ (lúc em dựng)');
+    expect(t.soiCayMoi).toBe('Cây bây giờ ({phanDien} đã sửa)');
+    expect(t.soiDung).toBe('✓ đúng');
     expect(Object.keys(t)).not.toContain('suaGiaoDichXemGoc'); // đã bỏ nút "Sửa giao dịch & xem gốc đổi"
     // khớp/lệch có icon và chữ, không chỉ màu
     expect(t.soiKhop).toBe('✓ giống');

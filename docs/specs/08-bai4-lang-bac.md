@@ -41,15 +41,18 @@ Lời "Khi {phanDien} tráo giao dịch" hiện giữa lúc làm trạm Trung b�
 
 Thay cho nút "Sửa giao dịch & xem gốc đổi" ở bản cũ. Công thức, số liệu và cách chấm sao (theo lỗi ở phần B) không đổi.
 - {phanDien} nói: "Tớ vừa lén sửa một lá trên cây em vừa dựng. Gốc đổi rồi đấy, xem em có tìm ra lá nào không!" (không nói lá nào).
-- Cây hiện **số lúc em dựng cây** (đã ghi trong sổ) ở mọi ô, lấy từ cây em vừa dựng ở phần 2, không viết cứng. Ví dụ lá 6, 3, 2, 1; T12 = 63, T34 = 21, gốc = 651. Giao dịch bị sửa là T3 (2 → 3). Dòng chú thích dưới cây: "Số trên ô là số lúc em dựng cây (đã ghi trong sổ)."
+- **Hai cây** (từ 640px xếp cạnh nhau, dưới 640px xếp trên–dưới; cây co theo bề rộng nên ở 360px cả hai hiện đủ, không cuộn ngang, chữ từ 14px). Số lấy từ cây em vừa dựng ở phần 2, không viết cứng. Ví dụ lá 6, 3, 2, 1; T12 = 63, T34 = 21, gốc = 651; giao dịch bị sửa là T3 (2 → 3):
+  - **"Cây trong sổ (lúc em dựng)":** hiện đủ số ở mọi ô, viền xanh, nhãn "✓ đúng" ở gốc.
+  - **"Cây bây giờ ({phanDien} đã sửa)":** chỉ hiện số gốc (661) kèm "✗ khác"; các ô khác hiện "?". Mỗi ô chỉ có tên ô và một số.
+  - Dòng chú thích dưới hai cây: "Số trên ô là số lúc em dựng cây (đã ghi trong sổ)."
 - Hai dòng đầu mối: "Sổ ghi số gốc 651 — em đã tính đúng ✓" và "{phanDien} sửa một lá, nên tính lại bây giờ ra 661. Hãy tìm lá đã khác so với lúc em dựng cây!".
 - Câu hướng dẫn: "Bấm vào một ô để so: số lúc em dựng cây (trong sổ) và số tính lại bây giờ."
-- Học sinh bấm (hoặc Enter/Space khi chọn bằng bàn phím) một ô để **soi**: ô hiện "lúc dựng {a}" và "bây giờ {b}". Giống thì xanh kèm "✓ giống", khác thì đỏ kèm "✗ khác" (có icon và chữ, không chỉ màu). Ô đã soi giữ nguyên trạng thái; soi lại ô cũ không đếm thêm.
+- **Soi một ô "?"** ở cây mới (bấm, hoặc Enter/Space khi chọn bằng bàn phím): ô hiện số bây giờ kèm "✓ giống" (xanh) hoặc "✗ khác" (đỏ), có icon và chữ, không chỉ màu. Ô cùng vị trí ở cây cũ được tô viền vàng để so (ô vừa soi viền đậm hơn). Ô đã soi giữ nguyên trạng thái.
+- **Ô "?" chỉ bấm được khi ô cha đã soi và "✗ khác"** (đi từ gốc xuống theo nhánh khác; gốc đã hiện sẵn "khác" nên T12 và T34 bấm được ngay). Ô chưa bấm được thì mờ nhẹ, có nhãn thay thế cho trình đọc màn hình ("chưa mở, hãy soi ô cha đang khác trước"). Vì đã chặn như vậy nên không còn gợi ý "soi sai 2 lần" của Bi.
 - Với ví dụ trên: gốc, T34, T3 khác; T12, T1, T2, T4 giống.
 - Soi trúng lá bị sửa: "Em tìm ra rồi! {phanDien} đã sửa T3 từ 2 thành 3.", chạy hiệu ứng đỏ lan từ lá lên gốc (như cũ), rồi mới gọi `onTwist` (lời thầy Linh).
-- Cuối phần: "Em soi {so} ô. Đi theo nhánh đỏ thì chỉ cần 2 ô mỗi tầng."
-- Khi em soi trúng ô giống lần thứ 2, Bi gợi ý: "Bắt đầu từ gốc, soi 2 ô con, rồi đi theo ô đỏ."
-- Logic soi là hàm thuần trong `lessons/bai-4/inspect.ts` (dùng `combine`, `buildTree`), có test.
+- Cuối phần: "Em soi {so} ô. Đi theo nhánh đỏ thì chỉ cần 2 ô mỗi tầng." ({so} đếm các ô em đã bấm; gốc hiện sẵn không tính.)
+- Logic soi là hàm thuần trong `lessons/bai-4/inspect.ts` (dùng `combine`, `buildTree`): soi từng ô, ô nào bấm được theo trạng thái soi, trúng lá bị sửa thì xong, đếm số lần soi. Có test.
 
 ### Ở mốc 1
 

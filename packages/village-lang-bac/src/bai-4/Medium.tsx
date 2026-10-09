@@ -5,15 +5,18 @@ import { GAME_CONFIG } from '@so-chung/core/config/gameConfig';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { buildTree, pathToRoot, generateMedium, DEFAULT_EASY_TXS, type EasyTx } from '@so-chung/core/lessons/bai-4/logic';
 import {
+  TOP_LEVEL,
+  canInspect,
   cellKey,
+  initialInspectState,
   inspectCell,
   inspectCount,
   isTamperedLeafHit,
-  shouldShowBiHint,
   type InspectCell,
   type InspectState,
 } from '@so-chung/core/lessons/bai-4/inspect';
 import { CayMerkle, type CellStatus } from './CayMerkle';
+import { SoiCay } from './SoiCay';
 import { portraitOf } from './nguoi';
 
 const T = bai4Texts.tramTb;
@@ -254,98 +257,26 @@ export function Medium({
     }, delay);
   }, [onTwist]);
 
-  // Phần 3: em soi từng ô (tính lại số rồi so với số đã ghi trong sổ). Soi trúng lá bị sửa thì chạy hiệu ứng đỏ lan lên gốc.
-  const [inspected, setInspected] = useState<InspectState>({});
+  // Phần 3: hai cây. Cây trong sổ hiện đủ số; cây bây giờ chỉ có số gốc (hiện sẵn "khác"), các ô khác là "?".
+  // Chỉ soi được ô mà ô cha đã soi và "khác" (đi từ gốc xuống). Soi trúng lá bị sửa thì chạy hiệu ứng đỏ lan lên gốc.
+  const [inspected, setInspected] = useState<InspectState>(() => initialInspectState(partBTree, tamperedTree));
+  const [lastInspected, setLastInspected] = useState<InspectCell | null>(null);
   const [found, setFound] = useState(false);
 
+  const canInspectCell = (cell: InspectCell) => !found && tamperStep < 0 && canInspect(cell, inspected);
+
   const handleInspect = (cell: InspectCell) => {
-    if (found || tamperStep >= 0 || inspected[cellKey(cell)]) return;
+    if (!canInspectCell(cell)) return;
     const result = inspectCell(partBTree, tamperedTree, cell);
     if (result.match) sound.playCorrect();
     else sound.playWrong();
     setInspected((prev) => ({ ...prev, [cellKey(cell)]: result }));
+    setLastInspected(cell);
     if (isTamperedLeafHit(cell, tamperedLeafIndex, result)) {
       setFound(true);
       timerRef.current = setTimeout(startTamperAnimation, 700);
     }
   };
-
-  const cellName = (level: number, index: number) =>
-    level === 2 ? T.goc : level === 1 ? `T${index * 2 + 1}${index * 2 + 2}` : `T${index + 1}`;
-
-  /** Ô soi được: số đã ghi trong sổ, sau khi soi thêm số tính lại và ✓ khớp / ✗ lệch (có chữ, không chỉ màu) */
-  const renderInspectSlot = (level: number, index: number) => {
-    if (tamperStep >= 0) return null;
-    const r = inspected[cellKey({ level, index })];
-    const name = cellName(level, index);
-    const recorded = partBTree[level][index];
-    const tone = r
-      ? r.match
-        ? 'border-xanh-la-dam bg-xanh-la/10 text-xanh-la-dam'
-        : 'border-do-son-dam bg-do-son/10 text-do-son-dam'
-      : 'border-nau-go/50 bg-white/80 text-chu hover:border-muc-tim cursor-pointer';
-    return (
-      <button
-        type="button"
-        onClick={() => handleInspect({ level, index })}
-        aria-disabled={Boolean(r) || found}
-        aria-label={
-          r
-            ? fmt(T.soiNhanKetQua, { nhan: name, so: r.recorded, so2: r.recomputed, ketQua: r.match ? T.soiNhanKhop : T.soiNhanLech })
-            : fmt(T.soiNhanCuaO, { nhan: name, so: recorded })
-        }
-        className={`flex min-h-[76px] w-full min-w-[92px] flex-col items-center justify-center rounded-[14px] border-2 px-1 py-1 text-center font-display text-sm leading-tight focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim ${tone}`}
-      >
-        <span className="font-extrabold uppercase tracking-wide">{name}</span>
-        <span className="font-bold">{fmt(T.soiSo, { so: recorded })}</span>
-        {r && (
-          <>
-            <span className="font-bold">{fmt(T.soiTinhLai, { so: r.recomputed })}</span>
-            <span className="font-extrabold">{r.match ? T.soiKhop : T.soiLech}</span>
-          </>
-        )}
-      </button>
-    );
-  };
-
-  // Cây hiển thị ở Phần C
-  const currentTreeC = useMemo(() => {
-    if (tamperStep < 0) {
-      return partBTree;
-    }
-    // Sao chép cây gốc của phần B
-    const tree = [
-      [...partBTree[0]],
-      [...partBTree[1]],
-      [...partBTree[2]],
-    ];
-    if (tamperStep >= 0) {
-      tree[0][tamperedLeafIndex] = tamperedNewValue;
-    }
-    if (tamperStep >= 1) {
-      const pIdx = tamperPath[1].index;
-      tree[1][pIdx] = tamperedTree[1][pIdx];
-    }
-    if (tamperStep >= 2) {
-      tree[2][0] = tamperedTree[2][0];
-    }
-    return tree;
-  }, [partBTree, tamperedTree, tamperStep, tamperedLeafIndex, tamperedNewValue, tamperPath]);
-
-  // Trạng thái các ô ở Phần C
-  const cellStatusesC = useMemo(() => {
-    // Trước khi tìm ra lá bị sửa, ô giữ kiểu mặc định (màu do kết quả soi quyết định); khi chạy hiệu ứng, ô ngoài đường đỏ hiện xanh
-    const base: CellStatus | undefined = tamperStep >= 0 ? 'dung' : undefined;
-    const s0: (CellStatus | undefined)[] = [base, base, base, base];
-    const s1: (CellStatus | undefined)[] = [base, base];
-    const s2: (CellStatus | undefined)[] = [base];
-
-    if (tamperStep >= 0) s0[tamperedLeafIndex] = 'doi-mau';
-    if (tamperStep >= 1) s1[tamperPath[1].index] = 'doi-mau';
-    if (tamperStep >= 2) s2[0] = 'doi-mau';
-
-    return [s0, s1, s2];
-  }, [tamperStep, tamperedLeafIndex, tamperPath]);
 
   // Quản lý phản hồi FeedbackSheet
   const [feedback, setFeedback] = useState<{
@@ -576,23 +507,16 @@ export function Medium({
 
           {!found && <p className="text-center text-sm text-nau-go-dam">{T.huongDanSoiO}</p>}
 
-          {/* Cây sổ: số đã ghi ở mọi ô; bấm một ô để soi */}
-          <CayMerkle
-            treeValues={currentTreeC}
-            cellStatuses={cellStatusesC}
-            highlightPath={tamperStep >= 0 ? tamperPath.slice(0, tamperStep + 1) : []}
-            renderSlot={(level, index) => renderInspectSlot(level, index)}
-            scrollHint
-            caption={T.soiTieuDeCay}
+          {/* Hai cây: cây trong sổ (đủ số) và cây bây giờ (chỉ số gốc, bấm "?" để soi) */}
+          <SoiCay
+            recorded={partBTree}
+            inspected={inspected}
+            last={lastInspected}
+            canInspect={canInspectCell}
+            onInspect={handleInspect}
+            pulse={tamperStep >= 0 ? tamperPath.slice(0, tamperStep + 1) : []}
           />
-
-          {/* Bi gợi ý khi em đã soi trúng ô khớp lần thứ 2 */}
-          {shouldShowBiHint(inspected) && !found && (
-            <div role="status" className="flex items-center gap-3 rounded-[16px] border-2 border-muc-tim/40 bg-muc-tim/10 p-3">
-              <Avatar portrait="bi" size="md" />
-              <p className="text-sm font-semibold text-chu">{T.soiBiGoiY}</p>
-            </div>
-          )}
+          <p className="text-center text-sm italic text-nau-go-dam">{T.soiTieuDeCay}</p>
 
           {found && (
             <p
@@ -613,7 +537,7 @@ export function Medium({
                 </Button>
               ) : (
                 <>
-                  <p className="text-center text-base font-semibold text-chu">{fmt(T.soiTongKet, { so: inspectCount(inspected) })}</p>
+                  <p className="text-center text-base font-semibold text-chu">{fmt(T.soiTongKet, { so: inspectCount(inspected, TOP_LEVEL) })}</p>
                   <Button
                     variant="primary"
                     size="lg"
