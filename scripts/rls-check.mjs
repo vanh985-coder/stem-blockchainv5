@@ -1,7 +1,8 @@
 // Kiểm tra nhanh quyền (RLS) trên Supabase thật, chỉ dùng khóa công khai (publishable/anon). Chạy: pnpm rls:check
 // Tự đăng ký 2 tài khoản học sinh thử, kiểm tra 3 điều, in ✅/❌ từng điều. Cần đã chạy migration 0001_init.sql.
-// Phần giáo viên (bước 12, cần thêm 0002_teacher.sql): đọc TEST_TEACHER_A_EMAIL/_PASSWORD và TEST_TEACHER_B_EMAIL/_PASSWORD
-// từ .env.local (hai tài khoản giáo viên có thật, đăng nhập bằng mật khẩu). Thiếu thì bỏ qua phần này và báo rõ.
+// Phần giáo viên (bước 12, cần thêm 0002_teacher.sql): đọc TEST_TEACHER_A_USER/_PASS và TEST_TEACHER_B_USER/_PASS
+// từ .env.local (hai tài khoản giáo viên có thật; USER là tên đăng nhập, script ghép thành <ten>@VITE_USERNAME_EMAIL_DOMAIN).
+// Thiếu thì bỏ qua phần này và báo rõ.
 import { randomBytes, randomInt } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -120,24 +121,24 @@ if (bInsErr || bGsErr || !bOwnLp?.length || !bOwnGs?.length) {
 
 // ===== Phần giáo viên (bước 12) =====
 const tEnv = {
-  aEmail: env.TEST_TEACHER_A_EMAIL ?? '',
-  aPass: env.TEST_TEACHER_A_PASSWORD ?? '',
-  bEmail: env.TEST_TEACHER_B_EMAIL ?? '',
-  bPass: env.TEST_TEACHER_B_PASSWORD ?? '',
+  aUser: (env.TEST_TEACHER_A_USER ?? '').trim(),
+  aPass: env.TEST_TEACHER_A_PASS ?? '',
+  bUser: (env.TEST_TEACHER_B_USER ?? '').trim(),
+  bPass: env.TEST_TEACHER_B_PASS ?? '',
 };
 const teacherClients = [];
-if (!tEnv.aEmail || !tEnv.aPass || !tEnv.bEmail || !tEnv.bPass) {
+if (!tEnv.aUser || !tEnv.aPass || !tEnv.bUser || !tEnv.bPass) {
   console.log(
-    '\nℹ️  Bỏ qua phần giáo viên: chưa có TEST_TEACHER_A_EMAIL, TEST_TEACHER_A_PASSWORD, TEST_TEACHER_B_EMAIL, TEST_TEACHER_B_PASSWORD trong .env.local.',
+    '\nℹ️  Bỏ qua phần giáo viên: chưa có TEST_TEACHER_A_USER, TEST_TEACHER_A_PASS, TEST_TEACHER_B_USER, TEST_TEACHER_B_PASS trong .env.local.',
   );
 } else {
   console.log('\n--- Phần giáo viên ---');
   let classId = null;
   let tA = null;
   try {
-    const signIn = async (email, password, tag) => {
+    const signIn = async (user, password, tag) => {
       const client = newClient();
-      const { data, error } = await client.auth.signInWithPassword({ email, password });
+      const { data, error } = await client.auth.signInWithPassword({ email: `${user.toLowerCase()}@${domain}`, password });
       if (error || !data.user) throw new Error(`Giáo viên ${tag} không đăng nhập được: ${error?.message ?? 'không có phiên'}`);
       teacherClients.push(client);
       const { data: prof } = await client.from('profiles').select('role').eq('id', data.user.id).maybeSingle();
@@ -146,8 +147,8 @@ if (!tEnv.aEmail || !tEnv.aPass || !tEnv.bEmail || !tEnv.bPass) {
       }
       return { client, id: data.user.id };
     };
-    tA = await signIn(tEnv.aEmail, tEnv.aPass, 'A');
-    const tB = await signIn(tEnv.bEmail, tEnv.bPass, 'B');
+    tA = await signIn(tEnv.aUser, tEnv.aPass, 'A');
+    const tB = await signIn(tEnv.bUser, tEnv.bPass, 'B');
 
     // Chuẩn bị: A tạo lớp; học sinh (a) vào lớp bằng mã; học sinh trả lời một câu để có số liệu câu hỏi.
     const created = await tA.client.rpc('create_class', { class_name: `Lớp thử RLS ${randomInt(1000, 9999)}` });
