@@ -56,8 +56,8 @@
 
 ## 3. Chuẩn bị trước mốc 1
 
-- [ ] **Tên miền: cần có ngay ở mốc 1.** Vì giữ subdomain, đăng nhập dùng chung giữa hub và các làng chỉ chạy khi có tên miền riêng; trên `vercel.app` thì không chạy.
-- [ ] Repo GitHub `so-chung`, tài khoản Vercel, project Supabase và đăng nhập Google (spec 02 mục 1)
+- [ ] **Tên miền: cần có ngay ở mốc 1.** Vì giữ subdomain, đăng nhập dùng chung giữa hub và các làng chỉ chạy khi có tên miền riêng; trên tên miền chung của dịch vụ hosting thì không chạy.
+- [ ] Repo GitHub `so-chung`, Docker Desktop và Cloudflare Tunnel trên server, project Supabase và đăng nhập Google (spec 02 mục 1)
 - [ ] Claude Code trong VS Code
 - [ ] Trong repo:
   - đặt `assets/` ở gốc (nằm trong `.gitignore`);

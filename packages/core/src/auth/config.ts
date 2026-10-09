@@ -35,6 +35,19 @@ export function readAuthConfig(env: AuthEnv): AuthConfig {
   };
 }
 
+/**
+ * Hàm thuần: tùy chọn cookie phiên Supabase (spec 02 mục 2). Có VITE_COOKIE_DOMAIN thì cookie dùng chung mọi subdomain;
+ * trang chạy https thì thêm Secure (localhost http thì không, để vẫn chạy được).
+ */
+export function sessionCookieOptions(cookieDomain: string | undefined, protocol: string) {
+  return {
+    domain: cookieDomain, // để trống trên localhost
+    path: '/',
+    sameSite: 'lax' as const,
+    secure: protocol === 'https:',
+  };
+}
+
 // Vite thay chuỗi import.meta.env.VITE_* lúc build.
 export const AUTH_CONFIG: AuthConfig = readAuthConfig({
   VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,

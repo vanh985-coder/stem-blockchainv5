@@ -1,0 +1,41 @@
+# Một service Caddy phục vụ 5 app + đồ họa. Chạy từ gốc repo:
+#   docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d --build
+# Cổng chỉ mở trên 127.0.0.1; Cloudflare Tunnel (cloudflared) mới là đường ra Internet.
+name: so-chung
+
+services:
+  web:
+    image: so-chung-web:latest
+    container_name: so-chung-web
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:?Thiếu VITE_SUPABASE_URL trong deploy/.env}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:?Thiếu VITE_SUPABASE_ANON_KEY trong deploy/.env}
+        VITE_USERNAME_EMAIL_DOMAIN: ${VITE_USERNAME_EMAIL_DOMAIN:?Thiếu VITE_USERNAME_EMAIL_DOMAIN trong deploy/.env}
+        VITE_COOKIE_DOMAIN: ${VITE_COOKIE_DOMAIN-}
+        VITE_ASSETS_URL: ${VITE_ASSETS_URL:?Thiếu VITE_ASSETS_URL trong deploy/.env}
+        VITE_HUB_URL: ${VITE_HUB_URL:?Thiếu VITE_HUB_URL trong deploy/.env}
+        VITE_LANG_GIAY_URL: ${VITE_LANG_GIAY_URL:?Thiếu VITE_LANG_GIAY_URL trong deploy/.env}
+        VITE_LANG_DET_URL: ${VITE_LANG_DET_URL:?Thiếu VITE_LANG_DET_URL trong deploy/.env}
+        VITE_LANG_KHAC_DAU_URL: ${VITE_LANG_KHAC_DAU_URL:?Thiếu VITE_LANG_KHAC_DAU_URL trong deploy/.env}
+        VITE_LANG_BAC_URL: ${VITE_LANG_BAC_URL:?Thiếu VITE_LANG_BAC_URL trong deploy/.env}
+        VITE_MERGED: ${VITE_MERGED:-false}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:8081" # hub
+      - "127.0.0.1:8082:8082" # lang-giay
+      - "127.0.0.1:8083:8083" # lang-det
+      - "127.0.0.1:8084:8084" # lang-khac-dau
+      - "127.0.0.1:8085:8085" # lang-bac
+      - "127.0.0.1:8086:8086" # assets
+    healthcheck:
+      # Cả 6 cổng đều trả lời (5 app: trang chủ; đồ họa: manifest.json, vì cổng 8086 không có trang chủ)
+      test:
+        - CMD-SHELL
+        - for p in 8081 8082 8083 8084 8085; do wget -q -O /dev/null http://127.0.0.1:$$p/ || exit 1; done; wget -q -O /dev/null http://127.0.0.1:8086/manifest.json
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

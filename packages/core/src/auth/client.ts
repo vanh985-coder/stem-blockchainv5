@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { AUTH_CONFIG } from './config';
+import { AUTH_CONFIG, sessionCookieOptions } from './config';
 
 let clientPromise: Promise<SupabaseClient | null> | null = null;
 let created: SupabaseClient | null = null;
@@ -26,12 +26,7 @@ export function getSupabase(): Promise<SupabaseClient | null> {
   clientPromise ??= import('@supabase/ssr').then(({ createBrowserClient }) =>
     {
       const c = createBrowserClient(AUTH_CONFIG.url, AUTH_CONFIG.anonKey, {
-        cookieOptions: {
-          domain: AUTH_CONFIG.cookieDomain, // để trống trên localhost
-          path: '/',
-          sameSite: 'lax',
-          secure: location.protocol === 'https:',
-        },
+        cookieOptions: sessionCookieOptions(AUTH_CONFIG.cookieDomain, location.protocol),
       });
       created = c;
       createdListeners.forEach((l) => l(c));

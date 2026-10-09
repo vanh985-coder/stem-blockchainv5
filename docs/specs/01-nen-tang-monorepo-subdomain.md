@@ -45,7 +45,7 @@ so-chung/
 - **Đăng nhập và dữ liệu:** `@supabase/supabase-js` và `@supabase/ssr` (xem spec 02).
 - **Hiệu ứng, kéo thả:** `motion`, `@dnd-kit/core`.
 - **Test:** `vitest` cho toàn bộ hàm logic trong `packages/`. Lệnh `pnpm test` chạy test của mọi gói.
-- **Hosting:** Vercel. Mỗi app là một project Vercel riêng, cùng trỏ vào repo này.
+- **Hosting:** tự host trên Windows Server: một image Docker (Caddy) phục vụ cả 5 app và đồ họa, đưa ra Internet bằng Cloudflare Tunnel (mục 7). Không dùng Vercel.
 
 ## 3. Chuyển code từ web 2D hiện có
 
@@ -122,7 +122,7 @@ export interface VillageModule {
 
 **Về Git:** `assets/` gốc nặng khoảng 600 MB nên **không đưa lên Git**:
 - thêm `assets/` vào `.gitignore`; bản gốc cất trên Google Drive;
-- chạy `pnpm assets:build` trên máy, rồi **commit thư mục `assets-build/`** (khoảng 40–60 MB). Vercel chỉ cần deploy thư mục này.
+- chạy `pnpm assets:build` trên máy, rồi **commit thư mục `assets-build/`** (khoảng 40–60 MB). Docker chỉ cần thư mục này (bỏ `_preview/`).
 
 **Lệnh `pnpm assets:build`** (script `scripts/assets-build.mjs`, dùng `@gltf-transform/core` và `sharp`). Đọc `assets/`, ghi kết quả ra `assets-build/`. **Không deploy** `concept/`, `source/` và mọi file không phải ảnh hoặc model.
 
@@ -147,7 +147,7 @@ export interface VillageModule {
 - Code tìm theo **đường dẫn không kèm đuôi file**, ví dụ `scenes/bai-hoc-lang-giay`, nên bản `.png` hay `.jpg` gốc đều dùng được.
 
 **Deploy và tải:**
-- `assets-build/` được deploy thành một project riêng tại `assets.ten-mien.vn`:
+- `assets-build/` được phục vụ như một site riêng (`sb-assets.blockchainptit.com`, cổng 8086, mục 7):
   - `Access-Control-Allow-Origin: *` cho mọi file;
   - file đã nén có `Cache-Control: public, max-age=31536000, immutable`.
 - App đọc đồ họa qua `VITE_ASSETS_URL`. Thiếu file thì dùng hình thay thế, không được làm hỏng trang.
@@ -168,19 +168,34 @@ File trong assets-build/ mang mã băm nội dung trong tên (ten.<hash8>.webp);
 | `VITE_COOKIE_DOMAIN` | `.ten-mien.vn` | Để trống khi chạy localhost |
 | `VITE_MERGED` | `false` | Đặt `true` sau khi gộp |
 
-## 7. Deploy trên Vercel
+## 7. Deploy bằng Docker + Cloudflare Tunnel
 
-1. Tạo **6 project** từ cùng một repo GitHub. Mỗi project đặt **Root Directory** riêng: `apps/hub`, `apps/lang-giay`, `apps/lang-det`, `apps/lang-khac-dau`, `apps/lang-bac`, `assets-build`.
-2. Gắn tên miền:
-   - hub: `ten-mien.vn` và `www.ten-mien.vn`;
-   - 4 làng: `lang-giay.ten-mien.vn` và tương tự cho 3 làng còn lại;
-   - đồ họa: `assets.ten-mien.vn`.
-3. Ở nhà cung cấp tên miền, tạo bản ghi DNS theo hướng dẫn Vercel hiện cho từng tên miền (thường là CNAME tới Vercel).
-4. Mỗi app có `vercel.json` để mọi đường dẫn đều trả về `index.html` (ứng dụng 1 trang):
-   ```json
-   { "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
-   ```
-5. Nhập biến môi trường của mục 6 vào từng project.
+**Mô hình:** một **image Docker** chứa web server Caddy, phục vụ 5 app (đã build) và thư mục đồ họa `assets-build/` ở 6 cổng. **Cloudflare Tunnel** (`cloudflared`, chạy như dịch vụ Windows, cấu hình bằng `config.yml`) đưa từng hostname vào đúng cổng. HTTPS do Cloudflare lo; Caddy chỉ nói HTTP trong máy. Hướng dẫn từng bước cho người làm tay: `docs/DEPLOY.md`.
+
+| Phần | Địa chỉ | Cổng (chỉ mở trên 127.0.0.1) |
+|---|---|---|
+| hub | `https://stem-block.blockchainptit.com` | 8081 |
+| lang-giay | `https://sb-lang-giay.blockchainptit.com` | 8082 |
+| lang-det | `https://sb-lang-det.blockchainptit.com` | 8083 |
+| lang-khac-dau | `https://sb-lang-khac-dau.blockchainptit.com` | 8084 |
+| lang-bac | `https://sb-lang-bac.blockchainptit.com` | 8085 |
+| assets | `https://sb-assets.blockchainptit.com` | 8086 |
+
+**File liên quan:**
+- `Dockerfile` (gốc repo), 2 tầng:
+  - tầng build: Node 22, pnpm đúng phiên bản `packageManager` (corepack), `pnpm install --frozen-lockfile`, chạy `pnpm check:text` và `pnpm test` (đỏ thì dừng, không tạo image), rồi `pnpm build`. Biến `VITE_*` truyền bằng **build args**; không chép `.env*` vào image;
+  - tầng chạy: `caddy:2-alpine` kèm `dist` của 5 app, `assets-build/` (không có `_preview/`) và `deploy/Caddyfile`.
+- `.dockerignore`: `node_modules`, `dist`, `assets/`, `.env*`, `_giai-doan-1/`, `assets-build/_preview/`, `.git`.
+- `deploy/Caddyfile`:
+  - 5 app: đường dẫn không phải file thì trả `index.html`; `index.html` là `no-cache`; file trong `/assets/` (có mã băm) là `public, max-age=31536000, immutable`; nén zstd/gzip; header `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` tắt camera, micro, định vị;
+  - assets: `Access-Control-Allow-Origin: *`; file có mã băm 8 ký tự là `immutable`, còn lại (như `manifest.json`) là `no-cache`; khai báo kiểu `.webp`, `.glb`, `.woff2` (giống `pnpm dev:assets`).
+- `deploy/docker-compose.yml`: 1 service, `restart: unless-stopped`, cổng gắn `127.0.0.1:8081–8086`, build args lấy từ `deploy/.env` (không commit; mẫu ở `deploy/.env.example`), có healthcheck.
+
+**Biến môi trường khi deploy:** `VITE_HUB_URL`, 4 biến `VITE_LANG_*_URL`, `VITE_ASSETS_URL` là 6 địa chỉ ở bảng trên; `VITE_COOKIE_DOMAIN=.blockchainptit.com`; `VITE_USERNAME_EMAIL_DOMAIN=hs.blockchainptit.com` (cùng giá trị với secret `USERNAME_EMAIL_DOMAIN` của Edge Function, spec 09); `VITE_SUPABASE_URL` và `VITE_SUPABASE_ANON_KEY` (chỉ khóa công khai).
+
+**Cookie:** cookie phiên Supabase, `sc_guest` và `sc_pending` đều đặt `Domain=.blockchainptit.com`, `Path=/`, `SameSite=Lax` và `Secure` (khi trang chạy https). Cookie dùng chung cho mọi subdomain `*.blockchainptit.com` đã được chủ dự án chấp nhận (mọi dịch vụ khác trên tên miền này cũng thấy cookie đó). **Tài khoản admin và giáo viên nên dùng hồ sơ trình duyệt riêng** (Chrome Profile hoặc cửa sổ riêng), tách khỏi các việc khác trên tên miền.
+
+**Cập nhật:** `git pull`, rồi dựng lại image và chạy lại (docs/DEPLOY.md, mục "Cập nhật").
 
 ## 8. Chạy trên máy
 
@@ -199,15 +214,15 @@ Thêm `--host` để mở thử bằng điện thoại cùng mạng Wi-Fi.
 
 **Mốc 1:**
 - [ ] `pnpm install`, `pnpm test`, `pnpm build` chạy không lỗi. Test logic 4 bài cũ vẫn ✅. Không còn Bài 5.
-- [ ] 6 project đã deploy. Mở `/` hay `/lang/<id>` ở subdomain làng thì chuyển về bản đồ ở hub.
+- [ ] Image Docker dựng được và chạy đủ 6 cổng; Cloudflare Tunnel đưa 6 hostname vào đúng cổng. Mở `/` hay `/lang/<id>` ở subdomain làng thì chuyển về bản đồ ở hub.
 - [ ] Từ bản đồ bấm "Vào" một bài học trên subdomain làng; xong bài bấm "Về bản đồ" quay lại hub được.
 - [ ] `pnpm assets:build` phần ảnh: ảnh đã chuyển WebP, có `manifest.json`, không deploy `concept/` và `source/`.
-- [ ] Một ảnh trên `assets.ten-mien.vn` tải được từ cả hub lẫn subdomain làng (không lỗi CORS).
+- [ ] Một ảnh trên `sb-assets.blockchainptit.com` tải được từ cả hub lẫn subdomain làng (không lỗi CORS).
 - [ ] Đã áp bảng đổi nội dung (Linh thành Lan, các tên, Bi); chuỗi trong test giữ nguyên; test vẫn ✅.
 
 **Mốc 2:**
 - [ ] `pnpm assets:build` phần model: texture nhân vật ≤ 1024; model không xương đã giảm mặt; có thư mục `_preview` để soi bằng mắt.
-- [ ] Một model trên `assets.ten-mien.vn` tải được từ cả hub lẫn subdomain làng (không lỗi CORS).
+- [ ] Một model trên `sb-assets.blockchainptit.com` tải được từ cả hub lẫn subdomain làng (không lỗi CORS).
 
 **Mốc 3:**
 - [ ] 2 lớp nền màn 6 đã tách nền trời trong suốt, hoặc đã báo cần vẽ lại.

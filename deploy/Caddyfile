@@ -1,0 +1,90 @@
+# Caddy trong container: 6 site theo cổng. HTTPS do Cloudflare Tunnel lo, nên Caddy chỉ nói HTTP.
+# Tunnel trỏ hostname -> http://localhost:<cổng> (docs/DEPLOY.md). Dùng site theo cổng nên không phụ thuộc tên Host.
+{
+	auto_https off
+	admin off
+}
+
+# ---------- Dùng chung cho 5 app (ứng dụng 1 trang) ----------
+(app) {
+	root * {args[0]}
+	encode zstd gzip
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+
+	# File trong /assets/ có mã băm trong tên (Vite): cache một năm. Thiếu file thì 404, không trả index.html.
+	handle /assets/* {
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+
+	# Mọi đường dẫn khác: có file thì trả file, không thì trả index.html (SPA). Luôn "no-cache" để bản mới có hiệu lực ngay.
+	handle {
+		header Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+http://:8081 {
+	import app /srv/hub
+}
+
+http://:8082 {
+	import app /srv/lang-giay
+}
+
+http://:8083 {
+	import app /srv/lang-det
+}
+
+http://:8084 {
+	import app /srv/lang-khac-dau
+}
+
+http://:8085 {
+	import app /srv/lang-bac
+}
+
+# ---------- Đồ họa (assets-build/): giống scripts/dev-assets.mjs ----------
+http://:8086 {
+	root * /srv/assets
+	encode zstd gzip
+
+	@preflight method OPTIONS
+	handle @preflight {
+		header Access-Control-Allow-Origin "*"
+		header Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+		header Access-Control-Allow-Headers "*"
+		respond 204
+	}
+
+	header {
+		Access-Control-Allow-Origin "*"
+		Access-Control-Allow-Methods "GET, HEAD, OPTIONS"
+		Access-Control-Allow-Headers "*"
+		X-Content-Type-Options nosniff
+	}
+
+	# Kiểu file: khai báo rõ để không phụ thuộc bảng kiểu của hệ thống
+	@webp path *.webp
+	header @webp Content-Type "image/webp"
+	@glb path *.glb
+	header @glb Content-Type "model/gltf-binary"
+	@woff2 path *.woff2
+	header @woff2 Content-Type "font/woff2"
+
+	# Tên có mã băm 8 ký tự (ten.<hash8>.webp): cache một năm. Còn lại (manifest.json…): no-cache.
+	@hashed path_regexp hashed \.[0-9a-f]{8}\.[a-z0-9]+$
+	header @hashed Cache-Control "public, max-age=31536000, immutable"
+	@unhashed {
+		not path_regexp hashed \.[0-9a-f]{8}\.[a-z0-9]+$
+	}
+	header @unhashed Cache-Control "no-cache"
+
+	file_server
+}

@@ -38,9 +38,11 @@
 
 1. **Hub nhận các làng:** trong `apps/hub`, import 4 gói `@sochung/village-*` và gắn route của từng gói dưới `/lang/<id>`. Mỗi gói tải lười, chỉ tải khi vào làng đó.
 2. **Bật chế độ gộp:** đặt `VITE_MERGED=true`. Cổng làng trong chợ và nút "Về chợ" lúc này điều hướng nội bộ, không tải lại trang.
-3. **Chuyển hướng subdomain cũ:** đổi `vercel.json` của 4 project làng để mọi đường dẫn chuyển về web chính. Ví dụ với Làng Giấy:
-   ```json
-   { "redirects": [{ "source": "/(.*)", "destination": "https://ten-mien.vn/lang/lang-giay", "permanent": false }] }
+3. **Chuyển hướng subdomain cũ:** sửa `deploy/Caddyfile` để 4 site làng (cổng 8082–8085) chuyển mọi đường dẫn về web chính. Ví dụ với Làng Giấy:
+   ```
+   http://:8082 {
+   	redir https://stem-block.blockchainptit.com/lang/lang-giay 302
+   }
    ```
 4. **Giữ vỏ chạy riêng `apps/lang-*`** để sửa lỗi từng làng sau này. Đổi tên miền của chúng thành tên miền thử nghiệm (ví dụ `thu-lang-giay.ten-mien.vn`), hoặc chỉ chạy trên máy.
 5. **Supabase:** giữ nguyên danh sách Redirect URLs.
@@ -85,7 +87,7 @@
 
 1. **Thử với một nhóm nhỏ trước,** 5–10 học sinh. Ghi lại các lỗi gặp phải.
 2. **Sửa lỗi,** rồi gửi đường dẫn và mã lớp cho giáo viên.
-3. **Theo dõi:** xem Supabase (Auth, Database, Logs) và Vercel Analytics trong tuần đầu.
+3. **Theo dõi:** xem Supabase (Auth, Database, Logs) và nhật ký của Caddy (`docker logs so-chung-web`) trong tuần đầu.
 
 ## Checklist nghiệm thu
 

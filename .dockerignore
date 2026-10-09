@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+dist
+**/dist
+assets/
+_giai-doan-1/
+assets-build/_preview/
+.git
+.env*
+**/.env*
+deploy/.env*
+.vitest/
+*.tsbuildinfo

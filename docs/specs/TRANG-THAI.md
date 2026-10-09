@@ -6,10 +6,10 @@ Cuối mỗi cửa sổ chat, Claude viết lại toàn bộ file này. Bạn x�
 
 | Mục | Giá trị |
 |---|---|
-| Tên miền | **Chưa có. Cần mua ở mốc 1**, vì đăng nhập dùng chung giữa các subdomain phải có tên miền riêng |
+| Tên miền | `blockchainptit.com` (hub `stem-block.`, làng và đồ họa `sb-*.`); cookie đăng nhập dùng chung `.blockchainptit.com` |
 | Repo, Supabase | (chưa có) |
 | Người code | Sonnet 5.5 qua Claude Code |
-| Hosting | Vercel: hub, 4 làng (subdomain), assets |
+| Hosting | Windows Server: Docker (Caddy) + Cloudflare Tunnel; hub, 4 làng (subdomain), assets (spec 01 mục 7) |
 | Nhịp làm | 2–3 giờ mỗi ngày; không còn hạn chót |
 
 ## Tiến độ theo mốc
