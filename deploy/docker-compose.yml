@@ -1,6 +1,6 @@
 # Một service Caddy phục vụ 5 app + đồ họa. Chạy từ gốc repo:
 #   docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d --build
-# Cổng chỉ mở trên 127.0.0.1; Cloudflare Tunnel (cloudflared) mới là đường ra Internet.
+# Cổng chỉ mở trên 127.0.0.1 (mặc định 18081–18086, đổi bằng HUB_PORT… trong deploy/.env); Cloudflare Tunnel (cloudflared) mới là đường ra Internet.
 name: so-chung
 
 services:
@@ -23,15 +23,17 @@ services:
         VITE_LANG_BAC_URL: ${VITE_LANG_BAC_URL:?Thiếu VITE_LANG_BAC_URL trong deploy/.env}
         VITE_MERGED: ${VITE_MERGED:-false}
     restart: unless-stopped
+    # Cổng bên TRONG container giữ nguyên 8081–8086 (Caddyfile). Cổng trên server (bên trái) lấy từ deploy/.env,
+    # mặc định 18081–18086 để khỏi trùng chương trình khác; đổi trong deploy/.env nếu bị trùng.
     ports:
-      - "127.0.0.1:8081:8081" # hub
-      - "127.0.0.1:8082:8082" # lang-giay
-      - "127.0.0.1:8083:8083" # lang-det
-      - "127.0.0.1:8084:8084" # lang-khac-dau
-      - "127.0.0.1:8085:8085" # lang-bac
-      - "127.0.0.1:8086:8086" # assets
+      - "127.0.0.1:${HUB_PORT:-18081}:8081" # hub
+      - "127.0.0.1:${LANG_GIAY_PORT:-18082}:8082" # lang-giay
+      - "127.0.0.1:${LANG_DET_PORT:-18083}:8083" # lang-det
+      - "127.0.0.1:${LANG_KHAC_DAU_PORT:-18084}:8084" # lang-khac-dau
+      - "127.0.0.1:${LANG_BAC_PORT:-18085}:8085" # lang-bac
+      - "127.0.0.1:${ASSETS_PORT:-18086}:8086" # assets
     healthcheck:
-      # Cả 6 cổng đều trả lời (5 app: trang chủ; đồ họa: manifest.json, vì cổng 8086 không có trang chủ)
+      # Chạy BÊN TRONG container nên dùng cổng trong (không đổi theo HUB_PORT…). Cả 6 cổng đều trả lời (5 app: trang chủ; đồ họa: manifest.json, vì cổng 8086 không có trang chủ)
       test:
         - CMD-SHELL
         - for p in 8081 8082 8083 8084 8085; do wget -q -O /dev/null http://127.0.0.1:$$p/ || exit 1; done; wget -q -O /dev/null http://127.0.0.1:8086/manifest.json

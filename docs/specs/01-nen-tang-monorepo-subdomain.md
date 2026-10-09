@@ -147,7 +147,7 @@ export interface VillageModule {
 - Code tìm theo **đường dẫn không kèm đuôi file**, ví dụ `scenes/bai-hoc-lang-giay`, nên bản `.png` hay `.jpg` gốc đều dùng được.
 
 **Deploy và tải:**
-- `assets-build/` được phục vụ như một site riêng (`sb-assets.blockchainptit.com`, cổng 8086, mục 7):
+- `assets-build/` được phục vụ như một site riêng (`sb-assets.blockchainptit.com`, mục 7):
   - `Access-Control-Allow-Origin: *` cho mọi file;
   - file đã nén có `Cache-Control: public, max-age=31536000, immutable`.
 - App đọc đồ họa qua `VITE_ASSETS_URL`. Thiếu file thì dùng hình thay thế, không được làm hỏng trang.
@@ -170,16 +170,16 @@ File trong assets-build/ mang mã băm nội dung trong tên (ten.<hash8>.webp);
 
 ## 7. Deploy bằng Docker + Cloudflare Tunnel
 
-**Mô hình:** một **image Docker** chứa web server Caddy, phục vụ 5 app (đã build) và thư mục đồ họa `assets-build/` ở 6 cổng. **Cloudflare Tunnel** (`cloudflared`, chạy như dịch vụ Windows, cấu hình bằng `config.yml`) đưa từng hostname vào đúng cổng. HTTPS do Cloudflare lo; Caddy chỉ nói HTTP trong máy. Hướng dẫn từng bước cho người làm tay: `docs/DEPLOY.md`.
+**Mô hình:** một **image Docker** chứa web server Caddy, phục vụ 5 app (đã build) và thư mục đồ họa `assets-build/` ở 6 cổng. **Cloudflare Tunnel** (`cloudflared`, chạy như dịch vụ Windows, cấu hình bằng `config.yml`) đưa từng hostname vào đúng cổng trên server (`http://localhost:18081` …). HTTPS do Cloudflare lo; Caddy chỉ nói HTTP trong máy. Hướng dẫn từng bước cho người làm tay: `docs/DEPLOY.md`.
 
-| Phần | Địa chỉ | Cổng (chỉ mở trên 127.0.0.1) |
-|---|---|---|
-| hub | `https://stem-block.blockchainptit.com` | 8081 |
-| lang-giay | `https://sb-lang-giay.blockchainptit.com` | 8082 |
-| lang-det | `https://sb-lang-det.blockchainptit.com` | 8083 |
-| lang-khac-dau | `https://sb-lang-khac-dau.blockchainptit.com` | 8084 |
-| lang-bac | `https://sb-lang-bac.blockchainptit.com` | 8085 |
-| assets | `https://sb-assets.blockchainptit.com` | 8086 |
+| Phần | Địa chỉ | Cổng trên server (mặc định, chỉ mở trên 127.0.0.1) | Cổng trong container |
+|---|---|---|---|
+| hub | `https://stem-block.blockchainptit.com` | 18081 (`HUB_PORT`) | 8081 |
+| lang-giay | `https://sb-lang-giay.blockchainptit.com` | 18082 (`LANG_GIAY_PORT`) | 8082 |
+| lang-det | `https://sb-lang-det.blockchainptit.com` | 18083 (`LANG_DET_PORT`) | 8083 |
+| lang-khac-dau | `https://sb-lang-khac-dau.blockchainptit.com` | 18084 (`LANG_KHAC_DAU_PORT`) | 8084 |
+| lang-bac | `https://sb-lang-bac.blockchainptit.com` | 18085 (`LANG_BAC_PORT`) | 8085 |
+| assets | `https://sb-assets.blockchainptit.com` | 18086 (`ASSETS_PORT`) | 8086 |
 
 **File liên quan:**
 - `Dockerfile` (gốc repo), 2 tầng:
@@ -189,7 +189,7 @@ File trong assets-build/ mang mã băm nội dung trong tên (ten.<hash8>.webp);
 - `deploy/Caddyfile`:
   - 5 app: đường dẫn không phải file thì trả `index.html`; `index.html` là `no-cache`; file trong `/assets/` (có mã băm) là `public, max-age=31536000, immutable`; nén zstd/gzip; header `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` tắt camera, micro, định vị;
   - assets: `Access-Control-Allow-Origin: *`; file có mã băm 8 ký tự là `immutable`, còn lại (như `manifest.json`) là `no-cache`; khai báo kiểu `.webp`, `.glb`, `.woff2` (giống `pnpm dev:assets`).
-- `deploy/docker-compose.yml`: 1 service, `restart: unless-stopped`, cổng gắn `127.0.0.1:8081–8086`, build args lấy từ `deploy/.env` (không commit; mẫu ở `deploy/.env.example`), có healthcheck.
+- `deploy/docker-compose.yml`: 1 service, `restart: unless-stopped`, cổng trên server gắn vào `127.0.0.1` lấy từ `deploy/.env` (`HUB_PORT`, `LANG_GIAY_PORT`, `LANG_DET_PORT`, `LANG_KHAC_DAU_PORT`, `LANG_BAC_PORT`, `ASSETS_PORT`; mặc định 18081–18086 để khỏi trùng chương trình khác; cổng bên trong container giữ nguyên 8081–8086), build args lấy từ `deploy/.env` (không commit; mẫu ở `deploy/.env.example`), có healthcheck.
 
 **Biến môi trường khi deploy:** `VITE_HUB_URL`, 4 biến `VITE_LANG_*_URL`, `VITE_ASSETS_URL` là 6 địa chỉ ở bảng trên; `VITE_COOKIE_DOMAIN=.blockchainptit.com`; `VITE_USERNAME_EMAIL_DOMAIN=hs.blockchainptit.com` (cùng giá trị với secret `USERNAME_EMAIL_DOMAIN` của Edge Function, spec 09); `VITE_SUPABASE_URL` và `VITE_SUPABASE_ANON_KEY` (chỉ khóa công khai).
 

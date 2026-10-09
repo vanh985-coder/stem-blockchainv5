@@ -2,18 +2,20 @@
 
 Tài liệu này dành cho người làm tay trên **Windows Server** đã cài **Docker Desktop (WSL2)** và có sẵn **cloudflared chạy như dịch vụ Windows** với tunnel cấu hình bằng `config.yml`. Đọc spec 01 mục 7 để hiểu mô hình.
 
-**Sáu địa chỉ và cổng** (cổng chỉ mở trên `127.0.0.1` của server):
+**Sáu địa chỉ và cổng trên server** (chỉ mở trên `127.0.0.1`; bên trong container các cổng vẫn là 8081–8086, nhưng anh không cần quan tâm):
 
-| Phần | Địa chỉ | Cổng |
+| Phần | Địa chỉ | Cổng trên server (mặc định) |
 |---|---|---|
-| hub | https://stem-block.blockchainptit.com | 8081 |
-| Làng Giấy | https://sb-lang-giay.blockchainptit.com | 8082 |
-| Làng Dệt | https://sb-lang-det.blockchainptit.com | 8083 |
-| Làng Khắc Dấu | https://sb-lang-khac-dau.blockchainptit.com | 8084 |
-| Làng Bạc | https://sb-lang-bac.blockchainptit.com | 8085 |
-| Đồ họa | https://sb-assets.blockchainptit.com | 8086 |
+| hub | https://stem-block.blockchainptit.com | 18081 |
+| Làng Giấy | https://sb-lang-giay.blockchainptit.com | 18082 |
+| Làng Dệt | https://sb-lang-det.blockchainptit.com | 18083 |
+| Làng Khắc Dấu | https://sb-lang-khac-dau.blockchainptit.com | 18084 |
+| Làng Bạc | https://sb-lang-bac.blockchainptit.com | 18085 |
+| Đồ họa | https://sb-assets.blockchainptit.com | 18086 |
 
 Tất cả lệnh dưới đây chạy trong **PowerShell** trên server, trừ khi ghi khác.
+
+Muốn đổi cổng (nếu bị trùng) thì sửa `HUB_PORT`, `LANG_GIAY_PORT`, `LANG_DET_PORT`, `LANG_KHAC_DAU_PORT`, `LANG_BAC_PORT`, `ASSETS_PORT` trong `deploy/.env` (mục a.2), rồi nhớ dùng đúng số mới ở mục (b).
 
 ---
 
@@ -58,7 +60,18 @@ notepad deploy\.env
 > **Tuyệt đối không** để service role key hay secret key trong file này. File `deploy/.env` không được commit (đã nằm trong `.gitignore`).
 > Các biến `VITE_*` được "đóng cứng" vào bản build: đổi giá trị thì phải dựng lại (mục f).
 
-### 3. Dựng và chạy
+### 3. Kiểm tra cổng còn trống
+
+Trước khi chạy, chắc chắn 6 cổng 18081–18086 chưa có chương trình nào dùng:
+
+```powershell
+netstat -ano | findstr :1808
+```
+
+- **Không in ra dòng nào** (hoặc chỉ có dòng trạng thái `TIME_WAIT`, không có `LISTENING`): cổng trống, làm tiếp.
+- **Có dòng `LISTENING` ở cổng nào đó** (ví dụ `127.0.0.1:18083 ... LISTENING 4321`): cổng đó đã bị chiếm. Xem chương trình nào bằng `tasklist /fi "PID eq 4321"` (thay 4321 bằng số cuối dòng). Nếu không tắt được chương trình đó, đổi cổng tương ứng trong `deploy/.env` (ví dụ `LANG_DET_PORT=18183`) và dùng số mới ở mục (b) và các lệnh kiểm tra bên dưới.
+
+### 4. Dựng và chạy
 
 ```powershell
 docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d --build
@@ -66,19 +79,19 @@ docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d --build
 
 Lần đầu mất vài phút (tải thư viện, chạy `pnpm check:text`, `pnpm test`, `pnpm build`). **Nếu test đỏ, quá trình build dừng** và không tạo container: đọc lỗi in ra, báo lại cho người code.
 
-### 4. Kiểm tra tại chỗ
+### 5. Kiểm tra tại chỗ
 
 ```powershell
 docker ps                    # cột STATUS phải là "Up ... (healthy)" sau khoảng 40 giây
-curl.exe -I http://localhost:8081
-curl.exe -I http://localhost:8082
-curl.exe -I http://localhost:8083
-curl.exe -I http://localhost:8084
-curl.exe -I http://localhost:8085
-curl.exe -I http://localhost:8086/manifest.json
+curl.exe -I http://localhost:18081
+curl.exe -I http://localhost:18082
+curl.exe -I http://localhost:18083
+curl.exe -I http://localhost:18084
+curl.exe -I http://localhost:18085
+curl.exe -I http://localhost:18086/manifest.json
 ```
 
-Mỗi lệnh phải trả `HTTP/1.1 200 OK`. Riêng cổng 8086 phải có dòng `Access-Control-Allow-Origin: *`. Cũng có thể mở http://localhost:8081 … 8086 bằng trình duyệt trên server. Nếu hub mở được nhưng hình trống: đó là vì `VITE_ASSETS_URL` trỏ ra `https://sb-assets…` mà tunnel chưa làm (mục b); làm xong mục b là có hình.
+Mỗi lệnh phải trả `HTTP/1.1 200 OK`. Riêng cổng 18086 phải có dòng `Access-Control-Allow-Origin: *`. Cũng có thể mở http://localhost:18081 … 18086 bằng trình duyệt trên server. Nếu hub mở được nhưng hình trống: đó là vì `VITE_ASSETS_URL` trỏ ra `https://sb-assets…` mà tunnel chưa làm (mục b); làm xong mục b là có hình.
 
 ---
 
@@ -98,17 +111,17 @@ Thêm 6 dòng này vào phần `ingress:`, **trước** dòng cuối `- service:
 ingress:
   # ... các dòng cũ của anh giữ nguyên ...
   - hostname: stem-block.blockchainptit.com
-    service: http://localhost:8081
+    service: http://localhost:18081
   - hostname: sb-lang-giay.blockchainptit.com
-    service: http://localhost:8082
+    service: http://localhost:18082
   - hostname: sb-lang-det.blockchainptit.com
-    service: http://localhost:8083
+    service: http://localhost:18083
   - hostname: sb-lang-khac-dau.blockchainptit.com
-    service: http://localhost:8084
+    service: http://localhost:18084
   - hostname: sb-lang-bac.blockchainptit.com
-    service: http://localhost:8085
+    service: http://localhost:18085
   - hostname: sb-assets.blockchainptit.com
-    service: http://localhost:8086
+    service: http://localhost:18086
   - service: http_status:404
 ```
 
@@ -116,7 +129,7 @@ Kiểm tra file hợp lệ:
 
 ```powershell
 cloudflared tunnel ingress validate
-cloudflared tunnel ingress rule https://sb-assets.blockchainptit.com   # phải in ra service http://localhost:8086
+cloudflared tunnel ingress rule https://sb-assets.blockchainptit.com   # phải in ra service http://localhost:18086
 ```
 
 ### 2. Tạo bản ghi DNS cho 5 hostname mới
@@ -228,7 +241,7 @@ notepad deploy\.env.localtest        # điền 2 dòng Supabase
 docker compose --env-file deploy/.env.localtest -f deploy/docker-compose.yml up -d --build
 ```
 
-Rồi mở http://localhost:8081 … 8086. Bản này dùng địa chỉ `localhost` và không đặt `VITE_COOKIE_DOMAIN`, nên đăng nhập ở hub **không** tự dùng chung sang các làng (khác cổng nên khác nguồn gốc); chỉ dùng để xem đủ 6 cổng chạy đúng. Tắt bằng `docker compose -f deploy/docker-compose.yml down`.
+Rồi mở http://localhost:18081 … 18086. Bản này dùng địa chỉ `localhost` và không đặt `VITE_COOKIE_DOMAIN`, nên đăng nhập ở hub **không** tự dùng chung sang các làng (khác cổng nên khác nguồn gốc); chỉ dùng để xem đủ 6 cổng chạy đúng. Tắt bằng `docker compose -f deploy/docker-compose.yml down`.
 
 ---
 
@@ -236,7 +249,7 @@ Rồi mở http://localhost:8081 … 8086. Bản này dùng địa chỉ `localh
 
 | Triệu chứng | Cách xử lý |
 |---|---|
-| Trình duyệt báo **502 / 1033** | Container chưa chạy hoặc cloudflared chưa nhận cấu hình. Kiểm tra `docker ps`, `curl.exe -I http://localhost:8081`, rồi `Restart-Service Cloudflared`. |
+| Trình duyệt báo **502 / 1033** | Container chưa chạy hoặc cloudflared chưa nhận cấu hình. Kiểm tra `docker ps`, `curl.exe -I http://localhost:18081`, rồi `Restart-Service Cloudflared`. |
 | Build dừng ở bước `pnpm test` hoặc `check:text` | Có test đỏ ở bản code này. Không deploy bản đó; báo người code kèm đoạn lỗi. |
 | Hub mở được nhưng **không có hình** | Mở `https://sb-assets.blockchainptit.com/manifest.json`; nếu không mở được thì tunnel/DNS của `sb-assets` chưa đúng (mục b). |
 | Đăng nhập ở hub nhưng **làng không nhận** | Kiểm tra `VITE_COOKIE_DOMAIN=.blockchainptit.com` (có dấu chấm ở đầu) trong `deploy/.env`, rồi dựng lại. Xóa cookie cũ của trình duyệt. |
