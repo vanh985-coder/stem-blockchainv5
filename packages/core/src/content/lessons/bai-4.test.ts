@@ -73,16 +73,23 @@ describe('content/lessons/bai-4.ts', () => {
 
   it('phần 3 "Khám phá bí mật": lời {phanDien} không nói lá nào, các câu soi đúng như spec', () => {
     const t = bai4Texts.tramTb;
-    expect(t.tinhNghichToVuaLen).toBe('**{phanDien} tinh nghịch: **"Tớ vừa lén sửa một giao dịch. Xem có ai nhận ra không nào!"');
-    expect(t.tinhNghichToVuaLen).not.toMatch(/T\d|\{so\}/);
-    expect(t.tinhLaiSoGoc).toBe('Tính lại số gốc: **{so}** ≠ **{so2}** trong sổ');
-    expect(t.soiTimRaRoi).toBe('Em tìm ra rồi! T{so} bị sửa từ {so2} thành {so3}');
+    expect(t.tinhNghichToVuaLen).toBe(
+      '**{phanDien} tinh nghịch: **"Tớ vừa lén sửa một lá trên cây em vừa dựng. Gốc đổi rồi đấy, xem em có tìm ra lá nào không!"',
+    );
+    expect(t.tinhNghichToVuaLen).not.toMatch(/T\d|\{so\}/); // không nói lá nào
+    expect(t.soGocDaGhi).toBe('Sổ ghi số gốc **{so}** — em đã tính đúng ✓');
+    expect(t.soGocTinhLai).toBe('{phanDien} sửa một lá, nên tính lại bây giờ ra **{so}**. Hãy tìm lá đã khác so với lúc em dựng cây!');
+    expect(t.huongDanSoiO).toBe('Bấm vào một ô để so: số lúc em dựng cây (trong sổ) và số tính lại bây giờ.');
+    expect(t.soiSo).toBe('lúc dựng {so}');
+    expect(t.soiTinhLai).toBe('bây giờ {so}');
+    expect(t.soiTieuDeCay).toBe('Số trên ô là số lúc em dựng cây (đã ghi trong sổ).');
+    expect(t.soiTimRaRoi).toBe('Em tìm ra rồi! {phanDien} đã sửa {la} từ {cu} thành {moi}.');
     expect(t.soiTongKet).toBe('Em soi {so} ô. Đi theo nhánh đỏ thì chỉ cần 2 ô mỗi tầng.');
     expect(t.soiBiGoiY).toBe('Bắt đầu từ gốc, soi 2 ô con, rồi đi theo ô đỏ.');
     expect(Object.keys(t)).not.toContain('suaGiaoDichXemGoc'); // đã bỏ nút "Sửa giao dịch & xem gốc đổi"
     // khớp/lệch có icon và chữ, không chỉ màu
-    expect(t.soiKhop).toContain('✓');
-    expect(t.soiLech).toContain('✗');
+    expect(t.soiKhop).toBe('✓ giống');
+    expect(t.soiLech).toBe('✗ khác');
   });
 
   it('có 4 thẻ "Em có biết?"', () => {

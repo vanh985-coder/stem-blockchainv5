@@ -294,7 +294,7 @@ export function Medium({
             ? fmt(T.soiNhanKetQua, { nhan: name, so: r.recorded, so2: r.recomputed, ketQua: r.match ? T.soiNhanKhop : T.soiNhanLech })
             : fmt(T.soiNhanCuaO, { nhan: name, so: recorded })
         }
-        className={`flex min-h-[76px] w-full min-w-[84px] flex-col items-center justify-center rounded-[14px] border-2 px-1 py-1 text-center font-display text-sm leading-tight focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim ${tone}`}
+        className={`flex min-h-[76px] w-full min-w-[92px] flex-col items-center justify-center rounded-[14px] border-2 px-1 py-1 text-center font-display text-sm leading-tight focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim ${tone}`}
       >
         <span className="font-extrabold uppercase tracking-wide">{name}</span>
         <span className="font-bold">{fmt(T.soiSo, { so: recorded })}</span>
@@ -562,13 +562,17 @@ export function Medium({
           </div>
 
           {/* Dòng đầu mối: số gốc tính lại không khớp số trong sổ */}
-          <p
-            role="status"
-            className="rounded-[14px] border-2 border-do-son-dam bg-do-son/10 px-3 py-2 text-center font-display text-base text-do-son-dam"
-          >
-            <span aria-hidden="true">≠ </span>
-            {rich(T.tinhLaiSoGoc, { so: tamperedTree[2][0], so2: partBTree[2][0] })}
-          </p>
+          <div className="space-y-2">
+            <p className="rounded-[14px] border-2 border-xanh-la-dam bg-xanh-la/10 px-3 py-2 text-center font-display text-base text-xanh-la-dam">
+              {rich(T.soGocDaGhi, { so: partBTree[2][0] })}
+            </p>
+            <p
+              role="status"
+              className="rounded-[14px] border-2 border-do-son-dam bg-do-son/10 px-3 py-2 text-center font-display text-base text-do-son-dam"
+            >
+              {rich(T.soGocTinhLai, { so: tamperedTree[2][0] })}
+            </p>
+          </div>
 
           {!found && <p className="text-center text-sm text-nau-go-dam">{T.huongDanSoiO}</p>}
 
@@ -596,7 +600,7 @@ export function Medium({
               className="rounded-[14px] border-2 border-xanh-la-dam bg-xanh-la/10 px-3 py-2 text-center font-display text-base font-extrabold text-xanh-la-dam"
             >
               <span aria-hidden="true">✓ </span>
-              {fmt(T.soiTimRaRoi, { so: tamperedLeafIndex + 1, so2: partBLeaves[tamperedLeafIndex], so3: tamperedNewValue })}
+              {fmt(T.soiTimRaRoi, { la: `T${tamperedLeafIndex + 1}`, cu: partBLeaves[tamperedLeafIndex], moi: tamperedNewValue })}
             </p>
           )}
 

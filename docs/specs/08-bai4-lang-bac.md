@@ -40,14 +40,15 @@ Lời "Khi {phanDien} tráo giao dịch" hiện giữa lúc làm trạm Trung b�
 ### Trạm Trung bình, phần 3 "Khám phá bí mật": soi ô tìm giao dịch bị sửa
 
 Thay cho nút "Sửa giao dịch & xem gốc đổi" ở bản cũ. Công thức, số liệu và cách chấm sao (theo lỗi ở phần B) không đổi.
-- {phanDien} nói: "Tớ vừa lén sửa một giao dịch. Xem có ai nhận ra không nào!" (không nói lá nào).
-- Cây hiện **số đã ghi trong sổ** ở mọi ô. Ví dụ lá 6, 3, 2, 1; T12 = 63, T34 = 21, gốc = 651. Giao dịch bị sửa là T3 (2 → 3).
-- Dòng đầu mối: "Tính lại số gốc: 661 ≠ 651 trong sổ".
-- Học sinh bấm (hoặc Enter/Space khi chọn bằng bàn phím) một ô để **soi**: ô hiện số tính lại cạnh số trong sổ. Khớp thì xanh kèm ✓ khớp, lệch thì đỏ kèm ✗ lệch (có icon và chữ, không chỉ màu). Ô đã soi giữ nguyên trạng thái; soi lại ô cũ không đếm thêm.
-- Với ví dụ trên: gốc, T34, T3 lệch; T12, T1, T2, T4 khớp.
-- Soi trúng lá bị sửa: "Em tìm ra rồi! T3 bị sửa từ 2 thành 3", chạy hiệu ứng đỏ lan từ lá lên gốc (như cũ), rồi mới gọi `onTwist` (lời thầy Linh).
+- {phanDien} nói: "Tớ vừa lén sửa một lá trên cây em vừa dựng. Gốc đổi rồi đấy, xem em có tìm ra lá nào không!" (không nói lá nào).
+- Cây hiện **số lúc em dựng cây** (đã ghi trong sổ) ở mọi ô, lấy từ cây em vừa dựng ở phần 2, không viết cứng. Ví dụ lá 6, 3, 2, 1; T12 = 63, T34 = 21, gốc = 651. Giao dịch bị sửa là T3 (2 → 3). Dòng chú thích dưới cây: "Số trên ô là số lúc em dựng cây (đã ghi trong sổ)."
+- Hai dòng đầu mối: "Sổ ghi số gốc 651 — em đã tính đúng ✓" và "{phanDien} sửa một lá, nên tính lại bây giờ ra 661. Hãy tìm lá đã khác so với lúc em dựng cây!".
+- Câu hướng dẫn: "Bấm vào một ô để so: số lúc em dựng cây (trong sổ) và số tính lại bây giờ."
+- Học sinh bấm (hoặc Enter/Space khi chọn bằng bàn phím) một ô để **soi**: ô hiện "lúc dựng {a}" và "bây giờ {b}". Giống thì xanh kèm "✓ giống", khác thì đỏ kèm "✗ khác" (có icon và chữ, không chỉ màu). Ô đã soi giữ nguyên trạng thái; soi lại ô cũ không đếm thêm.
+- Với ví dụ trên: gốc, T34, T3 khác; T12, T1, T2, T4 giống.
+- Soi trúng lá bị sửa: "Em tìm ra rồi! {phanDien} đã sửa T3 từ 2 thành 3.", chạy hiệu ứng đỏ lan từ lá lên gốc (như cũ), rồi mới gọi `onTwist` (lời thầy Linh).
 - Cuối phần: "Em soi {so} ô. Đi theo nhánh đỏ thì chỉ cần 2 ô mỗi tầng."
-- Khi em soi trúng ô khớp lần thứ 2, Bi gợi ý: "Bắt đầu từ gốc, soi 2 ô con, rồi đi theo ô đỏ."
+- Khi em soi trúng ô giống lần thứ 2, Bi gợi ý: "Bắt đầu từ gốc, soi 2 ô con, rồi đi theo ô đỏ."
 - Logic soi là hàm thuần trong `lessons/bai-4/inspect.ts` (dùng `combine`, `buildTree`), có test.
 
 ### Ở mốc 1
