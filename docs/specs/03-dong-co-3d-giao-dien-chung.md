@@ -232,7 +232,24 @@ Dùng ở mọi chỗ có lựa chọn: câu hỏi, Đồng ý/Từ chối, lự
 
 **Hội thoại ở trang bài học 2D** dùng `VnDialog` (mục 1): chân dung lớn của người nói, không còn khung 3D nhỏ chồng lên.
 
-**Ở trang bài học 2D (D), từ mốc 2:** đặt một khung 3D nhỏ (300×300, nền trong suốt) ở góc dưới trái, có nhân vật học sinh để phản ứng như trên. **Mốc 1 chưa có khung này.** Điện thoại yếu hoặc bật "Giảm chuyển động" thì ẩn khung này.
+**Ở trang bài học 2D (D), từ mốc 2: hai nhân vật 3D ở hai bên bảng bài học.** (Mốc 1 chưa có.)
+
+- **Bố trí:** màn hình từ **1280px** trở lên có **2 khung 3D nền trong suốt** đặt ở **2 khoảng trống hai bên bảng bài học** (bảng rộng khoảng 1200px ở giữa, xem mục 1 "Trang bài học trên màn hình lớn"). Mỗi khung khoảng **280×420px**:
+  - **bên trái:** `hoc-sinh-nam`;
+  - **bên phải:** {phanDien} (model `ti`).
+  Lúc chờ, cả hai ở tư thế `idle`.
+- **Phản ứng khi em trả lời:**
+
+| Em trả lời | Học sinh (trái) | {phanDien} (phải) |
+|---|---|---|
+| **Đúng** | `cheer` (2,5 giây đầu) | `hurt` (hoặc lắc đầu) |
+| **Sai** | `sad` | `cheer` |
+
+  Làm xong thì cả hai **về `idle`**.
+- **Ẩn cả 2 khung** khi: màn hình dưới 1280px; máy yếu (mức chất lượng **Thấp**); hoặc bật **"Giảm chuyển động"**.
+- **Tải:** 2 model **tải lười, sau khi trang bài học đã hiện** (không làm chậm trang đầu). Chưa tải xong hoặc tải lỗi thì **bỏ trống chỗ đó, không ảnh hưởng bài học** (không báo lỗi, không chặn nút).
+- **Sự kiện chung cho 4 bài:** `LessonPage2D` phát sự kiện **`onAnswer(dung: boolean)`** mỗi khi em nộp một câu trả lời (đúng hoặc sai); 2 khung 3D chỉ **nghe** sự kiện này. Nhờ vậy 4 bài (và các trạm bên trong) không phải tự nối với khung 3D. Chi tiết: mỗi trạm báo kết quả từng lần trả lời lên khung bài học; khung bài học phát `onAnswer` và chọn tư thế.
+- **Giới hạn:** tư thế `hurt` và `sad` do code dựng (mục 3); {phanDien} lắc đầu nếu dùng thì cũng do code dựng, tối đa 0,6 giây.
 
 ## 5. Bảng câu hỏi — `QuizCard`
 
@@ -342,6 +359,7 @@ Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút
   - 6 người đứng yên nhún nhẹ, lệch pha nhau.
 - [ ] `sad`, `point`, `slide`, `swing`, `hurt` trông tự nhiên; không clip nào làm nhân vật trôi khỏi chỗ.
 - [ ] `/dev/portraits` xuất được 11 ảnh chân dung rõ mặt.
+- [ ] Trang bài học 2D từ 1280px (mốc 2): 2 nhân vật 3D hai bên bảng; trả lời đúng thì học sinh `cheer` và {phanDien} `hurt`, trả lời sai thì {phanDien} `cheer` và học sinh `sad`, rồi về `idle`; dưới 1280px, mức Thấp hoặc "Giảm chuyển động" thì ẩn; model tải lỗi thì bỏ trống, bài học vẫn chơi được; `onAnswer(dung)` hoạt động ở cả 4 bài.
 - [ ] `Scene25D` hiện nền, hình rời và nhân vật 3D đúng lớp, co giãn đúng 16:9.
 - [ ] Đổi tên `phanDien` trong `characters.ts` thì đổi ở mọi lời thoại và câu hỏi.
 - [ ] `pnpm check:text` không báo chữ hiển thị nào nằm ngoài `content/`; có file `HUONG-DAN-SUA-CHU.md`.
