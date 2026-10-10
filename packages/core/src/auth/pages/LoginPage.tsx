@@ -48,7 +48,7 @@ export default function LoginPage() {
   };
 
   return (
-    <AccountPage>
+    <AccountPage page="dangNhap">
       <h1 className="text-3xl">{t.dangNhap.tieuDe}</h1>
       <ErrorNote message={error} />
 

@@ -1,5 +1,5 @@
 import { Link, Navigate, useParams } from 'react-router';
-import { canSeeTeacherPage, useAuth } from '@so-chung/core';
+import { NenTrangTri, PAGE_THEME, canSeeTeacherPage, useAuth } from '@so-chung/core';
 import { teacherTexts } from '@so-chung/core/content/teacher';
 import { ClassList } from './teacher/ClassList';
 import { ClassView } from './teacher/ClassView';
@@ -17,6 +17,8 @@ export default function Teacher() {
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl space-y-5 p-4 sm:p-6">
+      {/* Nền rất nhẹ: icon đứng yên, độ mờ thấp, không chuyển động (dữ liệu là chính) */}
+      <NenTrangTri theme={PAGE_THEME.giaoVien} variant="still" />
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl">{teacherTexts.tieuDe}</h1>
         <Link

@@ -11,7 +11,7 @@ Trang 2D, nhẹ, tải nhanh.
   - Chưa đăng nhập: nút chính "Đăng nhập để chơi", nút phụ "Chơi thử".
   - Đã đăng nhập: nút chính "Chơi tiếp", cùng tên học sinh và số Trang Sổ Vàng đã có (0/4). Ở mốc 1, "Chơi tiếp" mở `/ban-do`. Từ mốc 2 thì mở `/cho` (chợ 3D), và trang chủ có thêm liên kết "Bản đồ".
 - **Liên kết:** "Đọc truyện", "Hồ sơ"; với tài khoản giáo viên thêm "Trang giáo viên"; "Quyền riêng tư".
-- **Nền:** `NenTrangTri` (spec 03 mục 1): ảnh `ui/man-hinh-tai` hơi mờ cùng vài icon trôi chậm; tắt icon khi bật "Giảm chuyển động".
+- **Nền:** `NenTrangTri` (spec 03 mục 1): ảnh `ui/man-hinh-tai` hơi mờ cùng icon bộ `lang` trôi chậm; tắt icon khi bật "Giảm chuyển động".
 
 ## 2. Trang cốt truyện `/truyen`
 
@@ -45,6 +45,7 @@ Hiện 14 ảnh trong `assets/story/` (`01-ngu-guc` … `14-gio-tay`) theo kiể
 - "Tiếp ›" (hoặc →, Enter, Space) sang ảnh kế, "‹" (hoặc ←) lùi lại; tiến trình "x/14";
 - ảnh kế tiếp được tải trước; ảnh thiếu thì hiện khung trống kèm lời truyện, không lỗi;
 - "Bỏ qua" (hoặc Esc) đi thẳng vào `/ban-do`.
+- Nền có icon trôi chậm đổi bộ theo lượt: 1–5 `mo`, 6–11 `lang`, 12–14 `hoi` (spec 03 mục 1, `NenTrangTri`).
 
 **Lượt cuối (ảnh 14):** nút kết thúc là **"Bắt đầu hành trình"**. Ở mốc 1 dẫn vào `/ban-do`; từ mốc 2 dẫn vào `/cho`.
 

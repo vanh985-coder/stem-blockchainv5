@@ -4,7 +4,7 @@ import { AccountPage } from './shared';
 export default function PrivacyPage() {
   const p = ui.quyenRiengTu;
   return (
-    <AccountPage wide>
+    <AccountPage wide page="quyenRiengTu">
       <h1 className="text-3xl">{p.tieuDe}</h1>
       <p className="text-lg">{p.gioiThieu}</p>
       {p.muc.map((m, i) => (

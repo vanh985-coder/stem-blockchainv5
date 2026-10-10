@@ -2,15 +2,16 @@ import { useId, type ComponentProps, type ReactNode } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { HUB_MAP_URL, URLS, hubPageUrl } from '../../config/urls';
 import { ui } from '../../content/ui';
+import { PAGE_THEME, type PageKey } from '../../content/nenTrangTri';
 import { NenTrangTri } from '../../ui/NenTrangTri';
 import { Panel } from '../../ui/Panel';
 import { safeNext } from '../redirect';
 
 /** Khung chung của các trang tài khoản. */
-export function AccountPage({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
+export function AccountPage({ children, wide = false, page = 'hoSo' }: { children: ReactNode; wide?: boolean; page?: PageKey }) {
   return (
     <main className="grid min-h-screen place-items-center p-4">
-      <NenTrangTri />
+      <NenTrangTri theme={PAGE_THEME[page]} />
       <Panel className={['w-full space-y-4', wide ? 'max-w-2xl' : 'max-w-md'].join(' ')}>{children}</Panel>
     </main>
   );

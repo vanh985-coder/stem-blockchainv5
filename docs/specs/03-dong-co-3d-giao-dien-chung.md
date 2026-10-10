@@ -73,11 +73,50 @@ Dùng cho **mọi** hội thoại, truyện và giới thiệu làng trong game.
 
 ### Nền trang trí — `NenTrangTri` (`packages/core/src/ui/NenTrangTri.tsx`)
 
-Dùng cho trang chủ, `/ho-so`, `/dang-nhap`, `/dang-ky`, `/quyen-rieng-tu` (qua khung `AccountPage` và trang chủ). **Không dùng** ở trang bài học và trang giáo viên.
+Dùng cho **mọi trang** (bảng gán ở `packages/core/src/content/nenTrangTri.ts`, không viết cứng trong component).
 
-- Ảnh mờ (`ui/man-hinh-tai`) cộng 5–8 icon SVG tự vẽ (tờ giấy dó, lá tre, đồng xu) trôi chậm bằng CSS animation, đặt rải ở rìa màn hình.
-- `aria-hidden`, không nhận bấm, nằm dưới mọi bảng; **bảng nội dung vẫn đặc**, tương phản chữ không đổi.
-- Tắt icon khi bật "Giảm chuyển động" hoặc `prefers-reduced-motion` (chỉ còn ảnh mờ).
+**Bộ icon (theme):** mỗi bộ 8–12 icon SVG tự vẽ, cùng phong cách (viền nâu, màu pastel).
+
+| Bộ | Icon |
+|---|---|
+| `mo` | cuốn vở tím, ngôi sao, đám mây, trăng, bút lông, tờ giấy, Trang Sổ Vàng, tia sáng |
+| `lang` | tờ giấy dó, lá tre, đồng xu, nón lá, hoa |
+| `hoi` | đèn lồng, cờ, Trang Sổ Vàng, tia sáng, trống, hoa, đồng xu, sao |
+| `giay` | tờ giấy dó, khung phơi, lá tre, bút lông |
+| `det` | thoi dệt, cuộn chỉ, mảnh vải |
+| `khacdau` | con dấu, khuôn gỗ, mực đỏ, tờ giấy |
+| `bac` | đồng bạc, lá cây, cành cây, đồng xu |
+
+**Kiểu bố trí (`variant`):**
+- `full`: ảnh mờ và icon rải ở rìa cả màn hình, trôi chậm;
+- `sides`: chỉ icon (không ảnh nền), ở **2 khoảng trống hai bên bảng bài học**, tối đa **4 icon mỗi bên**, trôi rất chậm (mỗi vòng ≥ 45 giây); chỉ hiện khi màn hình từ **1296px** (bảng 1200px, mỗi bên còn ≥ 48px); dưới đó không hiện; icon không bao giờ nằm sau bảng;
+- `still`: như `full` nhưng icon **đứng yên**, độ mờ thấp, nền giấy phủ dày hơn (trang giáo viên).
+- Thêm `sparkle`: vài tia sáng lấp lánh (cảnh trao Trang Sổ Vàng, giới thiệu làng).
+
+**Bảng gán theo trang:**
+
+| Trang | Bộ | Kiểu |
+|---|---|---|
+| Trang chủ, `/ho-so`, `/dang-nhap`, `/dang-ky`, `/quyen-rieng-tu`, `/ban-do` | `lang` | `full` |
+| `/truyen` | theo lượt: 1–5 `mo`, 6–11 `lang`, 12–14 `hoi` | `full` (chỉ icon, trên ảnh nền mờ của truyện) |
+| Trang bài học màn 1, 4, 7, 10 | bộ của làng đó: `giay`, `det`, `khacdau`, `bac` | `sides` |
+| Cảnh trao Trang Sổ Vàng (cuối bài) | bộ của làng đó | `full` kèm `sparkle` |
+| Giới thiệu làng (`/ban-do`) | bộ của làng đó | `full` kèm `sparkle` (chỉ icon, trên ảnh nền mờ của làng) |
+| Trang giáo viên | `lang` | `still` |
+
+**Chung cho mọi trang:**
+- `aria-hidden`, không nhận bấm, nằm dưới mọi bảng; bảng nội dung vẫn đặc nên tương phản chữ không đổi.
+- Chỉ dùng CSS (`transform`, `opacity`), không thêm thư viện.
+- **Tắt** (không hiện icon) khi bật "Giảm chuyển động" hoặc `prefers-reduced-motion`; riêng `still` không có chuyển động nên vẫn hiện, rất mờ.
+- Màn hình dưới 640px: tối đa **5** hình (khi có tia sáng: 3 icon và 2 tia).
+- Icon SVG gom trong **một chunk dùng chung**, tải sau khi trang đã hiện (lỗi tải thì bỏ trống, không ảnh hưởng trang). Trang đầu của hub và của 4 làng tăng không quá 3 KB gzip.
+- Xem thử ở `/dev/nen?theme=det&variant=sides&sparkle=1&board=1` (chỉ khi chạy dev).
+
+### Trang bài học trên màn hình lớn (`LessonPage2D`, dùng chung 4 bài)
+
+- Từ **1280px** trở lên, cả trang bài học được phóng theo hệ số **1,35** (`.lesson-zoom` trong `theme.css`): bảng bài học rộng tối đa khoảng **1200px** (trước là khoảng 870px), chữ nhãn nhỏ nhất ≥ 16px, chữ nội dung ≥ 18px, số trong ô trang và ô cây ≥ 22px; ô trang, ô cây và thanh trên (ô trạm, nút) to theo.
+- Dưới 1280px (kể cả điện thoại < 640px) giữ nguyên như cũ.
+- Nút kiểm tra chính của vài trạm (Bài 1 trạm Dễ, Bài 3 trạm Dễ, Bài 4 trạm Khó) **dính ở đáy màn hình** từ 1280px để luôn thấy được.
 
 ## 2. Đồ họa và tải file
 

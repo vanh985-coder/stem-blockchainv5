@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { asset, useManifest } from '../assets/store';
 import { HUB_MAP_URL } from '../config/urls';
+import { VILLAGE_THEME } from '../content/nenTrangTri';
 import { fmt } from '../content/characters';
 import { VILLAGE_ORDER, levelById } from '../content/levels';
 import { ui } from '../content/ui';
@@ -8,6 +9,7 @@ import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
 import type { SaveStatus } from '../progress/manager';
 import { Button } from '../ui/Button';
+import { NenTrangTri } from '../ui/NenTrangTri';
 import { DialogueBox } from '../ui/DialogueBox';
 import { GuestBar } from '../ui/GuestBar';
 import { LevelComplete } from '../ui/LevelComplete';
@@ -255,8 +257,13 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   const onHard = currentIdx === STATION_ORDER.length - 1 && stage.kind !== 'complete';
 
   return (
-    <div className="lesson-zoom min-h-[calc(100vh/var(--lz))] bg-giay bg-cover bg-center" style={bg ? { backgroundImage: `url("${bg}")` } : undefined}>
-      <div className="min-h-[calc(100vh/var(--lz))] bg-giay/55">
+    // isolate: để lớp nền trang trí (z âm) nằm trên ảnh nền của làng nhưng dưới bảng bài học.
+    <div className="isolate min-h-screen bg-giay bg-cover bg-center" style={bg ? { backgroundImage: `url("${bg}")` } : undefined}>
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20 bg-giay/55" />
+      {/* Icon của làng: chỉ ở 2 khoảng trống hai bên bảng (màn từ 1296px, tối đa 4 mỗi bên), không bao giờ sau bảng; cảnh trao Trang Sổ Vàng thì rải cả màn kèm tia sáng. */}
+      <NenTrangTri theme={VILLAGE_THEME[villageId]} variant={stage.kind === 'award' ? 'full' : 'sides'} sparkle={stage.kind === 'award'} image={null} />
+      <div className="lesson-zoom min-h-[calc(100vh/var(--lz))]">
+        <div className="min-h-[calc(100vh/var(--lz))]">
         <GuestBar compact />
         <header className="mx-auto flex w-full max-w-4xl min-[1280px]:max-w-[calc(1200px/var(--lz))] flex-wrap items-center gap-x-3 gap-y-2 p-2 sm:p-3 max-[480px]:flex-nowrap max-[480px]:gap-1.5 max-[480px]:px-2 max-[480px]:py-1">
           <div className="min-w-0 flex-1 basis-full sm:basis-auto max-[480px]:basis-0">
@@ -343,6 +350,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
         </div>
       )}
       {showCards && <CardsDialog cards={onHard ? [...content.emCoBiet, ...(content.emCoBietKho ?? [])] : content.emCoBiet} onClose={() => setShowCards(false)} />}
+      </div>
     </div>
   );
 }

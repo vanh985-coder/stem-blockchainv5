@@ -45,6 +45,8 @@ export interface VnDialogProps {
   overlay?: boolean;
   /** Nhãn đọc cho người dùng đọc màn hình khi lượt không có tên người nói. */
   label?: string;
+  /** Lớp trang trí (ví dụ NenTrangTri chỉ có icon) vẽ trên ảnh nền, dưới hộp thoại; chỉ có tác dụng khi hộp nằm giữa màn hình. */
+  decor?: ReactNode;
   /** Báo lượt hiện tại (đếm từ 0). */
   onTurnChange?: (index: number) => void;
   className?: string;
@@ -82,7 +84,7 @@ const smallBtn =
  * phần dưới là khung lời có tên người nói. Góc dưới trái "x/n", góc dưới phải "Tiếp ›"; góc trên có "‹" và "Bỏ qua".
  * Phím: → / Enter / Space tiếp, ← lùi, Esc bỏ qua.
  */
-export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, overlay, label, onTurnChange, className = '' }: VnDialogProps) {
+export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, overlay, label, decor, onTurnChange, className = '' }: VnDialogProps) {
   const [index, setIndex] = useState(0);
   const wide = useWide();
   const manifest = useManifest();
@@ -276,6 +278,7 @@ export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, ove
         )}
         <div className="absolute inset-0 bg-chu/45" />
       </div>
+      {decor}
       {box}
     </div>
   );

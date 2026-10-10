@@ -1,7 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import {
-  FLOATERS,
   NenTrangTri,
   PORTRAIT_SIZE_NARROW,
   PORTRAIT_SIZE_WIDE,
@@ -11,6 +10,7 @@ import {
   withMoods,
   type VnTurn,
 } from '@so-chung/core';
+import Icons from '../../../packages/core/src/ui/nenTrangTriIcons';
 import { bai1Lesson } from '@so-chung/core/content/lessons/bai-1';
 import { bai2Lesson } from '@so-chung/core/content/lessons/bai-2';
 import { bai3Lesson } from '@so-chung/core/content/lessons/bai-3';
@@ -100,13 +100,10 @@ describe('truyện dùng VnDialog', () => {
   });
 });
 
-describe('NenTrangTri', () => {
+describe('NenTrangTri (vỏ)', () => {
   const html = renderToStaticMarkup(<NenTrangTri />);
 
-  it('5 đến 8 icon, aria-hidden, không nhận bấm, nằm dưới mọi bảng', () => {
-    expect(FLOATERS.length).toBeGreaterThanOrEqual(5);
-    expect(FLOATERS.length).toBeLessThanOrEqual(8);
-    expect(html.match(/<svg/g)?.length).toBe(FLOATERS.length);
+  it('aria-hidden, không nhận bấm, nằm dưới mọi bảng', () => {
     expect(html).toContain('aria-hidden="true"');
     expect(html).toContain('pointer-events-none');
     expect(html).toContain('-z-10');
@@ -117,9 +114,53 @@ describe('NenTrangTri', () => {
     expect(html.replace(/<[^>]*>/g, '')).toBe('');
   });
 
-  it('tắt khi prefers-reduced-motion (motion-reduce:hidden) và có animation CSS', () => {
-    expect(html).toContain('motion-reduce:hidden');
-    expect(html).toContain('animate-trang-tri-troi');
+  it('icon tải sau (chunk riêng): bản dựng đầu không có icon nào', () => {
+    expect(html).not.toContain('<svg');
+  });
+
+  it('chỉ icon (image=null) thì không có nền ảnh và nền giấy', () => {
+    const bare = renderToStaticMarkup(<NenTrangTri image={null} />);
+    expect(bare).not.toContain('bg-giay');
+  });
+});
+
+describe('NenTrangTri (icon)', () => {
+  const svgs = (h: string) => h.match(/<svg/g)?.length ?? 0;
+  const themes = ['mo', 'lang', 'hoi', 'giay', 'det', 'khacdau', 'bac'] as const;
+
+  it.each(themes)('bộ %s: 8–12 icon rải ở rìa, trôi chậm bằng CSS, ẩn bớt ở màn hẹp', (theme) => {
+    const h = renderToStaticMarkup(<Icons theme={theme} variant="full" />);
+    expect(svgs(h)).toBeGreaterThanOrEqual(8);
+    expect(svgs(h)).toBeLessThanOrEqual(12);
+    expect(h).toContain('animate-trang-tri-troi');
+    expect(h.match(/max-sm:hidden/g)?.length).toBe(svgs(h) - 5); // màn dưới 640px: tối đa 5 icon
+  });
+
+  it('trang bài học: chỉ ở 2 khoảng trống hai bên (từ 1296px), tối đa 4 icon mỗi bên', () => {
+    const h = renderToStaticMarkup(<Icons theme="det" variant="sides" />);
+    expect(svgs(h)).toBe(8);
+    expect(h).toContain('min-[1296px]:block');
+    expect(h).toContain('hidden'); // dưới 1296px không hiện
+    expect(h).toContain('calc((100vw - 1200px) / 2)'); // đúng bề rộng khoảng trống bên cạnh bảng 1200px
+    expect(h.match(/left-0/g)?.length).toBe(1);
+    expect(h.match(/right-0/g)?.length).toBe(1);
+  });
+
+  it('trang giáo viên: icon đứng yên (không animation), rất mờ', () => {
+    const h = renderToStaticMarkup(<Icons theme="lang" variant="still" />);
+    expect(svgs(h)).toBeGreaterThanOrEqual(8);
+    expect(h).not.toContain('animate-trang-tri-troi');
+    expect(h).toContain('opacity-[0.28]');
+  });
+
+  it('cảnh trao Trang Sổ Vàng và giới thiệu làng: thêm tia sáng lấp lánh', () => {
+    const plain = renderToStaticMarkup(<Icons theme="giay" variant="full" />);
+    const spark = renderToStaticMarkup(<Icons theme="giay" variant="full" sparkle />);
+    expect(svgs(spark) - svgs(plain)).toBe(7);
+    expect(spark).toContain('animate-trang-tri-lap-lanh');
+    // màn dưới 640px: icon bớt còn 3 và chỉ 2 tia, tổng tối đa 5 hình
+    expect(spark.match(/max-sm:hidden/g)?.length).toBe(svgs(spark) - 5);
+    expect(plain).not.toContain('animate-trang-tri-lap-lanh');
   });
 });
 

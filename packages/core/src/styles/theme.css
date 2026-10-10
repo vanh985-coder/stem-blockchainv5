@@ -170,6 +170,13 @@ html[data-reduce-motion='true'] *::after {
 }
 .animate-trang-tri-troi { animation: trang-tri-troi var(--dur, 22s) ease-in-out infinite; }
 
+/* Tia sáng lấp lánh (cảnh trao Trang Sổ Vàng, giới thiệu làng): chỉ opacity và transform */
+@keyframes trang-tri-lap-lanh {
+  0%, 100% { opacity: 0; transform: scale(0.6) rotate(0deg); }
+  50% { opacity: 0.9; transform: scale(1.1) rotate(20deg); }
+}
+.animate-trang-tri-lap-lanh { animation: trang-tri-lap-lanh var(--dur, 3s) ease-in-out infinite; }
+
 /* Trang mới của mạng lưới trượt vào từ bên phải (chỉ dùng transform) */
 @keyframes slide-in-right {
   0% { opacity: 0; transform: translateX(60px); }

@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import {
   CHARACTERS,
+  NenTrangTri,
   VILLAGE_INTRO,
+  VILLAGE_THEME,
   VnDialog,
   fmt,
   goldenPageNumber,
@@ -62,6 +64,7 @@ export default function VillageIntro({ village, unlockLevels, onDone }: { villag
       finishLabel={T.ketThuc}
       background={`scenes/bai-hoc-${village}`}
       label={fmt(T.nhan, { lang: ui.lang[village] })}
+      decor={<NenTrangTri theme={VILLAGE_THEME[village]} image={null} sparkle />}
     />
   );
 }

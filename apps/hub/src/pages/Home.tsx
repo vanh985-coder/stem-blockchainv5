@@ -3,6 +3,7 @@ import {
   AssetImage,
   Button,
   NenTrangTri,
+  PAGE_THEME,
   Panel,
   VILLAGE_ORDER,
   canSeeTeacherPage,
@@ -25,7 +26,7 @@ export function Home() {
 
   return (
     <>
-      <NenTrangTri />
+      <NenTrangTri theme={PAGE_THEME.trangChu} />
       <main className="grid min-h-screen place-items-center p-4 text-center">
         <Panel className="w-full max-w-md space-y-5">
           <AssetImage path="ui/logo-art" alt="" className="mx-auto h-40 w-auto max-w-full object-contain" />

@@ -40,7 +40,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <AccountPage>
+    <AccountPage page="dangKy">
       <h1 className="text-3xl">{t.dangKy.tieuDe}</h1>
       <ErrorNote message={error} />
 

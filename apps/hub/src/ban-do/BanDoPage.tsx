@@ -6,6 +6,7 @@ import {
   BottomSheet,
   GuestBar,
   NenTrangTri,
+  PAGE_THEME,
   Panel,
   VILLAGE_ORDER,
   fmt,
@@ -213,7 +214,7 @@ export default function BanDoPage() {
 
   return (
     <div className={big ? 'flex h-dvh flex-col overflow-hidden' : undefined}>
-      <NenTrangTri />
+      <NenTrangTri theme={PAGE_THEME.banDo} />
       <GuestBar />
       {header}
 
