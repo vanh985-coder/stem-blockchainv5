@@ -112,12 +112,6 @@ Dùng cho **mọi trang** (bảng gán ở `packages/core/src/content/nenTrangTr
 - Icon SVG gom trong **một chunk dùng chung**, tải sau khi trang đã hiện (lỗi tải thì bỏ trống, không ảnh hưởng trang). Trang đầu của hub và của 4 làng tăng không quá 3 KB gzip.
 - Xem thử ở `/dev/nen?theme=det&variant=sides&sparkle=1&board=1` (chỉ khi chạy dev).
 
-### Trang bài học trên màn hình lớn (`LessonPage2D`, dùng chung 4 bài)
-
-- Từ **1280px** trở lên, cả trang bài học được phóng theo hệ số **1,35** (`.lesson-zoom` trong `theme.css`): bảng bài học rộng tối đa khoảng **1200px** (trước là khoảng 870px), chữ nhãn nhỏ nhất ≥ 16px, chữ nội dung ≥ 18px, số trong ô trang và ô cây ≥ 22px; ô trang, ô cây và thanh trên (ô trạm, nút) to theo.
-- Dưới 1280px (kể cả điện thoại < 640px) giữ nguyên như cũ.
-- Nút kiểm tra chính của vài trạm (Bài 1 trạm Dễ, Bài 3 trạm Dễ, Bài 4 trạm Khó) **dính ở đáy màn hình** từ 1280px để luôn thấy được.
-
 ## 2. Đồ họa và tải file
 
 **Manifest:**
