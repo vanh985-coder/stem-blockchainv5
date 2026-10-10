@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { LEVELS } from '../content/levels';
-import { PAGE_THEME, STORY_THEME_RANGES, VILLAGE_THEME, storyTheme } from '../content/nenTrangTri';
+import { PAGE_THEME, STORY_IMAGE_OPACITY, STORY_THEME_RANGES, THEME_FADE_MS, THEME_GRADIENT, VILLAGE_THEME, storyTheme } from '../content/nenTrangTri';
 import {
   BOARD_WIDTH,
   MAX_ICONS,
@@ -108,12 +108,29 @@ describe('bảng gán bộ icon theo trang', () => {
     for (const l of LEVELS.filter((x) => x.kind === 'lesson')) expect(VILLAGE_THEME[l.lang]).toBeDefined();
   });
 
-  it('truyện đổi bộ theo lượt: 1–5 mo, 6–11 lang, 12–14 hoi; phủ kín 14 lượt', () => {
+  it('truyện đổi bộ theo lượt: 1–2 mo, 3–11 lang, 12–14 hoi; phủ kín 14 lượt', () => {
     const got = Array.from({ length: 14 }, (_, i) => storyTheme(i + 1));
-    expect(got).toEqual(['mo', 'mo', 'mo', 'mo', 'mo', 'lang', 'lang', 'lang', 'lang', 'lang', 'lang', 'hoi', 'hoi', 'hoi']);
+    expect(got).toEqual(['mo', 'mo', 'lang', 'lang', 'lang', 'lang', 'lang', 'lang', 'lang', 'lang', 'lang', 'hoi', 'hoi', 'hoi']);
     expect(STORY_THEME_RANGES[0].from).toBe(1);
     expect(STORY_THEME_RANGES[STORY_THEME_RANGES.length - 1].to).toBe(14);
     expect(storyTheme(0)).toBe('mo');
     expect(storyTheme(99)).toBe('hoi');
   });
 });
+
+describe('nền ấm của /truyen theo chủ đề', () => {
+  it('3 chủ đề có màu riêng: mo tím than đến tím nhạt, lang giấy dó F6EBD3 đến be ấm, hoi cam nhạt đến vàng', () => {
+    expect(THEME_GRADIENT.mo).toContain('#2b2a6b');
+    expect(THEME_GRADIENT.mo).toContain('#b9a9ec');
+    expect(THEME_GRADIENT.lang.toLowerCase()).toContain('#f6ebd3');
+    expect(THEME_GRADIENT.hoi).toContain('#ffe48a');
+    expect(new Set([THEME_GRADIENT.mo, THEME_GRADIENT.lang, THEME_GRADIENT.hoi]).size).toBe(3);
+  });
+
+  it('không còn lớp phủ tối: ảnh truyện mờ phủ 30–40%, chuyển nền khoảng 0,6 giây', () => {
+    expect(STORY_IMAGE_OPACITY).toBeGreaterThanOrEqual(0.3);
+    expect(STORY_IMAGE_OPACITY).toBeLessThanOrEqual(0.4);
+    expect(THEME_FADE_MS).toBe(600);
+  });
+});
+

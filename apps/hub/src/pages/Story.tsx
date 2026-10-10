@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { NenTrangTri, STORY, VnDialog, fmt, storyTheme, ui, useAuth, type VnTurn } from '@so-chung/core';
+import { STORY, VnDialog, fmt, storyTheme, ui, useAuth, type VnTurn } from '@so-chung/core';
+import { StoryBackdrop } from './StoryBackdrop';
 
 /**
  * Trang cốt truyện /truyen (spec 04 mục 2): 14 lượt kiểu visual novel. Ảnh truyện ở phần trên, lời ở dưới
@@ -25,8 +26,8 @@ export default function Story() {
       background=""
       label={ui.truyen.tieuDe}
       onTurnChange={setTurn}
-      // Icon trôi theo lượt: mở đầu (1–5), làng (6–11), hội làng (12–14)
-      decor={<NenTrangTri key={storyTheme(turn + 1)} theme={storyTheme(turn + 1)} image={null} />}
+      // Nền ấm và icon theo lượt: mở đầu (1–2), làng (3–11), hội làng (12–14); ảnh đang xem làm mờ phủ khoảng 35%
+      backdrop={<StoryBackdrop theme={storyTheme(turn + 1)} image={STORY[turn]?.image ?? STORY[0].image} />}
     />
   );
 }

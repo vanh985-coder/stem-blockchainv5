@@ -45,6 +45,8 @@ export interface VnDialogProps {
   overlay?: boolean;
   /** Nhãn đọc cho người dùng đọc màn hình khi lượt không có tên người nói. */
   label?: string;
+  /** Thay hoàn toàn nền mặc định (ảnh mờ và lớp tối) bằng nền riêng, ví dụ nền ấm theo chủ đề của /truyen. Chỉ có tác dụng khi hộp nằm giữa màn hình. */
+  backdrop?: ReactNode;
   /** Lớp trang trí (ví dụ NenTrangTri chỉ có icon) vẽ trên ảnh nền, dưới hộp thoại; chỉ có tác dụng khi hộp nằm giữa màn hình. */
   decor?: ReactNode;
   /** Báo lượt hiện tại (đếm từ 0). */
@@ -84,7 +86,7 @@ const smallBtn =
  * phần dưới là khung lời có tên người nói. Góc dưới trái "x/n", góc dưới phải "Tiếp ›"; góc trên có "‹" và "Bỏ qua".
  * Phím: → / Enter / Space tiếp, ← lùi, Esc bỏ qua.
  */
-export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, overlay, label, decor, onTurnChange, className = '' }: VnDialogProps) {
+export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, overlay, label, decor, backdrop, onTurnChange, className = '' }: VnDialogProps) {
   const [index, setIndex] = useState(0);
   const wide = useWide();
   const manifest = useManifest();
@@ -269,14 +271,18 @@ export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, ove
   return (
     <div className="fixed inset-0 z-40 grid place-items-center overflow-y-auto p-3 sm:p-6">
       {/* Nền: ảnh làm mờ, tối nhẹ */}
-      <div aria-hidden="true" className="fixed inset-0 -z-10 overflow-hidden bg-chu">
-        {bgUrl && (
-          <div
-            className="absolute inset-[-24px] scale-105 bg-cover bg-center opacity-90 blur-xl"
-            style={{ backgroundImage: `url("${bgUrl}")` }}
-          />
+      <div aria-hidden="true" className={`fixed inset-0 -z-10 overflow-hidden ${backdrop ? '' : 'bg-chu'}`}>
+        {backdrop ?? (
+          <>
+            {bgUrl && (
+              <div
+                className="absolute inset-[-24px] scale-105 bg-cover bg-center opacity-90 blur-xl"
+                style={{ backgroundImage: `url("${bgUrl}")` }}
+              />
+            )}
+            <div className="absolute inset-0 bg-chu/45" />
+          </>
         )}
-        <div className="absolute inset-0 bg-chu/45" />
       </div>
       {decor}
       {box}

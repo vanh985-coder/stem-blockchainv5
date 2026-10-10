@@ -98,7 +98,7 @@ Dùng cho **mọi trang** (bảng gán ở `packages/core/src/content/nenTrangTr
 | Trang | Bộ | Kiểu |
 |---|---|---|
 | Trang chủ, `/ho-so`, `/dang-nhap`, `/dang-ky`, `/quyen-rieng-tu`, `/ban-do` | `lang` | `full` |
-| `/truyen` | theo lượt: 1–5 `mo`, 6–11 `lang`, 12–14 `hoi` | `full` (chỉ icon, trên ảnh nền mờ của truyện) |
+| `/truyen` | theo lượt: 1–2 `mo`, 3–11 `lang`, 12–14 `hoi` | nền ấm theo chủ đề thay lớp phủ tối (`mo`: tím than → tím nhạt; `lang`: giấy dó #F6EBD3 → be ấm; `hoi`: cam nhạt → vàng), ảnh truyện làm mờ chỉ phủ khoảng 35%, icon của bộ; đổi chủ đề thì màu và icon chuyển dần khoảng 0,6 giây (tắt khi bật "Giảm chuyển động") |
 | Trang bài học màn 1, 4, 7, 10 | bộ của làng đó: `giay`, `det`, `khacdau`, `bac` | `sides` |
 | Cảnh trao Trang Sổ Vàng (cuối bài) | bộ của làng đó | `full` kèm `sparkle` |
 | Giới thiệu làng (`/ban-do`) | bộ của làng đó | `full` kèm `sparkle` (chỉ icon, trên ảnh nền mờ của làng) |

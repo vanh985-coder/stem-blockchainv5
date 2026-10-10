@@ -45,7 +45,7 @@ Hiện 14 ảnh trong `assets/story/` (`01-ngu-guc` … `14-gio-tay`) theo kiể
 - "Tiếp ›" (hoặc →, Enter, Space) sang ảnh kế, "‹" (hoặc ←) lùi lại; tiến trình "x/14";
 - ảnh kế tiếp được tải trước; ảnh thiếu thì hiện khung trống kèm lời truyện, không lỗi;
 - "Bỏ qua" (hoặc Esc) đi thẳng vào `/ban-do`.
-- Nền có icon trôi chậm đổi bộ theo lượt: 1–5 `mo`, 6–11 `lang`, 12–14 `hoi` (spec 03 mục 1, `NenTrangTri`).
+- Nền là màu ấm theo chủ đề đổi theo lượt (1–2 `mo`: tím than → tím nhạt; 3–11 `lang`: giấy dó → be ấm; 12–14 `hoi`: cam nhạt → vàng), không có lớp phủ tối; ảnh truyện đang xem làm mờ chỉ phủ khoảng 35%; icon trôi chậm của bộ. Đổi chủ đề thì màu và icon chuyển dần khoảng 0,6 giây (spec 03 mục 1, `NenTrangTri`).
 
 **Lượt cuối (ảnh 14):** nút kết thúc là **"Bắt đầu hành trình"**. Ở mốc 1 dẫn vào `/ban-do`; từ mốc 2 dẫn vào `/cho`.
 

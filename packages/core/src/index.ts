@@ -35,7 +35,7 @@ export { withMoods } from './lesson2d/flow';
 export { VnDialog, PORTRAIT_SIZE_WIDE, PORTRAIT_SIZE_NARROW } from './ui/VnDialog';
 export { NenTrangTri } from './ui/NenTrangTri';
 export type { NenTrangTriProps } from './ui/NenTrangTri';
-export { PAGE_THEME, VILLAGE_THEME, storyTheme } from './content/nenTrangTri';
+export { PAGE_THEME, VILLAGE_THEME, THEME_GRADIENT, THEME_FADE_MS, STORY_IMAGE_OPACITY, storyTheme } from './content/nenTrangTri';
 export type { NenTheme, PageKey } from './content/nenTrangTri';
 export type { VnTurn, VnDialogProps } from './ui/VnDialog';
 export type { DialogueTurn, DialogueBoxProps } from './ui/DialogueBox';

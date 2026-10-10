@@ -32,10 +32,10 @@ export const VILLAGE_THEME: Record<VillageId, NenTheme> = {
   'lang-bac': 'bac',
 };
 
-/** Trang cốt truyện /truyen đổi bộ icon theo lượt (1 đến 14): 1–5 'mo', 6–11 'lang', 12–14 'hoi'. */
+/** Trang cốt truyện /truyen đổi bộ icon và màu nền theo lượt (1 đến 14): 1–2 'mo', 3–11 'lang', 12–14 'hoi'. */
 export const STORY_THEME_RANGES: readonly { from: number; to: number; theme: NenTheme }[] = [
-  { from: 1, to: 5, theme: 'mo' },
-  { from: 6, to: 11, theme: 'lang' },
+  { from: 1, to: 2, theme: 'mo' },
+  { from: 3, to: 11, theme: 'lang' },
   { from: 12, to: 14, theme: 'hoi' },
 ];
 
@@ -45,3 +45,24 @@ export function storyTheme(n: number): NenTheme {
   if (hit) return hit.theme;
   return n < STORY_THEME_RANGES[0].from ? STORY_THEME_RANGES[0].theme : STORY_THEME_RANGES[STORY_THEME_RANGES.length - 1].theme;
 }
+
+/**
+ * Màu nền ấm của /truyen theo bộ (thay lớp phủ tối): 'mo' tím than → tím nhạt; 'lang' giấy dó #F6EBD3 → be ấm;
+ * 'hoi' cam nhạt → vàng. Ảnh truyện mờ chỉ phủ lên trên khoảng 35%.
+ */
+export const THEME_GRADIENT: Record<NenTheme, string> = {
+  mo: 'linear-gradient(160deg, #2b2a6b 0%, #5b4fb5 55%, #b9a9ec 100%)',
+  lang: 'linear-gradient(160deg, #F6EBD3 0%, #e8cfa0 100%)',
+  hoi: 'linear-gradient(160deg, #ffd3a0 0%, #ffe48a 100%)',
+  giay: 'linear-gradient(160deg, #F6EBD3 0%, #e8cfa0 100%)',
+  det: 'linear-gradient(160deg, #F6EBD3 0%, #e8cfa0 100%)',
+  khacdau: 'linear-gradient(160deg, #F6EBD3 0%, #e8cfa0 100%)',
+  bac: 'linear-gradient(160deg, #F6EBD3 0%, #e8cfa0 100%)',
+};
+
+/** Phần trăm ảnh truyện mờ phủ lên màu nền của /truyen (30 đến 40%). */
+export const STORY_IMAGE_OPACITY = 0.35;
+
+/** Thời gian chuyển dần màu nền và icon khi đổi bộ (mili giây). */
+export const THEME_FADE_MS = 600;
+
