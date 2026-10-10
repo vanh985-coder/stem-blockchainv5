@@ -17,11 +17,12 @@ const DOT_CLS: Record<LevelState, string> = {
 };
 
 /** Chấm nhỏ của một màn: hình khác nhau cho mỗi trạng thái (khóa, mở, xong, sắp ra mắt). */
-export function LevelDot({ state }: { state: LevelState }) {
+export function LevelDot({ state, size }: { state: LevelState; size?: number }) {
   return (
     <span
       aria-hidden="true"
-      className={`grid size-6 place-items-center rounded-full border-2 text-xs font-bold leading-none ${DOT_CLS[state]} ${state === 'open' ? 'rounded-md' : ''}`}
+      style={size ? { width: size, height: size, fontSize: Math.round(size * 0.5) } : undefined}
+      className={`grid place-items-center rounded-full border-2 font-bold leading-none ${size ? '' : 'size-6 text-xs'} ${DOT_CLS[state]} ${state === 'open' ? 'rounded-md' : ''}`}
     >
       {STATE_ICON[state]}
     </span>
