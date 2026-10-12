@@ -132,5 +132,16 @@ describe('nền ấm của /truyen theo chủ đề', () => {
     expect(STORY_IMAGE_OPACITY).toBeLessThanOrEqual(0.4);
     expect(THEME_FADE_MS).toBe(600);
   });
-});
 
+  it("'sides' với sideMax: bớt icon mỗi bên, giữ các chỗ trên cùng (khung 3D chiếm góc dưới)", () => {
+    for (const t of THEMES) {
+      const two = floatersFor(t, 'sides', 2);
+      expect(two.filter((f) => f.side === 'l')).toHaveLength(2);
+      expect(two.filter((f) => f.side === 'r')).toHaveLength(2);
+      expect(Math.max(...two.map((f) => f.y))).toBeLessThanOrEqual(40); // không xuống nửa dưới màn hình
+      expect(floatersFor(t, 'sides')).toHaveLength(8);
+      expect(floatersFor(t, 'sides', 0)).toHaveLength(0);
+      expect(floatersFor(t, 'sides', 99)).toHaveLength(8);
+    }
+  });
+});

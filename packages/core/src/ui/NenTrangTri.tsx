@@ -31,6 +31,8 @@ export interface NenTrangTriProps {
   image?: string | null;
   /** Thêm vài tia sáng lấp lánh (cảnh trao Trang Sổ Vàng, giới thiệu làng). */
   sparkle?: boolean;
+  /** Chỉ cho 'sides': số icon tối đa mỗi bên (mặc định 4). Trang bài học đặt 2 khi khung 3D hiện ở góc dưới hai bên. */
+  sideMax?: number;
 }
 
 /**
@@ -38,7 +40,7 @@ export interface NenTrangTriProps {
  * nằm dưới mọi bảng; không làm giảm tương phản chữ (bảng nội dung vẫn đặc). Tắt chuyển động và ẩn icon khi bật
  * "Giảm chuyển động" hoặc prefers-reduced-motion (riêng 'still' không chuyển động nên vẫn hiện). Màn dưới 640px: tối đa 5 icon.
  */
-export function NenTrangTri({ theme = 'lang', variant = 'full', image = 'ui/man-hinh-tai', sparkle = false }: NenTrangTriProps) {
+export function NenTrangTri({ theme = 'lang', variant = 'full', image = 'ui/man-hinh-tai', sparkle = false, sideMax }: NenTrangTriProps) {
   useManifest(); // để vẽ lại khi manifest tải xong
   const { settings } = useSettings();
   const url = image ? asset(image) : null;
@@ -74,7 +76,7 @@ export function NenTrangTri({ theme = 'lang', variant = 'full', image = 'ui/man-
       {showIcons && ready && (
         <Quiet>
           <Suspense fallback={null}>
-            <Icons theme={theme} variant={variant} sparkle={sparkle} />
+            <Icons theme={theme} variant={variant} sparkle={sparkle} sideMax={sideMax} />
           </Suspense>
         </Quiet>
       )}

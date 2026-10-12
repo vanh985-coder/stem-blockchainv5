@@ -1,4 +1,4 @@
-import { useCallback, useRef, useSyncExternalStore, type FocusEvent, type KeyboardEvent, type PointerEvent } from 'react';
+import { useCallback, useEffect, useRef, useSyncExternalStore, type FocusEvent, type KeyboardEvent, type PointerEvent, type RefObject } from 'react';
 import { choiceReactions, type ReactionState, type ReactionStore } from './choiceReactions';
 import type { Rect } from './poses';
 
@@ -63,4 +63,71 @@ export function useChoiceHandlers(store: ReactionStore = choiceReactions): Choic
   const select = useCallback((el: HTMLElement) => store.select(rectOf(el), last.current === 'touch'), [store]);
   const result = useCallback((correct: boolean) => store.result(correct), [store]);
   return { bindChoice, select, result };
+}
+
+/** Nút người dùng bấm được, tính từ phần tử đang rê hoặc focus tới (bỏ qua nút bị vô hiệu). */
+const CLICKABLE = 'button, [role="button"], input[type="button"], input[type="submit"], a[href]';
+
+function clickableOf(target: EventTarget | null, root: Element): HTMLElement | null {
+  const el = target instanceof Element ? target.closest<HTMLElement>(CLICKABLE) : null;
+  if (!el || !root.contains(el)) return null;
+  if (el instanceof HTMLButtonElement && el.disabled) return null;
+  if (el.getAttribute('aria-disabled') === 'true') return null;
+  return el;
+}
+
+/**
+ * Nối một lần cho cả vùng bài học: rê chuột hoặc focus (Tab) vào bất kỳ nút nào trong `ref` thì phát `hover` vào kho,
+ * rời đi thì `hover(null)`. Dùng event delegation nên không phải sửa từng trạm. Chạm không có rê nên bỏ qua; kết quả
+ * đúng/sai đến từ `sound.playCorrect/playWrong` (xem `audio/answerSignal.ts`).
+ */
+export function useChoiceDelegation(ref: RefObject<HTMLElement | null>, enabled = true, store: ReactionStore = choiceReactions): void {
+  useEffect(() => {
+    const root = ref.current;
+    if (!root || !enabled) return;
+    let touched = false;
+    const over = (e: Event) => {
+      const pe = e as globalThis.PointerEvent;
+      if (pe.pointerType === 'touch') {
+        touched = true;
+        return;
+      }
+      touched = false;
+      const b = clickableOf(e.target, root);
+      if (b) store.hover(rectOf(b));
+    };
+    const out = (e: Event) => {
+      const pe = e as globalThis.PointerEvent;
+      if (pe.pointerType === 'touch') return;
+      const b = clickableOf(e.target, root);
+      if (b && !b.contains(pe.relatedTarget as Node | null)) store.hover(null);
+    };
+    const focusIn = (e: Event) => {
+      if (touched) return;
+      const b = clickableOf(e.target, root);
+      if (b) store.hover(rectOf(b));
+    };
+    const focusOut = () => store.hover(null);
+    const down = (e: Event) => {
+      touched = (e as globalThis.PointerEvent).pointerType === 'touch';
+    };
+    const key = () => {
+      touched = false;
+    };
+    root.addEventListener('pointerover', over);
+    root.addEventListener('pointerout', out);
+    root.addEventListener('pointerdown', down);
+    root.addEventListener('keydown', key);
+    root.addEventListener('focusin', focusIn);
+    root.addEventListener('focusout', focusOut);
+    return () => {
+      root.removeEventListener('pointerover', over);
+      root.removeEventListener('pointerout', out);
+      root.removeEventListener('pointerdown', down);
+      root.removeEventListener('keydown', key);
+      root.removeEventListener('focusin', focusIn);
+      root.removeEventListener('focusout', focusOut);
+      store.hover(null);
+    };
+  }, [ref, enabled, store]);
 }

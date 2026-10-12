@@ -4,6 +4,8 @@
  * AudioContext chỉ được khởi tạo hoặc kích hoạt sau tương tác người dùng đầu tiên.
  */
 
+import { emitAnswer } from './answerSignal';
+
 class SoundManager {
   private ctx: AudioContext | null = null;
   private enabled: boolean = true;
@@ -78,6 +80,7 @@ class SoundManager {
    * Âm đúng: 2 nốt đi lên vui tươi (E5 -> A5)
    */
   public playCorrect(): void {
+    emitAnswer(true); // báo cho khung 3D (kể cả khi tắt âm thanh)
     const ctx = this.ensureContext();
     if (!ctx) return;
 
@@ -115,6 +118,7 @@ class SoundManager {
    * Âm sai: 1 nốt trầm ngắn (bút đỏ cô chấm bài)
    */
   public playWrong(): void {
+    emitAnswer(false);
     const ctx = this.ensureContext();
     if (!ctx) return;
 

@@ -4,8 +4,10 @@
  *
  *  - rê chuột hoặc focus vào một đáp án (máy tính): `hover(rect)` rồi `hover(null)` khi rời;
  *  - chọn: `select(rect, touch)`. Chạm (điện thoại) thì nhân vật chỉ (point) 0,3 giây trước khi cho hiện kết quả;
- *  - có kết quả: `result(correct)`. Đúng thì học sinh `cheer` và {phanDien} `hurt`; sai thì học sinh `sad` và {phanDien} `cheer`.
+ *  - có kết quả: `result(correct)`. Đúng thì học sinh `cheer`, {phanDien} giữ `idle` (`hurt` chỉ dành cho màn 5);
+ *    sai thì học sinh `sad` và {phanDien} `cheer`.
  */
+import { onAnswer } from '../audio/answerSignal';
 import type { ClipName } from './clips';
 import type { PoseName, Rect } from './poses';
 
@@ -58,9 +60,9 @@ export function reduceReaction(state: ReactionState, ev: ReactionEvent): Reactio
     case 'select':
       return { ...state, target: ev.target ?? state.target, locked: true };
     case 'result':
-      // Nhận kết quả: thả tay chỉ, mở khóa.
+      // Nhận kết quả: thả tay chỉ, mở khóa. Đúng thì {phanDien} giữ idle (không `hurt`: chỉ dành cho màn 5).
       return ev.correct
-        ? { target: null, locked: false, student: playClip(state.student, 'cheer'), rival: playPose(state.rival, 'hurt') }
+        ? { target: null, locked: false, student: playClip(state.student, 'cheer'), rival: { ...state.rival, clip: 'idle', pose: null } }
         : { target: null, locked: false, student: playPose(state.student, 'sad'), rival: playClip(state.rival, 'cheer') };
     case 'reset':
       return { ...INITIAL_REACTION_STATE, student: { ...idle(), clipN: state.student.clipN, poseN: state.student.poseN }, rival: { ...idle(), clipN: state.rival.clipN, poseN: state.rival.poseN } };
@@ -84,8 +86,15 @@ export interface ReactionStore {
 }
 
 /** Tạo một kho riêng (test dùng kho riêng; ứng dụng dùng `choiceReactions`). `delay` thay được bộ hẹn giờ trong test. */
-export function createReactionStore(delay: (ms: number, fn: () => void) => void = (ms, fn) => void setTimeout(fn, ms)): ReactionStore {
+/** Hai kết quả cùng chiều trong khoảng này (ms) là một (hộp phản hồi và trạm cùng báo một lần trả lời). */
+export const RESULT_DEDUPE_MS = 250;
+
+export function createReactionStore(
+  delay: (ms: number, fn: () => void) => void = (ms, fn) => void setTimeout(fn, ms),
+  now: () => number = () => Date.now(),
+): ReactionStore {
   let state = INITIAL_REACTION_STATE;
+  let lastResult: { correct: boolean; at: number } | null = null;
   const listeners = new Set<() => void>();
   const store: ReactionStore = {
     getState: () => state,
@@ -106,7 +115,12 @@ export function createReactionStore(delay: (ms: number, fn: () => void) => void 
       if (ms <= 0) return Promise.resolve();
       return new Promise<void>((resolve) => delay(ms, resolve));
     },
-    result: (correct) => store.dispatch({ type: 'result', correct }),
+    result(correct) {
+      const t = now();
+      if (lastResult && lastResult.correct === correct && t - lastResult.at < RESULT_DEDUPE_MS) return;
+      lastResult = { correct, at: t };
+      store.dispatch({ type: 'result', correct });
+    },
     reset: () => store.dispatch({ type: 'reset' }),
   };
   return store;
@@ -114,6 +128,9 @@ export function createReactionStore(delay: (ms: number, fn: () => void) => void 
 
 /** Kho dùng chung của ứng dụng. */
 export const choiceReactions: ReactionStore = createReactionStore();
+
+// Mọi lần em trả lời đúng/sai (sound.playCorrect/playWrong) đều thành kết quả ở kho này: nối một lần cho cả 4 bài.
+onAnswer((correct) => choiceReactions.result(correct));
 
 // Chỉ ở chế độ dev: mở kho ra window để kiểm tra bằng trình duyệt (QuizCard có phát đúng sự kiện không).
 if (import.meta.env.DEV && typeof window !== 'undefined') (window as unknown as { __choiceReactions?: ReactionStore }).__choiceReactions = choiceReactions;

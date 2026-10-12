@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { INITIAL_REACTION_STATE, TOUCH_POINT_MS, createReactionStore, reduceReaction, revealDelayMs } from './choiceReactions';
+import { emitAnswer } from '../audio/answerSignal';
+import { INITIAL_REACTION_STATE, RESULT_DEDUPE_MS, TOUCH_POINT_MS, choiceReactions, createReactionStore, reduceReaction, revealDelayMs } from './choiceReactions';
 
 const rect = (x: number) => ({ x, y: 10, width: 100, height: 40 });
 
@@ -29,11 +30,11 @@ describe('kho phản ứng khi chọn đáp án (spec 03 mục 4)', () => {
     expect(s.target).toEqual(rect(300));
   });
 
-  it('đúng: học sinh cheer, {phanDien} hurt; thả tay chỉ, mở khóa', () => {
+  it('đúng: học sinh cheer, {phanDien} giữ idle (không hurt: chỉ dành cho màn 5); thả tay chỉ, mở khóa', () => {
     let s = reduceReaction(INITIAL_REACTION_STATE, { type: 'select', target: rect(300) });
     s = reduceReaction(s, { type: 'result', correct: true });
     expect(s.student).toMatchObject({ clip: 'cheer', pose: null });
-    expect(s.rival).toMatchObject({ clip: 'idle', pose: 'hurt' });
+    expect(s.rival).toMatchObject({ clip: 'idle', pose: null, clipN: 0, poseN: 0 });
     expect(s.target).toBeNull();
     expect(s.locked).toBe(false);
   });
@@ -134,5 +135,55 @@ describe('createReactionStore', () => {
     store.subscribe(fn);
     store.hover(rect(2));
     expect(fn).not.toHaveBeenCalled();
+  });
+});
+
+describe('kết quả trùng và tín hiệu onAnswer', () => {
+  it('đúng không bao giờ làm {phanDien} hurt, dù bao nhiêu lần', () => {
+    let s = INITIAL_REACTION_STATE;
+    for (let i = 0; i < 5; i++) s = reduceReaction(s, { type: 'result', correct: true });
+    expect(s.rival.pose).toBeNull();
+    expect(s.rival.clip).toBe('idle');
+    expect(s.student.clipN).toBe(5);
+  });
+
+  it('hai kết quả cùng chiều trong 250 ms là một (hộp phản hồi và trạm cùng báo)', () => {
+    let t = 1000;
+    const store = createReactionStore(undefined, () => t);
+    store.result(false);
+    t += RESULT_DEDUPE_MS - 1;
+    store.result(false);
+    expect(store.getState().student.poseN).toBe(1);
+    t += 2;
+    store.result(false); // đã quá hạn: đây là lần trả lời mới
+    expect(store.getState().student.poseN).toBe(2);
+  });
+
+  it('khác chiều thì không gộp', () => {
+    let t = 0;
+    const store = createReactionStore(undefined, () => t);
+    store.result(true);
+    t += 10;
+    store.result(false);
+    expect(store.getState().student.pose).toBe('sad');
+    expect(store.getState().rival.clip).toBe('cheer');
+  });
+
+  it('sound.playCorrect/playWrong (qua tín hiệu onAnswer) thành kết quả ở kho dùng chung', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(1_000_000);
+      choiceReactions.reset();
+      const before = choiceReactions.getState();
+      emitAnswer(true);
+      expect(choiceReactions.getState().student.clipN).toBe(before.student.clipN + 1);
+      expect(choiceReactions.getState().student.clip).toBe('cheer');
+      vi.setSystemTime(1_000_000 + 1000);
+      emitAnswer(false);
+      expect(choiceReactions.getState().student.pose).toBe('sad');
+      expect(choiceReactions.getState().rival.clip).toBe('cheer');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

@@ -55,7 +55,6 @@ export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, 
     setChosen(index);
     if (ok) sound.playCorrect();
     else sound.playWrong();
-    reactions.result(ok);
     void recordAnswer({ questionId: question.id, correct: ok, chosenIndex: index, levelId });
     onAnswer(ok, question.id);
   };

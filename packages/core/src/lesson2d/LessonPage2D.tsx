@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { onAnswer } from '../audio/answerSignal';
 import { asset, useManifest } from '../assets/store';
 import { HUB_MAP_URL } from '../config/urls';
 import { VILLAGE_THEME } from '../content/nenTrangTri';
@@ -19,7 +20,11 @@ import { Panel } from '../ui/Panel';
 import { Stars } from '../ui/Stars';
 import type { VillageId } from '../village';
 import { dialogueFor, finalLessonStars, goldenPageAwarded, momentBeforeStation, startStationIndex, stationOpen, withMoods } from './flow';
+import { choiceReactions } from '../three/choiceReactions';
+import { useChoiceDelegation } from '../three/useReaction';
 import { GoldenPageScene } from './GoldenPageScene';
+import { LessonCharacters } from './LessonCharacters';
+import { useLessonFrames } from './useLessonFrames';
 import { STATION_ORDER, type LessonContent, type StationId, type StationResult } from './types';
 
 export interface StationDef {
@@ -28,6 +33,11 @@ export interface StationDef {
    * (hiện màn "Hết tim mất rồi!" với nút "Thử lại" làm lại trạm đó).
    */
   render: (p: { onComplete: (r: StationResult) => void; onFail: (tip: string) => void; onTwist: () => void }) => ReactNode;
+  /**
+   * Nếu trạm được tải sau (`lazy(() => import(...))`), đây là hàm tải. Trang gọi nó lúc rảnh sau khi đã hiện, trước khi em tới
+   * trạm, để trang đầu không phải mang mã của cả 3 trạm.
+   */
+  preload?: () => void;
 }
 
 export interface LessonPage2DProps {
@@ -38,6 +48,11 @@ export interface LessonPage2DProps {
   background: string;
   content: LessonContent;
   stations: Record<StationId, StationDef>;
+  /**
+   * Phát mỗi khi em nộp một câu trả lời (đúng hoặc sai) ở bất kỳ trạm nào (spec 03 mục 4). Hai khung 3D tự nghe kho
+   * `choiceReactions`, không cần dùng prop này; dành cho nơi khác muốn biết (ví dụ ghi số liệu).
+   */
+  onAnswer?: (dung: boolean) => void;
 }
 
 type Stage =
@@ -53,16 +68,30 @@ type Stage =
 
 const TEN_TRAM = ui.baiHoc.tram;
 
+/** Chờ bấy nhiêu ms sau khi trang hiện rồi mới nạp mã của trạm sắp tới. */
+const STATION_PRELOAD_DELAY_MS = 1500;
+
 /**
  * Khung trang bài học 2D (spec 03 mục 0, loại D): nền ảnh của làng, bảng bài học trên giấy dó,
  * thanh trên (tên màn, 3 trạm kèm sao, nút "Về bản đồ"), lời người dẫn theo thời điểm,
  * ghi tiến độ từng trạm, màn hoàn thành và cảnh trao Trang Sổ Vàng.
  */
-export function LessonPage2D({ levelId, villageId, background, content, stations }: LessonPage2DProps) {
+export function LessonPage2D({ levelId, villageId, background, content, stations, onAnswer: onAnswerProp }: LessonPage2DProps) {
   const level = levelById(levelId);
   const villageIndex = VILLAGE_ORDER.indexOf(villageId);
   const { progress, record, saveNow, saving, goldenPages } = useProgress();
   const manifest = useManifest();
+
+  // `onAnswer(dung)`: mọi lần em trả lời đúng/sai ở bất kỳ trạm nào đều đi qua sound.playCorrect/playWrong.
+  const answerRef = useRef(onAnswerProp);
+  answerRef.current = onAnswerProp;
+  useEffect(() => onAnswer((dung) => answerRef.current?.(dung)), []);
+  // Rê chuột hoặc focus vào nút nào ở trạm thì học sinh 3D nhìn và chỉ về nút đó; vào bài mới thì xóa phản ứng cũ.
+  const playArea = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    choiceReactions.reset();
+    return () => choiceReactions.reset();
+  }, [levelId]);
 
   // Vào lại màn: bắt đầu ở trạm đầu tiên chưa có sao (đã xong cả 3 thì ở trạm Dễ).
   const [stage, setStage] = useState<Stage>(() => ({ kind: 'dialogue', idx: startStationIndex(progress.levels[levelId]?.stars ?? {}) }));
@@ -142,6 +171,32 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
 
   const goMap = () => window.location.assign(HUB_MAP_URL);
 
+  // Hai khung 3D hai bên bảng: ẩn khi màn hẹp, giảm chuyển động, máy yếu, tải lỗi hoặc FPS thấp (frames.ts).
+  // Có khung thì bảng thu nhỏ để chừa chỗ (quyết định lúc mở trang, giữ nguyên khi khung bị ẩn về sau).
+  const frames = useLessonFrames(stage.kind === 'award');
+  const zoomStyle = frames.zoom === null ? undefined : ({ '--lz': frames.zoom } as CSSProperties);
+  const boardMax = frames.zoom === null ? 'max-w-4xl min-[1280px]:max-w-[calc(1200px/var(--lz))]' : 'max-w-4xl';
+  useChoiceDelegation(playArea, stage.kind === 'play' && frames.visible);
+
+  // Mã của trạm tải sau: nạp lúc rảnh khi em đang đọc lời thoại hoặc giới thiệu của trạm đó, để tới trạm không phải chờ.
+  const stationsRef = useRef(stations);
+  stationsRef.current = stations;
+  const preloadIdx = stage.kind === 'dialogue' || stage.kind === 'intro' ? stage.idx : -1;
+  useEffect(() => {
+    if (preloadIdx < 0) return;
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    const load = () => stationsRef.current[STATION_ORDER[preloadIdx]]?.preload?.();
+    let idle: number | undefined;
+    const t = setTimeout(() => {
+      if (w.requestIdleCallback) idle = w.requestIdleCallback(load, { timeout: 3000 });
+      else load();
+    }, STATION_PRELOAD_DELAY_MS);
+    return () => {
+      clearTimeout(t);
+      if (idle !== undefined) w.cancelIdleCallback?.(idle);
+    };
+  }, [preloadIdx]);
+
   let body: ReactNode = null;
   if (stage.kind === 'dialogue') {
     const moment = momentBeforeStation(stage.idx);
@@ -166,13 +221,17 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   } else if (stage.kind === 'play') {
     const id = STATION_ORDER[stage.idx];
     body = (
-      <Panel className="p-2 sm:p-6" key={`p${attempt}-${id}`}>
-        {stations[id].render({
-          onComplete: (r) => onStationComplete(stage.idx, r),
-          onFail: (tip) => setStage({ kind: 'failed', idx: stage.idx, tip }),
-          onTwist: () => setTwistOpen(true),
-        })}
-      </Panel>
+      <div ref={playArea}>
+        <Panel className="p-2 sm:p-6" key={`p${attempt}-${id}`}>
+          <Suspense fallback={<p role="status" className="p-6 text-center font-semibold">{ui.chung.dangTai}</p>}>
+            {stations[id].render({
+              onComplete: (r) => onStationComplete(stage.idx, r),
+              onFail: (tip) => setStage({ kind: 'failed', idx: stage.idx, tip }),
+              onTwist: () => setTwistOpen(true),
+            })}
+          </Suspense>
+        </Panel>
+      </div>
     );
   } else if (stage.kind === 'failed') {
     body = (
@@ -261,11 +320,12 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
     <div className="isolate min-h-screen bg-giay bg-cover bg-center" style={bg ? { backgroundImage: `url("${bg}")` } : undefined}>
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20 bg-giay/55" />
       {/* Icon của làng: chỉ ở 2 khoảng trống hai bên bảng (màn từ 1296px, tối đa 4 mỗi bên), không bao giờ sau bảng; cảnh trao Trang Sổ Vàng thì rải cả màn kèm tia sáng. */}
-      <NenTrangTri theme={VILLAGE_THEME[villageId]} variant={stage.kind === 'award' ? 'full' : 'sides'} sparkle={stage.kind === 'award'} image={null} />
-      <div className="lesson-zoom min-h-[calc(100vh/var(--lz))]">
+      <NenTrangTri theme={VILLAGE_THEME[villageId]} variant={stage.kind === 'award' ? 'full' : 'sides'} sparkle={stage.kind === 'award'} image={null} sideMax={frames.visible ? 2 : undefined} />
+      <LessonCharacters plan={frames} />
+      <div className="lesson-zoom min-h-[calc(100vh/var(--lz))]" style={zoomStyle}>
         <div className="min-h-[calc(100vh/var(--lz))]">
         <GuestBar compact />
-        <header className="mx-auto flex w-full max-w-4xl min-[1280px]:max-w-[calc(1200px/var(--lz))] flex-wrap items-center gap-x-3 gap-y-2 p-2 sm:p-3 max-[480px]:flex-nowrap max-[480px]:gap-1.5 max-[480px]:px-2 max-[480px]:py-1">
+        <header className={`mx-auto flex w-full ${boardMax} flex-wrap items-center gap-x-3 gap-y-2 p-2 sm:p-3 max-[480px]:flex-nowrap max-[480px]:gap-1.5 max-[480px]:px-2 max-[480px]:py-1`}>
           <div className="min-w-0 flex-1 basis-full sm:basis-auto max-[480px]:basis-0">
             <h1 className="truncate font-display text-xl font-extrabold sm:text-2xl max-[480px]:line-clamp-2 max-[480px]:whitespace-normal max-[480px]:text-sm max-[480px]:leading-tight">
               {level ? fmt(level.ten) : ''}
@@ -339,7 +399,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-4xl min-[1280px]:max-w-[calc(1200px/var(--lz))] px-1 pb-10 pt-2 sm:px-3">{body}</main>
+        <main className={`mx-auto w-full ${boardMax} px-1 pb-10 pt-2 sm:px-3`}>{body}</main>
       </div>
 
       {twistOpen && content.twist && content.twist.length > 0 && (

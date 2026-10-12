@@ -191,10 +191,12 @@ export interface IconsProps {
   theme: NenTheme;
   variant: Variant;
   sparkle?: boolean;
+  /** Chỉ cho 'sides': số icon tối đa mỗi bên */
+  sideMax?: number;
 }
 
-export default function Icons({ theme, variant, sparkle = false }: IconsProps) {
-  const list = floatersFor(theme, variant);
+export default function Icons({ theme, variant, sparkle = false, sideMax }: IconsProps) {
+  const list = floatersFor(theme, variant, sideMax);
   const still = variant === 'still';
   const opacity = still ? 'opacity-[0.28]' : variant === 'sides' ? 'opacity-60' : 'opacity-45';
   const item = (f: Floater, i: number) => (

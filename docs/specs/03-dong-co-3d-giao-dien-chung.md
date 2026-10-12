@@ -69,6 +69,7 @@ Dùng cho **mọi** hội thoại, truyện và giới thiệu làng trong game.
 
 - Từ **1280px** trở lên, cả trang bài học được phóng theo hệ số **1,35** (`.lesson-zoom` trong `theme.css`): bảng bài học rộng tối đa khoảng **1200px** (trước là khoảng 870px), chữ nhãn nhỏ nhất ≥ 16px, chữ nội dung ≥ 18px, số trong ô trang và ô cây ≥ 22px; ô trang, ô cây và thanh trên (ô trạm, nút) to theo.
 - Dưới 1280px (kể cả điện thoại < 640px) giữ nguyên như cũ.
+- **Khi có hai khung 3D hai bên (mục 4) thì bảng thu nhỏ để chừa chỗ**, không còn cố định 1,35: hệ số `s` tính theo chiều rộng màn hình (công thức ở mục 4). Không có khung (máy yếu, "Giảm chuyển động", "Chữ to", màn < 1280px) thì bảng phóng như trên (1,35 từ 1280px). Hệ số được đặt lúc mở trang (biến CSS `--lz` trên `.lesson-zoom`) và **giữ nguyên** nếu khung bị ẩn về sau (tải lỗi, FPS thấp), để bảng không nhảy.
 - Nút kiểm tra chính của vài trạm (Bài 1 trạm Dễ, Bài 3 trạm Dễ, Bài 4 trạm Khó) **dính ở đáy màn hình** từ 1280px để luôn thấy được.
 
 ### Nền trang trí — `NenTrangTri` (`packages/core/src/ui/NenTrangTri.tsx`)
@@ -294,34 +295,43 @@ Dùng ở mọi chỗ có lựa chọn: câu hỏi, Đồng ý/Từ chối, lự
 
 - **Máy tính:** rê chuột hoặc focus vào một đáp án thì nhân vật học sinh **quay đầu và người** về phía đáp án đó, kèm tư thế `point`.
 - **Điện thoại:** chạm là chọn. Nhân vật `point` 0,3 giây trước khi hiện kết quả.
-- **Kết quả:** đúng thì `cheer`, sai thì `sad`.
+- **Kết quả:** đúng thì `cheer`, sai thì `sad`. {phanDien} chỉ `cheer` khi em trả lời sai; đúng thì {phanDien} **giữ `idle`** (`hurt` chỉ dành cho màn 5).
 
 **Kho sự kiện dùng chung** (`three/choiceReactions.ts`, không import three nên nhẹ cho trang đầu): `QuizCard` và các trang bài học chỉ phát sự kiện, khung 3D chỉ nghe.
 - `hover(rect)` / `hover(null)`: rê chuột hoặc focus vào đáp án (rect là khung màn hình của nút) hoặc rời đi. Chạm không có rê nên không phát `hover`.
 - `select(rect, touch)`: chọn. Trả về Promise: **ngay** nếu bằng chuột hoặc bàn phím, **sau 0,3 giây** nếu chạm (nhân vật chỉ trước rồi mới hiện kết quả). Từ lúc chọn đến khi có kết quả thì khóa hướng chỉ, rê chuột đi chỗ khác không làm mất.
-- `result(correct)`: đúng thì học sinh `cheer` và {phanDien} `hurt`; sai thì học sinh `sad` và {phanDien} `cheer`; rồi về `idle`.
-- Hook `useChoiceHandlers()` (`bindChoice` gắn vào nút, `select`, `result`) và `useReaction()` (nghe). `QuizCard` đã nối sẵn; trang bài học 2D nối ở bước sau.
+- `result(correct)`: đúng thì học sinh `cheer`, {phanDien} giữ `idle`; sai thì học sinh `sad` và {phanDien} `cheer`; rồi về `idle`. Hai kết quả cùng chiều trong 250 ms là một (hộp phản hồi và trạm cùng báo một lần trả lời).
+- **Nối một lần cho cả 4 bài:** mọi chỗ em trả lời (hộp phản hồi, `QuizCard`, mọi trạm) đều gọi `sound.playCorrect()` hoặc `sound.playWrong()`; hai hàm này phát tín hiệu `onAnswer(dung)` (`audio/answerSignal.ts`) và kho `choiceReactions` tự nghe tín hiệu đó (tức là `onAnswer` là cách duy nhất để có `result`, kể cả khi âm thanh bị tắt). `LessonPage2D` có prop `onAnswer?: (dung) => void` cho nơi khác muốn nghe. Rê chuột hoặc focus vào nút thì `useChoiceDelegation` (event delegation trên vùng trạm) phát `hover`, không phải sửa từng trạm; chạm không có rê nên khung 3D trong bài học chỉ phản ứng khi có kết quả.
+- Hook `useChoiceHandlers()` (`bindChoice` gắn vào nút, `select`, `result`) và `useReaction()` (nghe). `QuizCard` và trang bài học 2D đã nối (xem dưới).
 - **Hướng nhìn:** `aimFromRects(khung3D, đáp án)` cho góc ngang `az` và góc cao `el` (tối đa ±75° và -35°…+45°); bên phải khung thì nhân vật quay sang +X (bên trái nhân vật, vì họ nhìn ra màn hình). `splitAim`: cả người 30% + vặn thân 40% + đầu 40% của `az`; ngẩng/cúi 70% đầu, 30% cổ. Cánh tay phải (`RightArm` rồi `RightForeArm`) quay từ hướng hiện tại tới hướng đáp án, tối đa 160°.
-- `<ReactionStage>` (`three/ReactionStage.tsx`) là khung 3D nghe kho này: học sinh và Tí cạnh nhau (thử ở `/dev/3d`); bước sau gắn thành hai khung hai bên bảng bài học.
+- `<ReactionStage>` (`three/ReactionStage.tsx`) là khung 3D nghe kho này: học sinh và Tí cạnh nhau (thử ở `/dev/3d`); ở trang bài học thì là hai khung hai bên bảng (`LessonStage3D`).
 
 **Hội thoại ở trang bài học 2D** dùng `VnDialog` (mục 1): chân dung lớn của người nói, không còn khung 3D nhỏ chồng lên.
 
 **Ở trang bài học 2D (D), từ mốc 2: hai nhân vật 3D ở hai bên bảng bài học.** (Mốc 1 chưa có.)
 
-- **Bố trí:** màn hình từ **1280px** trở lên có **2 khung 3D nền trong suốt** đặt ở **2 khoảng trống hai bên bảng bài học** (bảng rộng khoảng 1200px ở giữa, xem mục 1 "Trang bài học trên màn hình lớn"). Mỗi khung khoảng **280×420px**:
+- **Bố trí:** từ **1280px** trở lên, mỗi khung **rộng f = 14% chiều rộng màn hình, kẹp từ 180 đến 280px**, cao tối đa **420px**, đặt giữa khoảng trống hai bên bảng, mép dưới cách đáy 16px, **nền trong suốt** (chỉ có bóng đổ trên nền cảnh làng):
   - **bên trái:** `hoc-sinh-nam`;
-  - **bên phải:** {phanDien} (model `ti`).
+  - **bên phải:** {phanDien} (model `ti`), xoay nhẹ về phía bảng.
   Lúc chờ, cả hai ở tư thế `idle`.
-- **Phản ứng khi em trả lời:**
+  - **Bảng thu nhỏ để chừa chỗ** (hàm thuần `lessonFrameLayout`, `lesson2d/frames.ts`, có test): hệ số phóng của bảng **s = min(1,35, (chiều rộng màn − 2 × (f + 16)) / 872)**. 872px là **chiều rộng gốc của bảng** khi chưa phóng (thân trang `max-w-4xl` = 896px trừ lề 2 × 12px, đã đo bằng Chrome). Bảng thật trên màn hình rộng 872 × s. Nếu s < 1 thì **không có khung**, dùng bố cục cũ (1,35 từ 1280px); với công thức này s ≥ 1 từ 1280px khi không có thanh cuộn, nên chỉ xảy ra ở màn sát 1280px có thanh cuộn dọc. **Dung sai:** s từ 0,99 đến dưới 1 vẫn dùng s = 1 (thanh cuộn 17px của Windows ở đúng 1280px cho s = 0,999; khe giữa khung và bảng chỉ mất vài px, vẫn không đè). Chiều rộng màn hình tính **trừ thanh cuộn dọc** (trang giữ chỗ cho thanh cuộn bằng `scrollbar-gutter: stable` từ 1280px, để thanh cuộn hiện hay mất cũng không làm bảng dịch).
+  - Lý do bỏ cách cũ ("khung nằm trong khoảng trống của bảng 1200px"): bảng 1200px chỉ chừa 40px mỗi bên ở 1280px nên khung chỉ hiện từ 1512px; thu bảng lại thì khung có từ 1280px và vẫn không bao giờ đè lên bảng (mỗi bên bảng chừa đúng f + 16px: 8px mép màn hình, 8px mép bảng).
+  - **Số liệu thật** (`innerWidth`, thanh cuộn 0px / 15px): 1280 → f 180, s 1,018 / 1,001; 1366 → f 191 / 189, s 1,092 / 1,079; 1536 → f 215 / 213, s 1,232 / 1,219; 1920 → f 269 / 267, s 1,35 (giới hạn).
+  - **"Chữ to"** bật thì không có khung và bảng giữ cỡ cũ.
+  - **Quyết định bố cục một lần lúc mở trang**, trước khi tải 3D (`shouldReserveFrameLayout`: chỉ xét cỡ màn, "Giảm chuyển động", "Chữ to", máy yếu). Khung bị ẩn về sau (tải lỗi, FPS dưới 30) thì **giữ nguyên bố cục**, bảng không nhảy (chỗ hai bên để trống).
+  - **Một Canvas duy nhất** (một WebGL context) với drei `View` cho cả hai khung (`three/LessonStage3D.tsx`). Lưu ý: ở bản drei hiện dùng, `<View>` đặt ngoài Canvas **bỏ qua prop `track`** và theo dõi chính `<div>` mà nó render, nên khung phải là chính `<View style={…}>`.
+  - Khi khung hiện, **bớt icon nền** `NenTrangTri` ở hai bên còn **2 icon mỗi bên** (hai chỗ trên cùng) cho khỏi chồng lên khung (`sideMax`); khung ẩn thì trở lại 4.
+- **Phản ứng khi em trả lời** (khung bên trái còn quay đầu và người về phía nút em đang rê chuột hoặc focus, kèm `point`):
 
 | Em trả lời | Học sinh (trái) | {phanDien} (phải) |
 |---|---|---|
-| **Đúng** | `cheer` (2,5 giây đầu) | `hurt` (hoặc lắc đầu) |
+| **Đúng** | `cheer` (2,5 giây đầu) | giữ `idle` (`hurt` chỉ dành cho màn 5) |
 | **Sai** | `sad` | `cheer` |
 
   Làm xong thì cả hai **về `idle`**.
-- **Ẩn cả 2 khung** khi: màn hình dưới 1280px; máy yếu (mức chất lượng **Thấp**); hoặc bật **"Giảm chuyển động"**.
-- **Tải:** 2 model **tải lười, sau khi trang bài học đã hiện** (không làm chậm trang đầu). Chưa tải xong hoặc tải lỗi thì **bỏ trống chỗ đó, không ảnh hưởng bài học** (không báo lỗi, không chặn nút).
+- **Ẩn cả 2 khung** (không tải chunk 3D và model) khi: màn hình dưới 1280px hoặc không đủ chỗ (xem trên); bật **"Giảm chuyển động"** hoặc **"Chữ to"**; hoặc **máy yếu** = mức chất lượng **Thấp** (cài đặt "Tự động" chọn Thấp cho điện thoại và máy ít nhân hoặc ít RAM, hoặc em tự chọn Thấp). Máy đã tải rồi mà **FPS dưới 30 trong 3 giây đầu** thì **ẩn khung và dọn bộ nhớ** (gỡ Canvas, model giải phóng sau 1,5 giây) và đặt mức trần của phiên về Thấp, nên các bài sau không thử lại. Logic hiện/ẩn là hàm thuần `shouldShowLessonFrames`, có test.
+- **Ngừng vẽ** (`frameloop: 'never'`) khi tab bị ẩn hoặc cả hai khung ra khỏi màn hình.
+- **Tải:** chunk 3D và 2 model **tải lười, sau khi trang bài học đã hiện** (chờ 1,2 giây rồi chờ lúc rảnh; không làm chậm trang đầu). Chưa tải xong hoặc tải lỗi (chunk, hoặc một model thiếu/lỗi) thì **ẩn khung, bài học vẫn chơi được** (không báo lỗi, không chặn nút). Chỉ dựng khi cả hai model đã sẵn sàng, rồi hiện dần.
 - **Sự kiện chung cho 4 bài:** `LessonPage2D` phát sự kiện **`onAnswer(dung: boolean)`** mỗi khi em nộp một câu trả lời (đúng hoặc sai); 2 khung 3D chỉ **nghe** sự kiện này. Nhờ vậy 4 bài (và các trạm bên trong) không phải tự nối với khung 3D. Chi tiết: mỗi trạm báo kết quả từng lần trả lời lên khung bài học; khung bài học phát `onAnswer` và chọn tư thế.
 - **Giới hạn:** tư thế `hurt` và `sad` do code dựng (mục 3); {phanDien} lắc đầu nếu dùng thì cũng do code dựng, tối đa 0,6 giây.
 
@@ -409,7 +419,7 @@ Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút
 
 ## 9. Hiệu năng
 
-- **Dung lượng:** trang đầu ≤ 150 KB JS. Lõi 3D chỉ tải khi vào cảnh 3D. Mỗi màn tải riêng.
+- **Dung lượng:** trang đầu ≤ 150 KB JS (gzip). Lõi 3D chỉ tải khi vào cảnh 3D. Mỗi màn tải riêng. **Trang bài học 2D:** mã của 3 trạm (cùng `motion` và `@dnd-kit` mà chúng dùng) **tải sau** bằng `lazy(() => import(...))` ở từng trang `ManN`, và được nạp lúc rảnh (khoảng 1,5 giây sau khi trang hiện) cho trạm sắp tới; nhờ đó JS lúc mở trang bài học của cả 4 làng còn khoảng 117–125 KB (trước đó 152–181 KB).
 - **Bộ nhớ:** texture nhân vật đã được thu nhỏ khi build (spec 01). Nếu lúc chạy còn thấy texture lớn hơn 2048, ghi cảnh báo.
 - **Tốc độ:** mức Thấp ≥ 30fps trên điện thoại tầm trung.
 - **Code:** không tạo object mới trong `useFrame`; rời cảnh thì dispose (hình học, vật liệu, texture và **đóng `ImageBitmap`** của texture, vì `texture.dispose()` không giải phóng bitmap trong RAM). `AnimationMixer` tạo trong `useEffect`, cleanup gọi `stopAllAction` và `uncacheRoot`; mỗi lần effect chạy (kể cả lần gắn lại của StrictMode) tạo mixer mới.
@@ -435,7 +445,7 @@ Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút
   - 6 người đứng yên nhún nhẹ, lệch pha nhau.
 - [ ] `sad`, `point`, `slide`, `swing`, `hurt` trông tự nhiên; không clip nào làm nhân vật trôi khỏi chỗ.
 - [ ] `/dev/portraits` xuất được 11 ảnh chân dung rõ mặt.
-- [ ] Trang bài học 2D từ 1280px (mốc 2): 2 nhân vật 3D hai bên bảng; trả lời đúng thì học sinh `cheer` và {phanDien} `hurt`, trả lời sai thì {phanDien} `cheer` và học sinh `sad`, rồi về `idle`; dưới 1280px, mức Thấp hoặc "Giảm chuyển động" thì ẩn; model tải lỗi thì bỏ trống, bài học vẫn chơi được; `onAnswer(dung)` hoạt động ở cả 4 bài.
+- [ ] Trang bài học 2D từ 1280px (mốc 2): 2 nhân vật 3D hai bên bảng; trả lời đúng thì học sinh `cheer` và {phanDien} giữ `idle` (`hurt` chỉ dành cho màn 5), trả lời sai thì {phanDien} `cheer` và học sinh `sad`, rồi về `idle`; bảng thu nhỏ để chừa chỗ cho khung (f = 14% màn, 180–280px; s = min(1,35, (màn − 2 × (f + 16)) / 872)); dưới 1280px, mức Thấp, "Giảm chuyển động" hoặc "Chữ to" thì ẩn và bảng như cũ; khung ẩn về sau (lỗi, FPS thấp) thì bảng không nhảy; tắt âm thanh vẫn phản ứng; model tải lỗi thì bỏ trống, bài học vẫn chơi được; `onAnswer(dung)` hoạt động ở cả 4 bài.
 - [ ] `Scene25D` hiện nền, hình rời và nhân vật 3D đúng lớp, co giãn đúng 16:9.
 - [ ] Đổi tên `phanDien` trong `characters.ts` thì đổi ở mọi lời thoại và câu hỏi.
 - [ ] `pnpm check:text` không báo chữ hiển thị nào nằm ngoài `content/`; có file `HUONG-DAN-SUA-CHU.md`.

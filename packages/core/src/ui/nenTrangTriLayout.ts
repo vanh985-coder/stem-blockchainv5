@@ -106,12 +106,15 @@ const SIDE_SLOTS: readonly { x: number; y: number }[] = [
   { x: 52, y: 86 },
 ];
 
-/** Hàm thuần: các icon của một bộ theo kiểu bố trí. Cùng đầu vào thì cùng kết quả. */
-export function floatersFor(theme: NenTheme, variant: Variant): Floater[] {
+/**
+ * Hàm thuần: các icon của một bộ theo kiểu bố trí. Cùng đầu vào thì cùng kết quả.
+ * `sideMax`: ở 'sides', số icon tối đa mỗi bên (mặc định 4; còn 2 khi khung 3D ở góc dưới hai bên, giữ hai chỗ trên cùng).
+ */
+export function floatersFor(theme: NenTheme, variant: Variant, sideMax: number = SIDE_MAX): Floater[] {
   const kinds = THEME_KINDS[theme];
   if (variant === 'sides') {
     const out: Floater[] = [];
-    SIDE_SLOTS.slice(0, SIDE_MAX).forEach((slot, i) => {
+    SIDE_SLOTS.slice(0, Math.min(SIDE_MAX, Math.max(0, sideMax))).forEach((slot, i) => {
       for (const side of ['l', 'r'] as const) {
         const k = i * 2 + (side === 'l' ? 0 : 1);
         out.push({

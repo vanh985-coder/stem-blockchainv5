@@ -537,7 +537,7 @@ export const ui = {
     phanUngTieuDe: 'Thử ChoiceReaction',
     phanUngHuongDan: 'Rê chuột hoặc Tab vào một đáp án thì học sinh quay đầu và người về phía đó và chỉ. Bấm (hoặc chạm: chỉ 0,3 giây rồi mới ra kết quả) thì kết quả đúng hoặc sai ngẫu nhiên.',
     phanUngDapAn: 'Đáp án {x}',
-    phanUngDung: 'Kết quả: đúng (học sinh cheer, Tí hurt)',
+    phanUngDung: 'Kết quả: đúng (học sinh cheer, Tí giữ idle)',
     phanUngSai: 'Kết quả: sai (học sinh sad, Tí cheer)',
     phanUngChon: 'Đang chờ em chọn.',
   },
