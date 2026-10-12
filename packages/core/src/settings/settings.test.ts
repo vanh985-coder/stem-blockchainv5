@@ -7,13 +7,13 @@ describe('cài đặt', () => {
   });
 
   it('chưa lưu gì: giảm chuyển động theo máy, chữ to tắt', () => {
-    expect(resolveSettings({}, true)).toEqual({ reducedMotion: true, largeText: false, soundEnabled: true });
-    expect(resolveSettings({}, false)).toEqual({ reducedMotion: false, largeText: false, soundEnabled: true });
+    expect(resolveSettings({}, true)).toEqual({ reducedMotion: true, largeText: false, soundEnabled: true, quality: 'auto' });
+    expect(resolveSettings({}, false)).toEqual({ reducedMotion: false, largeText: false, soundEnabled: true, quality: 'auto' });
   });
 
   it('đã chọn rõ thì ưu tiên lựa chọn, kể cả khi ngược với máy', () => {
     expect(resolveSettings({ reducedMotion: false }, true).reducedMotion).toBe(false);
-    expect(resolveSettings({ reducedMotion: true, largeText: true }, false)).toEqual({ reducedMotion: true, largeText: true, soundEnabled: true });
+    expect(resolveSettings({ reducedMotion: true, largeText: true }, false)).toEqual({ reducedMotion: true, largeText: true, soundEnabled: true, quality: 'auto' });
   });
 
   it('đọc dữ liệu hỏng thì bỏ qua', () => {
@@ -30,8 +30,17 @@ describe('cài đặt', () => {
     expect(parseStored('{"soundEnabled":"không"}')).toEqual({});
   });
 
+  it('chất lượng 3D: mặc định auto; chọn rõ thì giữ; giá trị lạ thì bỏ qua', () => {
+    expect(resolveSettings({}, false).quality).toBe('auto');
+    expect(resolveSettings({ quality: 'high' }, false).quality).toBe('high');
+    expect(parseStored('{"quality":"low"}')).toEqual({ quality: 'low' });
+    expect(parseStored('{"quality":"auto"}')).toEqual({ quality: 'auto' });
+    expect(parseStored('{"quality":"cao"}')).toEqual({});
+    expect(parseStored('{"quality":3}')).toEqual({});
+  });
+
   it('lưu rồi đọc lại ra như cũ', () => {
-    const s = { reducedMotion: false, largeText: true, soundEnabled: false };
+    const s = { reducedMotion: false, largeText: true, soundEnabled: false, quality: 'medium' as const };
     expect(parseStored(serializeStored(s))).toEqual(s);
   });
 });

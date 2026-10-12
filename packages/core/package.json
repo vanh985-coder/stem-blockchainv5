@@ -16,7 +16,9 @@
   },
   "devDependencies": {
     "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^26.6.5",
     "@types/react": "catalog:",
+    "@types/three": "^0.186.0",
     "react": "catalog:",
     "react-router": "catalog:",
     "typescript": "catalog:",
@@ -24,10 +26,13 @@
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.1",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.2",
     "canvas-confetti": "^1.9.4",
-    "motion": "^14.0.0"
+    "motion": "^14.0.0",
+    "three": "^0.186.1"
   },
   "sideEffects": [
     "./src/styles/fonts.ts",

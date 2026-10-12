@@ -9,7 +9,7 @@ interface SettingsContextValue {
 }
 
 const DEFAULT_VALUE: SettingsContextValue = {
-  settings: { reducedMotion: false, largeText: false, soundEnabled: true },
+  settings: { reducedMotion: false, largeText: false, soundEnabled: true, quality: 'auto' },
   update: () => {},
 };
 

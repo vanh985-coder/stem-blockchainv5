@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import { ui } from '../content/ui';
 import { useSettings } from '../settings/SettingsProvider';
+import { QUALITY_CHOICES, type QualityChoice } from '../three/quality';
 import { Panel } from './Panel';
 
 interface SwitchRowProps {
@@ -50,7 +51,45 @@ function SwitchRow({ label, hint, checked, onChange }: SwitchRowProps) {
   );
 }
 
-/** Bảng cài đặt "Giảm chuyển động" và "Chữ to"; dùng ở các trang sau. */
+const QUALITY_LABEL: Record<QualityChoice, string> = {
+  auto: ui.caiDat.chatLuongTuDong,
+  low: ui.caiDat.chatLuongThap,
+  medium: ui.caiDat.chatLuongVua,
+  high: ui.caiDat.chatLuongCao,
+};
+
+/** Chọn một trong bốn mức chất lượng đồ họa 3D (Tự động, Thấp, Vừa, Cao). */
+function QualityRow({ value, onChange }: { value: QualityChoice; onChange: (value: QualityChoice) => void }) {
+  const id = useId();
+  return (
+    <div className="py-2">
+      <p id={`${id}-l`} className="font-display text-lg font-extrabold">
+        {ui.caiDat.chatLuong}
+      </p>
+      <p id={`${id}-d`} className="mb-2 text-sm text-nau-go-dam">
+        {ui.caiDat.chatLuongGhiChu}
+      </p>
+      <div role="radiogroup" aria-labelledby={`${id}-l`} aria-describedby={`${id}-d`} className="flex flex-wrap gap-2">
+        {QUALITY_CHOICES.map((choice) => (
+          <button
+            key={choice}
+            type="button"
+            role="radio"
+            aria-checked={value === choice}
+            onClick={() => onChange(choice)}
+            className={`min-h-11 min-w-11 cursor-pointer rounded-nut border-2 px-3 font-bold focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim ${
+              value === choice ? 'border-xanh-la-dam bg-xanh-la text-white' : 'border-nau-go bg-giay'
+            }`}
+          >
+            {QUALITY_LABEL[choice]}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Bảng cài đặt "Giảm chuyển động", "Âm thanh", "Chữ to" và "Chất lượng đồ họa"; dùng ở các trang sau. */
 export function SettingsPanel({ className = '' }: { className?: string }) {
   const { settings, update } = useSettings();
   return (
@@ -74,6 +113,7 @@ export function SettingsPanel({ className = '' }: { className?: string }) {
         checked={settings.largeText}
         onChange={(v) => update({ largeText: v })}
       />
+      <QualityRow value={settings.quality} onChange={(v) => update({ quality: v })} />
     </Panel>
   );
 }

@@ -407,6 +407,20 @@ export const ui = {
     amThanhGhiChu: 'Tiếng bấm nút, tiếng đúng sai và tiếng chúc mừng.',
     bat: 'Bật',
     tat: 'Tắt',
+    chatLuong: 'Chất lượng đồ họa',
+    chatLuongGhiChu: 'Chọn Thấp nếu máy chạy chậm hoặc nóng. Tự động là để máy tự chọn theo cấu hình.',
+    chatLuongTuDong: 'Tự động',
+    chatLuongThap: 'Thấp',
+    chatLuongVua: 'Vừa',
+    chatLuongCao: 'Cao',
+  },
+
+  /** Màn hình tải cảnh 3D */
+  tai3d: {
+    /** Dòng chữ trên thanh tiến độ khi đang tải model và ảnh của cảnh */
+    dangTai: 'Đang tải cảnh…',
+    /** Phần trăm đã tải */
+    phanTram: '{so}%',
   },
 
 
@@ -477,6 +491,29 @@ export const ui = {
     thieuAnh: 'Thiếu ảnh "{path}" trong manifest',
     anhLoi: 'Không tải được ảnh "{path}" ({src})',
     manifestLoi: 'Không tải được {path} ({loi}). Đã chạy pnpm dev:assets chưa?',
+    modelThieu: 'Không có model "{id}" trong manifest. Dùng hình thay thế.',
+    modelLoi: 'Không tải được model "{id}" ({loi}). Dùng hình thay thế.',
+    modelTextureLon: 'Model "{id}" có texture {x}×{y}, lớn hơn {max}. Hãy nén lại bằng pnpm assets:build.',
+  },
+
+  /** Trang /dev/3d (chỉ có khi chạy dev) */
+  dev3d: {
+    tieuDe: 'Model 3D (dev)',
+    chonModel: 'Model',
+    thongTin: '{so} tam giác, {kb} KB',
+    banXa: 'Bản xa',
+    banXaTuDong: 'Tự động theo khoảng cách',
+    banXaChinh: 'Luôn bản chính',
+    banXaXa: 'Luôn bản xa',
+    khongCoBanXa: 'Model này không có bản xa.',
+    chatLuong: 'Chất lượng',
+    mucDangDung: 'Mức đang dùng: {muc}. Đổi bản xa ở {m} đơn vị.',
+    fps: 'FPS: {so}',
+    khoangCach: 'Khoảng cách camera: {so}',
+    clip: 'Clip trong file',
+    khongCoClip: '(không có clip)',
+    hinhThayThe: 'Đang dùng hình thay thế (thiếu file hoặc tải lỗi).',
+    huongDan: 'Kéo để xoay, lăn chuột hoặc chụm hai ngón để phóng to.',
   },
 
   /** Lời thoại mẫu ở trang /dev/ui (4 lượt: bác An, {phanDien}, Bi, cô Chi) */

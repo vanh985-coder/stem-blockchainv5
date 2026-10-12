@@ -116,8 +116,20 @@ Dùng cho **mọi trang** (bảng gán ở `packages/core/src/content/nenTrangTr
 
 **Manifest:**
 - Tải theo `manifest.json` tại `VITE_ASSETS_URL` (spec 01, mục 5).
-- Hàm `asset(path)` trả URL; `useModel(id)` trả model đã nhân bản (dùng `SkeletonUtils.clone`).
+- Hàm `asset(path)` trả URL; `useModel(id)` trả model đã nhân bản (dùng `SkeletonUtils.clone`; hình học và vật liệu dùng chung giữa các bản nhân bản).
+- `id` là đường dẫn trong `models/`, ví dụ `characters/bac-an`, `env/cay-da`. Có cache theo id; hết chỗ dùng thì sau khoảng 1,5 giây model được giải phóng (dispose).
+- Tải bằng `GLTFLoader` kèm `MeshoptDecoder` (bản đóng gói cùng ứng dụng, không tải từ CDN); file nén meshopt bắt buộc cần bộ giải mã này.
 - Thiếu file thì dùng hình thay thế: capsule màu cho nhân vật, khối màu cho đồ vật, ô màu cho ảnh. Chỉ cảnh báo ở chế độ dev.
+- Lúc chạy, texture có cạnh dài hơn **2048** thì ghi cảnh báo ở console (mọi chế độ).
+
+**Bản xa (LOD):**
+- Mỗi model trong `models/env` và `models/games` có bản `<id>-xa` (spec 01 mục 5). `<Model id>` tự dùng bản xa khi camera ở xa hơn khoảng đổi (drei `Detailed`, độ trễ 5%): **Thấp 12, Vừa 20, Cao 30 đơn vị**.
+- Model không có bản xa (nhân vật) thì luôn dùng bản chính. Có thể ép bằng `lod="near"` hoặc `lod="far"`.
+- **Cỡ model trong file** (đã đo trên file đã nén): cạnh dài nhất của mọi model đều khoảng **1 đơn vị** (0,98). Nhân vật không xương cao 0,98 với đáy ở y = 0; 4 nhân vật có xương (`hoc-sinh-nam`, `ti`, `dan-lang-ba-cu`, `dan-lang-nong-dan`) cao **2,0** với gốc ở giữa người (đáy ở y = −1). Cảnh phải đặt tỉ lệ (ví dụ cổng làng, nhà phóng to nhiều lần) và độ cao cho từng model; khoảng đổi bản xa tính theo khoảng cách camera thật trong cảnh.
+
+**Khung cảnh `<Scene3D>`** (`packages/core/src/three/`): trời, mây, ánh sáng, sương, ACES như dưới đây; mức chất lượng; màn hình tải (thanh phần trăm trên nền giấy dó, `useProgress` của drei, chữ ở `content/ui.ts`); rời cảnh thì giải phóng. Không cấp phát đối tượng mới trong `useFrame`.
+
+**Chunk riêng:** lõi 3D (three, R3F, drei, `Scene3D`, `Model`) chỉ import qua `React.lazy(() => import('@so-chung/core/three/index'))`; trang đầu không import. Phần thuần (mức chất lượng, tên model) nằm ở `@so-chung/core`.
 
 **Vật lặp nhiều** (nhà, cây, rào): dùng `InstancedMesh` hoặc gộp hình; đổi màu, tỉ lệ, góc xoay để nhìn không bị lặp.
 
@@ -125,17 +137,21 @@ Dùng cho **mọi trang** (bảng gán ở `packages/core/src/content/nenTrangTr
 - Trời là khối cầu chuyển màu từ #E8F6FF lên #8FCBFF, có vài đám mây tròn do code dựng.
 - `HemisphereLight`: trời #FFFFFF, đất #B5D68A.
 - `DirectionalLight`: #FFF4E0.
-- Sương nhẹ; tone mapping ACES.
+- Sương nhẹ (màu chân trời #E8F6FF); tone mapping ACES. Mây trôi chậm; đứng yên khi bật "Giảm chuyển động".
 
 **Mức chất lượng** (Thấp / Vừa / Cao):
 
-| Mức | DPR | Bóng |
-|---|---|---|
-| Thấp | 1 | Vệt bóng tròn dưới chân |
-| Vừa | 1.5 | Bóng mềm 1024 |
-| Cao | 2 | Bóng mềm 2048 |
+| Mức | DPR | Bóng | Đổi bản xa ở |
+|---|---|---|---|
+| Thấp | 1 | Vệt bóng tròn dưới chân (`BlobShadow`) | 12 |
+| Vừa | 1.5 | Bóng mềm 1024 | 20 |
+| Cao | 2 | Bóng mềm 2048 | 30 |
 
-Tự hạ mức nếu FPS dưới 40 trong 3 giây đầu.
+DPR còn bị chặn bởi `devicePixelRatio` của máy.
+
+**Chọn mức:** cài đặt "Chất lượng đồ họa" (Tự động / Thấp / Vừa / Cao, lưu ở `settings.quality`). "Tự động": điện thoại (màn cảm ứng), máy từ 4 nhân CPU trở xuống hoặc RAM từ 4 GB trở xuống thì Thấp, còn lại Vừa; mức Cao chỉ có khi người dùng chọn.
+
+**Tự hạ mức:** nếu FPS trung bình dưới 40 trong 3 giây đầu của cảnh thì hạ một mức (Cao → Vừa → Thấp). Đo bắt đầu sau 0,5 giây khởi động (để thời gian biên dịch shader không làm hạ mức oan) và chỉ khi model đã tải xong. Mức trần này giữ cho các cảnh sau trong cùng lần mở trang, không ghi đè lựa chọn trong cài đặt. Logic chọn mức là hàm thuần (`three/quality.ts`, có test).
 
 **Chữ trên vật 3D:** `CanvasTexture`, vẽ sau `document.fonts.ready`.
 

@@ -29,6 +29,11 @@ export function loadManifest(): Promise<Manifest> {
   return loading;
 }
 
+/** Manifest hiện có, hoặc null nếu chưa tải xong. Không kích hoạt việc tải (dùng `loadManifest`). */
+export function getManifest(): Manifest | null {
+  return manifest;
+}
+
 /** URL đầy đủ của ảnh, hoặc null nếu manifest chưa tải xong hoặc không có file. */
 export function asset(path: string): string | null {
   return lookupAsset(manifest, ASSETS_URL, path);

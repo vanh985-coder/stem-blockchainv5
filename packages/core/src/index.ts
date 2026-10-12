@@ -120,3 +120,21 @@ export type { StationId, StationResult, StationMeta, LessonContent, LessonDialog
 export { momentBeforeStation, dialogueFor, goldenPageAwarded, lessonStars, applyStationResult } from './lesson2d/flow';
 export type { DialogueTurn as DialogueTurnType } from './ui/DialogueBox';
 export { starsFromMistakes, starsFromHearts } from './lessons/stars';
+// Mức chất lượng 3D và tên model: hàm thuần, không kéo three vào trang đầu. Lõi 3D nằm ở '@so-chung/core/three/index' (lazy).
+export {
+  QUALITY_LEVELS,
+  QUALITY_CHOICES,
+  QUALITY_TABLE,
+  FPS_MIN,
+  FPS_WINDOW_MS,
+  autoQuality,
+  resolveQuality,
+  effectiveDpr,
+  lodDistance,
+  lowerQuality,
+  shouldDowngrade,
+  createFpsTracker,
+  isQualityChoice,
+} from './three/quality';
+export type { QualityLevel, QualityChoice, QualityParams, DeviceInfo, FpsTracker } from './three/quality';
+export { LOD_SUFFIX, modelPath, lodId } from './three/modelIds';
