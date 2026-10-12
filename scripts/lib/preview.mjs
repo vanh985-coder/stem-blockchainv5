@@ -1,7 +1,8 @@
-// Dựng ảnh xem trước một model .glb bằng bộ vẽ phần mềm (không cần trình duyệt), để so trước/sau khi giảm mặt.
-// Chiếu song song, z-buffer, đổ bóng phẳng; lấy màu từ baseColorFactor, COLOR_0 và texture baseColor.
-// Bỏ qua mesh có xương (chỉ dùng cho model không xương).
+// Dựng ảnh xem trước một model .glb bằng bộ vẽ phần mềm (không cần trình duyệt), để so gốc | chính | xa.
+// Chiếu song song, z-buffer, đổ bóng lambert theo pháp tuyến nội suy; màu từ baseColorFactor, COLOR_0 và texture baseColor.
+// Lưới có xương được vẽ ở tư thế gốc. Không áp normal map và không có phản chiếu: ảnh chỉ để so hình khối và màu giữa các bản.
 import sharp from 'sharp';
+import { jointMatrices } from './glb.mjs';
 
 const TEX_SIZE = 512;
 
@@ -12,36 +13,80 @@ async function loadTexture(texture) {
   return { data, w: info.width, h: info.height };
 }
 
-/** Thu các tam giác (đã đưa về tọa độ thế giới) thành danh sách mảnh, mỗi mảnh một primitive. */
+const IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
+/** Thu các primitive (đã đưa về tọa độ thế giới) thành danh sách mảnh. */
 async function collect(doc) {
   const texCache = new Map();
   const pieces = [];
+  const skinCache = new Map();
   for (const node of doc.getRoot().listNodes()) {
     const mesh = node.getMesh();
-    if (!mesh || node.getSkin()) continue;
-    const m = node.getWorldMatrix();
+    if (!mesh) continue;
+    const skin = node.getSkin();
+    let jm = null;
+    if (skin) {
+      if (!skinCache.has(skin)) skinCache.set(skin, jointMatrices(skin));
+      jm = skinCache.get(skin);
+    }
+    // Lưới có xương: vị trí đã nằm trong không gian thế giới sau skinning, bỏ qua ma trận của node.
+    const m = skin ? IDENTITY : node.getWorldMatrix();
     for (const prim of mesh.listPrimitives()) {
       if (prim.getMode() !== 4) continue;
       const pos = prim.getAttribute('POSITION');
       if (!pos) continue;
+      const nrmA = prim.getAttribute('NORMAL');
+      const J = skin ? prim.getAttribute('JOINTS_0') : null;
+      const W = skin ? prim.getAttribute('WEIGHTS_0') : null;
       const n = pos.getCount();
       const world = new Float32Array(n * 3);
+      const nrm = nrmA ? new Float32Array(n * 3) : null;
       const p = [0, 0, 0];
+      const q = [0, 0, 0];
+      const ji = [0, 0, 0, 0];
+      const wi = [0, 0, 0, 0];
       for (let i = 0; i < n; i++) {
         pos.getElement(i, p);
-        world[i * 3] = m[0] * p[0] + m[4] * p[1] + m[8] * p[2] + m[12];
-        world[i * 3 + 1] = m[1] * p[0] + m[5] * p[1] + m[9] * p[2] + m[13];
-        world[i * 3 + 2] = m[2] * p[0] + m[6] * p[1] + m[10] * p[2] + m[14];
+        if (nrmA) nrmA.getElement(i, q);
+        if (J && W) {
+          J.getElement(i, ji);
+          W.getElement(i, wi);
+          let x = 0, y = 0, z = 0, nx = 0, ny = 0, nz = 0;
+          for (let k = 0; k < 4; k++) {
+            const w = wi[k];
+            if (!w) continue;
+            const mm = jm[ji[k]];
+            x += w * (mm[0] * p[0] + mm[4] * p[1] + mm[8] * p[2] + mm[12]);
+            y += w * (mm[1] * p[0] + mm[5] * p[1] + mm[9] * p[2] + mm[13]);
+            z += w * (mm[2] * p[0] + mm[6] * p[1] + mm[10] * p[2] + mm[14]);
+            if (nrm) {
+              nx += w * (mm[0] * q[0] + mm[4] * q[1] + mm[8] * q[2]);
+              ny += w * (mm[1] * q[0] + mm[5] * q[1] + mm[9] * q[2]);
+              nz += w * (mm[2] * q[0] + mm[6] * q[1] + mm[10] * q[2]);
+            }
+          }
+          world[i * 3] = x; world[i * 3 + 1] = y; world[i * 3 + 2] = z;
+          if (nrm) { nrm[i * 3] = nx; nrm[i * 3 + 1] = ny; nrm[i * 3 + 2] = nz; }
+        } else {
+          world[i * 3] = m[0] * p[0] + m[4] * p[1] + m[8] * p[2] + m[12];
+          world[i * 3 + 1] = m[1] * p[0] + m[5] * p[1] + m[9] * p[2] + m[13];
+          world[i * 3 + 2] = m[2] * p[0] + m[6] * p[1] + m[10] * p[2] + m[14];
+          if (nrm) {
+            nrm[i * 3] = m[0] * q[0] + m[4] * q[1] + m[8] * q[2];
+            nrm[i * 3 + 1] = m[1] * q[0] + m[5] * q[1] + m[9] * q[2];
+            nrm[i * 3 + 2] = m[2] * q[0] + m[6] * q[1] + m[10] * q[2];
+          }
+        }
       }
       const uvA = prim.getAttribute('TEXCOORD_0');
       let uv = null;
       if (uvA) {
         uv = new Float32Array(n * 2);
-        const q = [0, 0];
+        const t = [0, 0];
         for (let i = 0; i < n; i++) {
-          uvA.getElement(i, q);
-          uv[i * 2] = q[0];
-          uv[i * 2 + 1] = q[1];
+          uvA.getElement(i, t);
+          uv[i * 2] = t[0];
+          uv[i * 2 + 1] = t[1];
         }
       }
       const colA = prim.getAttribute('COLOR_0');
@@ -66,11 +111,15 @@ async function collect(doc) {
       }
       const idxA = prim.getIndices();
       const idx = idxA ? idxA.getArray() : Uint32Array.from({ length: n }, (_, i) => i);
-      pieces.push({ world, uv, col, tex, factor, idx });
+      pieces.push({ world, nrm, uv, col, tex, factor, idx });
     }
   }
   return pieces;
 }
+
+// Màu trong file là sRGB (texture) hoặc tuyến tính (màu đỉnh, baseColorFactor). Ảnh xem trước dựng trong sRGB:
+// đổi màu đỉnh và hệ số từ tuyến tính sang sRGB để màu khớp với cách trình xem hiển thị.
+const toSrgb = (v) => (v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055);
 
 /** Dựng ảnh RGB vuông cạnh `size`. Góc nhìn: xoay quanh trục đứng `yaw`, nghiêng xuống `pitch` (radian). */
 export async function renderRaw(doc, { size = 480, yaw = -0.6, pitch = 0.3 } = {}) {
@@ -82,7 +131,7 @@ export async function renderRaw(doc, { size = 480, yaw = -0.6, pitch = 0.3 } = {
     const z1 = -sy * x + cy * z;
     return [x1, cp * y - sp * z1, sp * y + cp * z1];
   };
-  let minX = Infinity, minY = Infinity, minZ = Infinity, maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   for (const pc of pieces) {
     const w = pc.world;
     for (let i = 0; i < w.length; i += 3) {
@@ -90,7 +139,14 @@ export async function renderRaw(doc, { size = 480, yaw = -0.6, pitch = 0.3 } = {
       w[i] = x; w[i + 1] = y; w[i + 2] = z;
       if (x < minX) minX = x; if (x > maxX) maxX = x;
       if (y < minY) minY = y; if (y > maxY) maxY = y;
-      if (z < minZ) minZ = z; if (z > maxZ) maxZ = z;
+    }
+    if (pc.nrm) {
+      const nr = pc.nrm;
+      for (let i = 0; i < nr.length; i += 3) {
+        const [x, y, z] = rot(nr[i], nr[i + 1], nr[i + 2]);
+        const l = Math.hypot(x, y, z) || 1;
+        nr[i] = x / l; nr[i + 1] = y / l; nr[i + 2] = z / l;
+      }
     }
   }
   const out = Buffer.alloc(size * size * 3);
@@ -102,9 +158,11 @@ export async function renderRaw(doc, { size = 480, yaw = -0.6, pitch = 0.3 } = {
   const zbuf = new Float32Array(size * size).fill(-Infinity);
   const light = [0.4, 0.7, 0.6];
   const ll = Math.hypot(...light);
+  const lx = light[0] / ll, ly = light[1] / ll, lz = light[2] / ll;
 
   for (const pc of pieces) {
-    const { world: w, uv, col, tex, factor, idx } = pc;
+    const { world: w, nrm, uv, col, tex, factor, idx } = pc;
+    const f0 = toSrgb(factor[0]), f1 = toSrgb(factor[1]), f2 = toSrgb(factor[2]);
     for (let t = 0; t + 2 < idx.length; t += 3) {
       const a = idx[t], b = idx[t + 1], c = idx[t + 2];
       const ax = w[a * 3] * scale + ox, ay = oy - w[a * 3 + 1] * scale, az = w[a * 3 + 2];
@@ -115,14 +173,15 @@ export async function renderRaw(doc, { size = 480, yaw = -0.6, pitch = 0.3 } = {
       if (x0 > x1 || y0 > y1) continue;
       const den = (by - cy2) * (ax - cx) + (cx - bx) * (ay - cy2);
       if (Math.abs(den) < 1e-9) continue;
-      // Pháp tuyến mặt (đã xoay) để đổ bóng phẳng, lật về phía người xem.
-      const ux = w[b * 3] - w[a * 3], uy = w[b * 3 + 1] - w[a * 3 + 1], uz = w[b * 3 + 2] - w[a * 3 + 2];
-      const vx = w[c * 3] - w[a * 3], vy = w[c * 3 + 1] - w[a * 3 + 1], vz = w[c * 3 + 2] - w[a * 3 + 2];
-      let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
-      const nl = Math.hypot(nx, ny, nz) || 1;
-      nx /= nl; ny /= nl; nz /= nl;
-      if (nz < 0) { nx = -nx; ny = -ny; nz = -nz; }
-      const shade = 0.4 + 0.6 * Math.max(0, (nx * light[0] + ny * light[1] + nz * light[2]) / ll);
+      // Pháp tuyến mặt, dùng khi model không có pháp tuyến đỉnh.
+      let fnx = 0, fny = 0, fnz = 0;
+      if (!nrm) {
+        const ux = w[b * 3] - w[a * 3], uy = w[b * 3 + 1] - w[a * 3 + 1], uz = w[b * 3 + 2] - w[a * 3 + 2];
+        const vx = w[c * 3] - w[a * 3], vy = w[c * 3 + 1] - w[a * 3 + 1], vz = w[c * 3 + 2] - w[a * 3 + 2];
+        fnx = uy * vz - uz * vy; fny = uz * vx - ux * vz; fnz = ux * vy - uy * vx;
+        const nl = Math.hypot(fnx, fny, fnz) || 1;
+        fnx /= nl; fny /= nl; fnz /= nl;
+      }
       for (let y = y0; y <= y1; y++) {
         for (let x = x0; x <= x1; x++) {
           const px = x + 0.5, py = y + 0.5;
@@ -134,18 +193,30 @@ export async function renderRaw(doc, { size = 480, yaw = -0.6, pitch = 0.3 } = {
           const zi = y * size + x;
           if (z <= zbuf[zi]) continue;
           zbuf[zi] = z;
-          let r = factor[0], g = factor[1], bl = factor[2];
+          let nx, ny, nz;
+          if (nrm) {
+            nx = l1 * nrm[a * 3] + l2 * nrm[b * 3] + l3 * nrm[c * 3];
+            ny = l1 * nrm[a * 3 + 1] + l2 * nrm[b * 3 + 1] + l3 * nrm[c * 3 + 1];
+            nz = l1 * nrm[a * 3 + 2] + l2 * nrm[b * 3 + 2] + l3 * nrm[c * 3 + 2];
+            const nl = Math.hypot(nx, ny, nz) || 1;
+            nx /= nl; ny /= nl; nz /= nl;
+          } else {
+            nx = fnx; ny = fny; nz = fnz;
+          }
+          if (nz < 0) { nx = -nx; ny = -ny; nz = -nz; }
+          const shade = 0.4 + 0.6 * Math.max(0, nx * lx + ny * ly + nz * lz);
+          let r = f0, g = f1, bl = f2;
           if (col) {
-            r *= l1 * col[a * 3] + l2 * col[b * 3] + l3 * col[c * 3];
-            g *= l1 * col[a * 3 + 1] + l2 * col[b * 3 + 1] + l3 * col[c * 3 + 1];
-            bl *= l1 * col[a * 3 + 2] + l2 * col[b * 3 + 2] + l3 * col[c * 3 + 2];
+            r *= toSrgb(l1 * col[a * 3] + l2 * col[b * 3] + l3 * col[c * 3]);
+            g *= toSrgb(l1 * col[a * 3 + 1] + l2 * col[b * 3 + 1] + l3 * col[c * 3 + 1]);
+            bl *= toSrgb(l1 * col[a * 3 + 2] + l2 * col[b * 3 + 2] + l3 * col[c * 3 + 2]);
           }
           if (tex) {
             let u = l1 * uv[a * 2] + l2 * uv[b * 2] + l3 * uv[c * 2];
             let v = l1 * uv[a * 2 + 1] + l2 * uv[b * 2 + 1] + l3 * uv[c * 2 + 1];
             u -= Math.floor(u);
             v -= Math.floor(v);
-            const ti = ((Math.min(tex.h - 1, (v * tex.h) | 0)) * tex.w + Math.min(tex.w - 1, (u * tex.w) | 0)) * 3;
+            const ti = (Math.min(tex.h - 1, (v * tex.h) | 0) * tex.w + Math.min(tex.w - 1, (u * tex.w) | 0)) * 3;
             r *= tex.data[ti] / 255;
             g *= tex.data[ti + 1] / 255;
             bl *= tex.data[ti + 2] / 255;
@@ -161,23 +232,20 @@ export async function renderRaw(doc, { size = 480, yaw = -0.6, pitch = 0.3 } = {
   return out;
 }
 
-/** Ghép ảnh trước (trái) và sau (phải) thành một PNG, kèm nhãn. */
-export async function composeBeforeAfter(beforeRaw, afterRaw, size, labelBefore, labelAfter) {
+/** Ghép các hình (raw RGB vuông cạnh `size`) cạnh nhau thành một PNG, mỗi hình có nhãn ở dưới. */
+export async function composePanels(panels, size) {
+  const band = 30;
   const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  const label = (txt, x) =>
-    `<text x="${x}" y="24" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="bold" fill="#222">${esc(txt)}</text>`;
-  const svg = Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${size * 2}" height="${size}">${label(labelBefore, 10)}${label(labelAfter, size + 10)}</svg>`,
-  );
-  const raw = { raw: { width: size, height: size, channels: 3 } };
-  const left = await sharp(beforeRaw, raw).png().toBuffer();
-  const right = await sharp(afterRaw, raw).png().toBuffer();
-  return sharp({ create: { width: size * 2, height: size, channels: 3, background: '#eeeeee' } })
-    .composite([
-      { input: left, left: 0, top: 0 },
-      { input: right, left: size, top: 0 },
-      { input: svg, left: 0, top: 0 },
-    ])
+  const label = (txt, i) =>
+    `<text x="${i * size + 10}" y="${size + 21}" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="bold" fill="#222">${esc(txt)}</text>`;
+  const svg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${size * panels.length}" height="${size + band}">${panels.map((p, i) => label(p.label, i)).join('')}</svg>`);
+  const layers = [];
+  for (const [i, p] of panels.entries()) {
+    layers.push({ input: await sharp(p.raw, { raw: { width: size, height: size, channels: 3 } }).png().toBuffer(), left: i * size, top: 0 });
+  }
+  layers.push({ input: svg, left: 0, top: 0 });
+  return sharp({ create: { width: size * panels.length, height: size + band, channels: 3, background: '#e4e4e4' } })
+    .composite(layers)
     .png({ compressionLevel: 9 })
     .toBuffer();
 }

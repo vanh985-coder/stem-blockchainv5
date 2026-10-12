@@ -113,7 +113,7 @@ export function checkCharacter(info, key) {
 // Hộp bao của lưới có xương ở tư thế gốc (skinning với xương đứng yên). Dùng để chắc chắn
 // quantize/nén không làm lệch bộ xương: so hộp bao trước và sau nén.
 
-function mul(a, b) {
+export function mul(a, b) {
   const o = new Array(16);
   for (let c = 0; c < 4; c++) {
     for (let r = 0; r < 4; r++) {
@@ -123,6 +123,13 @@ function mul(a, b) {
   return o;
 }
 
+/** Ma trận skinning (jointWorld * inverseBind) của từng xương ở tư thế gốc. */
+export function jointMatrices(skin) {
+  const ibm = skin.getInverseBindMatrices();
+  const identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+  return skin.listJoints().map((j, i) => mul(j.getWorldMatrix(), ibm ? ibm.getElement(i, new Array(16)) : identity));
+}
+
 export function skinnedRestBounds(doc) {
   const min = [Infinity, Infinity, Infinity];
   const max = [-Infinity, -Infinity, -Infinity];
@@ -130,9 +137,7 @@ export function skinnedRestBounds(doc) {
     const skin = node.getSkin();
     const mesh = node.getMesh();
     if (!skin || !mesh) continue;
-    const joints = skin.listJoints();
-    const ibmAcc = skin.getInverseBindMatrices();
-    const jm = joints.map((j, i) => mul(j.getWorldMatrix(), ibmAcc ? ibmAcc.getElement(i, new Array(16)) : [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]));
+    const jm = jointMatrices(skin);
     const p = [0, 0, 0];
     const ji = [0, 0, 0, 0];
     const wi = [0, 0, 0, 0];

@@ -6,7 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { checkCharacter, largestTexture, REQUIRED_CLIPS, textureBytes } from './lib/glb.mjs';
-import { buildModel, classifyModel } from './lib/model-build.mjs';
+import { buildModelSet, classifyModel, LOD_SUFFIX, LOD_TEXTURE, LOD_TRIS } from './lib/model-build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'assets');
@@ -272,51 +272,64 @@ try {
   console.log('Không có assets/models/: bỏ qua phần model.');
 }
 const previewName = (key) => `${key.replace(/^models\//, '').replace(/\//g, '-')}.png`;
-const modelEntries = [];
+const modelEntries = []; // mỗi mục: { key, lod: boolean, ...cacheEntry }
+const outFile = (key, glb) => `${path.posix.dirname(key)}/${path.posix.basename(key)}.${sha(glb, 8)}.glb`;
 
 for (const rel of modelFiles) {
   const key = `models/${rel.slice(0, -4)}`;
+  const lodKey = key + LOD_SUFFIX;
   const rule = classifyModel(key);
   const srcBuf = await readFile(path.join(MODELS_SRC, rel));
   const sig = `${MODEL_CODE_HASH}:${JSON.stringify(rule)}:${sha(srcBuf)}`;
   const previewPath = path.join(OUT, '_preview', 'models', previewName(key));
-  let entry;
-  const hit = cache[key];
-  if (hit && hit.sig === sig) {
+  let main, lod;
+  const hitMain = cache[key];
+  const hitLod = cache[lodKey];
+  if (hitMain?.sig === sig && (!rule.lod || hitLod?.sig === sig)) {
     try {
-      await stat(path.join(OUT, hit.file));
-      if (hit.model.simplified) await stat(previewPath);
-      entry = hit;
+      await stat(path.join(OUT, hitMain.file));
+      if (rule.lod) await stat(path.join(OUT, hitLod.file));
+      await stat(previewPath);
+      main = hitMain;
+      lod = rule.lod ? hitLod : null;
       modelStats.skipped++;
     } catch {
       /* file ra hoặc ảnh xem trước bị xóa: nén lại */
     }
   }
-  if (!entry) {
+  if (!main) {
     const t = Date.now();
-    const r = await buildModel(srcBuf, rule);
-    const dir = path.posix.dirname(key);
-    const file = `${dir}/${path.posix.basename(key)}.${sha(r.glb, 8)}.glb`;
-    await mkdir(path.dirname(path.join(OUT, file)), { recursive: true });
-    await writeFile(path.join(OUT, file), r.glb);
-    if (r.preview) {
-      await mkdir(path.dirname(previewPath), { recursive: true });
-      await writeFile(previewPath, r.preview);
-    }
-    entry = {
+    const r = await buildModelSet(srcBuf, rule);
+    const toEntry = (v, entryKey) => ({
       sig,
-      file,
-      bytes: r.glb.length,
+      file: outFile(entryKey, v.glb),
+      glb: v.glb,
+      bytes: v.glb.length,
       kind: rule.kind,
-      tris: r.after.tris,
-      model: { srcBytes: r.srcBytes, simplified: r.simplified, permissive: r.permissive, skinDeviation: r.skinDeviation, before: r.before, after: r.after, rule },
-    };
+      tris: v.after.tris,
+      model: { srcBytes: r.srcBytes, simplified: v.simplified, reachedTris: v.reachedTris, removedExt: v.removedExt, skinDeviation: v.skinDeviation, before: v.before, after: v.after, rule },
+    });
+    main = toEntry(r.main, key);
+    lod = r.lod ? toEntry(r.lod, lodKey) : null;
+    for (const e of [main, lod]) {
+      if (!e) continue;
+      await mkdir(path.dirname(path.join(OUT, e.file)), { recursive: true });
+      await writeFile(path.join(OUT, e.file), e.glb);
+      delete e.glb;
+    }
+    await mkdir(path.dirname(previewPath), { recursive: true });
+    await writeFile(previewPath, r.preview);
     modelStats.processed++;
-    console.log(`  nén  models/${rel}  ->  ${file}  (${fmt(r.srcBytes)} -> ${fmt(r.glb.length)}, ${Math.round(r.before.tris)} -> ${Math.round(r.after.tris)} tam giác, ${((Date.now() - t) / 1000).toFixed(1)}s)`);
+    console.log(
+      `  nén  models/${rel}  (${fmt(r.srcBytes)} -> ${fmt(main.bytes)}, ${Math.round(r.srcInfo.tris)} -> ${Math.round(main.tris)} tam giác${lod ? `; xa ${fmt(lod.bytes)}, ${Math.round(lod.tris)} tam giác` : ''}, ${((Date.now() - t) / 1000).toFixed(1)}s)`,
+    );
   }
-  newCache[key] = entry;
-  manifest[key] = { file: entry.file, bytes: entry.bytes, width: 0, height: 0, kind: 'model', tris: entry.tris };
-  modelEntries.push({ key, ...entry });
+  for (const [k, e, isLod] of [[key, main, false], [lodKey, lod, true]]) {
+    if (!e) continue;
+    newCache[k] = e;
+    manifest[k] = { file: e.file, bytes: e.bytes, width: 0, height: 0, kind: 'model', tris: e.tris };
+    modelEntries.push({ key: k, lod: isLod, ...e });
+  }
 }
 
 // Dọn file cũ: mọi file trong assets-build (trừ manifest.json và _preview/) không còn trong manifest.
@@ -372,57 +385,63 @@ if (unclassified.length) {
 }
 
 // ---------------------------------------------------------------------------
-// Model: bảng trước/sau, cảnh báo, kiểm tra xương và hoạt ảnh.
+// Model: bảng gốc / chính / xa, cảnh báo, kiểm tra xương và hoạt ảnh.
 if (modelEntries.length) {
   const MB = 1048576;
   const warnings = [];
+  const notes = [];
   const problems = [];
   const rows = [];
-  for (const e of modelEntries) {
-    const { before, after, rule, simplified, permissive, srcBytes, skinDeviation } = e.model;
+  const mains = modelEntries.filter((m) => !m.lod);
+  const lods = new Map(modelEntries.filter((m) => m.lod).map((m) => [m.key, m]));
+  for (const e of mains) {
+    const { before, after, rule, simplified, reachedTris, srcBytes, skinDeviation, removedExt } = e.model;
+    const lod = lods.get(e.key + LOD_SUFFIX);
     const tex = largestTexture(after);
-    const texTotal = textureBytes(after);
-    const notes = [];
-    const w = (msg) => {
-      warnings.push(`${e.key}: ${msg}`);
-      notes.push('!');
-    };
+    const w = (msg) => warnings.push(`${e.key}: ${msg}`);
     if (e.bytes > rule.maxBytes) w(`${(e.bytes / MB).toFixed(2)} MB, vượt mục tiêu ${rule.maxBytes / MB} MB (${rule.kind === 'nhan-vat' ? 'nhân vật' : 'đồ vật'})`);
-    if (rule.kind === 'nhan-vat' && texTotal > 2 * MB) w(`tổng texture ${(texTotal / MB).toFixed(2)} MB, vượt 2 MB`);
     if (before.skins > 0 && before.tris > 30000) w(`có xương và ${Math.round(before.tris)} tam giác: không giảm mặt, chỉ cảnh báo`);
-    if (simplified && after.tris > rule.targetTris * 1.5) w(`sau giảm mặt vẫn ${Math.round(after.tris)} tam giác (mục tiêu ~${rule.targetTris})`);
-    if (permissive) w('giảm mặt kiểu Permissive để đạt mục tiêu: texture có thể bị méo, hãy soi ảnh trong assets-build/_preview/models/');
+    if (simplified && reachedTris > rule.targetTris * 1.25) w(`chế độ chặt dừng ở ${Math.round(reachedTris)} tam giác (mục tiêu ${rule.targetTris}), giữ nguyên`);
     if (tex && Math.max(tex.width, tex.height) > rule.maxTexture) w(`texture ${tex.width}x${tex.height} vượt ${rule.maxTexture}`);
+    if (removedExt.length) notes.push(`${e.key}: ${removedExt.join(', ')}`);
     if (skinDeviation !== null && skinDeviation > 0.01) problems.push(`${e.key}: bộ xương lệch ${(skinDeviation * 100).toFixed(2)}% sau nén (tối đa 1%)`);
     if (REQUIRED_CLIPS[e.key]) {
       const { problems: p } = checkCharacter(after, e.key);
       for (const m of p) problems.push(`${e.key}: ${m}`);
     }
+    if (rule.lod && !lod) problems.push(`${e.key}: thiếu bản xa`);
+    if (lod) {
+      if (lod.bytes > rule.lodMaxBytes) w(`bản xa ${(lod.bytes / MB).toFixed(2)} MB, vượt mục tiêu ${rule.lodMaxBytes / MB} MB`);
+      if (lod.tris > LOD_TRIS * 1.25) w(`bản xa ${Math.round(lod.tris)} tam giác (mục tiêu ${LOD_TRIS})`);
+    }
     rows.push({
       name: e.key.replace(/^models\//, ''),
       before: srcBytes / MB,
       after: e.bytes / MB,
-      tris: `${Math.round(before.tris).toLocaleString('en-US')} -> ${Math.round(after.tris).toLocaleString('en-US')}${simplified ? ' (giảm)' : ''}`,
+      tris: `${Math.round(before.tris).toLocaleString('en-US')} -> ${Math.round(after.tris).toLocaleString('en-US')}`,
       tex: tex ? `${tex.width}x${tex.height}` : '-',
-      texMb: texTotal / MB,
-      mark: notes.length ? '!' : '',
+      lodMb: lod ? lod.bytes / MB : null,
+      lodTris: lod ? Math.round(lod.tris).toLocaleString('en-US') : '-',
     });
   }
   const nameW = Math.max(...rows.map((r) => r.name.length), 5);
-  console.log('\n=== Model: trước / sau ===');
-  console.log(`${'Model'.padEnd(nameW)}  ${'Trước MB'.padStart(8)}  ${'Sau MB'.padStart(7)}  ${'Tam giác (trước -> sau)'.padEnd(30)}  ${'Texture lớn nhất'.padEnd(16)}  Tổng texture MB`);
+  console.log('\n=== Model: gốc / bản chính / bản xa ===');
+  console.log(
+    `${'Model'.padEnd(nameW)}  ${'Gốc MB'.padStart(7)}  ${'Chính MB'.padStart(8)}  ${'Tam giác (gốc -> chính)'.padEnd(24)}  ${'Texture'.padEnd(9)}  ${'Xa MB'.padStart(6)}  Xa tam giác`,
+  );
   for (const r of rows) {
     console.log(
-      `${r.name.padEnd(nameW)}  ${r.before.toFixed(2).padStart(8)}  ${r.after.toFixed(2).padStart(7)}  ${r.tris.padEnd(30)}  ${r.tex.padEnd(16)}  ${r.texMb.toFixed(2).padStart(6)} ${r.mark}`,
+      `${r.name.padEnd(nameW)}  ${r.before.toFixed(2).padStart(7)}  ${r.after.toFixed(2).padStart(8)}  ${r.tris.padEnd(24)}  ${r.tex.padEnd(9)}  ${(r.lodMb === null ? '-' : r.lodMb.toFixed(2)).padStart(6)}  ${r.lodTris}`,
     );
   }
-  const sumBefore = rows.reduce((s, r) => s + r.before, 0);
-  const sumAfter = rows.reduce((s, r) => s + r.after, 0);
-  console.log(`${'TỔNG'.padEnd(nameW)}  ${sumBefore.toFixed(2).padStart(8)}  ${sumAfter.toFixed(2).padStart(7)}`);
-  console.log(`Model nén mới ${modelStats.processed}, bỏ qua (không đổi) ${modelStats.skipped}. Ảnh trước/sau: assets-build/_preview/models/`);
+  const sum = (xs) => xs.reduce((s, x) => s + x, 0);
+  console.log(
+    `${'TỔNG'.padEnd(nameW)}  ${sum(rows.map((r) => r.before)).toFixed(2).padStart(7)}  ${sum(rows.map((r) => r.after)).toFixed(2).padStart(8)}  ${''.padEnd(24)}  ${''.padEnd(9)}  ${sum(rows.map((r) => r.lodMb ?? 0)).toFixed(2).padStart(6)}`,
+  );
+  console.log(`Model nén mới ${modelStats.processed}, bỏ qua (không đổi) ${modelStats.skipped}. Ảnh so sánh gốc | chính | xa: assets-build/_preview/models/ (bản xa texture ${LOD_TEXTURE}).`);
 
   console.log('\n=== Kiểm tra xương và hoạt ảnh (đọc lại file đã nén) ===');
-  for (const e of modelEntries.filter((m) => m.model.before.skins > 0)) {
+  for (const e of mains.filter((m) => m.model.before.skins > 0)) {
     const { after, before, skinDeviation } = e.model;
     const clips = after.clips.map((c) => `${c.name} (${c.duration.toFixed(2)}s)`).join(', ');
     const srcClips = before.clips.length;
@@ -431,11 +450,15 @@ if (modelEntries.length) {
     if (after.clips.length !== srcClips) problems.push(`${e.key}: gốc ${srcClips} clip, sau nén ${after.clips.length}`);
   }
 
+  if (notes.length) {
+    console.log(`\nĐÃ GỠ vật liệu kính (đổi về vật liệu thường, giữ màu gốc) ở ${notes.length} model:`);
+    for (const m of notes) console.log(`  ${m}`);
+  }
   if (warnings.length) {
     console.log(`\nCẢNH BÁO model (${warnings.length}):`);
     for (const m of warnings) console.log(`  ${m}`);
   } else {
-    console.log('\nKhông có cảnh báo dung lượng model.');
+    console.log('\nKhông có cảnh báo model.');
   }
   if (problems.length) {
     console.log(`\nLỖI model (${problems.length}):`);

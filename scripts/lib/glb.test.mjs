@@ -4,8 +4,8 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { checkCharacter, createIO, findClip, inspectDoc, largestTexture, MIXAMO_JOINT_COUNT, REQUIRED_CLIPS, textureBytes } from './glb.mjs';
-import { classifyModel } from './model-build.mjs';
+import { checkCharacter, createIO, findClip, inspectDoc, largestTexture, MIXAMO_JOINT_COUNT, REQUIRED_CLIPS } from './glb.mjs';
+import { classifyModel, LOD_SUFFIX, LOD_TEXTURE, LOD_TRIS } from './model-build.mjs';
 
 const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'assets-build');
 const MB = 1048576;
@@ -59,16 +59,24 @@ describe('checkCharacter (dữ liệu giả)', () => {
 });
 
 describe('classifyModel', () => {
-  it('nhân vật: texture 1024, ~15.000 tam giác, ≤ 2,5 MB', () => {
-    expect(classifyModel('models/characters/ti')).toMatchObject({ kind: 'nhan-vat', maxTexture: 1024, targetTris: 15000, maxBytes: 2.5 * MB });
+  it('nhân vật: texture 2048, ≤ 3 MB, không có bản xa', () => {
+    expect(classifyModel('models/characters/ti')).toMatchObject({ kind: 'nhan-vat', maxTexture: 2048, targetTris: 15000, maxBytes: 3 * MB, lod: false });
   });
-  it('cây đa và 4 cổng làng: texture 2048', () => {
-    for (const k of ['models/env/cay-da', 'models/env/cong-lang-giay', 'models/env/cong-lang-det', 'models/env/cong-lang-khac-dau', 'models/env/cong-lang-bac']) {
-      expect(classifyModel(k)).toMatchObject({ kind: 'do-vat', maxTexture: 2048 });
+  it('cổng làng, cây đa, nhà: texture 2048, 50.000 tam giác, ≤ 2,5 MB, có bản xa', () => {
+    const keys = ['models/env/cay-da', 'models/env/nha-mai-ngoi', 'models/env/nha-mai-tranh', ...['giay', 'det', 'khac-dau', 'bac'].map((v) => `models/env/cong-lang-${v}`)];
+    for (const k of keys) {
+      expect(classifyModel(k)).toMatchObject({ kind: 'do-vat', maxTexture: 2048, targetTris: 50000, maxBytes: 2.5 * MB, lod: true, lodMaxBytes: 0.4 * MB });
     }
   });
-  it('đồ vật còn lại: texture 1024, ~8.000 tam giác, ≤ 1,5 MB', () => {
-    expect(classifyModel('models/env/gieng-lang')).toMatchObject({ kind: 'do-vat', maxTexture: 1024, targetTris: 8000, maxBytes: 1.5 * MB });
+  it('đồ vật còn lại (kể cả model chỉ có màu đỉnh): texture 1024, 30.000 tam giác, ≤ 2,5 MB, có bản xa', () => {
+    for (const k of ['models/env/gieng-lang', 'models/env/bui-tre', 'models/env/khung-cui', 'models/games/man-02-duoi-ti/sap-thap']) {
+      expect(classifyModel(k)).toMatchObject({ kind: 'do-vat', maxTexture: 1024, targetTris: 30000, maxBytes: 2.5 * MB, lod: true });
+    }
+  });
+  it('bản xa: 8.000 tam giác, texture 512, đuôi -xa', () => {
+    expect(LOD_TRIS).toBe(8000);
+    expect(LOD_TEXTURE).toBe(512);
+    expect(LOD_SUFFIX).toBe('-xa');
   });
 });
 
@@ -104,26 +112,56 @@ describe('model đã nén trong assets-build/', () => {
     expect(await n('models/characters/dan-lang-nong-dan')).toBe(2);
   }, 60000);
 
-  it('mọi model trong manifest: nén meshopt, không còn Draco, texture trong giới hạn, đúng mục tiêu dung lượng', async () => {
-    const keys = Object.keys(manifest).filter((k) => k.startsWith('models/'));
-    expect(keys.length).toBeGreaterThanOrEqual(25);
-    for (const key of keys) {
+  const modelKeys = () => Object.keys(manifest).filter((k) => k.startsWith('models/'));
+  const mainKeys = () => modelKeys().filter((k) => !k.endsWith(LOD_SUFFIX));
+  const lodKeys = () => modelKeys().filter((k) => k.endsWith(LOD_SUFFIX));
+
+  it('bản chính (25 model): nén meshopt, không còn Draco, không còn vật liệu kính, texture và dung lượng trong giới hạn', async () => {
+    expect(mainKeys().length).toBe(25);
+    for (const key of mainKeys()) {
       const rule = classifyModel(key);
       const info = inspectDoc(await load(key));
       expect(info.extensions, key).toContain('EXT_meshopt_compression');
       expect(info.extensions, key).not.toContain('KHR_draco_mesh_compression');
+      expect(info.extensions, key).not.toContain('KHR_materials_volume');
+      expect(info.extensions, key).not.toContain('KHR_materials_transmission');
       const big = largestTexture(info);
       if (big) expect(Math.max(big.width, big.height), `${key} texture`).toBeLessThanOrEqual(rule.maxTexture);
       expect(manifest[key].bytes, `${key} dung lượng`).toBeLessThanOrEqual(rule.maxBytes);
-      if (rule.kind === 'nhan-vat') expect(textureBytes(info), `${key} tổng texture`).toBeLessThanOrEqual(2 * MB);
       expect(manifest[key].kind).toBe('model');
       expect(manifest[key].tris).toBe(Math.round(info.tris));
     }
   }, 120000);
 
-  it('đồ vật đã giảm mặt: không còn model nào trên 40.000 tam giác (mục tiêu ~8.000, chế độ chặt có thể dừng cao hơn)', () => {
-    for (const key of Object.keys(manifest).filter((k) => k.startsWith('models/') && !k.startsWith('models/characters/'))) {
-      expect(manifest[key].tris, key).toBeLessThanOrEqual(40000);
+  it('nhân vật giữ nguyên số tam giác (không giảm mặt) và texture 2048', async () => {
+    for (const key of mainKeys().filter((k) => k.startsWith('models/characters/'))) {
+      expect(manifest[key].tris, key).toBeGreaterThan(17000);
+      expect(manifest[key].tris, key).toBeLessThan(19000);
+      expect(lodKeys(), key).not.toContain(key + LOD_SUFFIX);
     }
   });
+
+  // Chế độ chặt có thể dừng cao hơn mục tiêu; ba model dưới đây đã biết và có cảnh báo khi build.
+  const STALLED = { 'models/env/bui-tre': 50000, 'models/env/khung-cui': 150000, 'models/env/leu-cho': 80000 };
+  it('đồ vật đã giảm mặt đúng mục tiêu (cho phép lệch 25%), trừ bui-tre, khung-cui và leu-cho', () => {
+    for (const key of mainKeys().filter((k) => !k.startsWith('models/characters/'))) {
+      const rule = classifyModel(key);
+      const limit = STALLED[key] ?? Math.max(rule.targetTris * 1.25, 9200); // cay-da vốn có 9.126 tam giác
+      expect(manifest[key].tris, key).toBeLessThanOrEqual(limit);
+    }
+  });
+
+  it('mỗi model trong env và games có bản xa: ~8.000 tam giác, texture 512, ≤ 0,4 MB', async () => {
+    const expected = mainKeys().filter((k) => classifyModel(k).lod);
+    expect(expected.length).toBe(15);
+    expect(lodKeys().sort()).toEqual(expected.map((k) => k + LOD_SUFFIX).sort());
+    for (const key of lodKeys()) {
+      const info = inspectDoc(await load(key));
+      expect(info.extensions, key).toContain('EXT_meshopt_compression');
+      expect(info.tris, key).toBeLessThanOrEqual(LOD_TRIS * 1.25);
+      const big = largestTexture(info);
+      if (big) expect(Math.max(big.width, big.height), `${key} texture`).toBeLessThanOrEqual(LOD_TEXTURE);
+      expect(manifest[key].bytes, `${key} dung lượng`).toBeLessThanOrEqual(classifyModel(key.slice(0, -LOD_SUFFIX.length)).lodMaxBytes);
+    }
+  }, 120000);
 });

@@ -127,14 +127,21 @@ export interface VillageModule {
 **Lệnh `pnpm assets:build`** (script `scripts/assets-build.mjs`, dùng `@gltf-transform/core` và `sharp`). Đọc `assets/`, ghi kết quả ra `assets-build/`. **Không deploy** `concept/`, `source/` và mọi file không phải ảnh hoặc model.
 
 **Xử lý model (`.glb`):**
-1. **Mọi model:** `dedup`, `weld`; nén `meshopt`; texture chuyển sang WebP.
-2. **Nhân vật:**
-   - Texture tối đa **1024**. Hiện mỗi nhân vật có 3 texture, một cái tới 4096×4096.
-   - Nếu tổng texture một nhân vật sau nén vẫn trên 2 MB, ghi cảnh báo.
-3. **Model có trên 30.000 tam giác:**
-   - **không có xương** (6 nhân vật đứng yên, đồ vật): `simplify` xuống khoảng 15.000 tam giác (nhân vật) hoặc khoảng 8.000 (đồ vật). Xuất ảnh chụp trước và sau ra `assets-build/_preview/` để kiểm tra bằng mắt.
-   - **có xương:** không simplify, chỉ ghi cảnh báo.
-4. **Đồ vật thường:** texture 1024. Cây đa và 4 cổng làng: 2048.
+1. **Mọi model:** `dedup`, `weld`; nén `meshopt` (UV 14 bit); texture chuyển sang WebP chất lượng 90. Gỡ `KHR_materials_transmission` và `KHR_materials_volume` (đổi về vật liệu thường, giữ màu gốc; hiện chỉ có `volume` ở 14 model đồ vật, không model nào dùng `transmission`).
+2. **Texture tối đa:**
+   - **2048:** cả 10 nhân vật; cây đa; 4 cổng làng; nhà (`nha-mai-ngoi`, `nha-mai-tranh`).
+   - **1024:** đồ vật còn lại.
+3. **Giảm mặt bản chính** (`simplify` có tính UV, pháp tuyến, màu đỉnh; chỉ chế độ chặt, **không** dùng `Permissive`; sai số tối đa 3% kích thước model, để không sinh gai):
+   - **không có xương** (đồ vật; nhân vật đứng yên chỉ giảm nếu trên 30.000 tam giác, xuống khoảng 15.000, hiện không có cái nào):
+     - đồ vật thường: **30.000** tam giác;
+     - cổng làng, cây đa, nhà: **50.000** tam giác;
+     - model chỉ có màu đỉnh (`bui-tre`, `khung-cui`, `sap-thap`): **30.000** tam giác.
+   - **có xương:** không giảm mặt, chỉ ghi cảnh báo nếu trên 30.000 tam giác.
+   - Nếu chế độ chặt dừng ở mức cao hơn mục tiêu thì giữ nguyên và ghi cảnh báo. Hiện có 3 model: `khung-cui` (~134.000 tam giác), `leu-cho` (~67.000), `bui-tre` (~41.700).
+4. **Bản xa (LOD):** mỗi model trong `models/env` và `models/games` có thêm bản `<tên>-xa` (ví dụ `models/env/cong-lang-giay-xa`): khoảng **8.000** tam giác (dùng `Permissive`, tính lại pháp tuyến), texture **512** (WebP chất lượng 80). Ghi vào manifest như model thường. Nhân vật không có bản xa.
+5. **Kiểm tra bằng mắt:** mỗi model một ảnh `assets-build/_preview/models/<tên>.png` gồm các hình cùng góc nhìn và ánh sáng: gốc | bản chính | bản xa, kèm số tam giác và dung lượng. Ảnh do bộ vẽ phần mềm dựng (không có normal map) nên chỉ để so hình khối và màu; nhân vật có xương vẽ ở tư thế gốc.
+6. **Kiểm tra xương và hoạt ảnh:** với `hoc-sinh-nam`, `ti`, `dan-lang-ba-cu`, `dan-lang-nong-dan`, build đọc lại file đã nén và báo lỗi nếu không còn đủ 65 xương Mixamo hoặc thiếu clip ở spec 03 mục 3.2 (có test vitest).
+7. **Khi tải bằng `GLTFLoader`:** phải gọi `loader.setMeshoptDecoder(MeshoptDecoder)`, vì file nén `meshopt` bắt buộc cần bộ giải mã. Model không còn nén Draco.
 
 **Xử lý ảnh:**
 1. **Chuyển sang WebP:** ảnh nền và ảnh truyện tối đa 1920px chiều ngang, chất lượng 82. Hình rời, icon, ô lá, thẻ bài giữ nền trong suốt, tối đa 1024px (icon 256px).
@@ -153,8 +160,8 @@ export interface VillageModule {
 - App đọc đồ họa qua `VITE_ASSETS_URL`. Thiếu file thì dùng hình thay thế, không được làm hỏng trang.
 
 **Dung lượng mục tiêu sau build:**
-- Mỗi nhân vật ≤ 2,5 MB; mỗi đồ vật ≤ 1,5 MB; mỗi ảnh nền ≤ 400 KB.
-- Tổng cả bộ khoảng 40–60 MB, tải theo từng cảnh.
+- Mỗi nhân vật ≤ 3 MB; mỗi đồ vật ≤ 2,5 MB; mỗi bản xa ≤ 0,4 MB; mỗi ảnh nền ≤ 400 KB.
+- Tổng model của một cảnh ≤ 30 MB (hiện: chợ phiên khoảng 20–23 MB, Làng Giấy khoảng 11–13 MB, màn 2 khoảng 11–13 MB; cả bộ 25 model chính 30,7 MB và 15 bản xa 4,5 MB). Model tải theo từng cảnh.
 File trong assets-build/ mang mã băm nội dung trong tên (ten.<hash8>.webp); manifest.json ánh xạ đường dẫn gốc sang tên này và có Cache-Control: no-cache.
 ## 6. Biến môi trường
 
@@ -221,7 +228,7 @@ Thêm `--host` để mở thử bằng điện thoại cùng mạng Wi-Fi.
 - [ ] Đã áp bảng đổi nội dung (Linh thành Lan, các tên, Bi); chuỗi trong test giữ nguyên; test vẫn ✅.
 
 **Mốc 2:**
-- [ ] `pnpm assets:build` phần model: texture nhân vật ≤ 1024; model không xương đã giảm mặt; có thư mục `_preview` để soi bằng mắt.
+- [ ] `pnpm assets:build` phần model: texture nhân vật 2048; model không xương đã giảm mặt (30.000 / 50.000 tam giác); mỗi model env và games có bản `-xa`; có ảnh gốc | chính | xa trong `_preview/models/` để soi bằng mắt.
 - [ ] Một model trên `sb-assets.blockchainptit.com` tải được từ cả hub lẫn subdomain làng (không lỗi CORS).
 
 **Mốc 3:**

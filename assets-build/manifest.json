@@ -1,203 +1,323 @@
 {
   "models/characters/bac-an": {
-    "file": "models/characters/bac-an.62caa00a.glb",
-    "bytes": 679312,
+    "file": "models/characters/bac-an.e9a09cbd.glb",
+    "bytes": 1797384,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 18222
   },
   "models/characters/chu-dung": {
-    "file": "models/characters/chu-dung.503ded19.glb",
-    "bytes": 554052,
+    "file": "models/characters/chu-dung.8f155f35.glb",
+    "bytes": 1389508,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 18099
   },
   "models/characters/co-chi": {
-    "file": "models/characters/co-chi.d53903dc.glb",
-    "bytes": 516568,
+    "file": "models/characters/co-chi.094eb192.glb",
+    "bytes": 1251800,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 17730
   },
   "models/characters/cu-binh": {
-    "file": "models/characters/cu-binh.4d629a86.glb",
-    "bytes": 580516,
+    "file": "models/characters/cu-binh.ebe07107.glb",
+    "bytes": 1391136,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 18258
   },
   "models/characters/dan-lang-ba-cu": {
-    "file": "models/characters/dan-lang-ba-cu.260c17b9.glb",
-    "bytes": 777772,
+    "file": "models/characters/dan-lang-ba-cu.6068dbe5.glb",
+    "bytes": 1598876,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 18165
   },
   "models/characters/dan-lang-nong-dan": {
-    "file": "models/characters/dan-lang-nong-dan.52014054.glb",
-    "bytes": 861496,
+    "file": "models/characters/dan-lang-nong-dan.ce4e269f.glb",
+    "bytes": 1821392,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 18330
   },
   "models/characters/hoc-sinh-nam": {
-    "file": "models/characters/hoc-sinh-nam.73e47e41.glb",
-    "bytes": 1024916,
+    "file": "models/characters/hoc-sinh-nam.f465f5f3.glb",
+    "bytes": 1760496,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 18588
   },
   "models/characters/lai-buon": {
-    "file": "models/characters/lai-buon.d37c3a2c.glb",
-    "bytes": 568460,
+    "file": "models/characters/lai-buon.748aaa97.glb",
+    "bytes": 1394528,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 18017
   },
   "models/characters/thay-linh": {
-    "file": "models/characters/thay-linh.3578dcd3.glb",
-    "bytes": 752920,
+    "file": "models/characters/thay-linh.5876cd7a.glb",
+    "bytes": 1915116,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 18179
   },
   "models/characters/ti": {
-    "file": "models/characters/ti.00fe0da2.glb",
-    "bytes": 1051268,
+    "file": "models/characters/ti.ae089201.glb",
+    "bytes": 2074380,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 17805
   },
   "models/env/bui-tre": {
-    "file": "models/env/bui-tre.50859bcc.glb",
-    "bytes": 115784,
+    "file": "models/env/bui-tre.dba8e5a3.glb",
+    "bytes": 312132,
     "width": 0,
     "height": 0,
     "kind": "model",
-    "tris": 7878
+    "tris": 41691
+  },
+  "models/env/bui-tre-xa": {
+    "file": "models/env/bui-tre-xa.2d87ddae.glb",
+    "bytes": 271140,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 7890
   },
   "models/env/cay-da": {
-    "file": "models/env/cay-da.aa7947f9.glb",
-    "bytes": 594080,
+    "file": "models/env/cay-da.b1aa7154.glb",
+    "bytes": 638092,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 9126
   },
-  "models/env/cong-lang-bac": {
-    "file": "models/env/cong-lang-bac.8121d0a3.glb",
-    "bytes": 822816,
+  "models/env/cay-da-xa": {
+    "file": "models/env/cay-da-xa.c142952e.glb",
+    "bytes": 272900,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 8000
   },
-  "models/env/cong-lang-det": {
-    "file": "models/env/cong-lang-det.211098e3.glb",
-    "bytes": 882268,
+  "models/env/cong-lang-bac": {
+    "file": "models/env/cong-lang-bac.1cf8ddd7.glb",
+    "bytes": 1204204,
     "width": 0,
     "height": 0,
     "kind": "model",
-    "tris": 7999
+    "tris": 50000
+  },
+  "models/env/cong-lang-bac-xa": {
+    "file": "models/env/cong-lang-bac-xa.48552f88.glb",
+    "bytes": 331068,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 7990
+  },
+  "models/env/cong-lang-det": {
+    "file": "models/env/cong-lang-det.e86ddf29.glb",
+    "bytes": 1267720,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 49999
+  },
+  "models/env/cong-lang-det-xa": {
+    "file": "models/env/cong-lang-det-xa.275542d9.glb",
+    "bytes": 341328,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 7998
   },
   "models/env/cong-lang-giay": {
-    "file": "models/env/cong-lang-giay.3e153a98.glb",
-    "bytes": 1053760,
+    "file": "models/env/cong-lang-giay.084fe5e2.glb",
+    "bytes": 1439300,
     "width": 0,
     "height": 0,
     "kind": "model",
-    "tris": 7995
+    "tris": 49999
+  },
+  "models/env/cong-lang-giay-xa": {
+    "file": "models/env/cong-lang-giay-xa.4488ae8a.glb",
+    "bytes": 357616,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 8000
   },
   "models/env/cong-lang-khac-dau": {
-    "file": "models/env/cong-lang-khac-dau.f01006a2.glb",
-    "bytes": 1002496,
+    "file": "models/env/cong-lang-khac-dau.a2584185.glb",
+    "bytes": 1459772,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 50000
+  },
+  "models/env/cong-lang-khac-dau-xa": {
+    "file": "models/env/cong-lang-khac-dau-xa.e9e340b6.glb",
+    "bytes": 343344,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 8000
   },
   "models/env/gieng-lang": {
-    "file": "models/env/gieng-lang.b76ca031.glb",
-    "bytes": 399852,
+    "file": "models/env/gieng-lang.00d1eee6.glb",
+    "bytes": 581256,
     "width": 0,
     "height": 0,
     "kind": "model",
-    "tris": 13182
+    "tris": 30000
+  },
+  "models/env/gieng-lang-xa": {
+    "file": "models/env/gieng-lang-xa.810d7be3.glb",
+    "bytes": 332508,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 8000
   },
   "models/env/khung-cui": {
-    "file": "models/env/khung-cui.e31dfc51.glb",
-    "bytes": 74316,
+    "file": "models/env/khung-cui.76824b5f.glb",
+    "bytes": 1649928,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 134198
+  },
+  "models/env/khung-cui-xa": {
+    "file": "models/env/khung-cui-xa.9a7473b1.glb",
+    "bytes": 212460,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 7978
   },
   "models/env/leu-cho": {
-    "file": "models/env/leu-cho.bbe968fa.glb",
-    "bytes": 497332,
+    "file": "models/env/leu-cho.046f26da.glb",
+    "bytes": 1484896,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 66992
+  },
+  "models/env/leu-cho-xa": {
+    "file": "models/env/leu-cho-xa.c7de0453.glb",
+    "bytes": 359056,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 7910
   },
   "models/env/nha-mai-ngoi": {
-    "file": "models/env/nha-mai-ngoi.9c53722a.glb",
-    "bytes": 829536,
+    "file": "models/env/nha-mai-ngoi.a436d678.glb",
+    "bytes": 1782324,
     "width": 0,
     "height": 0,
     "kind": "model",
-    "tris": 30780
+    "tris": 50000
+  },
+  "models/env/nha-mai-ngoi-xa": {
+    "file": "models/env/nha-mai-ngoi-xa.c2a81b24.glb",
+    "bytes": 348704,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 8000
   },
   "models/env/nha-mai-tranh": {
-    "file": "models/env/nha-mai-tranh.526b0a08.glb",
-    "bytes": 828148,
+    "file": "models/env/nha-mai-tranh.9d83c67d.glb",
+    "bytes": 1637568,
     "width": 0,
     "height": 0,
     "kind": "model",
-    "tris": 35212
+    "tris": 50000
+  },
+  "models/env/nha-mai-tranh-xa": {
+    "file": "models/env/nha-mai-tranh-xa.ac64f66b.glb",
+    "bytes": 333892,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 8000
   },
   "models/env/phen-phoi-giay": {
-    "file": "models/env/phen-phoi-giay.a15c4fa8.glb",
-    "bytes": 484376,
+    "file": "models/env/phen-phoi-giay.e3d337c9.glb",
+    "bytes": 703084,
     "width": 0,
     "height": 0,
     "kind": "model",
-    "tris": 9877
+    "tris": 29999
+  },
+  "models/env/phen-phoi-giay-xa": {
+    "file": "models/env/phen-phoi-giay-xa.2a4cf3e8.glb",
+    "bytes": 347528,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 7994
   },
   "models/games/man-02-duoi-ti/sap-thap": {
-    "file": "models/games/man-02-duoi-ti/sap-thap.9266e3b5.glb",
-    "bytes": 45308,
+    "file": "models/games/man-02-duoi-ti/sap-thap.082367e7.glb",
+    "bytes": 153452,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 30000
+  },
+  "models/games/man-02-duoi-ti/sap-thap-xa": {
+    "file": "models/games/man-02-duoi-ti/sap-thap-xa.ae901950.glb",
+    "bytes": 190452,
     "width": 0,
     "height": 0,
     "kind": "model",
     "tris": 8000
   },
   "models/games/man-02-duoi-ti/xe-bo": {
-    "file": "models/games/man-02-duoi-ti/xe-bo.327dfc8a.glb",
-    "bytes": 811256,
+    "file": "models/games/man-02-duoi-ti/xe-bo.88ad7f79.glb",
+    "bytes": 797440,
     "width": 0,
     "height": 0,
     "kind": "model",
-    "tris": 39982
+    "tris": 29986
+  },
+  "models/games/man-02-duoi-ti/xe-bo-xa": {
+    "file": "models/games/man-02-duoi-ti/xe-bo-xa.a998a46d.glb",
+    "bytes": 348724,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 7908
   },
   "models/games/man-02-duoi-ti/xe-cho-hang": {
-    "file": "models/games/man-02-duoi-ti/xe-cho-hang.d5f39174.glb",
-    "bytes": 450796,
+    "file": "models/games/man-02-duoi-ti/xe-cho-hang.9b924296.glb",
+    "bytes": 677648,
     "width": 0,
     "height": 0,
     "kind": "model",
-    "tris": 7998
+    "tris": 30000
+  },
+  "models/games/man-02-duoi-ti/xe-cho-hang-xa": {
+    "file": "models/games/man-02-duoi-ti/xe-cho-hang-xa.d607172c.glb",
+    "bytes": 343824,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 7990
   },
   "scenes/bai-hoc-lang-bac": {
     "file": "scenes/bai-hoc-lang-bac.2f602809.webp",
