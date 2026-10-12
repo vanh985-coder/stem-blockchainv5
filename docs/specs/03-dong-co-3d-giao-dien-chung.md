@@ -125,7 +125,8 @@ Dùng cho **mọi trang** (bảng gán ở `packages/core/src/content/nenTrangTr
 **Bản xa (LOD):**
 - Mỗi model trong `models/env` và `models/games` có bản `<id>-xa` (spec 01 mục 5). `<Model id>` tự dùng bản xa khi camera ở xa hơn khoảng đổi (drei `Detailed`, độ trễ 5%): **Thấp 12, Vừa 20, Cao 30 đơn vị**.
 - Model không có bản xa (nhân vật) thì luôn dùng bản chính. Có thể ép bằng `lod="near"` hoặc `lod="far"`.
-- **Cỡ model trong file** (đã đo trên file đã nén): cạnh dài nhất của mọi model đều khoảng **1 đơn vị** (0,98). Nhân vật không xương cao 0,98 với đáy ở y = 0; 4 nhân vật có xương (`hoc-sinh-nam`, `ti`, `dan-lang-ba-cu`, `dan-lang-nong-dan`) cao **2,0** với gốc ở giữa người (đáy ở y = −1). Cảnh phải đặt tỉ lệ (ví dụ cổng làng, nhà phóng to nhiều lần) và độ cao cho từng model; khoảng đổi bản xa tính theo khoảng cách camera thật trong cảnh.
+- **Cỡ model trong file** (đo bằng three, đã áp xương ở tư thế gốc): cạnh dài nhất của mọi model đều khoảng **1 đơn vị** (0,98); cả 10 nhân vật cao ~0,98 với chân ở y = 0. Cảnh phải đặt tỉ lệ cho từng loại (ví dụ cổng làng, nhà phóng to nhiều lần); khoảng đổi bản xa tính theo khoảng cách camera thật trong cảnh.
+- **Chuẩn hóa cỡ trong cảnh** (`three/modelSizes.ts`): mọi nhân vật (4 có xương và 6 đứng yên) **cao 1,7 đơn vị**, chân ở y = 0, mặt quay +Z. `<Character>` đo khung bao lúc tải rồi phóng và dịch (hàm thuần `fitToHeight`); bảng `MODEL_SIZES` giữ chiều cao và góc xoay mặt (`facingYaw`) từng model, bước sau thêm cỡ đồ vật vào đây.
 
 **Khung cảnh `<Scene3D>`** (`packages/core/src/three/`): trời, mây, ánh sáng, sương, ACES như dưới đây; mức chất lượng; màn hình tải (thanh phần trăm trên nền giấy dó, `useProgress` của drei, chữ ở `content/ui.ts`); rời cảnh thì giải phóng. Không cấp phát đối tượng mới trong `useFrame`.
 
@@ -198,9 +199,15 @@ Tên hiển thị **không viết cứng**. Toàn bộ nằm trong `content/char
 | `cheer` (dài 12,1 giây) | 2,5 giây đầu | Một lần |
 | `idle` | Toàn bộ | Lặp |
 
-**Khóa chuyển động gốc (in-place):** bỏ phần dịch chuyển ngang của xương `mixamorig:Hips`. Vị trí nhân vật do code điều khiển, không do clip.
+**Khóa chuyển động gốc (in-place):** bỏ phần dịch chuyển ngang (x, z) của xương `mixamorig:Hips` (giữ nguyên độ cao y, cố định x, z theo khung đầu). Vị trí nhân vật do code điều khiển, không do clip. Hàm `lockRootMotion` ở `three/clipPlayback.ts`.
 
-**Dùng chung clip:** mọi model có xương đều là bộ xương Mixamo 65 xương, cùng tên. Vì vậy clip của model này phát được trên model khác. Ví dụ Tí cần `walk` thì mượn của học sinh.
+**Đoạn phát** nằm ở `three/clipConfig.ts` (`CLIP_CONFIG`); chỉnh bằng thanh trượt ở `/dev/3d` rồi bấm "Xuất ra clipConfig.ts". Chuyển giữa hai clip mượt khoảng 0,2 giây (crossfade). Clip một lần (`jump`, `cheer`) xong thì tự về `idle`.
+
+**Tốc độ ngầm:** clip `walk` của học sinh tiến ~0,9 đơn vị/giây trong cảnh, bà cụ ~0,66, chú nông dân ~0,71; clip `run` ~3,3–3,6. Dân làng đi đúng tốc độ này (đo từ khoảng dịch của hông trước khi khóa, nhân với hệ số phóng) nên chân không trượt.
+
+**Clip `hang`:** hông ở thấp hơn hẳn (y ≈ −0,07 trong file, so với 0,44 của clip khác) vì nhân vật treo mình dưới xà; khi dùng, code phải nâng nhân vật lên.
+
+**Dùng chung clip:** mọi model có xương đều là bộ xương Mixamo 65 xương, cùng tên. Vì vậy clip của model này phát được trên model khác. Ví dụ Tí cần `walk` thì mượn của học sinh. `<Character clips={[…]}>` chỉ tải model cho mượn khi thiếu clip (thứ tự cho mượn: học sinh, Tí, bà cụ, chú nông dân); nên liệt kê đúng các clip cần dùng.
 
 ### 3.3 Tư thế code tự dựng (xoay xương Mixamo)
 
@@ -224,7 +231,7 @@ Mỗi tư thế trộn với clip đang chạy, vào ra mượt trong 0,1 giây.
 | **Khi nói** | Nghiêng đầu (xoay cả model ±4°); quay mặt về phía người chơi |
 | **Khi vui** | Bật lên 0,15 hai lần |
 
-Mỗi người lệch pha ngẫu nhiên để không nhún đồng loạt.
+Mỗi người lệch pha ngẫu nhiên để không nhún đồng loạt. Hàm thuần ở `three/staticMotion.ts` (chu kỳ lắc 3,2 giây, nghiêng khi nói 1,4 giây; bật lên hai lần, mỗi lần 0,3 giây); khi nói quay mặt dần về điểm `lookAt`.
 
 ### 3.5 Bi (code dựng)
 
@@ -234,8 +241,8 @@ Mỗi người lệch pha ngẫu nhiên để không nhún đồng loạt.
 - Một mắt xích nhỏ trên đỉnh đầu.
 
 **Chuyển động:**
-- Bay lơ lửng nhấp nhô (biên độ 0,1, chu kỳ 2 giây), luôn theo sau vai người chơi.
-- Khi vui thì xoay một vòng.
+- Bay lơ lửng nhấp nhô (biên độ 0,1, chu kỳ 2 giây), luôn theo sau vai người chơi (`<Bi target={ref}>`: sau vai phải, hơi cao hơn đầu, mượt).
+- Khi vui thì xoay một vòng (0,8 giây). Hàm thuần ở `three/biMotion.ts`.
 
 ### 3.6 Chân dung (chụp một lần, lưu thành PNG)
 
@@ -393,7 +400,8 @@ Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút
 
 **`/dev/3d`:**
 - Chọn từng model trong manifest để xem.
-- Nút phát thử từng clip và từng tư thế code dựng.
+- Nút phát thử từng clip và từng tư thế code dựng (bước 3: đã có nút từng clip; tư thế code dựng ở bước sau).
+- Nút "Xem cả nhóm": 10 nhân vật và Bi cạnh nhau (cùng chiều cao; 6 người đứng yên nhún lệch pha; bà cụ và chú nông dân đi vòng).
 - Thanh trượt chỉnh đoạn phát của `jump` và `cheer`, rồi xuất ra `clipConfig.ts`.
 - Có thử `ChoiceReaction`, Bi, chân dung tự chụp, và bộ đếm FPS.
 

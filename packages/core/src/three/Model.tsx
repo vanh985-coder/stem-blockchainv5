@@ -1,13 +1,14 @@
 import { Detailed } from '@react-three/drei';
 import type { ThreeElements } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
-import type { AnimationClip, Mesh, Object3D } from 'three';
+import type { AnimationClip, Object3D } from 'three';
 import { getManifest, loadManifest } from '../assets/store';
 import { hasAsset } from '../assets/manifest';
 import { useQualityLevel } from './QualityContext';
 import { lodId, modelPath } from './modelIds';
 import { cloneModel, disposeClone, readModel, releaseModel, retainModel } from './modelLoader';
 import { lodDistance } from './quality';
+import { useShadowFlags } from './useShadowFlags';
 
 /** Thuộc tính của <group>, bỏ `id` (số định danh của Object3D) vì <Model id> dùng `id` làm đường dẫn model. */
 type GroupProps = Omit<ThreeElements['group'], 'id'>;
@@ -43,18 +44,6 @@ function useManifestReady() {
   const manifest = getManifest();
   if (!manifest) throw loadManifest();
   return manifest;
-}
-
-/** Bật bóng cho mọi mesh của model. Mức Thấp không dùng bản đồ bóng (dùng vệt bóng tròn, xem BlobShadow). */
-function useShadowFlags(scene: Object3D, cast: boolean, receive: boolean) {
-  useEffect(() => {
-    scene.traverse((o) => {
-      const mesh = o as Mesh;
-      if (!mesh.isMesh) return;
-      mesh.castShadow = cast;
-      mesh.receiveShadow = receive;
-    });
-  }, [scene, cast, receive]);
 }
 
 interface ShadowProps {

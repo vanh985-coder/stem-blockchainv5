@@ -5,11 +5,17 @@ import { useManifest } from '../assets/store';
 import { fmt } from '../content/characters';
 import { ui } from '../content/ui';
 import { Panel } from '../ui/Panel';
+import { Character } from './Character';
+import { DevCharacterGroup } from './DevCharacterGroup';
 import { Model, type ModelLod } from './Model';
 import { Scene3D } from './Scene3D';
+import { CLIP_CONFIG, formatClipConfig, type ClipConfigTable } from './clipConfig';
+import { CLIP_NAMES, type ClipName } from './clips';
 import { isLodId, lodId, modelPath } from './modelIds';
 import { preloadModel } from './modelLoader';
+import { RIGGED_CHARACTER_IDS, isCharacterId } from './modelSizes';
 import { QUALITY_CHOICES, lodDistance, type QualityChoice } from './quality';
+import type { Mood } from './staticMotion';
 import { useQuality } from './useQuality';
 
 interface Stats {
@@ -46,11 +52,19 @@ const LOD_LABEL: Record<ModelLod, string> = {
   far: ui.dev3d.banXaXa,
 };
 
+const MOOD_LABEL: Record<Mood | 'happy', string> = {
+  idle: ui.dev3d.trangThaiDung,
+  talking: ui.dev3d.trangThaiNoi,
+  happy: ui.dev3d.trangThaiVui,
+};
+
 const BTN = 'min-h-11 cursor-pointer rounded-nut border-2 px-3 font-bold';
+const on = (active: boolean) => (active ? 'border-xanh-la-dam bg-xanh-la text-white' : 'border-nau-go bg-giay');
 
 /**
- * Trang /dev/3d bản đầu (spec 03 mục 10): chọn model trong manifest, xoay và phóng to xem, bật tắt bản xa, chọn mức
- * chất lượng, bộ đếm FPS, liệt kê tên clip. Chưa phát clip (bước sau).
+ * Trang /dev/3d (spec 03 mục 10): chọn model trong manifest, xoay và phóng to xem, bật tắt bản xa, chọn mức chất lượng,
+ * bộ đếm FPS, tên clip; nhân vật có xương có nút phát từng clip và thanh trượt đoạn phát jump, cheer (xuất ra
+ * clipConfig.ts); nhân vật đứng yên có nút trạng thái; nút "Xem cả nhóm" đặt 10 nhân vật và Bi cạnh nhau.
  */
 export function DevModelViewer() {
   const manifest = useManifest();
@@ -66,11 +80,17 @@ export function DevModelViewer() {
     [manifest],
   );
   const [id, setId] = useState('characters/bac-an');
+  const [group, setGroup] = useState(false);
   const [lod, setLod] = useState<ModelLod>('auto');
   const [choice, setChoice] = useState<QualityChoice>('low');
   const [stats, setStats] = useState<Stats | null>(null);
   const [clips, setClips] = useState<string[] | null>(null);
   const [placeholder, setPlaceholder] = useState(false);
+  const [anim, setAnim] = useState<{ clip: ClipName; n: number }>({ clip: 'idle', n: 0 });
+  const [mood, setMood] = useState<Mood>('idle');
+  const [happyN, setHappyN] = useState<number | undefined>(undefined);
+  const [config, setConfig] = useState<ClipConfigTable>(CLIP_CONFIG);
+  const [exported, setExported] = useState<{ text: string; copied: boolean } | null>(null);
   const { level } = useQuality(choice);
 
   useEffect(() => {
@@ -90,54 +110,124 @@ export function DevModelViewer() {
   const hasLod = !!manifest?.[modelPath(lodId(id))];
   // Model không có bản xa thì luôn dùng bản chính, bất kể nút đã chọn.
   const activeLod: ModelLod = hasLod ? lod : 'near';
+  const isChar = isCharacterId(id);
+  const rigged = RIGGED_CHARACTER_IDS.includes(id);
+
+  const setJump = (patch: { from?: number; to?: number }) => setConfig((c) => ({ ...c, jump: { ...c.jump, ...patch } }));
+  const exportConfig = () => {
+    const text = formatClipConfig(config);
+    const done = (copied: boolean) => setExported({ text, copied });
+    if (navigator.clipboard) void navigator.clipboard.writeText(text).then(() => done(true), () => done(false));
+    else done(false);
+  };
 
   return (
     <main className="mx-auto grid max-w-[1400px] gap-4 p-4 lg:grid-cols-[22rem_1fr]">
       <Panel className="space-y-3">
         <h1 className="text-2xl">{ui.dev3d.tieuDe}</h1>
-        <label className="block">
-          <span className="font-bold">{ui.dev3d.chonModel}</span>
-          <select className="mt-1 min-h-11 w-full rounded-nut border-2 border-nau-go bg-giay px-2" value={id} onChange={(e) => setId(e.target.value)}>
-            {(ids.length ? ids : [id]).map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
-          </select>
-        </label>
-        {entry && <p className="text-sm">{fmt(ui.dev3d.thongTin, { so: entry.tris ?? 0, kb: Math.round(entry.bytes / 1024) })}</p>}
-        {placeholder && <p className="text-sm font-bold text-do-son">{ui.dev3d.hinhThayThe}</p>}
+        <button type="button" aria-pressed={group} onClick={() => setGroup((g) => !g)} className={`${BTN} w-full ${on(group)}`}>
+          {group ? ui.dev3d.xemTungModel : ui.dev3d.xemNhom}
+        </button>
+        {group && <p className="text-sm">{ui.dev3d.nhomMoTa}</p>}
 
-        <fieldset>
-          <legend className="font-bold">{ui.dev3d.banXa}</legend>
-          <div className="mt-1 flex flex-wrap gap-2">
-            {(['auto', 'near', 'far'] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                aria-pressed={activeLod === m}
-                disabled={!hasLod && m !== 'near'}
-                onClick={() => setLod(m)}
-                className={`${BTN} ${activeLod === m ? 'border-xanh-la-dam bg-xanh-la text-white' : 'border-nau-go bg-giay'} disabled:opacity-40`}
-              >
-                {LOD_LABEL[m]}
-              </button>
-            ))}
-          </div>
-          {!hasLod && <p className="mt-1 text-sm">{ui.dev3d.khongCoBanXa}</p>}
-        </fieldset>
+        {!group && (
+          <>
+            <label className="block">
+              <span className="font-bold">{ui.dev3d.chonModel}</span>
+              <select className="mt-1 min-h-11 w-full rounded-nut border-2 border-nau-go bg-giay px-2" value={id} onChange={(e) => setId(e.target.value)}>
+                {(ids.length ? ids : [id]).map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {entry && <p className="text-sm">{fmt(ui.dev3d.thongTin, { so: entry.tris ?? 0, kb: Math.round(entry.bytes / 1024) })}</p>}
+            {placeholder && <p className="text-sm font-bold text-do-son">{ui.dev3d.hinhThayThe}</p>}
+
+            {!isChar && (
+              <fieldset>
+                <legend className="font-bold">{ui.dev3d.banXa}</legend>
+                <div className="mt-1 flex flex-wrap gap-2">
+                  {(['auto', 'near', 'far'] as const).map((m) => (
+                    <button key={m} type="button" aria-pressed={activeLod === m} disabled={!hasLod && m !== 'near'} onClick={() => setLod(m)} className={`${BTN} ${on(activeLod === m)} disabled:opacity-40`}>
+                      {LOD_LABEL[m]}
+                    </button>
+                  ))}
+                </div>
+                {!hasLod && <p className="mt-1 text-sm">{ui.dev3d.khongCoBanXa}</p>}
+              </fieldset>
+            )}
+
+            {rigged && (
+              <>
+                <fieldset>
+                  <legend className="font-bold">{ui.dev3d.phatClip}</legend>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {CLIP_NAMES.map((c) => (
+                      <button key={c} type="button" aria-pressed={anim.clip === c} onClick={() => setAnim((a) => ({ clip: c, n: a.n + 1 }))} className={`${BTN} ${on(anim.clip === c)}`}>
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-1 text-sm">{ui.dev3d.clipBorMuon}</p>
+                </fieldset>
+
+                <fieldset className="space-y-2">
+                  <legend className="font-bold">{ui.dev3d.doanPhat}</legend>
+                  <label className="block text-sm">
+                    {fmt(ui.dev3d.jumpTu, { so: Math.round(config.jump.from * 100) })}
+                    <input type="range" min={0} max={100} value={Math.round(config.jump.from * 100)} onChange={(e) => setJump({ from: Number(e.target.value) / 100 })} className="w-full" />
+                  </label>
+                  <label className="block text-sm">
+                    {fmt(ui.dev3d.jumpDen, { so: Math.round((config.jump.to ?? 1) * 100) })}
+                    <input type="range" min={0} max={100} value={Math.round((config.jump.to ?? 1) * 100)} onChange={(e) => setJump({ to: Number(e.target.value) / 100 })} className="w-full" />
+                  </label>
+                  <label className="block text-sm">
+                    {fmt(ui.dev3d.cheerGiay, { so: (config.cheer.seconds ?? 2.5).toFixed(1) })}
+                    <input type="range" min={0.5} max={12} step={0.1} value={config.cheer.seconds ?? 2.5} onChange={(e) => setConfig((c) => ({ ...c, cheer: { ...c.cheer, seconds: Number(e.target.value) } }))} className="w-full" />
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={exportConfig} className={`${BTN} ${on(false)}`}>
+                      {ui.dev3d.xuatClipConfig}
+                    </button>
+                    <button type="button" onClick={() => setConfig(CLIP_CONFIG)} className={`${BTN} ${on(false)}`}>
+                      {ui.dev3d.datLaiDoan}
+                    </button>
+                  </div>
+                  {exported && (
+                    <div className="text-sm">
+                      <p>{exported.copied ? ui.dev3d.daChep : ui.dev3d.khongChep}</p>
+                      <textarea readOnly rows={8} value={exported.text} className="mt-1 w-full rounded-nut border-2 border-nau-go bg-white p-2 font-mono text-xs" />
+                    </div>
+                  )}
+                </fieldset>
+              </>
+            )}
+
+            {isChar && !rigged && (
+              <fieldset>
+                <legend className="font-bold">{ui.dev3d.trangThai}</legend>
+                <div className="mt-1 flex flex-wrap gap-2">
+                  {(['idle', 'talking'] as const).map((m) => (
+                    <button key={m} type="button" aria-pressed={mood === m} onClick={() => setMood(m)} className={`${BTN} ${on(mood === m)}`}>
+                      {MOOD_LABEL[m]}
+                    </button>
+                  ))}
+                  <button type="button" onClick={() => setHappyN((n) => (n ?? 0) + 1)} className={`${BTN} ${on(false)}`}>
+                    {MOOD_LABEL.happy}
+                  </button>
+                </div>
+              </fieldset>
+            )}
+          </>
+        )}
 
         <fieldset>
           <legend className="font-bold">{ui.dev3d.chatLuong}</legend>
           <div className="mt-1 flex flex-wrap gap-2">
             {QUALITY_CHOICES.map((q) => (
-              <button
-                key={q}
-                type="button"
-                aria-pressed={choice === q}
-                onClick={() => setChoice(q)}
-                className={`${BTN} ${choice === q ? 'border-xanh-la-dam bg-xanh-la text-white' : 'border-nau-go bg-giay'}`}
-              >
+              <button key={q} type="button" aria-pressed={choice === q} onClick={() => setChoice(q)} className={`${BTN} ${on(choice === q)}`}>
                 {QUALITY_LABEL[q]}
               </button>
             ))}
@@ -150,31 +240,41 @@ export function DevModelViewer() {
           <p className="text-base">{fmt(ui.dev3d.khoangCach, { so: stats ? stats.distance.toFixed(1) : '–' })}</p>
         </div>
 
-        <div>
-          <p className="font-bold">{ui.dev3d.clip}</p>
-          {clips && clips.length > 0 ? (
-            <ul className="list-disc pl-5 text-sm">
-              {clips.map((c) => (
-                <li key={c}>{c}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm">{clips ? ui.dev3d.khongCoClip : ui.chung.dangTai}</p>
-          )}
-        </div>
+        {!group && (
+          <div>
+            <p className="font-bold">{ui.dev3d.clip}</p>
+            {clips && clips.length > 0 ? (
+              <ul className="list-disc pl-5 text-sm">
+                {clips.map((c) => (
+                  <li key={c}>{c}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm">{clips ? ui.dev3d.khongCoClip : ui.chung.dangTai}</p>
+            )}
+          </div>
+        )}
         <p className="text-sm text-nau-go-dam">{ui.dev3d.huongDan}</p>
       </Panel>
 
       <div className="h-[70vh] min-h-[360px] overflow-hidden rounded-bang border-2 border-nau-go">
-        <Scene3D quality={choice} autoDowngrade={false} camera={{ position: [0, 3, 8] }} shadowExtent={12}>
+        <Scene3D key={group ? 'group' : 'single'} quality={choice} autoDowngrade={false} camera={{ position: group ? [0, 2.6, 12] : [0, 3, 8] }} shadowExtent={14}>
           <mesh rotation-x={-Math.PI / 2} receiveShadow>
             <circleGeometry args={[40, 48]} />
             <meshStandardMaterial color="#9bc47a" roughness={1} />
           </mesh>
-          <Bounds key={id} fit margin={1.6}>
-            <Model id={id} lod={activeLod} castShadow receiveShadow />
-          </Bounds>
-          <OrbitControls makeDefault enableDamping maxDistance={80} maxPolarAngle={Math.PI / 2 - 0.02} />
+          {group ? (
+            <DevCharacterGroup />
+          ) : (
+            <Bounds key={id} fit margin={1.6}>
+              {isChar ? (
+                <Character id={id} animation={anim.clip} trigger={anim.n} clipConfig={config} mood={mood} happyTrigger={happyN} lookAt={[0, 1, 10]} />
+              ) : (
+                <Model id={id} lod={activeLod} castShadow receiveShadow />
+              )}
+            </Bounds>
+          )}
+          <OrbitControls makeDefault enableDamping target={group ? [0, 0.9, 2] : undefined} maxDistance={80} maxPolarAngle={Math.PI / 2 - 0.02} />
           <StatsProbe onStats={setStats} />
         </Scene3D>
       </div>
