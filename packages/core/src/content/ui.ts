@@ -413,6 +413,9 @@ export const ui = {
     chatLuongThap: 'Thấp',
     chatLuongVua: 'Vừa',
     chatLuongCao: 'Cao',
+    doNhayChuot: 'Độ nhạy chuột',
+    doNhayChuotGhiChu: 'Tốc độ xoay camera khi rê chuột ở cảnh đi lại (máy tính). Kéo sang phải để xoay nhanh hơn.',
+    doNhayChuotGiaTri: '{so}×',
   },
 
   /** Màn hình tải cảnh 3D */
@@ -540,6 +543,42 @@ export const ui = {
     phanUngDung: 'Kết quả: đúng (học sinh cheer, Tí giữ idle)',
     phanUngSai: 'Kết quả: sai (học sinh sad, Tí cheer)',
     phanUngChon: 'Đang chờ em chọn.',
+  },
+
+  /** Điều khiển ở cảnh đi lại (spec 03 mục 3.7) */
+  dungDi: {
+    /** Lời nhắc khi đứng gần một vật tương tác được (máy tính). {vat} là tên vật. */
+    nhacTuongTac: 'E: {vat}',
+    /** Nhãn đọc và chữ trên nút ✋ ở điện thoại */
+    nutTuongTac: 'Tương tác với {vat}',
+    nutTuongTacTrong: 'Tương tác',
+    nutNhay: 'Nhảy',
+    canDieuKhien: 'Cần điều khiển: chạm nửa trái màn hình rồi kéo',
+    bieuTuongTuongTac: '✋',
+    bieuTuongNhay: '⬆',
+  },
+
+  /** Trang /dev/walk (chỉ có khi chạy dev) */
+  devWalk: {
+    tieuDe: 'Đi lại (dev)',
+    huongDan: 'Hướng dẫn',
+    huongDanMayTinh: 'W đi về phía camera nhìn; A, D, S quay người rồi đi · Shift để chạy · Space để nhảy · E để tương tác · bấm vào khung để khóa chuột, rê chuột để xoay camera · Esc nhả chuột và mở menu.',
+    huongDanDienThoai: 'Chạm nửa trái màn hình rồi kéo để đi (đẩy quá 80% là chạy) · vuốt nửa phải để xoay camera · nút ⬆ để nhảy · nút ✋ để tương tác.',
+    fps: 'FPS: {so}',
+    chatLuong: 'Chất lượng',
+    mucDangDung: 'Mức đang dùng: {muc}',
+    vatBienGo: 'Biển gỗ',
+    vatHomThu: 'Hòm thư',
+    suKienMenu: 'Đã nhận sự kiện mở menu: {so} lần',
+    thuHienVa: 'Thử va chạm: đi xéo vào góc các hộp, đi sát cột tròn, đi ra rìa nền (bán kính 20).',
+    menuTieuDe: 'Menu (chưa làm)',
+    menuMoTa: 'Chuột đã được nhả (Esc hoặc chuyển cửa sổ), điều khiển đang tạm dừng. Đây chỉ là hộp thử.',
+    baiDeChoiTiep: 'Bấm để chơi tiếp',
+    menuTiepTuc: 'Tiếp tục',
+    veTrangChu: 'Về trang chủ',
+    bienGoLuot1: 'Chào {ten}! Biển này chỉ để thử: bấm E (hoặc nút ✋) khi đứng gần là hộp thoại mở ra.',
+    bienGoLuot2: 'Trong lúc hộp thoại mở, nhân vật đứng yên. Đóng hộp thoại là đi tiếp được.',
+    homThuLuot1: 'Đây là hòm thư của làng. Chưa có thư nào, {ten} quay lại sau nhé.',
   },
 
   /** Lời thoại mẫu ở trang /dev/ui (4 lượt: bác An, {phanDien}, Bi, cô Chi) */

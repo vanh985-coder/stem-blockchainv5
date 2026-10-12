@@ -274,7 +274,7 @@ Mỗi người lệch pha ngẫu nhiên để không nhún đồng loạt. Hàm 
 
 | Thiết bị | Điều khiển |
 |---|---|
-| Máy tính | WASD/mũi tên để đi; Shift chạy; Space nhảy; E tương tác; Esc menu; kéo chuột xoay camera |
+| Máy tính | **Bấm vào khung để khóa chuột** (pointer lock), rê chuột xoay camera quanh nhân vật (kiểu PUBG); W/↑ đi về phía camera nhìn, A/D/S (và ←/→/↓) quay người đi về hướng đó; Shift chạy; Space nhảy; E tương tác; **Esc nhả chuột và mở menu** |
 | Điện thoại | Cần điều khiển động ở nửa trái màn hình (đẩy quá 80% là chạy); nút nhảy và nút ✋ ở góc phải |
 
 - **Tốc độ:** đi 4, chạy 7. **Nhảy:** vận tốc đầu 6, trọng lực 18.
@@ -287,7 +287,26 @@ Mỗi người lệch pha ngẫu nhiên để không nhún đồng loạt. Hàm 
 | Nhân vật ở (0.8, 0) r 0.4; hộp x ∈ [1, 3], z ∈ [−1, 1] | Bị đẩy tới (0.6, 0) |
 | Biên bán kính 60; nhân vật ở (61, 0) | Bị kéo về (59.6, 0) |
 
-- **Tương tác:** vật gần nhất trong bán kính 2,2 hiện lời nhắc "E: …".
+- **Tương tác:** vật gần nhất trong bán kính 2,2 hiện lời nhắc "E: …" (điện thoại hiện tên vật trên nút ✋; nút mờ khi không có vật nào gần).
+
+**Cách làm (mốc 2, bước 6)** — logic là hàm thuần có test, trong `packages/core/src/three/`:
+- `collision.ts`: `resolveCollisions` (vật tròn, hộp, biên bán kính; bán kính nhân vật 0,4). Đẩy ra theo điểm gần nhất của vật cản nên đi xéo vào hộp là trượt dọc mặt hộp, vòng qua góc; đâm đúng vào góc thì dừng yên, không rung.
+- `playerMotion.ts`: `stepPlayer` (đi 4, chạy 7, nhảy vận tốc đầu 6, trọng lực 18, đỉnh nhảy 1 đơn vị, ở trên không 2/3 giây). Tăng và giảm tốc mượt (~0,2 giây), mặt quay mượt 10 rad/giây về hướng đi, nhảy không đôi, bấm nhảy sớm ≤ 0,12 giây vẫn tính. Tạm dừng (`paused`): bỏ lệnh đi và nhảy. `animationFor`: idle/walk/run/jump; `locomotionTimeScale` và `jumpTimeScale` chỉnh tốc độ phát clip cho khớp tốc độ đi (kẹp 0,6–2,4).
+- `cameraRig.ts`: camera ở phía sau theo hướng nhìn, cách ngang 7, cao 4 (quỹ đạo bán kính √65, góc ngẩng mặc định ≈ 29,7°); bám mượt (độ gắt 7). "Tiến lên" là hướng camera nhìn.
+  - **Máy tính (khóa chuột):** `lookCamera(cam, movementX, movementY, độ nhạy)`: rê sang phải thì camera nhìn sang phải (yaw giảm), rê lên thì ngước (góc ngẩng giảm, camera hạ), rê xuống thì cúi (camera nâng lên); góc ngẩng kẹp trong **5°–60°**; 0,0025 rad mỗi pixel nhân với "Độ nhạy chuột"; mỗi sự kiện chuột chặn tối đa 150px (Chrome thỉnh thoảng báo cú nhảy vọt). Không còn giữ chuột trái để kéo (chỉ còn là cách dự phòng khi trình duyệt không có khóa chuột).
+  - **Điện thoại:** vuốt nửa phải màn hình bằng `dragCamera` (kéo sang phải thì cảnh trượt sang phải, giới hạn 0,12–1,2 rad), không đổi.
+  - **"Độ nhạy chuột"** là một thanh trượt trong Cài đặt (`Settings.mouseSensitivity`, 0,3 đến 3, bước 0,1, mặc định 1, lưu cùng các cài đặt khác; `clampMouseSensitivity` là hàm thuần có test), cũng có trong hộp menu của /dev/walk.
+- `interaction.ts`: `nearestInteractable`, bán kính 2,2.
+- `walkInput.ts`, `walkApi.ts`: ánh xạ phím (WASD, mũi tên, Shift, Space, E, Esc), cần điều khiển động (bán kính 56px, vùng chết 12%, quá 80% là chạy), gộp lệnh phím/cần mỗi khung hình.
+- `WalkControls.tsx` (DOM) ghi vào `WalkApi`; `WalkWorld.tsx` (trong Scene3D) đọc mỗi khung hình: nền đất tròn, người chơi (học sinh), camera, Bi. Hai bên chỉ trao đổi qua `WalkApi` (đối tượng thường) nên không cấp phát trong `useFrame`.
+- **Điện thoại:** `touch-action: none`, chặn `touchmove`/`gesturestart`, khóa cuộn trang khi đang chơi; nút nhảy 76px, nút ✋ 64px (≥ 44px). Chạm nửa trái hiện cần điều khiển tại điểm chạm; vuốt nửa phải xoay camera. Phần tử đánh dấu `data-walk-ui` (bảng thông tin, nút) không bắt đầu kéo camera hay cần điều khiển.
+- **Khóa chuột, hộp thoại và menu (máy tính):** `WalkControls` nhận `lockMode` (trình duyệt có `requestPointerLock` và con trỏ là chuột), `onLockChange`, `onLockError`; `WalkApi.lock.request/exit` cho nơi dùng xin hoặc nhả khóa.
+  - Bấm (chuột) vào khung thì `requestPointerLock` ngay trong sự kiện `pointerdown`.
+  - **Nhả khóa** (Esc, chuyển cửa sổ, bất cứ lý do gì) mà không có hộp thoại thì **hiện menu tạm dừng** có dòng **"Bấm để chơi tiếp"**; bấm vào khung hoặc nút đó thì khóa lại và menu đóng. Chrome từ chối khóa lại ngay sau khi vừa nhả bằng Esc (khoảng 1 giây): bắt lỗi `pointerlockerror` và Promise bị từ chối, hiện lại lời nhắc, không báo lỗi.
+  - **Mở hộp thoại (E)** thì tự nhả khóa để bấm được lựa chọn; **đóng hộp thoại** thì xin khóa lại ngay trong chính sự kiện bấm (nút "Tiếp"/"Bỏ qua", hay Enter/Space). Đóng bằng Esc thì Chrome có thể từ chối (Esc không tính là thao tác của người dùng): khi đó hiện menu với "Bấm để chơi tiếp".
+  - Không có khóa chuột (điện thoại, trình duyệt cũ): Esc bật tắt menu như trước (`onMenu`), nút "Tiếp tục".
+  - Tạm dừng (chưa khóa, hộp thoại hoặc menu): nơi dùng truyền `paused` cho `WalkControls` và `WalkWorld` (thả hết phím, bỏ lệnh); phím khác bị bỏ khi tạm dừng.
+- **Bi:** bay theo sau vai **phải** của người chơi. Nhân vật quay mặt +Z nên bên phải của họ là −X: `BI_FOLLOW_OFFSET = [−0,75, 2,0, −0,55]` (bước 3 từng đặt +0,75, là vai trái, đã sửa).
 
 ## 4. Phản ứng khi chọn đáp án — `ChoiceReaction`
 
@@ -433,6 +452,8 @@ Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút
 - Nút "Xem cả nhóm": 10 nhân vật và Bi cạnh nhau (cùng chiều cao; 6 người đứng yên nhún lệch pha; bà cụ và chú nông dân đi vòng).
 - Thanh trượt chỉnh đoạn phát của `jump` và `cheer`, rồi xuất ra `clipConfig.ts`.
 - Có thử `ChoiceReaction`, Bi, chân dung tự chụp, và bộ đếm FPS.
+
+**`/dev/walk`** (mốc 2, bước 6): nền đất phẳng bán kính 20 (`ui/textures/duong-dat`), vài cột tròn và hộp (có hai hộp vuông góc thành chữ L) để thử va chạm, 2 vật tương tác được (mở một `VnDialog` ngắn), 1 dân làng đi lại, bộ đếm FPS, chọn mức chất lượng, hộp "Menu (chưa làm)" mở bằng Esc. Mở bằng điện thoại: `pnpm dev:hub --host` rồi vào `http://<IP máy>:5173/dev/walk` (cần `pnpm dev:assets` chạy cùng). Chạy dev còn có `window.__walkPlayer` (trạng thái người chơi) để kiểm tra bằng trình duyệt.
 
 **`/dev/self-test`:** chạy mọi test logic trong trình duyệt.
 

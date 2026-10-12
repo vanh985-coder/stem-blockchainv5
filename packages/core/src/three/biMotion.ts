@@ -46,5 +46,8 @@ export function dampFactor(dt: number, rate: number): number {
   return 1 - Math.exp(-rate * dt);
 }
 
-/** Vị trí Bi so với người chơi, trong hệ tọa độ của người chơi: sau vai phải, hơi cao hơn đầu. */
-export const BI_FOLLOW_OFFSET: readonly [number, number, number] = [0.75, 2.0, -0.55];
+/**
+ * Vị trí Bi so với người chơi, trong hệ tọa độ của người chơi: sau vai phải, hơi cao hơn đầu. Nhân vật quay mặt về +Z
+ * nên bên phải của họ là −X (và phía sau là −Z).
+ */
+export const BI_FOLLOW_OFFSET: readonly [number, number, number] = [-0.75, 2.0, -0.55];

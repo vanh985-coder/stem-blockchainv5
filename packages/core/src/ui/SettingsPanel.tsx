@@ -1,5 +1,7 @@
 import { useId } from 'react';
+import { fmt } from '../content/characters';
 import { ui } from '../content/ui';
+import { MOUSE_SENSITIVITY_MAX, MOUSE_SENSITIVITY_MIN, MOUSE_SENSITIVITY_STEP, clampMouseSensitivity } from '../settings/settings';
 import { useSettings } from '../settings/SettingsProvider';
 import { QUALITY_CHOICES, type QualityChoice } from '../three/quality';
 import { Panel } from './Panel';
@@ -89,7 +91,38 @@ function QualityRow({ value, onChange }: { value: QualityChoice; onChange: (valu
   );
 }
 
-/** Bảng cài đặt "Giảm chuyển động", "Âm thanh", "Chữ to" và "Chất lượng đồ họa"; dùng ở các trang sau. */
+/** Thanh trượt "Độ nhạy chuột" (xoay camera ở cảnh đi lại trên máy tính). Dùng được riêng, ví dụ trong menu tạm dừng. */
+export function MouseSensitivityRow({ value, onChange }: { value: number; onChange: (value: number) => void }) {
+  const id = useId();
+  return (
+    <div className="py-2">
+      <div className="flex items-baseline justify-between gap-2">
+        <label htmlFor={id} className="font-display text-lg font-extrabold">
+          {ui.caiDat.doNhayChuot}
+        </label>
+        <output htmlFor={id} className="font-bold">
+          {fmt(ui.caiDat.doNhayChuotGiaTri, { so: value.toFixed(1).replace('.', ',') })}
+        </output>
+      </div>
+      <p id={`${id}-d`} className="mb-1 text-sm text-nau-go-dam">
+        {ui.caiDat.doNhayChuotGhiChu}
+      </p>
+      <input
+        id={id}
+        type="range"
+        min={MOUSE_SENSITIVITY_MIN}
+        max={MOUSE_SENSITIVITY_MAX}
+        step={MOUSE_SENSITIVITY_STEP}
+        value={value}
+        aria-describedby={`${id}-d`}
+        onChange={(e) => onChange(clampMouseSensitivity(Number(e.target.value)))}
+        className="h-11 w-full cursor-pointer accent-muc-tim"
+      />
+    </div>
+  );
+}
+
+/** Bảng cài đặt "Giảm chuyển động", "Âm thanh", "Chữ to", "Chất lượng đồ họa" và "Độ nhạy chuột"; dùng ở các trang sau. */
 export function SettingsPanel({ className = '' }: { className?: string }) {
   const { settings, update } = useSettings();
   return (
@@ -114,6 +147,7 @@ export function SettingsPanel({ className = '' }: { className?: string }) {
         onChange={(v) => update({ largeText: v })}
       />
       <QualityRow value={settings.quality} onChange={(v) => update({ quality: v })} />
+      <MouseSensitivityRow value={settings.mouseSensitivity} onChange={(v) => update({ mouseSensitivity: v })} />
     </Panel>
   );
 }

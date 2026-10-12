@@ -4,7 +4,7 @@ import { ui } from '../content/ui';
 import { devWarn } from '../lib/dev';
 import { lookupAsset, resolveAssetsUrl, type Manifest } from './manifest';
 
-export const ASSETS_URL = resolveAssetsUrl(import.meta.env.VITE_ASSETS_URL);
+export const ASSETS_URL = resolveAssetsUrl(import.meta.env.VITE_ASSETS_URL, typeof location === 'undefined' ? undefined : location.hostname);
 
 let manifest: Manifest | null = null;
 let loading: Promise<Manifest> | null = null;

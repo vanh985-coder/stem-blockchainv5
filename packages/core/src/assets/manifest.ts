@@ -35,8 +35,24 @@ export function hasAsset(manifest: Manifest | null | undefined, path: string): b
 
 const LOCAL_ASSETS_URL = 'http://localhost:5180';
 
-/** Hàm thuần: địa chỉ gốc của đồ họa, bỏ dấu "/" cuối; trống thì dùng cổng dev:assets. */
-export function resolveAssetsUrl(value: string | undefined): string {
+const LOOPBACK = new Set(['localhost', '127.0.0.1', '[::1]', '::1']);
+
+/**
+ * Hàm thuần: địa chỉ gốc của đồ họa, bỏ dấu "/" cuối; trống thì dùng cổng dev:assets.
+ * Khi mở trang bằng địa chỉ khác localhost (ví dụ điện thoại vào http://192.168.0.5:5173 sau `pnpm dev:hub --host`) mà địa chỉ
+ * đồ họa vẫn trỏ về localhost (điện thoại không có đồ họa ở "localhost" của nó) thì đổi tên máy thành tên máy của trang.
+ * @param pageHostname `location.hostname` của trang đang mở (bỏ trống thì không đổi)
+ */
+export function resolveAssetsUrl(value: string | undefined, pageHostname?: string): string {
   const v = (value ?? '').trim();
-  return (v === '' ? LOCAL_ASSETS_URL : v).replace(/\/+$/, '');
+  const base = (v === '' ? LOCAL_ASSETS_URL : v).replace(/\/+$/, '');
+  if (!pageHostname || LOOPBACK.has(pageHostname.toLowerCase())) return base;
+  try {
+    const u = new URL(base);
+    if (!LOOPBACK.has(u.hostname)) return base;
+    u.hostname = pageHostname;
+    return u.toString().replace(/\/+$/, '');
+  } catch {
+    return base;
+  }
 }

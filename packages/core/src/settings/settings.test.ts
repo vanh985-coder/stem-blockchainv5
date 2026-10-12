@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SETTINGS_KEY, parseStored, resolveSettings, serializeStored } from './settings';
+import { MOUSE_SENSITIVITY_MAX, MOUSE_SENSITIVITY_MIN, SETTINGS_KEY, clampMouseSensitivity, parseStored, resolveSettings, serializeStored } from './settings';
 
 describe('cài đặt', () => {
   it('khóa lưu là sochung.v3.settings', () => {
@@ -7,13 +7,13 @@ describe('cài đặt', () => {
   });
 
   it('chưa lưu gì: giảm chuyển động theo máy, chữ to tắt', () => {
-    expect(resolveSettings({}, true)).toEqual({ reducedMotion: true, largeText: false, soundEnabled: true, quality: 'auto' });
-    expect(resolveSettings({}, false)).toEqual({ reducedMotion: false, largeText: false, soundEnabled: true, quality: 'auto' });
+    expect(resolveSettings({}, true)).toEqual({ reducedMotion: true, largeText: false, soundEnabled: true, quality: 'auto', mouseSensitivity: 1 });
+    expect(resolveSettings({}, false)).toEqual({ reducedMotion: false, largeText: false, soundEnabled: true, quality: 'auto', mouseSensitivity: 1 });
   });
 
   it('đã chọn rõ thì ưu tiên lựa chọn, kể cả khi ngược với máy', () => {
     expect(resolveSettings({ reducedMotion: false }, true).reducedMotion).toBe(false);
-    expect(resolveSettings({ reducedMotion: true, largeText: true }, false)).toEqual({ reducedMotion: true, largeText: true, soundEnabled: true, quality: 'auto' });
+    expect(resolveSettings({ reducedMotion: true, largeText: true }, false)).toEqual({ reducedMotion: true, largeText: true, soundEnabled: true, quality: 'auto', mouseSensitivity: 1 });
   });
 
   it('đọc dữ liệu hỏng thì bỏ qua', () => {
@@ -39,8 +39,22 @@ describe('cài đặt', () => {
     expect(parseStored('{"quality":3}')).toEqual({});
   });
 
+  it('độ nhạy chuột: mặc định 1; kẹp trong 0,3 đến 3; làm tròn 0,1; giá trị lạ thì bỏ qua', () => {
+    expect(resolveSettings({}, false).mouseSensitivity).toBe(1);
+    expect(resolveSettings({ mouseSensitivity: 2.5 }, false).mouseSensitivity).toBe(2.5);
+    expect(clampMouseSensitivity(0)).toBe(MOUSE_SENSITIVITY_MIN);
+    expect(clampMouseSensitivity(99)).toBe(MOUSE_SENSITIVITY_MAX);
+    expect(clampMouseSensitivity(1.26)).toBe(1.3);
+    expect(clampMouseSensitivity(Number.NaN)).toBe(1);
+    expect(clampMouseSensitivity('2')).toBe(1);
+    expect(parseStored('{"mouseSensitivity":1.5}')).toEqual({ mouseSensitivity: 1.5 });
+    expect(parseStored('{"mouseSensitivity":50}')).toEqual({ mouseSensitivity: MOUSE_SENSITIVITY_MAX });
+    expect(parseStored('{"mouseSensitivity":"nhanh"}')).toEqual({});
+    expect(parseStored('{"mouseSensitivity":null}')).toEqual({});
+  });
+
   it('lưu rồi đọc lại ra như cũ', () => {
-    const s = { reducedMotion: false, largeText: true, soundEnabled: false, quality: 'medium' as const };
+    const s = { reducedMotion: false, largeText: true, soundEnabled: false, quality: 'medium' as const, mouseSensitivity: 1.7 };
     expect(parseStored(serializeStored(s))).toEqual(s);
   });
 });

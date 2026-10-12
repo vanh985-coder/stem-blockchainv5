@@ -61,4 +61,17 @@ describe('normalizeAssetPath / hasAsset / resolveAssetsUrl', () => {
     expect(resolveAssetsUrl('  ')).toBe('http://localhost:5180');
     expect(resolveAssetsUrl('https://assets.ten-mien.vn/')).toBe('https://assets.ten-mien.vn');
   });
+
+  it('mở bằng IP máy tính (điện thoại): địa chỉ đồ họa trỏ localhost thì đổi sang tên máy của trang', () => {
+    expect(resolveAssetsUrl(undefined, '192.168.0.123')).toBe('http://192.168.0.123:5180');
+    expect(resolveAssetsUrl('http://localhost:5180', '192.168.0.123')).toBe('http://192.168.0.123:5180');
+    expect(resolveAssetsUrl('http://127.0.0.1:5180/', 'mypc.local')).toBe('http://mypc.local:5180');
+  });
+
+  it('không đổi khi trang mở ở localhost hoặc địa chỉ đồ họa đã là máy khác', () => {
+    expect(resolveAssetsUrl(undefined, 'localhost')).toBe('http://localhost:5180');
+    expect(resolveAssetsUrl('http://localhost:5180', '127.0.0.1')).toBe('http://localhost:5180');
+    expect(resolveAssetsUrl('https://assets.ten-mien.vn', '192.168.0.123')).toBe('https://assets.ten-mien.vn');
+    expect(resolveAssetsUrl('không phải địa chỉ', '192.168.0.5')).toBe('không phải địa chỉ');
+  });
 });

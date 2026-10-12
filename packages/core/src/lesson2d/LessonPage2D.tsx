@@ -331,7 +331,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
               {level ? fmt(level.ten) : ''}
             </h1>
           </div>
-          <ol className="flex flex-1 items-stretch justify-center gap-1.5 sm:justify-start max-[480px]:flex-none max-[480px]:gap-0.5" aria-label={ui.baiHoc.cacTram}>
+          <ol className="flex flex-1 items-stretch justify-center gap-1.5 sm:min-w-max sm:justify-start max-[480px]:flex-none max-[480px]:gap-0.5" aria-label={ui.baiHoc.cacTram}>
             {STATION_ORDER.map((id, i) => {
               const n = saved[id] ?? 0;
               const current = currentIdx === i && stage.kind !== 'complete';

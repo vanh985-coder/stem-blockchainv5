@@ -29,6 +29,8 @@ export interface CharacterInfo {
    */
   walkSpeed: number | null;
   runSpeed: number | null;
+  /** Thời gian (giây) của đoạn clip jump đã cắt khi phát ở tốc độ 1; null nếu chưa có clip đó */
+  jumpSeconds: number | null;
 }
 
 /** Yêu cầu phát một tư thế; đổi `n` để phát lại. */
@@ -54,6 +56,8 @@ export interface CharacterProps extends GroupProps {
   clipConfig?: ClipConfigTable;
   /** Thời gian chuyển mượt giữa hai clip (giây, mặc định 0,2) */
   fade?: number;
+  /** Hệ số tốc độ phát của clip đang chạy (mặc định 1): ví dụ cho nhịp bước khớp tốc độ đi (xem `locomotionTimeScale`) */
+  timeScale?: number;
   /** Báo khi một clip phát một lần đã xong */
   onClipEnd?: (clip: ClipName) => void;
   /**
@@ -114,6 +118,7 @@ export function Character({
   clips = ALL_CLIPS,
   clipConfig = CLIP_CONFIG,
   fade = 0.2,
+  timeScale = 1,
   onClipEnd,
   pose,
   aim,
@@ -160,6 +165,7 @@ export function Character({
           clips={clips}
           clipConfig={clipConfig}
           fade={fade}
+          timeScale={timeScale}
           onClipEnd={onClipEnd}
           pose={pose}
           aim={aim}
@@ -190,6 +196,7 @@ interface RigAnimatorProps {
   clips: readonly ClipName[];
   clipConfig: ClipConfigTable;
   fade: number;
+  timeScale: number;
   pose?: PoseRequest;
   aim?: Aim | null;
   onClipEnd?: (clip: ClipName) => void;
@@ -204,7 +211,7 @@ interface Rig {
 }
 
 /** Không vẽ gì; điều khiển AnimationMixer và lớp tư thế của nhân vật có xương. */
-function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing, animation, trigger, returnTo, clips, clipConfig, fade, pose, aim, onClipEnd, onReady }: RigAnimatorProps) {
+function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing, animation, trigger, returnTo, clips, clipConfig, fade, timeScale, pose, aim, onClipEnd, onReady }: RigAnimatorProps) {
   // Mượn clip của model khác nếu thiếu. Hỏi tên clip của model cho mượn một cách lười: chỉ tải khi thật sự cần.
   const ownNames = animations.map((a) => a.name);
   const sources = borrowClips(id, (mid) => (mid === id ? ownNames : readModel(mid).animations.map((a) => a.name)), clips);
@@ -253,6 +260,8 @@ function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing
   }, [scene, playable, outer, motion, facing, fit.scale]);
 
   const current = useRef<{ name: ClipName; action: AnimationAction } | null>(null);
+  const scale = useRef(timeScale);
+  scale.current = timeScale;
   const play = useCallback(
     (name: ClipName) => {
       const next = rig?.actions[name];
@@ -260,7 +269,7 @@ function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing
       if (!rig || !next || !p) return;
       next.reset();
       next.enabled = true;
-      next.setEffectiveTimeScale(1);
+      next.setEffectiveTimeScale(scale.current);
       next.setEffectiveWeight(1);
       if (p.loop) {
         next.setLoop(LoopRepeat, Infinity);
@@ -296,6 +305,9 @@ function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing
   useEffect(() => {
     play(animation);
   }, [animation, trigger, play]);
+  useEffect(() => {
+    current.current?.action.setEffectiveTimeScale(timeScale);
+  }, [timeScale]);
 
   // Tư thế code dựng: phát khi `pose.n` đổi (chỉ tư thế được phép với model này); hướng nhìn/chỉ theo `aim`.
   useEffect(() => {
@@ -320,7 +332,7 @@ function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing
       const src = source(c);
       return src ? rootSpeed(src) * fit.scale : null;
     };
-    ready.current?.({ rigged: true, height, walkSpeed: speed('walk'), runSpeed: speed('run') });
+    ready.current?.({ rigged: true, height, walkSpeed: speed('walk'), runSpeed: speed('run'), jumpSeconds: playable.jump?.clip.duration ?? null });
   }, [sourceKey, fit.scale, height, animations]);
 
   return null;
@@ -363,7 +375,7 @@ function StaticMotion({ motion, outer, facing, height, mood, happyTrigger, lookA
   const ready = useRef(onReady);
   ready.current = onReady;
   useEffect(() => {
-    ready.current?.({ rigged: false, height, walkSpeed: null, runSpeed: null });
+    ready.current?.({ rigged: false, height, walkSpeed: null, runSpeed: null, jumpSeconds: null });
   }, [height]);
 
   useFrame((state, dt) => {
