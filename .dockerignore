@@ -3,7 +3,6 @@ node_modules
 dist
 **/dist
 assets/
-_giai-doan-1/
 assets-build/_preview/
 .git
 .env*

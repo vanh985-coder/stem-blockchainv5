@@ -185,7 +185,7 @@ File trong assets-build/ mang mã băm nội dung trong tên (ten.<hash8>.webp);
 - `Dockerfile` (gốc repo), 2 tầng:
   - tầng build: Node 22, pnpm đúng phiên bản `packageManager` (corepack), `pnpm install --frozen-lockfile`, chạy `pnpm check:text` và `pnpm test` (đỏ thì dừng, không tạo image), rồi `pnpm build`. Biến `VITE_*` truyền bằng **build args**; không chép `.env*` vào image;
   - tầng chạy: `caddy:2-alpine` kèm `dist` của 5 app, `assets-build/` (không có `_preview/`) và `deploy/Caddyfile`.
-- `.dockerignore`: `node_modules`, `dist`, `assets/`, `.env*`, `_giai-doan-1/`, `assets-build/_preview/`, `.git`.
+- `.dockerignore`: `node_modules`, `dist`, `assets/`, `.env*`, `assets-build/_preview/`, `.git`.
 - `deploy/Caddyfile`:
   - 5 app: đường dẫn không phải file thì trả `index.html`; `index.html` là `no-cache`; file trong `/assets/` (có mã băm) là `public, max-age=31536000, immutable`; nén zstd/gzip; header `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` tắt camera, micro, định vị;
   - assets: `Access-Control-Allow-Origin: *`; file có mã băm 8 ký tự là `immutable`, còn lại (như `manifest.json`) là `no-cache`; khai báo kiểu `.webp`, `.glb`, `.woff2` (giống `pnpm dev:assets`).

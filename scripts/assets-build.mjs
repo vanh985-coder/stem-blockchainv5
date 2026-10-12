@@ -1,10 +1,12 @@
 // Nén đồ họa: đọc assets/, ghi assets-build/ + manifest.json. Chạy: pnpm assets:build
-// Phần ảnh (mốc 1). Model .glb làm ở mốc 2; hai ảnh man-06 lúc này chuyển như ảnh nền thường.
+// Ảnh (mốc 1) và model .glb (mốc 2). Hai ảnh man-06 lúc này chuyển như ảnh nền thường.
 import { createHash } from 'node:crypto';
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
+import { checkCharacter, largestTexture, REQUIRED_CLIPS, textureBytes } from './lib/glb.mjs';
+import { buildModel, classifyModel } from './lib/model-build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'assets');
@@ -36,13 +38,13 @@ function classify(key) {
   return null;
 }
 
-async function walk(dir, rel = '') {
+async function walk(dir, rel = '', skip = SKIP_DIRS) {
   const out = [];
   for (const e of await readdir(path.join(dir, rel), { withFileTypes: true })) {
     const r = rel ? `${rel}/${e.name}` : e.name;
     if (e.isDirectory()) {
-      if (!rel && SKIP_DIRS.has(e.name)) continue;
-      out.push(...(await walk(dir, r)));
+      if (!rel && skip.has(e.name)) continue;
+      out.push(...(await walk(dir, r, skip)));
     } else if (e.isFile()) out.push(r);
   }
   return out;
@@ -255,10 +257,72 @@ await pool(jobs, CONCURRENCY, async ({ rel, key, rule }) => {
   if (rule.warnBig && entry.bytes > WARN_BYTES) bigFiles.push({ key, bytes: entry.bytes });
 });
 
+// ---------------------------------------------------------------------------
+// Model .glb: xử lý lần lượt (mỗi model gốc nặng vài triệu tam giác nên tốn bộ nhớ).
+const MODELS_SRC = path.join(SRC, 'models');
+const MODEL_CODE_HASH = createHash('sha256')
+  .update(await Promise.all(['glb', 'model-build', 'preview'].map((n) => readFile(path.join(path.dirname(fileURLToPath(import.meta.url)), 'lib', `${n}.mjs`)))).then((bs) => Buffer.concat(bs)))
+  .digest('hex')
+  .slice(0, 12);
+const modelStats = { processed: 0, skipped: 0 };
+const modelFiles = [];
+try {
+  for (const rel of (await walk(MODELS_SRC)).sort()) if (rel.toLowerCase().endsWith('.glb')) modelFiles.push(rel);
+} catch {
+  console.log('Không có assets/models/: bỏ qua phần model.');
+}
+const previewName = (key) => `${key.replace(/^models\//, '').replace(/\//g, '-')}.png`;
+const modelEntries = [];
+
+for (const rel of modelFiles) {
+  const key = `models/${rel.slice(0, -4)}`;
+  const rule = classifyModel(key);
+  const srcBuf = await readFile(path.join(MODELS_SRC, rel));
+  const sig = `${MODEL_CODE_HASH}:${JSON.stringify(rule)}:${sha(srcBuf)}`;
+  const previewPath = path.join(OUT, '_preview', 'models', previewName(key));
+  let entry;
+  const hit = cache[key];
+  if (hit && hit.sig === sig) {
+    try {
+      await stat(path.join(OUT, hit.file));
+      if (hit.model.simplified) await stat(previewPath);
+      entry = hit;
+      modelStats.skipped++;
+    } catch {
+      /* file ra hoặc ảnh xem trước bị xóa: nén lại */
+    }
+  }
+  if (!entry) {
+    const t = Date.now();
+    const r = await buildModel(srcBuf, rule);
+    const dir = path.posix.dirname(key);
+    const file = `${dir}/${path.posix.basename(key)}.${sha(r.glb, 8)}.glb`;
+    await mkdir(path.dirname(path.join(OUT, file)), { recursive: true });
+    await writeFile(path.join(OUT, file), r.glb);
+    if (r.preview) {
+      await mkdir(path.dirname(previewPath), { recursive: true });
+      await writeFile(previewPath, r.preview);
+    }
+    entry = {
+      sig,
+      file,
+      bytes: r.glb.length,
+      kind: rule.kind,
+      tris: r.after.tris,
+      model: { srcBytes: r.srcBytes, simplified: r.simplified, permissive: r.permissive, skinDeviation: r.skinDeviation, before: r.before, after: r.after, rule },
+    };
+    modelStats.processed++;
+    console.log(`  nén  models/${rel}  ->  ${file}  (${fmt(r.srcBytes)} -> ${fmt(r.glb.length)}, ${Math.round(r.before.tris)} -> ${Math.round(r.after.tris)} tam giác, ${((Date.now() - t) / 1000).toFixed(1)}s)`);
+  }
+  newCache[key] = entry;
+  manifest[key] = { file: entry.file, bytes: entry.bytes, width: 0, height: 0, kind: 'model', tris: entry.tris };
+  modelEntries.push({ key, ...entry });
+}
+
 // Dọn file cũ: mọi file trong assets-build (trừ manifest.json và _preview/) không còn trong manifest.
 const keep = new Set(Object.values(manifest).map((m) => m.file));
 let removed = 0;
-for (const f of await walk(OUT)) {
+for (const f of await walk(OUT, '', new Set())) { // assets-build/ có thư mục models/ (bản nén), nên không bỏ qua thư mục nào
   if (f === 'manifest.json' || f.startsWith('_preview/')) continue;
   if (!keep.has(f)) {
     await rm(path.join(OUT, f));
@@ -305,4 +369,77 @@ if (bigFiles.length) {
 if (unclassified.length) {
   console.log(`\nBỏ qua ${unclassified.length} ảnh chưa có quy tắc nén:`);
   for (const u of unclassified) console.log(`  ${u}`);
+}
+
+// ---------------------------------------------------------------------------
+// Model: bảng trước/sau, cảnh báo, kiểm tra xương và hoạt ảnh.
+if (modelEntries.length) {
+  const MB = 1048576;
+  const warnings = [];
+  const problems = [];
+  const rows = [];
+  for (const e of modelEntries) {
+    const { before, after, rule, simplified, permissive, srcBytes, skinDeviation } = e.model;
+    const tex = largestTexture(after);
+    const texTotal = textureBytes(after);
+    const notes = [];
+    const w = (msg) => {
+      warnings.push(`${e.key}: ${msg}`);
+      notes.push('!');
+    };
+    if (e.bytes > rule.maxBytes) w(`${(e.bytes / MB).toFixed(2)} MB, vượt mục tiêu ${rule.maxBytes / MB} MB (${rule.kind === 'nhan-vat' ? 'nhân vật' : 'đồ vật'})`);
+    if (rule.kind === 'nhan-vat' && texTotal > 2 * MB) w(`tổng texture ${(texTotal / MB).toFixed(2)} MB, vượt 2 MB`);
+    if (before.skins > 0 && before.tris > 30000) w(`có xương và ${Math.round(before.tris)} tam giác: không giảm mặt, chỉ cảnh báo`);
+    if (simplified && after.tris > rule.targetTris * 1.5) w(`sau giảm mặt vẫn ${Math.round(after.tris)} tam giác (mục tiêu ~${rule.targetTris})`);
+    if (permissive) w('giảm mặt kiểu Permissive để đạt mục tiêu: texture có thể bị méo, hãy soi ảnh trong assets-build/_preview/models/');
+    if (tex && Math.max(tex.width, tex.height) > rule.maxTexture) w(`texture ${tex.width}x${tex.height} vượt ${rule.maxTexture}`);
+    if (skinDeviation !== null && skinDeviation > 0.01) problems.push(`${e.key}: bộ xương lệch ${(skinDeviation * 100).toFixed(2)}% sau nén (tối đa 1%)`);
+    if (REQUIRED_CLIPS[e.key]) {
+      const { problems: p } = checkCharacter(after, e.key);
+      for (const m of p) problems.push(`${e.key}: ${m}`);
+    }
+    rows.push({
+      name: e.key.replace(/^models\//, ''),
+      before: srcBytes / MB,
+      after: e.bytes / MB,
+      tris: `${Math.round(before.tris).toLocaleString('en-US')} -> ${Math.round(after.tris).toLocaleString('en-US')}${simplified ? ' (giảm)' : ''}`,
+      tex: tex ? `${tex.width}x${tex.height}` : '-',
+      texMb: texTotal / MB,
+      mark: notes.length ? '!' : '',
+    });
+  }
+  const nameW = Math.max(...rows.map((r) => r.name.length), 5);
+  console.log('\n=== Model: trước / sau ===');
+  console.log(`${'Model'.padEnd(nameW)}  ${'Trước MB'.padStart(8)}  ${'Sau MB'.padStart(7)}  ${'Tam giác (trước -> sau)'.padEnd(30)}  ${'Texture lớn nhất'.padEnd(16)}  Tổng texture MB`);
+  for (const r of rows) {
+    console.log(
+      `${r.name.padEnd(nameW)}  ${r.before.toFixed(2).padStart(8)}  ${r.after.toFixed(2).padStart(7)}  ${r.tris.padEnd(30)}  ${r.tex.padEnd(16)}  ${r.texMb.toFixed(2).padStart(6)} ${r.mark}`,
+    );
+  }
+  const sumBefore = rows.reduce((s, r) => s + r.before, 0);
+  const sumAfter = rows.reduce((s, r) => s + r.after, 0);
+  console.log(`${'TỔNG'.padEnd(nameW)}  ${sumBefore.toFixed(2).padStart(8)}  ${sumAfter.toFixed(2).padStart(7)}`);
+  console.log(`Model nén mới ${modelStats.processed}, bỏ qua (không đổi) ${modelStats.skipped}. Ảnh trước/sau: assets-build/_preview/models/`);
+
+  console.log('\n=== Kiểm tra xương và hoạt ảnh (đọc lại file đã nén) ===');
+  for (const e of modelEntries.filter((m) => m.model.before.skins > 0)) {
+    const { after, before, skinDeviation } = e.model;
+    const clips = after.clips.map((c) => `${c.name} (${c.duration.toFixed(2)}s)`).join(', ');
+    const srcClips = before.clips.length;
+    console.log(`${e.key}: ${after.joints} xương (gốc ${before.joints}), ${after.clips.length}/${srcClips} clip, lệch hộp bao ${(skinDeviation * 100).toFixed(3)}%`);
+    console.log(`    clip: ${clips}`);
+    if (after.clips.length !== srcClips) problems.push(`${e.key}: gốc ${srcClips} clip, sau nén ${after.clips.length}`);
+  }
+
+  if (warnings.length) {
+    console.log(`\nCẢNH BÁO model (${warnings.length}):`);
+    for (const m of warnings) console.log(`  ${m}`);
+  } else {
+    console.log('\nKhông có cảnh báo dung lượng model.');
+  }
+  if (problems.length) {
+    console.log(`\nLỖI model (${problems.length}):`);
+    for (const m of problems) console.log(`  ${m}`);
+    process.exitCode = 1;
+  }
 }

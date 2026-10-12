@@ -6,6 +6,7 @@ const kb = (b: number) => (b / 1024).toFixed(1);
 export default function DevAssets() {
   const manifest = useManifest();
   const entries = manifest ? Object.entries(manifest) : [];
+  const images = entries.filter(([, m]) => m.kind !== 'model'); // model .glb không vẽ được bằng <img>
   const total = entries.reduce((s, [, m]) => s + m.bytes, 0);
 
   return (
@@ -32,7 +33,7 @@ export default function DevAssets() {
       <section>
         <h2 className="mb-2 text-lg">{ui.dev.moiAnh}</h2>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3">
-          {entries.map(([key, m]) => (
+          {images.map(([key, m]) => (
             <figure key={key} className="break-all text-xs">
               <AssetImage path={key} alt={key} loading="lazy" className="h-28 w-full bg-stone-200 object-contain" />
               <figcaption>

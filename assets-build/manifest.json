@@ -1,4 +1,204 @@
 {
+  "models/characters/bac-an": {
+    "file": "models/characters/bac-an.62caa00a.glb",
+    "bytes": 679312,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 18222
+  },
+  "models/characters/chu-dung": {
+    "file": "models/characters/chu-dung.503ded19.glb",
+    "bytes": 554052,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 18099
+  },
+  "models/characters/co-chi": {
+    "file": "models/characters/co-chi.d53903dc.glb",
+    "bytes": 516568,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 17730
+  },
+  "models/characters/cu-binh": {
+    "file": "models/characters/cu-binh.4d629a86.glb",
+    "bytes": 580516,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 18258
+  },
+  "models/characters/dan-lang-ba-cu": {
+    "file": "models/characters/dan-lang-ba-cu.260c17b9.glb",
+    "bytes": 777772,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 18165
+  },
+  "models/characters/dan-lang-nong-dan": {
+    "file": "models/characters/dan-lang-nong-dan.52014054.glb",
+    "bytes": 861496,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 18330
+  },
+  "models/characters/hoc-sinh-nam": {
+    "file": "models/characters/hoc-sinh-nam.73e47e41.glb",
+    "bytes": 1024916,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 18588
+  },
+  "models/characters/lai-buon": {
+    "file": "models/characters/lai-buon.d37c3a2c.glb",
+    "bytes": 568460,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 18017
+  },
+  "models/characters/thay-linh": {
+    "file": "models/characters/thay-linh.3578dcd3.glb",
+    "bytes": 752920,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 18179
+  },
+  "models/characters/ti": {
+    "file": "models/characters/ti.00fe0da2.glb",
+    "bytes": 1051268,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 17805
+  },
+  "models/env/bui-tre": {
+    "file": "models/env/bui-tre.50859bcc.glb",
+    "bytes": 115784,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 7878
+  },
+  "models/env/cay-da": {
+    "file": "models/env/cay-da.aa7947f9.glb",
+    "bytes": 594080,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 9126
+  },
+  "models/env/cong-lang-bac": {
+    "file": "models/env/cong-lang-bac.8121d0a3.glb",
+    "bytes": 822816,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 8000
+  },
+  "models/env/cong-lang-det": {
+    "file": "models/env/cong-lang-det.211098e3.glb",
+    "bytes": 882268,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 7999
+  },
+  "models/env/cong-lang-giay": {
+    "file": "models/env/cong-lang-giay.3e153a98.glb",
+    "bytes": 1053760,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 7995
+  },
+  "models/env/cong-lang-khac-dau": {
+    "file": "models/env/cong-lang-khac-dau.f01006a2.glb",
+    "bytes": 1002496,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 8000
+  },
+  "models/env/gieng-lang": {
+    "file": "models/env/gieng-lang.b76ca031.glb",
+    "bytes": 399852,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 13182
+  },
+  "models/env/khung-cui": {
+    "file": "models/env/khung-cui.e31dfc51.glb",
+    "bytes": 74316,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 7978
+  },
+  "models/env/leu-cho": {
+    "file": "models/env/leu-cho.bbe968fa.glb",
+    "bytes": 497332,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 7910
+  },
+  "models/env/nha-mai-ngoi": {
+    "file": "models/env/nha-mai-ngoi.9c53722a.glb",
+    "bytes": 829536,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 30780
+  },
+  "models/env/nha-mai-tranh": {
+    "file": "models/env/nha-mai-tranh.526b0a08.glb",
+    "bytes": 828148,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 35212
+  },
+  "models/env/phen-phoi-giay": {
+    "file": "models/env/phen-phoi-giay.a15c4fa8.glb",
+    "bytes": 484376,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 9877
+  },
+  "models/games/man-02-duoi-ti/sap-thap": {
+    "file": "models/games/man-02-duoi-ti/sap-thap.9266e3b5.glb",
+    "bytes": 45308,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 8000
+  },
+  "models/games/man-02-duoi-ti/xe-bo": {
+    "file": "models/games/man-02-duoi-ti/xe-bo.327dfc8a.glb",
+    "bytes": 811256,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 39982
+  },
+  "models/games/man-02-duoi-ti/xe-cho-hang": {
+    "file": "models/games/man-02-duoi-ti/xe-cho-hang.d5f39174.glb",
+    "bytes": 450796,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 7998
+  },
   "scenes/bai-hoc-lang-bac": {
     "file": "scenes/bai-hoc-lang-bac.2f602809.webp",
     "bytes": 100844,
@@ -368,6 +568,12 @@
   "ui/portraits/bac-an": {
     "file": "ui/portraits/bac-an.e22c0033.webp",
     "bytes": 13704,
+    "width": 512,
+    "height": 512
+  },
+  "ui/portraits/bac-an-cuoi": {
+    "file": "ui/portraits/bac-an-cuoi.908709b2.webp",
+    "bytes": 24038,
     "width": 512,
     "height": 512
   },

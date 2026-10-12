@@ -15,7 +15,6 @@ const IGNORE = [
   /^packages\/core\/src\/lessons\/[^/]+\/tests\.ts$/, // dữ liệu test của giai đoạn 1 (chuỗi so sánh nguyên văn)
   /\.test\.tsx?$/, // test vitest
   /^packages\/core\/src\/lib\/rng\.ts$/, // thông báo lỗi cho lập trình viên
-  /^_giai-doan-1\//,
 ];
 
 // Chữ cái có dấu của tiếng Việt (kể cả đ, Đ).

@@ -2,8 +2,12 @@
 export interface ManifestEntry {
   file: string;
   bytes: number;
+  /** Điểm ảnh; model .glb ghi 0 (không có ý nghĩa). */
   width: number;
   height: number;
+  /** Chỉ có ở model .glb: `kind` là 'model', `tris` là số tam giác sau nén. */
+  kind?: 'model';
+  tris?: number;
 }
 
 /** Khóa là đường dẫn không đuôi, ví dụ "scenes/bai-hoc-lang-giay". */
