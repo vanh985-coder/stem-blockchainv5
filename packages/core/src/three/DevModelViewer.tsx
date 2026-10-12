@@ -1,22 +1,26 @@
 import { Bounds, OrbitControls } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree, type RootState } from '@react-three/fiber';
 import { useEffect, useMemo, useState } from 'react';
 import { useManifest } from '../assets/store';
 import { fmt } from '../content/characters';
 import { ui } from '../content/ui';
 import { Panel } from '../ui/Panel';
-import { Character } from './Character';
+import { Character, type PoseRequest } from './Character';
+import { ReactionStage } from './ReactionStage';
 import { DevCharacterGroup } from './DevCharacterGroup';
 import { Model, type ModelLod } from './Model';
 import { Scene3D } from './Scene3D';
 import { CLIP_CONFIG, formatClipConfig, type ClipConfigTable } from './clipConfig';
 import { CLIP_NAMES, type ClipName } from './clips';
 import { isLodId, lodId, modelPath } from './modelIds';
-import { preloadModel } from './modelLoader';
+import { modelCacheStats, preloadModel } from './modelLoader';
+import { choiceReactions } from './choiceReactions';
+import { POSE_NAMES, isPoseAllowed, type Aim } from './poses';
 import { RIGGED_CHARACTER_IDS, isCharacterId } from './modelSizes';
 import { QUALITY_CHOICES, lodDistance, type QualityChoice } from './quality';
 import type { Mood } from './staticMotion';
 import { useQuality } from './useQuality';
+import { useChoiceHandlers } from './useReaction';
 
 interface Stats {
   fps: number;
@@ -37,6 +41,70 @@ function StatsProbe({ onStats }: { onStats: (s: Stats) => void }) {
     }
   });
   return null;
+}
+
+/** Đặt lại camera khi đổi giữa "từng model" và "cả nhóm" (giữ nguyên khung vẽ, nên model cũ phải được giải phóng). */
+function CameraPreset({ group }: { group: boolean }) {
+  const camera = useThree((st) => st.camera);
+  const controls = useThree((st) => st.controls) as { target: { set(x: number, y: number, z: number): void }; update(): void } | null;
+  useEffect(() => {
+    if (!group) return;
+    camera.position.set(0, 2.6, 12);
+    controls?.target.set(0, 0.9, 2);
+    controls?.update();
+  }, [group, camera, controls]);
+  return null;
+}
+
+/** Số liệu dev để kiểm tra rò rỉ bộ nhớ (chỉ khi chạy dev): window.__sochung3d. */
+interface DevProbe {
+  gl: RootState['gl'];
+  cache: typeof modelCacheStats;
+}
+const exposeProbe = (st: RootState) => {
+  if (import.meta.env.DEV) (window as unknown as { __sochung3d?: DevProbe }).__sochung3d = { gl: st.gl, cache: modelCacheStats };
+};
+
+const ANSWERS = ['A', 'B', 'C', 'D'] as const;
+
+/** Bốn nút đáp án giả: rê chuột, Tab, bấm hoặc chạm đều phát sự kiện vào kho, giống QuizCard. */
+function FakeAnswers() {
+  const reactions = useChoiceHandlers();
+  const [result, setResult] = useState<boolean | null>(null);
+  const [busy, setBusy] = useState(false);
+  const choose = (el: HTMLElement) => {
+    if (busy) return;
+    setBusy(true);
+    setResult(null);
+    void reactions.select(el).then(() => {
+      const ok = Math.random() < 0.5;
+      setResult(ok);
+      reactions.result(ok);
+      setBusy(false);
+    });
+  };
+  return (
+    <div className="space-y-2">
+      <ul className="grid grid-cols-2 gap-2">
+        {ANSWERS.map((a) => (
+          <li key={a}>
+            <button
+              type="button"
+              disabled={busy}
+              {...reactions.bindChoice()}
+              onClick={(e) => choose(e.currentTarget)}
+              className="min-h-14 w-full cursor-pointer rounded-nut border-2 border-nau-go bg-giay px-3 font-bold hover:brightness-105 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim"
+            >
+              {fmt(ui.dev3d.phanUngDapAn, { x: a })}
+            </button>
+          </li>
+        ))}
+      </ul>
+      <p className="text-sm font-bold" role="status">
+        {result === null ? ui.dev3d.phanUngChon : result ? ui.dev3d.phanUngDung : ui.dev3d.phanUngSai}
+      </p>
+    </div>
+  );
 }
 
 const QUALITY_LABEL: Record<QualityChoice, string> = {
@@ -90,6 +158,8 @@ export function DevModelViewer() {
   const [mood, setMood] = useState<Mood>('idle');
   const [happyN, setHappyN] = useState<number | undefined>(undefined);
   const [config, setConfig] = useState<ClipConfigTable>(CLIP_CONFIG);
+  const [poseReq, setPoseReq] = useState<PoseRequest | undefined>(undefined);
+  const [pointOn, setPointOn] = useState(false);
   const [exported, setExported] = useState<{ text: string; copied: boolean } | null>(null);
   const { level } = useQuality(choice);
 
@@ -112,6 +182,8 @@ export function DevModelViewer() {
   const activeLod: ModelLod = hasLod ? lod : 'near';
   const isChar = isCharacterId(id);
   const rigged = RIGGED_CHARACTER_IDS.includes(id);
+  /** Điểm chỉ thử: bên phải và hơi cao hơn tầm mắt (giống đáp án nằm bên phải khung). */
+  const sampleAim: Aim = { az: 0.9, el: 0.15 };
 
   const setJump = (patch: { from?: number; to?: number }) => setConfig((c) => ({ ...c, jump: { ...c.jump, ...patch } }));
   const exportConfig = () => {
@@ -173,8 +245,30 @@ export function DevModelViewer() {
                   <p className="mt-1 text-sm">{ui.dev3d.clipBorMuon}</p>
                 </fieldset>
 
+                <fieldset>
+                  <legend className="font-bold">{ui.dev3d.tuThe}</legend>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {POSE_NAMES.map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        disabled={!isPoseAllowed(id, p)}
+                        onClick={() => setPoseReq((r) => ({ name: p, n: (r?.n ?? 0) + 1 }))}
+                        className={`${BTN} ${on(poseReq?.name === p)} disabled:opacity-40`}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                    <button type="button" aria-pressed={pointOn} onClick={() => setPointOn((v) => !v)} className={`${BTN} ${on(pointOn)}`}>
+                      {ui.dev3d.tuThePoint}
+                    </button>
+                  </div>
+                  <p className="mt-1 text-sm">{ui.dev3d.tuTheGhiChu}</p>
+                </fieldset>
+
                 <fieldset className="space-y-2">
                   <legend className="font-bold">{ui.dev3d.doanPhat}</legend>
+
                   <label className="block text-sm">
                     {fmt(ui.dev3d.jumpTu, { so: Math.round(config.jump.from * 100) })}
                     <input type="range" min={0} max={100} value={Math.round(config.jump.from * 100)} onChange={(e) => setJump({ from: Number(e.target.value) / 100 })} className="w-full" />
@@ -257,8 +351,9 @@ export function DevModelViewer() {
         <p className="text-sm text-nau-go-dam">{ui.dev3d.huongDan}</p>
       </Panel>
 
+      <div className="space-y-4">
       <div className="h-[70vh] min-h-[360px] overflow-hidden rounded-bang border-2 border-nau-go">
-        <Scene3D key={group ? 'group' : 'single'} quality={choice} autoDowngrade={false} camera={{ position: group ? [0, 2.6, 12] : [0, 3, 8] }} shadowExtent={14}>
+        <Scene3D quality={choice} autoDowngrade={false} camera={{ position: [0, 3, 8] }} shadowExtent={14} onCreated={exposeProbe}>
           <mesh rotation-x={-Math.PI / 2} receiveShadow>
             <circleGeometry args={[40, 48]} />
             <meshStandardMaterial color="#9bc47a" roughness={1} />
@@ -268,16 +363,28 @@ export function DevModelViewer() {
           ) : (
             <Bounds key={id} fit margin={1.6}>
               {isChar ? (
-                <Character id={id} animation={anim.clip} trigger={anim.n} clipConfig={config} mood={mood} happyTrigger={happyN} lookAt={[0, 1, 10]} />
+                <Character id={id} animation={anim.clip} trigger={anim.n} clipConfig={config} pose={poseReq} aim={pointOn ? sampleAim : null} mood={mood} happyTrigger={happyN} lookAt={[0, 1, 10]} />
               ) : (
                 <Model id={id} lod={activeLod} castShadow receiveShadow />
               )}
             </Bounds>
           )}
           <OrbitControls makeDefault enableDamping target={group ? [0, 0.9, 2] : undefined} maxDistance={80} maxPolarAngle={Math.PI / 2 - 0.02} />
+          <CameraPreset group={group} />
           <StatsProbe onStats={setStats} />
         </Scene3D>
       </div>
+
+      <Panel className="grid gap-4 md:grid-cols-[1fr_16rem]">
+        <div className="md:col-span-2">
+          <h2 className="text-xl">{ui.dev3d.phanUngTieuDe}</h2>
+          <p className="text-sm">{ui.dev3d.phanUngHuongDan}</p>
+        </div>
+        <ReactionStage className="h-[340px] overflow-hidden rounded-bang border-2 border-nau-go" quality={choice} store={choiceReactions} />
+        <FakeAnswers />
+      </Panel>
+      </div>
     </main>
+
   );
 }

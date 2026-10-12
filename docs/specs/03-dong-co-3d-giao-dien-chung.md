@@ -221,6 +221,16 @@ Tên hiển thị **không viết cứng**. Toàn bộ nằm trong `content/char
 
 Mỗi tư thế trộn với clip đang chạy, vào ra mượt trong 0,1 giây.
 
+**Cách làm** (`three/poses.ts` thuần, `three/PoseLayer.ts` áp lên xương):
+- Độ lệch là góc cộng thêm lên xương **sau khi** `AnimationMixer` chạy, tính trong **hệ tọa độ của nhân vật** (+Z là hướng mặt, +X là bên trái nhân vật, quay quanh +X dương là cúi tới trước), rồi đổi sang hệ cục bộ của từng xương: `local' = P⁻¹·C·R·C⁻¹·P·local`. Nhờ vậy "cúi đầu 20°" luôn là cúi tới trước dù trục xương Mixamo thế nào.
+- **Thứ tự mỗi khung hình: `layer.restore()`, `mixer.update(dt)`, `layer.update(now, dt)`.** `PropertyMixer` của three chỉ ghi lại xương khi giá trị clip đổi so với khung trước; nếu không trả xương về giá trị gốc thì độ lệch cộng dồn từng khung (hông lún dần xuống đất).
+- Trọng số: vào 0,1 giây, giữ, ra 0,1 giây (`poseWeight`); `point` giữ đến khi thả (`heldWeight`).
+- Số độ cao tính theo đơn vị cảnh (nhân vật cao 1,7): `slide` hạ `Hips` 0,5, `hurt` nảy 0,3. **Thêm so với bảng:** khi `Hips` hạ thì đùi ra trước góc a và gối gập 2a (a = arccos((L − hạ)/L), tối đa 75°, L là chiều dài chân) để bàn chân vẫn chạm đất, nếu không chân lún dưới sàn.
+- `swing`: `RightArm` quét từ -175° (trên cao) xuống -20° (trước người) quanh trục X của nhân vật trong 0,25 giây, thêm khuỷu và thân hơi theo.
+- `hurt` chỉ có tác dụng với Tí (`isPoseAllowed`).
+- **Giới hạn khớp** (`JOINT_LIMITS`): mọi góc được chặn sau khi cộng dồn (ví dụ gối 0°–150°, đầu ±80° quanh trục đứng) để tay chân không gãy khi nhiều tư thế chồng nhau.
+- `<Character pose={{ name, n }}>` phát tư thế (đổi `n` để phát lại); `<Character aim={{ az, el }}>` là hướng nhìn và chỉ (mục 4).
+
 ### 3.4 Nhân vật không có xương (đứng yên)
 
 **Chuyển động do code làm:**
@@ -285,6 +295,14 @@ Dùng ở mọi chỗ có lựa chọn: câu hỏi, Đồng ý/Từ chối, lự
 - **Máy tính:** rê chuột hoặc focus vào một đáp án thì nhân vật học sinh **quay đầu và người** về phía đáp án đó, kèm tư thế `point`.
 - **Điện thoại:** chạm là chọn. Nhân vật `point` 0,3 giây trước khi hiện kết quả.
 - **Kết quả:** đúng thì `cheer`, sai thì `sad`.
+
+**Kho sự kiện dùng chung** (`three/choiceReactions.ts`, không import three nên nhẹ cho trang đầu): `QuizCard` và các trang bài học chỉ phát sự kiện, khung 3D chỉ nghe.
+- `hover(rect)` / `hover(null)`: rê chuột hoặc focus vào đáp án (rect là khung màn hình của nút) hoặc rời đi. Chạm không có rê nên không phát `hover`.
+- `select(rect, touch)`: chọn. Trả về Promise: **ngay** nếu bằng chuột hoặc bàn phím, **sau 0,3 giây** nếu chạm (nhân vật chỉ trước rồi mới hiện kết quả). Từ lúc chọn đến khi có kết quả thì khóa hướng chỉ, rê chuột đi chỗ khác không làm mất.
+- `result(correct)`: đúng thì học sinh `cheer` và {phanDien} `hurt`; sai thì học sinh `sad` và {phanDien} `cheer`; rồi về `idle`.
+- Hook `useChoiceHandlers()` (`bindChoice` gắn vào nút, `select`, `result`) và `useReaction()` (nghe). `QuizCard` đã nối sẵn; trang bài học 2D nối ở bước sau.
+- **Hướng nhìn:** `aimFromRects(khung3D, đáp án)` cho góc ngang `az` và góc cao `el` (tối đa ±75° và -35°…+45°); bên phải khung thì nhân vật quay sang +X (bên trái nhân vật, vì họ nhìn ra màn hình). `splitAim`: cả người 30% + vặn thân 40% + đầu 40% của `az`; ngẩng/cúi 70% đầu, 30% cổ. Cánh tay phải (`RightArm` rồi `RightForeArm`) quay từ hướng hiện tại tới hướng đáp án, tối đa 160°.
+- `<ReactionStage>` (`three/ReactionStage.tsx`) là khung 3D nghe kho này: học sinh và Tí cạnh nhau (thử ở `/dev/3d`); bước sau gắn thành hai khung hai bên bảng bài học.
 
 **Hội thoại ở trang bài học 2D** dùng `VnDialog` (mục 1): chân dung lớn của người nói, không còn khung 3D nhỏ chồng lên.
 
@@ -394,13 +412,14 @@ Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút
 - **Dung lượng:** trang đầu ≤ 150 KB JS. Lõi 3D chỉ tải khi vào cảnh 3D. Mỗi màn tải riêng.
 - **Bộ nhớ:** texture nhân vật đã được thu nhỏ khi build (spec 01). Nếu lúc chạy còn thấy texture lớn hơn 2048, ghi cảnh báo.
 - **Tốc độ:** mức Thấp ≥ 30fps trên điện thoại tầm trung.
-- **Code:** không tạo object mới trong `useFrame`; rời cảnh thì dispose.
+- **Code:** không tạo object mới trong `useFrame`; rời cảnh thì dispose (hình học, vật liệu, texture và **đóng `ImageBitmap`** của texture, vì `texture.dispose()` không giải phóng bitmap trong RAM). `AnimationMixer` tạo trong `useEffect`, cleanup gọi `stopAllAction` và `uncacheRoot`; mỗi lần effect chạy (kể cả lần gắn lại của StrictMode) tạo mixer mới.
 
 ## 10. Trang thử
 
 **`/dev/3d`:**
 - Chọn từng model trong manifest để xem.
-- Nút phát thử từng clip và từng tư thế code dựng (bước 3: đã có nút từng clip; tư thế code dựng ở bước sau).
+- Nút phát thử từng clip và từng tư thế code dựng (sad, slide, swing, hurt, và bật/tắt point).
+- Khu thử `ChoiceReaction`: khung 3D (học sinh và Tí) và 4 nút đáp án HTML giả (rê chuột hoặc Tab thì học sinh quay và chỉ; bấm hoặc chạm thì ra đúng hoặc sai ngẫu nhiên).
 - Nút "Xem cả nhóm": 10 nhân vật và Bi cạnh nhau (cùng chiều cao; 6 người đứng yên nhún lệch pha; bà cụ và chú nông dân đi vòng).
 - Thanh trượt chỉnh đoạn phát của `jump` và `cheer`, rồi xuất ra `clipConfig.ts`.
 - Có thử `ChoiceReaction`, Bi, chân dung tự chụp, và bộ đếm FPS.

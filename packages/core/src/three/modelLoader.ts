@@ -157,7 +157,13 @@ export function disposeModelScene(scene: Object3D): void {
     const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     for (const m of mats as Material[]) m.dispose();
   });
-  for (const t of textures) t.dispose();
+  for (const t of textures) {
+    t.dispose();
+    // GLTFLoader nạp ảnh dạng ImageBitmap: texture.dispose() chỉ giải phóng bản trên GPU, còn bitmap (bản giải nén trong RAM,
+    // ~16 MB cho ảnh 2048×2048) chỉ được thu gom khi trình duyệt muốn. Đóng ngay để vào/ra cảnh nhiều lần không phình bộ nhớ.
+    const img = t.image as { close?: () => void } | undefined;
+    if (img && typeof img.close === 'function') img.close();
+  }
 }
 
 /** Đánh dấu một chỗ đang dùng model. Gọi `releaseModel` khi không dùng nữa. */
@@ -183,4 +189,11 @@ export function releaseModel(id: string): void {
     cache.delete(id);
     if (entry.data) disposeModelScene(entry.data.scene);
   }, DISPOSE_DELAY_MS);
+}
+
+/** Số model đang giữ trong bộ nhớ đệm và tổng số chỗ đang dùng (để kiểm tra rò rỉ khi vào/ra cảnh). */
+export function modelCacheStats(): { entries: number; refs: number } {
+  let refs = 0;
+  cache.forEach((e) => (refs += e.refs));
+  return { entries: cache.size, refs };
 }

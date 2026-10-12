@@ -1,5 +1,5 @@
 import { useFrame, type ThreeElements } from '@react-three/fiber';
-import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { AnimationMixer, Box3, LoopOnce, LoopRepeat, type AnimationAction, type AnimationClip, type Group, type Object3D } from 'three';
 import { createMulberry32 } from '../lib/rng';
 import { BlobShadow } from './BlobShadow';
@@ -10,6 +10,8 @@ import { CLIP_NAMES, borrowClips, type ClipName } from './clips';
 import { useQualityLevel } from './QualityContext';
 import { CHARACTER_HEIGHT, fitToHeight, sizeOf, type Fit } from './modelSizes';
 import { readModel, releaseModel, retainModel } from './modelLoader';
+import { PoseLayer } from './PoseLayer';
+import { isPoseAllowed, type Aim, type PoseName } from './poses';
 import { createStaticPose, phaseFrom, staticPose, turnToward, yawTowards, type Mood } from './staticMotion';
 import { useShadowFlags } from './useShadowFlags';
 
@@ -27,6 +29,12 @@ export interface CharacterInfo {
    */
   walkSpeed: number | null;
   runSpeed: number | null;
+}
+
+/** Yêu cầu phát một tư thế; đổi `n` để phát lại. */
+export interface PoseRequest {
+  name: PoseName;
+  n: number;
 }
 
 export interface CharacterProps extends GroupProps {
@@ -48,6 +56,16 @@ export interface CharacterProps extends GroupProps {
   fade?: number;
   /** Báo khi một clip phát một lần đã xong */
   onClipEnd?: (clip: ClipName) => void;
+  /**
+   * Tư thế code dựng (sad, slide, swing, hurt) trộn lên trên clip đang chạy, vào ra mượt 0,1 giây. Đổi `n` để phát lại.
+   * `hurt` chỉ có tác dụng với Tí.
+   */
+  pose?: PoseRequest;
+  /**
+   * Hướng nhìn/chỉ về một đáp án (radian, xem `aimFromRects`): nhân vật quay đầu và người về phía đó kèm tư thế point.
+   * null hoặc bỏ trống thì thả.
+   */
+  aim?: Aim | null;
 
   // --- Nhân vật đứng yên ---
   /** "talking": nghiêng đầu và quay mặt về `lookAt` */
@@ -97,6 +115,8 @@ export function Character({
   clipConfig = CLIP_CONFIG,
   fade = 0.2,
   onClipEnd,
+  pose,
+  aim,
   mood = 'idle',
   happyTrigger,
   lookAt,
@@ -131,6 +151,9 @@ export function Character({
           animations={animations}
           fit={fit}
           height={height}
+          outer={outer}
+          motion={motion}
+          facing={facing}
           animation={animation}
           trigger={trigger}
           returnTo={returnTo}
@@ -138,6 +161,8 @@ export function Character({
           clipConfig={clipConfig}
           fade={fade}
           onClipEnd={onClipEnd}
+          pose={pose}
+          aim={aim}
           onReady={onReady}
         />
       ) : (
@@ -156,18 +181,30 @@ interface RigAnimatorProps {
   animations: AnimationClip[];
   fit: Fit;
   height: number;
+  outer: RefObject<Group | null>;
+  motion: RefObject<Group | null>;
+  facing: number;
   animation: ClipName;
   trigger?: number;
   returnTo: ClipName;
   clips: readonly ClipName[];
   clipConfig: ClipConfigTable;
   fade: number;
+  pose?: PoseRequest;
+  aim?: Aim | null;
   onClipEnd?: (clip: ClipName) => void;
   onReady?: (info: CharacterInfo) => void;
 }
 
-/** Không vẽ gì; điều khiển AnimationMixer của nhân vật có xương. */
-function RigAnimator({ id, scene, animations, fit, height, animation, trigger, returnTo, clips, clipConfig, fade, onClipEnd, onReady }: RigAnimatorProps) {
+/** Mixer, hành động và lớp tư thế của một nhân vật, tạo trong effect (không phải trong render). */
+interface Rig {
+  mixer: AnimationMixer;
+  actions: Partial<Record<ClipName, AnimationAction>>;
+  layer: PoseLayer;
+}
+
+/** Không vẽ gì; điều khiển AnimationMixer và lớp tư thế của nhân vật có xương. */
+function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing, animation, trigger, returnTo, clips, clipConfig, fade, pose, aim, onClipEnd, onReady }: RigAnimatorProps) {
   // Mượn clip của model khác nếu thiếu. Hỏi tên clip của model cho mượn một cách lười: chỉ tải khi thật sự cần.
   const ownNames = animations.map((a) => a.name);
   const sources = borrowClips(id, (mid) => (mid === id ? ownNames : readModel(mid).animations.map((a) => a.name)), clips);
@@ -193,31 +230,34 @@ function RigAnimator({ id, scene, animations, fit, height, animation, trigger, r
     return out;
   }, [sourceKey, clipConfig, animations]);
 
-  const mixer = useMemo(() => new AnimationMixer(scene), [scene]);
-
-  const actions = useMemo(() => {
-    const out: Partial<Record<ClipName, AnimationAction>> = {};
+  // Mixer tạo trong effect, dọn trong cleanup: dừng mọi hành động rồi uncacheRoot. Mỗi lần effect chạy (kể cả lần gắn lại
+  // của StrictMode) tạo mixer và hành động mới nên không bao giờ dùng lại hành động đã gỡ (lỗi _cacheIndex).
+  const rigRef = useRef<Rig | null>(null);
+  const [rig, setRig] = useState<Rig | null>(null);
+  useEffect(() => {
+    const mixer = new AnimationMixer(scene);
+    const actions: Partial<Record<ClipName, AnimationAction>> = {};
     for (const c of CLIP_NAMES) {
       const p = playable[c];
-      if (p) out[c] = mixer.clipAction(p.clip);
+      if (p) actions[c] = mixer.clipAction(p.clip);
     }
-    return out;
-  }, [mixer, playable]);
-  // Chỉ dừng các hành động khi gỡ, không "uncache": StrictMode (và đổi cấu hình ở /dev/3d) gắn lại effect với đúng các
-  // action cũ, mà action đã uncache thì không dùng lại được (lỗi _cacheIndex). Mixer và bản nhân bản cùng bị thu gom.
-  useEffect(
-    () => () => {
+    const created: Rig = { mixer, actions, layer: new PoseLayer(scene, outer.current ?? scene, motion.current ?? scene, facing, fit.scale) };
+    rigRef.current = created;
+    setRig(created);
+    return () => {
       mixer.stopAllAction();
-    },
-    [mixer, playable],
-  );
+      mixer.uncacheRoot(scene);
+      if (rigRef.current === created) rigRef.current = null;
+      setRig((r) => (r === created ? null : r));
+    };
+  }, [scene, playable, outer, motion, facing, fit.scale]);
 
   const current = useRef<{ name: ClipName; action: AnimationAction } | null>(null);
   const play = useCallback(
     (name: ClipName) => {
-      const next = actions[name];
+      const next = rig?.actions[name];
       const p = playable[name];
-      if (!next || !p) return;
+      if (!rig || !next || !p) return;
       next.reset();
       next.enabled = true;
       next.setEffectiveTimeScale(1);
@@ -234,13 +274,15 @@ function RigAnimator({ id, scene, animations, fit, height, animation, trigger, r
       if (prev && prev !== next) prev.crossFadeTo(next, fade, false);
       current.current = { name, action: next };
     },
-    [actions, playable, fade],
+    [rig, playable, fade],
   );
 
   // Clip một lần xong thì báo và chuyển về `returnTo`.
   const callbacks = useRef({ onClipEnd, returnTo });
   callbacks.current = { onClipEnd, returnTo };
   useEffect(() => {
+    if (!rig) return;
+    const mixer = rig.mixer;
     const onFinished = (e: { action: AnimationAction }) => {
       const cur = current.current;
       if (!cur || e.action !== cur.action) return;
@@ -249,14 +291,26 @@ function RigAnimator({ id, scene, animations, fit, height, animation, trigger, r
     };
     mixer.addEventListener('finished', onFinished as never);
     return () => mixer.removeEventListener('finished', onFinished as never);
-  }, [mixer, play]);
+  }, [rig, play]);
 
   useEffect(() => {
     play(animation);
   }, [animation, trigger, play]);
 
-  useFrame((_, dt) => {
-    mixer.update(dt);
+  // Tư thế code dựng: phát khi `pose.n` đổi (chỉ tư thế được phép với model này); hướng nhìn/chỉ theo `aim`.
+  useEffect(() => {
+    if (rig && pose && isPoseAllowed(id, pose.name)) rig.layer.play(pose.name);
+  }, [rig, pose?.name, pose?.n]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    rig?.layer.setAim(aim ?? null);
+  }, [rig, aim?.az, aim?.el, aim === null || aim === undefined]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useFrame((state, dt) => {
+    const r = rigRef.current;
+    if (!r) return;
+    r.layer.restore(); // trả các xương đã chỉnh về giá trị gốc, rồi mới cho mixer chạy
+    r.mixer.update(dt);
+    r.layer.update(state.clock.elapsedTime, dt);
   });
 
   const ready = useRef(onReady);

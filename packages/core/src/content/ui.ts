@@ -531,6 +531,15 @@ export const ui = {
     xemNhom: 'Xem cả nhóm',
     xemTungModel: 'Xem từng model',
     nhomMoTa: '10 nhân vật cao 1,7 và Bi. 6 người đứng yên nhún lệch pha; bà cụ và chú nông dân đi vòng.',
+    tuThe: 'Tư thế code dựng',
+    tuTheGhiChu: 'Trộn lên clip đang chạy, vào ra 0,1 giây. hurt chỉ có tác dụng với Tí.',
+    tuThePoint: 'point (chỉ về bên phải, phía trên)',
+    phanUngTieuDe: 'Thử ChoiceReaction',
+    phanUngHuongDan: 'Rê chuột hoặc Tab vào một đáp án thì học sinh quay đầu và người về phía đó và chỉ. Bấm (hoặc chạm: chỉ 0,3 giây rồi mới ra kết quả) thì kết quả đúng hoặc sai ngẫu nhiên.',
+    phanUngDapAn: 'Đáp án {x}',
+    phanUngDung: 'Kết quả: đúng (học sinh cheer, Tí hurt)',
+    phanUngSai: 'Kết quả: sai (học sinh sad, Tí cheer)',
+    phanUngChon: 'Đang chờ em chọn.',
   },
 
   /** Lời thoại mẫu ở trang /dev/ui (4 lượt: bác An, {phanDien}, Bi, cô Chi) */

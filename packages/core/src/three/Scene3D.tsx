@@ -1,4 +1,4 @@
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree, type RootState } from '@react-three/fiber';
 import { Suspense, useCallback, useEffect, useState, type ReactNode } from 'react';
 import { ACESFilmicToneMapping } from 'three';
 import { useSettings } from '../settings/SettingsProvider';
@@ -23,6 +23,10 @@ export interface Scene3DProps {
   autoDowngrade?: boolean;
   /** Camera ban đầu */
   camera?: { position?: [number, number, number]; fov?: number; near?: number; far?: number };
+  /** Điểm camera nhìn vào lúc đầu (mặc định gốc tọa độ). Nếu có điều khiển camera (OrbitControls) thì dùng `target` của nó. */
+  lookAt?: [number, number, number];
+  /** Gọi một lần khi khung vẽ đã tạo xong (lấy renderer, dùng cho công cụ dev) */
+  onCreated?: (state: RootState) => void;
   /** Khoảng sương [gần, xa]; false để tắt sương */
   fog?: [number, number] | false;
   /** Vị trí mặt trời (hướng đổ bóng) */
@@ -33,6 +37,15 @@ export interface Scene3DProps {
   onQualityLowered?: (fps: number, level: QualityLevel) => void;
   /** Báo khi cảnh đã tải xong (màn hình tải đã tắt) */
   onReady?: () => void;
+}
+
+/** Hướng camera về một điểm khi dựng cảnh (không cấp phát trong useFrame; chỉ chạy một lần). */
+function LookAt({ at }: { at: [number, number, number] }) {
+  const camera = useThree((st) => st.camera);
+  useEffect(() => {
+    camera.lookAt(at[0], at[1], at[2]);
+  }, [camera, at]);
+  return null;
 }
 
 /** Component rỗng đặt trong Suspense: chỉ gắn vào khi mọi thứ phía trên đã tải xong. */
@@ -57,6 +70,8 @@ export function Scene3D({
   quality,
   autoDowngrade = true,
   camera,
+  lookAt,
+  onCreated,
   fog = [60, 220],
   sunPosition,
   shadowExtent,
@@ -87,9 +102,11 @@ export function Scene3D({
         dpr={dpr}
         shadows={level === 'low' ? false : 'soft'}
         gl={{ antialias, powerPreference: 'high-performance', toneMapping: ACESFilmicToneMapping }}
+        onCreated={onCreated}
         camera={{ position: camera?.position ?? [0, 4, 10], fov: camera?.fov ?? 45, near: camera?.near ?? 0.1, far: camera?.far ?? SKY_RADIUS * 2 }}
       >
         <QualityContext.Provider value={level}>
+          {lookAt && <LookAt at={lookAt} />}
           {fog && <fog attach="fog" args={[SKY_HORIZON, fog[0], fog[1]]} />}
           <Suspense fallback={null}>
             <Sky animate={!settings.reducedMotion} />

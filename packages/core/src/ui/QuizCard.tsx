@@ -1,9 +1,11 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { sound } from '../audio/sound';
 import { fmt, type FmtVars } from '../content/characters';
 import type { Question } from '../content/questions';
 import { ui } from '../content/ui';
 import { recordAnswer } from '../quiz/recordAnswer';
+import { choiceReactions } from '../three/choiceReactions';
+import { useChoiceHandlers } from '../three/useReaction';
 import { Button } from './Button';
 import { Panel } from './Panel';
 
@@ -30,19 +32,42 @@ export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, 
   const answered = chosen !== null;
   const correct = chosen === question.correctIndex;
 
+  // Phát sự kiện cho nhân vật 3D (rê/focus, chọn, kết quả); khung 3D ở trang bài học chỉ nghe kho này.
+  const reactions = useChoiceHandlers();
+  const pending = useRef(false);
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+      if (choiceReactions.getState().locked) choiceReactions.reset();
+    };
+  }, []);
+
   // Sang câu mới thì xóa lựa chọn cũ.
   useEffect(() => {
     setChosen(null);
+    pending.current = false;
   }, [question.id]);
 
-  const choose = (index: number) => {
-    if (answered) return;
+  const reveal = (index: number) => {
     const ok = index === question.correctIndex;
     setChosen(index);
     if (ok) sound.playCorrect();
     else sound.playWrong();
+    reactions.result(ok);
     void recordAnswer({ questionId: question.id, correct: ok, chosenIndex: index, levelId });
     onAnswer(ok, question.id);
+  };
+
+  const choose = (index: number, el: HTMLElement) => {
+    if (answered || pending.current) return;
+    pending.current = true;
+    // Chạm thì nhân vật chỉ 0,3 giây rồi mới hiện kết quả; chuột và bàn phím hiện ngay.
+    void reactions.select(el).then(() => {
+      pending.current = false;
+      if (alive.current) reveal(index);
+    });
   };
 
   return (
@@ -66,7 +91,8 @@ export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, 
               <button
                 type="button"
                 disabled={answered}
-                onClick={() => choose(i)}
+                {...reactions.bindChoice()}
+                onClick={(e) => choose(i, e.currentTarget)}
                 className={[
                   'flex min-h-[52px] w-full items-center gap-3 rounded-nut border-2 px-4 py-3 text-left text-base font-semibold sm:text-lg',
                   'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim',
