@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, type RefObject } from 'react';
 import { MeshBasicMaterial, MeshStandardMaterial, SphereGeometry, TorusGeometry, Vector3, type Group, type Object3D } from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { createMulberry32 } from '../lib/rng';
-import { BI_COLOR, BI_FOLLOW_OFFSET, BI_SIZE, blinkScale, bobOffset, dampFactor, nextBlinkDelay, spinAngle } from './biMotion';
+import { BI_CAMERA_OFFSET, BI_COLOR, BI_FOLLOW_OFFSET, BI_SIZE, biCameraOffset, blinkScale, bobOffset, dampFactor, nextBlinkDelay, spinAngle } from './biMotion';
 import { turnToward } from './staticMotion';
 
 type GroupProps = Omit<ThreeElements['group'], 'id'>;
@@ -20,6 +20,11 @@ export interface BiProps extends GroupProps {
   happyTrigger?: number;
   /** Hạt giống cho nhịp chớp mắt */
   seed?: number;
+  /**
+   * Có thì Bi bay sau vai phải theo góc nhìn của camera (xem `BI_CAMERA_OFFSET`) thay vì theo hướng mặt của đối tượng: `yaw` là góc quay ngang của camera, đọc mỗi khung hình
+   * (cảnh đi lại truyền `api.camera`). Bỏ trống thì dùng `offset` trong hệ tọa độ của đối tượng.
+   */
+  cameraYaw?: { yaw: number };
   /** Mỗi khung hình ghi vị trí (x, z) của Bi vào đây (để Bi làm vật tương tác nói chuyện được) */
   track?: { x: number; z: number };
 }
@@ -33,7 +38,7 @@ const TURN_RATE = 4;
  * mỗi 3–5 giây, một mắt xích nhỏ trên đỉnh đầu. Bay nhấp nhô (biên độ 0,1, chu kỳ 2 giây), theo sau vai người chơi,
  * xoay một vòng khi vui. Không cấp phát trong useFrame; rời cảnh thì dispose.
  */
-export function Bi({ target, offset = BI_FOLLOW_OFFSET, happyTrigger, seed = 1, track, ...group }: BiProps) {
+export function Bi({ target, offset = BI_FOLLOW_OFFSET, happyTrigger, seed = 1, track, cameraYaw, ...group }: BiProps) {
   const outer = useRef<Group>(null);
   const inner = useRef<Group>(null);
   const eyes = useRef<Group>(null);
@@ -52,7 +57,7 @@ export function Bi({ target, offset = BI_FOLLOW_OFFSET, happyTrigger, seed = 1, 
   );
 
   // Đối tượng tạm dùng lại mỗi khung hình (không new trong useFrame).
-  const tmp = useMemo(() => ({ pos: new Vector3(), dir: new Vector3() }), []);
+  const tmp = useMemo(() => ({ pos: new Vector3(), dir: new Vector3(), off: { x: 0, y: 0, z: 0 } }), []);
   const rng = useMemo(() => createMulberry32(seed), [seed]);
   const st = useRef({ init: false, yaw: 0, nextBlink: -1, blinkAt: -1, happyAt: -1, pendingHappy: false });
 
@@ -71,8 +76,15 @@ export function Bi({ target, offset = BI_FOLLOW_OFFSET, happyTrigger, seed = 1, 
     const tgt = target?.current;
     if (tgt) {
       tgt.updateWorldMatrix(true, false);
-      tmp.pos.set(offset[0], offset[1], offset[2]);
-      tgt.localToWorld(tmp.pos);
+      if (cameraYaw) {
+        // sau vai phải theo góc nhìn của camera: vị trí của đối tượng cộng độ lệch trong cảnh
+        tgt.getWorldPosition(tmp.pos);
+        biCameraOffset(cameraYaw.yaw, BI_CAMERA_OFFSET, tmp.off);
+        tmp.pos.set(tmp.pos.x + tmp.off.x, tmp.pos.y + tmp.off.y, tmp.pos.z + tmp.off.z);
+      } else {
+        tmp.pos.set(offset[0], offset[1], offset[2]);
+        tgt.localToWorld(tmp.pos);
+      }
       if (!s.init) {
         o.position.copy(tmp.pos);
         s.init = true;

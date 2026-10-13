@@ -1,6 +1,7 @@
 import { Box3 } from 'three';
 import { describe, expect, it } from 'vitest';
-import { BOAT_HEIGHT, BOAT_LENGTH, BOAT_WIDTH, createBoatCanopy, createBoatHull, createHayStack, createJar } from './marketGeometry';
+import { BOAT_HEIGHT, BOAT_LENGTH, BOAT_WIDTH, createBoatCanopy, createBoatHull, createCraftProp, createHayStack, createJar } from './marketGeometry';
+import { PROP_SIZES, type PropKind } from './marketLayout';
 
 const box = (g: { computeBoundingBox(): void; boundingBox: Box3 | null }) => {
   g.computeBoundingBox();
@@ -43,5 +44,29 @@ describe('hình học tự dựng của chợ', () => {
     expect(h.max.y).toBeCloseTo(2, 6);
     expect(h.max.x).toBeGreaterThan(0.95);
     expect(h.max.x).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('đồ gợi nghề quanh cổng: hình dựng khớp PROP_SIZES (vật cản sát hình)', () => {
+  const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan'];
+  for (const kind of crafts) {
+    it(`${kind}: chân ở y = 0, cao đúng, vừa trong hình vật cản (hộp hoặc tròn)`, () => {
+      const g = createCraftProp(kind)!;
+      expect(g, kind).not.toBeNull();
+      const b = box(g);
+      const k = PROP_SIZES[kind];
+      expect(b.min.y).toBeCloseTo(0, 6);
+      expect(b.max.y).toBeCloseTo(k.h, 6);
+      if (k.box) {
+        expect(b.max.x - b.min.x).toBeCloseTo(k.box.hx * 2, 6);
+        expect(b.max.z - b.min.z).toBeCloseTo(k.box.hz * 2, 6);
+      } else {
+        expect((b.max.x - b.min.x) / 2).toBeCloseTo(k.r, 6);
+        expect((b.max.z - b.min.z) / 2).toBeCloseTo(k.r, 6);
+      }
+    });
+  }
+  it('chum, rơm, hoa, đá dựng ở nơi khác: không có ở đây', () => {
+    for (const kind of ['chum', 'rom', 'hoa', 'da'] as PropKind[]) expect(createCraftProp(kind)).toBeNull();
   });
 });

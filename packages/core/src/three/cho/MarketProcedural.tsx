@@ -21,8 +21,8 @@ import {
   type Texture,
 } from 'three';
 import { createMulberry32 } from '../../lib/rng';
-import { DECK_START_X, DECK_TOP, DOCK_END_X, DOCK_HALF_WIDTH, PLAZA_RADIUS, RAMP_START_X, RIVER_X, ROAD_WIDTH, WORLD_RADIUS, type MarketLayout, type PropPlacement } from './marketLayout';
-import { createBoatCanopy, createBoatHull, createHayStack, createJar } from './marketGeometry';
+import { FENCE_POST_HEIGHT, FENCE_RAIL_LENGTH, fenceLayout, DECK_START_X, DECK_TOP, DOCK_END_X, DOCK_HALF_WIDTH, PLAZA_RADIUS, RAMP_START_X, RIVER_X, ROAD_WIDTH, WORLD_RADIUS, type MarketLayout, type PropPlacement } from './marketLayout';
+import { createBoatCanopy, createBoatHull, createCraftProp, createHayStack, createJar } from './marketGeometry';
 import { createEdgeAlphaTexture, createGrassTexture, createPaddyTexture, createPlankTexture, createWaterTexture } from './marketTextures';
 
 /** Một bản nhân bản tĩnh: vị trí, góc xoay, tỉ lệ (đều hoặc từng trục), nhân màu. */
@@ -277,26 +277,15 @@ function River({ layout, water, plank }: { layout: MarketLayout; water: Texture;
   );
 }
 
-/** Hàng rào tre quanh rìa vùng đi lại, có chừa 4 con đường và bến sông. */
+/** Hàng rào tre quanh rìa vùng đi lại, có chừa 4 con đường và bến sông. Bố cục và vật cản lấy từ `fenceLayout` / `fenceColliders` (marketLayout.ts). */
 function Fence() {
-  const geo = useMemo(() => ({ post: new BoxGeometry(0.13, 1.35, 0.13), rail: new BoxGeometry(2.3, 0.09, 0.09) }), []);
+  const geo = useMemo(() => ({ post: new BoxGeometry(0.13, FENCE_POST_HEIGHT, 0.13), rail: new BoxGeometry(FENCE_RAIL_LENGTH, 0.09, 0.09) }), []);
   const mat = useMemo(() => new MeshStandardMaterial({ color: '#C8B26C', roughness: 1 }), []);
   useDispose(useMemo(() => [geo.post, geo.rail, mat], [geo, mat]));
   const { posts, rails } = useMemo(() => {
-    const R = WORLD_RADIUS - 0.7;
-    const step = 2.2 / R;
-    const posts: Item[] = [];
-    const rails: Item[] = [];
-    const gap = ROAD_WIDTH / 2 + 1.2;
-    for (let a = 0; a < Math.PI * 2; a += step) {
-      const x = Math.cos(a) * R;
-      const z = Math.sin(a) * R;
-      if (Math.abs(x) < gap || Math.abs(z) < gap || x < RIVER_X + 2) continue;
-      posts.push({ x, z, y: 0.67, yaw: -a });
-      const mx = Math.cos(a + step / 2) * R;
-      const mz = Math.sin(a + step / 2) * R;
-      for (const y of [0.45, 1.0]) rails.push({ x: mx, z: mz, y, yaw: -(a + step / 2) });
-    }
+    const f = fenceLayout();
+    const posts: Item[] = f.posts.map((p) => ({ x: p.x, z: p.z, y: FENCE_POST_HEIGHT / 2, yaw: p.yaw }));
+    const rails: Item[] = f.segments.flatMap((sg) => [0.45, 1.0].map((y) => ({ x: sg.x, z: sg.z, y, yaw: sg.yaw })));
     return { posts, rails };
   }, []);
   return (
@@ -332,7 +321,26 @@ const toItem = (p: PropPlacement, extra: Partial<Item> = {}): Item => ({ x: p.x,
  * Đồ nhỏ do code dựng, rải theo bố cục: đống rơm cạnh nhà, chum vại cạnh lều và nhà, khóm hoa (bụi xanh kèm hoa đỏ).
  * Mỗi loại một InstancedMesh dùng chung geometry và material.
  */
+/** Đồ gợi nghề quanh cổng (bước 8d): hình dựng (`createCraftProp`) và màu vật liệu; màu từng món nhân thêm màu `tint` của bố cục (cuộn vải nhiều màu). */
+const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan'] as const;
+const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughness: number }> = {
+  giay: { color: '#EFE6CC', roughness: 1 },
+  vai: { color: '#FFFFFF', roughness: 0.95 },
+  'khoi-da': { color: '#8E8E86', roughness: 1 },
+  'ban-da': { color: '#9C9C92', roughness: 1 },
+  hom: { color: '#8A5A2B', roughness: 0.9 },
+  thung: { color: '#D2A85A', roughness: 1 },
+  chan: { color: '#6B4526', roughness: 1 },
+};
+
 export function MarketProps({ layout }: { layout: MarketLayout }) {
+  const crafts = useMemo(
+    () => CRAFT_KINDS.map((kind) => ({ kind, geo: createCraftProp(kind)!, mat: new MeshStandardMaterial({ ...CRAFT_COLOR[kind], flatShading: kind === 'khoi-da' }) })),
+    [],
+  );
+  useDispose(useMemo(() => crafts.flatMap((c) => [c.geo, c.mat]), [crafts]));
+  const craftItems = useMemo(() => crafts.map((c) => layout.props.filter((p) => p.kind === c.kind).map((p) => toItem(p))), [crafts, layout]);
+
   const res = useMemo(() => {
     const hay = createHayStack();
     const jar = createJar();
@@ -371,6 +379,7 @@ export function MarketProps({ layout }: { layout: MarketLayout }) {
       <Instances geometry={res.geos.jar} material={res.mats.jar} items={items.jar} cast receive />
       <Instances geometry={res.geos.bush} material={res.mats.bush} items={items.bush} cast receive />
       <Instances geometry={res.geos.bloom} material={res.mats.bloom} items={items.bloom} />
+      {crafts.map((c, i) => (craftItems[i].length > 0 ? <Instances key={c.kind} geometry={c.geo} material={c.mat} items={craftItems[i]} cast={c.kind !== 'chan'} receive /> : null))}
     </>
   );
 }

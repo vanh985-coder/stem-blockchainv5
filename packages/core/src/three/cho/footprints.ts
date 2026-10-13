@@ -12,10 +12,52 @@ import { circle, obox, type Obstacle } from '../collision';
 import type { FootShape } from './footprintDerive';
 
 /**
- * Bảng sinh từ file model thật (công cụ footprintGen.test.ts), TRỪ cây đa (xem `TREE_TRUNK`). Cổng làng ở đây là chân tường thô (hai chân
+ * Bảng sinh từ file model thật (công cụ footprintGen.test.ts). Cây đa: nền rễ to nhô cao quanh gốc (bỏ rễ mảnh thò ra ngoài, removeThinFeatures), bước 8d. Cổng làng ở đây là chân tường thô (hai chân
  * cổng, tường, trụ), chưa nới lối đi: `FOOTPRINTS` nới lối giữa ra (`openGate`).
  */
 export const GENERATED: Readonly<Record<string, readonly FootShape[]>> = {
+  'env/cay-da': [
+    { kind: 'box', cx: -5.55, cz: -0.25, hx: 0.05, hz: 0.96 },
+    { kind: 'box', cx: -5.4, cz: -0.25, hx: 0.11, hz: 1.65 },
+    { kind: 'box', cx: -5.2, cz: -0.4, hx: 0.11, hz: 2.1 },
+    { kind: 'box', cx: -5, cz: -0.5, hx: 0.1, hz: 2.4 },
+    { kind: 'box', cx: -4.8, cz: -0.65, hx: 0.11, hz: 2.75 },
+    { kind: 'box', cx: -4.6, cz: -0.8, hx: 0.11, hz: 3.1 },
+    { kind: 'box', cx: -4.4, cz: -0.95, hx: 0.11, hz: 3.46 },
+    { kind: 'box', cx: -4.2, cz: -1.05, hx: 0.11, hz: 3.75 },
+    { kind: 'box', cx: -4, cz: -1.15, hx: 0.1, hz: 4.06 },
+    { kind: 'box', cx: -3.8, cz: -1.2, hx: 0.1, hz: 4.31 },
+    { kind: 'box', cx: -3.55, cz: -1.2, hx: 0.16, hz: 4.61 },
+    { kind: 'box', cx: -3.25, cz: -1.15, hx: 0.15, hz: 4.85 },
+    { kind: 'box', cx: -2.9, cz: -1.05, hx: 0.2, hz: 5.06 },
+    { kind: 'box', cx: -2.45, cz: -0.95, hx: 0.25, hz: 5.25 },
+    { kind: 'box', cx: -1.8, cz: -0.8, hx: 0.41, hz: 5.4 },
+    { kind: 'box', cx: -0.9, cz: -0.6, hx: 0.5, hz: 5.5 },
+    { kind: 'box', cx: 0.1, cz: -0.4, hx: 0.5, hz: 5.6 },
+    { kind: 'box', cx: 1.4, cz: -0.25, hx: 0.8, hz: 5.65 },
+    { kind: 'box', cx: 2.5, cz: -0.15, hx: 0.3, hz: 5.45 },
+    { kind: 'box', cx: 3, cz: -0.2, hx: 0.21, hz: 5.21 },
+    { kind: 'box', cx: 3.4, cz: -0.1, hx: 0.21, hz: 5 },
+    { kind: 'box', cx: 3.8, cz: -0.15, hx: 0.21, hz: 4.75 },
+    { kind: 'box', cx: 4.15, cz: -0.2, hx: 0.15, hz: 4.5 },
+    { kind: 'box', cx: 4.45, cz: -0.3, hx: 0.16, hz: 4.31 },
+    { kind: 'box', cx: 4.75, cz: -0.35, hx: 0.16, hz: 4.06 },
+    { kind: 'box', cx: 5.05, cz: -0.4, hx: 0.15, hz: 3.81 },
+    { kind: 'box', cx: 5.35, cz: -0.45, hx: 0.16, hz: 3.55 },
+    { kind: 'box', cx: 5.65, cz: -0.5, hx: 0.15, hz: 3.3 },
+    { kind: 'box', cx: 5.9, cz: -0.55, hx: 0.11, hz: 2.96 },
+    { kind: 'box', cx: 6.1, cz: -0.6, hx: 0.1, hz: 2.7 },
+    { kind: 'box', cx: 6.3, cz: -0.6, hx: 0.11, hz: 2.4 },
+    { kind: 'box', cx: 6.45, cz: -0.75, hx: 0.05, hz: 1.96 },
+    { kind: 'box', cx: 6.55, cz: -1.05, hx: 0.05, hz: 1.46 },
+    { kind: 'box', cx: 6.65, cz: -1.2, hx: 0.05, hz: 0.7 },
+  ],
+  'env/phen-phoi-giay': [
+    { kind: 'box', cx: 0, cz: 0, hx: 1.2, hz: 0.8 },
+  ],
+  'env/khung-cui': [
+    { kind: 'circle', cx: 0, cz: 0, r: 1.11 },
+  ],
   'env/cong-lang-giay': [
     { kind: 'box', cx: -5.1, cz: 0.25, hx: 0.11, hz: 0.35 },
     { kind: 'box', cx: -4.45, cz: 0.65, hx: 0.55, hz: 0.75 },
@@ -120,10 +162,19 @@ export const GENERATED: Readonly<Record<string, readonly FootShape[]>> = {
 };
 
 /**
- * Cây đa: chỉ gốc chính là vật cản (hình tròn bán kính 2,5 quanh gốc), rễ phụ và rễ nổi đi xuyên được (bước 8). Tâm và bán kính đo từ file
- * model (tâm phần thân cao 2–3,5 đơn vị là (0,27, −0,18); 50% điểm bề mặt thân nằm trong 1,94, 90% trong 2,55).
+ * Thân chính của cây đa (hình tròn bán kính 2,5 quanh gốc; tâm và bán kính đo từ model: tâm phần thân cao 2–3,5 là (0,27, −0,18), 50% điểm bề mặt thân trong 1,94, 90% trong 2,55).
+ * Chỉ để chắn camera (cao 12): người chơi không vào được vùng này vì nền rễ quanh gốc là vật cản (`FOOTPRINTS`), nhưng camera không bị chặn bởi cả nền rễ rộng 6,5 mà chỉ bởi thân.
  */
 export const TREE_TRUNK: FootShape = { kind: 'circle', cx: 0.27, cz: -0.18, r: 2.5 };
+/** Vật chắn camera của thân cây đa đặt ở (x, z), xoay yaw, tỉ lệ scale (hình tròn `TREE_TRUNK` chuyển ra cảnh). */
+export function treeTrunkObstacle(x: number, z: number, yaw: number, scale = 1): Obstacle {
+  const cos = Math.cos(yaw);
+  const sin = Math.sin(yaw);
+  const t = TREE_TRUNK as Extract<FootShape, { kind: 'circle' }>;
+  return circle(x + t.cx * scale * cos + t.cz * scale * sin, z - t.cx * scale * sin + t.cz * scale * cos, t.r * scale);
+}
+/** Độ cao dùng cho vật cản của nền rễ cây đa (nền nhô cao tới khoảng 1,4; dưới tầm nhìn của camera nên không chắn camera). */
+export const TREE_MOUND_HEIGHT = 1.4;
 
 /** Lối đi giữa cổng làng rộng tối thiểu bấy nhiêu (khoảng hở giữa hai vật cản, trong cảnh, ở cổng cao 6) — bước 8. */
 export const GATE_OPENING = 2.4;
@@ -157,7 +208,6 @@ export function openGate(shapes: readonly FootShape[], opening: number = GATE_OP
 
 export const FOOTPRINTS: Readonly<Record<string, readonly FootShape[]>> = {
   ...Object.fromEntries(Object.entries(GENERATED).map(([id, shapes]) => [id, isGate(id) ? openGate(shapes) : shapes])),
-  'env/cay-da': [TREE_TRUNK],
 };
 
 /**

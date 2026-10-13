@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BI_COLOR, BI_SIZE, BLINK_DURATION, BLINK_MAX, BLINK_MIN, BOB_AMPLITUDE, BOB_PERIOD, SPIN_DURATION, blinkScale, bobOffset, dampFactor, nextBlinkDelay, spinAngle } from './biMotion';
+import { BI_CAMERA_OFFSET, BI_COLOR, BI_SIZE, BLINK_DURATION, BLINK_MAX, BLINK_MIN, BOB_AMPLITUDE, BOB_PERIOD, SPIN_DURATION, blinkScale, bobOffset, dampFactor, nextBlinkDelay, spinAngle, biCameraOffset } from './biMotion';
 
 describe('Bi (spec 03 mục 3.5)', () => {
   it('màu muc-tim, cạnh khoảng 0,5', () => {
@@ -62,5 +62,32 @@ describe('Bi (spec 03 mục 3.5)', () => {
     expect(1 - (1 - half) * (1 - half)).toBeCloseTo(full, 9);
     expect(dampFactor(0, 8)).toBe(0);
     expect(dampFactor(100, 8)).toBeCloseTo(1, 9);
+  });
+});
+
+describe('Bi sau vai phải theo góc nhìn của camera (bước 8d)', () => {
+  const out = { x: 0, y: 0, z: 0 };
+  it('camera nhìn +Z (yaw 0): Bi lệch sang phải màn hình (−X), lùi về phía camera (−Z), cao ngang vai', () => {
+    biCameraOffset(0, BI_CAMERA_OFFSET, out);
+    expect(out.x).toBeCloseTo(-BI_CAMERA_OFFSET.right, 9);
+    expect(out.z).toBeCloseTo(-BI_CAMERA_OFFSET.back, 9);
+    expect(out.y).toBe(BI_CAMERA_OFFSET.up);
+  });
+
+  it('mọi góc nhìn: độ lệch có hình chiếu +right trên trục phải của màn hình và +back trên hướng về camera; độ dài không đổi', () => {
+    for (let k = 0; k < 24; k++) {
+      const yaw = (k / 24) * Math.PI * 2 - Math.PI;
+      biCameraOffset(yaw, BI_CAMERA_OFFSET, out);
+      const fwd = { x: Math.sin(yaw), z: Math.cos(yaw) };
+      const right = { x: -Math.cos(yaw), z: Math.sin(yaw) };
+      expect(out.x * right.x + out.z * right.z, `yaw ${yaw}`).toBeCloseTo(BI_CAMERA_OFFSET.right, 9);
+      expect(-(out.x * fwd.x + out.z * fwd.z), `yaw ${yaw}`).toBeCloseTo(BI_CAMERA_OFFSET.back, 9);
+      expect(Math.hypot(out.x, out.z)).toBeCloseTo(Math.hypot(BI_CAMERA_OFFSET.right, BI_CAMERA_OFFSET.back), 9);
+    }
+  });
+
+  it('Bi thấp hơn đầu nhân vật (1,7) và đủ gần: không che giữa màn hình', () => {
+    expect(BI_CAMERA_OFFSET.up).toBeLessThan(1.7);
+    expect(BI_CAMERA_OFFSET.right).toBeGreaterThanOrEqual(1.2);
   });
 });

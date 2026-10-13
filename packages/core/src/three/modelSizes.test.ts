@@ -1,6 +1,6 @@
 import { Box3 } from 'three';
 import { describe, expect, it } from 'vitest';
-import { CHARACTER_HEIGHT, MODEL_SIZES, RIGGED_CHARACTER_IDS, STATIC_CHARACTER_IDS, fitToHeight, isCharacterId, sizeInScene, sizeOf } from './modelSizes';
+import { CHARACTER_HEIGHT, MODEL_SIZES, topInScene, RIGGED_CHARACTER_IDS, STATIC_CHARACTER_IDS, fitToHeight, isCharacterId, sizeInScene, sizeOf } from './modelSizes';
 import { loadGltfForTest } from './testGlb';
 
 describe('bảng cỡ model', () => {
@@ -67,6 +67,8 @@ const ENV_IDS = [
   'env/leu-cho',
   'env/gieng-lang',
   'env/bui-tre',
+  'env/phen-phoi-giay',
+  'env/khung-cui',
 ];
 
 describe('cỡ thật của đồ vật ở chợ phiên', () => {
@@ -109,5 +111,18 @@ describe('cỡ thật của đồ vật ở chợ phiên', () => {
       expect(box.max.z - box.min.z, `${id} z`).toBeCloseTo(dims[2], 1);
       expect(Math.abs(box.min.y), `${id} chân ở y = 0`).toBeLessThan(0.01);
     }
+  });
+});
+
+describe('đồ gợi nghề quanh cổng (bước 8d)', () => {
+  it('khung cửi cao 2; phên phơi giấy là tấm phẳng dày 0,17 nhấc lên giá cao 0,85 nên đỉnh ở 1,02', () => {
+    expect(sizeOf('env/khung-cui')?.height).toBe(2);
+    expect(sizeOf('env/phen-phoi-giay')?.height).toBeCloseTo(0.17, 9);
+    expect(sizeOf('env/phen-phoi-giay')?.lift).toBe(0.85);
+    expect(sizeInScene('env/phen-phoi-giay')![0]).toBeCloseTo(2.43, 1); // rộng
+    expect(topInScene('env/phen-phoi-giay')).toBeCloseTo(1.02, 9);
+    expect(topInScene('env/khung-cui')).toBeCloseTo(2, 9);
+    expect(topInScene('env/chua-co')).toBeUndefined();
+    expect(topInScene('env/phen-phoi-giay', 1.2)).toBeCloseTo(1.224, 9);
   });
 });

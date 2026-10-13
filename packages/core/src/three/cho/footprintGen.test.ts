@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { describe, it } from 'vitest';
-import { deriveShapes, gridFromFilledPoints, gridFromHull, measureFit, type FootShape } from './footprintDerive';
+import { deriveShapes, gridFromFilledPoints, gridFromHull, measureFit, removeThinFeatures, type FootShape } from './footprintDerive';
 import { bandSample } from './footprintSample.testlib';
 
 /**
@@ -9,8 +9,12 @@ import { bandSample } from './footprintSample.testlib';
  */
 const OUT = process.env.GEN_FOOTPRINTS;
 
-/** Cây đa không nằm trong danh sách: chỉ gốc chính là vật cản (footprints.ts, `TREE_TRUNK`). */
+/** Cây đa: vật cản là nền rễ to (bỏ rễ mảnh, removeThinFeatures); thân chính chỉ chắn camera (footprints.ts, TREE_TRUNK). */
+export const TREE_ID = 'env/cay-da';
 export const FOOTPRINT_IDS = [
+  TREE_ID,
+  'env/phen-phoi-giay',
+  'env/khung-cui',
   'env/cong-lang-giay',
   'env/cong-lang-det',
   'env/cong-lang-khac-dau',
@@ -27,12 +31,13 @@ describe.skipIf(!OUT)('sinh bảng chân tường', () => {
     const out: Record<string, FootShape[]> = {};
     const report: string[] = [];
     for (const id of FOOTPRINT_IDS) {
-      const { points } = await bandSample(id);
+      const sample = await bandSample(id);
+      const points = id === TREE_ID ? removeThinFeatures(sample.points) : sample.points;
       const gate = id.includes('cong-lang');
       const grid = gate ? gridFromFilledPoints(points) : gridFromHull(points);
       const shapes = deriveShapes(grid, undefined, gate ? ['x'] : ['x', 'z']);
       out[id] = shapes;
-      report.push(`${id}: ${shapes.length} hình (${shapes.map((s) => s.kind[0]).join('')}) từ ${points.length} điểm; ${JSON.stringify(measureFit(shapes, grid))}`);
+      report.push(`${id}: ${shapes.length} hình (${shapes.map((s) => s.kind[0]).join('')}) từ ${points.length}/${sample.points.length} điểm; ${JSON.stringify(measureFit(shapes, grid))}`);
     }
     writeFileSync(OUT!, JSON.stringify(out, null, 1));
     writeFileSync(`${OUT}.txt`, report.join('\n'));

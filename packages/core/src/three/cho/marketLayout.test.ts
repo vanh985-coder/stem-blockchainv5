@@ -11,6 +11,18 @@ import {
   GATES,
   GATE_DISTANCE,
   MARKET_MODELS,
+  FENCE_POST_HEIGHT,
+  GATE_CLEAR_RADIUS,
+  GATE_DECOR,
+  MODEL_LOOM,
+  MODEL_PAPER_RACK,
+  PROP_COLLIDE_MIN_HEIGHT,
+  PROP_SIZES,
+  fenceColliders,
+  fenceLayout,
+  gateDecorWorld,
+  propCollider,
+  type PropKind,
   MODEL_BAMBOO,
   MODEL_HOUSE_THATCH,
   MODEL_HOUSE_TILE,
@@ -141,8 +153,9 @@ describe('bố cục chợ phiên: đặt đồ vật', () => {
 
   it('đồ nhỏ (chum, rơm, hoa) không đè lên nhà, lều hay nhau', () => {
     for (const p of layout.props) {
-      // bỏ chính vật cản của nó; còn lại không được chạm
-      const others = layout.obstacles.filter((o) => !(o.type === 'circle' && o.x === p.x && o.z === p.z));
+      if (p.kind === 'chan') continue; // chân giá nằm dưới phên phơi giấy, cố ý
+      // bỏ chính vật cản của nó (hình tròn hoặc hộp xoay cùng tâm); còn lại không được chạm
+      const others = layout.obstacles.filter((o) => !((o.type === 'circle' || o.type === 'obox') && o.x === p.x && o.z === p.z));
       const probe: Point2 = { x: p.x, z: p.z };
       expect(resolveCollisions(probe, 0.2, others, Infinity), `${p.kind} (${p.x.toFixed(1)}, ${p.z.toFixed(1)}) đè vật khác`).toBe(false);
     }
@@ -368,16 +381,23 @@ describe('groundHeight: mặt đi được', () => {
 });
 
 describe('vật cản bám chân tường thật', () => {
-  it('cây đa: chỉ gốc chính là vật cản (bán kính 2–2,5); rễ phụ ngoài gốc đi xuyên được', () => {
+  it('cây đa: nền rễ to nhô cao là vật cản (bán kính khoảng 6–7), người chơi không đi lên nền rễ được; thân chỉ chắn camera', () => {
     expect(blocked(0, 0)).toBe(true);
-    expect(blocked(1.5, 1)).toBe(true);
-    expect(blocked(0.27, -2.4)).toBe(true); // sát mép gốc
-    expect(blocked(0.27, -3.4)).toBe(false); // ngoài gốc 3 đơn vị: chỗ rễ nổi, đi được
-    expect(blocked(5, 0)).toBe(false);
-    expect(blocked(0, -9.5)).toBe(false);
+    expect(blocked(3, 3)).toBe(true);
+    expect(blocked(0.3, -5)).toBe(true); // trên nền rễ, cách gốc 5
+    expect(blocked(0.3, 5)).toBe(true);
+    expect(blocked(5, 0)).toBe(true);
+    expect(blocked(0, -9.5)).toBe(false); // ngoài nền rễ (mép cách gốc khoảng 6,5)
+    expect(blocked(0, 9.5)).toBe(false);
     const r = footprintRadius({ model: MODEL_TREE, scale: 1 });
-    expect(r).toBeGreaterThan(2);
-    expect(r).toBeLessThan(3);
+    expect(r).toBeGreaterThan(5.5);
+    expect(r).toBeLessThan(7.5);
+    // vật chắn camera của cây: chỉ thân (hình tròn bán kính 2,5, cao 12), không phải cả nền rễ
+    const tree = layout.placements.find((q) => q.model === MODEL_TREE)!;
+    const trunk = layout.blockers.filter((b) => b.height > 10 && Math.hypot((b.shape as { x?: number }).x ?? 99, (b.shape as { z?: number }).z ?? 99) < 1);
+    expect(trunk).toHaveLength(1);
+    expect(trunk[0].shape.type).toBe('circle');
+    expect(tree).toBeDefined();
   });
   it('lều chợ quây quanh gốc cây đa như concept: ít nhất 8 lều cách gốc dưới 14 đơn vị', () => {
     const near = layout.placements.filter((q) => q.model === MODEL_STALL && Math.hypot(q.x, q.z) < 14);
@@ -399,5 +419,180 @@ describe('vật cản bám chân tường thật', () => {
       expect(c.height).toBeGreaterThan(0);
     });
     expect(layout.props.filter((q) => q.kind === 'da').length).toBeGreaterThanOrEqual(10); // đá bờ sông có vật cản
+  });
+});
+
+describe('bước 8d: đồ gợi nghề quanh cổng', () => {
+  const placed = (model: string) => layout.placements.filter((p) => p.model === model);
+  const nearGate = (g: (typeof GATES)[number], r: number) => (x: number, z: number) => Math.hypot(x - g.x, z - g.z) < r;
+
+  it('Giấy: 2–3 phên phơi giấy và chồng giấy; Dệt: 1 khung cửi và cuộn vải; Khắc Dấu: khối đá và bàn đá; Bạc: hòm, thúng, chum', () => {
+    expect(placed(MODEL_PAPER_RACK).length).toBeGreaterThanOrEqual(2);
+    expect(placed(MODEL_PAPER_RACK).length).toBeLessThanOrEqual(3);
+    expect(placed(MODEL_LOOM)).toHaveLength(1);
+    const kindsAt = (id: (typeof GATES)[number]['id']) => new Set(GATE_DECOR[id].flatMap((d) => (d.kind ? [d.kind] : [])));
+    expect(kindsAt('giay').has('giay')).toBe(true);
+    expect(kindsAt('det').has('vai')).toBe(true);
+    expect(kindsAt('khac-dau')).toEqual(new Set<PropKind>(['khoi-da', 'ban-da']));
+    expect(kindsAt('bac')).toEqual(new Set<PropKind>(['hom', 'thung', 'chum']));
+    // phên ở quanh cổng Giấy (Bắc), khung cửi quanh cổng Dệt (Nam)
+    const giay = GATES.find((g) => g.id === 'giay')!;
+    const det = GATES.find((g) => g.id === 'det')!;
+    for (const p of placed(MODEL_PAPER_RACK)) expect(nearGate(giay, 14)(p.x, p.z)).toBe(true);
+    for (const p of placed(MODEL_LOOM)) expect(nearGate(det, 14)(p.x, p.z)).toBe(true);
+  });
+
+  it('không có nhà và bụi tre trong 8 đơn vị quanh tâm mỗi cổng; vẫn đủ nhà và bụi tre ở chỗ khác', () => {
+    expect(GATE_CLEAR_RADIUS).toBe(8);
+    for (const g of GATES) {
+      for (const p of layout.placements.filter((q) => q.model === MODEL_HOUSE_TILE || q.model === MODEL_HOUSE_THATCH || q.model === MODEL_BAMBOO)) {
+        expect(Math.hypot(p.x - g.x, p.z - g.z), `${p.model} gần cổng ${g.id}`).toBeGreaterThanOrEqual(GATE_CLEAR_RADIUS);
+      }
+    }
+    expect(placed(MODEL_HOUSE_TILE).length).toBeGreaterThanOrEqual(7);
+    expect(placed(MODEL_HOUSE_THATCH).length).toBeGreaterThanOrEqual(7);
+    expect(placed(MODEL_BAMBOO).length).toBeGreaterThanOrEqual(14);
+  });
+
+  it('đồ gợi nghề nằm hai bên đường, không chắn đường đất tới cổng: lối giữa rộng ít nhất 4,4 mỗi bên không có vật nào, và đi thẳng từ sân chợ tới tâm cổng không bị chặn', () => {
+    for (const g of GATES) {
+      for (const d of GATE_DECOR[g.id]) {
+        const w = gateDecorWorld(g, d);
+        const r = d.model ? footprintRadius({ model: d.model, scale: d.scale ?? 1 }) : PROP_SIZES[d.kind!].r * (d.scale ?? 1);
+        // khoảng cách ngang tới trục đường của cổng (trục đường là trục x hoặc z)
+        const lateral = g.direction === 'bac' || g.direction === 'nam' ? Math.abs(w.x) : Math.abs(w.z);
+        expect(lateral - r, `${g.id} (${d.model ?? d.kind}) lệch ${lateral.toFixed(2)} bán kính ${r.toFixed(2)}`).toBeGreaterThanOrEqual(ROAD_HALF_CLEAR - 1.0);
+      }
+      // đi dọc trục đường từ cách tâm 12 tới tâm cổng (đi vào lối giữa): không bị chặn
+      const fx = -g.x / GATE_DISTANCE;
+      const fz = -g.z / GATE_DISTANCE; // hướng về sân chợ
+      for (let d = 12; d >= 0; d -= 0.25) {
+        expect(blocked(g.x + fx * d, g.z + fz * d), `${g.id} d=${d}`).toBe(false);
+      }
+    }
+  });
+
+  it('mỗi đồ gợi nghề có vật cản đầy đủ: model có vật cản theo chân thật; đồ nhỏ cao hơn 0,3 có vật cản sát hình (tròn hoặc hộp xoay); các món không đè lên nhau', () => {
+    for (const g of GATES) {
+      const probes: Point2[] = [];
+      for (const d of GATE_DECOR[g.id]) {
+        const w = gateDecorWorld(g, d);
+        probes.push({ x: w.x, z: w.z });
+        expect(blocked(w.x, w.z), `${g.id} ${d.model ?? d.kind} tại tâm`).toBe(true);
+      }
+      expect(probes.length).toBeGreaterThanOrEqual(6);
+    }
+    // hai món bất kỳ ở cùng một cổng cách nhau đủ xa (không chồng lên nhau)
+    for (const g of GATES) {
+      const items = GATE_DECOR[g.id].map((d) => ({ ...gateDecorWorld(g, d), r: d.model ? footprintRadius({ model: d.model, scale: d.scale ?? 1 }) : PROP_SIZES[d.kind!].r * (d.scale ?? 1) }));
+      for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) expect(Math.hypot(items[i].x - items[j].x, items[i].z - items[j].z), `${g.id} ${i}-${j}`).toBeGreaterThan(items[i].r + items[j].r - 0.05);
+    }
+  });
+
+  it('phên phơi giấy nằm trên giá: có 4 chân mỗi phên, vật cản cao tới mặt phên (khoảng 1,0)', () => {
+    const racks = placed(MODEL_PAPER_RACK);
+    expect(layout.props.filter((q) => q.kind === 'chan')).toHaveLength(racks.length * 4);
+    const rackColliders = layout.colliders.filter((c) => racks.some((r) => Math.hypot((c.shape as { x: number }).x - r.x, (c.shape as { z: number }).z - r.z) < 0.1));
+    expect(rackColliders.length).toBeGreaterThanOrEqual(racks.length);
+    for (const c of rackColliders) expect(c.height).toBeCloseTo(1.02, 2);
+  });
+});
+
+describe('bước 8d: vật cản của đồ nhỏ do code dựng', () => {
+  const kinds = Object.keys(PROP_SIZES) as PropKind[];
+  const mk = (kind: PropKind, scale = 1) => ({ kind, x: 10, z: -4, yaw: 0.6, scale, tint: [1, 1, 1] as const });
+
+  it('vật cao hơn 0,3 có vật cản sát hình; khóm hoa thấp và chân giá thì không; hộp thì là hộp xoay đúng cỡ', () => {
+    for (const kind of kinds) {
+      const k = PROP_SIZES[kind];
+      const c = propCollider(mk(kind, 1.2));
+      if (kind === 'hoa' || kind === 'chan') {
+        expect(c, kind).toBeNull();
+        continue;
+      }
+      expect(k.h, kind).toBeGreaterThan(PROP_COLLIDE_MIN_HEIGHT);
+      expect(c, kind).not.toBeNull();
+      expect(c!.height).toBeCloseTo(k.h * 1.2, 9);
+      if (k.box) {
+        expect(c!.shape.type).toBe('obox');
+        if (c!.shape.type === 'obox') {
+          expect(c!.shape.hx).toBeCloseTo(k.box.hx * 1.2, 9);
+          expect(c!.shape.hz).toBeCloseTo(k.box.hz * 1.2, 9);
+          expect(c!.shape.yaw).toBe(0.6);
+        }
+      } else {
+        expect(c!.shape.type).toBe('circle');
+        if (c!.shape.type === 'circle') expect(c!.shape.r).toBeCloseTo(k.r * 1.2, 9);
+      }
+    }
+  });
+
+  it('mọi đồ nhỏ trong chợ cao hơn 0,3 đều có vật cản (trừ khóm hoa và chân giá), người đứng vào tâm bị đẩy ra', () => {
+    let tested = 0;
+    for (const p of layout.props) {
+      if (p.kind === 'hoa' || p.kind === 'chan') continue;
+      expect(blocked(p.x, p.z, 0.05), `${p.kind} (${p.x.toFixed(1)}, ${p.z.toFixed(1)})`).toBe(true);
+      tested++;
+    }
+    expect(tested).toBeGreaterThan(40);
+  });
+
+  it('khóm hoa thấp đi qua được: không có vật cản riêng', () => {
+    const hoa = layout.props.filter((p) => p.kind === 'hoa');
+    expect(hoa.length).toBeGreaterThan(5);
+    // không có vật cản nào có tâm trùng khóm hoa
+    for (const p of hoa) expect(layout.colliders.some((c) => (c.shape as { x?: number }).x === p.x && (c.shape as { z?: number }).z === p.z)).toBe(false);
+  });
+});
+
+describe('bước 8d: hàng rào tre', () => {
+  const fence = fenceLayout();
+  const colliders = fenceColliders(fence);
+
+  it('chuỗi hộp mỏng theo từng đoạn: mỗi đoạn một hộp xoay mỏng cao bằng cột, cả hàng rào có trong vật cản của chợ', () => {
+    expect(colliders.length).toBe(fence.segments.length);
+    expect(colliders.length).toBeGreaterThan(60);
+    for (const c of colliders) {
+      expect(c.shape.type).toBe('obox');
+      if (c.shape.type === 'obox') {
+        expect(c.shape.hz).toBeLessThan(0.15); // mỏng
+        expect(c.shape.hx).toBeGreaterThan(1);
+      }
+      expect(c.height).toBe(FENCE_POST_HEIGHT);
+      expect(layout.colliders.some((q) => q.shape.type === 'obox' && c.shape.type === 'obox' && q.shape.x === c.shape.x && q.shape.z === c.shape.z)).toBe(true);
+    }
+  });
+
+  it('thanh ngang và vật cản nằm theo tiếp tuyến của vòng rào (không phải theo bán kính)', () => {
+    for (const sg of fence.segments) {
+      // trục x của hộp sau khi xoay yaw (rotation.y của three): (cos yaw, −sin yaw)
+      const dx = Math.cos(sg.yaw);
+      const dz = -Math.sin(sg.yaw);
+      const rx = sg.x / Math.hypot(sg.x, sg.z);
+      const rz = sg.z / Math.hypot(sg.x, sg.z);
+      expect(Math.abs(dx * rx + dz * rz)).toBeLessThan(0.1); // gần vuông góc với bán kính
+    }
+  });
+
+  it('người chơi không đi xuyên hàng rào (đi thẳng từ trong ra rìa ở góc chéo), nhưng ra được ở 4 con đường', () => {
+    const run = (ang: number) => {
+      // đi từ (0.7R, ...) ra ngoài theo hướng ang với bước nhỏ, dừng khi bị chặn
+      const p: Point2 = { x: Math.cos(ang) * 30, z: Math.sin(ang) * 30 };
+      let maxR = 0;
+      for (let d = 0; d < 20; d += 0.05) {
+        p.x += Math.cos(ang) * 0.05;
+        p.z += Math.sin(ang) * 0.05;
+        resolveCollisions(p, PLAYER_RADIUS, layout.obstacles, WORLD_RADIUS);
+        maxR = Math.max(maxR, Math.hypot(p.x, p.z));
+      }
+      return maxR;
+    };
+    // hướng chéo (45° Tây Nam / Đông Bắc…): bị hàng rào chặn ở bán kính nhỏ hơn 41,3 − 0,4
+    for (const ang of [Math.PI * 0.25, Math.PI * 0.75, Math.PI * 1.25, Math.PI * 1.75]) {
+      if (Math.cos(ang) < -0.3) continue; // phía đông có sông
+      expect(run(ang), `góc ${ang}`).toBeLessThan(WORLD_RADIUS - 0.7 - 0.07 - PLAYER_RADIUS + 0.01);
+    }
+    // theo trục đường phía bắc: ra được tới sát biên (42)
+    expect(run(Math.PI / 2)).toBeGreaterThan(WORLD_RADIUS - 1);
   });
 });

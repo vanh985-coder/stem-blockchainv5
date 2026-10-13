@@ -133,7 +133,7 @@ Dùng cho **mọi trang** (bảng gán ở `packages/core/src/content/nenTrangTr
 
 | Model | Cao trong cảnh | Rộng × sâu trong cảnh | Gấp nhân vật | Ghi chú |
 |---|---|---|---|---|
-| `env/cay-da` | 12 | 19 × 12,7 | 7 lần | vật cản chỉ là gốc chính, bán kính 2,5; rễ phụ đi xuyên được; tán rộng |
+| `env/cay-da` | 12 | 19 × 12,7 | 7 lần | vật cản là mép nền rễ to nhô cao quanh gốc (bán kính khoảng 5,2–6,7, đo theo chân thật của nền); thân chính (bán kính 2,5) chỉ chắn camera; tán rộng |
 | `env/cong-lang-giay` | 6 | 10,4 × 2,7 | 3,5 lần | lối đi giữa nới ra 2,4 (xem mục 3.7) |
 | `env/cong-lang-det` | 6 | 8,4 × 3,0 | 3,5 lần | |
 | `env/cong-lang-khac-dau` | 6 | 10,7 × 3,8 | 3,5 lần | |
@@ -143,6 +143,8 @@ Dùng cho **mọi trang** (bảng gán ở `packages/core/src/content/nenTrangTr
 | `env/leu-cho` | 3,2 | 3,8 × 3,0 | 1,9 lần | |
 | `env/gieng-lang` | 2,4 | 2,4 × 2,3 | 1,4 lần | |
 | `env/bui-tre` | 5,5 | 5,9 × 5,3 | 3,2 lần | cả cụm, có nền đất |
+| `env/phen-phoi-giay` | 0,17 (nhấc lên giá cao 0,85, đỉnh 1,02) | 2,43 × 1,6 | tấm phẳng | phên phơi giấy của Làng Giấy; bốn chân giá do code dựng |
+| `env/khung-cui` | 2 | 1,8 × 1,9 | 1,2 lần | khung cửi của Làng Dệt; bản chính 134.198 tam giác nên chỉ dùng khi thật gần |
 
 Đồ nhỏ do code dựng: chum vại cao 1,05, đống rơm cao 2, khóm hoa cao khoảng 0,8, thuyền gỗ dài 4,6 rộng 1,3. Nhà, lều, bụi tre khi đặt còn nhân với tỉ lệ ngẫu nhiên 0,8 đến 1,25.
 
@@ -341,6 +343,9 @@ Mỗi người lệch pha ngẫu nhiên để không nhún đồng loạt. Hàm 
 - **Mặt đi được cao hơn 0 (bước 7b)** — `World.groundHeight(x, z)` (hàm thuần, mặc định 0). Đứng trên mặt đó khi không nhảy; nhảy và rơi tính từ độ cao đó; xuống chỗ thấp hơn quá `DROP_SNAP` (0,12) trong một khung hình thì rơi tự do. Ở chợ: `groundHeight` ở `cho/marketLayout.ts`, mặt đất 0, cầu tàu cao `DECK_TOP` = 0,45, dốc lên dài 2 ở đầu cầu (x từ −32 tới −34).
 - **Xem vùng va chạm:** thêm `?debug=colliders` vào URL (`/cho`, `/dev/walk`) thì vẽ khung lưới đỏ cho mọi vật cản (cao tới 1,5), lưới cam cho mặt cầu tàu (theo `groundHeight`), vòng xanh cho người chơi. Ở `/cho` thêm `?cam=free` (kèm `window.__freeCam`) để đặt camera soi từng chỗ. Chỉ để kiểm tra bằng mắt.
 - **Cổng làng (bước 8):** cổng cao **6** (trước là 5). Lối đi giữa nới tới **2,4** giữa hai vật cản (`GATE_OPENING`, `openGate` cắt mép trong hai chân cổng ra ngoài; chân cột thật hở 1,6 đến 2,2 nên nhân vật chạm nhẹ vào mép cột khi đi sát, chấp nhận được); thân người (bán kính 0,4) đi lọt dải rộng 1,6. Cổng đóng có thêm vật cản mỏng chắn kín lối (`gateBarrierObstacle`). Cây đa: vật cản chỉ là hình tròn bán kính 2,5 quanh gốc chính (`TREE_TRUNK`, tâm (0,27, −0,18)); rễ phụ đi xuyên được.
+- **Cây đa (bước 8d):** model có nền rễ to nhô cao quanh gốc (gò thoải lên cao khoảng 1,2 ở giữa); vật cản là các hộp bao sát mép nền (sinh bằng `footprintGen` từ điểm chân thật 0–1,5, bỏ rễ mảnh thò ra ngoài bằng `removeThinFeatures`, 34 hộp, thừa không quá 0,3), nên người chơi không đi lên nền rễ được (dừng cách gốc 5,2 đến 6,7). Chum vại đặt sẵn trên nền rễ là phần của model (cảnh, không tới được). Thân chính (hình tròn bán kính 2,5) chỉ là vật chắn camera cao 12, để camera không bị cả nền rễ rộng 6 kéo lại. Lều chợ tự xếp ra ngoài nền rễ (khoảng cách xếp tính theo bán kính 6,7).
+- **Đồ nhỏ do code dựng có vật cản sát hình (bước 8d):** vật cao hơn 0,3 đều có vật cản (`PROP_SIZES`, `propCollider`): chum, đống rơm, thúng, đá bờ sông, cuộn vải có vật cản tròn; chồng giấy, khối đá, bàn đá khắc, hòm có vật cản hộp xoay. Khóm hoa (0,8 nhưng thấp bụi) và chân giá phên không có vật cản (đi qua được). **Hàng rào tre là chuỗi hộp xoay mỏng** (nửa bề dày 0,08, cao 1,35) theo từng đoạn giữa hai cột (`fenceColliders`, khoảng 100 đoạn); thanh ngang nằm theo tiếp tuyến vòng (đã sửa: trước đó thanh ngang và vật cản quay nhầm theo bán kính). Thuyền nằm trên nước nên đã có vật cản của sông. Hiện đủ trong `?debug=colliders`.
+- **Bi sau vai phải theo camera (bước 8d):** ở cảnh đi lại Bi bay theo góc nhìn của camera chứ không theo hướng mặt người chơi: lệch sang phải màn hình 1,6, lùi về phía camera 1,1, cao 1,1 so với chân (ngang ngực, thấp hơn đầu 1,7), nên luôn ở góc dưới phải cạnh người chơi, không che giữa màn hình và không đè lên cổng ở phía trước (`BI_CAMERA_OFFSET`, `biCameraOffset`, `Bi` có `cameraYaw`).
 - **Xà ngang cổng (bước 8):** `CameraBlocker` có thêm `base` (đáy khối; mặc định 0). Mỗi cổng có một hộp xoay vắt qua lối đi từ đáy xà (1,9 đến 2,3 tùy cổng, `GATE_LINTELS` đo từ model) tới đỉnh cổng; camera đi dưới xà thì được, đi xuyên qua xà thì bị kéo lại. Hộp xà chỉ chắn camera, không chắn người đi.
 - **Vật dự phòng (bước 8):** `Interactable.fallback`: chỉ được chọn khi trong bán kính 2,2 không có vật thường nào (Bi luôn bay sát người chơi nên là vật dự phòng; đứng cạnh cổng hay dân làng thì E là cổng hay dân làng).
 - **Dân làng nhường đường (bước 8, `wander.ts`):** đang đi mà người chơi đứng chắn trong **1,5** phía trước (góc ±60° so với hướng mặt) thì dừng lại (clip `idle`), quay mặt về người chơi và chờ; người chơi tránh xa quá 2,0 trong 0,6 giây thì đi tiếp; chờ quá **3 giây** mà vẫn bị chắn thì đi vòng 1,8 giây (lệch hướng 69° sang bên không có người chơi). `hold`: người chơi đang nói chuyện thì đứng yên, quay mặt về người chơi. `stepWander(…, other, hold)`.

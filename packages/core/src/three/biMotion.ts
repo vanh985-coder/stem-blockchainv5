@@ -51,3 +51,23 @@ export function dampFactor(dt: number, rate: number): number {
  * nên bên phải của họ là −X (và phía sau là −Z).
  */
 export const BI_FOLLOW_OFFSET: readonly [number, number, number] = [-0.75, 2.0, -0.55];
+
+/**
+ * Ở cảnh đi lại (bước 8d) Bi bay "sau vai phải" của người chơi theo góc nhìn của CAMERA, không theo hướng mặt người chơi: lệch sang phải màn hình `right`, lùi về phía camera `back`,
+ * cao `up` so với chân (ngang ngực, thấp hơn đầu). Nhờ vậy Bi luôn ở góc dưới phải cạnh người chơi, không che giữa màn hình và không đè lên cổng ở phía trước (người chơi quay lưng
+ * hay đi lùi cũng vậy).
+ */
+export const BI_CAMERA_OFFSET = { right: 1.6, back: 1.1, up: 1.1 } as const;
+
+/**
+ * Độ lệch (x, y, z) trong cảnh của Bi so với chân người chơi, khi camera quay `yaw` (0 là nhìn +Z; phía trước = (sin yaw, cos yaw), bên phải màn hình = (−cos yaw, sin yaw)).
+ * Ghi vào `out`, không cấp phát.
+ */
+export function biCameraOffset(yaw: number, off: { right: number; back: number; up: number }, out: { x: number; y: number; z: number }): { x: number; y: number; z: number } {
+  const s = Math.sin(yaw);
+  const c = Math.cos(yaw);
+  out.x = -c * off.right - s * off.back;
+  out.z = s * off.right - c * off.back;
+  out.y = off.up;
+  return out;
+}

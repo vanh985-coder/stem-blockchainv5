@@ -82,6 +82,45 @@ export function gridFromPoints(points: readonly Pt[], cell = CELL, pad = 1): Gri
   return g;
 }
 
+/**
+ * Bỏ các chi tiết mảnh (rễ nhỏ, que): lấy các ô có điểm, "mở" vùng bằng hình tròn bán kính `radius` (co rồi nở), chỉ giữ điểm nằm trong vùng còn lại. Dùng cho cây đa: nền rễ
+ * to nhô cao quanh gốc là vật cản, còn rễ phụ mảnh thò ra ngoài thì không (bước 8d).
+ */
+export function removeThinFeatures(points: readonly Pt[], radius = 0.7, cell = CELL): Pt[] {
+  const g = gridFromPoints(points, cell, Math.ceil(radius / cell) + 2);
+  const r = Math.round(radius / cell);
+  const offs: [number, number][] = [];
+  for (let a = -r; a <= r; a++) for (let b = -r; b <= r; b++) if (a * a + b * b <= r * r) offs.push([a, b]);
+  const eroded = new Uint8Array(g.data.length);
+  for (let j = 0; j < g.nz; j++) {
+    for (let i = 0; i < g.nx; i++) {
+      if (!g.data[idx(g, i, j)]) continue;
+      let all = true;
+      for (const [a, b] of offs) {
+        const x = i + a;
+        const z = j + b;
+        if (x < 0 || z < 0 || x >= g.nx || z >= g.nz || !g.data[idx(g, x, z)]) {
+          all = false;
+          break;
+        }
+      }
+      if (all) eroded[idx(g, i, j)] = 1;
+    }
+  }
+  const opened = new Uint8Array(g.data.length);
+  for (let j = 0; j < g.nz; j++) {
+    for (let i = 0; i < g.nx; i++) {
+      if (!eroded[idx(g, i, j)]) continue;
+      for (const [a, b] of offs) {
+        const x = i + a;
+        const z = j + b;
+        if (x >= 0 && z >= 0 && x < g.nx && z < g.nz) opened[idx(g, x, z)] = 1;
+      }
+    }
+  }
+  return points.filter((p) => opened[idx(g, Math.floor((p.x - g.minX) / cell), Math.floor((p.z - g.minZ) / cell))] === 1);
+}
+
 /** Bao lồi (Andrew monotone chain), ngược chiều kim đồng hồ. */
 export function convexHull(points: readonly Pt[]): Pt[] {
   const cross = (o: Pt, a: Pt, b: Pt) => (a.x - o.x) * (b.z - o.z) - (a.z - o.z) * (b.x - o.x);

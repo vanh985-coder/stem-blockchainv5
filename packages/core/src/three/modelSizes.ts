@@ -17,12 +17,14 @@ export interface ModelSize {
    * assets-build/). Có giá trị này thì `sizeInScene` tính được bề rộng và bề sâu thật trong cảnh (để đặt vật cản và tránh chồng nhau).
    */
   dims?: readonly [number, number, number];
+  /** Nhấc cả model lên cao bấy nhiêu (đơn vị cảnh) so với mặt đất, ví dụ phên phơi giấy đặt trên giá (bước 8d); mặc định 0 */
+  lift?: number;
 }
 
 const character = (facingYaw = 0): ModelSize => ({ height: CHARACTER_HEIGHT, facingYaw });
 
 /** Đồ vật cao `height` đơn vị cảnh; `dims` là khung bao đo được trong file. */
-const prop = (height: number, dims: readonly [number, number, number]): ModelSize => ({ height, facingYaw: 0, dims });
+const prop = (height: number, dims: readonly [number, number, number], lift = 0): ModelSize => ({ height, facingYaw: 0, dims, ...(lift ? { lift } : {}) });
 
 /** Nhân vật: 4 có xương (`hoc-sinh-nam`, `ti`, `dan-lang-ba-cu`, `dan-lang-nong-dan`) và 6 đứng yên. */
 export const MODEL_SIZES: Readonly<Record<string, ModelSize>> = {
@@ -48,6 +50,9 @@ export const MODEL_SIZES: Readonly<Record<string, ModelSize>> = {
   'env/leu-cho': prop(3.2, [0.976, 0.824, 0.781]),
   'env/gieng-lang': prop(2.4, [0.978, 0.978, 0.931]),
   'env/bui-tre': prop(5.5, [0.976, 0.906, 0.874]),
+  // Đồ gợi nghề quanh cổng làng (bước 8d): phên phơi giấy (tấm phẳng dày 0,17 nằm trên giá cao 0,85), khung cửi
+  'env/phen-phoi-giay': prop(0.17, [0.986, 0.069, 0.666], 0.85),
+  'env/khung-cui': prop(2, [0.884, 0.979, 0.944]),
 };
 
 /** 6 nhân vật không có xương (đứng yên, spec 03 mục 3.4). */
@@ -76,6 +81,13 @@ export function isCharacterId(id: string): boolean {
 export function sizeOf(id: string): ModelSize | undefined {
   const base = id.endsWith('-xa') ? id.slice(0, -3) : id;
   return MODEL_SIZES[base] ?? (isCharacterId(base) ? character() : undefined);
+}
+
+/** Độ cao đỉnh của đồ vật so với mặt đất (kể cả phần nhấc lên `lift`), cho vật cản và vật chắn camera; undefined nếu chưa có cỡ. */
+export function topInScene(id: string, scale = 1): number | undefined {
+  const s = sizeInScene(id, scale);
+  if (!s) return undefined;
+  return s[1] + (sizeOf(id)?.lift ?? 0) * scale;
 }
 
 /** Kích thước thật [rộng x, cao y, sâu z] trong cảnh của một đồ vật (nhân thêm `scale` nếu đặt phóng to hay thu nhỏ); undefined nếu chưa có `dims`. */

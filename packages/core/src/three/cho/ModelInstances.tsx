@@ -127,7 +127,10 @@ function newShadowMesh(part: Part, capacity: number): InstancedMesh {
 }
 
 function buildSet(id: string, near: ModelData, mid: ModelData | null, far: ModelData, items: readonly Placement[]): InstanceSet {
-  const fit = fitOf(id, near.scene);
+  const fit0 = fitOf(id, near.scene);
+  // một số model nhấc lên khỏi mặt đất (phên phơi giấy đặt trên giá): cộng `lift` vào độ dịch đứng
+  const lift = sizeOf(id)?.lift ?? 0;
+  const fit = { scale: fit0.scale, offsetY: fit0.offsetY + lift };
   const nearParts = buildParts(near.scene, fit.scale, fit.offsetY);
   // bản xa dùng đúng hệ số phóng của bản chính để hai bản trùng khít
   const farParts = buildParts(far.scene, fit.scale, fit.offsetY);
@@ -152,7 +155,7 @@ function buildSet(id: string, near: ModelData, mid: ModelData | null, far: Model
     colors.set(it.tint, i * 3);
     const size = sizeInScene(id, it.scale) ?? [1, 1, 1];
     centers[i * 3] = it.x;
-    centers[i * 3 + 1] = size[1] / 2;
+    centers[i * 3 + 1] = size[1] / 2 + lift * it.scale;
     centers[i * 3 + 2] = it.z;
     radii[i] = 0.5 * Math.hypot(size[0], size[1], size[2]);
   });

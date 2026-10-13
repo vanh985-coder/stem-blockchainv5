@@ -107,6 +107,13 @@ export const MARKET_NEAR: Readonly<Record<'low' | 'medium' | 'high', number>> = 
 export const MARKET_NEAR_3_TIER: Readonly<Record<string, { medium: number; high: number }>> = {
   'env/cong-lang-': { medium: 12, high: 28 },
   'env/gieng-lang': { medium: 6, high: 14 },
+  'env/phen-phoi-giay': { medium: 6, high: 14 },
+};
+/**
+ * Model 2 bậc rất nặng: bản chính chỉ dùng khi thật gần (khung cửi 134.000 tam giác), còn lại dùng bản xa. Thấp vẫn `MARKET_NEAR.low`.
+ */
+export const MARKET_NEAR_HEAVY: Readonly<Record<string, { medium: number; high: number }>> = {
+  'env/khung-cui': { medium: 7, high: 10 },
 };
 
 /**
@@ -116,6 +123,8 @@ export const MARKET_NEAR_3_TIER: Readonly<Record<string, { medium: number; high:
 export function marketNearDistance(level: 'low' | 'medium' | 'high', modelId?: string): number {
   if (level !== 'low' && modelId) {
     for (const [prefix, d] of Object.entries(MARKET_NEAR_3_TIER)) if (modelId.startsWith(prefix)) return d[level];
+    const heavy = MARKET_NEAR_HEAVY[modelId];
+    if (heavy) return heavy[level];
   }
   return MARKET_NEAR[level];
 }

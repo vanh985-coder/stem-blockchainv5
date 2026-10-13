@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { cameraClearance } from '../cameraCollision';
 import { PLAYER_RADIUS, resolveCollisions, type Point2 } from '../collision';
-import { MAX_OVERHANG, MIN_COVERAGE, gridFromFilledPoints, gridFromHull, inAnyShape, measureFit } from './footprintDerive';
-import { FOOTPRINTS, GATE_OPENING, GENERATED, TREE_TRUNK, footprintObstacles, footprintOf, footprintRadiusOf, gateBarrierObstacle, gateLintel, openGate } from './footprints';
+import { MAX_OVERHANG, MIN_COVERAGE, gridFromFilledPoints, gridFromHull, inAnyShape, measureFit, removeThinFeatures } from './footprintDerive';
+import { FOOTPRINTS, GATE_OPENING, GENERATED, TREE_TRUNK, footprintObstacles, footprintOf, footprintRadiusOf, gateBarrierObstacle, gateLintel, openGate, treeTrunkObstacle } from './footprints';
 import { bandSample } from './footprintSample.testlib';
 
 const IDS = Object.keys(FOOTPRINTS);
@@ -10,9 +10,9 @@ const IDS = Object.keys(FOOTPRINTS);
 const RAW_IDS = Object.keys(GENERATED);
 
 describe('chân tường thật của đồ vật (so với file model)', () => {
-  it('có đủ 10 loại đồ vật của chợ', () => {
-    expect(IDS).toHaveLength(10);
-    for (const id of ['env/cay-da', 'env/nha-mai-ngoi', 'env/nha-mai-tranh', 'env/leu-cho', 'env/gieng-lang', 'env/bui-tre', 'env/cong-lang-giay', 'env/cong-lang-det', 'env/cong-lang-khac-dau', 'env/cong-lang-bac']) {
+  it('có đủ 12 loại đồ vật của chợ (10 cũ và phên phơi giấy, khung cửi)', () => {
+    expect(IDS).toHaveLength(12);
+    for (const id of ['env/phen-phoi-giay', 'env/khung-cui', 'env/cay-da', 'env/nha-mai-ngoi', 'env/nha-mai-tranh', 'env/leu-cho', 'env/gieng-lang', 'env/bui-tre', 'env/cong-lang-giay', 'env/cong-lang-det', 'env/cong-lang-khac-dau', 'env/cong-lang-bac']) {
       expect(footprintOf(id).length, id).toBeGreaterThan(0);
       expect(footprintOf(`${id}-xa`)).toBe(footprintOf(id)); // bản xa dùng chung chân tường
     }
@@ -32,7 +32,8 @@ describe('chân tường thật của đồ vật (so với file model)', () => 
     for (const id of RAW_IDS) {
       const { points } = await bandSample(id);
       const inside = points.filter((p) => inAnyShape(GENERATED[id], p.x, p.z)).length;
-      expect(inside / points.length, `${id}: ${inside}/${points.length}`).toBeGreaterThanOrEqual(0.985);
+      // khung cửi (hình tròn bao bốn chân, vài điểm góc ở ngoài) 97%; còn lại 98,5%
+      expect(inside / points.length, `${id}: ${inside}/${points.length}`).toBeGreaterThanOrEqual(id === 'env/khung-cui' ? 0.97 : 0.985);
     }
   }, 120000);
 
@@ -74,29 +75,56 @@ describe('chân tường thật của đồ vật (so với file model)', () => 
   });
 });
 
-describe('cây đa: chỉ gốc chính là vật cản', () => {
-  it('một hình tròn bán kính 2–2,5 quanh gốc', () => {
-    const f = footprintOf('env/cay-da');
-    expect(f).toHaveLength(1);
-    expect(f[0]).toBe(TREE_TRUNK);
+describe('cây đa: nền rễ to nhô cao là vật cản, thân chỉ chắn camera (bước 8d)', () => {
+  const mound = () => FOOTPRINTS['env/cay-da'];
+
+  it('vật cản là các hình bao nền rễ (bán kính khoảng 6–7), không còn là hình tròn thân 2,5', () => {
+    expect(mound().length).toBeGreaterThan(8);
+    expect(footprintRadiusOf('env/cay-da')).toBeGreaterThan(5.5);
+    expect(footprintRadiusOf('env/cay-da')).toBeLessThan(7.5);
+    // thân chính chỉ là vật chắn camera
     expect(TREE_TRUNK.kind).toBe('circle');
-    if (TREE_TRUNK.kind === 'circle') {
-      expect(TREE_TRUNK.r).toBeGreaterThanOrEqual(2);
-      expect(TREE_TRUNK.r).toBeLessThanOrEqual(2.5);
+    if (TREE_TRUNK.kind === 'circle') expect(TREE_TRUNK.r).toBeCloseTo(2.5, 9);
+    const t = treeTrunkObstacle(10, 20, 0.7, 1.1);
+    expect(t.type).toBe('circle');
+  });
+
+  it('phủ nền rễ: ít nhất 97% điểm bề mặt nhô cao 0,5–1,2 đều nằm trong vật cản; phần vật cản thừa ra ngoài nền không quá 0,3', async () => {
+    const { points } = await bandSample('env/cay-da', 1.2, 0.5);
+    expect(points.length).toBeGreaterThan(5000);
+    const inside = points.filter((q) => inAnyShape(mound(), q.x, q.z)).length;
+    expect(inside / points.length).toBeGreaterThanOrEqual(0.97);
+    // đo thừa: so với chân thật 0–1,5 bỏ rễ mảnh (như lúc sinh)
+    const full = await bandSample('env/cay-da');
+    const grid = gridFromHull(removeThinFeatures(full.points));
+    const fit = measureFit(mound(), grid);
+    expect(fit.coverage).toBeGreaterThanOrEqual(MIN_COVERAGE);
+    expect(fit.overhang).toBeLessThanOrEqual(MAX_OVERHANG);
+  }, 120000);
+
+  it('người chơi đi từ mọi hướng vào gốc cây không lên được nền rễ: dừng ở mép nền (xa gốc hơn 5)', () => {
+    const obs = footprintObstacles('env/cay-da', 0, 0, 0.35);
+    for (let k = 0; k < 16; k++) {
+      const ang = (k / 16) * Math.PI * 2;
+      const p: Point2 = { x: Math.cos(ang) * 12, z: Math.sin(ang) * 12 };
+      for (let d = 0; d < 14; d += 0.05) {
+        p.x -= Math.cos(ang) * 0.05;
+        p.z -= Math.sin(ang) * 0.05;
+        resolveCollisions(p, PLAYER_RADIUS, obs, Infinity);
+      }
+      expect(Math.hypot(p.x, p.z), `hướng ${k}`).toBeGreaterThan(5);
     }
   });
 
-  it('phủ ít nhất 85% điểm bề mặt thân cây (cao 2–3,5, trong 3,2 quanh gốc); rễ xa ngoài 4 đơn vị đi xuyên được', async () => {
-    const { points } = await bandSample('env/cay-da', 3.5, 2);
-    const trunk = points.filter((p) => Math.hypot(p.x - TREE_TRUNK.cx, p.z - TREE_TRUNK.cz) < 3.2);
-    expect(trunk.length).toBeGreaterThan(200);
-    const inside = trunk.filter((p) => inAnyShape(FOOTPRINTS['env/cay-da'], p.x, p.z)).length;
-    expect(inside / trunk.length).toBeGreaterThanOrEqual(0.85);
-    // ngoài 4 đơn vị tính từ gốc có điểm rễ của model nhưng không có vật cản
-    const roots = points.filter((p) => Math.hypot(p.x - TREE_TRUNK.cx, p.z - TREE_TRUNK.cz) > 4);
-    expect(roots.length).toBeGreaterThan(100);
-    expect(roots.every((p) => !inAnyShape(FOOTPRINTS['env/cay-da'], p.x, p.z))).toBe(true);
-  }, 120000);
+  it('removeThinFeatures bỏ chi tiết mảnh (que dài 0,3) nhưng giữ khối đặc', () => {
+    const pts: { x: number; z: number }[] = [];
+    for (let x = -2; x <= 2; x += 0.05) for (let z = -2; z <= 2; z += 0.05) pts.push({ x, z }); // khối đặc 4 × 4
+    for (let x = 2.1; x <= 4; x += 0.05) pts.push({ x, z: 0 }); // que mảnh thò ra
+    const kept = removeThinFeatures(pts, 0.7);
+    expect(kept.some((q) => q.x > 2.5)).toBe(false);
+    expect(kept.filter((q) => Math.abs(q.x) < 1.5 && Math.abs(q.z) < 1.5).length).toBeGreaterThan(1000);
+    expect(kept.length).toBeLessThan(pts.length);
+  });
 });
 
 describe('openGate', () => {
@@ -193,9 +221,9 @@ describe('đổi chân tường ra vật cản trong cảnh', () => {
     expect(footprintOf('env/nha-mai-tranh')).toHaveLength(1);
   });
 
-  it('bán kính bao của từng đồ vật hợp lý: cây đa (gốc chính) 2–3, nhà 3–3,6, giếng khoảng 1,2', () => {
-    expect(footprintRadiusOf('env/cay-da')).toBeGreaterThan(2);
-    expect(footprintRadiusOf('env/cay-da')).toBeLessThan(3);
+  it('bán kính bao của từng đồ vật hợp lý: cây đa (nền rễ) 5,5–7,5, nhà 3–3,6, giếng khoảng 1,2', () => {
+    expect(footprintRadiusOf('env/cay-da')).toBeGreaterThan(5.5);
+    expect(footprintRadiusOf('env/cay-da')).toBeLessThan(7.5);
     expect(footprintRadiusOf('env/nha-mai-ngoi')).toBeGreaterThan(3);
     expect(footprintRadiusOf('env/nha-mai-ngoi')).toBeLessThan(3.8);
     expect(footprintRadiusOf('env/gieng-lang')).toBeCloseTo(1.23, 1);

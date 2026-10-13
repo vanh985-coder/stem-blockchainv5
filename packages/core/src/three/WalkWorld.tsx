@@ -193,7 +193,7 @@ function Player({ api, paused, world, interactables, onNearestChange, player, st
       <group ref={root} position={[start[0], 0, start[1]]}>
         <Character id={WALK_PLAYER} clips={CLIPS} animation={anim} trigger={jumpN} returnTo="jump" timeScale={timeScale} onReady={setInfo} />
       </group>
-      <Bi target={root} track={biTrack} />
+      <Bi target={root} track={biTrack} cameraYaw={api.camera} />
     </>
   );
 }
