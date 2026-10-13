@@ -9,7 +9,7 @@ Trang 2D, nhẹ, tải nhanh.
 - **Đầu trang:** hình logo (`ui/logo-art`) cùng tên game "Giấc mơ Sổ Chung" (chữ do code viết), và một câu: "Mơ về Đại Việt thế kỷ XVI, học bí quyết giữ sổ để tỉnh giấc."
 - **Nút:**
   - Chưa đăng nhập: nút chính "Đăng nhập để chơi", nút phụ "Chơi thử".
-  - Đã đăng nhập: nút chính "Chơi tiếp", cùng tên học sinh và số Trang Sổ Vàng đã có (0/4). Ở mốc 1, "Chơi tiếp" mở `/ban-do`. Từ mốc 2 thì mở `/cho` (chợ 3D), và trang chủ có thêm liên kết "Bản đồ".
+  - Đã đăng nhập: nút chính "Chơi tiếp", cùng tên học sinh và số Trang Sổ Vàng đã có (0/4). Ở mốc 1, "Chơi tiếp" mở `/ban-do`. Từ mốc 2 thì mở `/cho` (chợ 3D), và trang chủ có thêm liên kết "Bản đồ" (đã làm ở bước 8 và 8b: "Chơi thử" và đăng nhập xong cũng mở `/cho`, kể cả đăng nhập mà không có `next`).
 - **Liên kết:** "Đọc truyện", "Hồ sơ"; với tài khoản giáo viên thêm "Trang giáo viên"; "Quyền riêng tư".
 - **Nền:** `NenTrangTri` (spec 03 mục 1): ảnh `ui/man-hinh-tai` hơi mờ cùng icon bộ `lang` trôi chậm; tắt icon khi bật "Giảm chuyển động".
 
@@ -47,7 +47,7 @@ Hiện 14 ảnh trong `assets/story/` (`01-ngu-guc` … `14-gio-tay`) theo kiể
 - "Bỏ qua" (hoặc Esc) đi thẳng vào `/ban-do`.
 - Nền là màu ấm theo chủ đề đổi theo lượt (1–2 `mo`: tím than → tím nhạt; 3–11 `lang`: giấy dó → be ấm; 12–14 `hoi`: cam nhạt → vàng), không có lớp phủ tối; ảnh truyện đang xem làm mờ chỉ phủ khoảng 35%; icon trôi chậm của bộ. Đổi chủ đề thì màu và icon chuyển dần khoảng 0,6 giây (spec 03 mục 1, `NenTrangTri`).
 
-**Lượt cuối (ảnh 14):** nút kết thúc là **"Bắt đầu hành trình"**. Ở mốc 1 dẫn vào `/ban-do`; từ mốc 2 dẫn vào `/cho`.
+**Lượt cuối (ảnh 14):** nút kết thúc là **"Bắt đầu hành trình"**. Ở mốc 1 dẫn vào `/ban-do`; từ mốc 2 dẫn vào `/cho` (đã làm ở bước 8; "Bỏ qua" vẫn vào `/ban-do`).
 
 Trang `/truyen` tải theo route (không nằm trong trang đầu của hub).
 
@@ -89,7 +89,8 @@ Xếp theo ảnh `concept-toan-canh` và `concept-cho-phien`. Phải **đủ đ�
 - **Đông:** sau cổng Bạc là bến sông (đường ra bến tàu ván gỗ rộng 3,4, thuyền gỗ có mui lá, bờ đá). Sông là vật cản ngoài bến tàu. Ruộng lúa phủ ngoài biên, đồi xa ở chân trời, hàng rào tre quanh rìa.
 - **Va chạm và mặt cầu (bước 7b):** vật cản của nhà, lều, giếng, cổng, tre, cây đa dựng theo chân tường thật (xem spec 03 mục 3.7), nên cây đa chiếm bán kính khoảng 6,4–7 và các lều xếp lùi ra xa hơn. Sông có vật cản dọc bờ (trừ lối lên cầu), cuối cầu và hai bên cầu có lan can vô hình; đá bờ sông có vật cản. Cầu tàu là sàn đặc cao 0,45 có dốc lên ở đầu cầu; người chơi đứng đúng mặt sàn, nhảy tính từ mặt sàn. `?debug=colliders` để soi.
 - **Người:** 4 dân làng (bà cụ, chú nông dân xen kẽ) đi lại trên 4 con đường và là vật cản tròn; lái buôn đứng gần bến sông.
-- **Chưa làm (bước 8):** cổng mở/khóa, HUD, Bi nhắc nhiệm vụ, dân chợ nói chuyện, menu thật.
+- **Bước 8 (đã làm):** cổng mở/khóa theo tiến độ, HUD, Bi nhắc nhiệm vụ, dân chợ nói chuyện, menu thật, mũi tên chỉ đường (xem các mục bên dưới). Lều chợ quây quanh gốc cây đa theo ảnh `concept-cho-phien` (vòng 5,5 đến 14 quanh cây; vòng ngoài 13 đến 22 nếu hết chỗ); cây đa chỉ có gốc chính là vật cản (bán kính 2,5).
+- **Chưa làm:** cảnh mở đầu (mục 4, mốc 4), hiệu ứng nhận Trang Sổ Vàng (mục 5, bước 15).
 
 ### Cổng làng
 
@@ -97,23 +98,30 @@ Xếp theo ảnh `concept-toan-canh` và `concept-cho-phien`. Phải **đủ đ�
 - **Cổng đã mở:**
   - lúc dev, tương tác thì chuyển sang subdomain của làng;
   - khi `VITE_MERGED=true`, chuyển nội bộ tới `/lang/<id>`.
+  - (Bước 8: `gateUrl(urls, id, merged)` trong `config/urls.ts`. Hiện trang gốc của làng `/lang/<id>` còn chuyển về bản đồ ở hub, cảnh làng 3D làm sau.)
 - **Cổng còn khóa:** code thêm thanh then gỗ và dây đỏ chắn ngang vòm cổng. Tương tác thì hiện "Cổng làng đóng vì sổ đang lệch. Hãy giúp [làng trước] trước nhé."
+  - (Bước 8: lời của Bi trong hộp thoại; thanh then gỗ, hai thanh ngang, hai sợi dây đỏ bắt chéo và chùm tua do code dựng (`GateBarrier.tsx`); cổng đóng có vật cản mỏng chắn kín lối đi. Cổng thứ k mở khi có k Trang Sổ Vàng (`computeUnlock().villageOpen`), tài khoản giáo viên mở hết; hàm thuần ở `three/cho/marketQuest.ts`. Lời nhắc: "E: Vào Làng Giấy" (mở) hay "E: Xem cổng Làng Dệt" (đóng).)
 
 ### HUD
 
 - **Góc trên trái:** dòng "Nhiệm vụ: …".
 - **Góc trên phải:** 4 ô Trang Sổ Vàng (icon `trang-vang`; trang chưa có thì mờ), nút menu.
 - **Chỉ đường:** mũi tên trên đầu nhân vật chỉ về cổng cần tới.
+- (Bước 8: `MarketHud.tsx`. Nhiệm vụ lấy từ `content/dialogues.ts` (`NHIEM_VU`, mục 5; 0 trang là "Đến Làng Giấy ở phía bắc gặp bác An."; đủ 4 trang là "Cả làng đang mở hội. Hãy đến dự hội làng nhé!"). 4 ô Trang Sổ Vàng theo `unlock.goldenPages`. Mũi tên là mũi tên vàng dẹt bay nhấp nhô (đứng yên khi "Giảm chuyển động"), quay mượt về cổng của nhiệm vụ, ẩn khi tới gần cổng 6 đơn vị hoặc đủ 4 trang. Nút Menu: máy tính nhả khóa chuột rồi menu hiện ra, điện thoại bật menu.)
 
 ### Nhân vật ở chợ
 
 - **Bi:** bay theo người chơi; nói chuyện với Bi thì Bi nhắc nhiệm vụ.
+  - (Bước 8: E gần Bi (vật dự phòng) mở hộp thoại 2 lượt có chân dung: câu Bi nói của bảng mục 5 (`BI_NHAC_NHIEM`), rồi "Nhiệm vụ của {ten} bây giờ: …".)
 - **Bà cụ và chú nông dân:** đi lại theo vài điểm mốc (clip `walk`), dừng lại thì `idle`. Mỗi người có 2–3 câu thoại vui về phiên chợ.
+  - (Bước 8: 4 dân làng đi lại, mỗi người 3 câu trong `content/dialogues.ts` (`MARKET_TALKERS`); E gần họ mở `VnDialog` có chân dung bà cụ hoặc chú nông dân. Trong lúc nói chuyện họ đứng yên quay mặt về người chơi; người chơi đứng chắn đường trong 1,5 phía trước thì họ dừng lại nhường, chờ rồi đi vòng (spec 03 mục 3.7). Lái buôn chỉ đứng yên, chưa nói chuyện.)
 - **Lái buôn:** đứng yên gần bến sông (kiểu không xương, spec 03 mục 3.4).
 
 ### Menu
 
-Tiếp tục; Hồ sơ; Cài đặt (chất lượng, âm thanh, giảm chuyển động, chữ to); Đọc lại truyện; Về trang chủ.
+Tiếp tục; Hồ sơ; Cài đặt (chất lượng, âm thanh, giảm chuyển động, chữ to, độ nhạy chuột); Đọc lại truyện; Bản đồ; Về trang chủ.
+
+(Bước 8: `MarketMenu.tsx`, thay hộp Menu tạm. Hiện khi nhả khóa chuột sau khi đã chơi, hoặc khi bấm nút Menu ở HUD (lúc chưa khóa thì hiện luôn). "Tiếp tục" khóa chuột lại ngay trong sự kiện bấm; bấm nền ngoài hộp cũng là tiếp tục. "Cài đặt" dùng lại `SettingsPanel` (có đủ 5 mục). Hồ sơ → `/ho-so`, Đọc lại truyện → `/truyen`, Bản đồ → `/ban-do`, Về trang chủ → `/`.)
 
 ## 4. Cảnh mở đầu (lần đầu vào `/cho`)
 

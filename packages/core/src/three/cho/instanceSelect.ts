@@ -41,6 +41,8 @@ export function sphereInFrustum(planes: ArrayLike<number>, x: number, y: number,
 export interface Selection {
   near: number;
   far: number;
+  /** Số bản dùng bản vừa (chỉ khi truyền `outMid`) */
+  mid: number;
 }
 
 export interface SelectParams {
@@ -57,15 +59,22 @@ export interface SelectParams {
   nearDistance: number;
   /** Xa hơn khoảng này thì không vẽ (Infinity: vẽ mọi vật trong khung nhìn) */
   maxDistance: number;
+  /**
+   * Chỉ khi có bản vừa (truyền `outMid`): bản vừa dùng cho vật từ `nearDistance` tới `midDistance` (tính như `nearDistance`); xa hơn nữa dùng bản xa.
+   * Không đặt thì không có bậc vừa.
+   */
+  midDistance?: number;
 }
 
 /**
  * Điền chỉ số các bản được vẽ vào `outNear` (bản chính) và `outFar` (bản xa), theo thứ tự tăng dần; ghi số lượng vào `result`.
  * Bản ngoài khung nhìn hoặc quá xa bị bỏ.
  */
-export function selectInstances(p: SelectParams, outNear: Int32Array | number[], outFar: Int32Array | number[], result: Selection): Selection {
+export function selectInstances(p: SelectParams, outNear: Int32Array | number[], outFar: Int32Array | number[], result: Selection, outMid?: Int32Array | number[]): Selection {
   let near = 0;
   let far = 0;
+  let mid = 0;
+  const midDistance = outMid ? (p.midDistance ?? p.nearDistance) : p.nearDistance;
   for (let i = 0; i < p.count; i++) {
     const x = p.centers[i * 3];
     const y = p.centers[i * 3 + 1];
@@ -74,11 +83,14 @@ export function selectInstances(p: SelectParams, outNear: Int32Array | number[],
     const dist = Math.hypot(x - p.camX, y - p.camY, z - p.camZ);
     if (dist - r > p.maxDistance) continue;
     if (!sphereInFrustum(p.planes, x, y, z, r)) continue;
-    if (dist - r * 0.5 < p.nearDistance) outNear[near++] = i;
+    const d = dist - r * 0.5;
+    if (d < p.nearDistance) outNear[near++] = i;
+    else if (outMid && d < midDistance) outMid[mid++] = i;
     else outFar[far++] = i;
   }
   result.near = near;
   result.far = far;
+  result.mid = mid;
   return result;
 }
 
@@ -89,12 +101,67 @@ export function sameSelection(a: ArrayLike<number>, an: number, b: ArrayLike<num
   return true;
 }
 
-/** Mức "bản chính gần": Thấp 5, Vừa 20, Cao 30 (spec 03 mục 2 đặt Thấp 12; bản chính của nhà, lều, cổng nặng 50.000 đến 67.000 tam giác nên ở chợ Thấp chỉ dùng khi đứng sát). */
-export function marketNearDistance(level: 'low' | 'medium' | 'high'): number {
-  return level === 'low' ? 5 : level === 'medium' ? 20 : 30;
+/** Bản chính của nhà, lều, bụi tre (không có bản vừa dùng được) dùng tới khoảng này; Thấp 5, Vừa và Cao do ngân sách tam giác (bước 8c). */
+export const MARKET_NEAR: Readonly<Record<'low' | 'medium' | 'high', number>> = { low: 5, medium: 15, high: 25 };
+/** Model có bản vừa dùng được (3 bậc): bản chính chỉ tới khoảng này ở mức Vừa và Cao (mức Thấp không có bậc vừa nên dùng `MARKET_NEAR.low`). */
+export const MARKET_NEAR_3_TIER: Readonly<Record<string, { medium: number; high: number }>> = {
+  'env/cong-lang-': { medium: 12, high: 28 },
+  'env/gieng-lang': { medium: 6, high: 14 },
+};
+
+/**
+ * Mức "bản chính gần" ở chợ (spec 03 mục 2 đặt Thấp 12, Vừa 20, Cao 30 cho model chung; bản chính của nhà, lều, cổng nặng 50.000 đến 67.000 tam giác nên ở chợ đặt theo ngân sách
+ * tam giác, kể cả lượt vẽ bóng). Model 3 bậc (cổng làng, giếng) có khoảng riêng (`MARKET_NEAR_3_TIER`); còn lại `MARKET_NEAR`.
+ */
+export function marketNearDistance(level: 'low' | 'medium' | 'high', modelId?: string): number {
+  if (level !== 'low' && modelId) {
+    for (const [prefix, d] of Object.entries(MARKET_NEAR_3_TIER)) if (modelId.startsWith(prefix)) return d[level];
+  }
+  return MARKET_NEAR[level];
+}
+
+/**
+ * Khoảng đổi sang bản xa khi model có bản vừa (spec 03 mục 2): từ `marketFarDistance` trở đi mới dùng bản xa (Vừa 30, Cao 40; Thấp không có bậc vừa nên bản xa từ
+ * `marketNearDistance`). Model không có bản vừa dùng được thì không có bậc này.
+ */
+export function marketFarDistance(level: 'low' | 'medium' | 'high', modelId?: string): number {
+  if (level === 'low') return marketNearDistance(level, modelId);
+  return level === 'medium' ? 30 : 40;
 }
 
 /** Xa hơn khoảng này (tính tới mặt vật) thì không vẽ: Thấp 52 (sương che), còn lại vẽ hết. */
 export function marketMaxDistance(level: 'low' | 'medium' | 'high'): number {
   return level === 'low' ? 52 : Infinity;
+}
+
+export interface ShadowSelectParams {
+  /** Điểm người chơi (tâm vùng bóng, mặt phẳng ngang) */
+  focusX: number;
+  focusZ: number;
+  /** Chỉ vật cách tâm không quá khoảng này (tính tới mặt vật) mới đổ bóng */
+  range: number;
+  /** Mặt phẳng khung nhìn của camera và khoảng nở thêm: vật ngoài khung nhìn vẫn đổ bóng vào khung nhìn nếu ở sát (bóng dài tới `throwDistance`) */
+  planes: ArrayLike<number>;
+  throwDistance: number;
+  centers: ArrayLike<number>;
+  radii: ArrayLike<number>;
+  count: number;
+}
+
+/**
+ * Điền chỉ số các bản đổ bóng vào `out` (tăng dần) và trả về số lượng: bản nằm trong `range` quanh người chơi VÀ (đã nở thêm `throwDistance`) còn chạm khung
+ * nhìn của camera, vì bóng của vật ngoài khung nhìn mà ở sát vẫn rơi vào khung nhìn. Vật xa người chơi hơn `range` không đổ bóng (chỗ đó nằm ngoài máy ảnh bóng).
+ */
+export function selectShadowCasters(p: ShadowSelectParams, out: Int32Array | number[]): number {
+  let n = 0;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.centers[i * 3];
+    const y = p.centers[i * 3 + 1];
+    const z = p.centers[i * 3 + 2];
+    const r = p.radii[i];
+    if (Math.hypot(x - p.focusX, z - p.focusZ) - r > p.range) continue;
+    if (!sphereInFrustum(p.planes, x, y, z, r + p.throwDistance)) continue;
+    out[n++] = i;
+  }
+  return n;
 }

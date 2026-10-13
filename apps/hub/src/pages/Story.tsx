@@ -16,11 +16,13 @@ export default function Story() {
     () => STORY.map((f) => ({ image: f.image, background: f.image, text: fmt(f.text, { ten }) })),
     [ten],
   );
+  // "Bỏ qua" đi thẳng vào bản đồ; hết truyện ("Bắt đầu hành trình") vào chợ phiên 3D (từ mốc 2)
   const toMap = () => navigate('/ban-do');
+  const toMarket = () => navigate('/cho');
   return (
     <VnDialog
       turns={turns}
-      onFinish={toMap}
+      onFinish={toMarket}
       onSkip={toMap}
       finishLabel={ui.truyen.batDauHanhTrinh}
       background=""

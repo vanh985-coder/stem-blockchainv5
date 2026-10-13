@@ -5,9 +5,9 @@ import type { AnimationClip, Object3D } from 'three';
 import { getManifest, loadManifest } from '../assets/store';
 import { hasAsset } from '../assets/manifest';
 import { useQualityLevel } from './QualityContext';
-import { lodId, modelPath } from './modelIds';
+import { isUsableMid, lodId, midId, modelPath } from './modelIds';
 import { cloneModel, disposeClone, readModel, releaseModel, retainModel } from './modelLoader';
-import { lodDistance } from './quality';
+import { lodDistance, lodTiers } from './quality';
 import { useShadowFlags } from './useShadowFlags';
 
 /** Thuộc tính của <group>, bỏ `id` (số định danh của Object3D) vì <Model id> dùng `id` làm đường dẫn model. */
@@ -79,13 +79,35 @@ function WithLod({ id, castShadow = false, receiveShadow = false, ...group }: { 
   );
 }
 
+/** Model có 3 bậc (chính, vừa, xa): bản vừa chỉ khi manifest có và nhẹ hơn hẳn bản chính. */
+function WithLod3({ id, castShadow = false, receiveShadow = false, ...group }: { id: string } & ShadowProps & GroupProps) {
+  const near = useModel(id);
+  const mid = useModel(midId(id));
+  const far = useModel(lodId(id));
+  const level = useQualityLevel();
+  const shadowMaps = level !== 'low';
+  useShadowFlags(near.scene, castShadow && shadowMaps, receiveShadow && shadowMaps);
+  useShadowFlags(mid.scene, false, receiveShadow && shadowMaps);
+  useShadowFlags(far.scene, false, receiveShadow && shadowMaps);
+  const tiers = lodTiers(level);
+  return (
+    <group {...group}>
+      <Detailed distances={[0, tiers.mid, tiers.far]} hysteresis={0.05}>
+        <primitive object={near.scene} />
+        <primitive object={mid.scene} />
+        <primitive object={far.scene} />
+      </Detailed>
+    </group>
+  );
+}
+
 export type ModelLod = 'auto' | 'near' | 'far';
 
 export interface ModelProps extends GroupProps, ShadowProps {
   /** Đường dẫn trong models/, ví dụ "characters/ti", "env/cong-lang-giay" */
   id: string;
   /**
-   * "auto" (mặc định): tự dùng bản xa khi camera ở xa hơn khoảng đổi của mức chất lượng (Thấp 12, Vừa 20, Cao 30).
+   * "auto" (mặc định): tự đổi bậc theo khoảng cách. Có bản vừa thì 3 bậc: chính, vừa, xa (xem `lodTiers`: bản xa từ 12 / 30 / 40 ở Thấp / Vừa / Cao); không thì 2 bậc, bản xa khi camera xa hơn `lodDistance` (Thấp 12, Vừa 20, Cao 30).
    * "near": luôn bản chính. "far": luôn bản xa. Model không có bản xa thì luôn dùng bản chính.
    */
   lod?: ModelLod;
@@ -100,6 +122,7 @@ export function Model({ id, lod = 'auto', ...rest }: ModelProps) {
   const hasFar = hasAsset(manifest, modelPath(lodId(id)));
   if (!hasFar || lod === 'near') return <Single id={id} {...rest} />;
   if (lod === 'far') return <Single id={lodId(id)} {...rest} />;
+  if (isUsableMid(manifest[modelPath(midId(id))]?.tris)) return <WithLod3 id={id} {...rest} />;
   return <WithLod id={id} {...rest} />;
 }
 

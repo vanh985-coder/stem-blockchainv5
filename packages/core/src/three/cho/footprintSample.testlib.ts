@@ -18,7 +18,7 @@ export interface BandSample {
   points: Pt[];
 }
 
-export async function bandSample(id: string, band = FOOT_BAND): Promise<BandSample> {
+export async function bandSample(id: string, band = FOOT_BAND, fromY = 0): Promise<BandSample> {
   const gltf = await loadGltfForTest(id);
   gltf.scene.updateMatrixWorld(true);
   const box = new Box3().setFromObject(gltf.scene, true);
@@ -46,7 +46,7 @@ export async function bandSample(id: string, band = FOOT_BAND): Promise<BandSamp
       vertex(t + 1, b);
       vertex(t + 2, c);
       // bỏ tam giác nằm hoàn toàn ngoài dải
-      if (Math.min(a.y, b.y, c.y) > band || Math.max(a.y, b.y, c.y) < 0) continue;
+      if (Math.min(a.y, b.y, c.y) > band || Math.max(a.y, b.y, c.y) < fromY) continue;
       const e = Math.max(a.distanceTo(b), b.distanceTo(c), c.distanceTo(a));
       const k = Math.max(1, Math.min(120, Math.ceil(e / STEP)));
       for (let i = 0; i <= k; i++) {
@@ -55,7 +55,7 @@ export async function bandSample(id: string, band = FOOT_BAND): Promise<BandSamp
           const v = j / k;
           const w = 1 - u - v;
           const y = a.y * u + b.y * v + c.y * w;
-          if (y < 0 || y > band) continue;
+          if (y < fromY || y > band) continue;
           const x = a.x * u + b.x * v + c.x * w;
           const z = a.z * u + b.z * v + c.z * w;
           const key = `${Math.round(x / STEP)},${Math.round(z / STEP)}`;

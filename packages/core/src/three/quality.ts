@@ -26,6 +26,20 @@ export const QUALITY_TABLE: Readonly<Record<QualityLevel, QualityParams>> = {
   high: { dpr: 2, shadow: 2048, lodDistance: 30 },
 };
 
+/**
+ * Khoảng đổi 3 bậc cho model có bản vừa (spec 03 mục 2): bản chính tới `mid`, bản vừa từ `mid` tới `far`, bản xa từ `far` trở đi. Bản xa chỉ xuất hiện ở xa:
+ * Vừa từ 30, Cao từ 40; mức Thấp giữ khoảng đổi của bảng trên (12). Model không có bản vừa dùng `lodDistance` (2 bậc).
+ */
+export const LOD_TIERS: Readonly<Record<QualityLevel, { mid: number; far: number }>> = {
+  low: { mid: 6, far: 12 },
+  medium: { mid: 10, far: 30 },
+  high: { mid: 15, far: 40 },
+};
+
+export function lodTiers(level: QualityLevel): { mid: number; far: number } {
+  return LOD_TIERS[level];
+}
+
 /** Dưới ngưỡng này (khung hình/giây) trong cửa sổ đo đầu tiên thì hạ một mức. */
 export const FPS_MIN = 40;
 /** Cửa sổ đo: 3 giây đầu của cảnh (spec 03 mục 2). */

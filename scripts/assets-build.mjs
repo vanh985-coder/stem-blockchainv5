@@ -6,7 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { checkCharacter, largestTexture, REQUIRED_CLIPS, textureBytes } from './lib/glb.mjs';
-import { buildModelSet, classifyModel, LOD_SUFFIX, LOD_TEXTURE, LOD_TRIS } from './lib/model-build.mjs';
+import { buildModelSet, classifyModel, LOD_SUFFIX, LOD_TEXTURE, LOD_TRIS, MID_MAX_TRIS, MID_MIN_MAIN_TRIS, MID_SUFFIX, MID_TRIS } from './lib/model-build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'assets');
@@ -278,19 +278,24 @@ const outFile = (key, glb) => `${path.posix.dirname(key)}/${path.posix.basename(
 for (const rel of modelFiles) {
   const key = `models/${rel.slice(0, -4)}`;
   const lodKey = key + LOD_SUFFIX;
+  const midKey = key + MID_SUFFIX;
   const rule = classifyModel(key);
   const srcBuf = await readFile(path.join(MODELS_SRC, rel));
   const sig = `${MODEL_CODE_HASH}:${JSON.stringify(rule)}:${sha(srcBuf)}`;
   const previewPath = path.join(OUT, '_preview', 'models', previewName(key));
-  let main, lod;
+  let main, mid, lod;
   const hitMain = cache[key];
+  const hitMid = cache[midKey];
   const hitLod = cache[lodKey];
-  if (hitMain?.sig === sig && (!rule.lod || hitLod?.sig === sig)) {
+  const wantMid = rule.lod && hitMain?.tris > MID_MIN_MAIN_TRIS && !hitMain?.midSkipped; // bản vừa chỉ có khi bản chính trên 20.000 tam giác và chế độ chặt xuống được ≤ 25.000
+  if (hitMain?.sig === sig && (!rule.lod || hitLod?.sig === sig) && (!wantMid || hitMid?.sig === sig)) {
     try {
       await stat(path.join(OUT, hitMain.file));
       if (rule.lod) await stat(path.join(OUT, hitLod.file));
+      if (wantMid) await stat(path.join(OUT, hitMid.file));
       await stat(previewPath);
       main = hitMain;
+      mid = wantMid ? hitMid : null;
       lod = rule.lod ? hitLod : null;
       modelStats.skipped++;
     } catch {
@@ -302,6 +307,7 @@ for (const rel of modelFiles) {
     const r = await buildModelSet(srcBuf, rule);
     const toEntry = (v, entryKey) => ({
       sig,
+      midSkipped: entryKey === key ? r.midSkipped : undefined,
       file: outFile(entryKey, v.glb),
       glb: v.glb,
       bytes: v.glb.length,
@@ -310,8 +316,9 @@ for (const rel of modelFiles) {
       model: { srcBytes: r.srcBytes, simplified: v.simplified, reachedTris: v.reachedTris, removedExt: v.removedExt, skinDeviation: v.skinDeviation, before: v.before, after: v.after, rule },
     });
     main = toEntry(r.main, key);
+    mid = r.mid ? toEntry(r.mid, midKey) : null;
     lod = r.lod ? toEntry(r.lod, lodKey) : null;
-    for (const e of [main, lod]) {
+    for (const e of [main, mid, lod]) {
       if (!e) continue;
       await mkdir(path.dirname(path.join(OUT, e.file)), { recursive: true });
       await writeFile(path.join(OUT, e.file), e.glb);
@@ -321,14 +328,14 @@ for (const rel of modelFiles) {
     await writeFile(previewPath, r.preview);
     modelStats.processed++;
     console.log(
-      `  nén  models/${rel}  (${fmt(r.srcBytes)} -> ${fmt(main.bytes)}, ${Math.round(r.srcInfo.tris)} -> ${Math.round(main.tris)} tam giác${lod ? `; xa ${fmt(lod.bytes)}, ${Math.round(lod.tris)} tam giác` : ''}, ${((Date.now() - t) / 1000).toFixed(1)}s)`,
+      `  nén  models/${rel}  (${fmt(r.srcBytes)} -> ${fmt(main.bytes)}, ${Math.round(r.srcInfo.tris)} -> ${Math.round(main.tris)} tam giác${mid ? `; vừa ${fmt(mid.bytes)}, ${Math.round(mid.tris)} tam giác` : ''}${lod ? `; xa ${fmt(lod.bytes)}, ${Math.round(lod.tris)} tam giác` : ''}, ${((Date.now() - t) / 1000).toFixed(1)}s)`,
     );
   }
-  for (const [k, e, isLod] of [[key, main, false], [lodKey, lod, true]]) {
+  for (const [k, e, tier] of [[key, main, 'main'], [midKey, mid, 'mid'], [lodKey, lod, 'lod']]) {
     if (!e) continue;
     newCache[k] = e;
     manifest[k] = { file: e.file, bytes: e.bytes, width: 0, height: 0, kind: 'model', tris: e.tris };
-    modelEntries.push({ key: k, lod: isLod, ...e });
+    modelEntries.push({ key: k, lod: tier === 'lod', mid: tier === 'mid', ...e });
   }
 }
 
@@ -392,11 +399,13 @@ if (modelEntries.length) {
   const notes = [];
   const problems = [];
   const rows = [];
-  const mains = modelEntries.filter((m) => !m.lod);
+  const mains = modelEntries.filter((m) => !m.lod && !m.mid);
   const lods = new Map(modelEntries.filter((m) => m.lod).map((m) => [m.key, m]));
+  const mids = new Map(modelEntries.filter((m) => m.mid).map((m) => [m.key, m]));
   for (const e of mains) {
     const { before, after, rule, simplified, reachedTris, srcBytes, skinDeviation, removedExt } = e.model;
     const lod = lods.get(e.key + LOD_SUFFIX);
+    const mid = mids.get(e.key + MID_SUFFIX);
     const tex = largestTexture(after);
     const w = (msg) => warnings.push(`${e.key}: ${msg}`);
     if (e.bytes > rule.maxBytes) w(`${(e.bytes / MB).toFixed(2)} MB, vượt mục tiêu ${rule.maxBytes / MB} MB (${rule.kind === 'nhan-vat' ? 'nhân vật' : 'đồ vật'})`);
@@ -410,6 +419,12 @@ if (modelEntries.length) {
       for (const m of p) problems.push(`${e.key}: ${m}`);
     }
     if (rule.lod && !lod) problems.push(`${e.key}: thiếu bản xa`);
+    if (e.midSkipped) w(`không tạo bản vừa: chế độ chặt (sai số 3%) dừng ở ${e.midSkipped.reachedTris} tam giác, trên ${MID_MAX_TRIS}`);
+    else if (e.tris > MID_MIN_MAIN_TRIS && !mid) problems.push(`${e.key}: thiếu bản vừa`);
+    if (mid) {
+      if (mid.tris > MID_TRIS * 1.25) w(`bản vừa: chế độ chặt dừng ở ${Math.round(mid.tris)} tam giác (mục tiêu ${MID_TRIS}), giữ nguyên`);
+      if (mid.bytes > e.bytes) w(`bản vừa ${(mid.bytes / MB).toFixed(2)} MB nặng hơn bản chính ${(e.bytes / MB).toFixed(2)} MB`);
+    }
     if (lod) {
       if (lod.bytes > rule.lodMaxBytes) w(`bản xa ${(lod.bytes / MB).toFixed(2)} MB, vượt mục tiêu ${rule.lodMaxBytes / MB} MB`);
       if (lod.tris > LOD_TRIS * 1.25) w(`bản xa ${Math.round(lod.tris)} tam giác (mục tiêu ${LOD_TRIS})`);
@@ -420,25 +435,27 @@ if (modelEntries.length) {
       after: e.bytes / MB,
       tris: `${Math.round(before.tris).toLocaleString('en-US')} -> ${Math.round(after.tris).toLocaleString('en-US')}`,
       tex: tex ? `${tex.width}x${tex.height}` : '-',
+      midMb: mid ? mid.bytes / MB : null,
+      midTris: mid ? Math.round(mid.tris).toLocaleString('en-US') : '-',
       lodMb: lod ? lod.bytes / MB : null,
       lodTris: lod ? Math.round(lod.tris).toLocaleString('en-US') : '-',
     });
   }
   const nameW = Math.max(...rows.map((r) => r.name.length), 5);
-  console.log('\n=== Model: gốc / bản chính / bản xa ===');
+  console.log('\n=== Model: gốc / bản chính / bản vừa / bản xa ===');
   console.log(
-    `${'Model'.padEnd(nameW)}  ${'Gốc MB'.padStart(7)}  ${'Chính MB'.padStart(8)}  ${'Tam giác (gốc -> chính)'.padEnd(24)}  ${'Texture'.padEnd(9)}  ${'Xa MB'.padStart(6)}  Xa tam giác`,
+    `${'Model'.padEnd(nameW)}  ${'Gốc MB'.padStart(7)}  ${'Chính MB'.padStart(8)}  ${'Tam giác (gốc -> chính)'.padEnd(24)}  ${'Texture'.padEnd(9)}  ${'Vừa MB'.padStart(6)}  ${'Vừa tam giác'.padStart(12)}  ${'Xa MB'.padStart(6)}  Xa tam giác`,
   );
   for (const r of rows) {
     console.log(
-      `${r.name.padEnd(nameW)}  ${r.before.toFixed(2).padStart(7)}  ${r.after.toFixed(2).padStart(8)}  ${r.tris.padEnd(24)}  ${r.tex.padEnd(9)}  ${(r.lodMb === null ? '-' : r.lodMb.toFixed(2)).padStart(6)}  ${r.lodTris}`,
+      `${r.name.padEnd(nameW)}  ${r.before.toFixed(2).padStart(7)}  ${r.after.toFixed(2).padStart(8)}  ${r.tris.padEnd(24)}  ${r.tex.padEnd(9)}  ${(r.midMb === null ? '-' : r.midMb.toFixed(2)).padStart(6)}  ${r.midTris.padStart(12)}  ${(r.lodMb === null ? '-' : r.lodMb.toFixed(2)).padStart(6)}  ${r.lodTris}`,
     );
   }
   const sum = (xs) => xs.reduce((s, x) => s + x, 0);
   console.log(
-    `${'TỔNG'.padEnd(nameW)}  ${sum(rows.map((r) => r.before)).toFixed(2).padStart(7)}  ${sum(rows.map((r) => r.after)).toFixed(2).padStart(8)}  ${''.padEnd(24)}  ${''.padEnd(9)}  ${sum(rows.map((r) => r.lodMb ?? 0)).toFixed(2).padStart(6)}`,
+    `${'TỔNG'.padEnd(nameW)}  ${sum(rows.map((r) => r.before)).toFixed(2).padStart(7)}  ${sum(rows.map((r) => r.after)).toFixed(2).padStart(8)}  ${''.padEnd(24)}  ${''.padEnd(9)}  ${sum(rows.map((r) => r.midMb ?? 0)).toFixed(2).padStart(6)}  ${''.padStart(12)}  ${sum(rows.map((r) => r.lodMb ?? 0)).toFixed(2).padStart(6)}`,
   );
-  console.log(`Model nén mới ${modelStats.processed}, bỏ qua (không đổi) ${modelStats.skipped}. Ảnh so sánh gốc | chính | xa: assets-build/_preview/models/ (bản xa texture ${LOD_TEXTURE}).`);
+  console.log(`Model nén mới ${modelStats.processed}, bỏ qua (không đổi) ${modelStats.skipped}. Ảnh so sánh gốc | chính | vừa | xa: assets-build/_preview/models/ (bản vừa texture 1024, bản xa texture ${LOD_TEXTURE}).`);
 
   console.log('\n=== Kiểm tra xương và hoạt ảnh (đọc lại file đã nén) ===');
   for (const e of mains.filter((m) => m.model.before.skins > 0)) {

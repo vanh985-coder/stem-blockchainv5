@@ -14,6 +14,20 @@ export const PREVIEW_SIZE = 480;
 export const LOD_SUFFIX = '-xa';
 export const LOD_TRIS = 8000;
 export const LOD_TEXTURE = 512;
+/**
+ * Bản vừa (LOD giữa, bước 8b): model đồ vật có bản chính trên `MID_MIN_MAIN_TRIS` tam giác có thêm "<tên>-vua" khoảng `MID_TRIS` tam giác. CHỈ dùng chế độ chặt
+ * (sai số tối đa 3%, không Permissive) nên texture và pháp tuyến sạch; nếu chế độ chặt dừng cao hơn mục tiêu thì giữ nguyên và ghi cảnh báo.
+ */
+export const MID_SUFFIX = '-vua';
+export const MID_TRIS = 15000;
+export const MID_MIN_MAIN_TRIS = 20000;
+/**
+ * Bản vừa chỉ được tạo (và ghi vào manifest) khi chế độ chặt xuống được tới mức này (tam giác) hoặc thấp hơn (bước 8c). Dừng cao hơn thì bản vừa chẳng nhẹ hơn bản chính bao nhiêu,
+ * không dùng được, nên bỏ: không tạo, không ghi manifest, và `pnpm assets:build` ghi cảnh báo.
+ */
+export const MID_MAX_TRIS = 25000;
+export const MID_TEXTURE = 1024;
+export const MID_WEBP_QUALITY = 85;
 /** Chất lượng WebP của texture (spec 01 mục 5). */
 export const WEBP_QUALITY = 90;
 /** Bản xa chỉ nhìn từ xa: nén mạnh hơn để giữ ≤ 0,4 MB. */
@@ -131,24 +145,25 @@ async function readSource(io, srcBytes) {
  * Một biến thể (bản chính hoặc bản xa), đọc lại từ file gốc.
  * Trả về { glb, before, after, simplified, reachedTris, removedExt, skinDeviation, raw }.
  */
-async function buildVariant(io, srcBytes, rule, { lod }) {
+async function buildVariant(io, srcBytes, rule, { lod, mid = false }) {
   const doc = await readSource(io, srcBytes);
   const before = inspectDoc(doc);
   const skinned = before.skins > 0;
-  const target = lod ? LOD_TRIS : rule.targetTris;
-  const simplified = !skinned && before.tris > (lod ? target : rule.simplifyAbove);
+  const target = lod ? LOD_TRIS : mid ? MID_TRIS : rule.targetTris;
+  const simplified = !skinned && before.tris > (lod || mid ? target : rule.simplifyAbove);
   const removedExt = removeGlassExtensions(doc);
   const boundsBefore = skinned ? skinnedRestBounds(doc) : null;
 
   const report = {};
   const steps = [dedup(), weld()];
-  if (simplified) steps.push(simplifyKeepingAttributes(target, { permissive: lod, error: lod ? 1 : MAIN_MAX_ERROR }, report));
+  if (simplified) steps.push(simplifyKeepingAttributes(target, { permissive: lod, error: lod ? 1 : MAIN_MAX_ERROR }, report)); // bản vừa như bản chính: chế độ chặt, sai số 3%
   // Giảm mặt kiểu Permissive làm pháp tuyến đỉnh hỏng (mảng đen, tối): bản xa tính lại pháp tuyến từ hình khối.
   if (simplified && lod) steps.push(normals({ overwrite: true }));
-  const maxTexture = lod ? LOD_TEXTURE : rule.maxTexture;
+  const maxTexture = lod ? LOD_TEXTURE : mid ? Math.min(MID_TEXTURE, rule.maxTexture) : rule.maxTexture;
+  const webpQuality = lod ? LOD_WEBP_QUALITY : mid ? MID_WEBP_QUALITY : WEBP_QUALITY;
   steps.push(
     prune({ keepLeaves: true }),
-    textureCompress({ encoder: sharp, targetFormat: 'webp', resize: [maxTexture, maxTexture], quality: lod ? LOD_WEBP_QUALITY : WEBP_QUALITY, effort: 4 }),
+    textureCompress({ encoder: sharp, targetFormat: 'webp', resize: [maxTexture, maxTexture], quality: webpQuality, effort: 4 }),
     // UV 12 bit (mặc định) chỉ có 4096 bước, sát với texture 2048; dùng 14 bit cho khỏi mất chi tiết.
     meshopt({ encoder: MeshoptEncoder, level: 'high', quantizeTexcoord: 14 }),
   );
@@ -167,8 +182,8 @@ const fmtTris = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : Math.round(n).to
 const fmtMb = (b) => `${(b / MB).toFixed(2)} MB`;
 
 /**
- * Nén một model: bản chính và (nếu rule.lod) bản xa, kèm ảnh so sánh gốc | chính | xa.
- * Trả về { srcBytes, srcInfo, main, lod, preview } (main và lod là kết quả buildVariant).
+ * Nén một model: bản chính, bản vừa (nếu bản chính trên 20.000 tam giác) và (nếu rule.lod) bản xa, kèm ảnh so sánh gốc | chính | vừa | xa.
+ * Trả về { srcBytes, srcInfo, main, mid, lod, preview } (main, mid và lod là kết quả buildVariant; mid là bản vừa, null nếu bản chính không quá MID_MIN_MAIN_TRIS).
  */
 export async function buildModelSet(srcBytes, rule) {
   const io = await createIO();
@@ -176,14 +191,20 @@ export async function buildModelSet(srcBytes, rule) {
   const srcInfo = inspectDoc(srcDoc);
   const srcRaw = await renderRaw(srcDoc, { size: PREVIEW_SIZE });
   const main = await buildVariant(io, srcBytes, rule, { lod: false });
+  const midTry = rule.lod && main.after.tris > MID_MIN_MAIN_TRIS ? await buildVariant(io, srcBytes, rule, { lod: false, mid: true }) : null;
+  // chế độ chặt dừng cao hơn MID_MAX_TRIS: bỏ bản vừa (ghi lại để build sau không thử lại và để cảnh báo)
+  const midSkipped = midTry && midTry.after.tris > MID_MAX_TRIS ? { reachedTris: Math.round(midTry.after.tris) } : null;
+  const mid = midTry && !midSkipped ? midTry : null;
   const lod = rule.lod ? await buildVariant(io, srcBytes, rule, { lod: true }) : null;
   const panels = [
     { raw: srcRaw, label: `Goc: ${fmtTris(srcInfo.tris)} tam giac, ${fmtMb(srcBytes.length)}` },
     { raw: main.raw, label: `Chinh: ${fmtTris(main.after.tris)} tam giac, ${fmtMb(main.glb.length)}` },
   ];
+  if (mid) panels.push({ raw: mid.raw, label: `Vua: ${fmtTris(mid.after.tris)} tam giac, ${fmtMb(mid.glb.length)}` });
   if (lod) panels.push({ raw: lod.raw, label: `Xa: ${fmtTris(lod.after.tris)} tam giac, ${fmtMb(lod.glb.length)}` });
   const preview = await composePanels(panels, PREVIEW_SIZE);
   delete main.raw;
+  if (mid) delete mid.raw;
   if (lod) delete lod.raw;
-  return { srcBytes: srcBytes.length, srcInfo, main, lod, preview };
+  return { srcBytes: srcBytes.length, srcInfo, main, mid, midSkipped, lod, preview };
 }

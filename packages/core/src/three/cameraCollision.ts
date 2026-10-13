@@ -10,6 +10,11 @@ export interface CameraBlocker {
   shape: Obstacle;
   /** Chiều cao khối: đoạn thẳng đi phía trên đỉnh thì không bị chặn */
   height: number;
+  /**
+   * Độ cao đáy khối (mặc định 0, khối đứng từ mặt đất): đoạn thẳng đi phía dưới đáy thì không bị chặn. Dùng cho xà ngang của cổng, camera
+   * được đi dưới xà nhưng không xuyên qua xà.
+   */
+  base?: number;
 }
 
 /** Camera cách vật cản ít nhất bấy nhiêu. */
@@ -114,17 +119,20 @@ export function cameraClearance(fx: number, fy: number, fz: number, cx: number, 
   for (let i = 0; i < blockers.length; i++) {
     const b = blockers[i];
     if (!horizontalSpan(fx, fz, dx, dz, b.shape, margin, span)) continue;
-    // chiều đứng: bị chặn nếu trong đoạn [t0, t1] có chỗ thấp hơn đỉnh vật cản
+    // chiều đứng: bị chặn nếu trong đoạn [t0, t1] có chỗ nằm giữa đáy và đỉnh vật cản
+    const base = b.base ?? -Infinity;
     let tb: number;
     if (Math.abs(dy) < 1e-9) {
-      if (fy >= b.height) continue;
-      tb = span.t0;
-    } else if (dy > 0) {
-      if (fy + dy * span.t0 >= b.height) continue; // đi lên: thấp nhất là lúc vào, đã ở trên đỉnh
+      if (fy >= b.height || fy < base) continue;
       tb = span.t0;
     } else {
-      if (fy + dy * span.t1 >= b.height) continue; // đi xuống: thấp nhất là lúc ra
-      tb = Math.max(span.t0, (b.height - fy) / dy);
+      // y(t) = fy + dy·t nằm trong [base, height] khi t nằm giữa hai nghiệm này
+      const ta = (base - fy) / dy;
+      const tt = (b.height - fy) / dy;
+      const s0 = Math.max(span.t0, Math.min(ta, tt));
+      const s1 = Math.min(span.t1, Math.max(ta, tt));
+      if (s0 > s1) continue;
+      tb = s0;
     }
     if (tb < hit) hit = tb;
   }

@@ -266,6 +266,8 @@ export const ui = {
     dangNhapDeChoi: 'Đăng nhập để chơi',
     choiThu: 'Chơi thử',
     choiTiep: 'Chơi tiếp',
+    /** Liên kết tới bản đồ 2D (đường đi nhanh, từ mốc 2 khi "Chơi tiếp" đã mở chợ 3D) */
+    banDo: 'Bản đồ',
     /** Đã đăng nhập: lời chào kèm tên hiển thị */
     chao: 'Chào {ten}!',
     docTruyen: 'Đọc truyện',
@@ -569,6 +571,27 @@ export const ui = {
   /** Chợ phiên 3D /cho (mốc 2) */
   cho: {
     tieuDe: 'Chợ phiên',
+    /** HUD góc trên trái: {nd} là dòng nhiệm vụ (đã qua fmt) */
+    nhiemVu: 'Nhiệm vụ: {nd}',
+    /** HUD góc trên phải: nút mở menu (máy tính: Esc nhả chuột rồi menu hiện ra) */
+    nutMenu: 'Menu',
+    nutMenuNhan: 'Mở menu',
+    /** Lời nhắc tương tác: "E: {vat}" ({nguoi} là tên người, {lang} là tên làng) */
+    nhanNoiChuyen: 'Nói chuyện với {nguoi}',
+    nhanCongMo: 'Vào {lang}',
+    nhanCongDong: 'Xem cổng {lang}',
+    /** Cổng làng còn khóa: {truoc} là tên làng phải giúp trước */
+    congDong: 'Cổng làng đóng vì sổ đang lệch. Hãy giúp {truoc} trước nhé.',
+    /** Menu của chợ (hộp hiện khi nhả khóa chuột hoặc bấm nút menu) */
+    menu: {
+      tiepTuc: 'Tiếp tục',
+      hoSo: 'Hồ sơ',
+      caiDat: 'Cài đặt',
+      docLaiTruyen: 'Đọc lại truyện',
+      banDo: 'Bản đồ',
+      veTrangChu: 'Về trang chủ',
+      quayLai: 'Quay lại',
+    },
   },
 
   /** Trang /dev/walk (chỉ có khi chạy dev) */

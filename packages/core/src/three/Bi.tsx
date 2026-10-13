@@ -20,6 +20,8 @@ export interface BiProps extends GroupProps {
   happyTrigger?: number;
   /** Hạt giống cho nhịp chớp mắt */
   seed?: number;
+  /** Mỗi khung hình ghi vị trí (x, z) của Bi vào đây (để Bi làm vật tương tác nói chuyện được) */
+  track?: { x: number; z: number };
 }
 
 /** Tốc độ bay theo (độ gắt của làm mượt, càng lớn càng bám sát). */
@@ -31,7 +33,7 @@ const TURN_RATE = 4;
  * mỗi 3–5 giây, một mắt xích nhỏ trên đỉnh đầu. Bay nhấp nhô (biên độ 0,1, chu kỳ 2 giây), theo sau vai người chơi,
  * xoay một vòng khi vui. Không cấp phát trong useFrame; rời cảnh thì dispose.
  */
-export function Bi({ target, offset = BI_FOLLOW_OFFSET, happyTrigger, seed = 1, ...group }: BiProps) {
+export function Bi({ target, offset = BI_FOLLOW_OFFSET, happyTrigger, seed = 1, track, ...group }: BiProps) {
   const outer = useRef<Group>(null);
   const inner = useRef<Group>(null);
   const eyes = useRef<Group>(null);
@@ -80,6 +82,10 @@ export function Bi({ target, offset = BI_FOLLOW_OFFSET, happyTrigger, seed = 1, 
       tgt.getWorldDirection(tmp.dir);
       s.yaw = turnToward(s.yaw, Math.atan2(tmp.dir.x, tmp.dir.z), TURN_RATE * dt);
       o.rotation.y = s.yaw;
+    }
+    if (track) {
+      track.x = o.position.x;
+      track.z = o.position.z;
     }
 
     if (s.pendingHappy) {

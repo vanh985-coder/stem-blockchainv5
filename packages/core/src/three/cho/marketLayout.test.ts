@@ -368,11 +368,20 @@ describe('groundHeight: mặt đi được', () => {
 });
 
 describe('vật cản bám chân tường thật', () => {
-  it('cây đa: chân tán rộng chiếm cả sân giữa (bán kính khoảng 6 đến 7), người đứng giữa chân cây bị đẩy ra', () => {
+  it('cây đa: chỉ gốc chính là vật cản (bán kính 2–2,5); rễ phụ ngoài gốc đi xuyên được', () => {
     expect(blocked(0, 0)).toBe(true);
-    expect(blocked(3, 3)).toBe(true);
+    expect(blocked(1.5, 1)).toBe(true);
+    expect(blocked(0.27, -2.4)).toBe(true); // sát mép gốc
+    expect(blocked(0.27, -3.4)).toBe(false); // ngoài gốc 3 đơn vị: chỗ rễ nổi, đi được
+    expect(blocked(5, 0)).toBe(false);
     expect(blocked(0, -9.5)).toBe(false);
-    expect(footprintRadius({ model: MODEL_TREE, scale: 1 })).toBeGreaterThan(6);
+    const r = footprintRadius({ model: MODEL_TREE, scale: 1 });
+    expect(r).toBeGreaterThan(2);
+    expect(r).toBeLessThan(3);
+  });
+  it('lều chợ quây quanh gốc cây đa như concept: ít nhất 8 lều cách gốc dưới 14 đơn vị', () => {
+    const near = layout.placements.filter((q) => q.model === MODEL_STALL && Math.hypot(q.x, q.z) < 14);
+    expect(near.length).toBeGreaterThanOrEqual(8);
   });
   it('mỗi nhà, lều, giếng, tre: người đứng cách tâm nhà 1 đơn vị (trong chân tường) bị đẩy ra; có nhiều hình thì phủ cả chân', () => {
     for (const p of layout.placements) {

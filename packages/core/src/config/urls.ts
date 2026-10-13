@@ -47,6 +47,17 @@ export function levelUrl(urls: AppUrls, id: VillageId, level: number): string {
   return `${urls.villages[id]}/lang/${id}/man/${level}`;
 }
 
+/**
+ * Địa chỉ vào một làng từ cổng ở chợ (spec 04 mục 3 "Cổng làng"): lúc chạy riêng từng làng là địa chỉ của làng (`<làng>/lang/<id>`); khi đã gộp web
+ * (`VITE_MERGED=true`) là đường dẫn nội bộ `/lang/<id>` ngay trên hub.
+ */
+export function gateUrl(urls: AppUrls, id: VillageId, merged: boolean): string {
+  return merged ? `/lang/${id}` : `${urls.villages[id]}/lang/${id}`;
+}
+
+/** Web đã gộp (spec 10): đặt VITE_MERGED=true. */
+export const MERGED = import.meta.env.VITE_MERGED === 'true';
+
 export function hubMapUrl(urls: AppUrls): string {
   return `${urls.hub}/ban-do`;
 }

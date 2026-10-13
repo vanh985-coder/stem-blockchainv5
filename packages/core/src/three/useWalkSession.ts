@@ -34,6 +34,10 @@ export interface WalkSession {
   /** Esc ở chế độ không khóa chuột: bật tắt menu */
   toggleMenu: () => void;
   closeMenu: () => void;
+  /**
+   * Mở menu theo yêu cầu (nút menu ở HUD): đang khóa chuột thì nhả khóa (menu hiện ra theo trạng thái khóa); chưa khóa lần nào thì hiện menu luôn; điện thoại thì bật menu.
+   */
+  openMenu: () => void;
   /** Gọi ngay trong sự kiện bấm đóng hộp thoại: khóa lại chuột */
   dialogClosed: () => void;
 }
@@ -51,6 +55,7 @@ export function useWalkSession(api: WalkApi, dialogOpen: boolean): WalkSession {
   const [started, setStarted] = useState(false);
   const [menu, setMenu] = useState(false); // menu mở bằng Esc khi không có khóa chuột
   const [menuCount, setMenuCount] = useState(0);
+  const [forced, setForced] = useState(false); // menu mở theo yêu cầu khi chưa khóa chuột lần nào
 
   const live = useRef({ locked, dialogOpen });
   live.current = { locked, dialogOpen };
@@ -70,7 +75,10 @@ export function useWalkSession(api: WalkApi, dialogOpen: boolean): WalkSession {
     clearTimeout(timer.current);
     setPending(false);
     setLocked(isLocked);
-    if (isLocked) setStarted(true);
+    if (isLocked) {
+      setStarted(true);
+      setForced(false);
+    }
     // Nhả khóa (Esc, chuyển cửa sổ) khi không phải để mở hộp thoại: sự kiện mở menu.
     else if (!live.current.dialogOpen) setMenuCount((c) => c + 1);
   }, []);
@@ -86,15 +94,27 @@ export function useWalkSession(api: WalkApi, dialogOpen: boolean): WalkSession {
     setMenuCount((c) => c + 1);
     setMenu((m) => !m);
   }, [lockMode]);
-  const closeMenu = useCallback(() => setMenu(false), []);
+  const closeMenu = useCallback(() => {
+    setMenu(false);
+    setForced(false);
+  }, []);
+  const openMenu = useCallback(() => {
+    if (lockMode) {
+      if (live.current.locked) api.lock.exit();
+      else setForced(true);
+      return;
+    }
+    setMenuCount((c) => c + 1);
+    setMenu(true);
+  }, [api, lockMode]);
 
   const dialogClosed = useCallback(() => {
     lastDialogClose.current = performance.now();
     lock();
   }, [lock]);
 
-  const menuOpen = lockMode ? started && !locked && !pending && !dialogOpen : menu;
+  const menuOpen = lockMode ? (started && !locked && !pending && !dialogOpen) || (forced && !locked && !dialogOpen) : menu;
   const paused = dialogOpen || (lockMode ? !locked : menu);
   const showHint = lockMode && !started && !locked;
-  return { lockMode, locked, started, showHint, menuOpen, paused, menuCount, lock, onLockChange, onLockError, toggleMenu, closeMenu, dialogClosed };
+  return { lockMode, locked, started, showHint, menuOpen, paused, menuCount, lock, onLockChange, onLockError, toggleMenu, closeMenu, openMenu, dialogClosed };
 }

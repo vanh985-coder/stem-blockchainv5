@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { checkCharacter, createIO, findClip, inspectDoc, largestTexture, MIXAMO_JOINT_COUNT, REQUIRED_CLIPS } from './glb.mjs';
-import { classifyModel, LOD_SUFFIX, LOD_TEXTURE, LOD_TRIS } from './model-build.mjs';
+import { classifyModel, LOD_SUFFIX, LOD_TEXTURE, LOD_TRIS, MID_MAX_TRIS, MID_MIN_MAIN_TRIS, MID_SUFFIX, MID_TEXTURE, MID_TRIS } from './model-build.mjs';
 
 const OUT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'assets-build');
 const MB = 1048576;
@@ -113,8 +113,9 @@ describe('model đã nén trong assets-build/', () => {
   }, 60000);
 
   const modelKeys = () => Object.keys(manifest).filter((k) => k.startsWith('models/'));
-  const mainKeys = () => modelKeys().filter((k) => !k.endsWith(LOD_SUFFIX));
+  const mainKeys = () => modelKeys().filter((k) => !k.endsWith(LOD_SUFFIX) && !k.endsWith(MID_SUFFIX));
   const lodKeys = () => modelKeys().filter((k) => k.endsWith(LOD_SUFFIX));
+  const midKeys = () => modelKeys().filter((k) => k.endsWith(MID_SUFFIX));
 
   it('bản chính (25 model): nén meshopt, không còn Draco, không còn vật liệu kính, texture và dung lượng trong giới hạn', async () => {
     expect(mainKeys().length).toBe(25);
@@ -162,6 +163,31 @@ describe('model đã nén trong assets-build/', () => {
       const big = largestTexture(info);
       if (big) expect(Math.max(big.width, big.height), `${key} texture`).toBeLessThanOrEqual(LOD_TEXTURE);
       expect(manifest[key].bytes, `${key} dung lượng`).toBeLessThanOrEqual(classifyModel(key.slice(0, -LOD_SUFFIX.length)).lodMaxBytes);
+    }
+  }, 120000);
+
+  // Chế độ chặt (sai số 3%, không Permissive) không xuống được ≤ 25.000 tam giác ở các model này: không tạo bản vừa, không ghi manifest, build có cảnh báo (bước 8c).
+  const MID_STALLED = ['models/env/bui-tre', 'models/env/khung-cui', 'models/env/leu-cho', 'models/env/nha-mai-ngoi', 'models/env/nha-mai-tranh'];
+
+  it('bản vừa (-vua): chỉ có cho model có bản chính trên 20.000 tam giác mà chế độ chặt xuống được ≤ 25.000; texture ≤ 1024, nhẹ hơn bản chính; bản không dùng được không có trong manifest', async () => {
+    const over = mainKeys().filter((k) => classifyModel(k).lod && manifest[k].tris > MID_MIN_MAIN_TRIS);
+    expect(over.length).toBe(14);
+    for (const k of MID_STALLED) expect(manifest[k + MID_SUFFIX], `${k} không được có bản vừa`).toBeUndefined();
+    const expected = over.filter((k) => !MID_STALLED.includes(k));
+    expect(expected.length).toBe(9);
+    expect(midKeys().sort()).toEqual(expected.map((k) => k + MID_SUFFIX).sort());
+    for (const key of midKeys()) {
+      const main = key.slice(0, -MID_SUFFIX.length);
+      const info = inspectDoc(await load(key));
+      expect(info.extensions, key).toContain('EXT_meshopt_compression');
+      expect(info.extensions, key).not.toContain('KHR_draco_mesh_compression');
+      expect(info.tris, key).toBeLessThanOrEqual(MID_MAX_TRIS);
+      expect(info.tris, key).toBeLessThan(manifest[main].tris);
+      if (main !== 'models/games/man-02-duoi-ti/xe-bo') expect(info.tris, key).toBeLessThanOrEqual(MID_TRIS * 1.05);
+      const big = largestTexture(info);
+      if (big) expect(Math.max(big.width, big.height), `${key} texture`).toBeLessThanOrEqual(MID_TEXTURE);
+      expect(manifest[key].bytes, `${key} dung lượng`).toBeLessThanOrEqual(manifest[main].bytes * 1.05);
+      expect(manifest[key].tris).toBe(Math.round(info.tris));
     }
   }, 120000);
 });

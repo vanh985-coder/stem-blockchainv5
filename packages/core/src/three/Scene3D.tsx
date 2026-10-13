@@ -33,6 +33,8 @@ export interface Scene3DProps {
   sunPosition?: [number, number, number];
   /** Nửa cạnh vùng đổ bóng quanh gốc tọa độ */
   shadowExtent?: number;
+  /** Bóng bám theo người chơi, phủ 25 đơn vị quanh người (cảnh đi lại); bỏ trống thì bóng cố định quanh gốc tọa độ */
+  shadowFollowPlayer?: boolean;
   /** Báo mức mới khi vừa tự hạ mức vì FPS thấp */
   onQualityLowered?: (fps: number, level: QualityLevel) => void;
   /** Báo khi cảnh đã tải xong (màn hình tải đã tắt) */
@@ -75,6 +77,7 @@ export function Scene3D({
   fog = [60, 220],
   sunPosition,
   shadowExtent,
+  shadowFollowPlayer = false,
   onQualityLowered,
   onReady,
 }: Scene3DProps) {
@@ -110,7 +113,7 @@ export function Scene3D({
           {fog && <fog attach="fog" args={[SKY_HORIZON, fog[0], fog[1]]} />}
           <Suspense fallback={null}>
             <Sky animate={!settings.reducedMotion} />
-            <DayLight level={level} sunPosition={sunPosition} shadowExtent={shadowExtent} />
+            <DayLight level={level} sunPosition={sunPosition} shadowExtent={shadowExtent} followPlayer={shadowFollowPlayer} />
             {children}
             <ReadySignal onReady={markReady} />
             {autoDowngrade && !quality && level !== 'low' && <FpsGuard key={level} onLow={handleLow} />}

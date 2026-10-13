@@ -119,6 +119,14 @@
     "kind": "model",
     "tris": 50000
   },
+  "models/env/cong-lang-bac-vua": {
+    "file": "models/env/cong-lang-bac-vua.8d359af8.glb",
+    "bytes": 435992,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 15000
+  },
   "models/env/cong-lang-bac-xa": {
     "file": "models/env/cong-lang-bac-xa.48552f88.glb",
     "bytes": 331068,
@@ -134,6 +142,14 @@
     "height": 0,
     "kind": "model",
     "tris": 49999
+  },
+  "models/env/cong-lang-det-vua": {
+    "file": "models/env/cong-lang-det-vua.52a133fb.glb",
+    "bytes": 476236,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 14999
   },
   "models/env/cong-lang-det-xa": {
     "file": "models/env/cong-lang-det-xa.275542d9.glb",
@@ -151,6 +167,14 @@
     "kind": "model",
     "tris": 49999
   },
+  "models/env/cong-lang-giay-vua": {
+    "file": "models/env/cong-lang-giay-vua.4a23fb51.glb",
+    "bytes": 535412,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 14997
+  },
   "models/env/cong-lang-giay-xa": {
     "file": "models/env/cong-lang-giay-xa.4488ae8a.glb",
     "bytes": 357616,
@@ -167,6 +191,14 @@
     "kind": "model",
     "tris": 50000
   },
+  "models/env/cong-lang-khac-dau-vua": {
+    "file": "models/env/cong-lang-khac-dau-vua.b52a2852.glb",
+    "bytes": 504220,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 15000
+  },
   "models/env/cong-lang-khac-dau-xa": {
     "file": "models/env/cong-lang-khac-dau-xa.e9e340b6.glb",
     "bytes": 343344,
@@ -182,6 +214,14 @@
     "height": 0,
     "kind": "model",
     "tris": 30000
+  },
+  "models/env/gieng-lang-vua": {
+    "file": "models/env/gieng-lang-vua.65458030.glb",
+    "bytes": 422684,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 15740
   },
   "models/env/gieng-lang-xa": {
     "file": "models/env/gieng-lang-xa.810d7be3.glb",
@@ -263,6 +303,14 @@
     "kind": "model",
     "tris": 29999
   },
+  "models/env/phen-phoi-giay-vua": {
+    "file": "models/env/phen-phoi-giay-vua.11396d6c.glb",
+    "bytes": 527832,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 14999
+  },
   "models/env/phen-phoi-giay-xa": {
     "file": "models/env/phen-phoi-giay-xa.2a4cf3e8.glb",
     "bytes": 347528,
@@ -278,6 +326,14 @@
     "height": 0,
     "kind": "model",
     "tris": 30000
+  },
+  "models/games/man-02-duoi-ti/sap-thap-vua": {
+    "file": "models/games/man-02-duoi-ti/sap-thap-vua.d210c55a.glb",
+    "bytes": 80592,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 15000
   },
   "models/games/man-02-duoi-ti/sap-thap-xa": {
     "file": "models/games/man-02-duoi-ti/sap-thap-xa.ae901950.glb",
@@ -295,6 +351,14 @@
     "kind": "model",
     "tris": 29986
   },
+  "models/games/man-02-duoi-ti/xe-bo-vua": {
+    "file": "models/games/man-02-duoi-ti/xe-bo-vua.0264e5c2.glb",
+    "bytes": 693304,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 24010
+  },
   "models/games/man-02-duoi-ti/xe-bo-xa": {
     "file": "models/games/man-02-duoi-ti/xe-bo-xa.a998a46d.glb",
     "bytes": 348724,
@@ -310,6 +374,14 @@
     "height": 0,
     "kind": "model",
     "tris": 30000
+  },
+  "models/games/man-02-duoi-ti/xe-cho-hang-vua": {
+    "file": "models/games/man-02-duoi-ti/xe-cho-hang-vua.146ea64f.glb",
+    "bytes": 509988,
+    "width": 0,
+    "height": 0,
+    "kind": "model",
+    "tris": 14998
   },
   "models/games/man-02-duoi-ti/xe-cho-hang-xa": {
     "file": "models/games/man-02-duoi-ti/xe-cho-hang-xa.d607172c.glb",

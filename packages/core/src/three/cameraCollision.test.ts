@@ -91,3 +91,32 @@ describe('camera tránh vật cản', () => {
     expect(clear(pillars)).toBe(1);
   });
 });
+
+describe('vật chắn camera có đáy (xà ngang cổng)', () => {
+  // khối rộng 4 (x từ −2 đến 2), sâu 1 (z từ −0,5 đến 0,5), đáy cao 2, đỉnh cao 6
+  const lintel: CameraBlocker = { shape: { type: 'box', minX: -2, maxX: 2, minZ: -0.5, maxZ: 0.5 }, height: 6, base: 2 };
+
+  it('đoạn đi phía dưới đáy thì không bị chặn', () => {
+    expect(cameraClearance(0, 1.3, -5, 0, 1.5, 5, [lintel], 0)).toBe(1);
+  });
+
+  it('đoạn đi xuyên giữa đáy và đỉnh thì bị chặn trước khi tới khối', () => {
+    const t = cameraClearance(0, 3, -5, 0, 3, 5, [lintel], 0);
+    expect(t).toBeCloseTo(4.5 / 10, 6);
+  });
+
+  it('đoạn đi phía trên đỉnh thì không bị chặn', () => {
+    expect(cameraClearance(0, 7, -5, 0, 7, 5, [lintel], 0)).toBe(1);
+  });
+
+  it('đoạn đi lên từ dưới đáy vào trong khối thì bị chặn ở chỗ chạm đáy', () => {
+    // từ (0, 1, −3) lên (0, 5, 3): chạm mặt trước khối (z = −0,5) ở t = 2,5/6, lúc đó cao 1 + 4 × 2,5/6 ≈ 2,67 (> đáy 2) nên bị chặn tại đó
+    const t = cameraClearance(0, 1, -3, 0, 5, 3, [lintel], 0);
+    expect(t).toBeCloseTo(2.5 / 6, 6);
+  });
+
+  it('khối không có đáy (mặc định) giống hệt trước: chặn từ mặt đất', () => {
+    const wall: CameraBlocker = { shape: { type: 'box', minX: -2, maxX: 2, minZ: -0.5, maxZ: 0.5 }, height: 6 };
+    expect(cameraClearance(0, 0.5, -5, 0, 0.5, 5, [wall], 0)).toBeCloseTo(0.45, 6);
+  });
+});

@@ -67,7 +67,7 @@ export function InfoNote({ message }: { message: string | null }) {
 
 /**
  * Đi tới trang sau khi đăng nhập: "next" trong địa chỉ nếu hợp lệ (cùng trang),
- * không có thì về bản đồ ở hub (/ban-do nếu đang ở hub, ngược lại sang hub).
+ * không có thì vào chợ phiên 3D ở hub (/cho nếu đang ở hub, ngược lại sang hub).
  */
 export function useGoAfterLogin(): () => void {
   const navigate = useNavigate();
@@ -75,7 +75,7 @@ export function useGoAfterLogin(): () => void {
   const next = safeNext(params.get('next'));
   return () => {
     if (next) navigate(next, { replace: true });
-    else goToMap(navigate);
+    else goToHub(navigate, '/cho'); // đăng nhập xong vào chợ phiên (từ mốc 2)
   };
 }
 

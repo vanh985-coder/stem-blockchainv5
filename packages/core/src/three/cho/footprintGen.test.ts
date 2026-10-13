@@ -9,8 +9,8 @@ import { bandSample } from './footprintSample.testlib';
  */
 const OUT = process.env.GEN_FOOTPRINTS;
 
+/** Cây đa không nằm trong danh sách: chỉ gốc chính là vật cản (footprints.ts, `TREE_TRUNK`). */
 export const FOOTPRINT_IDS = [
-  'env/cay-da',
   'env/cong-lang-giay',
   'env/cong-lang-det',
   'env/cong-lang-khac-dau',

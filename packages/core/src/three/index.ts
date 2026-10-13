@@ -53,6 +53,7 @@ export { WalkControls } from './WalkControls';
 export type { WalkControlsProps } from './WalkControls';
 export { DevWalk } from './DevWalk';
 export * from './cameraCollision';
+export * from './shadowFocus';
 export { MarketPage } from './cho/MarketPage';
 export { MarketScene } from './cho/MarketScene';
 export type { MarketStats } from './cho/MarketScene';

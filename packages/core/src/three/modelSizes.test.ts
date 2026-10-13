@@ -70,9 +70,9 @@ const ENV_IDS = [
 ];
 
 describe('cỡ thật của đồ vật ở chợ phiên', () => {
-  it('cao đúng bảng: cổng 5, nhà ngói 4,5, nhà tranh 4, cây đa 12, lều 3,2', () => {
+  it('cao đúng bảng: cổng 6, nhà ngói 4,5, nhà tranh 4, cây đa 12, lều 3,2', () => {
     expect(sizeOf('env/cay-da')?.height).toBe(12);
-    for (const g of ['giay', 'det', 'khac-dau', 'bac']) expect(sizeOf(`env/cong-lang-${g}`)?.height).toBe(5);
+    for (const g of ['giay', 'det', 'khac-dau', 'bac']) expect(sizeOf(`env/cong-lang-${g}`)?.height).toBe(6);
     expect(sizeOf('env/nha-mai-ngoi')?.height).toBe(4.5);
     expect(sizeOf('env/nha-mai-tranh')?.height).toBe(4);
     expect(sizeOf('env/leu-cho')?.height).toBe(3.2);

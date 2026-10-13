@@ -3,11 +3,12 @@ import { useEffect, useMemo, useRef } from 'react';
 import { Box3, BufferAttribute, DynamicDrawUsage, Float32BufferAttribute, InstancedBufferAttribute, InstancedMesh, Matrix4, Quaternion, Vector3, type BufferGeometry, type Material, type Mesh, type Object3D } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { getManifest } from '../../assets/store';
-import { lodId, modelPath } from '../modelIds';
+import { isUsableMid, lodId, midId, modelPath } from '../modelIds';
 import { readModel, releaseModel, retainModel, type ModelData } from '../modelLoader';
 import { fitToHeight, sizeInScene, sizeOf } from '../modelSizes';
 import { QUALITY_TABLE, type QualityLevel } from '../quality';
-import { extractFrustumPlanes, marketMaxDistance, marketNearDistance, sameSelection, selectInstances, type Selection } from './instanceSelect';
+import { SHADOW_RANGE, shadowFocus } from '../shadowFocus';
+import { extractFrustumPlanes, marketFarDistance, marketMaxDistance, marketNearDistance, sameSelection, selectInstances, selectShadowCasters, type Selection, type ShadowSelectParams } from './instanceSelect';
 import type { Placement } from './marketLayout';
 
 /** Một phần để vẽ: hình học đã nướng sẵn (vị trí trong cây node + phóng theo cỡ thật, chân ở y = 0) và vật liệu dùng chung. */
@@ -82,7 +83,14 @@ function fitOf(id: string, scene: Object3D) {
 interface InstanceSet {
   /** Bản chính (gần) và bản xa: mỗi phần một InstancedMesh */
   nearMeshes: InstancedMesh[];
+  /** Bản vừa (LOD giữa): rỗng nếu model không có bản vừa dùng được */
+  midMeshes: InstancedMesh[];
   farMeshes: InstancedMesh[];
+  /**
+   * Chỉ để đổ bóng: bản xa (nhẹ) của các vật trong vùng bóng quanh người chơi. Không vẽ ở lượt vẽ chính (xem `newShadowMesh`), nên vật gần dù dùng bản
+   * chính ở lượt vẽ chính vẫn chỉ đổ bóng bằng bản xa, và vật ngoài vùng bóng không đổ bóng.
+   */
+  shadowMeshes: InstancedMesh[];
   count: number;
   /** Ma trận (16 số) và màu (3 số) của từng bản, cố định */
   matrices: Float32Array;
@@ -104,11 +112,27 @@ function newMesh(part: Part, capacity: number): InstancedMesh {
   return mesh;
 }
 
-function buildSet(id: string, near: ModelData, far: ModelData, items: readonly Placement[]): InstanceSet {
+/**
+ * InstancedMesh chỉ đổ bóng: `castShadow`, không nhận bóng. Ở lượt vẽ chính `onBeforeRender` đặt số bản về 0 nên không vẽ gì (một draw call rỗng, 0 tam giác); ở
+ * lượt vẽ bóng (diễn ra trước, không gọi `onBeforeRender`) số bản là số đã đặt mỗi khung hình trong useFrame.
+ */
+function newShadowMesh(part: Part, capacity: number): InstancedMesh {
+  const mesh = newMesh(part, capacity);
+  mesh.castShadow = true;
+  mesh.receiveShadow = false;
+  mesh.onBeforeRender = () => {
+    mesh.count = 0;
+  };
+  return mesh;
+}
+
+function buildSet(id: string, near: ModelData, mid: ModelData | null, far: ModelData, items: readonly Placement[]): InstanceSet {
   const fit = fitOf(id, near.scene);
   const nearParts = buildParts(near.scene, fit.scale, fit.offsetY);
   // bản xa dùng đúng hệ số phóng của bản chính để hai bản trùng khít
   const farParts = buildParts(far.scene, fit.scale, fit.offsetY);
+  // bản vừa cũng dùng đúng hệ số phóng của bản chính
+  const midParts = mid ? buildParts(mid.scene, fit.scale, fit.offsetY) : [];
   const n = items.length;
   const matrices = new Float32Array(n * 16);
   const colors = new Float32Array(n * 3);
@@ -133,8 +157,11 @@ function buildSet(id: string, near: ModelData, far: ModelData, items: readonly P
     radii[i] = 0.5 * Math.hypot(size[0], size[1], size[2]);
   });
   const nearMeshes = nearParts.map((p) => newMesh(p, n));
+  const midMeshes = midParts.map((p) => newMesh(p, n));
   const farMeshes = farParts.map((p) => newMesh(p, n));
-  return { nearMeshes, farMeshes, count: n, matrices, colors, centers, radii, disposables: [...nearParts, ...farParts].map((p) => p.geometry) };
+  // Bụi tre (lá mảnh, bóng ít giá trị mà nặng 7.900 tam giác mỗi bụi) không đổ bóng
+  const shadowMeshes = NO_SHADOW_MODELS.has(id) ? [] : farParts.map((p) => newShadowMesh(p, n));
+  return { nearMeshes, midMeshes, farMeshes, shadowMeshes, count: n, matrices, colors, centers, radii, disposables: [...nearParts, ...midParts, ...farParts].map((p) => p.geometry) };
 }
 
 /** Chép các bản `idx[0..count)` vào InstancedMesh (ma trận và màu), cập nhật số bản và bật tải lại bộ đệm. Không cấp phát. */
@@ -159,6 +186,12 @@ function fill(meshes: InstancedMesh[], set: InstanceSet, idx: Int32Array, count:
   }
 }
 
+/** Model không đổ bóng lên cảnh (chỉ nhận bóng). */
+export const NO_SHADOW_MODELS: ReadonlySet<string> = new Set(['env/bui-tre']);
+
+/** Bóng của vật ngoài khung nhìn còn rơi vào khung nhìn nếu vật cách khung nhìn không quá khoảng này (bóng dài tối đa chừng đó với mặt trời hiện tại). */
+const SHADOW_THROW = 8;
+
 /** Bản chính có số tam giác không quá mức này thì luôn dùng bản chính (không đổi sang bản xa). */
 export const ALWAYS_NEAR_TRIS = 12000;
 
@@ -176,30 +209,33 @@ export interface ModelInstancesProps {
  * được nhân thêm (đổi màu nhẹ). Cần Suspense phía trên (đọc model).
  */
 export function ModelInstances({ id, items, level }: ModelInstancesProps) {
+  // Bản vừa (LOD giữa) chỉ có và chỉ tải khi model có bản vừa dùng được và mức này có bậc vừa (Vừa, Cao); xem `isUsableMid`.
+  const hasMid = isUsableMid(getManifest()?.[modelPath(midId(id))]?.tris) && marketFarDistance(level, id) > marketNearDistance(level, id);
   const near = readModel(id);
+  const mid = hasMid ? readModel(midId(id)) : null;
   const far = readModel(lodId(id));
   useEffect(() => {
-    retainModel(id);
-    retainModel(lodId(id));
+    const ids = hasMid ? [id, midId(id), lodId(id)] : [id, lodId(id)];
+    for (const i of ids) retainModel(i);
     return () => {
-      releaseModel(id);
-      releaseModel(lodId(id));
+      for (const i of ids) releaseModel(i);
     };
-  }, [id]);
+  }, [id, hasMid]);
 
-  const set = useMemo(() => buildSet(id, near, far, items), [id, near, far, items]);
+  const set = useMemo(() => buildSet(id, near, mid, far, items), [id, near, mid, far, items]);
   useEffect(
     () => () => {
-      for (const m of [...set.nearMeshes, ...set.farMeshes]) m.dispose();
+      for (const m of [...set.nearMeshes, ...set.midMeshes, ...set.farMeshes, ...set.shadowMeshes]) m.dispose();
       for (const d of set.disposables) d.dispose();
     },
     [set],
   );
 
   const shadows = QUALITY_TABLE[level].shadow !== 'blob';
+  // Bản chính và bản xa của lượt vẽ chính chỉ nhận bóng; bóng do `shadowMeshes` đổ (bản xa, chỉ vật trong vùng quanh người chơi).
   useEffect(() => {
-    for (const m of [...set.nearMeshes, ...set.farMeshes]) {
-      m.castShadow = shadows;
+    for (const m of [...set.nearMeshes, ...set.midMeshes, ...set.farMeshes]) {
+      m.castShadow = false;
       m.receiveShadow = shadows;
     }
   }, [set, shadows]);
@@ -210,21 +246,30 @@ export function ModelInstances({ id, items, level }: ModelInstancesProps) {
       planes: new Float32Array(24),
       mat: new Matrix4(),
       nearIdx: new Int32Array(set.count),
+      midIdx: new Int32Array(set.count),
       farIdx: new Int32Array(set.count),
       lastNear: new Int32Array(set.count),
+      lastMid: new Int32Array(set.count),
       lastFar: new Int32Array(set.count),
       lastNearN: -1,
+      lastMidN: -1,
       lastFarN: -1,
-      sel: { near: 0, far: 0 } as Selection,
+      shadowIdx: new Int32Array(set.count),
+      lastShadow: new Int32Array(set.count),
+      lastShadowN: -1,
+      // tham số chọn vật đổ bóng: dùng lại mỗi khung hình (không cấp phát trong useFrame)
+      shadowParams: { focusX: 0, focusZ: 0, range: SHADOW_RANGE, planes: new Float32Array(24), throwDistance: SHADOW_THROW, centers: set.centers, radii: set.radii, count: set.count } as ShadowSelectParams,
+      sel: { near: 0, mid: 0, far: 0 } as Selection,
     }),
     [set],
   );
   // Model mà bản chính chỉ nhẹ hơn bản xa chút ít (cây đa: 9.126 so với 8.000 tam giác) thì luôn dùng bản chính cho đẹp.
   const nearTris = getManifest()?.[modelPath(id)]?.tris ?? Infinity;
-  const nearDist = nearTris <= ALWAYS_NEAR_TRIS ? Infinity : marketNearDistance(level);
+  const nearDist = nearTris <= ALWAYS_NEAR_TRIS ? Infinity : marketNearDistance(level, id);
   const maxDist = marketMaxDistance(level);
-  const frame = useRef({ nearDist, maxDist });
-  frame.current = { nearDist, maxDist };
+  const midDist = hasMid ? marketFarDistance(level, id) : nearDist;
+  const frame = useRef({ nearDist, midDist, maxDist, shadows });
+  frame.current = { nearDist, midDist, maxDist, shadows };
 
   useFrame(({ camera }) => {
     camera.updateMatrixWorld();
@@ -233,25 +278,45 @@ export function ModelInstances({ id, items, level }: ModelInstancesProps) {
     const e = camera.matrixWorld.elements;
     const f = frame.current;
     selectInstances(
-      { camX: e[12], camY: e[13], camZ: e[14], planes: work.planes, centers: set.centers, radii: set.radii, count: set.count, nearDistance: f.nearDist, maxDistance: f.maxDist },
+      { camX: e[12], camY: e[13], camZ: e[14], planes: work.planes, centers: set.centers, radii: set.radii, count: set.count, nearDistance: f.nearDist, midDistance: f.midDist, maxDistance: f.maxDist },
       work.nearIdx,
       work.farIdx,
       work.sel,
+      hasMid ? work.midIdx : undefined,
     );
-    const { near: nn, far: fn } = work.sel;
+    const { near: nn, mid: mn, far: fn } = work.sel;
     if (import.meta.env.DEV) {
       const w = window as unknown as { __marketDebug?: Record<string, string> };
-      (w.__marketDebug ??= {})[id] = nn + "/" + fn;
+      (w.__marketDebug ??= {})[id] = hasMid ? nn + "/" + mn + "/" + fn : nn + "/" + fn;
     }
     if (!sameSelection(work.nearIdx, nn, work.lastNear, work.lastNearN)) {
       fill(set.nearMeshes, set, work.nearIdx, nn);
       work.lastNear.set(work.nearIdx);
       work.lastNearN = nn;
     }
+    if (hasMid && !sameSelection(work.midIdx, mn, work.lastMid, work.lastMidN)) {
+      fill(set.midMeshes, set, work.midIdx, mn);
+      work.lastMid.set(work.midIdx);
+      work.lastMidN = mn;
+    }
     if (!sameSelection(work.farIdx, fn, work.lastFar, work.lastFarN)) {
       fill(set.farMeshes, set, work.farIdx, fn);
       work.lastFar.set(work.farIdx);
       work.lastFarN = fn;
+    }
+    if (f.shadows) {
+      // vật đổ bóng: trong vùng bóng quanh người chơi (bóng của vật ngoài khung nhìn nhưng sát vẫn rơi vào khung nhìn)
+      work.shadowParams.focusX = shadowFocus.x;
+      work.shadowParams.focusZ = shadowFocus.z;
+      work.shadowParams.planes = work.planes;
+      const sn = selectShadowCasters(work.shadowParams, work.shadowIdx);
+      if (!sameSelection(work.shadowIdx, sn, work.lastShadow, work.lastShadowN)) {
+        fill(set.shadowMeshes, set, work.shadowIdx, sn);
+        work.lastShadow.set(work.shadowIdx);
+        work.lastShadowN = sn;
+      }
+      // lượt vẽ chính vừa đặt số bản về 0 (onBeforeRender): đặt lại cho lượt vẽ bóng của khung hình sau
+      for (const m of set.shadowMeshes) m.count = work.lastShadowN;
     }
   });
 
@@ -260,9 +325,16 @@ export function ModelInstances({ id, items, level }: ModelInstancesProps) {
       {set.nearMeshes.map((m, i) => (
         <primitive key={`n${i}`} object={m} />
       ))}
+      {set.midMeshes.map((m, i) => (
+        <primitive key={`m${i}`} object={m} />
+      ))}
       {set.farMeshes.map((m, i) => (
         <primitive key={`f${i}`} object={m} />
       ))}
+      {shadows &&
+        set.shadowMeshes.map((m, i) => (
+          <primitive key={`s${i}`} object={m} />
+        ))}
     </group>
   );
 }

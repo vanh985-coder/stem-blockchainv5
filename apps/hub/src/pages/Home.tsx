@@ -36,14 +36,14 @@ export function Home() {
           <div className="flex min-h-[7.5rem] flex-col items-stretch gap-3" aria-live="polite">
             {!loading && !session && (
               <>
-                <Button size="lg" onClick={() => navigate(loginPathFor('/ban-do'))}>
+                <Button size="lg" onClick={() => navigate(loginPathFor('/cho'))}>
                   {ui.trangChu.dangNhapDeChoi}
                 </Button>
                 <Button
                   variant="secondary"
                   onClick={() => {
                     startGuest();
-                    navigate('/ban-do');
+                    navigate('/cho');
                   }}
                 >
                   {ui.trangChu.choiThu}
@@ -59,7 +59,8 @@ export function Home() {
                   <AssetImage path="ui/icons/trang-vang" alt="" className="size-8 object-contain" />
                   {fmt(ui.moKhoa.trangSoVang, { so: goldenPages, max: VILLAGE_ORDER.length })}
                 </p>
-                <Button size="lg" onClick={() => navigate('/ban-do')}>
+                {/* Từ mốc 2, "Chơi tiếp" mở chợ phiên 3D (bản đồ 2D vẫn là đường đi nhanh, có liên kết "Bản đồ") */}
+                <Button size="lg" onClick={() => navigate('/cho')}>
                   {ui.trangChu.choiTiep}
                 </Button>
               </>
@@ -67,6 +68,9 @@ export function Home() {
           </div>
 
           <nav className="flex flex-wrap items-center justify-center gap-x-3">
+            <Link to="/ban-do" className={linkCls}>
+              {ui.trangChu.banDo}
+            </Link>
             <Link to="/truyen" className={linkCls}>
               {ui.trangChu.docTruyen}
             </Link>

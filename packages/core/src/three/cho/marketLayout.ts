@@ -9,7 +9,7 @@ import { createMulberry32 } from '../../lib/rng';
 import type { CameraBlocker } from '../cameraCollision';
 import { box, circle, type Obstacle } from '../collision';
 import { sizeInScene } from '../modelSizes';
-import { footprintObstacles, footprintRadiusOf } from './footprints';
+import { footprintObstacles, footprintRadiusOf, gateLintel } from './footprints';
 
 /** Vùng đi lại: hình tròn bán kính 42 quanh cây đa (cổng ở cách tâm 30, bến sông ở cuối đường phía đông). */
 export const WORLD_RADIUS = 42;
@@ -66,6 +66,19 @@ export const GATES: readonly GateDef[] = [
   { id: 'khac-dau', model: 'env/cong-lang-khac-dau', direction: 'tay', x: G, z: 0, yaw: -Math.PI / 2 },
   { id: 'bac', model: 'env/cong-lang-bac', direction: 'dong', x: -G, z: 0, yaw: Math.PI / 2 },
 ];
+
+/**
+ * Dân làng đi lại trên các con đường (dải đường luôn trống): bốn vòng, mỗi con đường một vòng (bắc, nam, tây, đông). Người thứ 0 và 3 là bà cụ, 1 và 2 là chú
+ * nông dân (xem MarketScene).
+ */
+export const VILLAGER_PATHS: readonly (readonly (readonly [number, number])[])[] = [
+  [[1.6, 17], [-1.6, 21], [1.4, 26], [-1.4, 22]],
+  [[-1.6, -17], [1.6, -22], [-1.4, -26], [1.2, -21]],
+  [[18, 1.5], [22, -1.5], [27, 1.2], [23, 1.4]],
+  [[-18, -1.5], [-22, 1.5], [-27, -1.2], [-24, -1.5]],
+];
+/** Lái buôn đứng gần bến sông, mặt quay vào chợ. */
+export const MERCHANT = { x: RIVER_X + 2.4, z: 4.2, yaw: Math.PI / 2 + 0.5 };
 
 export const MODEL_TREE = 'env/cay-da';
 export const MODEL_STALL = 'env/leu-cho';
@@ -227,7 +240,7 @@ export function generateMarket(seed = 20260101, density: MarketDensity = FULL_DE
   const stallR = footprintRadius({ model: MODEL_STALL, scale: 1 });
   let stalls = 0;
   for (let attempt = 0; attempt < 3000 && stalls < 15; attempt++) {
-    const ring = attempt < 1500 ? [9, 17] : [15, 25];
+    const ring = attempt < 1500 ? [5.5, 14] : [13, 22];
     const rho = rand(ring[0], ring[1]);
     const ang = rand(0, Math.PI * 2);
     const x = Math.cos(ang) * rho;
@@ -330,9 +343,14 @@ export function generateMarket(seed = 20260101, density: MarketDensity = FULL_DE
   // Vật cản và vật chắn camera
   const colliders: CameraBlocker[] = [];
   const blockers: CameraBlocker[] = [];
-  for (const p of placements) for (const c of collidersFor(p)) {
-    colliders.push(c);
-    blockers.push(c);
+  for (const p of placements) {
+    for (const c of collidersFor(p)) {
+      colliders.push(c);
+      blockers.push(c);
+    }
+    // xà ngang của cổng chỉ chắn camera (người đi được dưới xà)
+    const lintel = gateLintel(p.model, p.x, p.z, p.yaw, p.scale);
+    if (lintel) blockers.push(lintel);
   }
   for (const p of props) {
     const c = propCollider(p);
@@ -352,14 +370,8 @@ export function generateMarket(seed = 20260101, density: MarketDensity = FULL_DE
     rail(RIVER_X, RAMP_START_X, -DOCK_HALF_WIDTH - 0.5, -DOCK_HALF_WIDTH),
   );
 
-  // Dân làng đi lại trên các con đường (dải đường luôn trống): bốn vòng, mỗi con đường một vòng.
-  const villagerPaths: [number, number][][] = [
-    [[1.6, 17], [-1.6, 21], [1.4, 26], [-1.4, 22]],
-    [[-1.6, -17], [1.6, -22], [-1.4, -26], [1.2, -21]],
-    [[18, 1.5], [22, -1.5], [27, 1.2], [23, 1.4]],
-    [[-18, -1.5], [-22, 1.5], [-27, -1.2], [-24, -1.5]],
-  ];
-  const merchant = { x: RIVER_X + 2.4, z: 4.2, yaw: Math.PI / 2 + 0.5 };
+  const villagerPaths = VILLAGER_PATHS.map((p) => p.map((q) => [q[0], q[1]] as [number, number]));
+  const merchant = { ...MERCHANT };
   colliders.push({ shape: circle(merchant.x, merchant.z, 0.45), height: 1.7 });
   const obstacles = colliders.map((c) => c.shape);
   return { seed, placements, props, roads, colliders, obstacles, blockers, villagerPaths, merchant };

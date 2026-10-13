@@ -10,6 +10,7 @@ import type { Obstacle } from './collision';
 import type { ClipName } from './clips';
 import { nearestInteractable, type Interactable } from './interaction';
 import { RUN_SPEED, WALK_SPEED, animationFor, createPlayerState, jumpTimeScale, locomotionTimeScale, stepPlayer, type MoveInput, type PlayerState, type World } from './playerMotion';
+import { shadowFocus } from './shadowFocus';
 import { combineInput, type WalkApi } from './walkApi';
 
 /** Người chơi ở cảnh đi lại là học sinh (spec 03 mục 3.1). */
@@ -46,6 +47,8 @@ export interface WalkWorldProps {
   start?: readonly [number, number];
   /** true: không dùng camera bám theo người chơi (nơi dùng tự đặt camera, ví dụ góc nhìn từ trên cao để chụp ảnh) */
   freeCamera?: boolean;
+  /** Mỗi khung hình ghi vị trí của Bi vào đây (để làm vật tương tác) */
+  biTrack?: { x: number; z: number };
   /** Vẽ nền đất phẳng hình tròn mặc định (false khi cảnh tự dựng nền) */
   showGround?: boolean;
   /** Các vật khác của cảnh (hộp, cột, dân làng…) */
@@ -144,7 +147,7 @@ function ChaseCamera({ api, player, blockers }: { api: WalkApi; player: PlayerSt
 }
 
 /** Học sinh: di chuyển, nhảy, va chạm, clip theo trạng thái; Bi bay theo. Mọi logic ở `playerMotion.ts` (hàm thuần). */
-function Player({ api, paused, world, interactables, onNearestChange, player, start }: { api: WalkApi; paused: boolean; world: World; interactables: readonly Interactable[]; onNearestChange: (i: number) => void; player: PlayerState; start: readonly [number, number] }) {
+function Player({ api, paused, world, interactables, onNearestChange, player, start, biTrack }: { api: WalkApi; paused: boolean; world: World; interactables: readonly Interactable[]; onNearestChange: (i: number) => void; player: PlayerState; start: readonly [number, number]; biTrack?: { x: number; z: number } }) {
   const root = useRef<Group>(null);
   const input = useMemo<MoveInput>(() => ({ x: 0, y: 0, run: false, jump: false }), []);
   const live = useRef({ paused, world, interactables, onNearestChange });
@@ -165,6 +168,9 @@ function Player({ api, paused, world, interactables, onNearestChange, player, st
     const jumped = stepPlayer(player, input, api.camera.yaw, dt, l.world, l.paused);
     g.position.set(player.x, player.y, player.z);
     g.rotation.y = player.yaw;
+    shadowFocus.x = player.x;
+    shadowFocus.y = player.y;
+    shadowFocus.z = player.z;
 
     const a = animationFor(player);
     if (a !== shown.current) {
@@ -187,7 +193,7 @@ function Player({ api, paused, world, interactables, onNearestChange, player, st
       <group ref={root} position={[start[0], 0, start[1]]}>
         <Character id={WALK_PLAYER} clips={CLIPS} animation={anim} trigger={jumpN} returnTo="jump" timeScale={timeScale} onReady={setInfo} />
       </group>
-      <Bi target={root} />
+      <Bi target={root} track={biTrack} />
     </>
   );
 }
@@ -197,7 +203,7 @@ function Player({ api, paused, world, interactables, onNearestChange, player, st
  * theo sau vai phải. Đặt trong <Scene3D>; các vật của cảnh (hộp, cột, dân làng) là `children`, còn dữ liệu va chạm và tương tác
  * truyền riêng qua `obstacles` và `interactables`.
  */
-export function WalkWorld({ api, paused, obstacles, boundsRadius, interactables, cameraBlockers = NO_BLOCKERS, groundHeight, onNearestChange, groundUrl, start = [0, 0], showGround = true, freeCamera = false, children }: WalkWorldProps) {
+export function WalkWorld({ api, paused, obstacles, boundsRadius, interactables, cameraBlockers = NO_BLOCKERS, groundHeight, onNearestChange, groundUrl, start = [0, 0], showGround = true, freeCamera = false, biTrack, children }: WalkWorldProps) {
   const player = useMemo(() => createPlayerState(start[0], start[1], 0), []); // eslint-disable-line react-hooks/exhaustive-deps
   // Chỉ khi chạy dev: mở trạng thái người chơi ra window để kiểm tra bằng trình duyệt.
   if (import.meta.env.DEV) (window as unknown as { __walkPlayer?: PlayerState }).__walkPlayer = player;
@@ -205,7 +211,7 @@ export function WalkWorld({ api, paused, obstacles, boundsRadius, interactables,
   return (
     <>
       {showGround && <Ground radius={boundsRadius} url={groundUrl} />}
-      <Player api={api} paused={paused} world={world} interactables={interactables} onNearestChange={onNearestChange} player={player} start={start} />
+      <Player api={api} paused={paused} world={world} interactables={interactables} onNearestChange={onNearestChange} player={player} start={start} biTrack={biTrack} />
       {!freeCamera && <ChaseCamera api={api} player={player} blockers={cameraBlockers} />}
       <PlayerStateContext.Provider value={player}>{children}</PlayerStateContext.Provider>
     </>

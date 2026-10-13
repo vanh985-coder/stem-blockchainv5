@@ -14,13 +14,39 @@ export function lodId(id: string): string {
   return id + LOD_SUFFIX;
 }
 
+/**
+ * Đuôi của bản vừa (LOD giữa, spec 01 mục 5): model đồ vật có bản chính trên 20.000 tam giác có thêm `<id>-vua` khoảng 15.000 tam giác. Bản chính → bản vừa → bản xa.
+ */
+export const MID_SUFFIX = '-vua';
+
+export function midId(id: string): string {
+  return id + MID_SUFFIX;
+}
+
+export function isMidId(id: string): boolean {
+  return id.endsWith(MID_SUFFIX);
+}
+
+/**
+ * Bản vừa chỉ dùng được khi nó nhẹ hơn hẳn bản chính: chế độ chặt (sai số 3%, không Permissive) có model dừng rất cao (lều chợ vẫn 66.988 tam giác, nhà 36.000 đến 41.000), khi đó
+ * bản vừa chẳng nhẹ hơn bản chính bao nhiêu và không được dùng (đi thẳng từ bản chính sang bản xa). Nhẹ hơn mức này (tam giác) thì dùng.
+ */
+export const MID_USABLE_MAX_TRIS = 25000;
+
+/** Bản vừa có dùng được không, theo số tam giác ghi trong manifest (không có thì false). */
+export function isUsableMid(tris: number | undefined): boolean {
+  return typeof tris === 'number' && tris > 0 && tris <= MID_USABLE_MAX_TRIS;
+}
+
 export function isLodId(id: string): boolean {
   return id.endsWith(LOD_SUFFIX);
 }
 
-/** Id của bản chính, từ id bất kỳ (bản chính hoặc bản xa). */
+/** Id của bản chính, từ id bất kỳ (bản chính, bản vừa hay bản xa). */
 export function baseId(id: string): string {
-  return isLodId(id) ? id.slice(0, -LOD_SUFFIX.length) : id;
+  if (isLodId(id)) return id.slice(0, -LOD_SUFFIX.length);
+  if (isMidId(id)) return id.slice(0, -MID_SUFFIX.length);
+  return id;
 }
 
 /** Hình thay thế khi thiếu file: nhân vật là capsule, còn lại là khối. */

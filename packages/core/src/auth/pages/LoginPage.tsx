@@ -6,7 +6,7 @@ import { useProgress } from '../../progress/ProgressProvider';
 import { useAuth } from '../AuthProvider';
 import { safeNext } from '../redirect';
 import { normalizeUsername, validatePassword, validateUsername } from '../validate';
-import { AccountPage, ErrorNote, Field, goToMap, t, useGoAfterLogin } from './shared';
+import { AccountPage, ErrorNote, Field, goToHub, t, useGoAfterLogin } from './shared';
 
 export default function LoginPage() {
   const { session, loading, configured } = useAuth();
@@ -89,7 +89,7 @@ export default function LoginPage() {
         </Link>
         <button type="button" onClick={() => {
             startGuest();
-            goToMap(navigate);
+            goToHub(navigate, '/cho');
           }}
           className="inline-flex min-h-11 cursor-pointer items-center font-semibold underline">
           {t.dangNhap.choiThu}

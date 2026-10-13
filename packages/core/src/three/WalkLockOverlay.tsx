@@ -7,9 +7,10 @@ import type { WalkSession } from './useWalkSession';
  * Lớp phủ của cảnh đi lại (máy tính):
  * - chưa chơi lần nào: chỉ một dòng nhắc nhỏ "Bấm để điều khiển" giữa màn hình, không che cảnh (bấm đâu trên khung cũng khóa chuột);
  * - đã chơi rồi nhả khóa: hộp Menu tạm dừng có dòng "Bấm để chơi tiếp" (điện thoại: nút "Tiếp tục").
+ * `hideMenu`: nơi dùng tự vẽ menu riêng (chợ phiên: `MarketMenu`), chỉ giữ dòng nhắc.
  * `children` là các điều khiển thêm trong menu (ví dụ độ nhạy chuột); bấm vào chúng không khóa chuột.
  */
-export function WalkLockOverlay({ session, children, title = ui.dungDi.menuTieuDe, description = ui.dungDi.menuMoTa }: { session: WalkSession; children?: ReactNode; title?: string; description?: string }) {
+export function WalkLockOverlay({ session, children, title = ui.dungDi.menuTieuDe, description = ui.dungDi.menuMoTa, hideMenu = false }: { session: WalkSession; children?: ReactNode; title?: string; description?: string; hideMenu?: boolean }) {
   const { lockMode, showHint, menuOpen, lock, closeMenu } = session;
   return (
     <>
@@ -20,7 +21,7 @@ export function WalkLockOverlay({ session, children, title = ui.dungDi.menuTieuD
           </span>
         </div>
       )}
-      {menuOpen && (
+      {menuOpen && !hideMenu && (
         // Bấm vào đâu ngoài các điều khiển thì khóa chuột lại (trong chính sự kiện bấm này).
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={lockMode ? lock : undefined}>
           <Panel role="dialog" aria-labelledby="walk-menu" className="w-full max-w-sm space-y-3 text-center">

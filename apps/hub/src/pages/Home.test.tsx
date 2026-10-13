@@ -72,6 +72,13 @@ describe('Trang chủ "/" theo vai trò', () => {
     expect(html).toContain('Quyền riêng tư');
   });
 
+  it('có liên kết "Bản đồ" tới /ban-do (đường đi nhanh) dù chưa hay đã đăng nhập', () => {
+    for (const html of [render(<Home />, authOf({})), render(<Home />, authOf({ session, profile: profileOf('student') }), 1)]) {
+      expect(html).toContain('href="/ban-do"');
+      expect(html).toContain('Bản đồ');
+    }
+  });
+
   it('học sinh: "Chơi tiếp", tên, Trang Sổ Vàng x/4; không có "Trang giáo viên"', () => {
     const html = render(<Home />, authOf({ session, profile: profileOf('student') }), 2);
     expect(html).toContain('Chơi tiếp');

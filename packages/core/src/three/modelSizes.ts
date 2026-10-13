@@ -39,10 +39,10 @@ export const MODEL_SIZES: Readonly<Record<string, ModelSize>> = {
 
   // Đồ vật ở chợ phiên (spec 03 mục 2, bảng "Cỡ thật của đồ vật"). Cao tính theo đơn vị cảnh (nhân vật cao 1,7).
   'env/cay-da': prop(12, [1, 0.633, 0.67]),
-  'env/cong-lang-giay': prop(5, [0.98, 0.568, 0.252]),
-  'env/cong-lang-det': prop(5, [0.979, 0.703, 0.35]),
-  'env/cong-lang-khac-dau': prop(5, [0.979, 0.548, 0.346]),
-  'env/cong-lang-bac': prop(5, [0.979, 0.576, 0.371]),
+  'env/cong-lang-giay': prop(6, [0.98, 0.568, 0.252]),
+  'env/cong-lang-det': prop(6, [0.979, 0.703, 0.35]),
+  'env/cong-lang-khac-dau': prop(6, [0.979, 0.548, 0.346]),
+  'env/cong-lang-bac': prop(6, [0.979, 0.576, 0.371]),
   'env/nha-mai-ngoi': prop(4.5, [0.979, 0.838, 0.89]),
   'env/nha-mai-tranh': prop(4, [0.979, 0.74, 0.916]),
   'env/leu-cho': prop(3.2, [0.976, 0.824, 0.781]),
