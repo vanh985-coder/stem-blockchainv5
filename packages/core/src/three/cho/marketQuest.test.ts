@@ -127,3 +127,39 @@ describe('mũi tên chỉ đường', () => {
     expect(guideArrow(0, 30 - ARROW_HIDE_DISTANCE - 0.1, { x: 0, z: 30 }, out()).visible).toBe(true);
   });
 });
+
+describe('chỗ xuất hiện ở chợ khi từ làng về (?tu=<làng>)', () => {
+  it('ngay trước cổng làng đó, về phía sân chợ, quay lưng về cổng; làng lạ thì không có', async () => {
+    const { marketSpawn, SPAWN_FROM_GATE } = await import('./marketQuest');
+    expect(marketSpawn(null)).toBeNull();
+    expect(marketSpawn('lang-la')).toBeNull();
+    for (const g of GATES) {
+      const s = marketSpawn(GATE_VILLAGE[g.id])!;
+      expect(s, g.id).not.toBeNull();
+      expect(Math.hypot(s.x - g.x, s.z - g.z)).toBeCloseTo(SPAWN_FROM_GATE, 9);
+      // cổng nằm phía sau lưng: hướng mặt (sin yaw, cos yaw) ngược với hướng từ người tới cổng
+      const fx = Math.sin(s.yaw);
+      const fz = Math.cos(s.yaw);
+      const bx = (g.x - s.x) / SPAWN_FROM_GATE;
+      const bz = (g.z - s.z) / SPAWN_FROM_GATE;
+      expect(fx * bx + fz * bz, g.id).toBeCloseTo(-1, 9);
+      // đứng ở đó không bị vật cản đẩy ra (trống)
+    }
+    const giay = marketSpawn('lang-giay')!;
+    expect(giay.x).toBeCloseTo(0, 9);
+    expect(giay.z).toBeCloseTo(30 - SPAWN_FROM_GATE, 9);
+    expect(Math.abs(giay.yaw)).toBeCloseTo(Math.PI, 9); // nhìn về phía nam (vào chợ), lưng quay về cổng Bắc
+  });
+
+  it('chỗ xuất hiện trống: không đè lên vật cản nào của chợ', async () => {
+    const { marketSpawn } = await import('./marketQuest');
+    const { generateMarket, WORLD_RADIUS } = await import('./marketLayout');
+    const { resolveCollisions, PLAYER_RADIUS } = await import('../collision');
+    const L = generateMarket();
+    for (const g of GATES) {
+      const s = marketSpawn(GATE_VILLAGE[g.id])!;
+      const p = { x: s.x, z: s.z };
+      expect(resolveCollisions(p, PLAYER_RADIUS, L.obstacles, WORLD_RADIUS), g.id).toBe(false);
+    }
+  });
+});

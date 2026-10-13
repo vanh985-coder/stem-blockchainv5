@@ -19,10 +19,13 @@ export function GoldenPageScene({
   villageId,
   award,
   onLeave,
+  leaveLabel,
 }: {
   villageId: VillageId;
   award: GoldenAward;
   onLeave: () => void;
+  /** Chữ nút rời cảnh (mặc định "Về bản đồ"; làng có cảnh 3D thì "Về làng") */
+  leaveLabel?: string;
 }) {
   const { settings } = useSettings();
   const [talked, setTalked] = useState(false);
@@ -65,7 +68,7 @@ export function GoldenPageScene({
         <div className="flex flex-col items-center gap-3">
           {award.ghiChuCuoi && <p className="text-center font-display text-2xl font-extrabold">{award.ghiChuCuoi}</p>}
           <Button size="lg" autoFocus onClick={onLeave}>
-            {ui.baiHoc.veBanDo}
+            {leaveLabel ?? ui.baiHoc.veBanDo}
           </Button>
         </div>
       )}

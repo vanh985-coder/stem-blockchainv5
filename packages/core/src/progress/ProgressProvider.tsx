@@ -29,6 +29,8 @@ export interface ProgressState {
   startGuest: () => void;
   /** Đã xem giới thiệu một làng (ghi cờ: đăng nhập thì lên server, chơi thử thì vào cookie) */
   markVillageIntroSeen: (village: VillageId) => void;
+  /** Đã xem cảnh mở đầu của làng 3D (bước 9) */
+  markVillageSceneSeen: (village: VillageId) => void;
 }
 
 /** Chỉ để test: dựng ProgressContext giả. */
@@ -55,6 +57,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const saveNow = useCallback(() => progressManager.saveNow(), []);
   const startGuest = useCallback(() => progressManager.startGuest(), []);
   const markVillageIntroSeen = useCallback((village: VillageId) => progressManager.markVillageIntroSeen(village), []);
+  const markVillageSceneSeen = useCallback((village: VillageId) => progressManager.markVillageSceneSeen(village), []);
 
   const value = useMemo<ProgressState>(
     () => ({
@@ -69,8 +72,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       saveNow,
       startGuest,
       markVillageIntroSeen,
+      markVillageSceneSeen,
     }),
-    [snap, unlock, record, saveNow, startGuest, markVillageIntroSeen],
+    [snap, unlock, record, saveNow, startGuest, markVillageIntroSeen, markVillageSceneSeen],
   );
 
   return (
@@ -93,6 +97,7 @@ const FALLBACK: ProgressState = {
   saveNow: async () => 'saved',
   startGuest: () => {},
   markVillageIntroSeen: () => {},
+  markVillageSceneSeen: () => {},
 };
 
 export function useProgress(): ProgressState {

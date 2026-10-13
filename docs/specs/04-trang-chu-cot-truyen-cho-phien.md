@@ -83,6 +83,7 @@ Cảnh đi lại chính, nằm giữa 4 làng.
 Xếp theo ảnh `concept-toan-canh` và `concept-cho-phien`. Phải **đủ đông đồ vật** để chợ trông tấp nập.
 
 **Bản làm ở mốc 2 (bước 7, route `/cho`, chưa nối từ trang chủ):** chợ ĐƠN GIẢN, đủ đồ vật chính; chợ đông đồ vật làm ở mốc 4.
+- **Từ làng về chợ** (`/cho?tu=<id làng>`): người chơi xuất hiện cách tâm cổng làng đó 3,8 về phía sân chợ, quay lưng về cổng, camera cũng quay theo (`marketSpawn` trong `marketQuest.ts`, có test). `tu` sai hoặc không có thì dùng chỗ xuất hiện mặc định dưới đây.
 - **Tọa độ:** người chơi xuất hiện ở phía nam cây đa (0, −10) và nhìn về +Z, nên **Bắc = +Z, Nam = −Z, Tây = +X, Đông = −X**. Cây đa ở gốc. Vùng đi lại bán kính 42; cổng cách tâm 30; sân chợ bán kính 14; đường rộng 6.
 - **Cổng:** mặt trước quay về sân chợ. Bắc Giấy (0, 30), Nam Dệt (0, −30), Tây Khắc Dấu (30, 0), Đông Bạc (−30, 0). Hai bên cổng là vật cản, lối giữa đi qua được (cổng mở/khóa làm ở bước sau).
 - **Bao quanh:** 12 đến 15 lều chợ, giếng, 7 nhà mái ngói và 7 nhà mái tranh trở lên, 14 đến 20 bụi tre; đồ nhỏ do code dựng (chum vại, đống rơm, khóm hoa). Sinh bằng bộ ngẫu nhiên có seed (`three/cho/marketLayout.ts`, hàm thuần có test: không đè lên đường, không đè nhau, 4 cổng và bến tàu luôn tới được từ chỗ xuất hiện).

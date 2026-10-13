@@ -153,7 +153,7 @@ describe('bố cục chợ phiên: đặt đồ vật', () => {
 
   it('đồ nhỏ (chum, rơm, hoa) không đè lên nhà, lều hay nhau', () => {
     for (const p of layout.props) {
-      if (p.kind === 'chan') continue; // chân giá nằm dưới phên phơi giấy, cố ý
+      if (p.kind === 'chan' || p.kind === 'nuoc' || p.kind === 'so-chung') continue; // nằm dưới hay trên vật khác, cố ý
       // bỏ chính vật cản của nó (hình tròn hoặc hộp xoay cùng tâm); còn lại không được chạm
       const others = layout.obstacles.filter((o) => !((o.type === 'circle' || o.type === 'obox') && o.x === p.x && o.z === p.z));
       const probe: Point2 = { x: p.x, z: p.z };
@@ -506,7 +506,7 @@ describe('bước 8d: vật cản của đồ nhỏ do code dựng', () => {
     for (const kind of kinds) {
       const k = PROP_SIZES[kind];
       const c = propCollider(mk(kind, 1.2));
-      if (kind === 'hoa' || kind === 'chan') {
+      if (PROP_SIZES[kind].collide === false) {
         expect(c, kind).toBeNull();
         continue;
       }

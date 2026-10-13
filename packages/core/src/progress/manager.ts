@@ -4,7 +4,7 @@ import { mergeProgress, sameGame, sameLevel } from './merge';
 import { recordLevelResult, unlockOf, withGoldenPages, type ProgressOptions } from './record';
 import { emptyProgress, hasProgress, type GameState, type LevelProgress, type LevelResult, type Progress } from './types';
 import type { UnlockResult } from './unlock';
-import { hasSeenIntro, withIntroSeen } from './villageIntro';
+import { hasSeenIntro, hasSeenScene, withIntroSeen, withSceneSeen } from './villageIntro';
 import type { VillageId } from '../village';
 
 /** Nơi lưu trên máy cho tài khoản (localStorage). Thay bằng bản giả trong test. */
@@ -317,6 +317,18 @@ export class ProgressManager {
     this.progress = {
       ...this.progress,
       game: { ...this.progress.game, data: withIntroSeen(this.progress.game.data, village), updatedAt: this.now() },
+    };
+    this.persistLocal();
+    this.emit();
+    this.scheduleFlush();
+  }
+
+  /** Học sinh đã xem cảnh mở đầu của làng 3D (bước 9): ghi cờ như `markVillageIntroSeen`. */
+  markVillageSceneSeen(village: VillageId): void {
+    if (this.mode === 'loading' || hasSeenScene(this.progress.game.data, village)) return;
+    this.progress = {
+      ...this.progress,
+      game: { ...this.progress.game, data: withSceneSeen(this.progress.game.data, village), updatedAt: this.now() },
     };
     this.persistLocal();
     this.emit();

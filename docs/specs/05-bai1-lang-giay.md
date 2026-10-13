@@ -19,6 +19,7 @@
 - Xếp theo ảnh `concept-lang-giay`.
 - **Cảnh mở đầu (lần đầu vào làng):** chiếu ảnh truyện số 6 kèm lời. Bác An: "Mỗi trang sổ có một mã, tính từ mã trang trước. Đêm qua có kẻ sửa trộm một trang, cả làng cãi nhau xem ai nợ ai!"
 - **3 biển gỗ:** "Học cùng bác An" (màn 1), "Đuổi theo {phanDien}" (màn 2), "Ghép lại cuốn sổ" (màn 3).
+- **Đã làm (mốc 2, bước 9):** bố cục ở `packages/village-lang-giay/src/scene/layout.ts` (bán kính khu 21, hàng rào tre bán kính 19,8; cổng ở phía nam (0, −17,5), con đường đất dẫn tới ba biển ở sân trước; bên +X sân phơi 6 phên xếp hai hàng, mỗi phên 4 chân giá; bên −X nhà ngói, bàn chép sổ và bác An; phía sau ba bể ngâm giữa hai nhà). Test `layout.test.ts`: mọi món trong hàng rào, không chồng nhau, tới được mọi biển. Màn 2 và 3 hiện "Sắp ra mắt" cho tới khi làm xong; xong màn 1 thì nhiệm vụ là quay về chợ.
 
 ## Màn 1 — Game chính: "Trang nối trang" (trang bài học 2D)
 

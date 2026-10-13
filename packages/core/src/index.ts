@@ -93,7 +93,7 @@ export type { ProgressState } from './progress/ProgressProvider';
 export { GuestBar } from './ui/GuestBar';
 export { progressManager } from './progress/singleton';
 export { mergeProgress } from './progress/merge';
-export { shouldShowIntro, hasSeenIntro, introTasks, goldenPageNumber } from './progress/villageIntro';
+export { shouldShowIntro, hasSeenIntro, introTasks, goldenPageNumber, shouldShowScene, hasSeenScene } from './progress/villageIntro';
 export type { IntroTask } from './progress/villageIntro';
 export { VILLAGE_INTRO, villageIntroTexts } from './content/villageIntro';
 export { recordLevelResult, doneLevels, withGoldenPages, unlockOf } from './progress/record';

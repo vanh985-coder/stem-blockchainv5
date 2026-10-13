@@ -105,7 +105,7 @@ export interface Placement {
 }
 
 /** Đồ vật nhỏ do code dựng (chum vại, đống rơm, khóm hoa). */
-export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan';
+export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc';
 export interface PropPlacement {
   kind: PropKind;
   x: number;
@@ -185,6 +185,8 @@ export interface PropSize {
   h: number;
   box?: { hx: number; hz: number };
   collide?: boolean;
+  /** Nhấc vật lên cao bấy nhiêu so với mặt đất (cuốn sổ đặt trên bàn, mặt nước trong bể); mặc định 0. `h` là bề dày. */
+  lift?: number;
 }
 export const PROP_SIZES: Readonly<Record<PropKind, PropSize>> = {
   chum: { r: 0.52, h: 1.05 },
@@ -198,6 +200,11 @@ export const PROP_SIZES: Readonly<Record<PropKind, PropSize>> = {
   hom: { r: Math.hypot(0.55, 0.35), h: 0.7, box: { hx: 0.55, hz: 0.35 } },
   thung: { r: 0.45, h: 0.5 },
   chan: { r: 0.07, h: 0.85, collide: false },
+  // cảnh làng (bước 9): bàn chép sổ và cuốn Sổ Chung đặt trên bàn, bể ngâm giấy và mặt nước trong bể
+  'ban-chep': { r: Math.hypot(1.1, 0.55), h: 0.85, box: { hx: 1.1, hz: 0.55 } },
+  'so-chung': { r: 0.36, h: 0.12, box: { hx: 0.3, hz: 0.22 }, collide: false, lift: 0.85 },
+  'be-ngam': { r: Math.hypot(1.4, 0.8), h: 0.75, box: { hx: 1.4, hz: 0.8 } },
+  nuoc: { r: 1.4, h: 0.04, box: { hx: 1.2, hz: 0.6 }, collide: false, lift: 0.6 },
 };
 
 /** Vật cản của đồ nhỏ do code dựng: hình tròn hoặc hộp xoay sát hình; vật thấp (khóm hoa) và chi tiết dưới vật khác (chân giá) thì không có. */
@@ -311,16 +318,22 @@ export interface FenceLayout {
   /** Mỗi đoạn một mục (giữa hai cột liên tiếp); thanh ngang vẽ ở hai độ cao tại đó */
   segments: { x: number; z: number; yaw: number }[];
 }
-export function fenceLayout(): FenceLayout {
-  const R = WORLD_RADIUS - 0.7;
+/** Hàng rào của chợ: chừa 4 con đường (dải giữa rộng 2 × (ROAD_WIDTH/2 + 1,2)) và bến sông. */
+function marketFenceGap(x: number, z: number): boolean {
+  const gap = ROAD_WIDTH / 2 + 1.2;
+  return Math.abs(x) < gap || Math.abs(z) < gap || x < RIVER_X + 2;
+}
+
+/** Bố cục hàng rào tròn bán kính radius (mặc định chợ: WORLD_RADIUS − 0,7), bỏ những đoạn mà skip(x, z) đúng (chừa lối đi). Cảnh làng dùng lại với bán kính và lối riêng. */
+export function fenceLayout(radius: number = WORLD_RADIUS - 0.7, skip: (x: number, z: number) => boolean = marketFenceGap): FenceLayout {
+  const R = radius;
   const step = 2.2 / R;
   const posts: FenceLayout['posts'] = [];
   const segments: FenceLayout['segments'] = [];
-  const gap = ROAD_WIDTH / 2 + 1.2;
   for (let a = 0; a < Math.PI * 2; a += step) {
     const x = Math.cos(a) * R;
     const z = Math.sin(a) * R;
-    if (Math.abs(x) < gap || Math.abs(z) < gap || x < RIVER_X + 2) continue;
+    if (skip(x, z)) continue;
     posts.push({ x, z, yaw: -a });
     segments.push({ x: Math.cos(a + step / 2) * R, z: Math.sin(a + step / 2) * R, yaw: -(a + step / 2) - Math.PI / 2 }); // thanh ngang nằm theo tiếp tuyến vòng (rotation.y của three: trục x của thanh quay về (cos yaw, −sin yaw))
   }

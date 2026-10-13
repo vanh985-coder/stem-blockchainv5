@@ -105,7 +105,7 @@ export interface VillageModule {
   - trang `/` và `/lang/<id>` chuyển về `VITE_HUB_URL/ban-do`;
   - chỉ có route màn bài học `/lang/<id>/man/<n>`;
   - cuối bài chỉ có nút "Về bản đồ".
-- **Từ mốc 2:** trang `/` chuyển sang `/lang/<id>` (cảnh làng 3D); nút "Về chợ" mở `VITE_HUB_URL`, tức chuyển hẳn sang web chính.
+- **Từ mốc 2:** trang `/` chuyển sang `/lang/<id>` (cảnh làng 3D, giữ nguyên phần `?query`); nút "Về chợ" (menu và cổng làng) mở `VITE_HUB_URL/cho?tu=<id>`, tức chuyển hẳn sang web chính, và ở chợ người chơi xuất hiện ngay trước cổng của làng đó (xem spec 04 mục 3). Cuối màn 1 có "Về làng" và "Chơi tiếp: [tên game 1]" (bỏ khi game 1 `coming-soon`). Mốc 2 mới có Làng Giấy; 3 làng còn lại giữ cách của mốc 1 cho tới mốc 3.
 
 **Web chính `apps/hub`:**
 - Lúc mới dựng, cổng mỗi làng trong chợ phiên trỏ tới subdomain của làng đó.

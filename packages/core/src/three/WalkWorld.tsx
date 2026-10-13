@@ -45,6 +45,8 @@ export interface WalkWorldProps {
   groundUrl: string | null;
   /** Vị trí xuất phát [x, z] */
   start?: readonly [number, number];
+  /** Hướng mặt người chơi lúc xuất phát (radian, 0 là +Z); camera nên đặt cùng góc để nhìn theo hướng đó */
+  startYaw?: number;
   /** true: không dùng camera bám theo người chơi (nơi dùng tự đặt camera, ví dụ góc nhìn từ trên cao để chụp ảnh) */
   freeCamera?: boolean;
   /** Mỗi khung hình ghi vị trí của Bi vào đây (để làm vật tương tác) */
@@ -147,7 +149,7 @@ function ChaseCamera({ api, player, blockers }: { api: WalkApi; player: PlayerSt
 }
 
 /** Học sinh: di chuyển, nhảy, va chạm, clip theo trạng thái; Bi bay theo. Mọi logic ở `playerMotion.ts` (hàm thuần). */
-function Player({ api, paused, world, interactables, onNearestChange, player, start, biTrack }: { api: WalkApi; paused: boolean; world: World; interactables: readonly Interactable[]; onNearestChange: (i: number) => void; player: PlayerState; start: readonly [number, number]; biTrack?: { x: number; z: number } }) {
+function Player({ api, paused, world, interactables, onNearestChange, player, start, startYaw = 0, biTrack }: { api: WalkApi; paused: boolean; world: World; interactables: readonly Interactable[]; onNearestChange: (i: number) => void; player: PlayerState; start: readonly [number, number]; startYaw?: number; biTrack?: { x: number; z: number } }) {
   const root = useRef<Group>(null);
   const input = useMemo<MoveInput>(() => ({ x: 0, y: 0, run: false, jump: false }), []);
   const live = useRef({ paused, world, interactables, onNearestChange });
@@ -190,7 +192,7 @@ function Player({ api, paused, world, interactables, onNearestChange, player, st
 
   return (
     <>
-      <group ref={root} position={[start[0], 0, start[1]]}>
+      <group ref={root} position={[start[0], 0, start[1]]} rotation={[0, startYaw, 0]}>
         <Character id={WALK_PLAYER} clips={CLIPS} animation={anim} trigger={jumpN} returnTo="jump" timeScale={timeScale} onReady={setInfo} />
       </group>
       <Bi target={root} track={biTrack} cameraYaw={api.camera} />
@@ -203,15 +205,15 @@ function Player({ api, paused, world, interactables, onNearestChange, player, st
  * theo sau vai phải. Đặt trong <Scene3D>; các vật của cảnh (hộp, cột, dân làng) là `children`, còn dữ liệu va chạm và tương tác
  * truyền riêng qua `obstacles` và `interactables`.
  */
-export function WalkWorld({ api, paused, obstacles, boundsRadius, interactables, cameraBlockers = NO_BLOCKERS, groundHeight, onNearestChange, groundUrl, start = [0, 0], showGround = true, freeCamera = false, biTrack, children }: WalkWorldProps) {
-  const player = useMemo(() => createPlayerState(start[0], start[1], 0), []); // eslint-disable-line react-hooks/exhaustive-deps
+export function WalkWorld({ api, paused, obstacles, boundsRadius, interactables, cameraBlockers = NO_BLOCKERS, groundHeight, onNearestChange, groundUrl, start = [0, 0], showGround = true, freeCamera = false, biTrack, startYaw = 0, children }: WalkWorldProps) {
+  const player = useMemo(() => createPlayerState(start[0], start[1], startYaw), []); // eslint-disable-line react-hooks/exhaustive-deps
   // Chỉ khi chạy dev: mở trạng thái người chơi ra window để kiểm tra bằng trình duyệt.
   if (import.meta.env.DEV) (window as unknown as { __walkPlayer?: PlayerState }).__walkPlayer = player;
   const world = useMemo<World>(() => ({ obstacles, boundsRadius, groundHeight }), [obstacles, boundsRadius, groundHeight]);
   return (
     <>
       {showGround && <Ground radius={boundsRadius} url={groundUrl} />}
-      <Player api={api} paused={paused} world={world} interactables={interactables} onNearestChange={onNearestChange} player={player} start={start} biTrack={biTrack} />
+      <Player api={api} paused={paused} world={world} interactables={interactables} onNearestChange={onNearestChange} player={player} start={start} startYaw={startYaw} biTrack={biTrack} />
       {!freeCamera && <ChaseCamera api={api} player={player} blockers={cameraBlockers} />}
       <PlayerStateContext.Provider value={player}>{children}</PlayerStateContext.Provider>
     </>

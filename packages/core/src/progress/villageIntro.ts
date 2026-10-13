@@ -59,6 +59,47 @@ export function introDataFromMask(mask: unknown): Record<string, unknown> {
   return Object.keys(seen).length === 0 ? {} : { [INTRO_SEEN_KEY]: seen };
 }
 
+// ---------------------------------------------------------------------------
+// Cảnh mở đầu lần đầu vào làng 3D (mốc 2, bước 9): cờ riêng, cùng cách lưu với cờ giới thiệu làng ở bản đồ.
+
+/**
+ * Cờ "đã xem cảnh mở đầu của làng" nằm trong game_state.data: { villageSceneSeen: { "lang-giay": true } }; chơi thử: trường "vs" của cookie sc_guest (một bit mỗi làng).
+ */
+export const SCENE_SEEN_KEY = 'villageSceneSeen';
+
+function seenOf(data: Record<string, unknown> | undefined, key: string): IntroSeen {
+  const raw = data?.[key];
+  const out: IntroSeen = {};
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
+  for (const id of VILLAGE_ORDER) if ((raw as Record<string, unknown>)[id] === true) out[id] = true;
+  return out;
+}
+export const sceneSeenOf = (data: Record<string, unknown> | undefined): IntroSeen => seenOf(data, SCENE_SEEN_KEY);
+export const hasSeenScene = (data: Record<string, unknown> | undefined, village: VillageId): boolean => sceneSeenOf(data)[village] === true;
+/** Có chiếu cảnh mở đầu khi vào làng không: lần đầu thì có, đã xem thì không. */
+export const shouldShowScene = (data: Record<string, unknown> | undefined, village: VillageId): boolean => !hasSeenScene(data, village);
+export function withSceneSeen(data: Record<string, unknown> | undefined, village: VillageId): Record<string, unknown> {
+  return { ...(data ?? {}), [SCENE_SEEN_KEY]: { ...sceneSeenOf(data), [village]: true } };
+}
+/** Hợp hai bản cờ cảnh mở đầu (một bên đã xem thì coi là đã xem). */
+export function mergeSceneSeen(base: Record<string, unknown>, other: Record<string, unknown>): Record<string, unknown> {
+  const merged: IntroSeen = { ...sceneSeenOf(other), ...sceneSeenOf(base) };
+  if (Object.keys(merged).length === 0) return base;
+  return { ...base, [SCENE_SEEN_KEY]: merged };
+}
+export function sceneMask(data: Record<string, unknown> | undefined): number {
+  const seen = sceneSeenOf(data);
+  return VILLAGE_ORDER.reduce((mask, id, i) => (seen[id] ? mask | (1 << i) : mask), 0);
+}
+export function sceneDataFromMask(mask: unknown): Record<string, unknown> {
+  const m = typeof mask === 'number' && Number.isFinite(mask) ? Math.floor(mask) : 0;
+  const seen: IntroSeen = {};
+  VILLAGE_ORDER.forEach((id, i) => {
+    if (m & (1 << i)) seen[id] = true;
+  });
+  return Object.keys(seen).length === 0 ? {} : { [SCENE_SEEN_KEY]: seen };
+}
+
 /** Một nhiệm vụ (màn) trong danh sách của lượt cuối giới thiệu làng. `ten` chưa qua fmt() (có {phanDien}). */
 export interface IntroTask {
   id: number;

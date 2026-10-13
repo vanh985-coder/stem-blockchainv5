@@ -1,10 +1,12 @@
 import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { onAnswer } from '../audio/answerSignal';
 import { asset, useManifest } from '../assets/store';
+import { useNavigate } from 'react-router';
 import { HUB_MAP_URL } from '../config/urls';
+import { hasVillageScene } from '../content/villageScene';
 import { VILLAGE_THEME } from '../content/nenTrangTri';
 import { fmt } from '../content/characters';
-import { VILLAGE_ORDER, levelById } from '../content/levels';
+import { VILLAGE_ORDER, levelById, levelsOfVillage } from '../content/levels';
 import { ui } from '../content/ui';
 import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
@@ -169,7 +171,15 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
     setStage({ kind: 'stationDone', idx, result: r, coins: coinsEarned });
   };
 
-  const goMap = () => window.location.assign(HUB_MAP_URL);
+  // Làng có cảnh 3D (từ mốc 2): rời bài thì về làng (và có "Chơi tiếp: [game 1]" nếu game 1 đã làm xong); chưa có thì về bản đồ ở hub như mốc 1.
+  const navigate = useNavigate();
+  const hasScene = hasVillageScene(villageId);
+  const goVillage = () => navigate(`/lang/${villageId}`);
+  const goMap = hasScene ? goVillage : () => window.location.assign(HUB_MAP_URL);
+  const leaveLabel = hasScene ? ui.langScene.veLang : ui.baiHoc.veBanDo;
+  const villageLevels = levelsOfVillage(villageId);
+  const nextGame = hasScene ? villageLevels[villageLevels.findIndex((l) => l.id === levelId) + 1] : undefined;
+  const playNextGame = nextGame && nextGame.status === 'ready' ? { label: fmt(ui.langScene.choiTiep, { man: fmt(nextGame.ten) }), onClick: () => navigate(`/lang/${villageId}/man/${nextGame.id}`) } : undefined;
 
   // Hai khung 3D hai bên bảng: ẩn khi màn hẹp, giảm chuyển động, máy yếu, tải lỗi hoặc FPS thấp (frames.ts).
   // Có khung thì bảng thu nhỏ để chừa chỗ (quyết định lúc mở trang, giữ nguyên khi khung bị ẩn về sau).
@@ -293,12 +303,14 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
           timeSpentSec={Math.round(run.current.timeMs / 1000)}
           keyTakeaway={fmt(content.keyTakeaway)}
           onPlayAgain={restart}
-          hasNextLevel={awardNow}
-          nextLabel={awardNow ? ui.baiHoc.nhanTrang : ui.baiHoc.veBanDo}
-          nextLessonUrl={awardNow ? undefined : HUB_MAP_URL}
+          hasNextLevel={awardNow || hasScene}
+          nextLabel={awardNow ? ui.baiHoc.nhanTrang : leaveLabel}
+          nextLessonUrl={awardNow || hasScene ? undefined : HUB_MAP_URL}
           onNextLevel={() => {
             if (awardNow) setStage({ kind: 'award' });
+            else if (hasScene) goVillage();
           }}
+          extraAction={awardNow ? undefined : playNextGame}
         />
         {saveStatus === 'pending' && (
           <p role="status" className="mx-auto mt-2 max-w-xl px-4 text-center font-semibold">
@@ -308,7 +320,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
       </>
     );
   } else {
-    body = <GoldenPageScene villageId={villageId} award={content.award} onLeave={goMap} />;
+    body = <GoldenPageScene villageId={villageId} award={content.award} onLeave={goMap} leaveLabel={leaveLabel} />;
   }
 
   const currentIdx = 'idx' in stage ? stage.idx : stage.kind === 'saving' ? 2 : -1;
@@ -393,9 +405,9 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
               </>
             )}
             <Button variant="secondary" size="sm" className="max-[480px]:hidden" disabled={saving} onClick={goMap}>
-              {ui.baiHoc.veBanDo}
+              {leaveLabel}
             </Button>
-            <IconButton label={ui.baiHoc.veBanDo} icon="🗺️" disabled={saving} onClick={goMap} />
+            <IconButton label={leaveLabel} icon={hasScene ? '🏡' : '🗺️'} disabled={saving} onClick={goMap} />
           </div>
         </header>
 

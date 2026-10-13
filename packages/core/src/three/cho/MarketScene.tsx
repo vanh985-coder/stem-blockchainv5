@@ -2,6 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
 import { Character } from '../Character';
 import { SceneWarmup } from '../SceneWarmup';
+import { StatsProbe } from '../StatsProbe';
 import { Villager } from '../Villager';
 import { WalkWorld } from '../WalkWorld';
 import { circle, type CircleObstacle, type Obstacle } from '../collision';
@@ -49,29 +50,8 @@ export interface MarketSceneProps {
   targetGate: GateId | null;
   /** Dân làng thứ mấy đang được nói chuyện (đứng yên, quay mặt về người chơi); null nếu không có */
   talkingVillager: number | null;
-}
-
-/** Số liệu mỗi khung hình của bộ dựng hình (tam giác, draw call...), đọc ở `window.__marketStats` để kiểm tra hiệu năng. */
-export interface MarketStats {
-  triangles: number;
-  calls: number;
-  geometries: number;
-  textures: number;
-}
-
-/** Ghi số liệu của khung hình trước vào window.__marketStats (chỉ gán số vào đối tượng có sẵn, không cấp phát mỗi khung). */
-const stats: MarketStats = { triangles: 0, calls: 0, geometries: 0, textures: 0 };
-function StatsProbe() {
-  useFrame(({ gl }) => {
-    const w = window as unknown as { __marketStats?: MarketStats };
-    if (w.__marketStats !== stats) w.__marketStats = stats;
-    const i = gl.info;
-    stats.triangles = i.render.triangles;
-    stats.calls = i.render.calls;
-    stats.geometries = i.memory.geometries;
-    stats.textures = i.memory.textures;
-  });
-  return null;
+  /** Chỗ và hướng xuất hiện (mặc định `PLAYER_START`, nhìn về +Z); từ làng về thì ngay trước cổng làng đó (`marketSpawn`) */
+  spawn?: { x: number; z: number; yaw: number };
 }
 
 /**
@@ -80,7 +60,7 @@ function StatsProbe() {
  * Mọi đồ vật có vật cản (hàm va chạm của bước 6); vật cao chắn camera thì kéo camera lại gần; dân làng cũng là vật cản.
  * Nhà, lều, cây, cổng nhân bản bằng InstancedMesh (một draw call mỗi phần), có bản xa theo khoảng cách. Dùng trong <Scene3D>.
  */
-export function MarketScene({ api, paused, level, dirtUrl, animate, overview, debugColliders = false, layout: given, gateOpen, interactables, onNearestChange, targetGate, talkingVillager }: MarketSceneProps) {
+export function MarketScene({ api, paused, level, dirtUrl, animate, overview, debugColliders = false, layout: given, gateOpen, interactables, onNearestChange, targetGate, talkingVillager, spawn }: MarketSceneProps) {
   // Mức Thấp bớt lều và bụi tre (mật độ theo mức chất lượng)
   const layout = useMemo(() => given ?? generateMarket(undefined, densityFor(level)), [given, level]);
   // Chỉ khi chạy dev: mở bố cục ra window để kiểm tra bằng trình duyệt.
@@ -112,7 +92,8 @@ export function MarketScene({ api, paused, level, dirtUrl, animate, overview, de
       onNearestChange={onNearestChange}
       groundUrl={null}
       showGround={false}
-      start={PLAYER_START}
+      start={spawn ? [spawn.x, spawn.z] : PLAYER_START}
+      startYaw={spawn?.yaw ?? 0}
       freeCamera={!!overview}
     >
       {overview && <OverviewCamera kind={overview} />}

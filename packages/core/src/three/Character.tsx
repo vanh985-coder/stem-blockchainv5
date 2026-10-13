@@ -203,6 +203,20 @@ interface RigAnimatorProps {
   onReady?: (info: CharacterInfo) => void;
 }
 
+/**
+ * Phát thử mọi hành động một khung với trọng số 0 rồi dừng, để mixer kết nối trước (không đổi tư thế nhân vật: trọng số 0, thời gian 0). Không cấp phát lúc chơi.
+ */
+export function primeActions(mixer: AnimationMixer, actions: Partial<Record<ClipName, AnimationAction>>): void {
+  const list = Object.values(actions) as AnimationAction[];
+  for (const a of list) {
+    a.enabled = true;
+    a.setEffectiveWeight(0);
+    a.play();
+  }
+  mixer.update(0);
+  for (const a of list) a.stop();
+}
+
 /** Mixer, hành động và lớp tư thế của một nhân vật, tạo trong effect (không phải trong render). */
 interface Rig {
   mixer: AnimationMixer;
@@ -248,6 +262,9 @@ function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing
       const p = playable[c];
       if (p) actions[c] = mixer.clipAction(p.clip);
     }
+    // Chuẩn bị sẵn mọi hoạt ảnh lúc nạp cảnh (màn hình tải còn che): phát thử từng clip với trọng số 0 trong một khung (mixer.update(0)) để mixer kết nối xương và đường
+    // chạy (PropertyBinding) ngay, rồi dừng; kết nối vẫn nằm trong bộ nhớ đệm của mixer. Nếu không, lần đầu bắt đầu đi (walk, run) hay nhảy mới kết nối, khựng khoảng 55 ms.
+    primeActions(mixer, actions);
     const created: Rig = { mixer, actions, layer: new PoseLayer(scene, outer.current ?? scene, motion.current ?? scene, facing, fit.scale) };
     rigRef.current = created;
     setRig(created);

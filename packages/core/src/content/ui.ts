@@ -591,7 +591,32 @@ export const ui = {
       banDo: 'Bản đồ',
       veTrangChu: 'Về trang chủ',
       quayLai: 'Quay lại',
+      /** Chỉ có ở menu cảnh làng */
+      veCho: 'Về chợ',
     },
+  },
+
+  /** Cảnh làng 3D (spec 03 mục 6; mốc 2 bước 9) */
+  langScene: {
+    /** Lời nhắc tương tác: "E: {vat}" ({bien} là chữ trên biển, {nguoi} là tên người) */
+    nhanBien: 'Vào màn: {bien}',
+    nhanBienKhoa: 'Xem biển: {bien}',
+    nhanCong: 'Về chợ',
+    /** Dòng nhiệm vụ ({bien}: chữ trên biển; {lang}: tên làng) */
+    nhiemVuMan: 'Đến biển "{bien}".',
+    nhiemVuXong: '{lang} đã xong việc! Quay về chợ để sang làng kế tiếp.',
+    /** Bi nhắc việc khi nói chuyện */
+    biNhacMan: 'Việc tiếp theo ở {lang}: đến biển "{bien}".',
+    biNhacXong: '{lang} xong hết rồi! Mình quay về chợ nhé.',
+    /** Biển còn khóa (kèm "Hoàn thành … để mở" của ui.moKhoa) và màn sắp ra mắt */
+    bienSapRaMat: 'Màn "{bien}" sắp ra mắt. Em cứ làm việc khác trước nhé.',
+    /** Nhãn trạng thái vẽ trên biển gỗ */
+    bienDaXong: 'Đã xong',
+    bienKhoa: 'Khóa',
+    bienSapRaMat2: 'Sắp ra mắt',
+    /** Nút ở cuối màn 1: về làng (mở cảnh làng) và chơi tiếp game 1 */
+    veLang: 'Về làng',
+    choiTiep: 'Chơi tiếp: {man}',
   },
 
   /** Trang /dev/walk (chỉ có khi chạy dev) */

@@ -4,7 +4,7 @@
  */
 import { VILLAGE_ORDER } from '../../content/levels';
 import type { VillageId } from '../../village';
-import type { GateId } from './marketLayout';
+import { GATES, type GateId } from './marketLayout';
 
 /** Thứ tự cổng theo thứ tự làng: Giấy, Dệt, Khắc Dấu, Bạc. */
 export const GATE_ORDER: readonly GateId[] = ['giay', 'det', 'khac-dau', 'bac'];
@@ -61,6 +61,24 @@ export function questIndex(goldenPages: number): number {
 export function questGate(goldenPages: number): GateId | null {
   const k = questIndex(goldenPages);
   return k < MAX_PAGES ? GATE_ORDER[k] : null;
+}
+
+/** Người chơi xuất hiện cách tâm cổng bấy nhiêu về phía sân chợ khi từ làng về (`?tu=<làng>`). */
+export const SPAWN_FROM_GATE = 3.8;
+
+/**
+ * Chỗ xuất hiện ở chợ khi từ một làng về (`?tu=lang-giay`): ngay trước cổng làng đó (về phía sân chợ), quay lưng về cổng (mặt hướng vào sân chợ). `tu` không phải làng thì null
+ * (dùng chỗ xuất hiện mặc định).
+ */
+export function marketSpawn(tu: string | null | undefined): { x: number; z: number; yaw: number } | null {
+  const village = Object.entries(GATE_VILLAGE).find(([, v]) => v === tu);
+  if (!village) return null;
+  const g = GATES.find((q) => q.id === village[0]);
+  if (!g) return null;
+  const len = Math.hypot(g.x, g.z);
+  const ux = -g.x / len;
+  const uz = -g.z / len; // về phía tâm chợ
+  return { x: g.x + ux * SPAWN_FROM_GATE, z: g.z + uz * SPAWN_FROM_GATE, yaw: Math.atan2(ux, uz) };
 }
 
 /** Hướng từ (px, pz) về (tx, tz) dạng góc quanh trục đứng (0 là +Z, như rotation.y của three) và khoảng cách. */

@@ -9,9 +9,9 @@ import type { WalkSession } from '../useWalkSession';
 /**
  * Menu thật của chợ phiên (spec 04 mục 3 "Menu"; thay hộp Menu tạm): Tiếp tục; Hồ sơ; Cài đặt (chất lượng, âm thanh, giảm chuyển động, chữ to, độ nhạy chuột);
  * Đọc lại truyện; Bản đồ; Về trang chủ. Hiện khi nhả khóa chuột (Esc, chuyển cửa sổ), khi bấm nút menu ở HUD, hoặc (điện thoại) khi bấm nút menu.
- * "Tiếp tục" khóa chuột lại ngay trong sự kiện bấm. Bấm vào nền ngoài hộp cũng là tiếp tục (máy tính).
+ * Cảnh làng dùng lại với `onGo` (điều hướng sang hub khi đang ở vỏ riêng của làng) và `extraItems` ("Về chợ"). "Tiếp tục" khóa chuột lại ngay trong sự kiện bấm. Bấm vào nền ngoài hộp cũng là tiếp tục (máy tính).
  */
-export function MarketMenu({ session }: { session: WalkSession }) {
+export function MarketMenu({ session, onGo, extraItems = [] }: { session: WalkSession; onGo?: (path: string) => void; extraItems?: { label: string; onClick: () => void }[] }) {
   const navigate = useNavigate();
   const [view, setView] = useState<'main' | 'settings'>('main');
   const { lockMode, menuOpen, lock, closeMenu } = session;
@@ -24,7 +24,8 @@ export function MarketMenu({ session }: { session: WalkSession }) {
   };
   const go = (path: string) => {
     closeMenu();
-    navigate(path);
+    if (onGo) onGo(path);
+    else navigate(path);
   };
 
   return (
@@ -52,6 +53,11 @@ export function MarketMenu({ session }: { session: WalkSession }) {
               <Button variant="secondary" fullWidth onClick={() => go('/ban-do')}>
                 {ui.cho.menu.banDo}
               </Button>
+              {extraItems.map((it) => (
+                <Button key={it.label} variant="secondary" fullWidth onClick={() => { closeMenu(); it.onClick(); }}>
+                  {it.label}
+                </Button>
+              ))}
               <Button variant="secondary" fullWidth onClick={() => go('/')}>
                 {ui.cho.menu.veTrangChu}
               </Button>

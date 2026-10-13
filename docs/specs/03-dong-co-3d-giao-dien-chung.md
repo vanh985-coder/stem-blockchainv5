@@ -407,10 +407,13 @@ Dùng ở mọi chỗ có lựa chọn: câu hỏi, Đồng ý/Từ chối, lự
 
 ## 6. Khung màn chơi và mở khóa
 
-**`VillageScene`** (cảnh làng 3D):
-- Khu nhỏ, bán kính khoảng 20, có cổng làng và người dẫn đứng yên.
-- **3 biển gỗ** do code dựng: "Học bài", "Game 1", "Game 2", mỗi biển có icon. Tương tác thì mở màn tương ứng.
-- Biển còn khóa thì hiện "Hoàn thành … để mở".
+**`VillageScene`** (cảnh làng 3D, **đã làm ở mốc 2 bước 9**: `packages/core/src/three/village/`, dùng chung mọi làng; mỗi làng chỉ đưa dữ liệu bố cục `VillageLayoutInput`, ví dụ `packages/village-lang-giay/src/scene/layout.ts`):
+- Khu nhỏ, bán kính khoảng 20, có cổng làng và người dẫn đứng yên (không xương). Dùng lại `WalkWorld`, vật cản theo chân thật, ba bậc model chính/vừa/xa, nạp trước, HUD và menu như chợ; menu thêm "Về chợ".
+- **3 biển gỗ** do code dựng, mỗi biển có icon, chữ và dải trạng thái ("Đã xong", "Khóa", "Sắp ra mắt"). Lại gần bấm E thì vào màn `/lang/<id>/man/<n>`.
+- Biển còn khóa thì hiện "Hoàn thành … để mở" (kèm tên màn cần xong trước); biển "Sắp ra mắt" chỉ báo, không vào được và không chặn màn sau.
+- **Nhiệm vụ:** dòng nhiệm vụ ở HUD và mũi tên trên đầu chỉ tới biển của màn đang mở đầu tiên (`villageQuest.ts`: `nextLevel`). Hết việc thì nhắc quay về chợ. Bấm E vào người dẫn hay Bi thì nhắc việc tiếp theo.
+- **Cảnh mở đầu:** chiếu một lần khi lần đầu vào làng (ảnh truyện + lời người dẫn), có nút "Bỏ qua". Cờ đã xem lưu cùng tiến độ (`villageSceneSeen` trong `game_state.data`; khách là trường `vs` của cookie).
+- Chữ nằm ở `content/villageScene.ts` (theo từng làng) và `ui.langScene`. Làng chưa có cảnh (`hasScene` false) thì giữ cách cũ của mốc 1.
 
 **`MiniGameLevel`** (game phụ):
 - Thẻ bắt đầu: luật 2–3 dòng, cách điều khiển, điểm cao nhất, nút "Bắt đầu".

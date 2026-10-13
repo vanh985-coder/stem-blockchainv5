@@ -206,3 +206,46 @@ describe('ProgressManager.markVillageIntroSeen', () => {
     expect(m.getSnapshot()).toBe(first);
   });
 });
+
+describe('cờ đã xem cảnh mở đầu làng 3D (bước 9)', () => {
+  it('lần đầu thì chiếu; đánh dấu rồi thì không; không đụng cờ giới thiệu làng và các khóa khác', async () => {
+    const m = await import('./villageIntro');
+    expect(m.shouldShowScene(undefined, 'lang-giay')).toBe(true);
+    const d = m.withSceneSeen({ coi: 1, ...m.withIntroSeen({}, 'lang-det') }, 'lang-giay');
+    expect(m.shouldShowScene(d, 'lang-giay')).toBe(false);
+    expect(m.shouldShowScene(d, 'lang-det')).toBe(true);
+    expect(m.hasSeenIntro(d, 'lang-det')).toBe(true);
+    expect(m.hasSeenIntro(d, 'lang-giay')).toBe(false);
+    expect(d.coi).toBe(1);
+  });
+
+  it('bỏ qua dữ liệu hỏng; cờ thành số bit và ngược lại; hợp hai bên', async () => {
+    const m = await import('./villageIntro');
+    expect(m.sceneSeenOf({ villageSceneSeen: [true] })).toEqual({});
+    expect(m.sceneSeenOf({ villageSceneSeen: { 'lang-giay': 'x', 'lang-la': true } })).toEqual({});
+    const d = m.withSceneSeen({}, 'lang-khac-dau');
+    const mask = m.sceneMask(d);
+    expect(mask).toBe(1 << 2);
+    expect(m.sceneDataFromMask(mask)).toEqual(d);
+    expect(m.sceneDataFromMask(0)).toEqual({});
+    const merged = m.mergeSceneSeen(m.withSceneSeen({}, 'lang-giay'), m.withSceneSeen({}, 'lang-bac'));
+    expect(m.sceneSeenOf(merged)).toEqual({ 'lang-giay': true, 'lang-bac': true });
+  });
+
+  it('đi qua dạng gọn của cookie (vs) và gộp tiến độ', async () => {
+    const { encodeProgress, decodeProgress } = await import('./compact');
+    const { emptyProgress } = await import('./types');
+    const { withIntroSeen, withSceneSeen, hasSeenScene, hasSeenIntro } = await import('./villageIntro');
+    const { mergeProgress } = await import('./merge');
+    const p = emptyProgress();
+    p.game.data = withSceneSeen(withIntroSeen({}, 'lang-giay'), 'lang-giay');
+    const back = decodeProgress(encodeProgress(p));
+    expect(hasSeenScene(back.game.data, 'lang-giay')).toBe(true);
+    expect(hasSeenIntro(back.game.data, 'lang-giay')).toBe(true);
+    const a = emptyProgress();
+    a.game = { ...a.game, data: withSceneSeen({}, 'lang-giay'), updatedAt: 5 };
+    const b = emptyProgress();
+    b.game = { ...b.game, data: {}, updatedAt: 9 };
+    expect(hasSeenScene(mergeProgress(a, b).game.data, 'lang-giay')).toBe(true);
+  });
+});

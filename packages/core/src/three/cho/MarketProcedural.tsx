@@ -21,12 +21,12 @@ import {
   type Texture,
 } from 'three';
 import { createMulberry32 } from '../../lib/rng';
-import { FENCE_POST_HEIGHT, FENCE_RAIL_LENGTH, fenceLayout, DECK_START_X, DECK_TOP, DOCK_END_X, DOCK_HALF_WIDTH, PLAZA_RADIUS, RAMP_START_X, RIVER_X, ROAD_WIDTH, WORLD_RADIUS, type MarketLayout, type PropPlacement } from './marketLayout';
+import { FENCE_POST_HEIGHT, FENCE_RAIL_LENGTH, fenceLayout, type FenceLayout, DECK_START_X, DECK_TOP, DOCK_END_X, DOCK_HALF_WIDTH, PLAZA_RADIUS, RAMP_START_X, RIVER_X, ROAD_WIDTH, WORLD_RADIUS, type MarketLayout, type PropPlacement } from './marketLayout';
 import { createBoatCanopy, createBoatHull, createCraftProp, createHayStack, createJar } from './marketGeometry';
 import { createEdgeAlphaTexture, createGrassTexture, createPaddyTexture, createPlankTexture, createWaterTexture } from './marketTextures';
 
 /** Một bản nhân bản tĩnh: vị trí, góc xoay, tỉ lệ (đều hoặc từng trục), nhân màu. */
-interface Item {
+export interface Item {
   x: number;
   y?: number;
   z: number;
@@ -61,7 +61,7 @@ function buildInstanced(geometry: BufferGeometry, material: Material, items: rea
   return mesh;
 }
 
-function Instances({ geometry, material, items, cast = false, receive = false }: { geometry: BufferGeometry; material: Material; items: readonly Item[]; cast?: boolean; receive?: boolean }) {
+export function Instances({ geometry, material, items, cast = false, receive = false }: { geometry: BufferGeometry; material: Material; items: readonly Item[]; cast?: boolean; receive?: boolean }) {
   const mesh = useMemo(() => buildInstanced(geometry, material, items, cast, receive), [geometry, material, items, cast, receive]);
   useEffect(
     () => () => {
@@ -73,7 +73,7 @@ function Instances({ geometry, material, items, cast = false, receive = false }:
 }
 
 /** Giải phóng một danh sách tài nguyên khi rời cảnh. */
-function useDispose(list: { dispose(): void }[]) {
+export function useDispose(list: { dispose(): void }[]) {
   useEffect(
     () => () => {
       for (const o of list) o.dispose();
@@ -83,7 +83,7 @@ function useDispose(list: { dispose(): void }[]) {
 }
 
 /** Tải ảnh từ URL (TextureLoader), cấu hình lặp và màu; trả về null khi chưa có hoặc tải lỗi. Giải phóng khi rời cảnh. */
-function useImageTexture(url: string | null, repeat: [number, number]): Texture | null {
+export function useImageTexture(url: string | null, repeat: [number, number]): Texture | null {
   const [tex, setTex] = useState<Texture | null>(null);
   useEffect(() => {
     if (!url) return;
@@ -278,16 +278,16 @@ function River({ layout, water, plank }: { layout: MarketLayout; water: Texture;
 }
 
 /** Hàng rào tre quanh rìa vùng đi lại, có chừa 4 con đường và bến sông. Bố cục và vật cản lấy từ `fenceLayout` / `fenceColliders` (marketLayout.ts). */
-function Fence() {
+export function Fence({ fence }: { fence?: FenceLayout } = {}) {
   const geo = useMemo(() => ({ post: new BoxGeometry(0.13, FENCE_POST_HEIGHT, 0.13), rail: new BoxGeometry(FENCE_RAIL_LENGTH, 0.09, 0.09) }), []);
   const mat = useMemo(() => new MeshStandardMaterial({ color: '#C8B26C', roughness: 1 }), []);
   useDispose(useMemo(() => [geo.post, geo.rail, mat], [geo, mat]));
   const { posts, rails } = useMemo(() => {
-    const f = fenceLayout();
+    const f = fence ?? fenceLayout();
     const posts: Item[] = f.posts.map((p) => ({ x: p.x, z: p.z, y: FENCE_POST_HEIGHT / 2, yaw: p.yaw }));
     const rails: Item[] = f.segments.flatMap((sg) => [0.45, 1.0].map((y) => ({ x: sg.x, z: sg.z, y, yaw: sg.yaw })));
     return { posts, rails };
-  }, []);
+  }, [fence]);
   return (
     <>
       <Instances geometry={geo.post} material={mat} items={posts} cast />
@@ -297,7 +297,7 @@ function Fence() {
 }
 
 /** Dãy đồi xa quanh chân trời (khối cầu dẹt, sương làm nhạt dần). */
-function Hills() {
+export function Hills() {
   const geo = useMemo(() => new SphereGeometry(1, 20, 10), []);
   const mat = useMemo(() => new MeshStandardMaterial({ color: '#6FA66A', roughness: 1 }), []);
   useDispose(useMemo(() => [geo, mat], [geo, mat]));
@@ -315,14 +315,14 @@ function Hills() {
   return <Instances geometry={geo} material={mat} items={items} />;
 }
 
-const toItem = (p: PropPlacement, extra: Partial<Item> = {}): Item => ({ x: p.x, z: p.z, yaw: p.yaw, scale: p.scale, color: p.tint, ...extra });
+export const toItem = (p: PropPlacement, extra: Partial<Item> = {}): Item => ({ x: p.x, z: p.z, yaw: p.yaw, scale: p.scale, color: p.tint, ...extra });
 
 /**
  * Đồ nhỏ do code dựng, rải theo bố cục: đống rơm cạnh nhà, chum vại cạnh lều và nhà, khóm hoa (bụi xanh kèm hoa đỏ).
  * Mỗi loại một InstancedMesh dùng chung geometry và material.
  */
 /** Đồ gợi nghề quanh cổng (bước 8d): hình dựng (`createCraftProp`) và màu vật liệu; màu từng món nhân thêm màu `tint` của bố cục (cuộn vải nhiều màu). */
-const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan'] as const;
+const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc'] as const;
 const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughness: number }> = {
   giay: { color: '#EFE6CC', roughness: 1 },
   vai: { color: '#FFFFFF', roughness: 0.95 },
@@ -331,9 +331,13 @@ const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughne
   hom: { color: '#8A5A2B', roughness: 0.9 },
   thung: { color: '#D2A85A', roughness: 1 },
   chan: { color: '#6B4526', roughness: 1 },
+  'ban-chep': { color: '#8A5A2B', roughness: 0.9 },
+  'so-chung': { color: '#5B3FD6', roughness: 0.7 },
+  'be-ngam': { color: '#8D8F8A', roughness: 1 },
+  nuoc: { color: '#6FA3B8', roughness: 0.15 },
 };
 
-export function MarketProps({ layout }: { layout: MarketLayout }) {
+export function MarketProps({ layout }: { layout: Pick<MarketLayout, 'props' | 'seed'> }) {
   const crafts = useMemo(
     () => CRAFT_KINDS.map((kind) => ({ kind, geo: createCraftProp(kind)!, mat: new MeshStandardMaterial({ ...CRAFT_COLOR[kind], flatShading: kind === 'khoi-da' }) })),
     [],

@@ -48,15 +48,16 @@ describe('hình học tự dựng của chợ', () => {
 });
 
 describe('đồ gợi nghề quanh cổng: hình dựng khớp PROP_SIZES (vật cản sát hình)', () => {
-  const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan'];
+  const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc'];
   for (const kind of crafts) {
     it(`${kind}: chân ở y = 0, cao đúng, vừa trong hình vật cản (hộp hoặc tròn)`, () => {
       const g = createCraftProp(kind)!;
       expect(g, kind).not.toBeNull();
       const b = box(g);
       const k = PROP_SIZES[kind];
-      expect(b.min.y).toBeCloseTo(0, 6);
-      expect(b.max.y).toBeCloseTo(k.h, 6);
+      const lift = k.lift ?? 0;
+      expect(b.min.y).toBeCloseTo(lift, 6);
+      expect(b.max.y).toBeCloseTo(lift + k.h, 6);
       if (k.box) {
         expect(b.max.x - b.min.x).toBeCloseTo(k.box.hx * 2, 6);
         expect(b.max.z - b.min.z).toBeCloseTo(k.box.hz * 2, 6);

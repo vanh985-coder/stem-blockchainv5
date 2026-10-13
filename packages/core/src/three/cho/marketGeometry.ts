@@ -118,6 +118,33 @@ export function createCraftProp(kind: PropKind): BufferGeometry | null {
       g.translate(0, k.h / 2, 0);
       return g;
     }
+    case 'ban-chep': {
+      // bàn chép sổ: mặt bàn dày 0,1 trên bốn chân gỗ
+      const top = 0.1;
+      const legH = k.h - top;
+      const hx = k.box!.hx;
+      const hz = k.box!.hz;
+      const leg = (sx: number, sz: number) => slab(0.12, legH, 0.12, sx * (hx - 0.1), 0, sz * (hz - 0.1));
+      return mergeGeometries([slab(hx * 2, top, hz * 2, 0, legH), leg(-1, -1), leg(-1, 1), leg(1, -1), leg(1, 1)]);
+    }
+    case 'so-chung': {
+      // cuốn Sổ Chung đặt trên bàn (bìa tím): đáy ở y = lift
+      const g = slab(k.box!.hx * 2, k.h, k.box!.hz * 2);
+      g.translate(0, k.lift ?? 0, 0);
+      return g;
+    }
+    case 'be-ngam': {
+      // bể ngâm giấy: đáy và bốn thành đá, giữa lõm xuống để thấy mặt nước
+      const hx = k.box!.hx;
+      const hz = k.box!.hz;
+      const t = 0.18;
+      return mergeGeometries([slab(hx * 2, 0.45, hz * 2), slab(hx * 2, k.h - 0.45, t, 0, 0.45, -(hz - t / 2)), slab(hx * 2, k.h - 0.45, t, 0, 0.45, hz - t / 2), slab(t, k.h - 0.45, (hz - t) * 2, -(hx - t / 2), 0.45, 0), slab(t, k.h - 0.45, (hz - t) * 2, hx - t / 2, 0.45, 0)]);
+    }
+    case 'nuoc': {
+      const g = slab(k.box!.hx * 2, k.h, k.box!.hz * 2);
+      g.translate(0, k.lift ?? 0, 0);
+      return g;
+    }
     case 'chan': {
       const g = new CylinderGeometry(k.r, k.r, k.h, 8);
       g.translate(0, k.h / 2, 0);

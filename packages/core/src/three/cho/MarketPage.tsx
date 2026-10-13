@@ -21,7 +21,7 @@ import { MarketHud } from './MarketHud';
 import { MarketMenu } from './MarketMenu';
 import { MarketScene } from './MarketScene';
 import { PLAYER_START } from './marketLayout';
-import { GATE_VILLAGE, gateStates, previousVillage, questGate, questIndex } from './marketQuest';
+import { GATE_VILLAGE, gateStates, marketSpawn, previousVillage, questGate, questIndex } from './marketQuest';
 import { createInteractables, parseTarget, type MarketTarget } from './marketTargets';
 
 const DIRT_TEXTURE = 'ui/textures/duong-dat';
@@ -40,6 +40,12 @@ function forcedOverview(): 'top' | 'oblique' | 'free' | undefined {
   if (typeof location === 'undefined') return undefined;
   const c = new URLSearchParams(location.search).get('cam');
   return c === 'top' || c === 'oblique' || c === 'free' ? c : undefined;
+}
+
+/** `?tu=<làng>`: từ làng đó về chợ thì xuất hiện ngay trước cổng làng ấy; không có hoặc không hợp lệ thì chỗ mặc định. */
+function forcedSpawn() {
+  if (typeof location === 'undefined') return null;
+  return marketSpawn(new URLSearchParams(location.search).get('tu'));
 }
 
 /** `?debug=colliders`: vẽ khung xem vùng va chạm (chỉ để kiểm tra bằng mắt). */
@@ -67,10 +73,12 @@ export function MarketPage() {
   const navigate = useNavigate();
   const ten = profile?.display_name;
   const isTeacher = canSeeTeacherPage(profile?.role);
-  const api = useMemo(() => createWalkApi(0), []);
+  const spawn = useMemo(forcedSpawn, []);
+  const api = useMemo(() => createWalkApi(spawn?.yaw ?? 0), [spawn]);
   const forced = useMemo(forcedQuality, []);
   const overview = useMemo(forcedOverview, []);
   const debugColliders = useMemo(forcedDebugColliders, []);
+  const camStart = spawn ? { x: spawn.x, z: spawn.z, yaw: spawn.yaw } : { x: PLAYER_START[0], z: PLAYER_START[1], yaw: 0 };
   const { level } = useQuality(forced);
   const [near, setNear] = useState(-1);
   const [dialog, setDialog] = useState<DialogState | null>(null);
@@ -163,8 +171,8 @@ export function MarketPage() {
       >
         <Scene3D
           quality={forced}
-          camera={{ position: [PLAYER_START[0], 4, PLAYER_START[1] - 7], fov: 50 }}
-          lookAt={[PLAYER_START[0], 1.3, PLAYER_START[1]]}
+          camera={{ position: [camStart.x - Math.sin(camStart.yaw) * 7, 4, camStart.z - Math.cos(camStart.yaw) * 7], fov: 50 }}
+          lookAt={[camStart.x, 1.3, camStart.z]}
           fog={overview ? false : FOG}
           sunPosition={[26, 46, 18]}
           shadowFollowPlayer
@@ -182,6 +190,7 @@ export function MarketPage() {
             onNearestChange={onNearest}
             targetGate={targetGate}
             talkingVillager={dialog?.villager ?? null}
+            spawn={spawn ?? undefined}
           />
         </Scene3D>
 
