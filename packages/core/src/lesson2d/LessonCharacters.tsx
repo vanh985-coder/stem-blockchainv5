@@ -1,4 +1,5 @@
-import { Component, lazy, Suspense, useEffect, useState, type ReactNode } from 'react';
+import { Component, lazy, Suspense, useEffect, useState, type ErrorInfo, type ReactNode } from 'react';
+import { logCanvasError } from '../three/canvasLog';
 import { LOAD_DELAY_MS } from './frames';
 import type { LessonFramesPlan } from './useLessonFrames';
 
@@ -11,7 +12,8 @@ class Quiet extends Component<{ children: ReactNode; onError: () => void }, { fa
   static getDerivedStateFromError() {
     return { failed: true };
   }
-  componentDidCatch() {
+  componentDidCatch(error: unknown, info: ErrorInfo) {
+    logCanvasError(error, info); // ghi ra console, không báo gì cho học sinh
     this.props.onError();
   }
   render() {

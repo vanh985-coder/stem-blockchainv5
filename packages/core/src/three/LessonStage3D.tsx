@@ -1,5 +1,6 @@
 import { PerspectiveCamera, View } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
+import { ForcedCrash, forcedCanvasCrash } from './ForcedCrash';
 import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { ACESFilmicToneMapping } from 'three';
 import { shouldHideForFps, type FrameLayout } from '../lesson2d/frames';
@@ -93,6 +94,7 @@ export default function LessonStage3D({ layout, onFail, onSlow }: LessonStage3DP
   const active = useActive(left, right);
   const [ready, setReady] = useState(false);
   const [shown, setShown] = useState(false);
+  const crash = useState(forcedCanvasCrash)[0];
 
   // Tải đúng 2 model; thiếu file hoặc lỗi (đang là hình thay thế) thì báo lỗi. Giữ model suốt thời gian khung tồn tại.
   useEffect(() => {
@@ -146,11 +148,12 @@ export default function LessonStage3D({ layout, onFail, onSlow }: LessonStage3DP
         <Canvas
           frameloop={active ? 'always' : 'never'}
           dpr={effectiveDpr(level, window.devicePixelRatio)}
-          shadows="soft"
+          shadows="percentage"
           gl={{ alpha: true, antialias: true, powerPreference: 'high-performance', toneMapping: ACESFilmicToneMapping }}
           eventSource={document.body}
           style={{ pointerEvents: 'none' }}
         >
+          {crash && <ForcedCrash />}
           <View.Port />
           {active && <FpsGuard isLow={shouldHideForFps} onLow={onSlow} />}
         </Canvas>

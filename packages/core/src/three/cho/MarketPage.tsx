@@ -170,6 +170,7 @@ export function MarketPage() {
         className="size-full"
       >
         <Scene3D
+          errorCovers
           quality={forced}
           camera={{ position: [camStart.x - Math.sin(camStart.yaw) * 7, 4, camStart.z - Math.cos(camStart.yaw) * 7], fov: 50 }}
           lookAt={[camStart.x, 1.3, camStart.z]}

@@ -229,6 +229,7 @@ export function VillageScene({ input }: VillageSceneProps) {
         className="size-full"
       >
         <Scene3D
+          errorCovers
           quality={forced}
           camera={{ position: camPos, fov: 50 }}
           lookAt={[input.start.x, 1.3, input.start.z]}

@@ -5,6 +5,7 @@
  */
 export { Scene3D } from './Scene3D';
 export type { Scene3DProps } from './Scene3D';
+export { CanvasErrorBoundary, Canvas3DErrorBox } from './CanvasErrorBoundary';
 export { Model, useModel } from './Model';
 export type { ModelProps, ModelLod, UsedModel } from './Model';
 export { preloadModel, createPlaceholder } from './modelLoader';

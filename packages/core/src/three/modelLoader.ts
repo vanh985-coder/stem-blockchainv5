@@ -23,6 +23,8 @@ interface Entry {
   data?: ModelData;
   refs: number;
   disposeTimer?: ReturnType<typeof setTimeout>;
+  /** Lần cuối có component đọc model này lúc render (giờ `Date.now()`); đọc rồi mà chưa kịp `retainModel` (effect chạy sau commit) thì chưa được dọn */
+  lastRead: number;
 }
 
 const cache = new Map<string, Entry>();
@@ -107,6 +109,7 @@ function getEntry(id: string): Entry {
     const created: Entry = {
       status: 'pending',
       refs: 0,
+      lastRead: 0,
       promise: fetchModel(id).then((data) => {
         created.status = 'ready';
         created.data = data;
@@ -131,6 +134,7 @@ export function preloadModel(id: string): Promise<ModelData> {
 export function readModel(id: string): ModelData {
   const entry = getEntry(id);
   if (entry.status === 'pending') throw entry.promise;
+  entry.lastRead = Date.now();
   return entry.data as ModelData;
 }
 
@@ -183,12 +187,30 @@ export function releaseModel(id: string): void {
   if (!entry) return;
   entry.refs = Math.max(0, entry.refs - 1);
   if (entry.refs > 0 || entry.disposeTimer) return;
+  scheduleDispose(id, entry, DISPOSE_DELAY_MS);
+}
+
+/**
+ * Có được dọn model chưa: hết chỗ dùng, và không có ai vừa đọc lúc render mà chưa kịp giữ (nếu dọn lúc đó, scene vừa render sẽ mang texture đã đóng, rộng cao 0,
+ * lên GPU và WebGL báo texture kích thước 0). Trả về số mili giây còn phải chờ (0 = dọn được).
+ */
+export function disposeWaitMs(refs: number, lastRead: number, now: number, delay: number = DISPOSE_DELAY_MS): number {
+  if (refs > 0) return delay;
+  return Math.max(0, lastRead + delay - now);
+}
+
+function scheduleDispose(id: string, entry: Entry, wait: number): void {
   entry.disposeTimer = setTimeout(() => {
     entry.disposeTimer = undefined;
     if (entry.refs > 0) return;
+    const more = disposeWaitMs(entry.refs, entry.lastRead, Date.now());
+    if (more > 0) {
+      scheduleDispose(id, entry, more);
+      return;
+    }
     cache.delete(id);
     if (entry.data) disposeModelScene(entry.data.scene);
-  }, DISPOSE_DELAY_MS);
+  }, wait);
 }
 
 /** Số model đang giữ trong bộ nhớ đệm và tổng số chỗ đang dùng (để kiểm tra rò rỉ khi vào/ra cảnh). */

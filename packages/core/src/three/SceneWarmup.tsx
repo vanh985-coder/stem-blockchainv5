@@ -11,6 +11,23 @@ interface Saved {
 
 const isTexture = (v: unknown): v is Texture => !!v && (v as { isTexture?: boolean }).isTexture === true;
 
+/**
+ * Kích thước ảnh của texture (0 nếu chưa có ảnh, ảnh chưa tải xong, hay ImageBitmap đã bị đóng). Texture có kích thước 0 mà đưa lên GPU thì WebGL báo
+ * "glTexStorage2D: One or more image dimensions are not positive" và "glGenerateMipmap: ... does not support mipmap generation".
+ */
+export function textureSize(t: Texture): { width: number; height: number } {
+  const img = t.image as { width?: number; height?: number; naturalWidth?: number; naturalHeight?: number; videoWidth?: number; videoHeight?: number; complete?: boolean } | null | undefined;
+  if (!img) return { width: 0, height: 0 };
+  if (img.complete === false) return { width: 0, height: 0 };
+  return { width: img.naturalWidth ?? img.videoWidth ?? img.width ?? 0, height: img.naturalHeight ?? img.videoHeight ?? img.height ?? 0 };
+}
+
+/** Texture có ảnh dùng được (rộng và cao đều dương) thì mới đưa lên GPU. */
+export function textureUsable(t: Texture): boolean {
+  const { width, height } = textureSize(t);
+  return width > 0 && height > 0;
+}
+
 /** Mọi texture đang gắn vào vật liệu của cảnh (map, normalMap, ...), mỗi texture một lần. */
 export function sceneTextures(scene: Object3D): Texture[] {
   const seen = new Set<Texture>();
@@ -42,7 +59,10 @@ export function warmUp(gl: WebGLRenderer, scene: Scene, camera: Camera): void {
     saved.push(s);
   });
   try {
-    for (const t of sceneTextures(scene)) gl.initTexture(t);
+    for (const t of sceneTextures(scene)) {
+      if (textureUsable(t)) gl.initTexture(t);
+      else if (import.meta.env.DEV) console.warn('[3D] Skipped texture with no usable image (width or height 0):', t.name || t.uuid);
+    }
     gl.compile(scene, camera);
     gl.render(scene, camera);
   } finally {

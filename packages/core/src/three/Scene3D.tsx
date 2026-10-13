@@ -2,7 +2,9 @@ import { Canvas, useThree, type RootState } from '@react-three/fiber';
 import { Suspense, useCallback, useEffect, useState, type ReactNode } from 'react';
 import { ACESFilmicToneMapping } from 'three';
 import { useSettings } from '../settings/SettingsProvider';
+import { CanvasErrorBoundary } from './CanvasErrorBoundary';
 import { DayLight } from './DayLight';
+import { ForcedCrash, forcedCanvasCrash } from './ForcedCrash';
 import { FpsGuard } from './FpsGuard';
 import { LoadingScreen } from './LoadingScreen';
 import { QualityContext } from './QualityContext';
@@ -39,6 +41,8 @@ export interface Scene3DProps {
   onQualityLowered?: (fps: number, level: QualityLevel) => void;
   /** Báo khi cảnh đã tải xong (màn hình tải đã tắt) */
   onReady?: () => void;
+  /** Cảnh lỗi thì hộp báo lỗi phủ kín cả màn hình (trang đi lại toàn màn hình: chợ, làng) */
+  errorCovers?: boolean;
 }
 
 /** Hướng camera về một điểm khi dựng cảnh (không cấp phát trong useFrame; chỉ chạy một lần). */
@@ -66,7 +70,7 @@ function ReadySignal({ onReady }: { onReady: () => void }) {
  *
  * Nằm trong chunk riêng: chỉ import ở trang 3D (lazy), không import ở trang đầu.
  */
-export function Scene3D({
+function Scene3DInner({
   children,
   className = '',
   quality,
@@ -99,16 +103,19 @@ export function Scene3D({
   );
   const dpr = effectiveDpr(level, typeof window === 'undefined' ? 1 : window.devicePixelRatio);
 
+  const crash = useState(forcedCanvasCrash)[0];
+
   return (
     <div className={`relative size-full overflow-hidden ${className}`}>
       <Canvas
         dpr={dpr}
-        shadows={level === 'low' ? false : 'soft'}
+        shadows={level === 'low' ? false : 'percentage'}
         gl={{ antialias, powerPreference: 'high-performance', toneMapping: ACESFilmicToneMapping }}
         onCreated={onCreated}
         camera={{ position: camera?.position ?? [0, 4, 10], fov: camera?.fov ?? 45, near: camera?.near ?? 0.1, far: camera?.far ?? SKY_RADIUS * 2 }}
       >
         <QualityContext.Provider value={level}>
+          {crash && <ForcedCrash />}
           {lookAt && <LookAt at={lookAt} />}
           {fog && <fog attach="fog" args={[SKY_HORIZON, fog[0], fog[1]]} />}
           <Suspense fallback={null}>
@@ -122,5 +129,14 @@ export function Scene3D({
       </Canvas>
       <LoadingScreen visible={!ready} />
     </div>
+  );
+}
+
+/** Khung cảnh 3D có lớp chặn lỗi: cảnh bị lỗi thì hiện hộp "Cảnh 3D gặp lỗi" (Tải lại, Bản đồ) thay vì trang trắng. */
+export function Scene3D(props: Scene3DProps) {
+  return (
+    <CanvasErrorBoundary covers={props.errorCovers}>
+      <Scene3DInner {...props} />
+    </CanvasErrorBoundary>
   );
 }

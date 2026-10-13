@@ -493,6 +493,9 @@ Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút
 - **Bộ nhớ:** texture nhân vật đã được thu nhỏ khi build (spec 01). Nếu lúc chạy còn thấy texture lớn hơn 2048, ghi cảnh báo.
 - **Tốc độ:** mức Thấp ≥ 30fps trên điện thoại tầm trung.
 - **Code:** không tạo object mới trong `useFrame`; rời cảnh thì dispose (hình học, vật liệu, texture và **đóng `ImageBitmap`** của texture, vì `texture.dispose()` không giải phóng bitmap trong RAM). `AnimationMixer` tạo trong `useEffect`, cleanup gọi `stopAllAction` và `uncacheRoot`; mỗi lần effect chạy (kể cả lần gắn lại của StrictMode) tạo mixer mới.
+- **Mixer (mốc 2, bước 10b):** mixer, hành động và lớp tư thế do bộ điều khiển `CharacterRig` (`three/characterRig.ts`, thuần, có test) giữ; `build` dọn rig cũ trước khi dựng rig mới, `dispose` xóa mọi tham chiếu, `play`/`update` luôn tra rig HIỆN TẠI. Lý do: gọi `play()` trên hành động của mixer đã `uncacheRoot` thì three ném "Cannot set properties of undefined (setting '_cacheIndex')" và sập Canvas; trước đây hàm `play` cũ (giữ rig cũ trong state) vẫn chạy trong cùng lần commit khi model đổi (ví dụ đổi mức chất lượng lúc đang chơi).
+- **Lỗi 3D:** mọi `<Scene3D>` có lớp chặn lỗi `CanvasErrorBoundary`: hộp "Cảnh 3D gặp lỗi" trên nền giấy dó với "Tải lại" và "Bản đồ" (chợ, làng phủ kín màn hình), lỗi ghi ra console với tiền tố `[3D]`. Khung 3D trang bài học chỉ ẩn khung (bài học chạy tiếp) và ghi lỗi ra console. Thử bằng `?loi3d=1` (chỉ khi chạy dev).
+- **Texture kích thước 0:** `warmUp` chỉ `initTexture` các texture có ảnh dùng được (`textureUsable`); `modelLoader` không dọn model vừa được đọc lúc render mà chưa kịp giữ (`disposeWaitMs`), để scene vừa render không mang `ImageBitmap` đã đóng. Bóng đổ dùng `shadows="percentage"` (PCFShadowMap) vì `PCFSoftShadowMap` đã bị three gỡ.
 
 ## 10. Trang thử
 

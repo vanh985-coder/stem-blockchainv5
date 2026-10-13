@@ -3,6 +3,14 @@
  * Chỉ sửa chữ nằm giữa hai dấu nháy. Giữ nguyên các chỗ giữ tên như {ten}, {phanDien}, {so}.
  */
 export const ui = {
+  /** Hộp báo lỗi khi cảnh 3D bị lỗi (lớp chặn lỗi quanh mọi Canvas) */
+  loi3D: {
+    tieuDe: 'Cảnh 3D gặp lỗi',
+    moTa: 'Cảnh này không vẽ được. Em thử tải lại trang, hoặc quay về bản đồ nhé.',
+    taiLai: 'Tải lại',
+    banDo: 'Bản đồ',
+  },
+
   chung: {
     /** Nút ở hộp thoại: sang lượt nói tiếp theo */
     tiep: 'Tiếp',
