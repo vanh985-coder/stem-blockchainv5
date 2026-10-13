@@ -112,6 +112,12 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 | Bạc | 380 |
 | Vàng | 520 |
 
+**Đã làm (mốc 2, bước 10 — chỉ phần luật, chưa vẽ):** `packages/village-lang-giay/src/runner/`:
+- `runnerLogic.ts`: `createRunner({ seed })` và `stepRunner(state, input, dt)` (sửa state tại chỗ, không cấp phát lúc chạy; cùng seed và cùng lệnh thì cùng kết quả). Bước 11 chỉ việc vẽ `state` (làn, `x`, `y`, `rows`, `items`, `villain`, `events`) và nối phím vào `input` (`move`, `jump`, `slide`; lúc hỏi: `answer`, `resume`). Hàm thuần: `speedAt`, `runnerScore`, `runnerMedal`, `minGap`.
+- `runnerConfig.ts`: `RUNNER_SPEC` (số liệu đúng spec) và `RUNNER_TUNING` (số spec chưa có, có chú thích: thời gian đổi làn 0,15 giây; kích thước thân; nửa dài các chướng ngại; xe chở hàng dài 6 và hàng kế tiếp cách thêm 6; tần suất và độ dài chuỗi vật nhặt; vật nhặt trên nóc xe; hàng đầu cách vạch 30, sinh trước 90 phía trước; ném rơm rơi cách ít nhất 22 và bay 0,7 giây; chạy chậm 1,2 giây lúc hết vòng, tăng tốc lại 1,0 giây; xóa chướng ngại trong 14 mét phía trước lúc hỏi; nhấp nháy 1 giây sau khi mất tim).
+- Quy ước cụ thể: một hàng chỉ có tối đa 2 trong 3 làn có chướng ngại ("chắn kín" là cả 3 làn đều có); mỗi hàng có "làn đi qua được" (trống, thấp hoặc cao) lệch tối đa 1 làn so với hàng trước; rơm {phanDien} ném chỉ được thêm vào làn đang trống của một hàng cách xa ≥ 22 mét và còn chừa ít nhất một làn trống, nên cũng chịu hai luật trên. Hết vòng thì chạy chậm lại, không va chạm trong lúc chậm và lúc hỏi; trả lời xong phải `resume` mới chạy tiếp (để hiện giải thích).
+- Test `runnerLogic.test.ts` (đủ 9 ca của bảng trên, giữ nguyên số thứ tự) và `runnerBalance.test.ts` (300 ván bot giỏi, 300 ván bot trung bình; bot ở `testBots.ts`, chỉ dùng trong test). Cân bằng (cấu hình hiện tại): bot giỏi Vàng 95,7% (điểm trung bình 706); bot trung bình điểm trung bình 328: chưa đạt mốc 27,7%, Đồng 34,0%, Bạc 22,7%, Vàng 15,7%. Chỉ chỉnh được tần suất vật nhặt (`RUNNER_TUNING.chain`, `power`, `roof`); không đổi công thức điểm hay mốc điểm.
+
 **Hiệu năng:** đường chạy gồm các đoạn dài 40 đơn vị, chỉ giữ khoảng 5 đoạn cùng lúc; chướng ngại và vật nhặt đều dùng lại (pooling).
 
 **Test (`runnerLogic.ts`):**

@@ -415,9 +415,13 @@ Dùng ở mọi chỗ có lựa chọn: câu hỏi, Đồng ý/Từ chối, lự
 - **Cảnh mở đầu:** chiếu một lần khi lần đầu vào làng (ảnh truyện + lời người dẫn), có nút "Bỏ qua". Cờ đã xem lưu cùng tiến độ (`villageSceneSeen` trong `game_state.data`; khách là trường `vs` của cookie).
 - Chữ nằm ở `content/villageScene.ts` (theo từng làng) và `ui.langScene`. Làng chưa có cảnh (`hasScene` false) thì giữ cách cũ của mốc 1.
 
-**`MiniGameLevel`** (game phụ):
-- Thẻ bắt đầu: luật 2–3 dòng, cách điều khiển, điểm cao nhất, nút "Bắt đầu".
-- Màn kết quả: điểm, mốc đồng / bạc / vàng, nút "Chơi lại" và "Về làng".
+**`MiniGameLevel`** (game phụ; **đã làm ở mốc 2 bước 10**: `packages/core/src/ui/MiniGameLevel.tsx`, mốc điểm và ghi kết quả ở `games/medals.ts`, chữ ở `content/games.ts`):
+- Thẻ bắt đầu: tên game, luật 2–3 dòng, cách điều khiển (máy tính và điện thoại), điểm cao nhất (chưa chơi thì "Em chưa chơi màn này."), các mốc điểm, nút "Bắt đầu".
+- Màn kết quả: điểm, mốc đồng / bạc / vàng (và "Kỷ lục mới!", số xu nhận), nút "Chơi lại" và "Về làng".
+- Props: `levelId`, `medals` (3 mốc điểm của game), `renderGame({ paused, attempt, onFinish })` (phần chơi do từng game vẽ; gọi `onFinish(điểm)` một lần khi xong, thắng hay thua), `onLeave?`.
+- **Ghi tiến độ** (`recordLevelResult`, đăng nhập hay khách): chơi xong là `played = true` (kể cả điểm 0), `best_score` lấy số lớn hơn, `stars {"game": 0–3}` theo mốc (0 thì không ghi khóa, hiểu là 0), `completed` khi đạt ít nhất mốc Đồng; xu +10 cho mỗi sao mới. Ghi vào máy ngay rồi đẩy lên sau.
+- **Tạm dừng:** tab bị ẩn lúc đang chơi thì `paused` = true và hộp "Tạm dừng" giữ cho tới khi em bấm "Tiếp tục" (khỏi chạy tiếp lúc em chưa nhìn).
+- Trang thử (chỉ khi chạy dev): `/dev/minigame` (game giả có các nút kết thúc với điểm cho trước).
 
 **Luật chung:**
 - Chơi xong một màn (thắng hay thua) là tính **đã chơi**. Không bao giờ chặn đường.

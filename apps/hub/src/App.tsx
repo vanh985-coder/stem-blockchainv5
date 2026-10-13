@@ -13,6 +13,7 @@ const DevAssets = import.meta.env.DEV ? lazy(() => import('./DevAssets')) : null
 const DevUi = import.meta.env.DEV ? lazy(() => import('./DevUi')) : null;
 const DevHotspots = import.meta.env.DEV ? lazy(() => import('./ban-do/DevHotspots')) : null;
 const DevNen = import.meta.env.DEV ? lazy(() => import('./DevNen')) : null;
+const DevMiniGame = import.meta.env.DEV ? lazy(() => import('./DevMiniGame')) : null;
 // Lõi 3D (three, R3F, drei) nằm ở chunk riêng, chỉ tải khi vào trang 3D (spec 03 mục 9).
 const Dev3D = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.DevModelViewer }))) : null;
 // Chợ phiên 3D (mốc 2): trang riêng, chưa nối từ trang chủ. Lõi 3D ở chunk riêng.
@@ -42,6 +43,7 @@ export function App() {
       {DevAssets && <Route path="/dev/assets" element={<Lazy page={DevAssets} />} />}
       {DevUi && <Route path="/dev/ui" element={<Lazy page={DevUi} />} />}
       {DevNen && <Route path="/dev/nen" element={<Lazy page={DevNen} />} />}
+      {DevMiniGame && <Route path="/dev/minigame" element={<Lazy page={DevMiniGame} />} />}
       {Dev3D && <Route path="/dev/3d" element={<Lazy page={Dev3D} />} />}
       {DevWalk && <Route path="/dev/walk" element={<Lazy page={DevWalk} />} />}
       {DevHotspots && <Route path="/dev/ban-do-hotspots" element={<Lazy page={DevHotspots} />} />}
