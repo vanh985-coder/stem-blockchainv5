@@ -4,14 +4,17 @@ import { asset, useManifest } from '../assets/store';
 import { CHARACTERS, fmt, speakerLabel } from '../content/characters';
 import { ui } from '../content/ui';
 import { useSettings } from '../settings/SettingsProvider';
-import { Panel } from '../ui/Panel';
 import { MouseSensitivityRow } from '../ui/SettingsPanel';
 import { VnDialog, type VnTurn } from '../ui/VnDialog';
 import { Scene3D } from './Scene3D';
 import { Villager } from './Villager';
 import { WalkControls } from './WalkControls';
+import { WalkLockOverlay } from './WalkLockOverlay';
+import { useWalkSession } from './useWalkSession';
 import { WalkWorld } from './WalkWorld';
-import { box, circle, type Obstacle } from './collision';
+import type { CameraBlocker } from './cameraCollision';
+import { box, circle, obox, type Obstacle } from './collision';
+import { ColliderDebug } from './cho/ColliderDebug';
 import type { Interactable } from './interaction';
 import { QUALITY_CHOICES, type QualityChoice } from './quality';
 import { useQuality } from './useQuality';
@@ -53,12 +56,17 @@ const BLOCKS: readonly Block[] = [
 const SIGNPOST = { x: 0, z: 8 };
 const MAILBOX = { x: -7, z: -7 };
 
-const OBSTACLES: readonly Obstacle[] = [
-  ...PILLARS.map((p) => circle(p.x, p.z, p.r)),
-  ...BLOCKS.map((b) => box(b.minX, b.maxX, b.minZ, b.maxZ)),
-  circle(SIGNPOST.x, SIGNPOST.z, 0.3),
-  circle(MAILBOX.x, MAILBOX.z, 0.35),
+/**
+ * Vật cản của các vật thử, đúng bằng hình đã dựng (bước 7b): cột tròn và hộp đúng cỡ; biển gỗ là tấm biển 1,1 × 0,1 (phần chạm tới tầm
+ * 1,5 từ đất, hộp xoay theo trục), hòm thư là hộp 0,5 × 0,4. Mỗi cái kèm chiều cao để vẽ khung xem va chạm (`?debug=colliders`).
+ */
+export const DEV_WALK_COLLIDERS: readonly CameraBlocker[] = [
+  ...PILLARS.map((p) => ({ shape: circle(p.x, p.z, p.r) as Obstacle, height: p.h })),
+  ...BLOCKS.map((b) => ({ shape: box(b.minX, b.maxX, b.minZ, b.maxZ) as Obstacle, height: b.h })),
+  { shape: obox(SIGNPOST.x, SIGNPOST.z, 0.55, 0.05, 0), height: 1.65 },
+  { shape: obox(MAILBOX.x, MAILBOX.z, 0.25, 0.2, 0), height: 0.9 },
 ];
+const OBSTACLES: readonly Obstacle[] = DEV_WALK_COLLIDERS.map((c) => c.shape);
 
 const VILLAGER_PATH: readonly Waypoint[] = [
   [10, 10],
@@ -126,17 +134,6 @@ const QUALITY_LABEL: Record<QualityChoice, string> = {
   high: ui.caiDat.chatLuongCao,
 };
 
-/** Sau khi đóng hộp thoại, Esc vừa đóng không được tính là mở menu (chỉ dùng khi không có khóa chuột). */
-const MENU_GUARD_MS = 250;
-/** Hết chờ này mà trình duyệt chưa trả lời yêu cầu khóa chuột thì coi như chưa khóa được và hiện lại lời nhắc. */
-const LOCK_PENDING_MS = 1500;
-
-/** Trình duyệt có khóa chuột và con trỏ chính là chuột (không phải cảm ứng). */
-function detectLockMode(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
-  return 'requestPointerLock' in Element.prototype && window.matchMedia('(pointer: fine)').matches;
-}
-
 function QualitySelect({ value, onChange }: { value: QualityChoice; onChange: (v: QualityChoice) => void }) {
   return (
     <label className="flex items-center gap-1">
@@ -169,7 +166,6 @@ export function DevWalk() {
   const manifest = useManifest();
   const { settings, update } = useSettings();
   const api = useMemo(() => createWalkApi(0), []);
-  const lockMode = useMemo(detectLockMode, []);
   // Chỉ khi chạy dev: mở cầu nối điều khiển ra window để kiểm tra bằng trình duyệt (góc camera, khóa chuột).
   if (import.meta.env.DEV) (window as unknown as { __walkApi?: typeof api }).__walkApi = api;
   const [choice, setChoice] = useState<QualityChoice>(settings.quality);
@@ -177,13 +173,9 @@ export function DevWalk() {
   const [fps, setFps] = useState(0);
   const [near, setNear] = useState(-1);
   const [dialog, setDialog] = useState<number | null>(null);
-  const [menu, setMenu] = useState(false); // menu mở bằng Esc khi không có khóa chuột
-  const [locked, setLocked] = useState(false);
-  const [lockPending, setLockPending] = useState(false);
-  const [menuCount, setMenuCount] = useState(0);
-  // Có khóa chuột: menu hiện đúng khi chưa khóa (kể cả lúc mới vào) và không có hộp thoại. Không có: Esc bật tắt menu.
-  const menuOpen = lockMode ? !locked && !lockPending && dialog === null : menu;
-  const paused = dialog !== null || (lockMode ? !locked : menu);
+  const session = useWalkSession(api, dialog !== null);
+  const { paused, lockMode } = session;
+  const debugColliders = useMemo(() => new URLSearchParams(window.location.search).get('debug') === 'colliders', []);
   const coarse = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
 
   const groundUrl = useMemo(() => (manifest ? asset(GROUND_TEXTURE) : null), [manifest]);
@@ -207,51 +199,20 @@ export function DevWalk() {
     ];
   }, []);
 
-  // Giá trị mới nhất cho các hàm gọi từ sự kiện (không đăng ký lại mỗi lần vẽ).
-  const state = useRef({ near, dialog, menu, locked });
-  state.current = { near, dialog, menu, locked };
-  const lastDialogClose = useRef(0);
-  const pendingTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-
-  /** Xin khóa chuột. Phải gọi ngay trong sự kiện bấm. Bị từ chối thì `onLockError` hiện lại lời nhắc. */
-  const lock = useCallback(() => {
-    if (!lockMode || state.current.locked) return;
-    setLockPending(true);
-    clearTimeout(pendingTimer.current);
-    pendingTimer.current = setTimeout(() => setLockPending(false), LOCK_PENDING_MS);
-    api.lock.request();
-  }, [api, lockMode]);
-  const onLockChange = useCallback((isLocked: boolean) => {
-    clearTimeout(pendingTimer.current);
-    setLockPending(false);
-    setLocked(isLocked);
-    // Nhả khóa (Esc, chuyển cửa sổ) khi không phải để mở hộp thoại: coi là sự kiện mở menu.
-    if (!isLocked && state.current.dialog === null) setMenuCount((c) => c + 1);
-  }, []);
-  const onLockError = useCallback(() => {
-    clearTimeout(pendingTimer.current);
-    setLockPending(false); // hiện lại lời nhắc "Bấm để chơi tiếp", không báo lỗi
-  }, []);
-  useEffect(() => () => clearTimeout(pendingTimer.current), []);
+  const nearRef = useRef(near);
+  nearRef.current = near;
+  const dialogRef = useRef(dialog);
+  dialogRef.current = dialog;
 
   const interact = useCallback(() => {
-    const s = state.current;
-    if (s.dialog !== null || s.menu || s.near < 0) return;
-    setDialog(s.near);
+    if (dialogRef.current !== null || nearRef.current < 0) return;
+    setDialog(nearRef.current);
     api.lock.exit(); // nhả khóa để bấm được lựa chọn trong hộp thoại
   }, [api]);
-  const toggleMenu = useCallback(() => {
-    if (lockMode) return; // có khóa chuột: Esc do trình duyệt xử lý (nhả khóa), menu hiện theo trạng thái khóa
-    const s = state.current;
-    if (s.dialog !== null || performance.now() - lastDialogClose.current < MENU_GUARD_MS) return;
-    setMenuCount((c) => c + 1);
-    setMenu((m) => !m);
-  }, [lockMode]);
   const closeDialog = useCallback(() => {
-    lastDialogClose.current = performance.now();
     setDialog(null);
-    lock(); // đóng bằng cú bấm thì khóa lại ngay trong chính sự kiện bấm đó
-  }, [lock]);
+    session.dialogClosed(); // đóng bằng cú bấm thì khóa lại ngay trong chính sự kiện bấm đó
+  }, [session]);
 
   useEffect(() => {
     document.title = ui.devWalk.tieuDe;
@@ -267,16 +228,17 @@ export function DevWalk() {
         paused={paused}
         lockMode={lockMode}
         mouseSensitivity={settings.mouseSensitivity}
-        onLockChange={onLockChange}
-        onLockError={onLockError}
+        onLockChange={session.onLockChange}
+        onLockError={session.onLockError}
         interactLabel={near >= 0 ? labels[near] : null}
         onInteract={interact}
-        onMenu={toggleMenu}
+        onMenu={session.toggleMenu}
         className="size-full"
       >
         <Scene3D quality={choice === 'auto' ? undefined : choice} camera={{ position: [0, 4, -7], fov: 50 }} lookAt={[0, 1.3, 0]} shadowExtent={GROUND_RADIUS + 2}>
           <WalkWorld api={api} paused={paused} obstacles={OBSTACLES} boundsRadius={GROUND_RADIUS} interactables={interactables} onNearestChange={onNearest} groundUrl={groundUrl}>
             <Props />
+            {debugColliders && <ColliderDebug colliders={DEV_WALK_COLLIDERS} dynamic={[]} />}
             <Villager id="characters/dan-lang-ba-cu" waypoints={VILLAGER_PATH} seed={5} />
           </WalkWorld>
           <WalkStats onFps={onFps} />
@@ -302,7 +264,7 @@ export function DevWalk() {
             <p>{coarse ? ui.devWalk.huongDanDienThoai : ui.devWalk.huongDanMayTinh}</p>
             <p>{ui.devWalk.thuHienVa}</p>
           </details>
-          {menuCount > 0 && <p className="font-bold">{fmt(ui.devWalk.suKienMenu, { so: menuCount })}</p>}
+          {session.menuCount > 0 && <p className="font-bold">{fmt(ui.devWalk.suKienMenu, { so: session.menuCount })}</p>}
         </div>
 
         {/* Lời nhắc tương tác ở máy tính (điện thoại hiện trên nút ✋) */}
@@ -315,7 +277,7 @@ export function DevWalk() {
         )}
 
         {/* Dấu chấm giữa màn hình khi đã khóa chuột (con trỏ bị ẩn) */}
-        {lockMode && locked && <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-10 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80 ring-1 ring-black/40" />}
+        {lockMode && session.locked && <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-10 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80 ring-1 ring-black/40" />}
       </WalkControls>
 
       {dialog !== null && (
@@ -326,38 +288,10 @@ export function DevWalk() {
         </div>
       )}
 
-      {menuOpen && (
-        // Bấm vào đâu ngoài các điều khiển thì khóa chuột lại (trong chính sự kiện bấm này).
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={lockMode ? lock : undefined}>
-          <Panel role="dialog" aria-labelledby="walk-menu" className="w-full max-w-sm space-y-3 text-center">
-            <h2 id="walk-menu" className="text-2xl">
-              {ui.devWalk.menuTieuDe}
-            </h2>
-            <p>{ui.devWalk.menuMoTa}</p>
-            {lockMode ? (
-              <button
-                type="button"
-                autoFocus
-                onClick={(e) => {
-                  e.stopPropagation();
-                  lock();
-                }}
-                className="min-h-11 w-full cursor-pointer rounded-nut border-2 border-xanh-la-dam bg-xanh-la px-4 font-display text-lg font-extrabold text-white"
-              >
-                {ui.devWalk.baiDeChoiTiep}
-              </button>
-            ) : (
-              <button type="button" autoFocus onClick={() => setMenu(false)} className="min-h-11 cursor-pointer rounded-nut border-2 border-xanh-la-dam bg-xanh-la px-4 font-bold text-white">
-                {ui.devWalk.menuTiepTuc}
-              </button>
-            )}
-            <div className="space-y-2 text-left" onClick={(e) => e.stopPropagation()}>
-              <MouseSensitivityRow value={settings.mouseSensitivity} onChange={(v) => update({ mouseSensitivity: v })} />
-              <QualitySelect value={choice} onChange={setChoice} />
-            </div>
-          </Panel>
-        </div>
-      )}
+      <WalkLockOverlay session={session}>
+        <MouseSensitivityRow value={settings.mouseSensitivity} onChange={(v) => update({ mouseSensitivity: v })} />
+        <QualitySelect value={choice} onChange={setChoice} />
+      </WalkLockOverlay>
     </div>
   );
 }

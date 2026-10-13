@@ -25,7 +25,7 @@ export const AIR_TIME = (2 * JUMP_VELOCITY) / GRAVITY;
 export interface PlayerState {
   x: number;
   z: number;
-  /** Độ cao so với đất (0 là đứng trên đất) */
+  /** Độ cao của chân trong cảnh (đứng trên mặt đi được thì bằng `groundHeight(x, z)`, mặc định 0) */
   y: number;
   vx: number;
   vz: number;
@@ -59,7 +59,15 @@ export interface World {
   boundsRadius: number;
   /** Bán kính nhân vật khi va chạm (mặc định `PLAYER_RADIUS`) */
   radius?: number;
+  /**
+   * Độ cao mặt đi được tại (x, z); mặc định mặt đất phẳng (0). Đứng trên mặt đó khi không nhảy; nhảy và rơi tính từ độ cao đó. Đi xuống chỗ
+   * thấp hơn quá `DROP_SNAP` trong một khung hình thì rơi tự do.
+   */
+  groundHeight?: (x: number, z: number) => number;
 }
+
+/** Bước xuống tối đa (đơn vị) mà chân bám theo mặt đi được trong một khung hình (đi xuống dốc, bậc thấp); sâu hơn thì rơi. */
+export const DROP_SNAP = 0.12;
 
 /** Điểm hai chiều dùng làm kết quả (ghi vào, không cấp phát). */
 export interface Dir2 {
@@ -127,6 +135,12 @@ export function stepPlayer(s: PlayerState, input: MoveInput, camYaw: number, dt:
   // nhảy
   if (!paused && input.jump) s.jumpBuffer = JUMP_BUFFER;
   let jumped = false;
+  const floor = world.groundHeight ? world.groundHeight(s.x, s.z) : 0;
+  if (s.grounded) {
+    // đứng trên mặt đi được: bám theo (lên dốc, xuống dốc nhẹ); mặt đất tụt sâu thì rơi
+    if (s.y - floor > DROP_SNAP) s.grounded = false;
+    else s.y = floor;
+  }
   if (s.grounded && s.jumpBuffer > 0) {
     s.vy = JUMP_VELOCITY;
     s.grounded = false;
@@ -136,8 +150,8 @@ export function stepPlayer(s: PlayerState, input: MoveInput, camYaw: number, dt:
   if (!s.grounded) {
     s.vy -= GRAVITY * dt;
     s.y += s.vy * dt;
-    if (s.y <= 0) {
-      s.y = 0;
+    if (s.y <= floor && s.vy <= 0) {
+      s.y = floor;
       s.vy = 0;
       s.grounded = true;
     }

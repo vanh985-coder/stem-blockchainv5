@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PLAYER_RADIUS, box, circle, pullIntoBounds, pushOutOfBox, pushOutOfCircle, resolveCollisions, type BoxObstacle, type Obstacle, type Point2 } from './collision';
+import { PLAYER_RADIUS, box, circle, obox, pullIntoBounds, pushOutOfBox, pushOutOfCircle, pushOutOfOrientedBox, resolveCollisions, type BoxObstacle, type Obstacle, type Point2 } from './collision';
 
 const R = PLAYER_RADIUS;
 
@@ -151,5 +151,68 @@ describe('đi xéo vào góc hộp: không kẹt, không rung', () => {
     expect(backward(path, -SQ, -SQ)).toBe(0);
     const n = path.length;
     expect(Math.hypot(path[n - 1].x - path[n - 2].x, path[n - 1].z - path[n - 2].z)).toBeLessThan(1e-3);
+  });
+});
+
+describe('hộp xoay (nhà, cổng đặt chéo)', () => {
+  it('yaw 0 thì giống hộp theo trục', () => {
+    const a: Point2 = { x: 0.8, z: 0 };
+    const b: Point2 = { x: 0.8, z: 0 };
+    pushOutOfBox(a, 0.4, box(1, 3, -1, 1));
+    pushOutOfOrientedBox(b, 0.4, obox(2, 0, 1, 1, 0));
+    expect(b.x).toBeCloseTo(a.x, 9);
+    expect(b.z).toBeCloseTo(a.z, 9);
+  });
+  it('yaw 90°: hai cạnh đổi chỗ (hộp dài theo x thành dài theo z)', () => {
+    // hộp nửa kích thước hx 3, hz 1 ở gốc; xoay 90° thì chiếm x ∈ [−1, 1], z ∈ [−3, 3]
+    const p: Point2 = { x: 1.2, z: 2 };
+    expect(pushOutOfOrientedBox(p, 0.4, obox(0, 0, 3, 1, Math.PI / 2))).toBe(true);
+    expect(p.x).toBeCloseTo(1.4, 5);
+    expect(p.z).toBeCloseTo(2, 5);
+    const q: Point2 = { x: 2, z: 1.2 }; // ngoài hộp (chỉ rộng 1 theo x): không bị đẩy
+    expect(pushOutOfOrientedBox(q, 0.4, obox(0, 0, 3, 1, Math.PI / 2))).toBe(false);
+  });
+  it('yaw 45°: bị đẩy theo pháp tuyến của mặt xoay, đúng khoảng cách bán kính', () => {
+    const o = obox(0, 0, 2, 2, Math.PI / 4);
+    // mặt xoay có pháp tuyến (cos45, −sin45)... thử nhiều điểm: sau khi đẩy, cách hộp đúng bán kính
+    for (const [x, z] of [[2.5, 0], [0, 2.5], [-2.4, 0.3], [0.2, -2.6]] as const) {
+      const p: Point2 = { x, z };
+      pushOutOfOrientedBox(p, 0.4, o);
+      // khoảng cách tới hộp trong hệ hộp
+      const c = Math.cos(o.yaw);
+      const s = Math.sin(o.yaw);
+      const lx = p.x * c - p.z * s;
+      const lz = p.x * s + p.z * c;
+      const cx = Math.min(Math.max(lx, -2), 2);
+      const cz = Math.min(Math.max(lz, -2), 2);
+      expect(Math.hypot(lx - cx, lz - cz), `(${x}, ${z})`).toBeGreaterThanOrEqual(0.4 - 1e-6);
+    }
+  });
+  it('tâm trong hộp xoay thì bị đẩy ra ngoài', () => {
+    const p: Point2 = { x: 0.3, z: 0.2 };
+    pushOutOfOrientedBox(p, 0.4, obox(0, 0, 2, 1, 0.6));
+    expect(resolveCollisions({ x: p.x, z: p.z }, 0.4, [obox(0, 0, 2, 1, 0.6)], Infinity)).toBe(false);
+  });
+  it('đi xéo vào góc hộp xoay: không xuyên, không lùi, không rung', () => {
+    const wall = obox(0, 0, 2, 2, 0.5);
+    const SQ = 4 * Math.SQRT1_2;
+    const path = walk(-6, -6, SQ, SQ, 400, [wall]);
+    let backward = 0;
+    for (let i = 1; i < path.length; i++) {
+      const dot = ((path[i].x - path[i - 1].x) * SQ + (path[i].z - path[i - 1].z) * SQ) / 4;
+      if (dot < -1e-4) backward++;
+    }
+    expect(backward).toBe(0);
+    const c = Math.cos(0.5);
+    const s = Math.sin(0.5);
+    for (const p of path) {
+      const lx = p.x * c - p.z * s;
+      const lz = p.x * s + p.z * c;
+      const cx = Math.min(Math.max(lx, -2), 2);
+      const cz = Math.min(Math.max(lz, -2), 2);
+      expect(Math.hypot(lx - cx, lz - cz)).toBeGreaterThanOrEqual(R - 1e-4);
+    }
+    // hộp xoay 0,5 rad: hướng chéo 45° không đâm đúng góc nên trượt dọc mặt hộp, đi tiếp được (không kẹt)
+    expect(path[path.length - 1].x + path[path.length - 1].z).toBeGreaterThan(-12 + 8);
   });
 });

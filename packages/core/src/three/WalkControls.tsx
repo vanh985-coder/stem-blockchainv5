@@ -121,11 +121,25 @@ export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockCh
     const requestLock = () => {
       if (!live.current.lockMode || document.pointerLockElement === el) return;
       const fail = () => live.current.onLockError();
+      const plain = () => {
+        try {
+          const r = el.requestPointerLock() as Promise<void> | undefined;
+          if (r && typeof r.catch === 'function') r.catch(fail);
+        } catch {
+          fail();
+        }
+      };
+      // Thử chuột "thô" (không qua gia tốc của hệ điều hành, như game bắn súng); trình duyệt không hỗ trợ thì dùng cách thường.
       try {
-        const r = el.requestPointerLock() as Promise<void> | undefined;
-        if (r && typeof r.catch === 'function') r.catch(fail);
+        const r = el.requestPointerLock({ unadjustedMovement: true }) as Promise<void> | undefined;
+        if (r && typeof r.catch === 'function') {
+          r.catch((e: unknown) => {
+            if (e instanceof DOMException && e.name === 'NotSupportedError') plain();
+            else fail();
+          });
+        }
       } catch {
-        fail();
+        plain();
       }
     };
     const exitLock = () => {
@@ -144,14 +158,14 @@ export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockCh
     document.addEventListener('mousemove', look);
 
     const down = (e: PointerEvent) => {
-      if (live.current.paused) return;
       if (e.target instanceof Element && e.target.closest('[data-walk-ui]')) return;
       if (e.pointerType === 'touch') setTouchMode(true);
       if (e.pointerType === 'mouse' && live.current.lockMode) {
-        // Máy tính: bấm vào khung thì khóa chuột (trong chính sự kiện bấm); đã khóa thì không làm gì thêm.
+        // Máy tính: bấm vào khung thì khóa chuột (trong chính sự kiện bấm), kể cả lúc chưa khóa (đang tạm dừng); đã khóa thì không làm gì thêm.
         if (document.pointerLockElement !== el) requestLock();
         return;
       }
+      if (live.current.paused) return;
       const rect = el.getBoundingClientRect();
       if (e.pointerType === 'touch' && isLeftHalf(e.clientX - rect.left, rect.width)) {
         if (stick.id !== -1) return;

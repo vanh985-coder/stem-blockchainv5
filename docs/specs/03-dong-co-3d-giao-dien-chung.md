@@ -127,13 +127,37 @@ Dùng cho **mọi trang** (bảng gán ở `packages/core/src/content/nenTrangTr
 - Mỗi model trong `models/env` và `models/games` có bản `<id>-xa` (spec 01 mục 5). `<Model id>` tự dùng bản xa khi camera ở xa hơn khoảng đổi (drei `Detailed`, độ trễ 5%): **Thấp 12, Vừa 20, Cao 30 đơn vị**.
 - Model không có bản xa (nhân vật) thì luôn dùng bản chính. Có thể ép bằng `lod="near"` hoặc `lod="far"`.
 - **Cỡ model trong file** (đo bằng three, đã áp xương ở tư thế gốc): cạnh dài nhất của mọi model đều khoảng **1 đơn vị** (0,98); cả 10 nhân vật cao ~0,98 với chân ở y = 0. Cảnh phải đặt tỉ lệ cho từng loại (ví dụ cổng làng, nhà phóng to nhiều lần); khoảng đổi bản xa tính theo khoảng cách camera thật trong cảnh.
-- **Chuẩn hóa cỡ trong cảnh** (`three/modelSizes.ts`): mọi nhân vật (4 có xương và 6 đứng yên) **cao 1,7 đơn vị**, chân ở y = 0, mặt quay +Z. `<Character>` đo khung bao lúc tải rồi phóng và dịch (hàm thuần `fitToHeight`); bảng `MODEL_SIZES` giữ chiều cao và góc xoay mặt (`facingYaw`) từng model, bước sau thêm cỡ đồ vật vào đây.
+- **Chuẩn hóa cỡ trong cảnh** (`three/modelSizes.ts`): mọi nhân vật (4 có xương và 6 đứng yên) **cao 1,7 đơn vị**, chân ở y = 0, mặt quay +Z. `<Character>` đo khung bao lúc tải rồi phóng và dịch (hàm thuần `fitToHeight`); bảng `MODEL_SIZES` giữ chiều cao, góc xoay mặt (`facingYaw`) và khung bao chuẩn hóa `dims` từng model; hàm `sizeInScene(id, scale)` cho kích thước thật [rộng, cao, sâu] trong cảnh (bản xa `-xa` dùng cỡ của bản chính).
+
+**Cỡ thật của đồ vật** (mốc 2, bước 7; so với nhân vật cao 1,7; `dims` là khung bao đo bằng gltf-transform từ `assets-build/`, có test khớp với file thật):
+
+| Model | Cao trong cảnh | Rộng × sâu trong cảnh | Gấp nhân vật | Ghi chú |
+|---|---|---|---|---|
+| `env/cay-da` | 12 | 19 × 12,7 | 7 lần | thân (vật cản) bán kính 1,9; tán rộng |
+| `env/cong-lang-giay` | 5 | 8,6 × 2,2 | 2,9 lần | lối đi giữa rộng khoảng 20% |
+| `env/cong-lang-det` | 5 | 7,0 × 2,5 | 2,9 lần | |
+| `env/cong-lang-khac-dau` | 5 | 8,9 × 3,2 | 2,9 lần | |
+| `env/cong-lang-bac` | 5 | 8,5 × 3,2 | 2,9 lần | |
+| `env/nha-mai-ngoi` | 4,5 | 5,3 × 4,8 | 2,6 lần | |
+| `env/nha-mai-tranh` | 4 | 5,3 × 5,0 | 2,4 lần | |
+| `env/leu-cho` | 3,2 | 3,8 × 3,0 | 1,9 lần | |
+| `env/gieng-lang` | 2,4 | 2,4 × 2,3 | 1,4 lần | |
+| `env/bui-tre` | 5,5 | 5,9 × 5,3 | 3,2 lần | cả cụm, có nền đất |
+
+Đồ nhỏ do code dựng: chum vại cao 1,05, đống rơm cao 2, khóm hoa cao khoảng 0,8, thuyền gỗ dài 4,6 rộng 1,3. Nhà, lều, bụi tre khi đặt còn nhân với tỉ lệ ngẫu nhiên 0,8 đến 1,25.
 
 **Khung cảnh `<Scene3D>`** (`packages/core/src/three/`): trời, mây, ánh sáng, sương, ACES như dưới đây; mức chất lượng; màn hình tải (thanh phần trăm trên nền giấy dó, `useProgress` của drei, chữ ở `content/ui.ts`); rời cảnh thì giải phóng. Không cấp phát đối tượng mới trong `useFrame`.
 
 **Chunk riêng:** lõi 3D (three, R3F, drei, `Scene3D`, `Model`) chỉ import qua `React.lazy(() => import('@so-chung/core/three/index'))`; trang đầu không import. Phần thuần (mức chất lượng, tên model) nằm ở `@so-chung/core`.
 
 **Vật lặp nhiều** (nhà, cây, rào): dùng `InstancedMesh` hoặc gộp hình; đổi màu, tỉ lệ, góc xoay để nhìn không bị lặp.
+
+**Nhân bản bằng InstancedMesh ở chợ phiên** (`three/cho/ModelInstances.tsx`, mốc 2 bước 7):
+- Mọi bản của một model dùng chung hình học và vật liệu của model (không clone dữ liệu); mỗi phần (mỗi vật liệu) một draw call cho bản chính và một cho bản xa. Mesh cùng vật liệu được gộp (cây tre 42 mảnh thành 1). Hình học được **giải nén về Float32** trước khi nướng ma trận node (file nén meshopt lượng tử hóa vị trí, nếu không thì hình méo thành khối hộp).
+- **Tự cắt từng bản mỗi khung hình** (`cho/instanceSelect.ts`, hàm thuần có test): bỏ bản ngoài khung nhìn và quá xa, chia phần còn lại thành bản chính (gần) và bản xa. `InstancedMesh` của three chỉ cắt cả khối, nên không tự cắt thì số tam giác tính theo cả chợ.
+- **Khoảng đổi sang bản xa ở chợ:** Thấp **5**, Vừa 20, Cao 30 (bản chính của nhà, lều, cổng nặng 50.000 đến 67.000 tam giác nên mức Thấp chỉ dùng khi đứng sát). Mức Thấp không vẽ vật cách xa quá 52. Model mà bản chính chỉ nhẹ hơn bản xa chút ít (cây đa: 9.126 so với 8.000) thì luôn dùng bản chính.
+- **Mật độ theo mức:** mức Thấp bớt 25% lều chợ và 40% bụi tre (`densityFor`, rải đều; vật cản và vật chắn camera tính sau khi bớt nên luôn khớp). Vừa và Cao đủ đồ vật.
+- **Mục tiêu mức Thấp:** dưới 300.000 tam giác và dưới 150 draw call trên một khung hình. Đo ở bản build (Chrome, 1280×720): tối đa 255.000 tam giác và 37 draw call trong 5 góc nhìn thường gặp (chỗ xuất hiện và nhìn về 4 cổng). Nhìn từ trên cao thấy cả chợ thì không giữ mục tiêu này (không phải góc chơi bình thường).
 
 **Ánh sáng ban ngày (cảnh A, B):**
 - Trời là khối cầu chuyển màu từ #E8F6FF lên #8FCBFF, có vài đám mây tròn do code dựng.
@@ -301,11 +325,20 @@ Mỗi người lệch pha ngẫu nhiên để không nhún đồng loạt. Hàm 
 - `WalkControls.tsx` (DOM) ghi vào `WalkApi`; `WalkWorld.tsx` (trong Scene3D) đọc mỗi khung hình: nền đất tròn, người chơi (học sinh), camera, Bi. Hai bên chỉ trao đổi qua `WalkApi` (đối tượng thường) nên không cấp phát trong `useFrame`.
 - **Điện thoại:** `touch-action: none`, chặn `touchmove`/`gesturestart`, khóa cuộn trang khi đang chơi; nút nhảy 76px, nút ✋ 64px (≥ 44px). Chạm nửa trái hiện cần điều khiển tại điểm chạm; vuốt nửa phải xoay camera. Phần tử đánh dấu `data-walk-ui` (bảng thông tin, nút) không bắt đầu kéo camera hay cần điều khiển.
 - **Khóa chuột, hộp thoại và menu (máy tính):** `WalkControls` nhận `lockMode` (trình duyệt có `requestPointerLock` và con trỏ là chuột), `onLockChange`, `onLockError`; `WalkApi.lock.request/exit` cho nơi dùng xin hoặc nhả khóa.
-  - Bấm (chuột) vào khung thì `requestPointerLock` ngay trong sự kiện `pointerdown`.
+  - Bấm (chuột) vào khung thì `requestPointerLock({ unadjustedMovement: true })` ngay trong sự kiện `pointerdown` (chuột "thô", không qua gia tốc của hệ điều hành); trình duyệt không hỗ trợ (`NotSupportedError`) thì xin lại bằng cách thường. Bấm được cả lúc chưa khóa lần nào.
+  - **Mới vào, chưa khóa lần nào:** chỉ hiện một dòng nhắc nhỏ **"Bấm để điều khiển"** giữa màn hình, không che cảnh; hộp Menu đầy đủ chỉ hiện khi nhả khóa **sau khi đã chơi** (`useWalkSession`, `WalkLockOverlay` dùng chung cho /dev/walk và /cho).
   - **Nhả khóa** (Esc, chuyển cửa sổ, bất cứ lý do gì) mà không có hộp thoại thì **hiện menu tạm dừng** có dòng **"Bấm để chơi tiếp"**; bấm vào khung hoặc nút đó thì khóa lại và menu đóng. Chrome từ chối khóa lại ngay sau khi vừa nhả bằng Esc (khoảng 1 giây): bắt lỗi `pointerlockerror` và Promise bị từ chối, hiện lại lời nhắc, không báo lỗi.
   - **Mở hộp thoại (E)** thì tự nhả khóa để bấm được lựa chọn; **đóng hộp thoại** thì xin khóa lại ngay trong chính sự kiện bấm (nút "Tiếp"/"Bỏ qua", hay Enter/Space). Đóng bằng Esc thì Chrome có thể từ chối (Esc không tính là thao tác của người dùng): khi đó hiện menu với "Bấm để chơi tiếp".
   - Không có khóa chuột (điện thoại, trình duyệt cũ): Esc bật tắt menu như trước (`onMenu`), nút "Tiếp tục".
   - Tạm dừng (chưa khóa, hộp thoại hoặc menu): nơi dùng truyền `paused` cho `WalkControls` và `WalkWorld` (thả hết phím, bỏ lệnh); phím khác bị bỏ khi tạm dừng.
+- **Vật cản theo chân tường thật (bước 7b)** — mỗi model môi trường có vật cản dựng từ phần chân tường, KHÔNG dùng khung bao cả model (mái chìa ra rộng hơn tường):
+  - Lấy mặt model (sau khi áp cỡ chiều cao) ở khoảng **0–1,5 đơn vị tính từ mặt đất**, rải điểm lên bề mặt tam giác, rồi dựng hình bao sát: vòng tròn hoặc hộp, hoặc vài hộp ghép (cổng làng: hai chân cổng, lối giữa để trống). Hộp xoay (`obox`) là loại vật cản thứ ba của `collision.ts` (tâm, nửa cạnh, góc xoay như `rotation.y` của three).
+  - Bảng hình nằm sẵn ở `three/cho/footprints.ts` (hình ở tỉ lệ 1, trong hệ tọa độ model); `footprintObstacles(id, x, z, yaw, scale)` đổi sang vật cản trong cảnh. **Sinh lại bảng khi đổi model:** `GEN_FOOTPRINTS=<đường dẫn.json> pnpm vitest run packages/core/src/three/cho/footprintGen.test.ts` (ghi json và bản báo cáo `.txt`), rồi dán vào `footprints.ts`.
+  - Yêu cầu có test với GLB thật: hình phủ ≥ 90% diện tích chân tường và không thừa quá 0,3 đơn vị ra ngoài; ≥ 98,5% điểm chân tường nằm trong hình; lối cổng rộng ≥ 1,0.
+  - `/dev/walk` dùng hình đúng bằng hình dựng (cột, hộp, biển gỗ, hòm thư).
+- **Mặt đi được cao hơn 0 (bước 7b)** — `World.groundHeight(x, z)` (hàm thuần, mặc định 0). Đứng trên mặt đó khi không nhảy; nhảy và rơi tính từ độ cao đó; xuống chỗ thấp hơn quá `DROP_SNAP` (0,12) trong một khung hình thì rơi tự do. Ở chợ: `groundHeight` ở `cho/marketLayout.ts`, mặt đất 0, cầu tàu cao `DECK_TOP` = 0,45, dốc lên dài 2 ở đầu cầu (x từ −32 tới −34).
+- **Xem vùng va chạm:** thêm `?debug=colliders` vào URL (`/cho`, `/dev/walk`) thì vẽ khung lưới đỏ cho mọi vật cản (cao tới 1,5), lưới cam cho mặt cầu tàu (theo `groundHeight`), vòng xanh cho người chơi. Ở `/cho` thêm `?cam=free` (kèm `window.__freeCam`) để đặt camera soi từng chỗ. Chỉ để kiểm tra bằng mắt.
+- **Camera tránh vật cản** (`cameraCollision.ts`, hàm thuần có test): từ điểm nhìn (ngang ngực nhân vật) tới vị trí camera mong muốn, nếu đoạn thẳng cắt một vật cao (nhà, cổng, cây, lều, tre, giếng, đống rơm; khối thẳng đứng nở thêm 0,5) thấp hơn đỉnh của nó thì kéo camera lại gần, dừng ở mép vật; không bao giờ gần nhân vật hơn 1,8. Vào nhanh, ra chậm (độ gắt 3), rồi kiểm tra lại vị trí đã làm mượt để không cắt góc tường. Cổng chỉ chắn ở hai bên (tháp và tường), lối giữa để trống. `WalkWorld` nhận `cameraBlockers`.
 - **Bi:** bay theo sau vai **phải** của người chơi. Nhân vật quay mặt +Z nên bên phải của họ là −X: `BI_FOLLOW_OFFSET = [−0,75, 2,0, −0,55]` (bước 3 từng đặt +0,75, là vai trái, đã sửa).
 
 ## 4. Phản ứng khi chọn đáp án — `ChoiceReaction`

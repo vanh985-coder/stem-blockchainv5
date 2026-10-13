@@ -82,6 +82,15 @@ Cảnh đi lại chính, nằm giữa 4 làng.
 
 Xếp theo ảnh `concept-toan-canh` và `concept-cho-phien`. Phải **đủ đông đồ vật** để chợ trông tấp nập.
 
+**Bản làm ở mốc 2 (bước 7, route `/cho`, chưa nối từ trang chủ):** chợ ĐƠN GIẢN, đủ đồ vật chính; chợ đông đồ vật làm ở mốc 4.
+- **Tọa độ:** người chơi xuất hiện ở phía nam cây đa (0, −10) và nhìn về +Z, nên **Bắc = +Z, Nam = −Z, Tây = +X, Đông = −X**. Cây đa ở gốc. Vùng đi lại bán kính 42; cổng cách tâm 30; sân chợ bán kính 14; đường rộng 6.
+- **Cổng:** mặt trước quay về sân chợ. Bắc Giấy (0, 30), Nam Dệt (0, −30), Tây Khắc Dấu (30, 0), Đông Bạc (−30, 0). Hai bên cổng là vật cản, lối giữa đi qua được (cổng mở/khóa làm ở bước sau).
+- **Bao quanh:** 12 đến 15 lều chợ, giếng, 7 nhà mái ngói và 7 nhà mái tranh trở lên, 14 đến 20 bụi tre; đồ nhỏ do code dựng (chum vại, đống rơm, khóm hoa). Sinh bằng bộ ngẫu nhiên có seed (`three/cho/marketLayout.ts`, hàm thuần có test: không đè lên đường, không đè nhau, 4 cổng và bến tàu luôn tới được từ chỗ xuất hiện).
+- **Đông:** sau cổng Bạc là bến sông (đường ra bến tàu ván gỗ rộng 3,4, thuyền gỗ có mui lá, bờ đá). Sông là vật cản ngoài bến tàu. Ruộng lúa phủ ngoài biên, đồi xa ở chân trời, hàng rào tre quanh rìa.
+- **Va chạm và mặt cầu (bước 7b):** vật cản của nhà, lều, giếng, cổng, tre, cây đa dựng theo chân tường thật (xem spec 03 mục 3.7), nên cây đa chiếm bán kính khoảng 6,4–7 và các lều xếp lùi ra xa hơn. Sông có vật cản dọc bờ (trừ lối lên cầu), cuối cầu và hai bên cầu có lan can vô hình; đá bờ sông có vật cản. Cầu tàu là sàn đặc cao 0,45 có dốc lên ở đầu cầu; người chơi đứng đúng mặt sàn, nhảy tính từ mặt sàn. `?debug=colliders` để soi.
+- **Người:** 4 dân làng (bà cụ, chú nông dân xen kẽ) đi lại trên 4 con đường và là vật cản tròn; lái buôn đứng gần bến sông.
+- **Chưa làm (bước 8):** cổng mở/khóa, HUD, Bi nhắc nhiệm vụ, dân chợ nói chuyện, menu thật.
+
 ### Cổng làng
 
 - **Mỗi làng một model riêng:** `env/cong-lang-giay`, `env/cong-lang-det`, `env/cong-lang-khac-dau`, `env/cong-lang-bac`. Không đổi màu.

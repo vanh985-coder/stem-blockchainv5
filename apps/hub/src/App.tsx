@@ -15,6 +15,8 @@ const DevHotspots = import.meta.env.DEV ? lazy(() => import('./ban-do/DevHotspot
 const DevNen = import.meta.env.DEV ? lazy(() => import('./DevNen')) : null;
 // Lõi 3D (three, R3F, drei) nằm ở chunk riêng, chỉ tải khi vào trang 3D (spec 03 mục 9).
 const Dev3D = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.DevModelViewer }))) : null;
+// Chợ phiên 3D (mốc 2): trang riêng, chưa nối từ trang chủ. Lõi 3D ở chunk riêng.
+const Cho = lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.MarketPage })));
 const DevWalk = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.DevWalk }))) : null;
 
 function Lazy({ page: Page }: { page: LazyExoticComponent<ComponentType> }) {
@@ -31,6 +33,7 @@ export function App() {
       <Route path="/" element={<Home />} />
       <Route path="/truyen" element={<Lazy page={Story} />} />
       <Route path="/ban-do" element={<Lazy page={BanDo} />} />
+      <Route path="/cho" element={<Lazy page={Cho} />} />
       <Route path="/giao-vien" element={<Lazy page={Teacher} />} />
       <Route path="/giao-vien/:classId" element={<Lazy page={Teacher} />} />
       {accountRoutes.map((r) => (

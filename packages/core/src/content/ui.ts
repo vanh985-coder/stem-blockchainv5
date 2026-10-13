@@ -556,6 +556,19 @@ export const ui = {
     canDieuKhien: 'Cần điều khiển: chạm nửa trái màn hình rồi kéo',
     bieuTuongTuongTac: '✋',
     bieuTuongNhay: '⬆',
+    /** Dòng nhắc nhỏ lúc mới vào cảnh, trước khi khóa chuột (máy tính) */
+    baiDeDieuKhien: 'Bấm để điều khiển',
+    /** Hộp Menu khi nhả khóa chuột (Esc hoặc chuyển cửa sổ) */
+    menuTieuDe: 'Menu',
+    menuMoTa: 'Chuột đã được nhả, điều khiển đang tạm dừng.',
+    baiDeChoiTiep: 'Bấm để chơi tiếp',
+    /** Điện thoại: nút đóng menu */
+    menuTiepTuc: 'Tiếp tục',
+  },
+
+  /** Chợ phiên 3D /cho (mốc 2) */
+  cho: {
+    tieuDe: 'Chợ phiên',
   },
 
   /** Trang /dev/walk (chỉ có khi chạy dev) */
@@ -571,10 +584,6 @@ export const ui = {
     vatHomThu: 'Hòm thư',
     suKienMenu: 'Đã nhận sự kiện mở menu: {so} lần',
     thuHienVa: 'Thử va chạm: đi xéo vào góc các hộp, đi sát cột tròn, đi ra rìa nền (bán kính 20).',
-    menuTieuDe: 'Menu (chưa làm)',
-    menuMoTa: 'Chuột đã được nhả (Esc hoặc chuyển cửa sổ), điều khiển đang tạm dừng. Đây chỉ là hộp thử.',
-    baiDeChoiTiep: 'Bấm để chơi tiếp',
-    menuTiepTuc: 'Tiếp tục',
     veTrangChu: 'Về trang chủ',
     bienGoLuot1: 'Chào {ten}! Biển này chỉ để thử: bấm E (hoặc nút ✋) khi đứng gần là hộp thoại mở ra.',
     bienGoLuot2: 'Trong lúc hộp thoại mở, nhân vật đứng yên. Đóng hộp thoại là đi tiếp được.',

@@ -286,3 +286,86 @@ describe('hệ số tốc độ phát clip', () => {
     expect(jumpTimeScale(null)).toBe(1);
   });
 });
+
+describe('mặt đi được cao hơn 0 (cầu tàu, dốc)', () => {
+  /** Dốc lên từ x = 5 tới x = 7 (cao 0,45), rồi sàn phẳng cao 0,45 từ x = 7 tới x = 14; ngoài ra là đất 0. */
+  const ground = (x: number, z: number): number => (Math.abs(z) > 2 ? 0 : x < 5 || x > 14 ? 0 : x < 7 ? (0.45 * (x - 5)) / 2 : 0.45);
+  const dock: World = { obstacles: [], boundsRadius: Infinity, groundHeight: ground };
+  const walkTo = (s: PlayerState, x: number, input: Partial<MoveInput> = {}) => {
+    // đi về phía +X (camera nhìn +X: yaw π/2, tiến là +X)
+    for (let i = 0; i < 600 && s.x < x; i++) stepPlayer(s, { ...none, y: 1, ...input }, Math.PI / 2, DT, dock);
+  };
+
+  it('đứng trên mặt đất thì y = 0; đi lên dốc thì y đi theo mặt dốc, luôn bám đất (không bay lên, không chui xuống)', () => {
+    const s = createPlayerState(0, 0, Math.PI / 2);
+    let maxGap = 0;
+    for (let i = 0; i < 400 && s.x < 9; i++) {
+      stepPlayer(s, { ...none, y: 1 }, Math.PI / 2, DT, dock);
+      maxGap = Math.max(maxGap, Math.abs(s.y - ground(s.x, s.z)));
+      expect(s.grounded, `x=${s.x.toFixed(2)}`).toBe(true);
+    }
+    expect(maxGap).toBeLessThan(1e-9);
+    expect(s.y).toBeCloseTo(0.45, 9);
+  });
+
+  it('trên giữa cầu: đứng yên thì y đúng bằng độ cao sàn', () => {
+    const s = createPlayerState(10, 0, 0);
+    run(s, none, 1, 0, dock);
+    expect(s.y).toBe(0.45);
+    expect(s.grounded).toBe(true);
+  });
+
+  it('nhảy trên cầu tính từ độ cao sàn: đỉnh nhảy cao hơn sàn khoảng 1, đáp xuống đúng sàn', () => {
+    const s = createPlayerState(10, 0, 0);
+    let peak = 0;
+    stepPlayer(s, { ...none, jump: true }, 0, DT, dock);
+    for (let i = 0; i < 200 && !s.grounded; i++) {
+      peak = Math.max(peak, s.y);
+      stepPlayer(s, none, 0, DT, dock);
+    }
+    expect(peak - 0.45).toBeGreaterThan(0.95);
+    expect(peak - 0.45).toBeLessThan(1.02);
+    expect(s.y).toBe(0.45);
+    expect(s.grounded).toBe(true);
+  });
+
+  it('đi xuống dốc ở tốc độ chạy vẫn bám đất (không rơi tự do, không chuyển sang clip jump)', () => {
+    const s = createPlayerState(12, 0, -Math.PI / 2);
+    for (let i = 0; i < 300 && s.x > 3; i++) {
+      stepPlayer(s, { ...none, y: 1, run: true }, -Math.PI / 2, DT, dock); // camera nhìn −X: tiến là −X
+      expect(s.grounded, `x=${s.x.toFixed(2)}`).toBe(true);
+      expect(animationFor(s)).toBe('run');
+    }
+    expect(s.y).toBe(0);
+  });
+
+  it('bước ra khỏi mép sàn (tụt 0,45 một lúc) thì rơi xuống đất rồi đứng ở 0', () => {
+    const s = createPlayerState(13.8, 0, Math.PI / 2);
+    run(s, { ...none, y: 1 }, 0.2, Math.PI / 2, dock); // qua x = 14: ngoài sàn
+    expect(s.x).toBeGreaterThan(14);
+    let fell = false;
+    for (let i = 0; i < 120 && !s.grounded; i++) {
+      fell = true;
+      stepPlayer(s, none, 0, DT, dock);
+    }
+    expect(fell).toBe(true);
+    expect(s.y).toBe(0);
+  });
+
+  it('nhảy từ đất lên cầu (nhảy tới trên sàn): đáp xuống mặt sàn chứ không xuyên xuống đất', () => {
+    const s = createPlayerState(5.5, 0, Math.PI / 2);
+    // đang ở trên dốc, nhảy
+    stepPlayer(s, { ...none, y: 1, jump: true }, Math.PI / 2, DT, dock);
+    for (let i = 0; i < 200 && !s.grounded; i++) stepPlayer(s, { ...none, y: 1 }, Math.PI / 2, DT, dock);
+    expect(s.grounded).toBe(true);
+    expect(s.y).toBeCloseTo(ground(s.x, s.z), 9);
+    expect(s.y).toBeGreaterThan(0);
+  });
+
+  it('không có groundHeight thì giống hệt trước (mặt đất phẳng 0)', () => {
+    const s = createPlayerState();
+    run(s, { ...none, y: 1 }, 1);
+    expect(s.y).toBe(0);
+    walkTo(createPlayerState(0, 0, 0), 0); // không lỗi
+  });
+});

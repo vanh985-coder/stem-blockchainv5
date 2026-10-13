@@ -19,6 +19,8 @@ export interface VillagerProps extends GroupProps {
   seed?: number;
   /** Ghi đè tham số đi lại (tốc độ mặc định lấy theo clip walk để chân không trượt) */
   wander?: Partial<WanderParams>;
+  /** Vật cản tròn đi theo dân làng (dân làng cũng là vật cản): mỗi khung hình ghi vị trí vào x, z của nó */
+  collider?: { x: number; z: number };
 }
 
 const CLIPS: readonly ClipName[] = ['idle', 'walk'];
@@ -27,7 +29,7 @@ const CLIPS: readonly ClipName[] = ['idle', 'walk'];
  * Dân làng đi lại theo điểm mốc (spec 03 mục 3.1): đi (walk) giữa các điểm, tới nơi thì đứng lại (idle) một lúc rồi đi
  * tiếp. Logic chọn điểm và hướng là hàm thuần ở `wander.ts`. Dùng trong <Scene3D>.
  */
-export function Villager({ id, waypoints, start = 0, seed = 1, wander, ...group }: VillagerProps) {
+export function Villager({ id, waypoints, start = 0, seed = 1, wander, collider, ...group }: VillagerProps) {
   const root = useRef<Group>(null);
   const rng = useMemo(() => createMulberry32(seed), [seed]);
   const params = useRef<WanderParams>({ ...DEFAULT_WANDER, ...wander });
@@ -46,6 +48,10 @@ export function Villager({ id, waypoints, start = 0, seed = 1, wander, ...group 
     stepWander(state, waypoints, params.current, Math.min(dt, 0.1), rng);
     g.position.set(state.x, 0, state.z);
     g.rotation.y = state.yaw;
+    if (collider) {
+      collider.x = state.x;
+      collider.z = state.z;
+    }
     if (state.mode !== shown.current) {
       shown.current = state.mode;
       setMode(state.mode);

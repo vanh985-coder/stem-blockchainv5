@@ -37,16 +37,24 @@ const LOCAL_ASSETS_URL = 'http://localhost:5180';
 
 const LOOPBACK = new Set(['localhost', '127.0.0.1', '[::1]', '::1']);
 
+/** Hàm thuần: tên máy là địa chỉ IP (IPv4 như 192.168.0.5, hoặc IPv6 như [fe80::1]), không phải tên miền. */
+export function isIpHostname(hostname: string): boolean {
+  const h = hostname.trim();
+  return /^\d{1,3}(\.\d{1,3}){3}$/.test(h) || (h.includes(':') && /^\[?[0-9a-fA-F:.]+\]?$/.test(h));
+}
+
 /**
  * Hàm thuần: địa chỉ gốc của đồ họa, bỏ dấu "/" cuối; trống thì dùng cổng dev:assets.
- * Khi mở trang bằng địa chỉ khác localhost (ví dụ điện thoại vào http://192.168.0.5:5173 sau `pnpm dev:hub --host`) mà địa chỉ
- * đồ họa vẫn trỏ về localhost (điện thoại không có đồ họa ở "localhost" của nó) thì đổi tên máy thành tên máy của trang.
+ * Chỉ khi chạy dev trên điện thoại: trang mở bằng **địa chỉ IP** (ví dụ http://192.168.0.5:5173 sau `pnpm dev:hub --host`) mà địa chỉ
+ * đồ họa vẫn trỏ về localhost (điện thoại không có đồ họa ở "localhost" của nó) thì đổi tên máy thành IP của trang.
+ * Không đổi trong mọi trường hợp khác: trang mở ở localhost, trang mở bằng tên miền (bản thật: stem-block.…, sb-lang-….), địa chỉ
+ * đồ họa đã là một máy khác (ví dụ https://sb-assets.…).
  * @param pageHostname `location.hostname` của trang đang mở (bỏ trống thì không đổi)
  */
 export function resolveAssetsUrl(value: string | undefined, pageHostname?: string): string {
   const v = (value ?? '').trim();
   const base = (v === '' ? LOCAL_ASSETS_URL : v).replace(/\/+$/, '');
-  if (!pageHostname || LOOPBACK.has(pageHostname.toLowerCase())) return base;
+  if (!pageHostname || LOOPBACK.has(pageHostname.toLowerCase()) || !isIpHostname(pageHostname)) return base;
   try {
     const u = new URL(base);
     if (!LOOPBACK.has(u.hostname)) return base;

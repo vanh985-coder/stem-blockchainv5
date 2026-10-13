@@ -27,7 +27,20 @@ export interface BoxObstacle {
   maxZ: number;
 }
 
-export type Obstacle = CircleObstacle | BoxObstacle;
+/**
+ * Hộp xoay quanh trục đứng (nhà, cổng đặt chéo): tâm (x, z), nửa kích thước hx (theo trục x của hộp) và hz (theo trục z),
+ * xoay `yaw` radian giống `rotation.y` của three (yaw 0 thì trùng hộp theo trục).
+ */
+export interface OrientedBoxObstacle {
+  type: 'obox';
+  x: number;
+  z: number;
+  hx: number;
+  hz: number;
+  yaw: number;
+}
+
+export type Obstacle = CircleObstacle | BoxObstacle | OrientedBoxObstacle;
 
 /** Bán kính nhân vật khi va chạm (đơn vị cảnh). */
 export const PLAYER_RADIUS = 0.4;
@@ -39,6 +52,7 @@ export const MAX_PASSES = 4;
 const EPS = 1e-6;
 
 export const circle = (x: number, z: number, r: number): CircleObstacle => ({ type: 'circle', x, z, r });
+export const obox = (x: number, z: number, hx: number, hz: number, yaw: number): OrientedBoxObstacle => ({ type: 'obox', x, z, hx, hz, yaw });
 export const box = (minX: number, maxX: number, minZ: number, maxZ: number): BoxObstacle => ({ type: 'box', minX, maxX, minZ, maxZ });
 
 /** Đẩy `p` ra khỏi vật tròn. Trả về true nếu có đẩy. */
@@ -91,6 +105,28 @@ export function pushOutOfBox(p: Point2, radius: number, b: BoxObstacle): boolean
   return true;
 }
 
+const local: Point2 = { x: 0, z: 0 };
+
+/**
+ * Đẩy `p` ra khỏi hộp xoay: đưa `p` về hệ tọa độ của hộp (xoay ngược `yaw`), đẩy ra khỏi hộp theo trục như `pushOutOfBox`, rồi đưa
+ * kết quả về lại hệ tọa độ cảnh. Không cấp phát.
+ */
+export function pushOutOfOrientedBox(p: Point2, radius: number, o: OrientedBoxObstacle): boolean {
+  const cos = Math.cos(o.yaw);
+  const sin = Math.sin(o.yaw);
+  const dx = p.x - o.x;
+  const dz = p.z - o.z;
+  const reach = Math.hypot(o.hx, o.hz) + radius;
+  if (dx * dx + dz * dz > reach * reach) return false; // xa quá tầm với: bỏ qua sớm (tiết kiệm sin/cos khi có hàng trăm hộp)
+  // three: xoay yaw quanh Y đưa (lx, lz) tới (lx cos + lz sin, −lx sin + lz cos); đây là phép xoay ngược
+  local.x = dx * cos - dz * sin;
+  local.z = dx * sin + dz * cos;
+  if (!pushOutOfBox(local, radius, { type: 'box', minX: -o.hx, maxX: o.hx, minZ: -o.hz, maxZ: o.hz })) return false;
+  p.x = o.x + local.x * cos + local.z * sin;
+  p.z = o.z - local.x * sin + local.z * cos;
+  return true;
+}
+
 /** Kéo `p` về trong biên hình tròn bán kính `boundsRadius` quanh gốc (tâm nhân vật tối đa cách gốc boundsRadius − radius). */
 export function pullIntoBounds(p: Point2, radius: number, boundsRadius: number): boolean {
   const max = boundsRadius - radius;
@@ -113,7 +149,7 @@ export function resolveCollisions(p: Point2, radius: number, obstacles: readonly
     let changed = false;
     for (let i = 0; i < obstacles.length; i++) {
       const o = obstacles[i];
-      if (o.type === 'circle' ? pushOutOfCircle(p, radius, o) : pushOutOfBox(p, radius, o)) changed = true;
+      if (o.type === 'circle' ? pushOutOfCircle(p, radius, o) : o.type === 'box' ? pushOutOfBox(p, radius, o) : pushOutOfOrientedBox(p, radius, o)) changed = true;
     }
     if (boundsRadius !== Infinity && pullIntoBounds(p, radius, boundsRadius)) changed = true;
     if (!changed) break;

@@ -1,8 +1,9 @@
 import { useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { RepeatWrapping, SRGBColorSpace, TextureLoader, Vector3, type Group, type Texture } from 'three';
 import { Bi } from './Bi';
 import { dampFactor } from './biMotion';
+import { cameraClearance, type CameraBlocker } from './cameraCollision';
 import { CAMERA_FOLLOW_RATE, CAMERA_LOOK_HEIGHT, CAMERA_MIN_Y, cameraOffset, type Vec3Out } from './cameraRig';
 import { Character, type CharacterInfo } from './Character';
 import type { Obstacle } from './collision';
@@ -14,6 +15,13 @@ import { combineInput, type WalkApi } from './walkApi';
 /** Người chơi ở cảnh đi lại là học sinh (spec 03 mục 3.1). */
 export const WALK_PLAYER = 'characters/hoc-sinh-nam';
 const CLIPS: readonly ClipName[] = ['idle', 'walk', 'run', 'jump'];
+const NO_BLOCKERS: readonly CameraBlocker[] = [];
+
+/** Trạng thái người chơi cho các thành phần con của cảnh (ví dụ khung xem va chạm); null ngoài <WalkWorld>. */
+const PlayerStateContext = createContext<PlayerState | null>(null);
+export function usePlayerState(): PlayerState | null {
+  return useContext(PlayerStateContext);
+}
 /** Một ô texture đất phủ bấy nhiêu đơn vị cảnh. */
 const GROUND_TILE = 5;
 
@@ -26,12 +34,20 @@ export interface WalkWorldProps {
   /** Bán kính nền đất (và biên đi lại) */
   boundsRadius: number;
   interactables: readonly Interactable[];
+  /** Độ cao mặt đi được tại (x, z) (cầu tàu, dốc); bỏ trống thì mặt đất phẳng. Xem `playerMotion.World.groundHeight`. */
+  groundHeight?: (x: number, z: number) => number;
+  /** Vật cao chắn camera (nhà, cổng, cây): camera được kéo lại gần thay vì xuyên qua. Bỏ trống thì camera không tránh gì. */
+  cameraBlockers?: readonly CameraBlocker[];
   /** Báo chỉ số vật tương tác gần nhất (−1 nếu không có) mỗi khi nó đổi */
   onNearestChange: (index: number) => void;
   /** Đường dẫn ảnh nền đất (lấy từ manifest); null thì dùng màu thay thế */
   groundUrl: string | null;
   /** Vị trí xuất phát [x, z] */
   start?: readonly [number, number];
+  /** true: không dùng camera bám theo người chơi (nơi dùng tự đặt camera, ví dụ góc nhìn từ trên cao để chụp ảnh) */
+  freeCamera?: boolean;
+  /** Vẽ nền đất phẳng hình tròn mặc định (false khi cảnh tự dựng nền) */
+  showGround?: boolean;
   /** Các vật khác của cảnh (hộp, cột, dân làng…) */
   children?: ReactNode;
 }
@@ -76,17 +92,37 @@ function Ground({ radius, url }: { radius: number; url: string | null }) {
   );
 }
 
-/** Camera bám sau lưng người chơi, cách 7 cao 4, mượt; góc xoay lấy từ `api.camera`. Không cấp phát trong useFrame. */
-function ChaseCamera({ api, player }: { api: WalkApi; player: PlayerState }) {
+/** Cạnh quanh điểm nhìn: camera bị chặn thì kéo lại gần ngay (không bao giờ xuyên), hết bị chặn thì đi ra từ từ. */
+const CLEARANCE_OUT_RATE = 3;
+
+/**
+ * Camera bám sau lưng người chơi, cách 7 cao 4, mượt; góc xoay lấy từ `api.camera`. Có vật cản thì kéo camera lại gần (xem
+ * `cameraClearance`): vào nhanh, ra chậm, và kiểm tra lại vị trí đã làm mượt để chắc chắn không xuyên tường. Không cấp phát trong useFrame.
+ */
+function ChaseCamera({ api, player, blockers }: { api: WalkApi; player: PlayerState; blockers: readonly CameraBlocker[] }) {
   const camera = useThree((st) => st.camera);
-  const tmp = useMemo(() => ({ off: { x: 0, y: 0, z: 0 } as Vec3Out, want: new Vector3(), look: new Vector3(), lookWant: new Vector3(), init: false }), []);
+  if (import.meta.env.DEV) (window as unknown as { __walkCamera?: typeof camera }).__walkCamera = camera;
+  const tmp = useMemo(() => ({ off: { x: 0, y: 0, z: 0 } as Vec3Out, want: new Vector3(), look: new Vector3(), lookWant: new Vector3(), focus: new Vector3(), init: false, scale: 1 }), []);
   useFrame((_, dt) => {
     const a = api.camera;
     cameraOffset(a.yaw, a.pitch, tmp.off);
     // chân người chơi trên đất; nhảy chỉ kéo camera lên một nửa để khỏi nhấp nhô
     const baseY = player.y * 0.5;
-    tmp.want.set(player.x + tmp.off.x, Math.max(CAMERA_MIN_Y, baseY + tmp.off.y), player.z + tmp.off.z);
-    tmp.lookWant.set(player.x, baseY + CAMERA_LOOK_HEIGHT, player.z);
+    const fx = player.x;
+    const fy = baseY + CAMERA_LOOK_HEIGHT;
+    const fz = player.z;
+    tmp.lookWant.set(fx, fy, fz);
+    let wx = fx + tmp.off.x;
+    let wy = Math.max(CAMERA_MIN_Y, baseY + tmp.off.y);
+    let wz = fz + tmp.off.z;
+    if (blockers.length > 0) {
+      const t = cameraClearance(fx, fy, fz, wx, wy, wz, blockers);
+      tmp.scale = t < tmp.scale ? t : tmp.scale + (t - tmp.scale) * dampFactor(Math.min(dt, 0.1), CLEARANCE_OUT_RATE);
+      wx = fx + (wx - fx) * tmp.scale;
+      wy = fy + (wy - fy) * tmp.scale;
+      wz = fz + (wz - fz) * tmp.scale;
+    }
+    tmp.want.set(wx, wy, wz);
     if (!tmp.init) {
       camera.position.copy(tmp.want);
       tmp.look.copy(tmp.lookWant);
@@ -95,6 +131,12 @@ function ChaseCamera({ api, player }: { api: WalkApi; player: PlayerState }) {
       const k = dampFactor(Math.min(dt, 0.1), CAMERA_FOLLOW_RATE);
       camera.position.lerp(tmp.want, k);
       tmp.look.lerp(tmp.lookWant, k);
+    }
+    if (blockers.length > 0) {
+      // vị trí đã làm mượt có thể đi cắt góc tường: kéo lại nếu vẫn bị chặn
+      const c = camera.position;
+      const t2 = cameraClearance(fx, fy, fz, c.x, c.y, c.z, blockers);
+      if (t2 < 1) camera.position.set(fx + (c.x - fx) * t2, fy + (c.y - fy) * t2, fz + (c.z - fz) * t2);
     }
     camera.lookAt(tmp.look);
   });
@@ -155,17 +197,17 @@ function Player({ api, paused, world, interactables, onNearestChange, player, st
  * theo sau vai phải. Đặt trong <Scene3D>; các vật của cảnh (hộp, cột, dân làng) là `children`, còn dữ liệu va chạm và tương tác
  * truyền riêng qua `obstacles` và `interactables`.
  */
-export function WalkWorld({ api, paused, obstacles, boundsRadius, interactables, onNearestChange, groundUrl, start = [0, 0], children }: WalkWorldProps) {
+export function WalkWorld({ api, paused, obstacles, boundsRadius, interactables, cameraBlockers = NO_BLOCKERS, groundHeight, onNearestChange, groundUrl, start = [0, 0], showGround = true, freeCamera = false, children }: WalkWorldProps) {
   const player = useMemo(() => createPlayerState(start[0], start[1], 0), []); // eslint-disable-line react-hooks/exhaustive-deps
   // Chỉ khi chạy dev: mở trạng thái người chơi ra window để kiểm tra bằng trình duyệt.
   if (import.meta.env.DEV) (window as unknown as { __walkPlayer?: PlayerState }).__walkPlayer = player;
-  const world = useMemo<World>(() => ({ obstacles, boundsRadius }), [obstacles, boundsRadius]);
+  const world = useMemo<World>(() => ({ obstacles, boundsRadius, groundHeight }), [obstacles, boundsRadius, groundHeight]);
   return (
     <>
-      <Ground radius={boundsRadius} url={groundUrl} />
+      {showGround && <Ground radius={boundsRadius} url={groundUrl} />}
       <Player api={api} paused={paused} world={world} interactables={interactables} onNearestChange={onNearestChange} player={player} start={start} />
-      <ChaseCamera api={api} player={player} />
-      {children}
+      {!freeCamera && <ChaseCamera api={api} player={player} blockers={cameraBlockers} />}
+      <PlayerStateContext.Provider value={player}>{children}</PlayerStateContext.Provider>
     </>
   );
 }
