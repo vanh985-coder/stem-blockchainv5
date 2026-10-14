@@ -140,6 +140,8 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 - **Ván thử đủ 4 vòng trong Chrome** (bot giỏi + bấm thẻ câu hỏi thật): 682 điểm = trang 42 → 420, tiền 34, quãng đường 1080 → 108, câu đúng 4 → 120; Vàng, không lỗi.
 - Số liệu (Intel UHD, Chrome, bot giỏi chơi 22 giây): Thấp 173 FPS (thấp nhất 142), tối đa 246.000 tam giác; Vừa 110 FPS (72), 839.000; Cao 99 FPS (64), 1.227.000. Vào cảnh lần đầu (bản build, tắt cache): Thấp 9,0 MB, Vừa và Cao 14,1 MB.
 
+**Khựng ở màn 2 (mốc 2, bước 13):** chạy trọn ván 3 mức, 2 ván mỗi mức, ghi từng khung > 33 ms kèm sự kiện của ván. Khung lâu nhất: Thấp 28 ms, Vừa 35 ms, Cao 34 ms; không khung nào > 50 ms; khung > 33 ms duy nhất là lúc mở màn kết quả (hủy cảnh 3D và dựng màn kết quả, sau khi ván đã xong). Đóng nạp trước (`?warmup=off`) thì ở mức Cao có khung 55 và 76 ms ở 1 đến 3 giây đầu (biên dịch shader và đưa hình lên GPU lần đầu): nạp trước trong màn hình tải đang đủ. Khựng 64 đến 72 FPS, 70 ms đo ở bước 12 không tái hiện được; nguyên nhân khả dĩ nhất là máy đang bận lúc đo (số đo cùng cách, đo lại ngay sau đó: Vừa 287 FPS, Cao 215 đến 257 FPS). Cũng đo: tạo `AudioContext` lần đầu mất khoảng 42 ms, nhưng nút "Bắt đầu" (có tiếng bấm) đã tạo nó trước khi chơi.
+
 **Hiệu năng:** đường chạy gồm các đoạn dài 40 đơn vị, chỉ giữ khoảng 5 đoạn cùng lúc; chướng ngại và vật nhặt đều dùng lại (pooling).
 
 **Test (`runnerLogic.ts`):**
@@ -216,6 +218,13 @@ Trước vòng 2 và vòng 3, {phanDien} lẻn tới nhét trang giả vào xấ
 | Thẻ giả (31, 50, 99) | Bị nhận là trang giả, vì `pageCode(31, 50)` = 12, khác 99 |
 | Thẻ (26, 12, 64) đặt sau trang có mã 31 | Bị từ chối, vì sai mã trang trước |
 | Sinh 500 đề | Mã trang thật không trùng; trang giả luôn sai công thức |
+
+**Đã làm (mốc 2, bước 13 — luật màn 3, chưa có giao diện kéo thả):** `packages/village-lang-giay/src/rebuild/`: `rebuildConfig.ts` (số liệu đúng spec), `rebuildLogic.ts` (hàm thuần, `createMulberry32(seed)`, dùng lại `pageCode`, `buildChain`, `randomGenesis`, `randomContents`, `solutionSteps` của Bài 1).
+- API: `generateDeal(rng, số trang, có trang giả)`, `createRebuild(seed)`, `placeCard`, `binCard`, `insertFake`, `advance`, `inspectCard` ("Soi công thức": prev × 2, tổng, kết quả mod 100, khớp hay không), `checkPlacement(mã trang cuối, thẻ)` → ok | badPrev | fake, `roundScore`, `rebuildScore`, `rebuildMedal`. Trạng thái sửa tại chỗ như `runnerLogic`; `phase`: villain (chờ {phanDien} nhét trang giả, vòng 2 và 3) → play → roundDone → over.
+- Tạo đề: chuỗi thật bằng `buildChain`; mã trang không trùng nhau và không trùng mã trang bìa (chặt hơn spec một chút, để mỗi mã trước chỉ khớp đúng một trang thật); trang giả có mã trước là mã của một trang thật không phải trang cuối, nội dung ngẫu nhiên, mã khác `pageCode` và khác mọi mã thật. Phát hiện trang giả luôn bằng công thức, không đọc cờ `isFake`.
+- Chỗ spec chưa nói, tôi chọn: (1) trang thật bỏ vào rổ thì bật về và mất 1 tim (không thì kéo thử từng thẻ vào rổ là lộ trang giả không mất gì); (2) mã trước sai được xét trước mã trang sai (thẻ giả đặt sai chỗ là "sai mã trước"); (3) hết tim giữa vòng thì vòng dở không được điểm, các vòng đã xong vẫn tính; (4) vòng xong khi đủ trang thật, không bắt buộc bỏ trang giả vào rổ (không bỏ thì mất 30 điểm thưởng).
+- Điểm cao nhất 100 + 130 + 130 = 360. Có 3 tim và lỗi thứ 3 kết thúc ván, nên ván hoàn thành có tối đa 2 lỗi: thấp nhất 360 − 20 = 340 nếu bỏ đúng cả 2 trang giả (Vàng 330), còn không bỏ trang giả nào thì tối đa 300 − 20 = 280 (Bạc).
+- Test `rebuildLogic.test.ts`: 5 ca của bảng test (giữ số thứ tự), 1000 đề giải được, 1000 đề trang giả luôn phát hiện được, vòng, tim, điểm, mốc, tất định.
 
 ## Kết thúc làng
 

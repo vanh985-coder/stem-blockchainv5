@@ -436,6 +436,14 @@ export const ui = {
     phanTram: '{so}%',
   },
 
+  /** Cảnh 2.5D (Scene25D): màn 3, 5, 6, 8, 9, 11, 12 */
+  canh25d: {
+    /** Lời nhắc khi điện thoại xoay dọc mà cảnh chỉ chơi ngang */
+    xoayNgang: 'Xoay ngang để chơi',
+    /** Dòng phụ dưới lời nhắc */
+    xoayGoiY: 'Em xoay điện thoại nằm ngang để thấy cả bàn chơi nhé.',
+  },
+
 
   /** Chữ ở các trang chỉ có khi chạy dev */
   dev: {

@@ -18,6 +18,14 @@ Mọi thứ trong spec này nằm ở `packages/core`. Hub và 4 gói làng đ�
 - Bảng điểm, nút, câu hỏi là HTML phủ lên trên.
 - Tỉ lệ khung 16:9, co giãn theo màn hình. Khi điện thoại xoay dọc, hiện lời nhắc "Xoay ngang để chơi" (riêng màn 12 chơi được cả khung dọc).
 
+**Đã làm (mốc 2, bước 13):** `packages/core/src/three/scene25d/`: `Scene25D.tsx` (component), `layout25d.ts` (hàm thuần có test), `Dev25D.tsx` (trang `/dev/25d` chỉ có khi chạy dev).
+- Đơn vị thế giới: khung ngang 16 × 9 (dọc 9 × 16), gốc ở tâm, x sang phải, y lên trên; camera trực giao đặt z = 20 nhìn về −z, `manual` nên khung nhìn phủ đúng khung (không phụ thuộc kích thước canvas). Lớp theo Z (`LAYERS`): background −10, far −5, back −2, actorsBack −1, actors 0, actorsFront 1,2, front 3, near 5; các lớp nhân vật cách nhau ≥ 1 đơn vị.
+- Props: `background` (đường dẫn manifest, phủ kiểu cover), `sprites` (khóa, đường dẫn, x, y, lớp, cao hoặc rộng, lật, độ mờ, xoay), `children` (R3F: `<Actor25D x y layer height facing><Character …/></Actor25D>`), `overlay` (HTML phủ lên khung), `allowPortrait`, `quality`, `onReady`, `onModeChange`.
+- Khung 16:9 co giãn theo phần tử cha (`fitFrame`, dải đen hai bên hoặc trên dưới). Điện thoại xoay dọc (cạnh ngắn dưới 600 điểm ảnh) mà cảnh không cho dọc thì hiện "Xoay ngang để chơi"; cửa sổ máy tính hẹp vẫn chơi trong khung thu nhỏ; `allowPortrait` (màn 12) dùng khung 9:16.
+- Nạp trước: ảnh nền và hình rời nạp xong cùng model trước khi tắt màn hình tải, rồi `SceneWarmup`. Thiếu ảnh thì hiện ô màu thay thế. Có `CanvasErrorBoundary`; texture được dispose khi rời cảnh (dựng lại cảnh 6 lần: số texture, geometry, draw call không đổi, không lỗi).
+- Số liệu (`/dev/25d`, Intel UHD): 144 FPS (giới hạn của màn hình) ở cả 3 mức, khung lâu nhất 7 đến 14 ms, khoảng 54.700 tam giác, 7 đến 10 draw call.
+- **Lưu ý đồ họa:** ảnh trong `assets/sprites/` (kiểm `ro-trang-gia`, `cot-tre`, `than-cay`, `chuot-giay-thuong`) có kênh alpha nhưng 0 điểm ảnh trong suốt: nền ô vuông xám trắng của ảnh "trong suốt" tạo bằng AI đã in thẳng vào ảnh, nên hình rời hiện kèm ô vuông. Cần ảnh có nền trong suốt thật (hoặc thêm bước tách nền vào `assets-build`) trước khi dùng cho màn 3 trở đi.
+
 **`LessonPage2D`:**
 - **Nền:** ảnh `scenes/bai-hoc-<làng>`, làm tối 20% và mờ nhẹ.
 - **Giữa:** bảng bài học, dùng lại component các trạm của giai đoạn 1, đổi giao diện theo mục 1.

@@ -72,6 +72,12 @@ export * from './village/villageQuest';
 
 // Dựng game chạy (mốc 2, bước 11): đất, đồi, texture do code vẽ, nạp trước cảnh, số liệu hiệu năng
 export { SceneWarmup } from './SceneWarmup';
+
+// Cảnh 2.5D (mốc 2, bước 13): camera trực giao, ảnh nền và hình rời xếp lớp, nhân vật 3D
+export { Scene25D, Actor25D } from './scene25d/Scene25D';
+export type { Scene25DProps, Sprite25D, Actor25DProps } from './scene25d/Scene25D';
+export { Dev25D } from './scene25d/Dev25D';
+export * from './scene25d/layout25d';
 export { StatsProbe } from './StatsProbe';
 export { Hills, useImageTexture, useDispose } from './cho/MarketProcedural';
 export { createGrassTexture, createPaddyTexture, createEdgeAlphaTexture } from './cho/marketTextures';

@@ -18,6 +18,7 @@ const DevMiniGame = import.meta.env.DEV ? lazy(() => import('./DevMiniGame')) : 
 const Dev3D = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.DevModelViewer }))) : null;
 // Chợ phiên 3D (mốc 2): trang riêng, chưa nối từ trang chủ. Lõi 3D ở chunk riêng.
 const Cho = lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.MarketPage })));
+const Dev25D = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.Dev25D }))) : null;
 const DevWalk = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.DevWalk }))) : null;
 
 function Lazy({ page: Page }: { page: LazyExoticComponent<ComponentType> }) {
@@ -45,6 +46,7 @@ export function App() {
       {DevNen && <Route path="/dev/nen" element={<Lazy page={DevNen} />} />}
       {DevMiniGame && <Route path="/dev/minigame" element={<Lazy page={DevMiniGame} />} />}
       {Dev3D && <Route path="/dev/3d" element={<Lazy page={Dev3D} />} />}
+      {Dev25D && <Route path="/dev/25d" element={<Lazy page={Dev25D} />} />}
       {DevWalk && <Route path="/dev/walk" element={<Lazy page={DevWalk} />} />}
       {DevHotspots && <Route path="/dev/ban-do-hotspots" element={<Lazy page={DevHotspots} />} />}
       <Route path="*" element={<Home />} />
