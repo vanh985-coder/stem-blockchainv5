@@ -66,7 +66,12 @@ export const RUNNER_TUNING = {
   firstRowZ: 30,
   spawnAhead: 90,
   keepBehind: 12,
-  /** Khoảng cách hai hàng = tốc độ × hệ số (1,0 hoặc 1,2) × (1 + ngẫu nhiên từ 0 đến gapJitter) */
+  /**
+   * Hệ số khoảng cách tối thiểu mà bộ sinh dùng LUÔN (kể cả khi chưa có guốc mộc): 1,2 thay vì 1,0 của spec, để lúc vừa nhặt guốc (nhảy mất 0,91 giây) không gặp đoạn quá khó vì
+   * các hàng đã sinh sẵn cách nhau theo 1,0. Test của spec (≥ 1,0) vẫn đúng.
+   */
+  gapFactor: 1.2,
+  /** Khoảng cách hai hàng = tốc độ × gapFactor × (1 + ngẫu nhiên từ 0 đến gapJitter) */
   gapJitter: 0.55,
   /** Làn "luôn đi qua được" của hàng kế tiếp: giữ nguyên / sang trái / sang phải (tối đa 1 làn mỗi hàng) */
   pathMove: { stay: 0.5, left: 0.25, right: 0.25 },

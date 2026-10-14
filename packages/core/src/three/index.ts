@@ -6,6 +6,8 @@
 export { Scene3D } from './Scene3D';
 export type { Scene3DProps } from './Scene3D';
 export { CanvasErrorBoundary, Canvas3DErrorBox } from './CanvasErrorBoundary';
+export { DynamicModel, DynamicBoxes } from './DynamicInstances';
+export type { DynamicInstancesApi, DynamicBoxesApi, DynamicModelProps, DynamicBoxesProps } from './DynamicInstances';
 export { Model, useModel } from './Model';
 export type { ModelProps, ModelLod, UsedModel } from './Model';
 export { preloadModel, createPlaceholder } from './modelLoader';
@@ -67,3 +69,9 @@ export { VillageScene } from './village/VillageScene';
 export type { VillageSceneProps } from './village/VillageScene';
 export * from './village/villageLayout';
 export * from './village/villageQuest';
+
+// Dựng game chạy (mốc 2, bước 11): đất, đồi, texture do code vẽ, nạp trước cảnh, số liệu hiệu năng
+export { SceneWarmup } from './SceneWarmup';
+export { StatsProbe } from './StatsProbe';
+export { Hills, useImageTexture, useDispose } from './cho/MarketProcedural';
+export { createGrassTexture, createPaddyTexture, createEdgeAlphaTexture } from './cho/marketTextures';

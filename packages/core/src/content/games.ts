@@ -48,6 +48,8 @@ export const gameUi = {
   xuNhan: 'Em nhận được {so} xu.',
   choiLai: 'Chơi lại',
   veLang: 'Về làng',
+  /** Thanh trên màn chơi: quãng đường đã chạy */
+  quangDuong: '{so} m',
   /** Tạm dừng khi tab bị ẩn */
   tamDung: 'Tạm dừng',
   tamDungLoiNhac: 'Trò chơi đã dừng vì em rời khỏi trang này.',

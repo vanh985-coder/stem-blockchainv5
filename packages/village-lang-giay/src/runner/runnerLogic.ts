@@ -143,6 +143,8 @@ export interface RunnerState {
   ghost: boolean;
   /** Test: tắt sinh đường chạy tự động (tự dựng `rows`) */
   autoSpawn: boolean;
+  /** Chạy không giới hạn vòng (không hết vòng, không hỏi): bước 11 chưa có câu hỏi nên chạy tới khi hết tim */
+  noRounds: boolean;
   /** Test: ghi lại mọi hàng đã sinh */
   rowLog: Row[] | null;
 }
@@ -163,6 +165,7 @@ export interface RunnerOptions {
   rounds?: number;
   ghost?: boolean;
   autoSpawn?: boolean;
+  noRounds?: boolean;
   recordRows?: boolean;
 }
 
@@ -283,6 +286,7 @@ export function createRunner(opts: RunnerOptions): RunnerState {
     rounds: opts.rounds ?? SPEC.rounds,
     ghost: opts.ghost ?? false,
     autoSpawn: opts.autoSpawn ?? true,
+    noRounds: opts.noRounds ?? false,
     rowLog: opts.recordRows ? [] : null,
   };
   s.villain.throwTimer = throwInterval(s);
@@ -311,7 +315,7 @@ function spawnRows(s: RunnerState): void {
 function addRow(s: RunnerState): void {
   const first = s.nextRowId === 1;
   const boots = s.boots > 0;
-  const mult = boots ? SPEC.gapFactorBoots : SPEC.gapFactor;
+  const mult = Math.max(T.gapFactor, boots ? SPEC.gapFactorBoots : SPEC.gapFactor);
   // Tốc độ lúc nhân vật tới hàng này: ước thời gian tới nơi từ quãng đường còn lại (chia cho tốc độ khởi đầu nên ước nhiều hơn thật, tức là tốc độ tính ra không thấp hơn tốc độ thật)
   const toRow = first ? T.firstRowZ : Math.max(0, s.genZ - s.z) + minGap(speedAt(s.time), boots);
   const basis = speedAt(s.time + toRow / SPEC.speed.start);
@@ -488,7 +492,7 @@ function sub(s: RunnerState, input: RunnerInput, dt: number): void {
   if (s.autoSpawn) spawnRows(s);
 
   // hết vòng
-  if (s.phase === 'run' && s.roundTime >= SPEC.roundSec) {
+  if (s.phase === 'run' && !s.noRounds && s.roundTime >= SPEC.roundSec) {
     s.phase = 'slow';
     s.events.push({ type: 'roundEnd', round: s.round });
   } else if (s.phase === 'slow' && s.speedScale <= 0) {

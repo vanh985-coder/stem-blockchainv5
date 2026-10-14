@@ -53,6 +53,10 @@ export const MODEL_SIZES: Readonly<Record<string, ModelSize>> = {
   // Đồ gợi nghề quanh cổng làng (bước 8d): phên phơi giấy (tấm phẳng dày 0,17 nằm trên giá cao 0,85), khung cửi
   'env/phen-phoi-giay': prop(0.17, [0.986, 0.069, 0.666], 0.85),
   'env/khung-cui': prop(2, [0.884, 0.979, 0.944]),
+  // Game chạy màn 2 (mốc 2, bước 11): đặt cao bằng chính khung bao (hệ số phóng gốc 1); game phóng thêm theo từng trục để khớp kích thước trong runnerConfig
+  'games/man-02-duoi-ti/sap-thap': prop(0.261, [0.358, 0.261, 0.983]),
+  'games/man-02-duoi-ti/xe-bo': prop(0.426, [0.978, 0.426, 0.499]),
+  'games/man-02-duoi-ti/xe-cho-hang': prop(0.756, [0.98, 0.756, 0.546]),
 };
 
 /** 6 nhân vật không có xương (đứng yên, spec 03 mục 3.4). */

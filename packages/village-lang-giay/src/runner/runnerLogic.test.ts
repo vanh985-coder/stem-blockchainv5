@@ -554,3 +554,21 @@ describe('điểm và mốc', () => {
     expect([0, 199, 200, 379, 380, 519, 520, 9999].map(runnerMedal)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
   });
 });
+
+describe('bước 11: khoảng cách tối thiểu 1,2 luôn (kể cả chưa có guốc mộc) và chạy không giới hạn vòng', () => {
+  it('mọi hàng cách hàng trước ≥ tốc độ × 1,2 kể cả hàng sinh lúc không có guốc mộc (test của spec ≥ 1,0 vẫn đúng)', () => {
+    const rows = ghostRun(600, 51).rowLog!;
+    for (let i = 1; i < rows.length; i++) {
+      expect(rows[i].z - rows[i - 1].z, `hàng ${rows[i].id}`).toBeGreaterThanOrEqual(rows[i].speedBasis * SPEC.gapFactorBoots - 1e-9);
+      expect(rows[i].z - rows[i - 1].z).toBeGreaterThanOrEqual(rows[i].speedBasis * SPEC.gapFactor - 1e-9);
+    }
+  });
+
+  it('noRounds: quá 25 giây không hết vòng, không hỏi; đến khi hết tim', () => {
+    const s = createRunner({ seed: 3, noRounds: true, ghost: true });
+    for (let i = 0; i < 60 * 40; i++) stepRunner(s, {}, DT);
+    expect(s.phase).toBe('run');
+    expect(s.round).toBe(0);
+    expect(s.time).toBeGreaterThan(39);
+  });
+});

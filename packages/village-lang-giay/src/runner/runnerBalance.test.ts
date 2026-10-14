@@ -6,8 +6,8 @@ import { AVERAGE_BOT, GOOD_BOT, playBot, type BotProfile, type BotResult } from 
  * Kiểm tra cân bằng bằng mô phỏng (không vẽ): 300 ván mỗi loại bot trên cùng 300 seed.
  * Mục tiêu: bot giỏi đạt Vàng (≥ 520) ở ít nhất 90% số ván; bot trung bình chủ yếu Đồng hoặc Bạc.
  * Chỉ chỉnh được tần suất vật nhặt trong `runnerConfig.ts` (RUNNER_TUNING.chain, power, roof); KHÔNG đổi công thức điểm hay mốc điểm của spec.
- * Kết quả đã chạy với cấu hình hiện tại (300 ván mỗi bot): bot giỏi Vàng 95,7% (điểm trung bình 706, thấp nhất 443); bot trung bình điểm trung bình 328:
- * chưa đạt mốc 27,7%, Đồng 34,0%, Bạc 22,7%, Vàng 15,7%. Đổi cấu hình thì chạy lại và cập nhật con số này.
+ * Kết quả đã chạy với cấu hình hiện tại (300 ván mỗi bot): bot giỏi Vàng 93,0% (điểm trung bình 662, thấp nhất 435); bot trung bình điểm trung bình 290:
+ * chưa đạt mốc 31,0%, Đồng 40,0%, Bạc 20,3%, Vàng 8,7%. Đổi cấu hình thì chạy lại và cập nhật con số này.
  */
 const GAMES = 300;
 

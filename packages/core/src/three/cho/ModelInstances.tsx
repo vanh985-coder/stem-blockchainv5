@@ -12,7 +12,7 @@ import { extractFrustumPlanes, marketFarDistance, marketMaxDistance, marketNearD
 import type { Placement } from './marketLayout';
 
 /** Một phần để vẽ: hình học đã nướng sẵn (vị trí trong cây node + phóng theo cỡ thật, chân ở y = 0) và vật liệu dùng chung. */
-interface Part {
+export interface Part {
   geometry: BufferGeometry;
   material: Material;
 }
@@ -41,7 +41,7 @@ function toFloat32(geometry: BufferGeometry): BufferGeometry {
  * Gom mọi mesh (không xương) của model thành các phần theo vật liệu: nướng ma trận node vào hình học, phóng theo `scale`
  * và dịch `offsetY`; các mesh cùng vật liệu và cùng thuộc tính được gộp thành một hình học (một draw call cho cả cây tre 42 mảnh).
  */
-function buildParts(scene: Object3D, scale: number, offsetY: number): Part[] {
+export function buildParts(scene: Object3D, scale: number, offsetY: number): Part[] {
   scene.updateMatrixWorld(true);
   const byMaterial = new Map<Material, BufferGeometry[]>();
   scene.traverse((o) => {
@@ -74,7 +74,7 @@ function buildParts(scene: Object3D, scale: number, offsetY: number): Part[] {
 }
 
 /** Hệ số phóng và dịch cho một model theo cỡ thật trong bảng (đo khung bao của chính model). */
-function fitOf(id: string, scene: Object3D) {
+export function fitOf(id: string, scene: Object3D) {
   scene.updateMatrixWorld(true);
   const box = new Box3().setFromObject(scene);
   return fitToHeight(box.min.y, box.max.y, sizeOf(id)?.height ?? 1);
@@ -101,7 +101,7 @@ interface InstanceSet {
   disposables: { dispose(): void }[];
 }
 
-function newMesh(part: Part, capacity: number): InstancedMesh {
+export function newMesh(part: Part, capacity: number): InstancedMesh {
   const mesh = new InstancedMesh(part.geometry, part.material, capacity);
   mesh.instanceMatrix.setUsage(DynamicDrawUsage);
   mesh.instanceColor = new InstancedBufferAttribute(new Float32Array(capacity * 3), 3);
