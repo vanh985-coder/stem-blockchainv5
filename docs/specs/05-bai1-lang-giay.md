@@ -19,7 +19,7 @@
 - Xếp theo ảnh `concept-lang-giay`.
 - **Cảnh mở đầu (lần đầu vào làng):** chiếu ảnh truyện số 6 kèm lời. Bác An: "Mỗi trang sổ có một mã, tính từ mã trang trước. Đêm qua có kẻ sửa trộm một trang, cả làng cãi nhau xem ai nợ ai!"
 - **3 biển gỗ:** "Học cùng bác An" (màn 1), "Đuổi theo {phanDien}" (màn 2), "Ghép lại cuốn sổ" (màn 3).
-- **Đã làm (mốc 2, bước 9):** bố cục ở `packages/village-lang-giay/src/scene/layout.ts` (bán kính khu 21, hàng rào tre bán kính 19,8; cổng ở phía nam (0, −17,5), con đường đất dẫn tới ba biển ở sân trước; bên +X sân phơi 6 phên xếp hai hàng, mỗi phên 4 chân giá; bên −X nhà ngói, bàn chép sổ và bác An; phía sau ba bể ngâm giữa hai nhà). Test `layout.test.ts`: mọi món trong hàng rào, không chồng nhau, tới được mọi biển. Màn 2 và 3 hiện "Sắp ra mắt" cho tới khi làm xong; xong màn 1 thì nhiệm vụ là quay về chợ.
+- **Đã làm (mốc 2, bước 9):** bố cục ở `packages/village-lang-giay/src/scene/layout.ts` (bán kính khu 21, hàng rào tre bán kính 19,8; cổng ở phía nam (0, −17,5), con đường đất dẫn tới ba biển ở sân trước; bên +X sân phơi 6 phên xếp hai hàng, mỗi phên 4 chân giá; bên −X nhà ngói, bàn chép sổ và bác An; phía sau ba bể ngâm giữa hai nhà). Test `layout.test.ts`: mọi món trong hàng rào, không chồng nhau, tới được mọi biển. Màn 2 đã mở (mốc 2, bước 12), màn 3 hiện "Sắp ra mắt" cho tới khi làm xong; xong màn 1 thì nhiệm vụ là quay về chợ.
 
 ## Màn 1 — Game chính: "Trang nối trang" (trang bài học 2D)
 
@@ -120,13 +120,25 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 
 **Khoảng cách tối thiểu 1,2 (mốc 2, bước 11):** bộ sinh luôn đặt hai hàng cách nhau ≥ tốc độ × **1,2** (kể cả khi chưa có guốc mộc), để lúc vừa nhặt guốc không gặp đoạn quá khó; test của spec (≥ 1,0, guốc × 1,2) vẫn đúng. Cân bằng chạy lại: bot giỏi Vàng 93,0% (điểm trung bình 662); bot trung bình điểm trung bình 290, chưa đạt mốc 31,0%, Đồng 40,0%, Bạc 20,3%, Vàng 8,7% (không đổi cấu hình vật nhặt).
 
-**Đã làm (mốc 2, bước 11 — đường chạy 3D, điều khiển, chướng ngại; chưa có vật nhặt, rơm, câu hỏi):** route `/lang/lang-giay/man/2` (biển vẫn "Sắp ra mắt" cho tới hết bước 12), `pages/Man2.tsx` bọc game trong `MiniGameLevel`, phần chơi ở `runner/RunnerGame.tsx` (khung 3D, phím, vuốt, tim, quãng đường) và `runner/RunnerWorld.tsx` (bên trong khung 3D).
-- **Bước thời gian cố định 1/60 giây** (`RunnerSession`, `FixedStepper`): thời gian thật cộng dồn, mỗi khung chạy tối đa 5 bước; vị trí nhân vật, {phanDien} vẽ nội suy giữa bước trước và bước hiện tại. Lệnh phím/vuốt vào hàng đợi cỡ 4 (không cấp phát), mỗi bước dùng một lệnh. Bước 11 chạy `noRounds` (không hết vòng, không hỏi) cho tới khi hết tim, rồi sang màn kết quả sau 1 giây.
+**Đã làm (mốc 2, bước 11 — đường chạy 3D, điều khiển, chướng ngại; chưa có vật nhặt, rơm, câu hỏi):** route `/lang/lang-giay/man/2` (từ bước 12 biển mở theo `unlock.ts`), `pages/Man2.tsx` bọc game trong `MiniGameLevel`, phần chơi ở `runner/RunnerGame.tsx` (khung 3D, phím, vuốt, tim, quãng đường) và `runner/RunnerWorld.tsx` (bên trong khung 3D).
+- **Bước thời gian cố định 1/60 giây** (`RunnerSession`, `FixedStepper`): thời gian thật cộng dồn, mỗi khung chạy tối đa 5 bước; vị trí nhân vật, {phanDien} vẽ nội suy giữa bước trước và bước hiện tại. Lệnh phím/vuốt vào hàng đợi cỡ 4 (không cấp phát), mỗi bước dùng một lệnh. Từ bước 12 ván có 4 vòng (xem bên dưới); `noRounds` đã bỏ.
 - **Điều khiển:** máy tính ←/→ hoặc A/D đổi làn, ↑/W/Space nhảy, ↓/S trượt; điện thoại vuốt trái/phải/lên/xuống (phát lệnh ngay khi ngón tay đi đủ 28 điểm ảnh). Camera sau lưng nhìn về +z nên phải màn hình là x nhỏ: **trái màn hình = làn +1 (x = +2)**.
 - **Cảnh:** đường đất 3 làn giữa cỏ và ruộng, đoạn dài 40 đơn vị lặp theo 6 mẫu (đôi khi lật trái phải) gồm nhà ngói, nhà tranh, bụi tre, giá phơi giấy; mọi vật vẽ bằng "bể" bản dùng lại (`DynamicModel`, `DynamicBoxes` ở core: cấp bộ đệm một lần, mỗi khung ghi lại ma trận, không tạo vật mới). Bản chính/vừa/xa theo khoảng cách tới camera; mức Thấp bỏ bản chính của nhà, 40% vật cảnh, mỗi giá chỉ một phên, nhìn xa 60 mét.
 - **Chướng ngại** (kích thước đúng `RUNNER_TUNING`, có test): thấp = `sap-thap` (model) hoặc đống rơm (code); cao = sào phơi giấy bắc ngang (code, rèm giấy từ độ cao 1,0 tới 1,5); chắn làn cao 2,5 = `xe-bo` chất rơm ba tầng (model + code) hoặc ba tầng phên `env/phen-phoi-giay` giữa bốn cột; xe chở hàng = `xe-cho-hang` phóng theo từng trục cho nóc cao đúng 0,9 và dài 6, chạy trên nóc được.
 - **Nhân vật:** học sinh `run`, nhảy bằng clip `jump`, trượt bằng tư thế `slide`, nhấp nháy 1 giây và camera rung khi mất tim; {phanDien} (Tí) chạy phía trước 12 đến 15 đơn vị ôm xấp trang.
 - Số liệu (máy thử: Intel UHD, Chrome): Thấp 144 FPS, khung lâu nhất 28 ms, tối đa khoảng 243.000 tam giác; Vừa 143 FPS, 573.000; Cao 119 FPS, 1.209.000. Vào cảnh lần đầu (bản build): Thấp 9,1 MB, Vừa và Cao 14,4 MB (chủ yếu model).
+
+**Đã làm (mốc 2, bước 12 — vật nhặt, rơm, câu hỏi, điểm):** màn 2 chơi trọn được, `levels.ts` màn 2 là "ready", biển "Đuổi theo {phanDien}" mở theo `unlock.ts`, cuối màn 1 có nút "Chơi tiếp: Đuổi theo {phanDien}".
+- **Ván 4 vòng:** mỗi vòng 25 giây; hết vòng thì chạy chậm lại, hiện QuizCard (ngân hàng câu hỏi Bài 1, tên phản diện lấy từ `{phanDien}`). Đúng +3 trang; sai −1 tim và hiện giải thích; trả lời xong bấm tiếp thì tăng tốc lại theo `runnerLogic`. Ván kết thúc sau vòng 4 hoặc khi hết tim.
+- **Tốc độ** đúng spec: bắt đầu 8, **cộng 0,25 mỗi 5 giây theo bậc** (không tăng liên tục), tối đa 16 (`speedAt`, có test).
+- **5 vật nhặt** (xoay nhẹ, nổ hạt lấp lánh khi nhặt; hạt dùng bể `ParticlePool`): trang sổ, tiền đồng, nón lá, guốc mộc, túi tiền. Nón lá, guốc, túi hiện biểu tượng và thời gian còn lại trên HUD.
+- **{phanDien} ném rơm:** theo `runnerLogic`, có động tác ném, đống rơm bay vòng cung (`runnerFlight.ts`) và bóng đen báo chỗ rơi trên làn sẽ có chướng ngại.
+- **Làm rơi trang (3b):** thỉnh thoảng {phanDien} làm rơi 2 đến 4 trang (động tác trượt tay, trang rơi lả tả, bóng báo chỗ rơi) xuống làn trống phía trước; chạm đất thì thành "trang sổ" thường (10 điểm, công thức điểm không đổi). Logic thuần ở `runnerLogic` (có test): chỉ rơi vào chỗ nhặt được (không trong chướng ngại, không trùng chỗ rơm) và **trừ vào ngân sách trang** (`pageDebt`: chuỗi trang sổ sau đó ít đi tương ứng).
+- **HUD và kết quả:** tim, trang, tiền, quãng đường, vòng x/4. Màn kết quả liệt kê các phần điểm (`scoreParts`: trang × 10, tiền, quãng đường ÷ 10, câu đúng × 30; tổng bằng `runnerScore`) và mốc huy chương. Âm thanh dùng module có sẵn: nhặt, va, đúng, sai; tôn trọng nút tắt tiếng.
+- **Pooling:** vật nhặt, rơm, trang rơi, hạt đều dùng bể cố định; chạy không tạo vật mới.
+- **Cân bằng chạy lại** (tốc độ từng bậc + trang rơi): bot giỏi Vàng 99,7% (điểm trung bình 688); bot trung bình điểm trung bình 314: chưa đạt mốc 27,3%, Đồng 35,3%, Bạc 24,7%, Vàng 12,7%.
+- **Ván thử đủ 4 vòng trong Chrome** (bot giỏi + bấm thẻ câu hỏi thật): 682 điểm = trang 42 → 420, tiền 34, quãng đường 1080 → 108, câu đúng 4 → 120; Vàng, không lỗi.
+- Số liệu (Intel UHD, Chrome, bot giỏi chơi 22 giây): Thấp 173 FPS (thấp nhất 142), tối đa 246.000 tam giác; Vừa 110 FPS (72), 839.000; Cao 99 FPS (64), 1.227.000. Vào cảnh lần đầu (bản build, tắt cache): Thấp 9,0 MB, Vừa và Cao 14,1 MB.
 
 **Hiệu năng:** đường chạy gồm các đoạn dài 40 đơn vị, chỉ giữ khoảng 5 đoạn cùng lúc; chướng ngại và vật nhặt đều dùng lại (pooling).
 

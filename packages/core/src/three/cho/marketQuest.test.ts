@@ -50,8 +50,9 @@ describe('cổng theo tiến độ', () => {
     expect(isGateOpen('det', [], false)).toBe(false);
   });
 
-  it('làm xong bài học làng Giấy (các màn còn lại sắp ra mắt) thì cổng Dệt mở', () => {
-    const unlock = computeUnlock({ doneLevels: [1] });
+  it('xong bài học làng Giấy chưa mở cổng Dệt; chơi xong màn 2 (màn sẵn sàng cuối, màn 3 sắp ra mắt) thì cổng Dệt mở', () => {
+    expect(gateStates(computeUnlock({ doneLevels: [1] }).villageOpen, false).det).toBe(false);
+    const unlock = computeUnlock({ doneLevels: [1, 2] });
     expect(unlock.goldenPages).toBe(1);
     expect(gateStates(unlock.villageOpen, false).det).toBe(true);
     expect(gateStates(unlock.villageOpen, false)['khac-dau']).toBe(false);

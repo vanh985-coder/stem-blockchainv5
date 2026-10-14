@@ -77,18 +77,19 @@ describe('unlock: 9 tình huống của spec 03 mục 6', () => {
 });
 
 describe('unlock: các trường hợp bổ sung', () => {
-  it('bảng status mặc định của mốc 1: chỉ màn 1, 4, 7, 10 là ready', () => {
+  it('bảng status mặc định (bước 12): màn 1, 2, 4, 7, 10 là ready; màn 2 khóa cho tới khi xong màn 1', () => {
     const r = computeUnlock({ doneLevels: [] });
     expect(r.levels.map((l) => l.state)).toEqual([
-      'open', 'coming-soon', 'coming-soon',
+      'open', 'locked', 'coming-soon',
       'locked', 'coming-soon', 'coming-soon',
       'locked', 'coming-soon', 'coming-soon',
       'locked', 'coming-soon', 'coming-soon',
     ]);
-    const after = computeUnlock({ doneLevels: [1] });
+    expect(computeUnlock({ doneLevels: [1] }).goldenPages).toBe(0); // xong bài học chưa đủ: còn màn 2
+    const after = computeUnlock({ doneLevels: [1, 2] });
     expect(after.goldenPages).toBe(1);
     expect(after.levels.find((l) => l.id === 4)!.state).toBe('open');
-    const all = computeUnlock({ doneLevels: [1, 4, 7, 10] });
+    const all = computeUnlock({ doneLevels: [1, 2, 4, 7, 10] });
     expect(all.goldenPages).toBe(4);
   });
 
@@ -130,10 +131,11 @@ describe('unlock: các trường hợp bổ sung', () => {
     expect(state(r, 7).state).toBe('locked');
   });
 
-  it('giáo viên: màn đã xong hiện done, màn coming-soon vẫn không vào được', () => {
+  it('giáo viên: màn đã xong hiện done, màn sẵn sàng mở hết, màn coming-soon vẫn không vào được', () => {
     const r = computeUnlock({ doneLevels: [1], isTeacher: true });
     expect(state(r, 1).state).toBe('done');
-    expect(state(r, 2).state).toBe('coming-soon');
+    expect(state(r, 2).state).toBe('open');
+    expect(state(r, 3).state).toBe('coming-soon');
     expect(state(r, 4).state).toBe('open');
     expect(state(r, 10).state).toBe('open');
   });

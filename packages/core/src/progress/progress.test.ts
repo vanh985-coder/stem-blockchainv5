@@ -144,7 +144,10 @@ describe('doneLevels, Trang Sổ Vàng, mở khóa', () => {
   });
 
   it('xong màn ready cuối cùng của làng thì nhận Trang Sổ Vàng và ghi lại', () => {
-    const p = lesson1Done(); // mốc 1: màn 2, 3 là coming-soon nên xong bài học là nhận trang 1
+    let p = lesson1Done(); // màn 2 đã sẵn sàng (bước 12), màn 3 là coming-soon: xong bài học chưa nhận trang
+    expect(p.game.goldenPages).toBe(0);
+    expect(unlockOf(p).levels.find((l) => l.id === 4)!.state).toBe('locked');
+    p = recordLevelResult(p, 2, { stars: { game: 0 } }, T0 + 1).progress; // chơi xong màn 2 (kể cả thua) là màn ready cuối cùng của làng
     expect(p.game.goldenPages).toBe(1);
     expect(unlockOf(p).levels.find((l) => l.id === 4)!.state).toBe('open');
   });
@@ -181,10 +184,10 @@ describe('cookie dạng gọn', () => {
   it('mã hóa rồi giải mã ra đúng tiến độ', () => {
     const p = recordLevelResult(emptyProgress(), 1, { stars: { de: 3, tb: 2, kho: 1 } }, T0).progress;
     const raw = encodeProgress(p);
-    expect(JSON.parse(raw)).toMatchObject({ v: 1, lv: { '1': [1, 1, 3, 2, 1] }, gp: 1, c: 60 });
+    expect(JSON.parse(raw)).toMatchObject({ v: 1, lv: { '1': [1, 1, 3, 2, 1] }, gp: 0, c: 60 });
     const back = decodeProgress(raw);
     expect(back.levels[1]).toMatchObject({ played: true, completed: true, stars: { de: 3, tb: 2, kho: 1 } });
-    expect(back.game).toMatchObject({ goldenPages: 1, coins: 60 });
+    expect(back.game).toMatchObject({ goldenPages: 0, coins: 60 });
   });
 
   it('game giữ mốc điểm và điểm cao nhất', () => {

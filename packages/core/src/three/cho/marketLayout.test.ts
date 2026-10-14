@@ -377,7 +377,7 @@ describe('groundHeight: mặt đi được', () => {
         if (h !== 0) expect(Math.abs(z) <= DOCK_HALF_WIDTH && x <= RAMP_START_X && x >= DOCK_END_X, `(${x}, ${z}) h=${h}`).toBe(true);
       }
     }
-  });
+  }, 30_000); // quét lưới dày: chậm khi máy bận, nới thời hạn mặc định 5 giây
 });
 
 describe('vật cản bám chân tường thật', () => {

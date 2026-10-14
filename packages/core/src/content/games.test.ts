@@ -26,7 +26,7 @@ describe('content/games.ts', () => {
     const phanDien = fmt('{phanDien}');
     for (const [path, s] of strings) {
       expect(s, path).not.toContain(phanDien);
-      expect(fmt(s, { diem: 1, so: 1, so2: 2, so3: 3, muc: 'Đồng' }), path).not.toMatch(/[{}]/);
+      expect(fmt(s, { diem: 1, so: 1, so2: 2, so3: 3, muc: 'Đồng', nhan: 'x' }), path).not.toMatch(/[{}]/);
     }
   });
 

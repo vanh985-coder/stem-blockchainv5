@@ -117,7 +117,7 @@ describe('isVillageDone và lọc "Chưa xong làng …"', () => {
   it('lọc những em chưa xong một làng', () => {
     const names = (list: typeof t) => list.map((s) => s.name);
     expect(names(filterStudents(t, { notDoneVillage: 'lang-det' }))).toEqual(['An', 'Bình']);
-    expect(names(filterStudents(t, { notDoneVillage: 'lang-giay' }))).toEqual(['An']);
+    expect(names(filterStudents(t, { notDoneVillage: 'lang-giay' }))).toEqual(['An', 'Đào']); // Đào chưa chơi màn 2
     expect(names(filterStudents(t, { notDoneVillage: null }))).toEqual(['An', 'Bình', 'Đào']);
   });
 

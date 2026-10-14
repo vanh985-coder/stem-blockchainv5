@@ -77,38 +77,72 @@ interface Plan {
   gapUntil: number[];
 }
 
-export function playBot(seed: number, profile: BotProfile, onEvent?: (e: RunnerEvent, s: RunnerState) => void): BotResult {
-  const rnd = mulberry(seed * 7919 + 13);
-  const s = createRunner({ seed });
-  const notice = new Map<number, boolean>();
-  const noticed = (it: Item): boolean => {
+/**
+ * Bộ não của bot: nhìn trạng thái ván (`decide`) rồi trả về lệnh đổi làn, nhảy, trượt như người chơi; `quizAnswer` cho biết trả lời đúng hay sai theo tỉ lệ của hồ sơ.
+ * Dùng cho mô phỏng cân bằng (`playBot`) và, khi chạy dev với `?bot=good`, để bot chơi thật trên cảnh 3D (kiểm tra trọn một ván).
+ */
+export class BotBrain {
+  private readonly rnd: () => number;
+  private readonly notice = new Map<number, boolean>();
+  private readonly skipAt = new Set<number>();
+  private readonly decided = new Map<string, boolean>();
+  private ordinal = 0;
+  private plan: Plan | null = null;
+  private planKey = '';
+
+  constructor(
+    seed: number,
+    private readonly profile: BotProfile,
+  ) {
+    this.rnd = mulberry(seed * 7919 + 13);
+    // chọn trước các chướng ngại (đếm theo thứ tự gặp trong làn của bot) mà bot cố tình không né
+    const mistakeCount = profile.mistakes[0] + Math.floor(this.rnd() * (profile.mistakes[1] - profile.mistakes[0] + 1));
+    while (this.skipAt.size < mistakeCount) this.skipAt.add(2 + Math.floor(this.rnd() * 18));
+  }
+
+  private noticed = (it: Item): boolean => {
     // quyết định một lần cho mỗi chuỗi (nhóm vật nhặt) có để ý hay không; không để ý thì không đi đường vòng để nhặt, nhưng đi ngang qua vẫn nhặt được
-    if (profile.noticeRate >= 1) return true;
-    let v = notice.get(it.group);
+    if (this.profile.noticeRate >= 1) return true;
+    let v = this.notice.get(it.group);
     if (v === undefined) {
-      v = rnd() < profile.noticeRate;
-      notice.set(it.group, v);
+      v = this.rnd() < this.profile.noticeRate;
+      this.notice.set(it.group, v);
     }
     return v;
   };
-  // chọn trước các chướng ngại (đếm theo thứ tự gặp trong làn của bot) mà bot cố tình không né
-  const mistakeCount = profile.mistakes[0] + Math.floor(rnd() * (profile.mistakes[1] - profile.mistakes[0] + 1));
-  const skipAt = new Set<number>();
-  while (skipAt.size < mistakeCount) skipAt.add(2 + Math.floor(rnd() * 18));
+
   // mỗi chướng ngại cần nhảy hoặc trượt được đánh số theo thứ tự gặp; số nằm trong skipAt thì bot không né
-  const decided = new Map<string, boolean>();
-  let ordinal = 0;
-  const shouldSkip = (key: string): boolean => {
-    let v = decided.get(key);
+  private shouldSkip = (key: string): boolean => {
+    let v = this.decided.get(key);
     if (v === undefined) {
-      ordinal++;
-      v = skipAt.has(ordinal);
-      decided.set(key, v);
+      this.ordinal++;
+      v = this.skipAt.has(this.ordinal);
+      this.decided.set(key, v);
     }
     return v;
   };
-  let plan: Plan | null = null;
-  let planKey = '';
+
+  /** Lệnh cho bước này (không gồm trả lời câu hỏi). */
+  decide(s: RunnerState): RunnerInput {
+    // chỉ lập lại kế hoạch khi hàng đầu tiên phía trước đổi (kế hoạch bao trùm cả đoạn tới hàng đó), để không đổi ý sát chướng ngại
+    const first = s.rows.find((r) => rowFar(r) + 0.6 > s.z);
+    const key = `${first?.id ?? 0}`;
+    if (key !== this.planKey) {
+      this.plan = makePlan(s, this.noticed);
+      this.planKey = key;
+    }
+    return control(s, this.plan, this.shouldSkip);
+  }
+
+  /** Trả lời đúng hay sai (theo tỉ lệ đúng của hồ sơ). */
+  quizAnswer(): boolean {
+    return this.rnd() < this.profile.correctRate;
+  }
+}
+
+export function playBot(seed: number, profile: BotProfile, onEvent?: (e: RunnerEvent, s: RunnerState) => void): BotResult {
+  const s = createRunner({ seed });
+  const brain = new BotBrain(seed, profile);
   let pickupPoints = 0;
   const seen = new Map<number, number>();
   let taken = 0;
@@ -117,18 +151,8 @@ export function playBot(seed: number, profile: BotProfile, onEvent?: (e: RunnerE
 
   while (s.phase !== 'over' && guard++ < 200_000) {
     let input: RunnerInput = {};
-    if (s.phase === 'quiz') {
-      input = s.quiz!.answered === null ? { answer: rnd() < profile.correctRate } : { resume: true };
-    } else {
-      // chỉ lập lại kế hoạch khi hàng đầu tiên phía trước đổi (kế hoạch bao trùm cả đoạn tới hàng đó), để không đổi ý sát chướng ngại
-      const first = s.rows.find((r) => rowFar(r) + 0.6 > s.z);
-      const key = `${first?.id ?? 0}`;
-      if (key !== planKey) {
-        plan = makePlan(s, noticed);
-        planKey = key;
-      }
-      input = control(s, plan, shouldSkip);
-    }
+    if (s.phase === 'quiz') input = s.quiz!.answered === null ? { answer: brain.quizAnswer() } : { resume: true };
+    else input = brain.decide(s);
     const before = { p: s.pages, c: s.coins };
     stepRunner(s, input, DT);
     for (const it of s.items) if (it.y < SPEC.roofHeight && !seen.has(it.id)) seen.set(it.id, it.z);

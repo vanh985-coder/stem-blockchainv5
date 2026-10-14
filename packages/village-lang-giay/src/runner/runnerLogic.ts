@@ -38,6 +38,15 @@ export interface Cell {
   top: number;
   thrown: boolean;
   landAt: number;
+  /** Rơm ném: thời điểm (giờ chạy) và vị trí lúc {phanDien} ném (để vẽ vòng cung); 0 nếu không phải rơm ném */
+  t0: number;
+  fromX: number;
+  fromZ: number;
+  /** Nửa rộng (va chạm, đáp lên nóc): một làn, hoặc hẹp hơn với xe chở hàng */
+  halfWidth: number;
+  /** Chắn làn: đoạn đầu dài `frontLen` chỉ cao `frontTop` (con bò); 0 nếu cả khối cao như nhau */
+  frontLen: number;
+  frontTop: number;
   /** Đã va (hay đã lướt qua lúc đang nhấp nháy): không va lại */
   spent: boolean;
 }
@@ -59,6 +68,11 @@ export interface Row {
 
 export interface Item {
   id: number;
+  /** Trang {phanDien} làm rơi: chưa nhặt được cho tới `landAt` (giờ chạy); `t0`, `fromX`, `fromZ` là lúc và chỗ bắt đầu rơi (để vẽ). Vật thường: 0. */
+  landAt: number;
+  t0: number;
+  fromX: number;
+  fromZ: number;
   /** Cùng một chuỗi hay một nhóm vật nhặt thì cùng số này (bước 11 dùng để vẽ chuỗi trang; bot dùng để chọn có nhặt cả chuỗi hay không) */
   group: number;
   kind: PickupKind;
@@ -86,6 +100,8 @@ export type RunnerEvent =
   | { type: 'land'; roof: boolean }
   | { type: 'slide' }
   | { type: 'throw'; lane: Lane; z: number; landAt: number }
+  /** {phanDien} làm rơi `n` trang xuống làn `lane`, nằm từ z đến z + (n − 1) × spacing, nhặt được từ `landAt` */
+  | { type: 'drop'; lane: Lane; z: number; n: number; landAt: number }
   | { type: 'roundEnd'; round: number }
   | { type: 'quiz'; round: number }
   | { type: 'answer'; correct: boolean; timedOut: boolean }
@@ -128,7 +144,9 @@ export interface RunnerState {
   quiz: QuizState | null;
   rows: Row[];
   items: Item[];
-  villain: { ahead: number; throwTimer: number; swing: number };
+  villain: { ahead: number; throwTimer: number; dropTimer: number; swing: number };
+  /** Số trang đã rơi từ {phanDien} mà chưa trừ vào các chuỗi trang sinh sau (ngân sách trang sổ không đổi) */
+  pageDebt: number;
   events: RunnerEvent[];
   // bộ sinh đường chạy
   genZ: number;
@@ -143,8 +161,6 @@ export interface RunnerState {
   ghost: boolean;
   /** Test: tắt sinh đường chạy tự động (tự dựng `rows`) */
   autoSpawn: boolean;
-  /** Chạy không giới hạn vòng (không hết vòng, không hỏi): bước 11 chưa có câu hỏi nên chạy tới khi hết tim */
-  noRounds: boolean;
   /** Test: ghi lại mọi hàng đã sinh */
   rowLog: Row[] | null;
 }
@@ -165,7 +181,6 @@ export interface RunnerOptions {
   rounds?: number;
   ghost?: boolean;
   autoSpawn?: boolean;
-  noRounds?: boolean;
   recordRows?: boolean;
 }
 
@@ -198,16 +213,32 @@ function pickWeighted<K extends string>(s: { rng: number }, weights: Readonly<Re
 // ---------------------------------------------------------------------------
 // Số liệu theo luật
 
-/** Tốc độ theo giờ chạy: 8, tăng 0,25 mỗi 5 giây (tăng đều), tối đa 16. */
+/** Tốc độ theo giờ chạy: 8, tăng 0,25 mỗi 5 giây THEO BẬC (8 trong 5 giây đầu, 8,25 trong 5 giây kế…), tối đa 16 (spec 05). */
 export function speedAt(time: number): number {
   const { start, add, everySec, max } = SPEC.speed;
-  return Math.min(max, start + (add * Math.max(0, time)) / everySec);
+  return Math.min(max, start + add * Math.floor(Math.max(0, time) / everySec + 1e-9));
 }
 
 /** Điểm = trang × 10 + tiền đồng + quãng đường ÷ 10 (làm tròn xuống) + câu đúng × 30. */
 export function runnerScore(s: Pick<RunnerState, 'pages' | 'coins' | 'distance' | 'correct'>): number {
   const k = SPEC.score;
   return s.pages * k.perPage + s.coins * k.perCoin + Math.floor(s.distance / k.perMeters) + s.correct * k.perCorrect;
+}
+
+export type ScoreKey = 'trang' | 'tien' | 'quangDuong' | 'cauDung';
+
+/**
+ * Điểm chia theo từng phần (cho màn kết quả): trang (× 10), tiền đồng (× 1), quãng đường (mét, ÷ 10 làm tròn xuống), câu đúng (× 30). Tổng `points` luôn bằng `runnerScore`.
+ */
+export function scoreParts(s: Pick<RunnerState, 'pages' | 'coins' | 'distance' | 'correct'>): { key: ScoreKey; count: number; points: number }[] {
+  const k = SPEC.score;
+  const meters = Math.floor(s.distance);
+  return [
+    { key: 'trang', count: s.pages, points: s.pages * k.perPage },
+    { key: 'tien', count: s.coins, points: s.coins * k.perCoin },
+    { key: 'quangDuong', count: meters, points: Math.floor(s.distance / k.perMeters) },
+    { key: 'cauDung', count: s.correct, points: s.correct * k.perCorrect },
+  ];
 }
 
 /** Mốc điểm: 0 chưa tới Đồng, 1 Đồng (200), 2 Bạc (380), 3 Vàng (520). */
@@ -220,18 +251,50 @@ export function minGap(speed: number, boots: boolean): number {
   return speed * (boots ? SPEC.gapFactorBoots : SPEC.gapFactor);
 }
 
+const baseCell = (kind: ObstacleKind, variant: number, z0: number, z1: number, bottom: number, top: number): Cell => ({
+  kind,
+  variant,
+  z0,
+  z1,
+  bottom,
+  top,
+  thrown: false,
+  landAt: 0,
+  t0: 0,
+  fromX: 0,
+  fromZ: 0,
+  halfWidth: T.laneHalfWidth,
+  frontLen: 0,
+  frontTop: 0,
+  spent: false,
+});
+
 const cellOf = (kind: ObstacleKind, variant: number, z: number): Cell => {
   switch (kind) {
     case 'low':
-      return { kind, variant, z0: z - T.low.halfDepth, z1: z + T.low.halfDepth, bottom: 0, top: T.low.height, thrown: false, landAt: 0, spent: false };
+      return baseCell(kind, variant, z - T.low.halfDepth, z + T.low.halfDepth, 0, T.low.height);
     case 'high':
-      return { kind, variant, z0: z - T.high.halfDepth, z1: z + T.high.halfDepth, bottom: T.high.bottom, top: T.high.top, thrown: false, landAt: 0, spent: false };
-    case 'block':
-      return { kind, variant, z0: z - T.block.halfDepth, z1: z + T.block.halfDepth, bottom: 0, top: T.block.height, thrown: false, landAt: 0, spent: false };
-    case 'truck':
-      return { kind, variant, z0: z - T.truck.nearOffset, z1: z - T.truck.nearOffset + T.truck.length, bottom: 0, top: SPEC.roofHeight, thrown: false, landAt: 0, spent: false };
+      return baseCell(kind, variant, z - T.high.halfDepth, z + T.high.halfDepth, T.high.bottom, T.high.top);
+    case 'block': {
+      // xe bò (variant 0) dài và có con bò thấp ở đầu; phên giấy (variant 1) ngắn và cao đều
+      if (variant === 0) {
+        const c = baseCell(kind, variant, z - T.block.halfDepth, z + T.block.halfDepth, 0, T.block.height);
+        c.frontLen = T.block.frontLen;
+        c.frontTop = T.block.frontTop;
+        return c;
+      }
+      return baseCell(kind, variant, z - T.phenHalfDepth, z + T.phenHalfDepth, 0, T.block.height);
+    }
+    case 'truck': {
+      const c = baseCell(kind, variant, z - T.truck.nearOffset, z - T.truck.nearOffset + T.truck.length, 0, SPEC.roofHeight);
+      c.halfWidth = T.truck.halfWidth;
+      return c;
+    }
   }
 };
+
+/** Vị trí ngang của {phanDien} theo giờ chạy (lách nhẹ qua lại giữa đường): nơi vẽ và nơi tính chỗ ném dùng chung. */
+export const villainX = (time: number): number => Math.sin(time * 0.8) * 1.2;
 
 /** Tạo một chướng ngại đặt tại z (dùng cho test và bước 11). */
 export function makeCell(kind: ObstacleKind, z: number, variant = 0): Cell {
@@ -275,7 +338,8 @@ export function createRunner(opts: RunnerOptions): RunnerState {
     quiz: null,
     rows: [],
     items: [],
-    villain: { ahead: SPEC.villainAhead[0], throwTimer: SPEC.throwEverySec, swing: 0 },
+    villain: { ahead: SPEC.villainAhead[0], throwTimer: SPEC.throwEverySec, dropTimer: T.drop.everySec, swing: 0 },
+    pageDebt: 0,
     events: [],
     genZ: 0,
     genEnd: 0,
@@ -286,10 +350,10 @@ export function createRunner(opts: RunnerOptions): RunnerState {
     rounds: opts.rounds ?? SPEC.rounds,
     ghost: opts.ghost ?? false,
     autoSpawn: opts.autoSpawn ?? true,
-    noRounds: opts.noRounds ?? false,
     rowLog: opts.recordRows ? [] : null,
   };
   s.villain.throwTimer = throwInterval(s);
+  s.villain.dropTimer = dropInterval(s);
   if (s.autoSpawn) spawnRows(s);
   return s;
 }
@@ -300,6 +364,7 @@ export function cloneRunner(s: RunnerState): RunnerState {
 }
 
 const throwInterval = (s: RunnerState): number => SPEC.throwEverySec + (rand(s) * 2 - 1) * T.throwJitterSec;
+const dropInterval = (s: RunnerState): number => T.drop.everySec + (rand(s) * 2 - 1) * T.drop.jitterSec;
 
 // ---------------------------------------------------------------------------
 // Sinh đường chạy: mọi hàng, kể cả rơm {phanDien} ném, đều đi qua đây nên cùng chịu các luật
@@ -365,8 +430,14 @@ function placeItems(s: RunnerState, row: Row): void {
   if (b - a > T.chain.spacing && rand(s) < T.chain.chance) {
     chainLane = Math.floor(rand(s) * 3) as Lane;
     const cap = Math.floor((b - a) / T.chain.spacing) + 1;
-    const n = Math.min(cap, T.chain.min + Math.floor(rand(s) * (T.chain.max - T.chain.min + 1)));
+    let n = Math.min(cap, T.chain.min + Math.floor(rand(s) * (T.chain.max - T.chain.min + 1)));
     const kind: PickupKind = rand(s) < T.chain.pageShare ? 'trang' : 'dong';
+    // trang đã rơi từ {phanDien} được trừ vào các chuỗi trang: giữ nguyên tổng số trang
+    if (kind === 'trang' && s.pageDebt > 0) {
+      const cut = Math.min(s.pageDebt, n);
+      n -= cut;
+      s.pageDebt -= cut;
+    }
     const span = (n - 1) * T.chain.spacing;
     const start = a + rand(s) * Math.max(0, b - a - span);
     const group = s.nextGroup++;
@@ -390,8 +461,59 @@ function placeItems(s: RunnerState, row: Row): void {
   }
 }
 
-function addItem(s: RunnerState, kind: PickupKind, lane: Lane, z: number, y: number, group: number): void {
-  s.items.push({ id: s.nextItemId++, group, kind, lane, x: LANE_X[lane], z, y });
+function addItem(s: RunnerState, kind: PickupKind, lane: Lane, z: number, y: number, group: number): Item {
+  const it: Item = { id: s.nextItemId++, landAt: 0, t0: 0, fromX: 0, fromZ: 0, group, kind, lane, x: LANE_X[lane], z, y };
+  s.items.push(it);
+  return it;
+}
+
+/** Mép gần nhất của hàng (nhỏ nhất của z0 các chướng ngại; hàng trống thì z − 0,5). */
+const rowNear = (r: Row): number => {
+  let n = r.z - 0.5;
+  for (const c of r.cells) if (c && c.z0 < n) n = c.z0;
+  return n;
+};
+
+/**
+ * {phanDien} làm rơi 2 đến 4 trang sổ xuống một làn ở phía trước: chọn một khoảng giữa hai hàng chướng ngại (hoặc sau hàng cuối còn nằm trong vùng đã sinh) cách người chơi ≥ `drop.aheadMin`,
+ * đủ dài để đặt hết các trang cách nhau `drop.spacing` mà vẫn cách chướng ngại ≥ `drop.margin` (nên nhặt được, không nằm trong chướng ngại hay chỗ rơm), rồi chọn một làn chưa có vật nhặt ở chỗ đó.
+ * Trả về chỗ rơi hoặc null nếu chưa có chỗ phù hợp. Số trang rơi cộng vào `pageDebt`.
+ */
+export function dropPages(s: RunnerState): { lane: Lane; z: number; n: number } | null {
+  const D = T.drop;
+  const n = D.min + Math.floor(rand(s) * (D.max - D.min + 1));
+  const span = (n - 1) * D.spacing;
+  const minZ = s.z + D.aheadMin;
+  // các khoảng trống giữa hai hàng liên tiếp, chỉ lấy phần ≥ minZ
+  const spans: { a: number; b: number }[] = [];
+  for (let i = 0; i + 1 < s.rows.length; i++) {
+    const a = Math.max(rowEnd(s.rows[i]) + D.margin, minZ);
+    const b = rowNear(s.rows[i + 1]) - D.margin;
+    if (b - a >= span + 0.2) spans.push({ a, b });
+  }
+  if (spans.length === 0) return null;
+  const pick = spans[Math.floor(rand(s) * spans.length)];
+  const z = pick.a + rand(s) * (pick.b - pick.a - span);
+  // làn chưa có vật nhặt (kể cả đang rơi) trong đoạn này
+  const free: Lane[] = [];
+  for (let l = 0; l < 3; l++) {
+    let busy = false;
+    for (const it of s.items) if (it.lane === l && it.z > z - D.spacing && it.z < z + span + D.spacing) busy = true;
+    if (!busy) free.push(l as Lane);
+  }
+  if (free.length === 0) return null;
+  const lane = free[Math.floor(rand(s) * free.length)];
+  const group = s.nextGroup++;
+  const landAt = s.time + D.flightSec;
+  for (let i = 0; i < n; i++) {
+    const it = addItem(s, 'trang', lane, z + i * D.spacing, T.itemY, group);
+    it.landAt = landAt;
+    it.t0 = s.time;
+    it.fromX = villainX(s.time);
+    it.fromZ = s.z + s.villain.ahead;
+  }
+  s.pageDebt += n;
+  return { lane, z, n };
 }
 
 /**
@@ -408,6 +530,9 @@ export function throwStraw(s: RunnerState): { row: Row; lane: Lane } | null {
     const c = cellOf('low', 1, row.z);
     c.thrown = true;
     c.landAt = s.time + T.throwFlightSec;
+    c.t0 = s.time;
+    c.fromX = villainX(s.time);
+    c.fromZ = s.z + s.villain.ahead;
     row.cells[lane] = c;
     return { row, lane };
   }
@@ -484,6 +609,17 @@ function sub(s: RunnerState, input: RunnerInput, dt: number): void {
         s.villain.throwTimer = T.throwRetrySec; // chưa có hàng nào còn chỗ trống: thử lại ngay sau đó, không bỏ lượt
       }
     }
+    s.villain.dropTimer -= dt;
+    if (s.villain.dropTimer <= 0) {
+      const d = dropPages(s);
+      if (d) {
+        s.villain.dropTimer = dropInterval(s);
+        s.villain.swing = 0.5;
+        s.events.push({ type: 'drop', lane: d.lane, z: d.z, n: d.n, landAt: s.time + T.drop.flightSec });
+      } else {
+        s.villain.dropTimer = T.drop.retrySec;
+      }
+    }
   }
 
   // dọn và sinh thêm
@@ -492,7 +628,7 @@ function sub(s: RunnerState, input: RunnerInput, dt: number): void {
   if (s.autoSpawn) spawnRows(s);
 
   // hết vòng
-  if (s.phase === 'run' && !s.noRounds && s.roundTime >= SPEC.roundSec) {
+  if (s.phase === 'run' && s.roundTime >= SPEC.roundSec) {
     s.phase = 'slow';
     s.events.push({ type: 'roundEnd', round: s.round });
   } else if (s.phase === 'slow' && s.speedScale <= 0) {
@@ -527,7 +663,7 @@ function applyInput(s: RunnerState, input: RunnerInput): void {
 const bodyHeight = (s: RunnerState): number => (s.slide > 0 && s.grounded ? SPEC.slide.height : T.player.height);
 
 /** Nhân vật (theo x thật) chồng lên làn `l` không? */
-const overlapsLane = (s: RunnerState, l: number): boolean => Math.abs(s.x - LANE_X[l]) < T.laneHalfWidth + T.player.halfWidth;
+const overlapsLane = (s: RunnerState, l: number, c?: Cell): boolean => Math.abs(s.x - LANE_X[l]) < (c ? c.halfWidth : T.laneHalfWidth) + T.player.halfWidth;
 /** Đoạn z mà nhân vật quét qua bước này chồng lên [z0, z1] không? */
 const overlapsZ = (s: RunnerState, prevZ: number, z0: number, z1: number): boolean => s.z + T.player.halfDepth > z0 && prevZ - T.player.halfDepth < z1;
 
@@ -538,7 +674,7 @@ function supportLevel(s: RunnerState, prevZ: number, prevY: number): number {
     for (let l = 0; l < 3; l++) {
       const c = row.cells[l];
       if (!c || c.kind !== 'truck' || c.spent) continue;
-      if (!overlapsLane(s, l) || !overlapsZ(s, prevZ, c.z0, c.z1)) continue;
+      if (!overlapsLane(s, l, c) || !overlapsZ(s, prevZ, c.z0, c.z1)) continue;
       if (prevY >= c.top - EPS && c.top > level) level = c.top;
     }
   }
@@ -581,8 +717,8 @@ function collide(s: RunnerState, prevZ: number, prevY: number): void {
     for (let l = 0; l < 3; l++) {
       const c = row.cells[l];
       if (!c || c.spent || (c.thrown && c.landAt > s.time)) continue;
-      if (!overlapsLane(s, l) || !overlapsZ(s, prevZ, c.z0, c.z1)) continue;
-      if (!blocks(c, lo, hi, h, prevY)) continue;
+      if (!overlapsLane(s, l, c) || !overlapsZ(s, prevZ, c.z0, c.z1)) continue;
+      if (!blocks(c, lo, hi, h, prevY, topAt(s, c, prevZ))) continue;
       c.spent = true;
       if (s.invuln > 0) continue;
       if (s.shield > 0) {
@@ -601,17 +737,24 @@ function collide(s: RunnerState, prevZ: number, prevY: number): void {
   }
 }
 
+/** Độ cao đỉnh của chướng ngại tại chỗ nhân vật đang chồng lên: xe bò chỉ cao `frontTop` ở đoạn con bò, chạm sang thùng xe phía sau thì cao cả. */
+function topAt(s: RunnerState, c: Cell, prevZ: number): number {
+  if (c.frontLen <= 0) return c.top;
+  const inRear = s.z + T.player.halfDepth > c.z0 + c.frontLen && prevZ - T.player.halfDepth < c.z1;
+  return inRear ? c.top : c.frontTop;
+}
+
 /**
  * Nhân vật (chân từ `lo` đến `hi` trong bước này, thân cao `h`) có va vào chướng ngại `c` không?
  *  - thấp, chắn làn: va nếu chân còn thấp hơn đỉnh chướng ngại (nhảy cao hơn đỉnh thì không va);
  *  - sào ngang: va nếu thân (từ chân tới đầu) chồng lên khoảng cao của sào; trượt (thân 0,6) hay nhảy cao hơn sào thì không va;
  *  - xe chở hàng: ở ngang hoặc cao hơn nóc từ đầu bước thì không va (đáp lên nóc), thấp hơn thì va vào đầu xe.
  */
-function blocks(c: Cell, lo: number, hi: number, h: number, prevY: number): boolean {
+function blocks(c: Cell, lo: number, hi: number, h: number, prevY: number, top: number = c.top): boolean {
   switch (c.kind) {
     case 'low':
     case 'block':
-      return lo < c.top - EPS;
+      return lo < top - EPS;
     case 'high':
       return hi + h > c.bottom + EPS && lo < c.top - EPS;
     case 'truck':
@@ -625,7 +768,7 @@ function markGhost(s: RunnerState): void {
   for (const row of s.rows) {
     for (let l = 0; l < 3; l++) {
       const c = row.cells[l];
-      if (c && !c.spent && overlapsLane(s, l) && s.z + T.player.halfDepth > c.z0 && s.z - T.player.halfDepth < c.z1) c.spent = true;
+      if (c && !c.spent && overlapsLane(s, l, c) && s.z + T.player.halfDepth > c.z0 && s.z - T.player.halfDepth < c.z1) c.spent = true;
     }
   }
 }
@@ -636,6 +779,7 @@ function collect(s: RunnerState, prevZ: number, prevY: number): void {
   const hi = Math.max(prevY, s.y) + bodyHeight(s);
   for (let i = s.items.length - 1; i >= 0; i--) {
     const it = s.items[i];
+    if (it.landAt > s.time) continue; // trang còn đang rơi
     const magnetized = s.magnet > 0 && it.kind === 'dong' && it.z >= s.z - 0.5 && it.z <= s.z + SPEC.magnetRange;
     let hit = magnetized;
     if (!hit) {

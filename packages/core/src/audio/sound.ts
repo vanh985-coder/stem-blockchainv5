@@ -210,6 +210,78 @@ class SoundManager {
       // Bỏ qua
     }
   }
+
+  /** Tiếng nhặt vật (trang, tiền đồng): một nốt cao rất ngắn; `bright` cao hơn một chút cho tiền đồng. */
+  public playPickup(bright = false): void {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(bright ? 1318.5 : 987.8, now);
+      osc.frequency.exponentialRampToValueAtTime(bright ? 1760 : 1318.5, now + 0.07);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.09, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.12);
+    } catch {
+      // Bỏ qua
+    }
+  }
+
+  /** Tiếng nhặt vật đặc biệt (nón lá, guốc mộc, túi tiền): ba nốt đi lên. */
+  public playPowerUp(): void {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      [523.25, 659.25, 880].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const t = now + i * 0.07;
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.001, t);
+        gain.gain.linearRampToValueAtTime(0.1, t + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.12);
+      });
+    } catch {
+      // Bỏ qua
+    }
+  }
+
+  /** Tiếng va chạm: cú đập trầm ngắn; `blocked` (nón lá chặn được) thì nhẹ và cao hơn. */
+  public playHit(blocked = false): void {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = blocked ? 'square' : 'sawtooth';
+      osc.frequency.setValueAtTime(blocked ? 330 : 150, now);
+      osc.frequency.exponentialRampToValueAtTime(blocked ? 220 : 60, now + 0.16);
+      gain.gain.setValueAtTime(blocked ? 0.07 : 0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.18);
+    } catch {
+      // Bỏ qua
+    }
+  }
 }
+
+
 
 export const sound = new SoundManager();

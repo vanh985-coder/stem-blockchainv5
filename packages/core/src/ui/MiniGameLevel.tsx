@@ -12,14 +12,21 @@ import { Panel } from './Panel';
 import { PortraitFrame } from './PortraitFrame';
 import { Stars } from './Stars';
 
+/** Một phần của điểm ở màn kết quả: tên phần (đã qua fmt), số lượng và số điểm của phần đó. */
+export interface ScorePart {
+  label: string;
+  count: number;
+  points: number;
+}
+
 /** Những gì khung truyền cho phần chơi của từng game. */
 export interface MiniGameRenderProps {
   /** true khi tab bị ẩn (hoặc đang dừng chờ em bấm "Tiếp tục"): game phải ngừng chạy và ngừng tính giờ */
   paused: boolean;
   /** Số lần chơi (bắt đầu từ 1, tăng mỗi lần "Chơi lại"): dùng làm key và làm hạt giống ván mới */
   attempt: number;
-  /** Game gọi khi chơi xong (thắng hay thua đều gọi một lần) kèm điểm; khung ghi tiến độ rồi hiện màn kết quả */
-  onFinish: (score: number) => void;
+  /** Game gọi khi chơi xong (thắng hay thua đều gọi một lần) kèm điểm (và, nếu có, từng phần của điểm để hiện ở màn kết quả); khung ghi tiến độ rồi hiện màn kết quả */
+  onFinish: (score: number, parts?: readonly ScorePart[]) => void;
 }
 
 export interface MiniGameLevelProps {
@@ -33,7 +40,7 @@ export interface MiniGameLevelProps {
   onLeave?: () => void;
 }
 
-type Stage = { kind: 'card' } | { kind: 'play' } | { kind: 'result'; score: number; medal: Medal; newBest: boolean; coins: number };
+type Stage = { kind: 'card' } | { kind: 'play' } | { kind: 'result'; score: number; medal: Medal; newBest: boolean; coins: number; parts: readonly ScorePart[] };
 
 /** Theo dõi tab có đang bị ẩn không (đọc lại khi đổi trạng thái). */
 function useTabHidden(): boolean {
@@ -70,14 +77,14 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave }: MiniGame
 
   const finished = useRef(false);
   const onFinish = useCallback(
-    (score: number) => {
+    (score: number, parts: readonly ScorePart[] = []) => {
       if (finished.current) return; // chỉ nhận một lần cho mỗi ván
       finished.current = true;
       const before = progressManager.getSnapshot().progress.levels[levelId]?.bestScore ?? 0;
       const { coinsEarned } = record(levelId, gameResultOf(score, medals));
       void saveNow();
       const sum = summarizeGame(score, medals, before);
-      setStage({ kind: 'result', score: sum.score, medal: sum.medal, newBest: sum.newBest, coins: coinsEarned });
+      setStage({ kind: 'result', score: sum.score, medal: sum.medal, newBest: sum.newBest, coins: coinsEarned, parts });
     },
     [levelId, medals, record, saveNow],
   );
@@ -125,6 +132,16 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave }: MiniGame
           <p className="font-display text-5xl font-extrabold" data-testid="diem">
             {fmt(gameUi.diem, { diem: formatNumber(stage.score) })}
           </p>
+          {stage.parts.length > 0 && (
+            <section aria-label={gameUi.cacPhanDiem} className="mx-auto w-full max-w-sm rounded-2xl border-2 border-nau-go/50 bg-white/60 p-3 text-left">
+              <h3 className="mb-1 text-center text-sm font-bold text-nau-go-dam">{gameUi.cacPhanDiem}</h3>
+              <ul className="space-y-0.5" data-testid="phan-diem">
+                {stage.parts.map((p) => (
+                  <li key={p.label}>{fmt(gameUi.dongDiem, { nhan: p.label, so: formatNumber(p.count), diem: formatNumber(p.points) })}</li>
+                ))}
+              </ul>
+            </section>
+          )}
           {stage.newBest && <p className="font-bold text-xanh-la-dam">{gameUi.kyLucMoi}</p>}
           <div className="flex justify-center">
             <Stars earned={stage.medal} max={3} size="lg" />

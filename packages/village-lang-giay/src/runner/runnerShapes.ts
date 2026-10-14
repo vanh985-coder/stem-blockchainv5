@@ -1,20 +1,22 @@
 /**
- * Hình dáng chướng ngại của game chạy (spec 05 Màn 2): từ một `Cell` của `runnerLogic` ra danh sách phần phải vẽ (model có sẵn, phóng theo từng trục để khớp đúng kích thước trong
- * `runnerConfig`; và hộp do code dựng). Hàm thuần, không import three: nơi vẽ đưa vào một `Emitter` (không cấp phát).
+ * Hình dáng chướng ngại của game chạy (spec 05 Màn 2): từ một `Cell` của `runnerLogic` ra danh sách phần phải vẽ (model có sẵn phóng ĐỀU, và hộp, đống rơm do code dựng).
+ * Hàm thuần, không import three: nơi vẽ đưa vào một `Emitter` (không cấp phát). Kích thước khớp số trong `runnerConfig`; mọi model chỉ phóng đều, tỉ lệ giữa các trục lệch tối đa 1,3.
  *
- * Kích thước khớp số trong `RUNNER_TUNING` (rộng một làn = 2 × `laneHalfWidth`; cao, dài theo từng loại):
- *  - thấp (cao 0,8): `sap-thap` hoặc đống rơm (hộp do code dựng);
- *  - cao (sào ngang từ 1,0 đến 1,5): do code dựng (hai cột, sào tre, rèm giấy);
- *  - chắn làn (cao 2,5): `xe-bo` chất rơm cao, hoặc ba tầng phên `env/phen-phoi-giay` giữa bốn cột;
- *  - xe chở hàng (nóc cao 0,9, dài `truck.length`): `xe-cho-hang` chỉnh tỉ lệ cho đúng nóc.
+ *  - thấp (cao 0,8): đống rơm (code dựng, hai kiểu). Model `sap-thap` không dùng: phóng đều cho cao 0,8 thì dài 3,0, rộng hơn một làn (1,8).
+ *  - cao (sào ngang từ 1,0 đến 1,5): do code dựng (hai cột, sào tre, rèm giấy).
+ *  - chắn làn (cao 2,5): `xe-bo` xoay cho con bò ở đầu, quay về phía người chơi chạy tới, thùng xe chất đống rơm cao (code dựng); hoặc ba tầng phên `env/phen-phoi-giay` giữa bốn cột.
+ *  - xe chở hàng (nóc cao đúng 0,9): `units` xe `xe-cho-hang` nối đuôi, càng xe quay về phía người chơi, thành một khối chạy trên nóc liên tục.
+ *
+ * Hướng trong file model (đo từ các điểm của model): `xe-bo` có con bò ở phía x âm (x từ −0,49 tới 0), thùng xe ở phía x dương; `xe-cho-hang` có thùng xe ở phía x âm (x từ −0,49 tới 0,22)
+ * và hai càng xe thấp ở phía x dương. Xoay quanh trục đứng một góc θ đưa điểm x về z' = −x·sin θ (cộng z·cos θ), nên θ = +π/2 đưa phía x dương về −z (phía người chơi đang chạy tới)
+ * cho xe chở hàng, và θ = −π/2 đưa phía x âm về −z cho xe bò.
  */
 import { sizeInScene, sizeOf } from '@so-chung/core/three/modelSizes';
 import { RUNNER_SPEC as SPEC, RUNNER_TUNING as T } from './runnerConfig';
 import type { Cell } from './runnerLogic';
 
-export type ModelKey = 'sap' | 'xe-bo' | 'xe-cho-hang' | 'phen';
+export type ModelKey = 'xe-bo' | 'xe-cho-hang' | 'phen';
 export const MODEL_IDS: Readonly<Record<ModelKey, string>> = {
-  sap: 'games/man-02-duoi-ti/sap-thap',
   'xe-bo': 'games/man-02-duoi-ti/xe-bo',
   'xe-cho-hang': 'games/man-02-duoi-ti/xe-cho-hang',
   phen: 'env/phen-phoi-giay',
@@ -48,6 +50,8 @@ export interface Emitter {
   model(key: ModelKey, x: number, y: number, z: number, yaw: number, sx: number, sy: number, sz: number): void;
   /** Một hộp: tâm (x, y, z), kích thước (sx, sy, sz), góc xoay quanh trục đứng, màu */
   box(x: number, y: number, z: number, sx: number, sy: number, sz: number, yaw: number, color: BoxColor): void;
+  /** Một đống rơm (hình tròn xoay): chân (x, y, z), bán kính theo x (`rx`) và z (`rz`), chiều cao thật `h`, màu */
+  hay(x: number, y: number, z: number, rx: number, h: number, rz: number, color: BoxColor): void;
 }
 
 const HALF_PI = Math.PI / 2;
@@ -59,12 +63,18 @@ function dims(key: ModelKey): readonly [number, number, number] {
   return d;
 }
 
-/** Rộng một chướng ngại theo làn (bằng làn trừ chút khe để hai chướng ngại cạnh nhau không dính). */
+/** Rộng một chướng ngại theo làn. */
 export const OBSTACLE_WIDTH = 2 * T.laneHalfWidth;
-/** Rộng xe chở hàng (hơi hẹp hơn làn để chạy trên nóc nhìn rõ mép). */
-export const TRUCK_WIDTH = OBSTACLE_WIDTH - 0.2;
-/** Cao thân xe bò (phần dưới rơm). */
-export const CART_BODY_HEIGHT = 1.0;
+
+/** Đo từ file `xe-cho-hang`: thùng xe từ x = −0,49 tới 0,22; kiện hàng cao nhất 0,76; phần x dương là hai càng xe (đầu xe). */
+export const TRUCK_MODEL = { bedFront: 0.22, bedLength: 0.71, topY: 0.756 } as const;
+/** Đo từ file `xe-bo`: con bò từ x = −0,49 tới 0 (cao 0,33), thùng xe từ 0 tới 0,49 (cao 0,42); cả xe dài 0,98. */
+export const CART_MODEL = { cartTop: 0.42, oxTop: 0.33, length: 0.98 } as const;
+
+/** Hệ số phóng đều của xe bò: cả xe dài 0,98 × 2,4 = 2,35 = 2 × `block.halfDepth` (thùng xe rộng 0,5 × 2,4 = 1,2). */
+export const CART_SCALE = (2 * T.block.halfDepth) / (sizeInScene(MODEL_IDS['xe-bo'])?.[0] ?? CART_MODEL.length);
+/** Độ cao mặt trên thùng xe bò (nơi đống rơm bắt đầu). */
+export const CART_TOP = CART_MODEL.cartTop * CART_SCALE;
 
 /**
  * Đưa mọi phần của một chướng ngại ở làn có tâm x = `laneX` vào `e`. Chiều dọc đường lấy từ chính `cell` (z0, z1), nên hình luôn trùng vùng va chạm.
@@ -74,15 +84,12 @@ export function emitCell(cell: Cell, laneX: number, e: Emitter): void {
   const depth = cell.z1 - cell.z0;
   switch (cell.kind) {
     case 'low': {
+      // đống rơm thấp: kiểu 0 một đống rộng bằng làn, kiểu 1 (rơm {phanDien} ném) hai đống nhỏ cạnh nhau
       if (cell.variant === 1) {
-        // đống rơm: một khối thấp hai tầng
-        e.box(laneX, T.low.height * 0.3, zc, OBSTACLE_WIDTH * 0.95, T.low.height * 0.6, depth * 0.95, 0, COLORS.ro);
-        e.box(laneX, T.low.height * 0.78, zc, OBSTACLE_WIDTH * 0.7, T.low.height * 0.44, depth * 0.7, 0, COLORS.ro);
+        for (const sx of [-1, 1]) e.hay(laneX + sx * 0.4, 0, zc, 0.45, T.low.height, depth * 0.48, COLORS.ro);
         return;
       }
-      // sạp thấp: trục dài của model là z, xoay 90° cho nằm ngang làn
-      const d = dims('sap');
-      e.model('sap', laneX, 0, zc, HALF_PI, depth / d[0], T.low.height / d[1], OBSTACLE_WIDTH / d[2]);
+      e.hay(laneX, 0, zc, OBSTACLE_WIDTH * 0.47, T.low.height, depth * 0.48, COLORS.roNhat);
       return;
     }
     case 'high': {
@@ -97,38 +104,32 @@ export function emitCell(cell: Cell, laneX: number, e: Emitter): void {
     }
     case 'block': {
       if (cell.variant === 1) {
-        // phên chắn làn: ba tầng phên giấy giữa bốn cột tre, cao đúng bằng chướng ngại
+        // phên chắn làn: ba tầng phên giấy giữa bốn cột tre, cao đúng bằng chướng ngại; phóng đều theo bề rộng làn
         const d = dims('phen');
-        const sx = OBSTACLE_WIDTH / d[0];
-        const sz = depth / d[2];
+        const k = OBSTACLE_WIDTH / d[0];
         // model phên tự nhấc lên `lift` (đặt trên giá); ở đây trừ đi để tầng dưới cùng nằm ở độ cao 0,8
         const lift = sizeOf(MODEL_IDS.phen)?.lift ?? 0;
-        for (let i = 0; i < 3; i++) e.model('phen', laneX, 0.8 + i * 0.7 - lift, zc, 0, sx, 1, sz);
+        for (let i = 0; i < 3; i++) e.model('phen', laneX, 0.8 + i * 0.7 - lift, zc, 0, k, k, k);
         const post = 0.1;
-        for (const sxn of [-1, 1]) for (const szn of [-1, 1]) e.box(laneX + sxn * (T.laneHalfWidth - post / 2), T.block.height / 2, zc + szn * (depth / 2 - post / 2), post, T.block.height, post, 0, COLORS.treSam);
+        const dz = (d[2] * k) / 2;
+        for (const sxn of [-1, 1]) for (const szn of [-1, 1]) e.box(laneX + sxn * (T.laneHalfWidth - post / 2), T.block.height / 2, zc + szn * (dz - post / 2), post, T.block.height, post, 0, COLORS.treSam);
         return;
       }
-      // xe bò chất rơm cao: thân là model, rơm là hộp lên tới đỉnh chướng ngại
-      const d = dims('xe-bo');
-      e.model('xe-bo', laneX, 0, zc, 0, OBSTACLE_WIDTH / d[0], CART_BODY_HEIGHT / d[1], depth / d[2]);
-      // rơm chất thành ba tầng thu nhỏ dần (đống rơm cao), tầng cao nhất chạm đỉnh chướng ngại
-      const load = T.block.height - CART_BODY_HEIGHT;
-      const tiers: readonly (readonly [number, number, BoxColor])[] = [
-        [0.5, 0.88, COLORS.ro],
-        [0.3, 0.7, COLORS.roSam],
-        [0.2, 0.5, COLORS.roNhat],
-      ];
-      let y0 = CART_BODY_HEIGHT;
-      for (const [share, w, color] of tiers) {
-        e.box(laneX, y0 + (load * share) / 2, zc, OBSTACLE_WIDTH * w, load * share, depth * (0.55 + 0.3 * w), 0, color);
-        y0 += load * share;
-      }
+      // xe bò: con bò ở đầu (phía z nhỏ, quay về người chơi), thùng xe phía sau chất đống rơm tới đỉnh chướng ngại
+      e.model('xe-bo', laneX, 0, zc, -HALF_PI, CART_SCALE, CART_SCALE, CART_SCALE);
+      const rear0 = cell.z0 + cell.frontLen;
+      const rearLen = cell.z1 - rear0;
+      e.hay(laneX, CART_TOP - 0.05, rear0 + rearLen / 2, T.laneHalfWidth * 0.78, T.block.height - CART_TOP + 0.05, rearLen * 0.5, COLORS.ro);
       return;
     }
     case 'truck': {
-      // xe chở hàng: trục dài của model là x, xoay 90° cho nằm dọc đường; cao đúng bằng nóc (0,9)
-      const d = dims('xe-cho-hang');
-      e.model('xe-cho-hang', laneX, 0, zc, HALF_PI, depth / d[0], SPEC.roofHeight / d[1], TRUCK_WIDTH / d[2]);
+      // xe chở hàng: `units` xe nối đuôi, càng xe quay về phía người chơi (z nhỏ); phóng đều theo x, z và theo y cho đỉnh kiện hàng đúng 0,9
+      const s = T.truck.scale;
+      const sy = SPEC.roofHeight / TRUCK_MODEL.topY;
+      const unit = TRUCK_MODEL.bedLength * s;
+      for (let i = 0; i < T.truck.units; i++) {
+        e.model('xe-cho-hang', laneX, 0, cell.z0 + TRUCK_MODEL.bedFront * s + i * unit, HALF_PI, s, sy, s);
+      }
       return;
     }
   }

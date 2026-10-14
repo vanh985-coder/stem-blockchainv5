@@ -3,7 +3,7 @@
  * Không phụ thuộc React hay three nên test được; `update(dt)` được gọi mỗi khung hình vẽ. Không cấp phát khi chạy (các ảnh chụp và `input` dùng lại).
  */
 import { CommandQueue, FIXED_STEP, FixedStepper, commandToInput, type RunnerCommand } from './runnerCommands';
-import { createRunner, runnerScore, stepRunner, type RunnerInput, type RunnerOptions, type RunnerState } from './runnerLogic';
+import { createRunner, runnerScore, stepRunner, type RunnerEvent, type RunnerInput, type RunnerOptions, type RunnerState } from './runnerLogic';
 import { lerp } from './runnerView';
 
 /** Phần vị trí của nhân vật cần nội suy. */
@@ -28,9 +28,17 @@ export class RunnerSession {
   time = 0;
   /** Tổng số bước đã chạy */
   steps = 0;
+  /** Mọi sự kiện của các bước đã chạy trong lần `update` gần nhất (`state.events` chỉ giữ bước cuối); nơi vẽ đọc để phát âm thanh và hiệu ứng */
+  readonly frameEvents: RunnerEvent[] = [];
   private readonly input: RunnerInput = {};
+  private pendingAnswer: boolean | undefined = undefined;
+  private pendingResume = false;
+
+  /** Hạt giống của ván (dùng cho cả việc chọn câu hỏi) */
+  readonly seed: number;
 
   constructor(opts: RunnerOptions) {
+    this.seed = opts.seed;
     this.state = createRunner(opts);
     this.snapshot(this.cur);
     this.snapshot(this.prev);
@@ -49,6 +57,16 @@ export class RunnerSession {
     this.queue.push(c);
   }
 
+  /** Em trả lời câu hỏi (đúng/sai): dùng ở bước mô phỏng kế tiếp; chỉ nhận lần đầu mỗi câu. */
+  answerQuiz(correct: boolean): void {
+    if (this.pendingAnswer === undefined) this.pendingAnswer = correct;
+  }
+
+  /** Đã xem giải thích: chạy tiếp (hoặc kết thúc ván nếu hết tim hay hết 4 vòng). */
+  resumeQuiz(): void {
+    this.pendingResume = true;
+  }
+
   /** Hết tim (hay kết thúc) chưa. */
   get over(): boolean {
     return this.state.phase === 'over';
@@ -63,6 +81,7 @@ export class RunnerSession {
    * `paused` thì không chạy gì và bỏ phần thời gian dồn (khỏi nhảy vọt khi tiếp tục).
    */
   update(dt: number, paused: boolean): number {
+    this.frameEvents.length = 0;
     if (paused || this.over) {
       this.stepper.reset();
       return 0;
@@ -73,13 +92,25 @@ export class RunnerSession {
       input.move = undefined;
       input.jump = undefined;
       input.slide = undefined;
+      input.answer = undefined;
+      input.resume = undefined;
       const c = this.queue.shift();
       if (c) commandToInput(c, input);
+      if (this.pendingAnswer !== undefined) {
+        input.answer = this.pendingAnswer;
+        this.pendingAnswer = undefined;
+      }
+      if (this.pendingResume) {
+        input.resume = true;
+        this.pendingResume = false;
+      }
       this.prev.z = this.cur.z;
       this.prev.x = this.cur.x;
       this.prev.y = this.cur.y;
       this.prev.villainZ = this.cur.villainZ;
       stepRunner(this.state, input, FIXED_STEP);
+      const ev = this.state.events;
+      for (let k = 0; k < ev.length; k++) this.frameEvents.push(ev[k]);
       this.snapshot(this.cur);
       this.time += FIXED_STEP;
       this.steps++;

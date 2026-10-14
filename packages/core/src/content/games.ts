@@ -28,6 +28,35 @@ export const GAMES: Readonly<Partial<Record<number, GameText>>> = {
   },
 };
 
+/** Tên các phần điểm ở màn kết quả của màn 2 (điểm = trang × 10 + tiền đồng + quãng đường ÷ 10 + câu đúng × 30). */
+export const runnerScoreLabels = {
+  trang: 'Trang sổ nhặt được',
+  tien: 'Tiền đồng',
+  quangDuong: 'Quãng đường chạy (mét)',
+  cauDung: 'Câu hỏi trả lời đúng',
+} as const;
+
+/** Chữ trong lúc chơi màn 2: thanh trên, vật nhặt đặc biệt, câu hỏi giữa ván. */
+export const runnerUi = {
+  vong: 'Vòng {so}/{max}',
+  trang: 'Trang sổ: {so}',
+  tien: 'Tiền đồng: {so}',
+  nonla: 'Nón lá',
+  guoc: 'Guốc mộc',
+  tui: 'Túi tiền',
+  /** Nhãn đọc cho người dùng đọc màn hình: tên vật và số giây còn lại */
+  conLai: '{nhan}: còn {giay} giây',
+  cauSo: 'Câu {so}/{max}',
+  cauHoi: 'Hết vòng {so}! Em trả lời đúng thì {phanDien} làm rơi thêm trang.',
+  conGio: 'Còn {giay} giây',
+  hetGio: 'Hết giờ rồi, em mất 1 tim.',
+  dapAnDung: 'Đáp án đúng: {dapAn}',
+  quizDung: '{phanDien} làm rơi thêm trang! Em được thêm {so} trang.',
+  quizSai: 'Chưa đúng, em mất 1 tim.',
+  chayTiep: 'Chạy tiếp',
+  xemKetQua: 'Xem kết quả',
+} as const;
+
 export const gameUi = {
   /** Thẻ bắt đầu */
   luat: 'Luật chơi',
@@ -46,6 +75,9 @@ export const gameUi = {
   mocDatDuoc: 'Mốc em đạt: {muc}',
   kyLucMoi: 'Kỷ lục mới!',
   xuNhan: 'Em nhận được {so} xu.',
+  /** Một dòng điểm thành phần ở màn kết quả: tên phần, số lượng, điểm */
+  dongDiem: '{nhan}: {so} → {diem} điểm',
+  cacPhanDiem: 'Điểm từng phần',
   choiLai: 'Chơi lại',
   veLang: 'Về làng',
   /** Thanh trên màn chơi: quãng đường đã chạy */

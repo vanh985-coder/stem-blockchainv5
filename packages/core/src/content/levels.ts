@@ -22,11 +22,11 @@ export interface LevelDef {
 
 /**
  * 12 màn (tên lấy từ spec 05 đến 08).
- * Mốc 1: chỉ 4 bài học (màn 1, 4, 7, 10) là 'ready'. Đổi một game sang 'ready' khi làm xong game đó.
+ * 4 bài học (màn 1, 4, 7, 10) là 'ready' từ mốc 1; màn 2 (game chạy) 'ready' từ mốc 2 bước 12. Đổi một game sang 'ready' khi làm xong game đó.
  */
 export const LEVELS: readonly LevelDef[] = [
   { id: 1, lang: 'lang-giay', kind: 'lesson', ten: 'Trang nối trang', bien: 'Học cùng bác An', status: 'ready' },
-  { id: 2, lang: 'lang-giay', kind: 'game', ten: 'Đuổi theo {phanDien}', bien: 'Đuổi theo {phanDien}', status: 'coming-soon' },
+  { id: 2, lang: 'lang-giay', kind: 'game', ten: 'Đuổi theo {phanDien}', bien: 'Đuổi theo {phanDien}', status: 'ready' },
   { id: 3, lang: 'lang-giay', kind: 'game', ten: 'Ghép lại cuốn sổ', bien: 'Ghép lại cuốn sổ', status: 'coming-soon' },
   { id: 4, lang: 'lang-det', kind: 'lesson', ten: 'Cả làng cùng giữ sổ', bien: 'Học cùng cụ Bình', status: 'ready' },
   { id: 5, lang: 'lang-det', kind: 'game', ten: 'Đập {phanDien}', bien: 'Đập {phanDien}', status: 'coming-soon' },

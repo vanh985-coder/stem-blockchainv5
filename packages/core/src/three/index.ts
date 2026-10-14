@@ -75,3 +75,4 @@ export { SceneWarmup } from './SceneWarmup';
 export { StatsProbe } from './StatsProbe';
 export { Hills, useImageTexture, useDispose } from './cho/MarketProcedural';
 export { createGrassTexture, createPaddyTexture, createEdgeAlphaTexture } from './cho/marketTextures';
+export { createHayStack } from './cho/marketGeometry';

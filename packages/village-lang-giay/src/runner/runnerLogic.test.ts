@@ -9,6 +9,7 @@ import {
   passable,
   runnerMedal,
   runnerScore,
+  scoreParts,
   speedAt,
   stepRunner,
   type Cell,
@@ -191,13 +192,18 @@ describe('bảng test của spec 05, Màn 2 (9 ca)', () => {
 });
 
 describe('tốc độ, nhảy, trượt', () => {
-  it('tốc độ 8, tăng 0,25 mỗi 5 giây, tối đa 16', () => {
+  it('tốc độ 8, tăng 0,25 mỗi 5 giây THEO BẬC (spec 05 dòng 50), tối đa 16', () => {
     expect(speedAt(0)).toBe(8);
+    expect(speedAt(4.999)).toBe(8);
     expect(speedAt(5)).toBeCloseTo(8.25, 9);
+    expect(speedAt(9.999)).toBeCloseTo(8.25, 9);
     expect(speedAt(10)).toBeCloseTo(8.5, 9);
     expect(speedAt(100)).toBeCloseTo(13, 9);
+    expect(speedAt(100 - 0.001)).toBeCloseTo(12.75, 9);
+    expect(speedAt(159.999)).toBeCloseTo(15.75, 9);
     expect(speedAt(160)).toBe(16);
     expect(speedAt(1000)).toBe(16);
+    expect(speedAt(-3)).toBe(8);
   });
 
   /** Nhảy một lần ở chỗ trống, trả về đỉnh cao và thời gian bay. */
@@ -267,7 +273,7 @@ describe('tốc độ, nhảy, trượt', () => {
 });
 
 describe('vật nhặt', () => {
-  const itemAt = (kind: 'trang' | 'dong' | 'nonla' | 'guoc' | 'tui', lane: 0 | 1 | 2, z: number, y = T.itemY) => ({ id: 1, group: 1, kind, lane, x: SPEC.laneX[lane], z, y });
+  const itemAt = (kind: 'trang' | 'dong' | 'nonla' | 'guoc' | 'tui', lane: 0 | 1 | 2, z: number, y = T.itemY) => ({ id: 1, group: 1, landAt: 0, t0: 0, fromX: 0, fromZ: 0, kind, lane, x: SPEC.laneX[lane], z, y });
 
   it('trang +1, tiền đồng +1', () => {
     const s = blank();
@@ -564,11 +570,164 @@ describe('bước 11: khoảng cách tối thiểu 1,2 luôn (kể cả chưa c�
     }
   });
 
-  it('noRounds: quá 25 giây không hết vòng, không hỏi; đến khi hết tim', () => {
-    const s = createRunner({ seed: 3, noRounds: true, ghost: true });
-    for (let i = 0; i < 60 * 40; i++) stepRunner(s, {}, DT);
-    expect(s.phase).toBe('run');
+  it('hết 25 giây thì hết vòng và vào pha hỏi (không còn chạy mãi)', () => {
+    const s = createRunner({ seed: 3, ghost: true });
+    for (let i = 0; i < 60 * 27; i++) stepRunner(s, {}, DT);
+    expect(s.phase).toBe('quiz');
     expect(s.round).toBe(0);
-    expect(s.time).toBeGreaterThan(39);
+  });
+});
+
+describe('bước 12 (3b): {phanDien} làm rơi 2 đến 4 trang sổ', () => {
+  it('trang rơi 2–4 cái một lần, cách người chơi ≥ drop.aheadMin, không nằm trong chướng ngại (cách ≥ margin), không chồng vật nhặt khác, không cùng chỗ rơm', () => {
+    let drops = 0;
+    const sizes = new Set<number>();
+    ghostRun(500, 61, (st) => {
+      for (const e of st.events) {
+        if (e.type !== 'drop') continue;
+        drops++;
+        sizes.add(e.n);
+        expect(e.n).toBeGreaterThanOrEqual(T.drop.min);
+        expect(e.n).toBeLessThanOrEqual(T.drop.max);
+        expect(e.z - st.z, 'cách người chơi').toBeGreaterThanOrEqual(T.drop.aheadMin - 1e-6);
+        const mine = st.items.filter((i) => i.landAt > st.time && i.lane === e.lane && Math.abs(i.landAt - e.landAt) < 1e-9);
+        expect(mine).toHaveLength(e.n);
+        for (const it of mine) {
+          expect(it.kind).toBe('trang');
+          expect(it.landAt - it.t0).toBeCloseTo(T.drop.flightSec, 9);
+          // không nằm trong chướng ngại của làn mình (kể cả rơm ném đang bay), cách ≥ margin
+          for (const r of st.rows) {
+            const c = r.cells[it.lane];
+            if (c) expect(it.z < c.z0 - T.drop.margin + 1e-6 || it.z > c.z1 + T.drop.margin - 1e-6, `trang ${it.z.toFixed(1)} chồng ${c.kind} ${c.z0.toFixed(1)}..${c.z1.toFixed(1)}`).toBe(true);
+          }
+          // không chồng vật nhặt khác cùng làn
+          for (const o of st.items) if (o.group !== it.group && o.lane === it.lane) expect(Math.abs(o.z - it.z), 'chồng vật nhặt').toBeGreaterThanOrEqual(T.drop.spacing - 1e-6);
+        }
+      }
+    });
+    expect(drops).toBeGreaterThan(8);
+    expect(sizes.size).toBeGreaterThanOrEqual(2);
+  });
+
+  it('trang đang rơi chưa nhặt được; hạ xuống rồi thì nhặt như trang thường (+1 trang, 10 điểm mỗi trang)', () => {
+    const s = createRunner({ seed: 9, autoSpawn: false });
+    s.rows = [rowOf(25, [null, null, null], 1), rowOf(60, [null, null, null], 2)];
+    s.villain.dropTimer = 0.01;
+    for (let i = 0; i < 5 && !s.events.some((e) => e.type === 'drop'); i++) stepRunner(s, {}, DT);
+    const ev = s.events.find((e) => e.type === 'drop');
+    expect(ev).toBeDefined();
+    const items = s.items.filter((i) => i.landAt > s.time);
+    expect(items.length).toBe(ev && ev.type === 'drop' ? ev.n : -1);
+    expect(s.pageDebt).toBe(items.length);
+    // đặt nhân vật ngay trên chỗ rơi lúc chưa hạ xuống: không nhặt được
+    const first = items[0];
+    s.z = first.z - 0.2;
+    s.lane = first.lane;
+    s.x = first.x;
+    stepRunner(s, {}, DT);
+    expect(s.pages).toBe(0);
+    // sau khi hạ xuống (landAt) thì nhặt được
+    s.time = first.landAt + 0.01;
+    s.z = first.z - 0.2;
+    stepRunner(s, {}, DT);
+    expect(s.pages).toBeGreaterThanOrEqual(1);
+    expect(runnerScore({ pages: s.pages, coins: 0, distance: 0, correct: 0 })).toBe(s.pages * 10);
+  });
+
+  it('ngân sách trang sổ: số trang rơi trừ vào các chuỗi trang sinh sau (tổng trang gần như không đổi)', () => {
+    const s = createRunner({ seed: 71, autoSpawn: false });
+    s.pageDebt = 5;
+    s.rows = [];
+    // sinh nhiều hàng; mọi chuỗi trang đều bị bớt cho tới khi hết nợ
+    s.autoSpawn = true;
+    s.genZ = 0;
+    s.z = 0;
+    for (let i = 0; i < 4000 && s.pageDebt > 0; i++) {
+      s.z += 5;
+      stepRunner(s, { jump: false }, 0.0001);
+    }
+    expect(s.pageDebt).toBe(0);
+  });
+
+  it('trong cả ván dài: số trang rơi và nợ trang cân bằng (nợ còn lại nhỏ)', () => {
+    let dropped = 0;
+    const s = ghostRun(800, 81, (st) => {
+      for (const e of st.events) if (e.type === 'drop') dropped += e.n;
+    });
+    expect(dropped).toBeGreaterThan(20);
+    expect(s.pageDebt).toBeLessThanOrEqual(T.drop.max * 2);
+  });
+});
+
+describe('bước 12: va chạm theo hình (xe bò có con bò thấp ở đầu, xe chở hàng hẹp hơn làn)', () => {
+  it('xe bò: nhảy qua phần con bò (cao 0,9) được, nhưng chạm thùng xe phía sau (cao 2,5) thì va', () => {
+    const s = blank();
+    const c = makeCell('block', 10, 0);
+    s.rows = [rowOf(10, [null, c, null])];
+    // đang ở độ cao 1,0 ngay trên đoạn con bò: không va
+    s.z = c.z0 + 0.4;
+    s.y = 1.0;
+    s.vy = 0;
+    s.grounded = false;
+    stepRunner(s, {}, DT);
+    stepRunner(s, {}, DT);
+    expect(s.hearts).toBe(SPEC.hearts);
+    // tới thùng xe ở cùng độ cao thì va
+    s.z = c.z0 + c.frontLen + 0.5;
+    s.y = 1.0;
+    s.vy = 0;
+    s.grounded = false;
+    stepRunner(s, {}, DT);
+    expect(s.hearts).toBe(SPEC.hearts - 1);
+  });
+
+  it('xe chở hàng hẹp hơn làn: đứng cạnh (x = 1,0) không va; chắn làn thì va ở cùng chỗ', () => {
+    const run = (kind: 'truck' | 'block') => {
+      const s = blank();
+      const c = makeCell(kind, 5, kind === 'block' ? 1 : 0);
+      s.rows = [rowOf(5, [null, c, null])];
+      s.x = 1.0;
+      s.lane = 2; // đích ở x = 2: không chạy về x = 1
+      s.z = c.z0 + 0.3;
+      stepRunner(s, {}, 1 / 600);
+      return s.hearts;
+    };
+    // lane 2 → x tiến dần về 2; ở x = 1,0 ngay bước đầu
+    expect(run('truck')).toBe(SPEC.hearts);
+    expect(run('block')).toBe(SPEC.hearts - 1);
+  });
+
+  it('ghi chú: nhảy lên nóc khối xe chở hàng dài và chạy hết chiều dài khối', () => {
+    const s = blank();
+    const c = makeCell('truck', 3, 0);
+    s.rows = [rowOf(3, [null, c, null])];
+    s.z = c.z0 + 0.2;
+    s.y = 1.1;
+    s.vy = -1;
+    s.grounded = false;
+    for (let i = 0; i < 8; i++) stepRunner(s, {}, DT);
+    expect(s.onRoof).toBe(true);
+    const start = s.z;
+    for (let i = 0; i < 20 && s.z < c.z1 - 0.3; i++) stepRunner(s, {}, DT);
+    expect(s.z - start).toBeGreaterThan(1.5);
+    expect(s.hearts).toBe(SPEC.hearts);
+  });
+});
+
+describe('điểm chia theo từng phần (màn kết quả)', () => {
+  it('từng phần đúng công thức và tổng bằng điểm của runnerScore (kể cả quãng đường lẻ)', () => {
+    for (const st of [
+      { pages: 23, coins: 50, distance: 1080, correct: 3 },
+      { pages: 0, coins: 0, distance: 99.9, correct: 0 },
+      { pages: 7, coins: 13, distance: 543.7, correct: 4 },
+    ]) {
+      const parts = scoreParts(st);
+      expect(parts.map((p) => p.key)).toEqual(['trang', 'tien', 'quangDuong', 'cauDung']);
+      expect(parts[0]).toEqual({ key: 'trang', count: st.pages, points: st.pages * 10 });
+      expect(parts[1]).toEqual({ key: 'tien', count: st.coins, points: st.coins });
+      expect(parts[2].points).toBe(Math.floor(st.distance / 10));
+      expect(parts[3]).toEqual({ key: 'cauDung', count: st.correct, points: st.correct * 30 });
+      expect(parts.reduce((a, p) => a + p.points, 0)).toBe(runnerScore(st));
+    }
   });
 });

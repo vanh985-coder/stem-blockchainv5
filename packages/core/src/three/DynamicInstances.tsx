@@ -1,5 +1,5 @@
 import { useEffect, useMemo, type Ref } from 'react';
-import { BoxGeometry, DynamicDrawUsage, InstancedBufferAttribute, InstancedMesh, Matrix4, MeshStandardMaterial, Quaternion, Vector3, type Object3D } from 'three';
+import { BoxGeometry, DynamicDrawUsage, type BufferGeometry, InstancedBufferAttribute, InstancedMesh, Matrix4, MeshStandardMaterial, Quaternion, Vector3, type Object3D } from 'three';
 import { getManifest } from '../assets/store';
 import { buildParts, fitOf, newMesh } from './cho/ModelInstances';
 import { isUsableMid, lodId, midId, modelPath } from './modelIds';
@@ -166,6 +166,8 @@ export interface DynamicBoxesProps {
   capacity: number;
   apiRef: Ref<DynamicBoxesApi>;
   roughness?: number;
+  /** Hình dùng thay hộp đơn vị (ví dụ đống rơm, đồng xu). Hình do nơi gọi giữ và giải phóng. */
+  geometry?: BufferGeometry;
 }
 
 /** Hộp đơn vị (1 × 1 × 1) nhân bản có màu riêng từng bản: cột, sào, kiện hàng… do code dựng, cùng cách dùng lại bộ đệm như `DynamicModel`. */
@@ -176,9 +178,9 @@ export interface DynamicBoxesApi {
   end(): void;
 }
 
-export function DynamicBoxes({ capacity, apiRef, roughness = 0.9 }: DynamicBoxesProps) {
+export function DynamicBoxes({ capacity, apiRef, roughness = 0.9, geometry: given }: DynamicBoxesProps) {
   const res = useMemo(() => {
-    const geometry = new BoxGeometry(1, 1, 1);
+    const geometry = given ?? new BoxGeometry(1, 1, 1);
     const material = new MeshStandardMaterial({ color: '#FFFFFF', roughness });
     const mesh = new InstancedMesh(geometry, material, capacity);
     mesh.instanceMatrix.setUsage(DynamicDrawUsage);
@@ -186,12 +188,12 @@ export function DynamicBoxes({ capacity, apiRef, roughness = 0.9 }: DynamicBoxes
     mesh.instanceColor.setUsage(DynamicDrawUsage);
     mesh.count = 0;
     mesh.frustumCulled = false;
-    return { geometry, material, mesh, n: 0 };
-  }, [capacity, roughness]);
+    return { geometry, material, mesh, n: 0, own: !given };
+  }, [capacity, roughness, given]);
   useEffect(
     () => () => {
       res.mesh.dispose();
-      res.geometry.dispose();
+      if (res.own) res.geometry.dispose();
       res.material.dispose();
     },
     [res],

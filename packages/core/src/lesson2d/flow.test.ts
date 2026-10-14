@@ -91,7 +91,7 @@ describe('ghi tiến độ từng trạm', () => {
     expect(applyStationResult(p, 1, 'tb', 3, T0 + 2).coinsEarned).toBe(0);
   });
 
-  it('đủ 3 trạm: completed, bài tính là đã xong, nhận Trang Sổ Vàng 1 (mốc 1: màn 2, 3 là coming-soon)', () => {
+  it('đủ 3 trạm: completed, bài tính là đã xong; chưa nhận Trang Sổ Vàng 1 (màn 2 đã sẵn sàng nên phải chơi màn 2 mới nhận)', () => {
     let p = emptyProgress();
     p = applyStationResult(p, 1, 'de', 3, T0).progress;
     p = applyStationResult(p, 1, 'tb', 2, T0 + 1).progress;
@@ -100,9 +100,9 @@ describe('ghi tiến độ từng trạm', () => {
     const last = applyStationResult(p, 1, 'kho', 1, T0 + 2);
     expect(last.progress.levels[1].completed).toBe(true);
     expect(doneLevels(last.progress)).toEqual([1]);
-    expect(last.progress.game.goldenPages).toBe(1);
+    expect(last.progress.game.goldenPages).toBe(0);
     expect(last.progress.game.coins).toBe(60);
-    expect(goldenPageAwarded(p.game.goldenPages, last.progress.game.goldenPages, 0)).toBe(true);
+    expect(goldenPageAwarded(p.game.goldenPages, last.progress.game.goldenPages, 0)).toBe(false);
   });
 
   it('bỏ dở sau trạm 1: tiến độ giữ sao trạm 1, completed vẫn false, không có Trang Sổ Vàng', () => {
