@@ -144,10 +144,13 @@ describe('doneLevels, Trang Sổ Vàng, mở khóa', () => {
   });
 
   it('xong màn ready cuối cùng của làng thì nhận Trang Sổ Vàng và ghi lại', () => {
-    let p = lesson1Done(); // màn 2 đã sẵn sàng (bước 12), màn 3 là coming-soon: xong bài học chưa nhận trang
+    let p = lesson1Done(); // màn 2 và 3 đều sẵn sàng (bước 14): xong bài học chưa nhận trang
     expect(p.game.goldenPages).toBe(0);
     expect(unlockOf(p).levels.find((l) => l.id === 4)!.state).toBe('locked');
-    p = recordLevelResult(p, 2, { stars: { game: 0 } }, T0 + 1).progress; // chơi xong màn 2 (kể cả thua) là màn ready cuối cùng của làng
+    p = recordLevelResult(p, 2, { stars: { game: 0 } }, T0 + 1).progress; // chơi xong màn 2: còn màn 3 nên chưa nhận trang
+    expect(p.game.goldenPages).toBe(0);
+    expect(unlockOf(p).levels.find((l) => l.id === 4)!.state).toBe('locked');
+    p = recordLevelResult(p, 3, { stars: { game: 0 } }, T0 + 2).progress; // chơi xong màn 3 (kể cả thua) là màn ready cuối cùng của làng
     expect(p.game.goldenPages).toBe(1);
     expect(unlockOf(p).levels.find((l) => l.id === 4)!.state).toBe('open');
   });

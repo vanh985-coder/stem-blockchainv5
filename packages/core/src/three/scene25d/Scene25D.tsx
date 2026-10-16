@@ -68,8 +68,10 @@ export interface Scene25DProps {
   quality?: QualityChoice;
   /** Tự hạ một mức nếu FPS dưới 40 trong 3 giây đầu (mặc định bật) */
   autoDowngrade?: boolean;
-  /** Báo khi cảnh đã tải xong (ảnh, model; màn hình tải đã tắt) */
+  /** Báo khi cảnh đã tải xong (ảnh, model); từ lúc này cảnh đã vẽ được dưới màn hình tải. */
   onReady?: () => void;
+  /** Giữ màn hình tải thêm sau khi cảnh sẵn sàng (true), để màn chơi chạy thử các chuyển động đầu tiên (tư thế, clip) khi người chơi chưa nhìn thấy, tránh khựng lần đầu. Tắt khi đã xong. */
+  hold?: boolean;
   /** Báo mức mới khi vừa tự hạ mức vì FPS thấp */
   onQualityLowered?: (fps: number, level: QualityLevel) => void;
   /** Báo khi chế độ khung đổi (ngang, dọc, nhắc xoay) */
@@ -276,7 +278,7 @@ function useElementSize(): [React.RefObject<HTMLDivElement | null>, Size] {
   return [ref, size];
 }
 
-function Scene25DInner({ background, sprites = [], children, overlay, allowPortrait = false, quality, autoDowngrade = true, onReady, onQualityLowered, onModeChange, className = '' }: Scene25DProps) {
+function Scene25DInner({ background, sprites = [], children, overlay, allowPortrait = false, quality, autoDowngrade = true, onReady, hold = false, onQualityLowered, onModeChange, className = '' }: Scene25DProps) {
   const { level } = useQuality(quality);
   const [hostRef, host] = useElementSize();
   const mode = frameMode(host, allowPortrait);
@@ -337,12 +339,12 @@ function Scene25DInner({ background, sprites = [], children, overlay, allowPortr
               </Suspense>
             </QualityContext.Provider>
           </Canvas>
-          <div className="absolute inset-0" style={{ pointerEvents: ready ? 'auto' : 'none' }}>
+          <div className="absolute inset-0" style={{ pointerEvents: ready && !hold ? 'auto' : 'none' }}>
             {overlay}
           </div>
         </div>
       )}
-      <LoadingScreen visible={!ready} />
+      <LoadingScreen visible={!ready || hold} />
       {mode === 'rotate' && <RotatePrompt />}
     </div>
   );

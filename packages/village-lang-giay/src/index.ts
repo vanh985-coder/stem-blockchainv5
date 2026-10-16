@@ -12,8 +12,8 @@ export const langGiay: VillageModule = {
   routes: [
     { index: true, element: createElement(Suspense, { fallback: createElement('p', { className: 'p-6 text-center' }, ui.chung.dangTai) }, createElement(Scene)) },
     guardedRoute('man/1', 1, () => import('./pages/Man1')),
-    // Màn 2 (game chạy): đã dựng đường chạy ở bước 11; biển vẫn "Sắp ra mắt" (status coming-soon) cho tới khi xong bước 12, vào bằng đường dẫn để thử
     guardedRoute('man/2', 2, () => import('./pages/Man2')),
+    guardedRoute('man/3', 3, () => import('./pages/Man3')),
   ],
 };
 

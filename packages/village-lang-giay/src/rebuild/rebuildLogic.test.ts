@@ -5,6 +5,7 @@ import { REBUILD_SPEC as SPEC } from './rebuildConfig';
 import {
   advance,
   binCard,
+  checkInspection,
   checkPlacement,
   createRebuild,
   formulaHolds,
@@ -15,6 +16,7 @@ import {
   rebuildMedal,
   rebuildScore,
   roundScore,
+  scoreParts,
   tailCode,
   type Card,
   type RebuildState,
@@ -269,5 +271,40 @@ describe('vòng, tim, điểm', () => {
     const a = createRebuild(31);
     const b = createRebuild(31);
     expect(a.tray.map((c) => c.id)).toEqual(b.tray.map((c) => c.id));
+  });
+});
+
+describe('soi công thức: em tự tính, không lộ đáp án', () => {
+  it('tính sai thì chỉ báo sai, không kèm kết quả đúng', () => {
+    const r = checkInspection(card(31, 7, 69), 70);
+    expect(r).toEqual({ kind: 'sai' });
+    expect(JSON.stringify(r)).not.toContain('69');
+  });
+  it('tính đúng và thẻ khớp: khớp; tính đúng nhưng thẻ ghi mã khác: lệch (trang giả)', () => {
+    expect(checkInspection(card(31, 7, 69), 69)).toEqual({ kind: 'khop', expected: 69 });
+    expect(checkInspection(card(31, 50, 99), 12)).toEqual({ kind: 'lech', expected: 12 });
+  });
+  it('em tính ra đúng mã ghi trên thẻ giả thì vẫn là sai (vì thẻ giả ghi mã khác công thức)', () => {
+    expect(checkInspection(card(31, 50, 99), 99)).toEqual({ kind: 'sai' });
+  });
+});
+
+describe('các phần điểm cho màn kết quả', () => {
+  it('tổng các phần bằng điểm ván, vòng dở dang không có dòng', () => {
+    const s = createRebuild(12);
+    placeCard(s, s.tray.find((c) => c.prev !== tailCode(s))!.id); // 1 lỗi ở vòng 1
+    playPerfectRound(s);
+    advance(s);
+    playPerfectRound(s); // vòng 2 có trang giả bỏ đúng
+    advance(s);
+    insertFake(s);
+    for (let i = 0; i < 2; i++) placeCard(s, s.tray.find((c) => c.prev !== tailCode(s) && formulaHolds(c))!.id);
+    const rows = scoreParts(s);
+    expect(rows).toEqual([
+      { key: 'vong', round: 0, count: 1, points: 90 },
+      { key: 'vong', round: 1, count: 0, points: 100 },
+      { key: 'trangGia', round: 1, count: 1, points: 30 },
+    ]);
+    expect(rows.reduce((a, r) => a + r.points, 0)).toBe(rebuildScore(s));
   });
 });

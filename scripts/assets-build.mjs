@@ -5,6 +5,7 @@ import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
+import { autoCutout, assessCutout } from './lib/cutout.mjs';
 import { checkCharacter, largestTexture, REQUIRED_CLIPS, textureBytes } from './lib/glb.mjs';
 import { buildModelSet, classifyModel, LOD_SUFFIX, LOD_TEXTURE, LOD_TRIS, MID_MAX_TRIS, MID_MIN_MAIN_TRIS, MID_SUFFIX, MID_TRIS } from './lib/model-build.mjs';
 
@@ -18,15 +19,20 @@ const WARN_BYTES = 400 * 1024;
 const CONCURRENCY = 4;
 
 // Sửa chính file script này thì mọi ảnh được nén lại (mã băm của script nằm trong chữ ký cache).
-const SCRIPT_HASH = createHash('sha256').update(await readFile(fileURLToPath(import.meta.url))).digest('hex').slice(0, 12);
+const SCRIPT_HASH = createHash('sha256')
+  .update(await readFile(fileURLToPath(import.meta.url)))
+  .update(await readFile(path.join(path.dirname(fileURLToPath(import.meta.url)), 'lib', 'cutout.mjs')))
+  .digest('hex')
+  .slice(0, 12);
 
 /** Quy tắc nén theo đường dẫn không đuôi (dấu /). Trả null nếu chưa có quy tắc. */
 function classify(key) {
   if (/^(scenes|story)\//.test(key) || key === 'ui/ban-do' || key === 'ui/man-hinh-tai') {
     return { kind: 'nen', maxWidth: 1920, quality: 82, warnBig: true };
   }
+  // Hình rời (sprites): ảnh do AI tạo hay in sẵn nền ô vuông hoặc nền một màu vào ảnh; tự tách nền (scripts/lib/cutout.mjs), ảnh đã trong suốt thật thì để nguyên.
+  if (key.startsWith('sprites/')) return { kind: 'hinh-roi', box: 1024, quality: 85, autoCutout: true };
   if (
-    key.startsWith('sprites/') ||
     /^ui\/(cards|tiles|textures)\//.test(key) ||
     key === 'ui/logo-art' ||
     key === 'ui/bang-khen-khung'
@@ -175,13 +181,47 @@ async function writeIconPreview(manifest) {
   await sharp(check).composite(layers).webp({ quality: 90 }).toFile(path.join(OUT, '_preview', 'icons.webp'));
 }
 
+/** Đường dẫn ảnh xem trước tách nền của một sprite (key bắt đầu bằng "sprites/"): _preview/sprites/<thư mục>-<tên>.png */
+const spritePreview = (key) => path.join(OUT, '_preview', 'sprites', key.slice('sprites/'.length).split('/').join('-') + '.png');
+
+/** Ảnh trước | sau (nền tối) | sau (nền sáng) để soi mép tách nền. Mỗi ô cao `PREVIEW_H` điểm ảnh. */
+const PREVIEW_H = 384;
+async function cutoutPreview(beforeFile, afterRgba, w, h) {
+  const scale = PREVIEW_H / h;
+  const pw = Math.max(1, Math.round(w * scale));
+  const before = await sharp(beforeFile).rotate().flatten({ background: '#2b2b36' }).resize(pw, PREVIEW_H).png().toBuffer();
+  const afterPng = await sharp(afterRgba, { raw: { width: w, height: h, channels: 4 } }).resize(pw, PREVIEW_H).png().toBuffer();
+  const panel = (bg) => sharp({ create: { width: pw, height: PREVIEW_H, channels: 3, background: bg } }).composite([{ input: afterPng }]).png().toBuffer();
+  const dark = await panel('#2b2b36');
+  const light = await panel('#f1e6c8');
+  return sharp({ create: { width: pw * 3 + 8, height: PREVIEW_H, channels: 3, background: '#888' } })
+    .composite([{ input: before, left: 0, top: 0 }, { input: dark, left: pw + 4, top: 0 }, { input: light, left: pw * 2 + 8, top: 0 }])
+    .png()
+    .toBuffer();
+}
+
 async function encode(file, rule) {
   if (rule.cutout) return encodeIcon(file, rule);
   let img = sharp(file).rotate();
+  let cut = null;
+  if (rule.autoCutout) {
+    const { data, info: raw } = await sharp(file).rotate().ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    const rgba = { data: new Uint8Array(data.buffer, data.byteOffset, data.length) };
+    const r = autoCutout(rgba, raw.width, raw.height);
+    cut = { kind: r.bg.kind, removed: r.removed, colors: r.bg.colors ?? null };
+    if (r.mask) {
+      const q = assessCutout(rgba, raw.width, raw.height, r.bg, r.removed);
+      cut.clean = q.clean;
+      cut.reasons = q.reasons;
+      cut.preview = await cutoutPreview(file, data, raw.width, raw.height);
+      img = sharp(data, { raw: { width: raw.width, height: raw.height, channels: 4 } });
+    }
+  }
   if (rule.maxWidth) img = img.resize({ width: rule.maxWidth, withoutEnlargement: true });
   else if (rule.box) img = img.resize({ width: rule.box, height: rule.box, fit: 'inside', withoutEnlargement: true });
   else if (rule.exact) img = img.resize(rule.exact, rule.exact, { fit: 'cover' });
-  return img.webp({ quality: rule.quality, alphaQuality: 100, effort: 5 }).toBuffer({ resolveWithObject: true });
+  const out = await img.webp({ quality: rule.quality, alphaQuality: 100, effort: 5 }).toBuffer({ resolveWithObject: true });
+  return cut ? { ...out, cut } : out;
 }
 
 async function pool(items, n, fn) {
@@ -225,6 +265,7 @@ const manifest = {};
 const newCache = {};
 const stats = { processed: 0, skipped: 0 };
 const bigFiles = [];
+const cutouts = [];
 
 await pool(jobs, CONCURRENCY, async ({ rel, key, rule }) => {
   const srcPath = path.join(SRC, rel);
@@ -235,6 +276,7 @@ await pool(jobs, CONCURRENCY, async ({ rel, key, rule }) => {
   if (hit && hit.sig === sig) {
     try {
       await stat(path.join(OUT, hit.file));
+      if (hit.cutout && hit.cutout.kind !== 'transparent' && hit.cutout.kind !== 'none') await stat(spritePreview(key));
       entry = hit;
       stats.skipped++;
     } catch {
@@ -242,20 +284,45 @@ await pool(jobs, CONCURRENCY, async ({ rel, key, rule }) => {
     }
   }
   if (!entry) {
-    const { data, info } = await encode(srcPath, rule);
+    const { data, info, cut } = await encode(srcPath, rule);
     const dir = path.posix.dirname(key);
     const name = path.posix.basename(key);
     const file = `${dir === '.' ? '' : dir + '/'}${name}.${sha(data, 8)}.webp`;
     await mkdir(path.dirname(path.join(OUT, file)), { recursive: true });
     await writeFile(path.join(OUT, file), data);
     entry = { sig, file, bytes: data.length, width: info.width, height: info.height, kind: rule.kind, warnBig: !!rule.warnBig };
+    if (cut) {
+      entry.cutout = { kind: cut.kind, removed: cut.removed, colors: cut.colors, clean: cut.clean ?? null, reasons: cut.reasons ?? [] };
+      if (cut.preview) {
+        const pv = spritePreview(key);
+        await mkdir(path.dirname(pv), { recursive: true });
+        await writeFile(pv, cut.preview);
+      }
+    }
     stats.processed++;
     console.log(`  nén  ${rel}  ->  ${file}  (${fmt(data.length)})`);
   }
   newCache[key] = entry;
+  if (entry.cutout) cutouts.push({ key, ...entry.cutout });
   manifest[key] = { file: entry.file, bytes: entry.bytes, width: entry.width, height: entry.height };
   if (rule.warnBig && entry.bytes > WARN_BYTES) bigFiles.push({ key, bytes: entry.bytes });
 });
+
+// Báo cáo tách nền hình rời: ảnh nào trong suốt thật, ảnh nào bị nền ô vuông / một màu in sẵn và kết quả tách (ảnh chưa sạch cần vẽ lại).
+{
+  cutouts.sort((a, b) => a.key.localeCompare(b.key));
+  const label = { transparent: 'trong suốt thật (giữ nguyên)', checker: 'nền ô vuông', solid: 'nền một màu', none: 'nền là cảnh (không tách)' };
+  console.log('Tách nền hình rời (assets/sprites):');
+  for (const c of cutouts) {
+    const colors = c.colors ? ' ' + c.colors.map((k) => '#' + k.map((v) => v.toString(16).padStart(2, '0')).join('')).join(' ') : '';
+    const res = c.kind === 'checker' || c.kind === 'solid' ? `, xóa ${(c.removed * 100).toFixed(1)}% -> ${c.clean ? 'sạch' : 'CHƯA SẠCH: ' + c.reasons.join('; ')}` : '';
+    console.log(`  ${c.key}: ${label[c.kind] ?? c.kind}${colors}${res}`);
+  }
+  const dirty = cutouts.filter((c) => c.clean === false);
+  console.log(dirty.length ? `  => ${dirty.length} ảnh tách chưa sạch (xem _preview/sprites/): ${dirty.map((c) => c.key).join(', ')}` : '  => mọi ảnh bị nền đều tách sạch');
+  await mkdir(path.join(OUT, '_preview', 'sprites'), { recursive: true });
+  await writeFile(path.join(OUT, '_preview', 'sprites', '_report.json'), JSON.stringify(cutouts, null, 2));
+}
 
 // ---------------------------------------------------------------------------
 // Model .glb: xử lý lần lượt (mỗi model gốc nặng vài triệu tam giác nên tốn bộ nhớ).

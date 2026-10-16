@@ -107,7 +107,8 @@ describe('isVillageDone và lọc "Chưa xong làng …"', () => {
   const [an, binh, dao] = t;
 
   it('làng xong khi mọi màn sẵn sàng xong; game sắp ra mắt không tính', () => {
-    expect(isVillageDone(binh, 'lang-giay')).toBe(true); // mốc 1 chỉ có bài 1 sẵn sàng
+    expect(isVillageDone(binh, 'lang-giay')).toBe(false); // Bình đã chơi màn 2 nhưng chưa chơi màn 3 (sẵn sàng từ mốc 2 bước 14)
+    expect(isVillageDone(binh, 'lang-giay', [{ ...levelById(1)!, status: 'ready' as const }, { ...levelById(2)!, status: 'ready' as const }, { ...levelById(3)!, status: 'coming-soon' as const }])).toBe(true); // màn 3 sắp ra mắt thì không tính
     expect(isVillageDone(an, 'lang-giay')).toBe(false);
     expect(isVillageDone(binh, 'lang-det')).toBe(false); // bài 4 chưa đủ 3 trạm
     expect(isVillageDone(dao, 'lang-det')).toBe(true);
@@ -117,7 +118,7 @@ describe('isVillageDone và lọc "Chưa xong làng …"', () => {
   it('lọc những em chưa xong một làng', () => {
     const names = (list: typeof t) => list.map((s) => s.name);
     expect(names(filterStudents(t, { notDoneVillage: 'lang-det' }))).toEqual(['An', 'Bình']);
-    expect(names(filterStudents(t, { notDoneVillage: 'lang-giay' }))).toEqual(['An', 'Đào']); // Đào chưa chơi màn 2
+    expect(names(filterStudents(t, { notDoneVillage: 'lang-giay' }))).toEqual(['An', 'Bình', 'Đào']); // Bình chưa chơi màn 3, Đào chưa chơi màn 2
     expect(names(filterStudents(t, { notDoneVillage: null }))).toEqual(['An', 'Bình', 'Đào']);
   });
 

@@ -464,122 +464,122 @@
     "height": 768
   },
   "sprites/man-03-ghep-so/ro-trang-gia": {
-    "file": "sprites/man-03-ghep-so/ro-trang-gia.53006a18.webp",
-    "bytes": 113470,
+    "file": "sprites/man-03-ghep-so/ro-trang-gia.17f493c8.webp",
+    "bytes": 25894,
     "width": 1024,
     "height": 559
   },
   "sprites/man-05-dap-ti/chuot-giay-doi-lan": {
-    "file": "sprites/man-05-dap-ti/chuot-giay-doi-lan.5d0a43bc.webp",
-    "bytes": 95250,
+    "file": "sprites/man-05-dap-ti/chuot-giay-doi-lan.7a029c9a.webp",
+    "bytes": 32744,
     "width": 1024,
     "height": 559
   },
   "sprites/man-05-dap-ti/chuot-giay-nhanh": {
-    "file": "sprites/man-05-dap-ti/chuot-giay-nhanh.dc094019.webp",
-    "bytes": 103084,
+    "file": "sprites/man-05-dap-ti/chuot-giay-nhanh.719bc33a.webp",
+    "bytes": 21480,
     "width": 1024,
     "height": 559
   },
   "sprites/man-05-dap-ti/chuot-giay-thuong": {
-    "file": "sprites/man-05-dap-ti/chuot-giay-thuong.448e7acc.webp",
-    "bytes": 85152,
+    "file": "sprites/man-05-dap-ti/chuot-giay-thuong.e399854b.webp",
+    "bytes": 27838,
     "width": 1024,
     "height": 559
   },
   "sprites/man-05-dap-ti/chuot-giay-to": {
-    "file": "sprites/man-05-dap-ti/chuot-giay-to.31ee6dd6.webp",
-    "bytes": 107686,
+    "file": "sprites/man-05-dap-ti/chuot-giay-to.f3839a30.webp",
+    "bytes": 23796,
     "width": 1024,
     "height": 559
   },
   "sprites/man-05-dap-ti/vet-muc": {
-    "file": "sprites/man-05-dap-ti/vet-muc.a59d1edf.webp",
-    "bytes": 75446,
+    "file": "sprites/man-05-dap-ti/vet-muc.72445ea1.webp",
+    "bytes": 23588,
     "width": 1024,
     "height": 559
   },
   "sprites/man-06-dieu/cong-lang-xa": {
-    "file": "sprites/man-06-dieu/cong-lang-xa.53f06056.webp",
-    "bytes": 87882,
+    "file": "sprites/man-06-dieu/cong-lang-xa.b866a956.webp",
+    "bytes": 49322,
     "width": 1024,
     "height": 559
   },
   "sprites/man-06-dieu/cot-tre": {
-    "file": "sprites/man-06-dieu/cot-tre.a046e0a0.webp",
-    "bytes": 13390,
+    "file": "sprites/man-06-dieu/cot-tre.f56dfb8a.webp",
+    "bytes": 21502,
     "width": 1024,
     "height": 559
   },
   "sprites/man-06-dieu/dieu": {
-    "file": "sprites/man-06-dieu/dieu.daa2bbdf.webp",
-    "bytes": 104464,
+    "file": "sprites/man-06-dieu/dieu.e09ceec5.webp",
+    "bytes": 38000,
     "width": 1024,
     "height": 572
   },
   "sprites/man-06-dieu/dieu-den": {
-    "file": "sprites/man-06-dieu/dieu-den.3cd950f4.webp",
-    "bytes": 103494,
+    "file": "sprites/man-06-dieu/dieu-den.3488b122.webp",
+    "bytes": 31872,
     "width": 1024,
     "height": 572
   },
   "sprites/man-09-chua-ga/ga-benh": {
-    "file": "sprites/man-09-chua-ga/ga-benh.046f2ad6.webp",
-    "bytes": 121816,
+    "file": "sprites/man-09-chua-ga/ga-benh.4dc53501.webp",
+    "bytes": 23978,
     "width": 1024,
     "height": 572
   },
   "sprites/man-09-chua-ga/ga-khoe": {
-    "file": "sprites/man-09-chua-ga/ga-khoe.161a1b55.webp",
-    "bytes": 9362,
+    "file": "sprites/man-09-chua-ga/ga-khoe.27ea8a59.webp",
+    "bytes": 20418,
     "width": 1024,
     "height": 572
   },
   "sprites/man-09-chua-ga/ga-trum": {
-    "file": "sprites/man-09-chua-ga/ga-trum.1ce44821.webp",
-    "bytes": 118744,
+    "file": "sprites/man-09-chua-ga/ga-trum.7b910aaf.webp",
+    "bytes": 29674,
     "width": 1024,
     "height": 572
   },
   "sprites/man-09-chua-ga/na-cao-su": {
-    "file": "sprites/man-09-chua-ga/na-cao-su.656d9975.webp",
-    "bytes": 91948,
+    "file": "sprites/man-09-chua-ga/na-cao-su.9362cba2.webp",
+    "bytes": 24484,
     "width": 1024,
     "height": 559
   },
   "sprites/man-11-ghep-la/cay-ghep-la": {
-    "file": "sprites/man-11-ghep-la/cay-ghep-la.8b303f5d.webp",
-    "bytes": 64898,
+    "file": "sprites/man-11-ghep-la/cay-ghep-la.dc0e2010.webp",
+    "bytes": 33264,
     "width": 1024,
     "height": 559
   },
   "sprites/man-12-leo-cay/canh-ngang": {
-    "file": "sprites/man-12-leo-cay/canh-ngang.adba56a1.webp",
-    "bytes": 111796,
+    "file": "sprites/man-12-leo-cay/canh-ngang.f4a601f9.webp",
+    "bytes": 14892,
     "width": 1024,
     "height": 559
   },
   "sprites/man-12-leo-cay/goc-cay": {
-    "file": "sprites/man-12-leo-cay/goc-cay.608c7443.webp",
-    "bytes": 90282,
+    "file": "sprites/man-12-leo-cay/goc-cay.1b5f390a.webp",
+    "bytes": 26152,
     "width": 1024,
     "height": 572
   },
   "sprites/man-12-leo-cay/ngon-cay": {
-    "file": "sprites/man-12-leo-cay/ngon-cay.72529c8a.webp",
-    "bytes": 91950,
+    "file": "sprites/man-12-leo-cay/ngon-cay.73882f38.webp",
+    "bytes": 32476,
     "width": 1024,
     "height": 572
   },
   "sprites/man-12-leo-cay/tay-nam": {
-    "file": "sprites/man-12-leo-cay/tay-nam.a55daddb.webp",
-    "bytes": 107370,
+    "file": "sprites/man-12-leo-cay/tay-nam.5c178a53.webp",
+    "bytes": 19034,
     "width": 1024,
     "height": 559
   },
   "sprites/man-12-leo-cay/than-cay": {
-    "file": "sprites/man-12-leo-cay/than-cay.7edaaa51.webp",
-    "bytes": 85236,
+    "file": "sprites/man-12-leo-cay/than-cay.4b663753.webp",
+    "bytes": 10064,
     "width": 1024,
     "height": 572
   },

@@ -300,3 +300,35 @@ export function advance(s: RebuildState): void {
   s.round++;
   startRound(s);
 }
+
+/** Kết quả khi em tự tính ở "Soi công thức": 'sai' = em tính chưa đúng (không lộ đáp án); đúng thì cho biết thẻ khớp hay lệch công thức. */
+export type SoiResult = { kind: 'sai' } | { kind: 'khop'; expected: number } | { kind: 'lech'; expected: number };
+
+/** Em nhập kết quả của (mã trước × 2 + nội dung) mod 100; chỉ khi em tính đúng mới hiện phép tính đầy đủ và so với mã trang ghi trên thẻ. */
+export function checkInspection(card: Pick<Card, 'prev' | 'content' | 'code'>, typed: number): SoiResult {
+  const expected = solutionSteps(card.prev, card.content).code;
+  if (typed !== expected) return { kind: 'sai' };
+  return card.code === expected ? { kind: 'khop', expected } : { kind: 'lech', expected };
+}
+
+/**
+ * Các phần điểm cho màn kết quả (tổng bằng `rebuildScore`): mỗi vòng đã xong một dòng "số lần sai → 100 − 10 × lỗi", và thêm một dòng +30 nếu bỏ đúng trang giả vào rổ.
+ * Vòng dở dang (hết tim) không có dòng nào.
+ */
+export interface ScorePartRow {
+  key: 'vong' | 'trangGia';
+  /** Chỉ số vòng, 0 đến 2 */
+  round: number;
+  /** vong: số lần sai; trangGia: 1 */
+  count: number;
+  points: number;
+}
+
+export function scoreParts(s: Pick<RebuildState, 'parts'>): ScorePartRow[] {
+  const rows: ScorePartRow[] = [];
+  for (const p of s.parts) {
+    rows.push({ key: 'vong', round: p.round, count: p.errors, points: roundScore(p.errors, false) });
+    if (p.fakeBinned) rows.push({ key: 'trangGia', round: p.round, count: 1, points: SPEC.fakeBonus });
+  }
+  return rows;
+}

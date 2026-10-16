@@ -13,9 +13,9 @@ describe('levels', () => {
     expect(VILLAGE_ORDER).toEqual(['lang-giay', 'lang-det', 'lang-khac-dau', 'lang-bac']);
   });
 
-  it('mốc 2 bước 12: màn 1, 2 (game chạy), 4, 7, 10 là ready; 7 màn còn lại là coming-soon', () => {
-    expect(LEVELS.filter((l) => l.status === 'ready').map((l) => l.id)).toEqual([1, 2, 4, 7, 10]);
-    expect(LEVELS.filter((l) => l.status === 'coming-soon')).toHaveLength(7);
+  it('mốc 2 bước 14: màn 1, 2, 3 (làng Giấy trọn vẹn), 4, 7, 10 là ready; 6 màn còn lại là coming-soon', () => {
+    expect(LEVELS.filter((l) => l.status === 'ready').map((l) => l.id)).toEqual([1, 2, 3, 4, 7, 10]);
+    expect(LEVELS.filter((l) => l.status === 'coming-soon')).toHaveLength(6);
   });
 
   it('có tên màn và tên biển gỗ, chỗ giữ tên hợp lệ', () => {

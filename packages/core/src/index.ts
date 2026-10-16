@@ -58,7 +58,7 @@ export type { PickParams } from './quiz/pickQuestions';
 export { recordAnswer } from './quiz/recordAnswer';
 export { LEVELS, VILLAGE_ORDER, levelById, levelsOfVillage } from './content/levels';
 export { medalOf, gameResultOf, summarizeGame } from './games/medals';
-export { GAMES, gameUi, runnerUi, runnerScoreLabels } from './content/games';
+export { GAMES, gameUi, runnerUi, runnerScoreLabels, rebuildUi } from './content/games';
 export type { GameText } from './content/games';
 export { MiniGameLevel } from './ui/MiniGameLevel';
 export type { MiniGameLevelProps, MiniGameRenderProps, ScorePart } from './ui/MiniGameLevel';
