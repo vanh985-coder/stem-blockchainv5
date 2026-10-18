@@ -1,7 +1,7 @@
 // Xóa dấu ngôi sao (dấu mờ của công cụ vẽ ảnh AI) ở góc dưới phải ảnh. Hàm thuần trên bộ đệm RGBA thô { data, width, height }, dùng chung cho `assets-build.mjs` và test.
 //
-// Dấu là một ngôi sao bốn cánh (cạnh lõm) màu trắng phủ mờ (alpha khoảng 0,2 đến 0,4 trên nền sẫm, tới 0,7 trên nền gần trắng). Kích thước và vị trí tỉ lệ theo bề cao ảnh: ở ảnh cao 768
-// (điểm ảnh "chuẩn") nửa cạnh khoảng 26 điểm ảnh, tâm cách mép phải và mép dưới 120 điểm ảnh. Chỉ tìm và sửa trong MỘT Ô GÓC CỐ ĐỊNH quanh tâm đó (cửa sổ 1,5 lần nửa cạnh): không điểm
+// Dấu là một ngôi sao bốn cánh (cạnh lõm) màu trắng phủ mờ (alpha khoảng 0,2 đến 0,4 trên nền sẫm, tới 0,7 trên nền gần trắng). Kích thước và vị trí tỉ lệ theo cỡ ảnh (xem `sparkleGeometry`): ở ảnh cao 768
+// (điểm ảnh "chuẩn", s = 1) nửa cạnh khoảng 26 điểm ảnh, tâm cách mép phải và mép dưới 120 điểm ảnh. Chỉ tìm và sửa trong MỘT Ô GÓC CỐ ĐỊNH quanh tâm đó (cửa sổ 1,5 lần nửa cạnh): không điểm
 // ảnh nào ngoài ô bị đổi.
 //
 //  1. `detectSparkle`: hai kiểm định, dùng cửa sổ lấy mẫu ở độ phân giải chuẩn nên ảnh to hay nhỏ đều so được:
@@ -25,9 +25,12 @@ export const plateauFactor = (a) => 1 + 0.5 * Math.max(0, 1 - a / 0.65);
 const HALF_REF = Math.ceil(SPARKLE.radius * 1.5);
 const SIDE_REF = 2 * HALF_REF + 1;
 
-/** Tâm (làm tròn), nửa cạnh và độ lệch dưới điểm ảnh của dấu ở ảnh w × h (điểm ảnh thật), cùng hệ số tỉ lệ `s`. */
+/**
+ * Tâm (làm tròn), nửa cạnh và độ lệch dưới điểm ảnh của dấu ở ảnh w × h (điểm ảnh thật), cùng hệ số tỉ lệ `s`. Công cụ vẽ ảnh đóng dấu cỡ cố định theo cỡ ảnh xuất ra: ảnh khoảng 1 triệu điểm ảnh
+ * (1376 × 768, 1408 × 768) có s = 1; ảnh khoảng 4 triệu điểm ảnh (2752 × 1536, 2816 × 1536, 2048 × 2048) có s = 2. Nên s = căn bậc hai của (số điểm ảnh / 1,057 triệu), làm tròn, tối thiểu 1.
+ */
 export function sparkleGeometry(w, h) {
-  const s = h / 768;
+  const s = Math.max(1, Math.round(Math.sqrt((w * h) / (1376 * 768))));
   return { s, cx: Math.round(w - SPARKLE.offset * s), cy: Math.round(h - SPARKLE.offset * s), R: SPARKLE.radius * s, sx: SPARKLE.shift * s, sy: SPARKLE.shift * s };
 }
 
@@ -178,7 +181,7 @@ function lapTest(data, w, h, g) {
 export function detectSparkle(rgba, w, h) {
   const g = sparkleGeometry(w, h);
   const out = { found: false, reliable: false, ...g, k: 0, peak: 0, rms: 0, lapAlpha: 0, lapZ: 0 };
-  if (h < 192 || g.cx - HALF_REF * g.s - 1 < 0 || g.cy - HALF_REF * g.s - 1 < 0) return out;
+  if (g.cx - HALF_REF * g.s - 1 < 0 || g.cy - HALF_REF * g.s - 1 < 0) return out;
   const c = regress(windowLuma(rgba.data, w, h, g.cx, g.cy, g.s, 0));
   let shMax = -Infinity;
   const o = 10 * g.s;
@@ -235,17 +238,17 @@ function fullWindow(g) {
  * Gỡ dấu đã nhận dạng (`det` từ `detectSparkle`). Trả về { alpha, fixed, residual, fallback }: alpha tìm được, số điểm ảnh đã đổi, tương quan Laplacian còn lại sau khi gỡ, và có phải
  * tô lại từ điểm ảnh xung quanh (khi gỡ theo lớp phủ trắng chưa sạch) không. Chỉ đổi điểm ảnh trong cửa sổ quanh tâm.
  */
-export function removeSparkle(rgba, w, h, det) {
+export function removeSparkle(rgba, w, h, det, opts = {}) {
   const { data } = rgba;
   const g = { s: det.s, cx: det.cx, cy: det.cy, R: det.R, sx: det.sx, sy: det.sy };
   const viaRegression = regressionUsable(det);
-  const alpha = estimateAlpha(data, w, h, g, viaRegression);
+  const alpha = opts.alpha ?? estimateAlpha(data, w, h, g, viaRegression);
   if (alpha < 0.005) return { alpha, fixed: 0, residual: 0, fallback: false };
   const before = new Uint8Array(data.length);
   before.set(data);
   const win = fullWindow(g);
   // ước lượng alpha từ nét biên mà ra quá lớn (nền gần trắng, dấu gần như vô hình): gỡ theo công thức dễ làm tối nên tô lại từ điểm ảnh xung quanh
-  if (!viaRegression && alpha >= 0.5) return { alpha, fixed: inpaint(data, w, h, g, win), residual: 0, fallback: true };
+  if (opts.alpha === undefined && !viaRegression && alpha >= 0.5) return { alpha, fixed: inpaint(data, w, h, g, win), residual: 0, fallback: true };
   let fixed = 0;
   for (let dy = -win.half; dy <= win.half; dy++) {
     const y = g.cy + dy;
@@ -334,4 +337,19 @@ export function cleanSparkle(rgba, w, h) {
   const info = { k: det.k, peak: det.peak, lapAlpha: det.lapAlpha, lapZ: det.lapZ };
   if (!det.found) return { found: false, ...info, alpha: 0, fixed: 0, residual: 0, fallback: false };
   return { found: true, ...info, ...removeSparkle(rgba, w, h, det) };
+}
+
+/** Alpha thường gặp của dấu ở ảnh to (đo trên các ảnh nhận dạng chắc chắn: 0,26 đến 0,40, trung vị khoảng 0,31); dùng cho ảnh trong danh sách "luôn xóa". */
+export const TYPICAL_ALPHA = 0.31;
+
+/**
+ * Luôn xóa ở ô góc (dùng cho ảnh trong danh sách "luôn xóa" của assets:build, nơi dấu mờ quá nên nhận dạng không chắc chắn): bỏ qua nhận dạng, gỡ lớp phủ trắng với alpha thường gặp
+ * (`TYPICAL_ALPHA`, giữ nguyên hoa văn nền); nếu sau khi gỡ vẫn còn tương quan với nét biên ngôi sao thì tô lại vùng ngôi sao từ điểm ảnh xung quanh. Chỉ đổi điểm ảnh trong cửa sổ quanh tâm.
+ * Trả về { found, forced: true, alpha, fixed, residual, fallback, ... }.
+ */
+export function forceCleanSparkle(rgba, w, h, alpha = TYPICAL_ALPHA) {
+  const det = detectSparkle(rgba, w, h);
+  const info = { k: det.k, peak: det.peak, lapAlpha: det.lapAlpha, lapZ: det.lapZ };
+  if (det.cx - HALF_REF * det.s - 1 < 0 || det.cy - HALF_REF * det.s - 1 < 0) return { found: false, forced: true, ...info, alpha: 0, fixed: 0, residual: 0, fallback: false };
+  return { found: true, forced: true, ...info, ...removeSparkle(rgba, w, h, det, { alpha }) };
 }

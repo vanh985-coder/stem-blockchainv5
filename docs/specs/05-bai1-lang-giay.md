@@ -242,16 +242,18 @@ Trước vòng 2 và vòng 3, {phanDien} lẻn tới nhét trang giả vào xấ
 - Bác An: "Một mình giữ sổ thì kẻ gian vẫn ngồi sửa cả đêm được. Vì thế các làng không bao giờ để sổ ở một nơi. Xuống Làng Dệt mà xem."
 - Nút "Về chợ".
 
-## Checklist nghiệm thu
+**Bản làm (mốc 2, bước 15a):**
+- **Cảnh trao trang** (`VillageScene`): vào làng khi đã có Trang Sổ Vàng của làng này mà chưa chiếu (xong màn 3, hoặc đã có trang từ trước; nếu cảnh mở đầu làng cũng là lần đầu thì chiếu sau cảnh đó) thì bác An nói hai lượt (`villageScene.lang-giay.award.loi`: "Em đã mang các trang về và ghép lại cuốn sổ rồi đấy! Bác trao em Trang Sổ Vàng thứ nhất." rồi câu của spec). Lượt đầu có hàng 4 ô Trang Sổ Vàng (`GoldenPagesRow`): trang vừa nhận bay vào ô trang 1 (bật "Giảm chuyển động" thì nằm sẵn trong ô), ô trang 1 trên HUD nhấp sáng 3 lần (`animate-golden-glow`). Lượt cuối có nút "Về chợ" (sang `/cho?mo=lang-giay`, xem spec 04 mục 5); "Bỏ qua" ở lại làng.
+- **Chiếu một lần, lưu theo tiến độ:** cờ `goldenSeen` trong `game_state.data` (chơi thử: trường `gs` của cookie `sc_guest`, một bit mỗi làng), hợp cờ khi gộp tiến độ; hàm thuần `shouldShowGolden` ở `progress/villageIntro.ts`, test `goldenFlags.test.ts`. Tài khoản giáo viên không chiếu.
 
-- [ ] Test của Bài 1 (giai đoạn 1), `runnerLogic` và `rebuildLogic` đều ✅.
+- [x] Test của Bài 1 (giai đoạn 1), `runnerLogic` và `rebuildLogic` đều ✅. (Bước 15a: `pnpm test` 103 file, 1180 test xanh.)
 - [ ] Màn 1: đủ 3 trạm; domino và cuộc đua sửa sổ chạy đúng.
 - [ ] Màn 2:
   - vuốt và phím đều nhận ngay;
   - có câu hỏi sau mỗi vòng;
   - chạy lên nóc xe được;
   - không bao giờ gặp hàng chắn kín 3 làn.
-- [ ] Màn 3: trang giả luôn phát hiện được bằng công thức; kéo thả dùng được trên điện thoại.
-- [ ] Xong màn 3: nhận Trang Sổ Vàng, về chợ thấy cổng Làng Dệt mở.
+- [ ] Màn 3: trang giả luôn phát hiện được bằng công thức; kéo thả dùng được trên điện thoại. (Bước 15a: `rebuildLogic.test.ts` xanh; chơi hết màn trên bản build bằng chuột và bằng chạm giả lập đều ra "Vàng 360 điểm", 144 fps, không khung nào quá 33 ms. Còn cần thử trên điện thoại thật.)
+- [x] Xong màn 3: nhận Trang Sổ Vàng, về chợ thấy cổng Làng Dệt mở. (Bước 15a, kiểm bằng Chrome: ghi kết quả 3 màn, vào làng thì bác An trao trang, "Về chợ" sang `/cho?mo=lang-giay`, then gỗ và dây đỏ rơi, Bi nói "Một trang rồi! Cổng Làng Dệt đã mở.", nhiệm vụ đổi sang Làng Dệt; tải lại thì không chiếu lại.)
 - [ ] Màn 1 là bài 2D giai đoạn 1 đặt trên nền làng, lời bác An hiện đúng chỗ.
-- [ ] Ít nhất 30fps ở mức Thấp trên điện thoại tầm trung.
+- [ ] Ít nhất 30fps ở mức Thấp trên điện thoại tầm trung. (Bước 15a, bản build trên máy tính, mức Thấp: cảnh trao trang 546 fps, đi lại 604 fps; làm chậm CPU 4 lần còn 212 và 275 fps. Còn cần thử trên điện thoại thật.)

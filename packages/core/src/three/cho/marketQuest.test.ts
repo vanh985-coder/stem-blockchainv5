@@ -9,6 +9,8 @@ import {
   GATE_VILLAGE,
   bearingTo,
   clampPages,
+  gateOpenedAfter,
+  gateOpeningSpawn,
   gateStates,
   guideArrow,
   isGateOpen,
@@ -163,5 +165,33 @@ describe('chỗ xuất hiện ở chợ khi từ làng về (?tu=<làng>)', () =
       const p = { x: s.x, z: s.z };
       expect(resolveCollisions(p, PLAYER_RADIUS, L.obstacles, WORLD_RADIUS), g.id).toBe(false);
     }
+  });
+});
+
+describe('hiệu ứng mở cổng khi về chợ sau Trang Sổ Vàng', () => {
+  it('cổng vừa mở là cổng của làng kế tiếp; làng cuối không mở cổng nào', () => {
+    expect(gateOpenedAfter('lang-giay')).toBe('det');
+    expect(gateOpenedAfter('lang-det')).toBe('khac-dau');
+    expect(gateOpenedAfter('lang-khac-dau')).toBe('bac');
+    expect(gateOpenedAfter('lang-bac')).toBeNull();
+  });
+  it('chỗ xuất hiện: cách cổng vừa mở 8,5 đơn vị về phía sân chợ và nhìn thẳng vào cổng', () => {
+    for (const giver of ['lang-giay', 'lang-det', 'lang-khac-dau']) {
+      const s = gateOpeningSpawn(giver)!;
+      expect(s).not.toBeNull();
+      const g = GATES.find((q) => q.id === s.gate)!;
+      const d = Math.hypot(g.x - s.x, g.z - s.z);
+      expect(d).toBeCloseTo(8.5, 6);
+      // hướng nhìn (sin yaw, cos yaw) trùng hướng từ người chơi tới cổng
+      expect(Math.sin(s.yaw) * ((g.x - s.x) / d) + Math.cos(s.yaw) * ((g.z - s.z) / d)).toBeCloseTo(1, 6);
+      // gần tâm chợ hơn cổng
+      expect(Math.hypot(s.x, s.z)).toBeLessThan(Math.hypot(g.x, g.z));
+    }
+  });
+  it('làng Bạc, làng lạ, không có: null (dùng chỗ xuất hiện mặc định)', () => {
+    expect(gateOpeningSpawn('lang-bac')).toBeNull();
+    expect(gateOpeningSpawn('xyz')).toBeNull();
+    expect(gateOpeningSpawn(null)).toBeNull();
+    expect(gateOpeningSpawn(undefined)).toBeNull();
   });
 });

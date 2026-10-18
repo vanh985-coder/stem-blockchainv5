@@ -6,7 +6,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { autoCutout, assessCutout } from './lib/cutout.mjs';
-import { cleanSparkle, sparkleGeometry } from './lib/watermark.mjs';
+import { cleanSparkle, forceCleanSparkle, sparkleGeometry } from './lib/watermark.mjs';
+
+/** Ảnh mà dấu ngôi sao quá mờ để nhận dạng chắc chắn: luôn tô lại vùng ngôi sao ở ô góc từ điểm ảnh xung quanh (khóa manifest, không đuôi). */
+const FORCE_SPARKLE = new Set(['story/06-lang-giay', 'ui/portraits/lan', 'ui/textures/san-gach']);
 import { checkCharacter, largestTexture, REQUIRED_CLIPS, textureBytes } from './lib/glb.mjs';
 import { buildModelSet, classifyModel, LOD_SUFFIX, LOD_TEXTURE, LOD_TRIS, MID_MAX_TRIS, MID_MIN_MAIN_TRIS, MID_SUFFIX, MID_TRIS } from './lib/model-build.mjs';
 
@@ -229,8 +232,8 @@ async function encode(file, rule) {
     const { data, info: raw } = await sharp(file).rotate().ensureAlpha().raw().toBuffer({ resolveWithObject: true });
     const rgba = { data: new Uint8Array(data.buffer, data.byteOffset, data.length) };
     const before = Buffer.from(data);
-    const r = cleanSparkle(rgba, raw.width, raw.height);
-    wm = { found: r.found, k: r.k, peak: r.peak, lapZ: r.lapZ, alpha: r.alpha, fallback: r.fallback, fixed: r.fixed };
+    const r = rule.forceSparkle ? forceCleanSparkle(rgba, raw.width, raw.height) : cleanSparkle(rgba, raw.width, raw.height);
+    wm = { forced: !!r.forced, found: r.found, k: r.k, peak: r.peak, lapZ: r.lapZ, alpha: r.alpha, fallback: r.fallback, fixed: r.fixed };
     if (r.found) {
       wm.preview = await sparklePreview(before, data, raw.width, raw.height);
       img = sharp(data, { raw: { width: raw.width, height: raw.height, channels: 4 } });
@@ -291,7 +294,7 @@ for (const rel of files) {
   }
   if (seen.has(key)) throw new Error(`Hai ảnh trùng tên không đuôi: ${seen.get(key)} và ${rel}`);
   seen.set(key, rel);
-  jobs.push({ rel, key, rule });
+  jobs.push({ rel, key, rule: FORCE_SPARKLE.has(key) ? { ...rule, forceSparkle: true } : rule });
 }
 
 const manifest = {};
@@ -327,7 +330,7 @@ await pool(jobs, CONCURRENCY, async ({ rel, key, rule }) => {
     await writeFile(path.join(OUT, file), data);
     entry = { sig, file, bytes: data.length, width: info.width, height: info.height, kind: rule.kind, warnBig: !!rule.warnBig };
     if (wm) {
-      entry.watermark = { found: wm.found, k: wm.k, peak: wm.peak, lapZ: wm.lapZ, alpha: wm.alpha, fallback: wm.fallback, fixed: wm.fixed };
+      entry.watermark = { forced: wm.forced, found: wm.found, k: wm.k, peak: wm.peak, lapZ: wm.lapZ, alpha: wm.alpha, fallback: wm.fallback, fixed: wm.fixed };
       if (wm.preview) {
         await mkdir(path.dirname(watermarkPreview(key)), { recursive: true });
         await writeFile(watermarkPreview(key), wm.preview);
@@ -372,7 +375,7 @@ await pool(jobs, CONCURRENCY, async ({ rel, key, rule }) => {
   watermarks.sort((a, b) => a.key.localeCompare(b.key));
   const found = watermarks.filter((w) => w.found);
   console.log('Dấu ngôi sao ở góc dưới phải (scenes, story, ui):');
-  for (const w of found) console.log(`  ${w.key}: alpha ${w.alpha.toFixed(2)}, ${w.fallback ? 'tô lại từ điểm ảnh xung quanh' : 'gỡ lớp phủ trắng'}, sửa ${w.fixed} điểm ảnh`);
+  for (const w of found) console.log(`  ${w.key}: ${w.forced ? 'luôn xóa (danh sách FORCE_SPARKLE), ' : ''}${w.fallback ? 'tô lại từ điểm ảnh xung quanh' : `gỡ lớp phủ trắng, alpha ${w.alpha.toFixed(2)}`}, sửa ${w.fixed} điểm ảnh`);
   const maybe = watermarks.filter((w) => !w.found && (w.lapZ >= 2.5 || w.peak >= 1.5));
   if (maybe.length) console.log(`  nghi còn dấu mờ, chưa nhận dạng chắc chắn: ${maybe.map((w) => w.key).join(', ')}`);
   console.log(`  => ${found.length} ảnh có dấu đã xóa (ảnh trước | sau ở _preview/watermark/)`);

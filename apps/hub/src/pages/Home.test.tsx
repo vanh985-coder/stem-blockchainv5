@@ -48,6 +48,8 @@ const progressOf = (goldenPages: number): ProgressState => ({
   startGuest: () => {},
   markVillageIntroSeen: () => {},
   markVillageSceneSeen: () => {},
+  markGoldenSeen: () => {},
+  markGateOpenSeen: () => {},
 });
 
 function render(ui: ReactElement, auth: AuthState, golden = 0): string {

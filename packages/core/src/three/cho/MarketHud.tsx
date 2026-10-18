@@ -8,6 +8,8 @@ export interface MarketHudProps {
   quest: string;
   /** Số Trang Sổ Vàng đã có (0 đến 4) */
   pages: number;
+  /** Chỉ số ô trang (từ 0) vừa nhận, sáng lên một lúc; bỏ trống thì không có ô nào sáng */
+  glow?: number;
   /** Bấm nút menu (máy tính: nhả khóa chuột rồi menu hiện ra; điện thoại: bật menu) */
   onMenu: () => void;
 }
@@ -16,7 +18,7 @@ export interface MarketHudProps {
  * HUD của chợ phiên (spec 04 mục 3 "HUD"): góc trên trái dòng "Nhiệm vụ: …", góc trên phải 4 ô Trang Sổ Vàng (icon \`trang-vang\`; trang chưa có thì mờ) và nút menu. Các phần
  * tử có \`data-walk-ui\` nên bấm vào không bắt đầu kéo camera hay cần điều khiển. Lớp phủ không bắt chuột ngoài các phần tử này.
  */
-export function MarketHud({ quest, pages, onMenu }: MarketHudProps) {
+export function MarketHud({ quest, pages, glow, onMenu }: MarketHudProps) {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-2">
       <p data-walk-ui role="status" className="pointer-events-auto max-w-[min(26rem,58vw)] rounded-bang border-2 border-nau-go/60 bg-giay/90 px-3 py-2 font-display text-sm font-extrabold leading-snug shadow-md sm:text-base">
@@ -30,7 +32,8 @@ export function MarketHud({ quest, pages, onMenu }: MarketHudProps) {
               <li
                 key={i}
                 title={got ? ui.banDo.trangDaNhan : ui.banDo.trangChuaNhan}
-                className={`grid size-9 place-items-center rounded-lg border-2 sm:size-10 ${got ? 'border-vang-dam bg-vang/40' : 'border-dashed border-nau-go bg-giay/60'}`}
+                className={`grid size-9 place-items-center rounded-lg border-2 sm:size-10 ${got ? 'border-vang-dam bg-vang/40' : 'border-dashed border-nau-go bg-giay/60'} ${glow === i ? 'animate-golden-glow' : ''}`}
+                data-glow={glow === i ? '1' : undefined}
               >
                 <AssetImage path="ui/icons/trang-vang" alt="" className={`size-7 object-contain sm:size-8 ${got ? '' : 'opacity-30 grayscale'}`} />
                 <span className="sr-only">

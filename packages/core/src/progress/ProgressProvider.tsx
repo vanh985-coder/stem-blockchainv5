@@ -31,6 +31,8 @@ export interface ProgressState {
   markVillageIntroSeen: (village: VillageId) => void;
   /** Đã xem cảnh mở đầu của làng 3D (bước 9) */
   markVillageSceneSeen: (village: VillageId) => void;
+  markGoldenSeen: (village: VillageId) => void;
+  markGateOpenSeen: (village: VillageId) => void;
 }
 
 /** Chỉ để test: dựng ProgressContext giả. */
@@ -58,6 +60,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const startGuest = useCallback(() => progressManager.startGuest(), []);
   const markVillageIntroSeen = useCallback((village: VillageId) => progressManager.markVillageIntroSeen(village), []);
   const markVillageSceneSeen = useCallback((village: VillageId) => progressManager.markVillageSceneSeen(village), []);
+  const markGoldenSeen = useCallback((village: VillageId) => progressManager.markGoldenSeen(village), []);
+  const markGateOpenSeen = useCallback((village: VillageId) => progressManager.markGateOpenSeen(village), []);
 
   const value = useMemo<ProgressState>(
     () => ({
@@ -73,8 +77,10 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       startGuest,
       markVillageIntroSeen,
       markVillageSceneSeen,
+      markGoldenSeen,
+      markGateOpenSeen,
     }),
-    [snap, unlock, record, saveNow, startGuest, markVillageIntroSeen, markVillageSceneSeen],
+    [snap, unlock, record, saveNow, startGuest, markVillageIntroSeen, markVillageSceneSeen, markGoldenSeen, markGateOpenSeen],
   );
 
   return (
@@ -98,6 +104,8 @@ const FALLBACK: ProgressState = {
   startGuest: () => {},
   markVillageIntroSeen: () => {},
   markVillageSceneSeen: () => {},
+  markGoldenSeen: () => {},
+  markGateOpenSeen: () => {},
 };
 
 export function useProgress(): ProgressState {

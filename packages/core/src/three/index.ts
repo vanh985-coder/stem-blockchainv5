@@ -55,6 +55,8 @@ export type { WalkWorldProps } from './WalkWorld';
 export { WalkControls } from './WalkControls';
 export type { WalkControlsProps } from './WalkControls';
 export { DevWalk } from './DevWalk';
+export { DevPortraits } from './DevPortraits';
+export * from './portraitFrame';
 export * from './cameraCollision';
 export * from './shadowFocus';
 export { MarketPage } from './cho/MarketPage';

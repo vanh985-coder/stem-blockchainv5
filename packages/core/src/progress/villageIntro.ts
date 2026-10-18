@@ -119,3 +119,65 @@ export function introTasks(village: VillageId, unlockLevels: readonly LevelUnloc
 export function goldenPageNumber(village: VillageId): number {
   return VILLAGE_ORDER.indexOf(village) + 1;
 }
+
+// ---------------------------------------------------------------------------
+// Cảnh trao Trang Sổ Vàng và hiệu ứng mở cổng làng kế tiếp (mốc 2, bước 15a): hai cờ riêng theo làng, cùng cách lưu với cờ giới thiệu và cờ cảnh mở đầu.
+
+/** Cờ "đã chiếu cảnh người dẫn trao Trang Sổ Vàng của làng này" (game_state.data.goldenSeen; chơi thử: trường "gs" của cookie, một bit mỗi làng). */
+export const GOLDEN_SEEN_KEY = 'goldenSeen';
+/** Cờ "đã chiếu hiệu ứng mở cổng làng kế tiếp sau Trang Sổ Vàng của làng này" (game_state.data.gateOpenSeen; cookie: trường "go"). */
+export const GATE_SEEN_KEY = 'gateOpenSeen';
+
+function withSeen(data: Record<string, unknown> | undefined, key: string, village: VillageId): Record<string, unknown> {
+  return { ...(data ?? {}), [key]: { ...seenOf(data, key), [village]: true } };
+}
+function mergeSeen(base: Record<string, unknown>, other: Record<string, unknown>, key: string): Record<string, unknown> {
+  const merged: IntroSeen = { ...seenOf(other, key), ...seenOf(base, key) };
+  if (Object.keys(merged).length === 0) return base;
+  return { ...base, [key]: merged };
+}
+function maskOf(data: Record<string, unknown> | undefined, key: string): number {
+  const seen = seenOf(data, key);
+  return VILLAGE_ORDER.reduce((mask, id, i) => (seen[id] ? mask | (1 << i) : mask), 0);
+}
+function dataFromMask(mask: unknown, key: string): Record<string, unknown> {
+  const m = typeof mask === 'number' && Number.isFinite(mask) ? Math.floor(mask) : 0;
+  const seen: IntroSeen = {};
+  VILLAGE_ORDER.forEach((id, i) => {
+    if (m & (1 << i)) seen[id] = true;
+  });
+  return Object.keys(seen).length === 0 ? {} : { [key]: seen };
+}
+
+export const goldenSeenOf = (data: Record<string, unknown> | undefined): IntroSeen => seenOf(data, GOLDEN_SEEN_KEY);
+export const hasSeenGolden = (data: Record<string, unknown> | undefined, village: VillageId): boolean => goldenSeenOf(data)[village] === true;
+export const withGoldenSeen = (data: Record<string, unknown> | undefined, village: VillageId): Record<string, unknown> => withSeen(data, GOLDEN_SEEN_KEY, village);
+export const mergeGoldenSeen = (base: Record<string, unknown>, other: Record<string, unknown>): Record<string, unknown> => mergeSeen(base, other, GOLDEN_SEEN_KEY);
+export const goldenMask = (data: Record<string, unknown> | undefined): number => maskOf(data, GOLDEN_SEEN_KEY);
+export const goldenDataFromMask = (mask: unknown): Record<string, unknown> => dataFromMask(mask, GOLDEN_SEEN_KEY);
+
+export const gateSeenOf = (data: Record<string, unknown> | undefined): IntroSeen => seenOf(data, GATE_SEEN_KEY);
+export const hasSeenGateOpen = (data: Record<string, unknown> | undefined, village: VillageId): boolean => gateSeenOf(data)[village] === true;
+export const withGateOpenSeen = (data: Record<string, unknown> | undefined, village: VillageId): Record<string, unknown> => withSeen(data, GATE_SEEN_KEY, village);
+export const mergeGateSeen = (base: Record<string, unknown>, other: Record<string, unknown>): Record<string, unknown> => mergeSeen(base, other, GATE_SEEN_KEY);
+export const gateMask = (data: Record<string, unknown> | undefined): number => maskOf(data, GATE_SEEN_KEY);
+export const gateDataFromMask = (mask: unknown): Record<string, unknown> => dataFromMask(mask, GATE_SEEN_KEY);
+
+/**
+ * Có chiếu cảnh người dẫn trao Trang Sổ Vàng khi em vào làng này không: đã có Trang Sổ Vàng của làng (`goldenPages` ≥ số trang của làng) và chưa chiếu lần nào. Chiếu một lần, lưu theo tiến độ.
+ * Mọi trường hợp nhận trang theo bảng mở khóa (chơi xong màn ready cuối của làng, hoặc làng chỉ còn bài học ready) đều làm `goldenPages` tăng nên đều qua hàm này.
+ */
+export function shouldShowGolden(data: Record<string, unknown> | undefined, village: VillageId, goldenPages: number): boolean {
+  return goldenPages >= goldenPageNumber(village) && !hasSeenGolden(data, village);
+}
+
+/**
+ * Hiệu ứng mở cổng chờ chiếu khi về chợ: có k Trang Sổ Vàng (1 đến 3) thì cổng của làng thứ k + 1 mới mở; chiếu một lần (cờ theo làng vừa trao trang). Trả về làng đã trao trang
+ * (cờ cần ghi), hoặc null nếu không có gì để chiếu (chưa có trang, đã chiếu, hoặc đủ 4 trang: lúc đó mở hội, không còn cổng nào mới).
+ */
+export function pendingGateOpening(data: Record<string, unknown> | undefined, goldenPages: number): VillageId | null {
+  const k = Math.floor(goldenPages);
+  if (!(k >= 1) || k >= VILLAGE_ORDER.length) return null;
+  const giver = VILLAGE_ORDER[k - 1];
+  return hasSeenGateOpen(data, giver) ? null : giver;
+}

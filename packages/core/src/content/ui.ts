@@ -633,6 +633,8 @@ export const ui = {
     /** Nút ở cuối màn 1: về làng (mở cảnh làng) và chơi tiếp game 1 */
     veLang: 'Về làng',
     choiTiep: 'Chơi tiếp: {man}',
+    /** Cảnh trao Trang Sổ Vàng: nút ở lượt cuối (sang chợ xem cổng mở) */
+    traoVeCho: 'Về chợ',
   },
 
   /** Trang /dev/walk (chỉ có khi chạy dev) */

@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router';
 import { asset, useManifest } from '../../assets/store';
 import { useAuth } from '../../auth/AuthProvider';
 import { CHARACTERS, fmt, speakerLabel } from '../../content/characters';
-import { levelById, levelsOfVillage } from '../../content/levels';
+import { VILLAGE_ORDER, levelById, levelsOfVillage } from '../../content/levels';
 import { STORY } from '../../content/story';
 import { ui } from '../../content/ui';
 import { VILLAGE_SCENE } from '../../content/villageScene';
 import { MERGED, URLS, hubPageUrl } from '../../config/urls';
-import { shouldShowScene } from '../../progress/villageIntro';
+import { canSeeTeacherPage } from '../../auth/roles';
+import { shouldShowGolden, shouldShowScene } from '../../progress/villageIntro';
+import { gateOpenedAfter } from '../cho/marketQuest';
 import { useProgress } from '../../progress/ProgressProvider';
 import { useSettings } from '../../settings/SettingsProvider';
 import { VnDialog, type VnTurn } from '../../ui/VnDialog';
@@ -30,6 +32,7 @@ import { MarketHud } from '../cho/MarketHud';
 import { MarketMenu } from '../cho/MarketMenu';
 import { MarketProps } from '../cho/MarketProcedural';
 import { ModelInstances } from '../cho/ModelInstances';
+import { GoldenPagesRow } from './GoldenPagesRow';
 import { VillageBoards } from './VillageBoards';
 import { VillageTerrain } from './VillageTerrain';
 import { assembleVillage, createVillageInteractables, parseVillageTarget, villageBiSlot, type VillageLayoutInput, type VillageTarget } from './villageLayout';
@@ -59,6 +62,8 @@ interface DialogState {
   guideTalking: boolean;
   /** Cảnh mở đầu: có nút "Bỏ qua" và đánh dấu đã xem khi xong */
   cutscene?: boolean;
+  /** Cảnh người dẫn trao Trang Sổ Vàng: lượt cuối có nút "Về chợ" (sang chợ xem cổng mở), "Bỏ qua" ở lại làng; đánh dấu đã xem khi xong */
+  golden?: boolean;
 }
 
 /**
@@ -128,9 +133,10 @@ export function VillageScene({ input }: VillageSceneProps) {
 
   const bi = useCallback((t: string): VnTurn => ({ speaker: speakerLabel('bi'), portrait: CHARACTERS.bi.portrait, text: t }), []);
 
-  const goMarket = useCallback(() => {
+  const goMarket = useCallback((opening = false) => {
     api.lock.exit();
-    const path = `/cho?tu=${input.id}`;
+    // sau khi nhận Trang Sổ Vàng: về chợ và đứng trước cổng vừa mở để xem hiệu ứng (?mo=); thường: ngay trước cổng làng này (?tu=)
+    const path = opening && gateOpenedAfter(input.id) ? `/cho?mo=${input.id}` : `/cho?tu=${input.id}`;
     if (MERGED) navigate(path);
     else window.location.assign(hubPageUrl(URLS, path));
   }, [api, input.id, navigate]);
@@ -188,8 +194,16 @@ export function VillageScene({ input }: VillageSceneProps) {
     const d = dialogRef.current;
     setDialog(null);
     if (d?.cutscene) progress.markVillageSceneSeen(input.id);
+    if (d?.golden) progress.markGoldenSeen(input.id);
     session.dialogClosed();
   }, [input.id, progress, session]);
+
+  // Cuối cảnh trao trang: ghi cờ rồi sang chợ xem cổng làng kế tiếp mở
+  const finishGolden = useCallback(() => {
+    setDialog(null);
+    progress.markGoldenSeen(input.id);
+    goMarket(true);
+  }, [goMarket, input.id, progress]);
 
   // Cảnh mở đầu lần đầu vào làng: sau khi màn hình tải tắt và đã biết chắc cờ "đã xem" (chơi thử, hoặc đã kéo xong tiến độ từ máy chủ)
   const flagKnown = mode === 'guest' || (mode === 'user' && synced);
@@ -205,6 +219,30 @@ export function VillageScene({ input }: VillageSceneProps) {
     setDialog({ turns, guideTalking: false, cutscene: true });
     api.lock.exit();
   }, [ready, flagKnown, text, progress.progress.game.data, input.id, ten, api]);
+
+  // Cảnh trao Trang Sổ Vàng: về làng sau khi nhận trang (xong màn ready cuối của làng), chiếu một lần, sau cảnh mở đầu nếu đó cũng là lần đầu. Bỏ qua được.
+  const [glow, setGlow] = useState<number | undefined>(undefined);
+  const goldenDone = useRef(false);
+  const isTeacher = canSeeTeacherPage(profile?.role);
+  useEffect(() => {
+    if (!ready || !flagKnown || goldenDone.current || !text || dialog !== null || isTeacher) return;
+    if (shouldShowScene(progress.progress.game.data, input.id)) return;
+    goldenDone.current = true;
+    const pages = progress.progress.game.goldenPages;
+    if (!shouldShowGolden(progress.progress.game.data, input.id, pages)) return;
+    const index = VILLAGE_ORDER.indexOf(input.id);
+    const portrait = CHARACTERS[text.guide].portrait;
+    const turns: VnTurn[] = text.award.loi.map((line, i) => ({
+      speaker: speakerLabel(text.guide),
+      portrait,
+      mood: 'vui' as const,
+      text: fmt(line, { ten }),
+      extra: i === 0 ? <GoldenPagesRow arriving={index} reducedMotion={settings.reducedMotion} /> : undefined,
+    }));
+    setGlow(index);
+    setDialog({ turns, guideTalking: true, golden: true });
+    api.lock.exit();
+  }, [ready, flagKnown, text, dialog, isTeacher, progress.progress.game.data, progress.progress.game.goldenPages, input.id, ten, settings.reducedMotion, api]);
 
   useEffect(() => {
     document.title = langName;
@@ -258,7 +296,7 @@ export function VillageScene({ input }: VillageSceneProps) {
           />
         </Scene3D>
 
-        <MarketHud quest={quest} pages={unlock.goldenPages} onMenu={session.openMenu} />
+        <MarketHud quest={quest} pages={unlock.goldenPages} glow={glow} onMenu={session.openMenu} />
 
         {label && !session.paused && (
           <div className="pointer-events-none absolute inset-x-0 bottom-8 z-10 hidden justify-center [@media(pointer:fine)]:flex">
@@ -273,13 +311,19 @@ export function VillageScene({ input }: VillageSceneProps) {
       {dialog && (
         <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/30 p-3">
           <div className="flex w-full max-w-[960px] justify-center">
-            <VnDialog turns={dialog.turns} onFinish={closeDialog} onSkip={dialog.cutscene ? closeDialog : undefined} label={langName} />
+            <VnDialog
+              turns={dialog.turns}
+              onFinish={dialog.golden ? finishGolden : closeDialog}
+              onSkip={dialog.cutscene || dialog.golden ? closeDialog : undefined}
+              finishLabel={dialog.golden && gateOpenedAfter(input.id) ? ui.langScene.traoVeCho : undefined}
+              label={langName}
+            />
           </div>
         </div>
       )}
 
       <WalkLockOverlay session={session} hideMenu />
-      <MarketMenu session={session} onGo={goHub} extraItems={[{ label: ui.cho.menu.veCho, onClick: goMarket }]} />
+      <MarketMenu session={session} onGo={goHub} extraItems={[{ label: ui.cho.menu.veCho, onClick: () => goMarket() }]} />
     </div>
   );
 }

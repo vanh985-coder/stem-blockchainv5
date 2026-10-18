@@ -92,7 +92,7 @@ Xếp theo ảnh `concept-toan-canh` và `concept-cho-phien`. Phải **đủ đ�
 - **Người:** 4 dân làng (bà cụ, chú nông dân xen kẽ) đi lại trên 4 con đường và là vật cản tròn; lái buôn đứng gần bến sông.
 - **Bước 8 (đã làm):** cổng mở/khóa theo tiến độ, HUD, Bi nhắc nhiệm vụ, dân chợ nói chuyện, menu thật, mũi tên chỉ đường (xem các mục bên dưới). Lều chợ quây quanh gốc cây đa theo ảnh `concept-cho-phien` (vòng 5,5 đến 14 quanh cây; vòng ngoài 13 đến 22 nếu hết chỗ); cây đa chỉ có gốc chính là vật cản (bán kính 2,5).
 - **Quanh mỗi cổng làng (bước 8d):** không có nhà và bụi tre trong 8 đơn vị quanh tâm cổng; thay bằng đồ gợi nghề của làng, nằm hai bên đường (cách trục đường từ 5,6, ngoài dải đường rộng 4,4 mỗi bên) và phía sân chợ của tường cổng, có vật cản đầy đủ và không chắn đường đất tới cổng: **Giấy (Bắc)** 3 phên phơi giấy (`env/phen-phoi-giay`, nằm trên giá cao 0,85) và 4 chồng giấy; **Dệt (Nam)** 1 khung cửi (`env/khung-cui`) và 7 cuộn vải nhiều màu; **Khắc Dấu (Tây)** 4 khối đá và 2 bàn đá khắc; **Bạc (Đông)** 3 hòm gỗ, 3 thúng, 3 chum. Vị trí khai báo theo khung của cổng (`GATE_DECOR`, `gateDecorWorld`). Bản chính khung cửi (134.000 tam giác) chỉ dùng khi cách camera dưới 7 (Vừa) hay 10 (Cao); xa hơn dùng bản xa.
-- **Chưa làm:** cảnh mở đầu (mục 4, mốc 4), hiệu ứng nhận Trang Sổ Vàng (mục 5, bước 15).
+- **Chưa làm:** cảnh mở đầu (mục 4, mốc 4). Hiệu ứng nhận Trang Sổ Vàng và mở cổng đã làm ở bước 15a (mục 5).
 
 ### Cổng làng
 
@@ -150,6 +150,11 @@ Bỏ qua được bằng nút "Bỏ qua".
 | 3 | "Ba trang! Chỉ còn Làng Bạc thôi." | Đến Làng Bạc ở phía đông gặp thầy Linh |
 | 4 | "Đủ 4 trang rồi! Cả làng đang mở hội." | Chuyển sang `/hoi-lang` (spec 10) |
 
+**Bản làm (mốc 2, bước 15a):**
+- **Cờ chiếu một lần**, mỗi làng một cờ trong `game_state.data` (chơi thử: một bit trong cookie `sc_guest`), hợp cờ khi gộp tiến độ: `goldenSeen` (cảnh người dẫn trao trang ở làng; cookie `gs`) và `gateOpenSeen` (hiệu ứng mở cổng ở chợ; cookie `go`). Hàm thuần `shouldShowGolden`, `pendingGateOpening` ở `progress/villageIntro.ts`, có test (`goldenFlags.test.ts`). Tài khoản giáo viên không chiếu.
+- **Ở làng** (spec 05 "Kết thúc làng"): người dẫn trao trang, hàng 4 ô Trang Sổ Vàng có trang vừa nhận bay vào, HUD nhấp sáng ô đó; lượt cuối nút "Về chợ" sang `/cho?mo=<id làng>`; "Bỏ qua" ở lại làng.
+- **Ở chợ** (`/cho?mo=<id làng>`, `MarketPage`): người chơi xuất hiện cách cổng vừa mở 8,5 đơn vị, quay mặt về cổng (`gateOpeningSpawn`, `marketQuest.ts`); chờ 0,9 giây; then gỗ và dây đỏ rơi xuống nằm trên đất (`barrierFall` ở `gateFall.ts`, hàm thuần có test: thanh trên rơi trước, rồi thanh dưới, dây đỏ và chùm tua; khoảng 1,9 giây, kèm tiếng vút và tiếng đập; bật "Giảm chuyển động" thì không có hoạt cảnh, cổng mở ngay); rồi Bi nói câu của bảng trên và dòng "Nhiệm vụ của {ten} bây giờ: …". Dòng nhiệm vụ và mũi tên chỉ đổi sang cổng mới sau khi Bi nói xong. Trạng thái chuỗi nằm ở `data-seq` của phần tử gốc (idle, wait, fall, talk, done) để kiểm tra bằng trình duyệt. Vào `/cho` bằng đường khác (không `?mo=`) mà hiệu ứng còn chờ thì Bi báo ngay, không có hoạt cảnh rơi (cổng đã mở sẵn). Chiếu xong ghi cờ `gateOpenSeen` nên không bao giờ chiếu lại.
+
 ## 6. Làm sau (mốc 4)
 
 Tiệm đồ, đồ mặc cho nhân vật, trang sổ giấu quanh chợ để đi tìm, chế độ 2D nhẹ cho máy yếu.
@@ -192,8 +197,8 @@ Phần này để trống chỗ, **không làm trong đợt này**.
 - [ ] Trang chủ, `/ho-so`, `/dang-nhap`, `/dang-ky`, `/quyen-rieng-tu` có nền trang trí; bật "Giảm chuyển động" thì icon đứng yên (ẩn).
 - [ ] `/truyen` hiện đủ 14 lượt kiểu visual novel (nền là ảnh đang xem làm mờ); ảnh thiếu thì hiện khung trống có lời truyện, không lỗi trang; lượt cuối có nút "Bắt đầu hành trình" dẫn vào `/ban-do`.
 - [ ] `/cho`:
-  - cảnh mở đầu chạy đúng và bỏ qua được;
-  - chỉ cổng Làng Giấy mở;
-  - bấm cổng thì sang được subdomain Làng Giấy.
-- [ ] HUD hiện đúng số Trang Sổ Vàng theo tiến độ đã lưu.
-- [ ] Đạt ít nhất 30fps ở mức Thấp trên điện thoại tầm trung.
+  - cảnh mở đầu chạy đúng và bỏ qua được; (CHƯA LÀM: mục 4 để mốc 4)
+  - chỉ cổng Làng Giấy mở; (đạt, bước 15a: tài khoản mới: bấm E ở cổng Làng Dệt hiện "Cổng làng đóng vì sổ đang lệch. Hãy giúp Làng Giấy trước nhé.")
+  - bấm cổng thì sang được subdomain Làng Giấy. (đạt, bước 15a: bấm E ở cổng Giấy sang `localhost:5174/lang/lang-giay`; subdomain thật cần thử trên server)
+- [x] HUD hiện đúng số Trang Sổ Vàng theo tiến độ đã lưu. (Bước 15a: tiến độ 0 trang thì 4 ô "Chưa nhận"; sau khi xong màn 3 thì ô 1 "Đã nhận", ô 2 đến 4 "Chưa nhận".)
+- [ ] Đạt ít nhất 30fps ở mức Thấp trên điện thoại tầm trung. (Bước 15a, `/cho` bản build trên máy tính, mức Thấp: 146 fps khi vsync 144 Hz, 519 fps không vsync, 161 fps khi làm chậm CPU 4 lần; 202 nghìn tam giác, 39 draw call. Còn cần thử trên điện thoại thật.)

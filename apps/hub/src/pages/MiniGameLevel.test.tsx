@@ -16,6 +16,8 @@ const stateOf = (progress: Progress): ProgressState => ({
   startGuest: () => {},
   markVillageIntroSeen: () => {},
   markVillageSceneSeen: () => {},
+  markGoldenSeen: () => {},
+  markGateOpenSeen: () => {},
 });
 
 function render(progress: Progress): string {

@@ -114,8 +114,8 @@ describe('xóa dấu ngôi sao', { timeout: 120_000 }, () => {
     expect(outsideWindowEqual(work, marked)).toBe(true);
   });
 
-  it('ảnh to gấp đôi ảnh thử khác (1376 × 768 so với 688 × 384): dấu to gấp đôi vẫn được nhận ra và gỡ', () => {
-    const clean = makeBackground(1376, 768);
+  it('ảnh cỡ 4 triệu điểm ảnh (2752 × 1536): dấu to gấp đôi (s = 2) vẫn được nhận ra và gỡ', () => {
+    const clean = makeBackground(2752, 1536);
     const marked = clone(clean);
     stamp(marked, 0.3);
     const before = windowError(marked, clean);
@@ -149,8 +149,8 @@ describe('xóa dấu ngôi sao', { timeout: 120_000 }, () => {
   it('mảng sáng lớn hình chữ nhật ở đúng góc (không phải ngôi sao): để nguyên', () => {
     const img = makeBackground(688, 384);
     const g = sparkleGeometry(img.width, img.height);
-    for (let y = g.cy - 20; y <= g.cy + 20; y++) {
-      for (let x = g.cx - 20; x <= g.cx + 20; x++) {
+    for (let y = g.cy - 70; y <= g.cy + 70; y++) {
+      for (let x = g.cx - 70; x <= g.cx + 70; x++) {
         const o = (y * img.width + x) * 4;
         for (let k = 0; k < 3; k++) img.data[o + k] = Math.min(255, img.data[o + k] + 40);
       }
@@ -166,5 +166,17 @@ describe('xóa dấu ngôi sao', { timeout: 120_000 }, () => {
     expect(cleanSparkle(work, work.width, work.height).found).toBe(false);
     const tiny = makeBackground(60, 40);
     expect(cleanSparkle(tiny, tiny.width, tiny.height).found).toBe(false);
+  });
+});
+
+describe('hệ số tỉ lệ theo cỡ ảnh', () => {
+  it('ảnh khoảng 1 triệu điểm ảnh: s = 1; khoảng 4 triệu (kể cả ảnh vuông 2048 × 2048): s = 2', () => {
+    expect(sparkleGeometry(1376, 768).s).toBe(1);
+    expect(sparkleGeometry(1408, 768).s).toBe(1);
+    expect(sparkleGeometry(2752, 1536).s).toBe(2);
+    expect(sparkleGeometry(2816, 1536).s).toBe(2);
+    const sq = sparkleGeometry(2048, 2048);
+    expect(sq.s).toBe(2);
+    expect([2048 - sq.cx, 2048 - sq.cy]).toEqual([2 * SPARKLE.offset, 2 * SPARKLE.offset]);
   });
 });

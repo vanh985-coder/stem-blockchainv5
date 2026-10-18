@@ -81,6 +81,31 @@ export function marketSpawn(tu: string | null | undefined): { x: number; z: numb
   return { x: g.x + ux * SPAWN_FROM_GATE, z: g.z + uz * SPAWN_FROM_GATE, yaw: Math.atan2(ux, uz) };
 }
 
+/** Người chơi đứng cách tâm cổng bấy nhiêu, nhìn vào cổng, khi chiếu hiệu ứng mở cổng (xem `gateOpeningSpawn`). */
+export const OPENING_DISTANCE = 8.5;
+
+/** Cổng vừa mở sau khi làng `giver` trao Trang Sổ Vàng (cổng của làng kế tiếp); làng cuối (Bạc) không mở cổng nào nên null. */
+export function gateOpenedAfter(giver: VillageId): GateId | null {
+  const k = VILLAGE_ORDER.indexOf(giver);
+  return k < 0 || k + 1 >= GATE_ORDER.length ? null : GATE_ORDER[k + 1];
+}
+
+/**
+ * Chỗ xuất hiện khi về chợ lần đầu sau khi nhận Trang Sổ Vàng của làng `giver` (`/cho?mo=<làng>`): cách cổng vừa mở `OPENING_DISTANCE` về phía sân chợ, mặt nhìn thẳng vào cổng để thấy
+ * hiệu ứng mở cổng. Làng lạ hoặc không có cổng nào mở thì null (dùng chỗ xuất hiện mặc định).
+ */
+export function gateOpeningSpawn(giver: string | null | undefined): { x: number; z: number; yaw: number; gate: GateId } | null {
+  const village = VILLAGE_ORDER.find((v) => v === giver);
+  if (!village) return null;
+  const id = gateOpenedAfter(village);
+  const g = id ? GATES.find((q) => q.id === id) : undefined;
+  if (!id || !g) return null;
+  const len = Math.hypot(g.x, g.z);
+  const ux = -g.x / len;
+  const uz = -g.z / len; // về phía tâm chợ
+  return { x: g.x + ux * OPENING_DISTANCE, z: g.z + uz * OPENING_DISTANCE, yaw: Math.atan2(-ux, -uz), gate: id };
+}
+
 /** Hướng từ (px, pz) về (tx, tz) dạng góc quanh trục đứng (0 là +Z, như rotation.y của three) và khoảng cách. */
 export function bearingTo(px: number, pz: number, tx: number, tz: number): { yaw: number; distance: number } {
   const dx = tx - px;

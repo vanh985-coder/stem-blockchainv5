@@ -307,6 +307,12 @@ Mỗi người lệch pha ngẫu nhiên để không nhún đồng loạt. Hàm 
 - **Cách làm:** chép các file vào `assets/ui/portraits/`, chạy lại `pnpm assets:build`. Lúc chạy game chỉ đọc ảnh có sẵn, không chụp lại.
 - **Tên file:** `hoc-sinh-nam`, `ti`, `bac-an`, `cu-binh`, `co-chi`, `chu-dung`, `thay-linh`, `lai-buon`, `ba-cu`, `nong-dan`, `bi`. 5 người phụ đã có ảnh sẵn.
 
+**Bản làm (mốc 2, bước 15a):** `/dev/portraits` (`three/DevPortraits.tsx`, khung chọn ở `three/portraitFrame.ts`, hàm thuần có test):
+- Một khung vẽ 512×512, nền trong suốt (hiện trên nền ô caro), ánh sáng riêng (không có trời), nhân vật đứng tư thế `idle`. Camera nhìn góc 3/4 (lệch 25°, cúi 4°, góc nhìn dọc 24°) vào 35% phía trên **khối bao đo thật của tư thế đang đứng** (đo bằng `Box3` chính xác có xương), chừa viền 6% mỗi phía. Bà cụ lấy 48% (đầu to hơn các người khác, 35% chỉ còn mặt). Bi là khối do code dựng nên lấy cả khối.
+- Nút bấm từng tên hoặc "Tai tat ca" tải về các PNG. Chạy dev còn có `window.__portraits` (`names`, `select(tên)`, `capture()`) để chụp tự động bằng trình duyệt.
+- Đã thay 10 chân dung nhân vật và thêm `bi` (khối 3D thay cho hình SVG `BiAvatar` ở `PortraitFrame`, vì có `ui/portraits/bi` thì dùng ảnh); `bac-an-cuoi` (dùng khi lời thoại ở trạng thái vui) chụp cùng model ở tư thế nghiêng đầu nói chuyện (`mood: 'talking'`) cho cùng kiểu ảnh với `bac-an`. 5 người phụ (giang, hoa, khang, lan, minh) giữ nguyên. Ảnh cũ cắt từ ảnh gốc ChatGPT (nền trắng) không còn dùng.
+- `pnpm crop-portraits` bỏ qua 10 chân dung đã chụp từ 3D (danh sách `da_co_anh_3d` trong `scripts/portrait-crops.json`), thêm `--force` để cắt lại từ ảnh gốc.
+
 ### 3.7 Điều khiển ở cảnh đi lại (A)
 
 | Thiết bị | Điều khiển |
@@ -528,9 +534,9 @@ Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút
   - 2 dân làng đi lại;
   - 6 người đứng yên nhún nhẹ, lệch pha nhau.
 - [ ] `sad`, `point`, `slide`, `swing`, `hurt` trông tự nhiên; không clip nào làm nhân vật trôi khỏi chỗ.
-- [ ] `/dev/portraits` xuất được 11 ảnh chân dung rõ mặt.
+- [x] `/dev/portraits` xuất được 11 ảnh chân dung rõ mặt. (Bước 15a: 12 ảnh gồm cả `bac-an-cuoi`; đã xem từng ảnh, 512×512, nền trong suốt; đã chép vào `assets/ui/portraits/` và chạy `pnpm assets:build`.)
 - [ ] Trang bài học 2D từ 1280px (mốc 2): 2 nhân vật 3D hai bên bảng; trả lời đúng thì học sinh `cheer` và {phanDien} giữ `idle` (`hurt` chỉ dành cho màn 5), trả lời sai thì {phanDien} `cheer` và học sinh `sad`, rồi về `idle`; bảng thu nhỏ để chừa chỗ cho khung (f = 14% màn, 180–280px; s = min(1,35, (màn − 2 × (f + 16)) / 872)); dưới 1280px, mức Thấp, "Giảm chuyển động" hoặc "Chữ to" thì ẩn và bảng như cũ; khung ẩn về sau (lỗi, FPS thấp) thì bảng không nhảy; tắt âm thanh vẫn phản ứng; model tải lỗi thì bỏ trống, bài học vẫn chơi được; `onAnswer(dung)` hoạt động ở cả 4 bài.
 - [ ] `Scene25D` hiện nền, hình rời và nhân vật 3D đúng lớp, co giãn đúng 16:9.
 - [ ] Đổi tên `phanDien` trong `characters.ts` thì đổi ở mọi lời thoại và câu hỏi.
 - [ ] `pnpm check:text` không báo chữ hiển thị nào nằm ngoài `content/`; có file `HUONG-DAN-SUA-CHU.md`.
-- [ ] Test va chạm và `unlock.ts` ✅. Mức Thấp ≥ 30fps.
+- [ ] Test va chạm và `unlock.ts` ✅. Mức Thấp ≥ 30fps. (Bước 15a: `collision.test.ts`, `unlock.test.ts` xanh; fps trên máy tính xem spec 04 và 05; điện thoại tầm trung thật chưa thử.)

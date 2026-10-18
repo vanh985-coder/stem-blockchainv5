@@ -8,6 +8,8 @@ import { BI_NHAC_LAI, BI_NHAC_NHIEM, MARKET_TALKERS, NHIEM_VU } from '../../cont
 import { ui } from '../../content/ui';
 import { MERGED, URLS, gateUrl } from '../../config/urls';
 import { useProgress } from '../../progress/ProgressProvider';
+import { pendingGateOpening } from '../../progress/villageIntro';
+import type { VillageId } from '../../village';
 import { useSettings } from '../../settings/SettingsProvider';
 import { VnDialog, type VnTurn } from '../../ui/VnDialog';
 import { Scene3D } from '../Scene3D';
@@ -21,7 +23,7 @@ import { MarketHud } from './MarketHud';
 import { MarketMenu } from './MarketMenu';
 import { MarketScene } from './MarketScene';
 import { PLAYER_START } from './marketLayout';
-import { GATE_VILLAGE, gateStates, marketSpawn, previousVillage, questGate, questIndex } from './marketQuest';
+import { GATE_VILLAGE, gateOpenedAfter, gateOpeningSpawn, gateStates, marketSpawn, previousVillage, questGate, questIndex } from './marketQuest';
 import { createInteractables, parseTarget, type MarketTarget } from './marketTargets';
 
 const DIRT_TEXTURE = 'ui/textures/duong-dat';
@@ -48,6 +50,15 @@ function forcedSpawn() {
   return marketSpawn(new URLSearchParams(location.search).get('tu'));
 }
 
+/**
+ * `?mo=<làng>`: về chợ ngay sau khi nhận Trang Sổ Vàng của làng đó (nút "Về chợ" ở cảnh trao trang): xuất hiện cách cổng làng kế tiếp 8,5 đơn vị, nhìn thẳng vào cổng để thấy hiệu ứng
+ * mở cổng; không có hoặc không hợp lệ thì null.
+ */
+function forcedOpening() {
+  if (typeof location === 'undefined') return null;
+  return gateOpeningSpawn(new URLSearchParams(location.search).get('mo'));
+}
+
 /** `?debug=colliders`: vẽ khung xem vùng va chạm (chỉ để kiểm tra bằng mắt). */
 function forcedDebugColliders(): boolean {
   return typeof location !== 'undefined' && new URLSearchParams(location.search).get('debug') === 'colliders';
@@ -69,11 +80,12 @@ export function MarketPage() {
   const { settings } = useSettings();
   const { profile } = useAuth();
   const progress = useProgress();
-  const { unlock } = progress;
+  const { unlock, mode, synced } = progress;
   const navigate = useNavigate();
   const ten = profile?.display_name;
   const isTeacher = canSeeTeacherPage(profile?.role);
-  const spawn = useMemo(forcedSpawn, []);
+  const opening = useMemo(forcedOpening, []);
+  const spawn = useMemo(() => (opening ? { x: opening.x, z: opening.z, yaw: opening.yaw } : forcedSpawn()), [opening]);
   const api = useMemo(() => createWalkApi(spawn?.yaw ?? 0), [spawn]);
   const forced = useMemo(forcedQuality, []);
   const overview = useMemo(forcedOverview, []);
@@ -88,9 +100,22 @@ export function MarketPage() {
 
   // Cổng mở/khóa và nhiệm vụ theo số Trang Sổ Vàng (unlock.ts); giáo viên mở hết các cổng.
   const pages = unlock.goldenPages;
-  const gateOpen = useMemo(() => gateStates(unlock.villageOpen, isTeacher), [unlock.villageOpen, isTeacher]);
-  const questText = useMemo(() => fmt(NHIEM_VU[questIndex(pages)]), [pages]);
-  const targetGate = questGate(pages);
+  const gateOpenBase = useMemo(() => gateStates(unlock.villageOpen, isTeacher), [unlock.villageOpen, isTeacher]);
+
+  // Hiệu ứng mở cổng sau khi nhận Trang Sổ Vàng (spec 04 mục 5), chiếu một lần: chờ → then gỗ và dây đỏ rơi → Bi nói → nhiệm vụ mới. Trong lúc chiếu cổng vẫn coi là đóng,
+  // dòng nhiệm vụ giữ như cũ và chưa có mũi tên; xong thì mới cập nhật.
+  type Seq = 'idle' | 'wait' | 'fall' | 'talk' | 'done';
+  const [ready, setReady] = useState(false);
+  const [seq, setSeq] = useState<Seq>('idle');
+  const [giver, setGiver] = useState<VillageId | null>(null);
+  const seqRef = useRef<Seq>('idle');
+  seqRef.current = seq;
+  const seqActive = seq === 'wait' || seq === 'fall' || seq === 'talk';
+  const openingGate = giver ? gateOpenedAfter(giver) : null;
+  const gateOpen = useMemo(() => (seqActive && openingGate ? { ...gateOpenBase, [openingGate]: false } : gateOpenBase), [gateOpenBase, seqActive, openingGate]);
+  const shownPages = seqActive ? Math.max(0, pages - 1) : pages;
+  const questText = useMemo(() => fmt(NHIEM_VU[questIndex(shownPages)]), [shownPages]);
+  const targetGate = seqActive ? null : questGate(pages);
 
   // Vật tương tác: cổng, dân làng, Bi (vị trí sống, do cảnh cập nhật mỗi khung hình)
   const interactables = useMemo(createInteractables, []);
@@ -144,10 +169,51 @@ export function MarketPage() {
     api.lock.exit(); // nhả khóa để bấm được hộp thoại
   }, [api, navigate, biTurn]);
 
+  const giverRef = useRef(giver);
+  giverRef.current = giver;
   const closeDialog = useCallback(() => {
     setDialog(null);
+    if (seqRef.current === 'talk') {
+      // Bi nói xong: ghi cờ "đã chiếu" và hiện nhiệm vụ mới
+      if (giverRef.current) progress.markGateOpenSeen(giverRef.current);
+      setSeq('done');
+    }
     session.dialogClosed(); // đóng bằng cú bấm thì khóa lại ngay trong chính sự kiện bấm đó
-  }, [session]);
+  }, [session, progress]);
+
+  // Bắt đầu chiếu khi cảnh đã sẵn sàng và đã biết chắc cờ (chơi thử, hoặc đã kéo xong tiến độ từ máy chủ). Giáo viên không chiếu.
+  const flagKnown = mode === 'guest' || (mode === 'user' && synced);
+  const started = useRef(false);
+  useEffect(() => {
+    if (!ready || !flagKnown || started.current || isTeacher) return;
+    started.current = true;
+    const pending = pendingGateOpening(progress.progress.game.data, progress.progress.game.goldenPages);
+    if (!pending) return;
+    setGiver(pending);
+    if (opening && gateOpenedAfter(pending) === opening.gate) {
+      setSeq('wait');
+    } else {
+      // Không đứng trước cổng (vào chợ bằng cách khác): không có hoạt cảnh rơi, Bi báo luôn
+      setSeq('talk');
+      setDialog({ turns: [biTurn(fmt(BI_NHAC_NHIEM[questIndex(pages)], { ten })), biTurn(fmt(BI_NHAC_LAI, { ten, nd: fmt(NHIEM_VU[questIndex(pages)]) }))], villager: null });
+      api.lock.exit();
+    }
+  }, [ready, flagKnown, isTeacher, progress.progress.game.data, progress.progress.game.goldenPages, opening, pages, ten, biTurn, api]);
+
+  // chờ một chút để em nhìn thấy cổng rồi then gỗ mới rơi
+  useEffect(() => {
+    if (seq !== 'wait') return;
+    const t = setTimeout(() => setSeq('fall'), 900);
+    return () => clearTimeout(t);
+  }, [seq]);
+
+  const onGateFallen = useCallback(() => {
+    if (seqRef.current !== 'fall') return;
+    setSeq('talk');
+    const k = questIndex(pages);
+    setDialog({ turns: [biTurn(fmt(BI_NHAC_NHIEM[k], { ten })), biTurn(fmt(BI_NHAC_LAI, { ten, nd: fmt(NHIEM_VU[k]) }))], villager: null });
+    api.lock.exit();
+  }, [pages, ten, biTurn, api]);
 
   useEffect(() => {
     document.title = ui.cho.tieuDe;
@@ -156,7 +222,7 @@ export function MarketPage() {
   const onNearest = useCallback((i: number) => setNear(i), []);
 
   return (
-    <div className="fixed inset-0 bg-giay">
+    <div className="fixed inset-0 bg-giay" data-testid="cho" data-seq={seq}>
       <WalkControls
         api={api}
         paused={session.paused}
@@ -177,6 +243,7 @@ export function MarketPage() {
           fog={overview ? false : FOG}
           sunPosition={[26, 46, 18]}
           shadowFollowPlayer
+          onReady={() => setReady(true)}
         >
           <MarketScene
             api={api}
@@ -192,10 +259,12 @@ export function MarketPage() {
             targetGate={targetGate}
             talkingVillager={dialog?.villager ?? null}
             spawn={spawn ?? undefined}
+            fallingGate={seq === 'fall' ? openingGate : null}
+            onGateFallen={onGateFallen}
           />
         </Scene3D>
 
-        <MarketHud quest={questText} pages={pages} onMenu={session.openMenu} />
+        <MarketHud quest={questText} pages={pages} glow={seqActive ? pages - 1 : undefined} onMenu={session.openMenu} />
 
         {/* Lời nhắc tương tác ở máy tính (điện thoại hiện trên nút ✋) */}
         {label && !session.paused && (

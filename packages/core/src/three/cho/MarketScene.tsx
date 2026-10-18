@@ -52,6 +52,10 @@ export interface MarketSceneProps {
   talkingVillager: number | null;
   /** Chỗ và hướng xuất hiện (mặc định `PLAYER_START`, nhìn về +Z); từ làng về thì ngay trước cổng làng đó (`marketSpawn`) */
   spawn?: { x: number; z: number; yaw: number };
+  /** Cổng đang chơi hoạt cảnh mở (then gỗ và dây đỏ rơi); phải là cổng đang đóng (`gateOpen` false). Bỏ trống thì không có */
+  fallingGate?: GateId | null;
+  /** Gọi một lần khi then gỗ và dây đỏ của `fallingGate` đã rơi xong */
+  onGateFallen?: () => void;
 }
 
 /**
@@ -60,7 +64,7 @@ export interface MarketSceneProps {
  * Mọi đồ vật có vật cản (hàm va chạm của bước 6); vật cao chắn camera thì kéo camera lại gần; dân làng cũng là vật cản.
  * Nhà, lều, cây, cổng nhân bản bằng InstancedMesh (một draw call mỗi phần), có bản xa theo khoảng cách. Dùng trong <Scene3D>.
  */
-export function MarketScene({ api, paused, level, dirtUrl, animate, overview, debugColliders = false, layout: given, gateOpen, interactables, onNearestChange, targetGate, talkingVillager, spawn }: MarketSceneProps) {
+export function MarketScene({ api, paused, level, dirtUrl, animate, overview, debugColliders = false, layout: given, gateOpen, interactables, onNearestChange, targetGate, talkingVillager, spawn, fallingGate = null, onGateFallen }: MarketSceneProps) {
   // Mức Thấp bớt lều và bụi tre (mật độ theo mức chất lượng)
   const layout = useMemo(() => given ?? generateMarket(undefined, densityFor(level)), [given, level]);
   // Chỉ khi chạy dev: mở bố cục ra window để kiểm tra bằng trình duyệt.
@@ -104,7 +108,7 @@ export function MarketScene({ api, paused, level, dirtUrl, animate, overview, de
         <Villager key={i} id={VILLAGER_MODELS[i % VILLAGER_MODELS.length]} waypoints={path} seed={101 + i * 17} start={i % path.length} collider={villagers[i]} track={interactables[villagerSlot(i)]} hold={talkingVillager === i} />
       ))}
       <Character id="characters/lai-buon" position={[layout.merchant.x, 0, layout.merchant.z]} rotation={[0, layout.merchant.yaw, 0]} mood="idle" seed={9} />
-      <GateBarriers gates={closedGates} />
+      <GateBarriers gates={closedGates} falling={fallingGate} onFallen={onGateFallen} animate={animate} />
       <GuideArrow target={targetPos} animate={animate} />
       {debugColliders && <ColliderDebug colliders={layout.colliders} dynamic={villagers} />}
       <StatsProbe />

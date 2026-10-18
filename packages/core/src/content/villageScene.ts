@@ -13,6 +13,8 @@ export interface VillageSceneText {
   opening: string;
   /** Người dẫn nhắc việc tiếp theo khi nói chuyện (E), theo việc đang chờ: bài học, game 1, game 2, hoặc đã xong cả làng */
   guideNext: { lesson: string; game1: string; game2: string; done: string };
+  /** Cảnh trao Trang Sổ Vàng khi về làng sau khi xong màn ready cuối (spec 05 "Kết thúc làng"): các lượt người dẫn nói, lượt cuối có nút "Về chợ" */
+  award: { loi: readonly string[] };
 }
 
 /** Làng này đã có cảnh 3D (mốc 2: chỉ Làng Giấy; mốc 3 thêm 3 làng). Làng có cảnh thì cuối màn có "Về làng" thay cho "Về bản đồ". */
@@ -29,6 +31,12 @@ export const VILLAGE_SCENE: Partial<Record<VillageId, VillageSceneText>> = {
       game1: 'Giờ tới biển "Đuổi theo {phanDien}" nhé. Nó ôm xấp trang bị trộm chạy qua sân phơi giấy đấy!',
       game2: 'Còn biển "Ghép lại cuốn sổ": giúp bác ghép lại những trang sổ bị xé nhé.',
       done: 'Làng Giấy cảm ơn em nhiều! Em quay về chợ để sang làng kế tiếp nhé.',
+    },
+    award: {
+      loi: [
+        'Em đã mang các trang về và ghép lại cuốn sổ rồi đấy! Bác trao em Trang Sổ Vàng thứ nhất.',
+        'Một mình giữ sổ thì kẻ gian vẫn ngồi sửa cả đêm được. Vì thế các làng không bao giờ để sổ ở một nơi. Xuống Làng Dệt mà xem.',
+      ],
     },
   },
 };

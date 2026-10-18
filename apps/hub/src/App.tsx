@@ -20,6 +20,7 @@ const Dev3D = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/inde
 const Cho = lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.MarketPage })));
 const Dev25D = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.Dev25D }))) : null;
 const DevWalk = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.DevWalk }))) : null;
+const DevPortraits = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.DevPortraits }))) : null;
 
 function Lazy({ page: Page }: { page: LazyExoticComponent<ComponentType> }) {
   return (
@@ -48,6 +49,7 @@ export function App() {
       {Dev3D && <Route path="/dev/3d" element={<Lazy page={Dev3D} />} />}
       {Dev25D && <Route path="/dev/25d" element={<Lazy page={Dev25D} />} />}
       {DevWalk && <Route path="/dev/walk" element={<Lazy page={DevWalk} />} />}
+      {DevPortraits && <Route path="/dev/portraits" element={<Lazy page={DevPortraits} />} />}
       {DevHotspots && <Route path="/dev/ban-do-hotspots" element={<Lazy page={DevHotspots} />} />}
       <Route path="*" element={<Home />} />
     </Routes>

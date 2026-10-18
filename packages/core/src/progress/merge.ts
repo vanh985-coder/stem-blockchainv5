@@ -1,4 +1,4 @@
-import { mergeIntroSeen, mergeSceneSeen } from './villageIntro';
+import { mergeGateSeen, mergeGoldenSeen, mergeIntroSeen, mergeSceneSeen } from './villageIntro';
 import { emptyLevel, type GameState, type LevelProgress, type Progress, type StarKey, type Stars } from './types';
 
 const maxStars = (a: Stars, b: Stars): Stars => {
@@ -24,11 +24,12 @@ export function mergeGame(local: GameState, remote: GameState): GameState {
   // coins: lấy giá trị lớn hơn (xu chỉ tăng, chưa có chỗ tiêu). Nếu sau này có cửa hàng thì phải xem lại.
   const localNewer = local.updatedAt > remote.updatedAt;
   const winner = localNewer ? local : remote;
+  const loser = (winner === local ? remote : local).data;
   return {
     goldenPages: Math.max(local.goldenPages, remote.goldenPages),
     coins: Math.max(local.coins, remote.coins),
     // Cờ "đã xem giới thiệu làng" thì hợp hai bên: xem ở máy nào cũng tính là đã xem.
-    data: mergeSceneSeen(mergeIntroSeen(winner.data, winner === local ? remote.data : local.data), winner === local ? remote.data : local.data),
+    data: mergeGateSeen(mergeGoldenSeen(mergeSceneSeen(mergeIntroSeen(winner.data, loser), loser), loser), loser),
     updatedAt: Math.max(local.updatedAt, remote.updatedAt),
   };
 }

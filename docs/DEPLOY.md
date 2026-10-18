@@ -15,6 +15,11 @@ Tài liệu này dành cho người làm tay trên **Windows Server** đã cài 
 
 Tất cả lệnh dưới đây chạy trong **PowerShell** trên server, trừ khi ghi khác.
 
+**Có gì mới ở mốc 2 (chợ 3D, model `.glb`):**
+- Hub có trang `/cho` (chợ 3D, vào bằng đường dẫn `https://stem-block.blockchainptit.com/cho`; `/cho?tu=<id làng>` và `/cho?mo=<id làng>` là đường dẫn trong game). Không cần cấu hình thêm: Caddy trả `index.html` cho mọi đường dẫn không phải file. Các trang `/dev/*` (kể cả `/dev/portraits`) chỉ có khi chạy dev, không có trên bản deploy.
+- Model 3D (`.glb`) nằm trong `assets-build/models/` và được phục vụ bởi `sb-assets` như ảnh (cùng `VITE_ASSETS_URL`; không có biến `VITE_*` mới): `Content-Type: model/gltf-binary`, CORS `*`, tên có mã băm 8 ký tự thì `immutable`. `assets-build/` đã nặng khoảng 46 MB (40 MB là model), còn chợ phiên tải khoảng 22 đến 24 MB model ở lần vào đầu (tải theo cảnh, trình duyệt lưu lại).
+- `assets-build/` được commit vào Git; **trên server không có `assets/` (bản gốc) nên không chạy `pnpm assets:build` ở server**. Mỗi lần đổi đồ họa: chạy `pnpm assets:build` trên máy dev, commit `assets-build/` (không có `_preview/`), rồi `git pull` và dựng lại trên server (mục f).
+
 Muốn đổi cổng (nếu bị trùng) thì sửa `HUB_PORT`, `LANG_GIAY_PORT`, `LANG_DET_PORT`, `LANG_KHAC_DAU_PORT`, `LANG_BAC_PORT`, `ASSETS_PORT` trong `deploy/.env` (mục a.2), rồi nhớ dùng đúng số mới ở mục (b).
 
 ---
@@ -224,6 +229,9 @@ Xem nhật ký: `docker logs so-chung-web --tail 100`.
 - [ ] **Chơi thử không tài khoản:** mở cửa sổ ẩn danh, bấm "Chơi thử không cần tài khoản", chơi một trạm; cookie `sc_guest` có Domain `.blockchainptit.com` và Secure.
 - [ ] **Google:** bấm "Đăng nhập bằng Google" từ hub và từ một làng; đăng nhập xong quay về đúng trang đang đứng.
 - [ ] **Trang giáo viên:** đăng nhập tài khoản giáo viên, vào `/giao-vien`, tạo lớp, cho một học sinh nhập mã lớp, xem tiến độ, xuất CSV mở bằng Excel không lỗi dấu, **đặt lại mật khẩu** cho một học sinh dùng tên đăng nhập rồi đăng nhập thử bằng mật khẩu mới. Học sinh gõ `/giao-vien` thì bị đưa về trang chủ.
+- [ ] **Chợ 3D (mốc 2):** mở `https://stem-block.blockchainptit.com/cho` (gõ thẳng đường dẫn, không được 404): thanh tải chạy hết, đi được bằng W A S D (điện thoại: cần điều khiển bên trái), Bi bay theo. F12 → Network: các file `.glb` lấy từ `https://sb-assets.blockchainptit.com/models/...` trả 200, `Content-Type: model/gltf-binary`, `Access-Control-Allow-Origin: *`, `Cache-Control: public, max-age=31536000, immutable`; không lỗi CORS đỏ trong Console. Lần đầu mất khoảng 22 đến 24 MB.
+- [ ] **Cổng làng:** ở chợ, đứng sát cổng Làng Giấy bấm E thì sang `https://sb-lang-giay.blockchainptit.com/lang/lang-giay`; ba cổng còn lại có then gỗ và dây đỏ, bấm E thì Bi báo "Cổng làng đóng…".
+- [ ] **Trao Trang Sổ Vàng (dùng tài khoản học sinh mới hoặc chơi thử ẩn danh):** ở Làng Giấy chơi xong màn 3 rồi vào lại làng thì bác An trao trang (ô trang 1 sáng), bấm "Về chợ" thì sang hub `/cho` đứng trước cổng Làng Dệt, then gỗ và dây đỏ rơi, Bi nói "Một trang rồi! Cổng Làng Dệt đã mở."; tải lại không chiếu lại; ghi tiến độ rồi mở bằng máy khác cùng tài khoản cũng không chiếu lại.
 - [ ] **Điện thoại thật:** mở bằng 4G (không dùng Wi-Fi của server): đăng nhập, chơi Bài 1 đến hết, xoay ngang/dọc, không cuộn ngang trang.
 - [ ] **Dung lượng tải trang đầu:** F12 → Network → bỏ chọn "Disable cache" → tải lại (Ctrl+Shift+R) → xem dòng cuối "transferred": trang chủ hub khoảng 100 KB chữ + hình nền. Ghi lại con số để so sau này.
 - [ ] **Cache đúng:** F12 → Network, bấm một file trong `/assets/`: có `Cache-Control: public, max-age=31536000, immutable`; còn `index.html` và `manifest.json` là `no-cache`.

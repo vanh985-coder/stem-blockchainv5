@@ -4,7 +4,7 @@ import { mergeProgress, sameGame, sameLevel } from './merge';
 import { recordLevelResult, unlockOf, withGoldenPages, type ProgressOptions } from './record';
 import { emptyProgress, hasProgress, type GameState, type LevelProgress, type LevelResult, type Progress } from './types';
 import type { UnlockResult } from './unlock';
-import { hasSeenIntro, hasSeenScene, withIntroSeen, withSceneSeen } from './villageIntro';
+import { hasSeenGateOpen, hasSeenGolden, hasSeenIntro, hasSeenScene, withGateOpenSeen, withGoldenSeen, withIntroSeen, withSceneSeen } from './villageIntro';
 import type { VillageId } from '../village';
 
 /** Nơi lưu trên máy cho tài khoản (localStorage). Thay bằng bản giả trong test. */
@@ -330,6 +330,24 @@ export class ProgressManager {
       ...this.progress,
       game: { ...this.progress.game, data: withSceneSeen(this.progress.game.data, village), updatedAt: this.now() },
     };
+    this.persistLocal();
+    this.emit();
+    this.scheduleFlush();
+  }
+
+  /** Em đã xem cảnh người dẫn trao Trang Sổ Vàng của làng (bước 15a): ghi cờ như `markVillageIntroSeen`. */
+  markGoldenSeen(village: VillageId): void {
+    if (this.mode === 'loading' || hasSeenGolden(this.progress.game.data, village)) return;
+    this.progress = { ...this.progress, game: { ...this.progress.game, data: withGoldenSeen(this.progress.game.data, village), updatedAt: this.now() } };
+    this.persistLocal();
+    this.emit();
+    this.scheduleFlush();
+  }
+
+  /** Em đã xem hiệu ứng mở cổng làng kế tiếp sau Trang Sổ Vàng của làng (bước 15a). */
+  markGateOpenSeen(village: VillageId): void {
+    if (this.mode === 'loading' || hasSeenGateOpen(this.progress.game.data, village)) return;
+    this.progress = { ...this.progress, game: { ...this.progress.game, data: withGateOpenSeen(this.progress.game.data, village), updatedAt: this.now() } };
     this.persistLocal();
     this.emit();
     this.scheduleFlush();

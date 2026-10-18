@@ -13,12 +13,17 @@ const SIZE = 512;
 const THUMB = 256;
 const COLS = 5;
 
-const { crops } = JSON.parse(await readFile(path.join(ROOT, 'scripts/portrait-crops.json'), 'utf8'));
+const { crops, da_co_anh_3d: from3d = [] } = JSON.parse(await readFile(path.join(ROOT, 'scripts/portrait-crops.json'), 'utf8'));
 await mkdir(OUT_DIR, { recursive: true });
 await mkdir(path.dirname(PREVIEW), { recursive: true });
 
 const thumbs = [];
+const force = process.argv.includes('--force');
 for (const [name, c] of Object.entries(crops)) {
+  if (from3d.includes(name) && !force) {
+    console.log(`${name.padEnd(13)} bỏ qua (đã chụp từ model 3D ở /dev/portraits; thêm --force để cắt lại từ ảnh gốc)`);
+    continue;
+  }
   const file = path.join(SRC_DIR, `${c.nguon}.jpg`);
   const { width, height } = await sharp(file).metadata();
   let side = Math.round(c.size * height);
@@ -35,6 +40,10 @@ for (const [name, c] of Object.entries(crops)) {
   console.log(`${name.padEnd(13)} <- ${c.nguon}.jpg  khung ${side}px tại (${left}, ${top})${side < SIZE ? '  (phóng to nhẹ)' : ''}`);
 }
 
+if (thumbs.length === 0) {
+  console.log('Không cắt ảnh nào.');
+  process.exit(0);
+}
 const rows = Math.ceil(thumbs.length / COLS);
 await sharp({
   create: { width: COLS * THUMB, height: rows * THUMB, channels: 3, background: '#ffffff' },

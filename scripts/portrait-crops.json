@@ -1,5 +1,6 @@
 {
-  "_ghi_chu": "Khung cắt chân dung từ assets/source/characters/<nguon>.jpg. cx, cy = tâm khung (tỉ lệ 0–1 theo chiều ngang, chiều dọc ảnh). size = cạnh khung vuông (tỉ lệ 0–1 theo CHIỀU CAO ảnh). Chỉnh tay rồi chạy: pnpm crop-portraits",
+  "_ghi_chu": "Khung cắt chân dung từ assets/source/characters/<nguon>.jpg. cx, cy = tâm khung (tỉ lệ 0–1 theo chiều ngang, chiều dọc ảnh). size = cạnh khung vuông (tỉ lệ 0–1 theo CHIỀU CAO ảnh). Chỉnh tay rồi chạy: pnpm crop-portraits. Từ mốc 2 các chân dung trong da_co_anh_3d đã được chụp từ model 3D (/dev/portraits, spec 03 mục 3.6): script bỏ qua chúng, thêm --force để cắt lại từ ảnh gốc.",
+  "da_co_anh_3d": ["hoc-sinh-nam", "ti", "bac-an", "cu-binh", "co-chi", "chu-dung", "thay-linh", "lai-buon", "ba-cu", "nong-dan"],
   "crops": {
     "hoc-sinh-nam": { "nguon": "hoc-sinh-nam", "cx": 0.5, "cy": 0.2, "size": 0.34 },
     "ti": { "nguon": "ti", "cx": 0.5, "cy": 0.19, "size": 0.34 },
