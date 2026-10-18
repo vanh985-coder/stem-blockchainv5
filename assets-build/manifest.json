@@ -392,38 +392,38 @@
     "tris": 7990
   },
   "scenes/bai-hoc-lang-bac": {
-    "file": "scenes/bai-hoc-lang-bac.2f602809.webp",
-    "bytes": 100844,
+    "file": "scenes/bai-hoc-lang-bac.041e83ff.webp",
+    "bytes": 102024,
     "width": 1376,
     "height": 768
   },
   "scenes/bai-hoc-lang-det": {
-    "file": "scenes/bai-hoc-lang-det.dcf47da8.webp",
-    "bytes": 127424,
+    "file": "scenes/bai-hoc-lang-det.038dfa30.webp",
+    "bytes": 127292,
     "width": 1376,
     "height": 768
   },
   "scenes/bai-hoc-lang-giay": {
-    "file": "scenes/bai-hoc-lang-giay.f18abe56.webp",
-    "bytes": 139322,
+    "file": "scenes/bai-hoc-lang-giay.be12b79d.webp",
+    "bytes": 139182,
     "width": 1376,
     "height": 768
   },
   "scenes/bai-hoc-lang-khac-dau": {
-    "file": "scenes/bai-hoc-lang-khac-dau.a3113e45.webp",
-    "bytes": 144898,
+    "file": "scenes/bai-hoc-lang-khac-dau.e18572be.webp",
+    "bytes": 144806,
     "width": 1376,
     "height": 768
   },
   "scenes/man-03-xuong-giay": {
-    "file": "scenes/man-03-xuong-giay.a9301b58.webp",
-    "bytes": 112532,
+    "file": "scenes/man-03-xuong-giay.b620c6f0.webp",
+    "bytes": 112424,
     "width": 1376,
     "height": 768
   },
   "scenes/man-05-san-det": {
-    "file": "scenes/man-05-san-det.907f6711.webp",
-    "bytes": 101238,
+    "file": "scenes/man-05-san-det.e93f7456.webp",
+    "bytes": 101126,
     "width": 1376,
     "height": 768
   },
@@ -446,14 +446,14 @@
     "height": 768
   },
   "scenes/man-08-kho-dau": {
-    "file": "scenes/man-08-kho-dau.35afa5ce.webp",
-    "bytes": 86102,
+    "file": "scenes/man-08-kho-dau.7810f705.webp",
+    "bytes": 85970,
     "width": 1376,
     "height": 768
   },
   "scenes/man-09-duong-lang": {
-    "file": "scenes/man-09-duong-lang.92c6ca63.webp",
-    "bytes": 149020,
+    "file": "scenes/man-09-duong-lang.3d901b06.webp",
+    "bytes": 148946,
     "width": 1376,
     "height": 768
   },
@@ -584,32 +584,32 @@
     "height": 572
   },
   "story/01-ngu-guc": {
-    "file": "story/01-ngu-guc.441cf34e.webp",
-    "bytes": 37736,
+    "file": "story/01-ngu-guc.45d0264f.webp",
+    "bytes": 37668,
     "width": 1408,
     "height": 768
   },
   "story/02-cuon-vo-sang": {
-    "file": "story/02-cuon-vo-sang.734c9cf0.webp",
-    "bytes": 26052,
+    "file": "story/02-cuon-vo-sang.1b5666fb.webp",
+    "bytes": 25994,
     "width": 1408,
     "height": 768
   },
   "story/03-cho-phien": {
-    "file": "story/03-cho-phien.65d59064.webp",
-    "bytes": 137604,
+    "file": "story/03-cho-phien.9d1e3cbb.webp",
+    "bytes": 137534,
     "width": 1408,
     "height": 768
   },
   "story/04-gap-bi": {
-    "file": "story/04-gap-bi.c3275358.webp",
-    "bytes": 242188,
+    "file": "story/04-gap-bi.635d57bb.webp",
+    "bytes": 242130,
     "width": 1920,
     "height": 1072
   },
   "story/05-ti-chay": {
-    "file": "story/05-ti-chay.b4499314.webp",
-    "bytes": 158308,
+    "file": "story/05-ti-chay.70f70703.webp",
+    "bytes": 158234,
     "width": 1408,
     "height": 768
   },
@@ -620,14 +620,14 @@
     "height": 768
   },
   "story/07-lang-det": {
-    "file": "story/07-lang-det.9dffe50d.webp",
-    "bytes": 76308,
+    "file": "story/07-lang-det.968d45c9.webp",
+    "bytes": 76252,
     "width": 1408,
     "height": 768
   },
   "story/08-lang-khac-dau": {
-    "file": "story/08-lang-khac-dau.e5031674.webp",
-    "bytes": 33366,
+    "file": "story/08-lang-khac-dau.b1ed0cf3.webp",
+    "bytes": 33336,
     "width": 1408,
     "height": 768
   },
@@ -638,44 +638,44 @@
     "height": 768
   },
   "story/10-ti-tren-cay": {
-    "file": "story/10-ti-tren-cay.374da01d.webp",
-    "bytes": 47078,
+    "file": "story/10-ti-tren-cay.42bf50d5.webp",
+    "bytes": 47044,
     "width": 1408,
     "height": 768
   },
   "story/11-ti-hoi-cai": {
-    "file": "story/11-ti-hoi-cai.1e38a7b8.webp",
-    "bytes": 35642,
+    "file": "story/11-ti-hoi-cai.0d9a3998.webp",
+    "bytes": 35616,
     "width": 1408,
     "height": 768
   },
   "story/12-hoi-lang": {
-    "file": "story/12-hoi-lang.d468d6d0.webp",
-    "bytes": 190440,
+    "file": "story/12-hoi-lang.ef60ff44.webp",
+    "bytes": 190280,
     "width": 1920,
     "height": 1072
   },
   "story/13-tinh-giac": {
-    "file": "story/13-tinh-giac.2cf3c23c.webp",
-    "bytes": 27810,
+    "file": "story/13-tinh-giac.224b1291.webp",
+    "bytes": 27738,
     "width": 1408,
     "height": 768
   },
   "story/14-gio-tay": {
-    "file": "story/14-gio-tay.cd233c1e.webp",
-    "bytes": 34002,
+    "file": "story/14-gio-tay.776b1511.webp",
+    "bytes": 33744,
     "width": 1408,
     "height": 768
   },
   "ui/ban-do": {
-    "file": "ui/ban-do.5f8c6320.webp",
-    "bytes": 392834,
+    "file": "ui/ban-do.434168fe.webp",
+    "bytes": 392730,
     "width": 1920,
     "height": 1047
   },
   "ui/bang-khen-khung": {
-    "file": "ui/bang-khen-khung.b0bc0881.webp",
-    "bytes": 79876,
+    "file": "ui/bang-khen-khung.a3c4ba51.webp",
+    "bytes": 79796,
     "width": 1024,
     "height": 559
   },
@@ -902,8 +902,8 @@
     "height": 1024
   },
   "ui/tiles/la-gia": {
-    "file": "ui/tiles/la-gia.cbd959a9.webp",
-    "bytes": 12122,
+    "file": "ui/tiles/la-gia.59e12408.webp",
+    "bytes": 12116,
     "width": 1024,
     "height": 559
   },

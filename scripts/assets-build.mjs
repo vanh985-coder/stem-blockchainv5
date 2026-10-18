@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { autoCutout, assessCutout } from './lib/cutout.mjs';
+import { cleanSparkle, sparkleGeometry } from './lib/watermark.mjs';
 import { checkCharacter, largestTexture, REQUIRED_CLIPS, textureBytes } from './lib/glb.mjs';
 import { buildModelSet, classifyModel, LOD_SUFFIX, LOD_TEXTURE, LOD_TRIS, MID_MAX_TRIS, MID_MIN_MAIN_TRIS, MID_SUFFIX, MID_TRIS } from './lib/model-build.mjs';
 
@@ -22,6 +23,7 @@ const CONCURRENCY = 4;
 const SCRIPT_HASH = createHash('sha256')
   .update(await readFile(fileURLToPath(import.meta.url)))
   .update(await readFile(path.join(path.dirname(fileURLToPath(import.meta.url)), 'lib', 'cutout.mjs')))
+  .update(await readFile(path.join(path.dirname(fileURLToPath(import.meta.url)), 'lib', 'watermark.mjs')))
   .digest('hex')
   .slice(0, 12);
 
@@ -200,10 +202,41 @@ async function cutoutPreview(beforeFile, afterRgba, w, h) {
     .toBuffer();
 }
 
+/** Đường dẫn ảnh xem trước xóa dấu ngôi sao: _preview/watermark/<khóa, dấu / đổi thành ->.png */
+const watermarkPreview = (key) => path.join(OUT, '_preview', 'watermark', key.split('/').join('-') + '.png');
+
+/** Ảnh xem trước xóa dấu: vùng góc quanh dấu (cạnh 4,4 nửa cạnh dấu) trước | sau, phóng 3 lần. */
+async function sparklePreview(before, after, w, h) {
+  const g = sparkleGeometry(w, h);
+  const half = Math.round(g.R * 2.2);
+  const crop = (buf) => sharp(buf, { raw: { width: w, height: h, channels: 4 } }).extract({ left: g.cx - half, top: g.cy - half, width: 2 * half, height: 2 * half }).resize(2 * half * 3, 2 * half * 3, { kernel: 'nearest' }).png().toBuffer();
+  const [a, b] = await Promise.all([crop(before), crop(after)]);
+  const side = 2 * half * 3;
+  return sharp({ create: { width: side * 2 + 8, height: side, channels: 3, background: '#888' } })
+    .composite([{ input: a, left: 0, top: 0 }, { input: b, left: side + 8, top: 0 }])
+    .png()
+    .toBuffer();
+}
+
 async function encode(file, rule) {
   if (rule.cutout) return encodeIcon(file, rule);
   let img = sharp(file).rotate();
   let cut = null;
+  let wm = null;
+  if (!rule.autoCutout) {
+    // Dấu ngôi sao của công cụ vẽ ảnh ở góc dưới phải: tìm trong ô góc cố định rồi xóa (scripts/lib/watermark.mjs). Không thấy dấu thì giữ nguyên ảnh.
+    const meta = await sharp(file).metadata();
+    const { data, info: raw } = await sharp(file).rotate().ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    const rgba = { data: new Uint8Array(data.buffer, data.byteOffset, data.length) };
+    const before = Buffer.from(data);
+    const r = cleanSparkle(rgba, raw.width, raw.height);
+    wm = { found: r.found, k: r.k, peak: r.peak, lapZ: r.lapZ, alpha: r.alpha, fallback: r.fallback, fixed: r.fixed };
+    if (r.found) {
+      wm.preview = await sparklePreview(before, data, raw.width, raw.height);
+      img = sharp(data, { raw: { width: raw.width, height: raw.height, channels: 4 } });
+      if (!meta.hasAlpha) img = img.removeAlpha();
+    }
+  }
   if (rule.autoCutout) {
     const { data, info: raw } = await sharp(file).rotate().ensureAlpha().raw().toBuffer({ resolveWithObject: true });
     const rgba = { data: new Uint8Array(data.buffer, data.byteOffset, data.length) };
@@ -221,7 +254,7 @@ async function encode(file, rule) {
   else if (rule.box) img = img.resize({ width: rule.box, height: rule.box, fit: 'inside', withoutEnlargement: true });
   else if (rule.exact) img = img.resize(rule.exact, rule.exact, { fit: 'cover' });
   const out = await img.webp({ quality: rule.quality, alphaQuality: 100, effort: 5 }).toBuffer({ resolveWithObject: true });
-  return cut ? { ...out, cut } : out;
+  return { ...out, ...(cut ? { cut } : {}), ...(wm ? { wm } : {}) };
 }
 
 async function pool(items, n, fn) {
@@ -266,6 +299,7 @@ const newCache = {};
 const stats = { processed: 0, skipped: 0 };
 const bigFiles = [];
 const cutouts = [];
+const watermarks = [];
 
 await pool(jobs, CONCURRENCY, async ({ rel, key, rule }) => {
   const srcPath = path.join(SRC, rel);
@@ -276,6 +310,7 @@ await pool(jobs, CONCURRENCY, async ({ rel, key, rule }) => {
   if (hit && hit.sig === sig) {
     try {
       await stat(path.join(OUT, hit.file));
+      if (hit.watermark?.found) await stat(watermarkPreview(key));
       if (hit.cutout && hit.cutout.kind !== 'transparent' && hit.cutout.kind !== 'none') await stat(spritePreview(key));
       entry = hit;
       stats.skipped++;
@@ -284,13 +319,20 @@ await pool(jobs, CONCURRENCY, async ({ rel, key, rule }) => {
     }
   }
   if (!entry) {
-    const { data, info, cut } = await encode(srcPath, rule);
+    const { data, info, cut, wm } = await encode(srcPath, rule);
     const dir = path.posix.dirname(key);
     const name = path.posix.basename(key);
     const file = `${dir === '.' ? '' : dir + '/'}${name}.${sha(data, 8)}.webp`;
     await mkdir(path.dirname(path.join(OUT, file)), { recursive: true });
     await writeFile(path.join(OUT, file), data);
     entry = { sig, file, bytes: data.length, width: info.width, height: info.height, kind: rule.kind, warnBig: !!rule.warnBig };
+    if (wm) {
+      entry.watermark = { found: wm.found, k: wm.k, peak: wm.peak, lapZ: wm.lapZ, alpha: wm.alpha, fallback: wm.fallback, fixed: wm.fixed };
+      if (wm.preview) {
+        await mkdir(path.dirname(watermarkPreview(key)), { recursive: true });
+        await writeFile(watermarkPreview(key), wm.preview);
+      }
+    }
     if (cut) {
       entry.cutout = { kind: cut.kind, removed: cut.removed, colors: cut.colors, clean: cut.clean ?? null, reasons: cut.reasons ?? [] };
       if (cut.preview) {
@@ -304,6 +346,7 @@ await pool(jobs, CONCURRENCY, async ({ rel, key, rule }) => {
   }
   newCache[key] = entry;
   if (entry.cutout) cutouts.push({ key, ...entry.cutout });
+  if (entry.watermark) watermarks.push({ key, ...entry.watermark });
   manifest[key] = { file: entry.file, bytes: entry.bytes, width: entry.width, height: entry.height };
   if (rule.warnBig && entry.bytes > WARN_BYTES) bigFiles.push({ key, bytes: entry.bytes });
 });
@@ -322,6 +365,17 @@ await pool(jobs, CONCURRENCY, async ({ rel, key, rule }) => {
   console.log(dirty.length ? `  => ${dirty.length} ảnh tách chưa sạch (xem _preview/sprites/): ${dirty.map((c) => c.key).join(', ')}` : '  => mọi ảnh bị nền đều tách sạch');
   await mkdir(path.join(OUT, '_preview', 'sprites'), { recursive: true });
   await writeFile(path.join(OUT, '_preview', 'sprites', '_report.json'), JSON.stringify(cutouts, null, 2));
+}
+
+// Báo cáo dấu ngôi sao của công cụ vẽ ảnh (xem scripts/lib/watermark.mjs): ảnh nào có dấu và đã xóa thế nào; ảnh gần ngưỡng mà chưa xóa.
+{
+  watermarks.sort((a, b) => a.key.localeCompare(b.key));
+  const found = watermarks.filter((w) => w.found);
+  console.log('Dấu ngôi sao ở góc dưới phải (scenes, story, ui):');
+  for (const w of found) console.log(`  ${w.key}: alpha ${w.alpha.toFixed(2)}, ${w.fallback ? 'tô lại từ điểm ảnh xung quanh' : 'gỡ lớp phủ trắng'}, sửa ${w.fixed} điểm ảnh`);
+  const maybe = watermarks.filter((w) => !w.found && (w.lapZ >= 2.5 || w.peak >= 1.5));
+  if (maybe.length) console.log(`  nghi còn dấu mờ, chưa nhận dạng chắc chắn: ${maybe.map((w) => w.key).join(', ')}`);
+  console.log(`  => ${found.length} ảnh có dấu đã xóa (ảnh trước | sau ở _preview/watermark/)`);
 }
 
 // ---------------------------------------------------------------------------

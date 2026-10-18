@@ -5,7 +5,7 @@ import { REBUILD_SPEC as SPEC } from './rebuildConfig';
 import {
   advance,
   binCard,
-  checkInspection,
+  inspectionLine,
   checkPlacement,
   createRebuild,
   formulaHolds,
@@ -274,18 +274,24 @@ describe('vòng, tim, điểm', () => {
   });
 });
 
-describe('soi công thức: em tự tính, không lộ đáp án', () => {
-  it('tính sai thì chỉ báo sai, không kèm kết quả đúng', () => {
-    const r = checkInspection(card(31, 7, 69), 70);
-    expect(r).toEqual({ kind: 'sai' });
-    expect(JSON.stringify(r)).not.toContain('69');
+describe('dòng "Soi công thức" hiện sẵn phép tính và kết quả', () => {
+  it('thẻ thật: kết quả bằng mã trang ghi trên thẻ → khớp (ví dụ spec: (31 × 2 + 7) mod 100 = 69)', () => {
+    expect(inspectionLine(card(31, 7, 69))).toEqual({ kind: 'khop', expected: 69 });
   });
-  it('tính đúng và thẻ khớp: khớp; tính đúng nhưng thẻ ghi mã khác: lệch (trang giả)', () => {
-    expect(checkInspection(card(31, 7, 69), 69)).toEqual({ kind: 'khop', expected: 69 });
-    expect(checkInspection(card(31, 50, 99), 12)).toEqual({ kind: 'lech', expected: 12 });
+  it('trang giả: kết quả khác mã ghi trên thẻ → lệch, kèm kết quả đúng của công thức', () => {
+    expect(inspectionLine(card(31, 50, 99))).toEqual({ kind: 'lech', expected: 12 });
   });
-  it('em tính ra đúng mã ghi trên thẻ giả thì vẫn là sai (vì thẻ giả ghi mã khác công thức)', () => {
-    expect(checkInspection(card(31, 50, 99), 99)).toEqual({ kind: 'sai' });
+  it('không phụ thuộc vị trí của thẻ: không nói thẻ đặt được hay không, chỉ so mã trang với công thức', () => {
+    expect(inspectionLine(card(26, 12, 64))).toEqual({ kind: 'khop', expected: 64 }); // thẻ thật dù mã trước không khớp trang cuối
+  });
+  it('mọi thẻ thật của 300 đề đều khớp và mọi trang giả đều lệch', () => {
+    const rng = createMulberry32(4242);
+    for (let i = 0; i < 300; i++) {
+      const r = SPEC.rounds[i % 3];
+      const d = generateDeal(rng, r.pages, r.fake);
+      for (const c of d.real) expect(inspectionLine(c).kind).toBe('khop');
+      if (d.fake) expect(inspectionLine(d.fake).kind).toBe('lech');
+    }
   });
 });
 

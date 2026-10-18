@@ -127,14 +127,10 @@ export const rebuildUi = {
   biNhetTrang: 'Coi chừng, {phanDien} vừa nhét thêm một trang vào xấp giấy!',
   /** Lời của {phanDien} khi nhét trang giả */
   phanDienCuoi: 'Hí hí hí! Thêm một trang nữa, chắc không ai để ý đâu.',
-  /** Soi công thức (để em tự tính mã trang, không hiện sẵn đáp án) */
+  /** Soi công thức: hiện phép tính của thẻ đang chọn và khớp hay không (spec 05 Màn 3) */
   soiNut: 'Soi công thức',
   soiTieuDe: 'Soi công thức mã trang',
   soiChuaChon: 'Em chọn một thẻ ở khay, rồi bấm "Soi công thức" nhé.',
-  soiPhepTinh: '({truoc} × 2 + {noidung}) mod 100 = ?',
-  soiNhap: 'Em tính ra',
-  soiKiemTra: 'Kiểm tra',
-  soiSai: 'Chưa đúng, em tính lại nhé.',
   soiKhop: '({truoc} × 2 + {noidung}) mod 100 = {kq} → khớp',
   soiLech: '({truoc} × 2 + {noidung}) mod 100 = {kq}, thẻ ghi {ma} → không khớp',
   /** Hết vòng */

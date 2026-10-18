@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { BiAvatar, Button, Hearts, NumberInput, fmt, rebuildUi, sound, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import { BiAvatar, Button, Hearts, fmt, rebuildUi, sound, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
 import { Scene25D, isQualityChoice, type QualityChoice, type Sprite25D } from '@so-chung/core/three/index';
 import { REBUILD_SPEC as SPEC } from './rebuildConfig';
 import { BacAnActor, StudentActor, VillainActor, type Reaction } from './RebuildActors';
-import { Basket, CardFace, ChainRow, Tray, useCardDrag, type DropTarget } from './RebuildCards';
+import { Basket, ChainRow, DragGhost, Tray, useCardDrag, type DropTarget } from './RebuildCards';
 import { AREAS, REDUCED_MOTION_SCALE, VILLAIN_TIMING, cardHeight, cardWidth, center, villainStageAt, worldPoint, type VillainStage } from './rebuildLayout';
-import { advance, binCard, checkInspection, createRebuild, insertFake, placeCard, rebuildScore, roundScore, scoreParts, type Card, type RebuildState, type SoiResult } from './rebuildLogic';
+import { advance, binCard, createRebuild, insertFake, inspectionLine, placeCard, rebuildScore, roundScore, scoreParts, type Card, type RebuildState } from './rebuildLogic';
 
 const BACKGROUND = 'scenes/man-03-xuong-giay';
 const BASKET_ASSET = 'sprites/man-03-ghep-so/ro-trang-gia';
@@ -40,7 +40,7 @@ function BiSay({ say }: { say: Say | null }) {
   return (
     <div role="status" aria-live="polite" key={say.n} className="absolute flex animate-toast-pop items-center gap-[1cqw]" style={{ left: `${AREAS.mid.x0}cqw`, top: `${AREAS.mid.y0 + 1}%`, width: `${AREAS.mid.x1 - AREAS.mid.x0 - 30}cqw` }} data-testid="bi-noi">
       <BiAvatar size={56} className="shrink-0" />
-      <p className={`rounded-[1.2cqw] border-[0.3cqw] bg-giay px-[1.4cqw] py-[0.8cqw] font-display font-bold text-chu shadow-md ${tone}`} style={{ fontSize: 'max(1.9cqw, 13px)' }}>
+      <p className={`rounded-[1.2cqw] border-[0.3cqw] bg-giay px-[1.4cqw] py-[0.8cqw] font-display font-bold text-chu ${tone}`} style={{ fontSize: 'max(1.9cqw, 13px)' }}>
         {say.text}
       </p>
     </div>
@@ -48,20 +48,11 @@ function BiSay({ say }: { say: Say | null }) {
 }
 
 /**
- * "Soi công thức": em tự tính (mã trước × 2 + nội dung) mod 100 rồi nhập; chỉ khi em tính đúng mới hiện phép tính và so với mã trang ghi trên thẻ. Nằm gọn trong dải giữa (không che
- * chuỗi và khay). Đóng bằng nút "Soi công thức" ở thanh trên (bật tắt) hoặc phím Escape.
+ * "Soi công thức" (spec 05 Màn 3): hiện phép tính của thẻ đang chọn kèm kết quả và khớp hay không, ví dụ "(31 × 2 + 7) mod 100 = 69 → khớp". Không nói thẻ nào là trang giả
+ * và không nói đặt vào đâu: em tự so với mã trang trước của chuỗi. Nằm gọn trong dải giữa (không che chuỗi và khay). Đóng bằng nút "Soi công thức" ở thanh trên (bật tắt) hoặc phím Escape.
  */
 function InspectPanel({ card, onClose }: { card: Card | null; onClose: () => void }) {
-  const [typed, setTyped] = useState<number | null>(null);
-  const [result, setResult] = useState<SoiResult | null>(null);
-  const id = card?.id;
-  useEffect(() => {
-    setTyped(null);
-    setResult(null);
-  }, [id]);
-  const check = () => {
-    if (card && typed !== null) setResult(checkInspection(card, typed));
-  };
+  const line = card ? inspectionLine(card) : null;
   return (
     <div
       role="dialog"
@@ -70,28 +61,15 @@ function InspectPanel({ card, onClose }: { card: Card | null; onClose: () => voi
       onKeyDown={(e) => {
         if (e.key === 'Escape') onClose();
       }}
-      className="absolute z-20 rounded-[1.2cqw] border-[0.3cqw] border-nau-go bg-giay px-[1.4cqw] py-[0.8cqw] shadow-xl"
-      style={{ left: `${AREAS.mid.x0 + 3}cqw`, top: `${AREAS.mid.y0 + 0.5}%`, width: `${AREAS.mid.x1 - AREAS.mid.x0 - 6}cqw`, fontSize: 'max(1.6cqw, 11px)' }}
+      className="absolute z-20 rounded-[1.2cqw] border-[0.3cqw] border-nau-go bg-giay px-[1.4cqw] py-[0.8cqw]"
+      style={{ left: `${AREAS.mid.x0 + 3}cqw`, top: `${AREAS.mid.y0 + 0.5}%`, width: `${AREAS.mid.x1 - AREAS.mid.x0 - 6}cqw`, fontSize: 'max(1.7cqw, 12px)' }}
     >
-      {!card ? (
+      {!card || !line ? (
         <p data-testid="soi-chua-chon">{rebuildUi.soiChuaChon}</p>
       ) : (
-        <>
-          <p className="font-display font-extrabold" data-testid="soi-phep-tinh">
-            {fmt(rebuildUi.soiPhepTinh, { truoc: card.prev, noidung: card.content })}
-          </p>
-          <div className="mt-1 flex flex-wrap items-center gap-x-2">
-            <NumberInput value={typed} onChange={setTyped} min={0} max={999} showButtons={false} ariaLabel={rebuildUi.soiNhap} placeholder={rebuildUi.soiNhap} onEnter={check} className="w-24" inputClassName="min-h-11" />
-            <Button size="sm" onClick={check} disabled={typed === null} className="min-h-11" data-testid="soi-kiem-tra">
-              {rebuildUi.soiKiemTra}
-            </Button>
-            {result && (
-              <p role="status" className={`font-bold ${result.kind === 'khop' ? 'text-xanh-la-dam' : result.kind === 'lech' ? 'text-do-son-dam' : 'text-chu'}`} data-testid="soi-ket-qua">
-                {result.kind === 'sai' ? rebuildUi.soiSai : fmt(result.kind === 'khop' ? rebuildUi.soiKhop : rebuildUi.soiLech, { truoc: card.prev, noidung: card.content, kq: result.expected, ma: card.code })}
-              </p>
-            )}
-          </div>
-        </>
+        <p role="status" className={`font-display font-extrabold ${line.kind === 'khop' ? 'text-xanh-la-dam' : 'text-do-son-dam'}`} data-testid="soi-ket-qua">
+          {fmt(line.kind === 'khop' ? rebuildUi.soiKhop : rebuildUi.soiLech, { truoc: card.prev, noidung: card.content, kq: line.expected, ma: card.code })}
+        </p>
       )}
     </div>
   );
@@ -101,7 +79,7 @@ function InspectPanel({ card, onClose }: { card: Card | null; onClose: () => voi
 function HudBar({ hearts, round, score, soiOpen, onSoi }: { hearts: number; round: number; score: number; soiOpen: boolean; onSoi: () => void }) {
   return (
     <div className="absolute flex items-center justify-between" style={{ left: `${AREAS.hud.x0}cqw`, right: `${100 - AREAS.hud.x1}cqw`, top: `${AREAS.hud.y0}%` }}>
-      <div className="flex items-center gap-3 rounded-nut border-2 border-nau-go bg-giay/90 px-3 py-1 shadow-md" data-testid="hud">
+      <div className="flex items-center gap-3 rounded-nut border-2 border-nau-go bg-giay/90 px-3 py-1" data-testid="hud">
         <Hearts current={hearts} max={SPEC.hearts} size="sm" />
         <span className="font-display text-base font-extrabold" data-testid="vong">
           {fmt(rebuildUi.vong, { so: round + 1, max: SPEC.rounds.length })}
@@ -126,7 +104,7 @@ function FlyingPage({ landed, width }: { landed: boolean; width: number }) {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute rounded-[0.9cqw] border-[0.3cqw] border-nau-go bg-giay shadow-lg"
+      className="pointer-events-none absolute rounded-[0.9cqw] border-[0.3cqw] border-nau-go bg-giay"
       style={{ width: `${width}cqw`, height: `${h}cqw`, ...pos, transition: 'left 0.7s ease-in, top 0.7s ease-in, transform 0.7s ease-in', transform: landed ? 'rotate(8deg)' : 'rotate(-18deg)', zIndex: 15 }}
       data-testid="trang-bay"
     >
@@ -375,22 +353,18 @@ export function RebuildGame({ paused, attempt, onFinish }: MiniGameRenderProps) 
         overlay={
           <div ref={overlayRef} className="absolute inset-0 select-none" style={{ containerType: 'size' }} data-testid="man3-khung" data-phase={phase} data-villain={villain.stage} data-flying={villain.flying ? (villain.landed ? 'landed' : 'start') : 'no'}>
             <HudBar hearts={state.hearts} round={state.round} score={score} soiOpen={soiOpen} onSoi={() => setSoiOpen((o) => !o)} />
-            <p className="absolute rounded-nut bg-giay/90 px-[1cqw] py-[0.15cqw] font-bold text-chu shadow" style={{ left: `${AREAS.chain.x0}cqw`, top: '10.2%', fontSize: 'max(1.45cqw, 11px)' }}>
+            <p className="absolute rounded-nut bg-giay/90 px-[1cqw] py-[0.15cqw] font-bold text-chu" style={{ left: `${AREAS.chain.x0}cqw`, top: '10.2%', fontSize: 'max(1.45cqw, 11px)' }}>
               {rebuildUi.chuThich}
             </p>
             <ChainRow slots={slots} width={width} genesis={state.deal.genesis} chain={state.chain} armed={armed} hover={hover === 'chain'} badFlash={badFlash} onActivate={activateChain} version={version} />
             <Basket armed={armed} hover={hover === 'basket'} onActivate={activateBasket} label={rebuildUi.roTrangGia} />
             <Tray cards={state.tray} width={width} selected={selected} shake={shake} fresh={fresh} dragId={ghost?.id ?? null} enabled={playing} bind={bind as (id: string) => Record<string, unknown>} onSelectKey={onTap} version={version} />
             {villain.flying && <FlyingPage landed={villain.landed} width={width} />}
-            {ghost && state.tray.find((c) => c.id === ghost.id) && (
-              <div className="pointer-events-none absolute z-30" style={{ left: ghost.left, top: ghost.top, width: ghost.width, height: ghost.height }} data-testid="the-dang-keo" aria-hidden="true">
-                <CardFace card={state.tray.find((c) => c.id === ghost.id)!} width={(ghost.width / (overlayRef.current?.clientWidth || 1)) * 100} mood="selected" />
-              </div>
-            )}
+            <DragGhost ghost={ghost} card={ghost ? (state.tray.find((c) => c.id === ghost.id) ?? null) : null} width={width} />
             <BiSay say={say} />
             {soiOpen && playing && <InspectPanel card={selectedCard} onClose={() => setSoiOpen(false)} />}
             {banner && (
-              <div role="status" className="absolute flex flex-col items-center gap-2 rounded-[1.4cqw] border-[0.3cqw] border-nau-go bg-giay p-[1.6cqw] text-center shadow-xl" style={{ left: `${AREAS.mid.x0 + 8}cqw`, top: `${AREAS.mid.y0 + 3}%`, width: `${AREAS.mid.x1 - AREAS.mid.x0 - 16}cqw`, fontSize: 'max(1.9cqw, 13px)' }} data-testid="banner">
+              <div role="status" className="absolute flex flex-col items-center gap-2 rounded-[1.4cqw] border-[0.3cqw] border-nau-go bg-giay p-[1.6cqw] text-center" style={{ left: `${AREAS.mid.x0 + 8}cqw`, top: `${AREAS.mid.y0 + 3}%`, width: `${AREAS.mid.x1 - AREAS.mid.x0 - 16}cqw`, fontSize: 'max(1.9cqw, 13px)' }} data-testid="banner">
                 <p className="font-display font-extrabold">{banner.kind === 'over' ? rebuildUi.hetTim : fmt(rebuildUi.vongXong, { so: banner.round + 1, diem: banner.points })}</p>
                 <Button
                   size="md"

@@ -301,14 +301,16 @@ export function advance(s: RebuildState): void {
   startRound(s);
 }
 
-/** Kết quả khi em tự tính ở "Soi công thức": 'sai' = em tính chưa đúng (không lộ đáp án); đúng thì cho biết thẻ khớp hay lệch công thức. */
-export type SoiResult = { kind: 'sai' } | { kind: 'khop'; expected: number } | { kind: 'lech'; expected: number };
+/** Dòng "Soi công thức" của một thẻ: phép tính (mã trước × 2 + nội dung) mod 100 đã có kết quả, và thẻ khớp hay lệch công thức (trang giả thì lệch). */
+export interface InspectionLine {
+  kind: 'khop' | 'lech';
+  /** (mã trước × 2 + nội dung) mod 100 */
+  expected: number;
+}
 
-/** Em nhập kết quả của (mã trước × 2 + nội dung) mod 100; chỉ khi em tính đúng mới hiện phép tính đầy đủ và so với mã trang ghi trên thẻ. */
-export function checkInspection(card: Pick<Card, 'prev' | 'content' | 'code'>, typed: number): SoiResult {
+export function inspectionLine(card: Pick<Card, 'prev' | 'content' | 'code'>): InspectionLine {
   const expected = solutionSteps(card.prev, card.content).code;
-  if (typed !== expected) return { kind: 'sai' };
-  return card.code === expected ? { kind: 'khop', expected } : { kind: 'lech', expected };
+  return { kind: card.code === expected ? 'khop' : 'lech', expected };
 }
 
 /**

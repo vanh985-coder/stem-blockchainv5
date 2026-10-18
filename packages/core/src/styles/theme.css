@@ -204,3 +204,59 @@ sup {
   font-size: 1em;
   line-height: 0;
 }
+
+/* Màn kết quả của game phụ (MiniGameLevel) ở điện thoại ngang (thấp dưới 500 điểm ảnh: 844 × 390, 667 × 375): hai cột trong đúng một màn hình, không cuộn;
+   bên trái điểm, sao, mốc; bên phải điểm từng phần và hai nút "Chơi lại", "Về làng" luôn thấy. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .mg-result {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    max-width: none;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: var(--color-giay);
+  }
+  .mg-result-panel {
+    width: 100%;
+    max-height: calc(100dvh - 12px);
+    display: grid;
+    grid-template-columns: 1fr 1.25fr;
+    column-gap: 14px;
+    align-items: center;
+    padding: 8px 14px;
+    font-size: 14px;
+    line-height: 1.25;
+    overflow: hidden;
+  }
+  .mg-result-panel > * { margin: 0; }
+  .mg-result-main, .mg-result-side { display: flex; flex-direction: column; justify-content: center; gap: 4px; margin: 0; }
+  .mg-result-main > *, .mg-result-side > * { margin: 0; }
+  .mg-result-portrait { display: none; }
+  .mg-result-main h2 { font-size: 20px; line-height: 1.15; }
+  .mg-result-main p { font-size: 15px; line-height: 1.2; }
+  .mg-result-main p[data-testid="diem"] { font-size: 34px; line-height: 1.05; }
+  .mg-result-stars svg { width: 26px; height: 26px; }
+  .mg-result-parts { padding: 5px 8px; max-width: none; }
+  .mg-result-parts h3 { font-size: 12px; margin: 0 0 2px; }
+  .mg-result-parts ul { font-size: 13px; }
+  .mg-result-side p { font-size: 13px; }
+  .mg-result-buttons { flex-direction: row; gap: 8px; }
+  .mg-result-buttons > * { flex: 1; min-height: 44px; padding-top: 0; padding-bottom: 0; }
+}
+
+/* Lớp HTML phủ lên Scene25D (bảng điểm, thẻ, nút, câu hỏi): KHÔNG có bóng đổ (box-shadow, text-shadow, drop-shadow). Đo trên bản build ở Chrome + Intel UHD: lớp phủ nằm trên canvas WebGL nên
+   mỗi lần một phần tử đổi (hiện bảng, thẻ rung, lời Bi) trình duyệt vẽ lại các ô nền của lớp phủ bằng GPU, và mỗi bóng đổ (mờ hay cứng) thêm một lần vẽ rrect/blur: nhiều khung hình chậm 60 đến
+   240 ms (khựng khi xong vòng và khi nhân vật chạy vào). Bỏ hết bóng đổ trong lớp phủ thì khung lâu nhất xuống 28 ms. Muốn tạo khối: dùng viền dưới dày hơn (border-b) thay cho bóng. */
+.scene25d-overlay,
+.scene25d-overlay *,
+.scene25d-overlay *::before,
+.scene25d-overlay *::after {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+.scene25d-overlay * {
+  filter: none !important;
+}

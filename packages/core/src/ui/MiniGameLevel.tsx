@@ -121,41 +121,46 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave }: MiniGame
   }
 
   if (stage.kind === 'result') {
+    // Điện thoại ngang (thấp dưới 500 điểm ảnh): hai cột trong đúng một màn hình, không cuộn (xem .mg-result trong theme.css). Màn khác: một cột như cũ.
     return (
-      <div className="mx-auto w-full max-w-xl px-4 py-8">
-        <Panel className="space-y-5 p-6 text-center sm:p-8">
-          <div className="flex justify-center">
-            <PortraitFrame portrait="bi" size={96} />
+      <div className="mg-result mx-auto w-full max-w-xl px-4 py-8">
+        <Panel className="mg-result-panel space-y-5 p-6 text-center sm:p-8">
+          <div className="mg-result-main space-y-5">
+            <div className="mg-result-portrait flex justify-center">
+              <PortraitFrame portrait="bi" size={96} />
+            </div>
+            <h2 className="text-3xl text-muc-tim-dam">{title}</h2>
+            <p className="text-lg font-semibold">{gameUi.ketQua}</p>
+            <p className="font-display text-5xl font-extrabold" data-testid="diem">
+              {fmt(gameUi.diem, { diem: formatNumber(stage.score) })}
+            </p>
+            {stage.newBest && <p className="font-bold text-xanh-la-dam">{gameUi.kyLucMoi}</p>}
+            <div className="mg-result-stars flex justify-center">
+              <Stars earned={stage.medal} max={3} size="lg" />
+            </div>
+            <p className="text-xl font-bold">{fmt(gameUi.mocDatDuoc, { muc: gameUi.moc[stage.medal] })}</p>
           </div>
-          <h2 className="text-3xl text-muc-tim-dam">{title}</h2>
-          <p className="text-lg font-semibold">{gameUi.ketQua}</p>
-          <p className="font-display text-5xl font-extrabold" data-testid="diem">
-            {fmt(gameUi.diem, { diem: formatNumber(stage.score) })}
-          </p>
-          {stage.parts.length > 0 && (
-            <section aria-label={gameUi.cacPhanDiem} className="mx-auto w-full max-w-sm rounded-2xl border-2 border-nau-go/50 bg-white/60 p-3 text-left">
-              <h3 className="mb-1 text-center text-sm font-bold text-nau-go-dam">{gameUi.cacPhanDiem}</h3>
-              <ul className="space-y-0.5" data-testid="phan-diem">
-                {stage.parts.map((p) => (
-                  <li key={p.label}>{fmt(gameUi.dongDiem, { nhan: p.label, so: formatNumber(p.count), diem: formatNumber(p.points) })}</li>
-                ))}
-              </ul>
-            </section>
-          )}
-          {stage.newBest && <p className="font-bold text-xanh-la-dam">{gameUi.kyLucMoi}</p>}
-          <div className="flex justify-center">
-            <Stars earned={stage.medal} max={3} size="lg" />
-          </div>
-          <p className="text-xl font-bold">{fmt(gameUi.mocDatDuoc, { muc: gameUi.moc[stage.medal] })}</p>
-          <p className="text-sm">{moc}</p>
-          {stage.coins > 0 && <p className="font-semibold">{fmt(gameUi.xuNhan, { so: stage.coins })}</p>}
-          <div className="flex flex-col justify-center gap-3 sm:flex-row">
-            <Button size="lg" onClick={start}>
-              {gameUi.choiLai}
-            </Button>
-            <Button size="lg" variant="secondary" onClick={leave}>
-              {gameUi.veLang}
-            </Button>
+          <div className="mg-result-side space-y-5">
+            {stage.parts.length > 0 && (
+              <section aria-label={gameUi.cacPhanDiem} className="mg-result-parts mx-auto w-full max-w-sm rounded-2xl border-2 border-nau-go/50 bg-white/60 p-3 text-left">
+                <h3 className="mb-1 text-center text-sm font-bold text-nau-go-dam">{gameUi.cacPhanDiem}</h3>
+                <ul className="space-y-0.5" data-testid="phan-diem">
+                  {stage.parts.map((p) => (
+                    <li key={p.label}>{fmt(gameUi.dongDiem, { nhan: p.label, so: formatNumber(p.count), diem: formatNumber(p.points) })}</li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            <p className="text-sm">{moc}</p>
+            {stage.coins > 0 && <p className="font-semibold">{fmt(gameUi.xuNhan, { so: stage.coins })}</p>}
+            <div className="mg-result-buttons flex flex-col justify-center gap-3 sm:flex-row">
+              <Button size="lg" onClick={start}>
+                {gameUi.choiLai}
+              </Button>
+              <Button size="lg" variant="secondary" onClick={leave}>
+                {gameUi.veLang}
+              </Button>
+            </div>
           </div>
         </Panel>
       </div>

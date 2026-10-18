@@ -24,7 +24,7 @@ export function CardFace({ card, width, mood = 'normal', className = '', style }
   const h = cardHeight(width);
   return (
     <div
-      className={`relative flex select-none flex-col items-center justify-between overflow-hidden rounded-[0.9cqw] border-[0.3cqw] bg-giay py-[0.5cqw] text-chu shadow-md transition-transform duration-150 ${MOOD_CLASS[mood]} ${className}`}
+      className={`relative flex select-none flex-col items-center justify-between overflow-hidden rounded-[0.9cqw] border-[0.3cqw] border-b-[0.7cqw] bg-giay py-[0.5cqw] text-chu transition-transform duration-150 ${MOOD_CLASS[mood]} ${className}`}
       style={{ width: `${width}cqw`, height: `${h}cqw`, ...style }}
     >
       <span className="font-bold text-nau-go-dam" style={{ fontSize: `${width * 0.27}cqw`, lineHeight: 1 }} data-part="truoc">
@@ -47,7 +47,7 @@ export function CoverFace({ code, width }: { code: number; width: number }) {
     <div
       role="img"
       aria-label={fmt(rebuildUi.biaMa, { so: code })}
-      className="flex select-none flex-col items-center justify-around rounded-[0.9cqw] border-[0.3cqw] border-muc-tim bg-giay py-[0.5cqw] text-chu shadow-md"
+      className="flex select-none flex-col items-center justify-around rounded-[0.9cqw] border-[0.3cqw] border-muc-tim bg-giay py-[0.5cqw] text-chu"
       style={{ width: `${width}cqw`, height: `${h}cqw` }}
       data-testid="trang-bia"
     >
@@ -66,7 +66,7 @@ export function CoverFace({ code, width }: { code: number; width: number }) {
 
 export type DropTarget = 'chain' | 'basket';
 
-export interface DragGhost {
+export interface DragState {
   id: string;
   /** Góc trên trái của thẻ đang kéo, điểm ảnh, so với khung phủ */
   left: number;
@@ -114,7 +114,7 @@ interface Pending {
 /** Điều khiển kéo thả cho các thẻ ở khay. Mỗi thẻ gắn `bind(id)`; thẻ đang kéo hiện qua `ghost`. */
 export function useCardDrag({ overlayRef, enabled, onTap, onDrop }: UseCardDragOptions) {
   const pending = useRef<Pending | null>(null);
-  const [ghost, setGhost] = useState<DragGhost | null>(null);
+  const [ghost, setGhost] = useState<DragState | null>(null);
   const [hover, setHover] = useState<DropTarget | null>(null);
 
   const place = useCallback(
@@ -304,9 +304,27 @@ export const Basket = memo(function Basket({ armed, hover, onActivate, label }: 
       className={`absolute flex items-end justify-center rounded-[1.2cqw] border-[0.35cqw] border-dashed pb-[0.6cqw] ${hover ? 'border-xanh-la bg-xanh-la/25' : armed ? 'animate-pulse border-muc-tim/80' : 'border-transparent'}`}
       style={{ left: `${b.x0}cqw`, top: `${b.y0}%`, width: `${b.x1 - b.x0}cqw`, height: `${b.y1 - b.y0}%` }}
     >
-      <span className="rounded-nut bg-giay/90 px-[1cqw] py-[0.3cqw] font-display font-bold text-chu shadow" style={{ fontSize: '1.7cqw' }}>
+      <span className="rounded-nut bg-giay/90 px-[1cqw] py-[0.3cqw] font-display font-bold text-chu" style={{ fontSize: '1.7cqw' }}>
         {label}
       </span>
     </div>
   );
 });
+
+/** Thẻ dựng sẵn (hình bản sao thẻ đang kéo): ở trạng thái nghỉ nằm ở góc, mờ 1% để trình duyệt vẽ sẵn lớp này lúc nạp cảnh; lúc kéo di chuyển bằng transform (chỉ ghép lớp, không dàn trang lại). */
+const PARKED = { prev: 0, content: 0, code: 0 };
+
+export function DragGhost({ ghost, card, width }: { ghost: DragState | null; card: Card | null; width: number }) {
+  const shown = !!ghost && !!card;
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="the-dang-keo"
+      data-dragging={shown ? '1' : '0'}
+      className="pointer-events-none absolute left-0 top-0 z-30"
+      style={{ transform: `translate3d(${ghost && card ? ghost.left : 0}px, ${ghost && card ? ghost.top : 0}px, 0)`, opacity: shown ? 1 : 0.01, willChange: 'transform, opacity' }}
+    >
+      <CardFace card={card ?? PARKED} width={width} mood="selected" />
+    </div>
+  );
+}
