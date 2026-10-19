@@ -12,7 +12,7 @@ Game phiêu lưu 3D trên web dạy blockchain cho học sinh THPT: 12 màn ở 
 - `pnpm assets:build`: nén đồ họa vào `assets-build/` và tạo `manifest.json`
 
 ## Cấu trúc
-- `apps/hub`: web chính. `apps/lang-*`: vỏ chạy riêng từng làng.
+- `apps/hub`: web chính, trang `/cho` là thế giới mở (chợ + 4 làng trong một cảnh, `packages/core/src/three/world/`). `apps/lang-*`: vỏ chạy riêng từng làng, chỉ còn trang bài học và game (`/` và `/lang/<id>` chuyển sang `/cho?tu=<id>` ở hub).
 - `packages/core`: giao diện, động cơ 3D, đăng nhập, tiến độ, câu hỏi, logic 4 bài.
 - `packages/village-*`: nội dung từng làng, export `VillageModule`.
 - `supabase/`: migrations SQL, edge functions.

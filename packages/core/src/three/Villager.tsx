@@ -29,6 +29,8 @@ export interface VillagerProps extends GroupProps {
    * trong 1,5 phía trước vẫn làm dân làng dừng lại nhường (xem `stepWander`), khi ở trong <WalkWorld>.
    */
   hold?: boolean;
+  /** Cách người chơi xa hơn khoảng này thì ẩn (không vẽ, nhưng vẫn đi lại): thế giới mở có 4 dân làng ở 4 đường, ở xa không cần vẽ 18.000 tam giác mỗi người. Mặc định không ẩn. */
+  cullDistance?: number;
 }
 
 const CLIPS: readonly ClipName[] = ['idle', 'walk'];
@@ -37,7 +39,7 @@ const CLIPS: readonly ClipName[] = ['idle', 'walk'];
  * Dân làng đi lại theo điểm mốc (spec 03 mục 3.1): đi (walk) giữa các điểm, tới nơi thì đứng lại (idle) một lúc rồi đi
  * tiếp. Logic chọn điểm và hướng là hàm thuần ở `wander.ts`. Dùng trong <Scene3D>.
  */
-export function Villager({ id, waypoints, start = 0, seed = 1, wander, collider, track, hold = false, ...group }: VillagerProps) {
+export function Villager({ id, waypoints, start = 0, seed = 1, wander, collider, track, hold = false, cullDistance = Infinity, ...group }: VillagerProps) {
   const root = useRef<Group>(null);
   const rng = useMemo(() => createMulberry32(seed), [seed]);
   const params = useRef<WanderParams>({ ...DEFAULT_WANDER, ...wander });
@@ -59,6 +61,7 @@ export function Villager({ id, waypoints, start = 0, seed = 1, wander, collider,
     stepWander(state, waypoints, params.current, Math.min(dt, 0.1), rng, player, holdRef.current);
     g.position.set(state.x, 0, state.z);
     g.rotation.y = state.yaw;
+    if (player && cullDistance !== Infinity) g.visible = (state.x - player.x) ** 2 + (state.z - player.z) ** 2 < cullDistance * cullDistance;
     if (collider) {
       collider.x = state.x;
       collider.z = state.z;

@@ -13,12 +13,9 @@ export interface VillageSceneText {
   opening: string;
   /** Người dẫn nhắc việc tiếp theo khi nói chuyện (E), theo việc đang chờ: bài học, game 1, game 2, hoặc đã xong cả làng */
   guideNext: { lesson: string; game1: string; game2: string; done: string };
-  /** Cảnh trao Trang Sổ Vàng khi về làng sau khi xong màn ready cuối (spec 05 "Kết thúc làng"): các lượt người dẫn nói, lượt cuối có nút "Về chợ" */
+  /** Cảnh trao Trang Sổ Vàng khi vào làng sau khi xong màn ready cuối (spec 05 "Kết thúc làng"): các lượt người dẫn nói */
   award: { loi: readonly string[] };
 }
-
-/** Làng này đã có cảnh 3D (mốc 2: chỉ Làng Giấy; mốc 3 thêm 3 làng). Làng có cảnh thì cuối màn có "Về làng" thay cho "Về bản đồ". */
-export const hasVillageScene = (id: VillageId): boolean => VILLAGE_SCENE[id] !== undefined;
 
 /** Mốc 2 chỉ có Làng Giấy; 3 làng còn lại điền ở mốc 3. */
 export const VILLAGE_SCENE: Partial<Record<VillageId, VillageSceneText>> = {

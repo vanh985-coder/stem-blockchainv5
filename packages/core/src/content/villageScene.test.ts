@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { fmt } from './characters';
-import { hasVillageScene, VILLAGE_SCENE } from './villageScene';
+import { VILLAGE_SCENE } from './villageScene';
 
 describe('chữ của cảnh làng 3D', () => {
-  it('chỉ Làng Giấy có cảnh ở mốc 2', () => {
-    expect(hasVillageScene('lang-giay')).toBe(true);
-    for (const id of ['lang-det', 'lang-khac-dau', 'lang-bac'] as const) expect(hasVillageScene(id)).toBe(false);
+  it('chỉ Làng Giấy có chữ cảnh mở đầu và trao trang ở mốc 2 (3 làng kia điền ở mốc 3)', () => {
+    expect(Object.keys(VILLAGE_SCENE)).toEqual(['lang-giay']);
   });
   it('không viết cứng tên phản diện; tên lấy qua {phanDien}', () => {
     const t = VILLAGE_SCENE['lang-giay']!;

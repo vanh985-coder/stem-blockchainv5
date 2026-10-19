@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
+import { MERGED, URLS, villageWorldUrl } from '../config/urls';
 import { fmt } from '../content/characters';
 import { GAMES, gameUi } from '../content/games';
 import { guideSectionOfLevel, huongDan } from '../content/huongDan';
@@ -38,7 +39,7 @@ export interface MiniGameLevelProps {
   medals: MedalThresholds;
   /** Vẽ phần chơi (bước 11 đến 12 của màn 2, tương tự cho các game khác) */
   renderGame: (props: MiniGameRenderProps) => ReactNode;
-  /** Bấm "Về làng": mặc định chuyển tới `/lang/<làng của màn này>` */
+  /** Bấm "Về làng": mặc định về làng của màn này trong thế giới mở ở hub (`/cho?tu=<làng>`) */
   onLeave?: () => void;
 }
 
@@ -99,7 +100,14 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave }: MiniGame
     setAttempt((a) => a + 1);
     setStage({ kind: 'play' });
   };
-  const leave = onLeave ?? (() => navigate(def ? `/lang/${def.lang}` : '/'));
+  const leave =
+    onLeave ??
+    (() => {
+      if (!def) return navigate('/');
+      const url = villageWorldUrl(URLS, def.lang, MERGED);
+      if (MERGED) navigate(url);
+      else window.location.assign(url);
+    });
 
   const title = fmt(text?.ten ?? def?.ten ?? '');
   const best = progress.levels[levelId]?.bestScore ?? 0;

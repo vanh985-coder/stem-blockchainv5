@@ -8,7 +8,7 @@
 
 **Loại cảnh:** cảnh làng là 3D đi lại; màn 10 là trang bài học 2D; màn 11 và màn 12 là 2.5D; cảnh cao trào là 3D. Tên phản diện viết `{phanDien}` (hiện là Tí).
 
-## Cảnh làng (3D đi lại, `VillageScene`)
+## Cảnh làng (3D đi lại, vùng làng của `WorldScene` ở thế giới mở `/cho`; bước W1 chỉ có bản tối giản, nội dung đầy đủ làm sau)
 
 - **Cổng vào:** `env/cong-lang-bac`.
 - **Giữa làng:** cây đa `env/cay-da`; code treo thêm nhiều thẻ gỗ nhỏ ghi số đung đưa trên cành. Đây là "cây gộp sổ".

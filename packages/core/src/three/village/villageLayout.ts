@@ -55,12 +55,13 @@ export interface VillageLayoutInput {
   /** Đồ nhỏ do code dựng (chồng giấy, bể ngâm, bàn chép sổ…) */
   props: PropPlacement[];
   boards: VillageBoardDef[];
-  guide: VillageGuideDef;
+  /** Người dẫn đứng yên; làng chưa dựng đủ (mốc 3) thì không có */
+  guide?: VillageGuideDef;
   /** Sân đất nện: hình tròn */
   yards: { x: number; z: number; r: number }[];
   roads: VillageRoad[];
   /** Hàng rào tre tròn quanh khu: bán kính; chừa lối quanh cổng (bán kính `gap` tính từ tâm cổng). Bỏ trống thì không có hàng rào. */
-  fence?: { radius: number; gap: number };
+  fence?: { radius: number; gap: number; /** tâm vòng rào (mặc định gốc tọa độ; thế giới mở: tâm làng) */ center?: { x: number; z: number } };
   /** Hạt giống cho đồ nhỏ rải ngẫu nhiên (hoa, tint) */
   seed: number;
 }
@@ -102,46 +103,14 @@ export function assembleVillage(input: VillageLayoutInput): VillageLayout {
     if (p.kind === 'rom') blockers.push(c);
   }
   for (const b of input.boards) colliders.push(boardCollider(b));
-  colliders.push({ shape: circle(input.guide.x, input.guide.z, GUIDE_RADIUS), height: 1.7 });
+  if (input.guide) colliders.push({ shape: circle(input.guide.x, input.guide.z, GUIDE_RADIUS), height: 1.7 });
   let fence: FenceLayout | null = null;
   if (input.fence) {
     const g = input.gate;
     const gap = input.fence.gap;
-    fence = fenceLayout(input.fence.radius, (x, z) => Math.hypot(x - g.x, z - g.z) < gap);
+    fence = fenceLayout(input.fence.radius, (x, z) => Math.hypot(x - g.x, z - g.z) < gap, input.fence.center);
     for (const c of fenceColliders(fence)) colliders.push(c);
   }
   const models = [...new Set([input.gate.model, ...input.placements.map((p) => p.model)])];
   return { ...input, colliders, obstacles: colliders.map((c) => c.shape), blockers, models, fenceLayout: fence };
-}
-
-// ---------------------------------------------------------------------------
-// Vật tương tác (nhấn E): biển gỗ, người dẫn, cổng (về chợ), Bi
-
-import type { Interactable } from '../interaction';
-
-export type VillageTarget = { kind: 'board'; level: number } | { kind: 'guide' } | { kind: 'gate' } | { kind: 'bi' };
-export const VILLAGE_BI_ID = 'bi';
-
-/**
- * Danh sách vật tương tác theo thứ tự: các biển gỗ (theo `layout.boards`), người dẫn, cổng (về chợ), Bi (vật dự phòng: chỉ được chọn khi không có vật nào khác trong bán kính, vì Bi luôn bay
- * sát người chơi). Vị trí Bi được `WalkWorld` ghi đè mỗi khung hình.
- */
-export function createVillageInteractables(layout: Pick<VillageLayoutInput, 'boards' | 'guide' | 'gate'>): Interactable[] {
-  return [
-    ...layout.boards.map((b) => ({ id: `board:${b.level}`, x: b.x, z: b.z })),
-    { id: 'guide', x: layout.guide.x, z: layout.guide.z },
-    { id: 'gate', x: layout.gate.x, z: layout.gate.z },
-    { id: VILLAGE_BI_ID, x: 0, z: 0, fallback: true },
-  ];
-}
-
-/** Chỉ số của Bi trong danh sách do `createVillageInteractables` tạo. */
-export const villageBiSlot = (layout: Pick<VillageLayoutInput, 'boards'>): number => layout.boards.length + 2;
-
-export function parseVillageTarget(id: string): VillageTarget | null {
-  if (id === 'guide') return { kind: 'guide' };
-  if (id === 'gate') return { kind: 'gate' };
-  if (id === VILLAGE_BI_ID) return { kind: 'bi' };
-  const m = /^board:(\d+)$/.exec(id);
-  return m ? { kind: 'board', level: Number(m[1]) } : null;
 }

@@ -18,7 +18,7 @@ const DevGuide = import.meta.env.DEV ? lazy(() => import('./DevGuide')) : null;
 // Lõi 3D (three, R3F, drei) nằm ở chunk riêng, chỉ tải khi vào trang 3D (spec 03 mục 9).
 const Dev3D = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.DevModelViewer }))) : null;
 // Chợ phiên 3D (mốc 2): trang riêng, chưa nối từ trang chủ. Lõi 3D ở chunk riêng.
-const Cho = lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.MarketPage })));
+const Cho = lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.WorldPage })));
 const Dev25D = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.Dev25D }))) : null;
 const DevWalk = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.DevWalk }))) : null;
 const DevPortraits = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.DevPortraits }))) : null;

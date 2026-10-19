@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hubMapUrl, hubPageUrl, levelUrl, resolveUrls } from './urls';
+import { hubMapUrl, hubPageUrl, levelUrl, resolveUrls, villageWorldUrl } from './urls';
 
 describe('resolveUrls', () => {
   it('không có biến môi trường thì dùng cổng localhost của spec 01 mục 8', () => {
@@ -30,5 +30,13 @@ describe('hubPageUrl', () => {
     expect(hubPageUrl(u, '/')).toBe('https://ten-mien.vn/');
     expect(hubPageUrl(u, '/giao-vien')).toBe('https://ten-mien.vn/giao-vien');
     expect(hubPageUrl(u, 'giao-vien')).toBe('https://ten-mien.vn/giao-vien');
+  });
+});
+
+describe('villageWorldUrl', () => {
+  it('về thế giới mở ở hub, vào thẳng làng', () => {
+    const u = resolveUrls({ VITE_HUB_URL: 'https://ten-mien.vn/' });
+    expect(villageWorldUrl(u, 'lang-giay', false)).toBe('https://ten-mien.vn/cho?tu=lang-giay');
+    expect(villageWorldUrl(u, 'lang-bac', true)).toBe('/cho?tu=lang-bac');
   });
 });

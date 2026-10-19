@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import manifest from '../../../../assets-build/manifest.json';
-import { PLAYER_RADIUS, resolveCollisions, type Point2 } from '@so-chung/core/three/collision';
-import { footprintOf, footprintRadiusOf } from '@so-chung/core/three/cho/footprints';
-import { PROP_SIZES } from '@so-chung/core/three/cho/marketLayout';
-import { sizeOf } from '@so-chung/core/three/modelSizes';
-import { assembleVillage, createVillageInteractables, parseVillageTarget } from '@so-chung/core/three/village/villageLayout';
-import { INTERACT_RADIUS, nearestInteractable } from '@so-chung/core/three/interaction';
-import { LANG_GIAY_LAYOUT as L } from './layout';
+import manifest from '../../../../../../assets-build/manifest.json';
+import { PLAYER_RADIUS, resolveCollisions, type Point2 } from '../../collision';
+import { footprintOf, footprintRadiusOf } from '../../cho/footprints';
+import { PROP_SIZES } from '../../cho/marketLayout';
+import { sizeOf } from '../../modelSizes';
+import { assembleVillage } from '../../village/villageLayout';
+import { INTERACT_RADIUS, nearestInteractable } from '../../interaction';
+import { LANG_GIAY_LAYOUT as L } from './giay';
 
 const layout = assembleVillage(L);
 const blocked = (x: number, z: number, r = PLAYER_RADIUS): boolean => resolveCollisions({ x, z } as Point2, r, layout.obstacles, L.radius);
@@ -133,17 +133,15 @@ describe('bố cục Làng Giấy', () => {
       }
       return false;
     };
-    for (const it of createVillageInteractables(L)) {
-      if (parseVillageTarget(it.id)?.kind === 'bi') continue;
-      expect(reach(it.x, it.z), it.id).toBe(true);
-    }
+    const targets = [...L.boards.map((b) => ({ id: `board:${b.level}`, x: b.x, z: b.z })), { id: 'guide', x: L.guide.x, z: L.guide.z }, { id: 'gate', x: L.gate.x, z: L.gate.z }];
+    for (const it of targets) expect(reach(it.x, it.z), it.id).toBe(true);
     // và đi xuyên lối giữa cổng không bị chặn
     for (let z = L.gate.z - 3; z <= L.gate.z + 4; z += 0.25) expect(blocked(L.gate.x, z), `z=${z}`).toBe(false);
   });
 
-  it('vật tương tác: 3 biển, người dẫn, cổng, Bi; đứng trước biển 1 thì biển 1 được chọn', () => {
-    const list = createVillageInteractables(L);
-    expect(list.map((i) => i.id)).toEqual(['board:1', 'board:2', 'board:3', 'guide', 'gate', 'bi']);
+  it('vật tương tác (biển, người dẫn, cổng): đứng trước biển 1 thì biển 1 được chọn, trước người dẫn thì người dẫn', () => {
+    const list = [...L.boards.map((b) => ({ id: `board:${b.level}`, x: b.x, z: b.z })), { id: 'guide', x: L.guide.x, z: L.guide.z }, { id: 'gate', x: L.gate.x, z: L.gate.z }];
+    expect(list.map((i) => i.id)).toEqual(['board:1', 'board:2', 'board:3', 'guide', 'gate']);
     const b1 = L.boards[0];
     expect(list[nearestInteractable(b1.x, b1.z - 1.2, list)].id).toBe('board:1');
     expect(list[nearestInteractable(L.guide.x, L.guide.z - 1.4, list)].id).toBe('guide');

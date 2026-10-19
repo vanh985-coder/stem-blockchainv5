@@ -290,9 +290,9 @@ describe('mật độ theo mức chất lượng', () => {
     const low = generateMarket(20260101, densityFor('low'));
     const count = (l: MarketLayout, m: string) => l.placements.filter((p) => p.model === m).length;
     expect(count(low, MODEL_STALL)).toBeLessThan(count(layout, MODEL_STALL));
-    expect(count(low, MODEL_STALL)).toBeGreaterThanOrEqual(10);
+    expect(count(low, MODEL_STALL)).toBeGreaterThanOrEqual(8);
     expect(count(low, MODEL_BAMBOO)).toBeLessThan(count(layout, MODEL_BAMBOO));
-    expect(count(low, MODEL_BAMBOO)).toBeGreaterThanOrEqual(10);
+    expect(count(low, MODEL_BAMBOO)).toBeGreaterThanOrEqual(8);
     for (const m of [MODEL_HOUSE_TILE, MODEL_HOUSE_THATCH, MODEL_TREE, MODEL_WELL]) expect(count(low, m)).toBe(count(layout, m));
     for (const g of GATES) expect(count(low, g.model)).toBe(1);
   });

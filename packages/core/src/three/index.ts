@@ -59,16 +59,14 @@ export { DevPortraits } from './DevPortraits';
 export * from './portraitFrame';
 export * from './cameraCollision';
 export * from './shadowFocus';
-export { MarketPage } from './cho/MarketPage';
-export { MarketScene } from './cho/MarketScene';
+export { WorldPage } from './world/WorldPage';
+export { WorldScene } from './world/WorldScene';
 export type { MarketStats } from './StatsProbe';
 export * from './cho/marketLayout';
 export * from './cho/instanceSelect';
 export { useWalkSession, detectLockMode } from './useWalkSession';
 export type { WalkSession } from './useWalkSession';
 export { WalkLockOverlay } from './WalkLockOverlay';
-export { VillageScene } from './village/VillageScene';
-export type { VillageSceneProps } from './village/VillageScene';
 export * from './village/villageLayout';
 export * from './village/villageQuest';
 

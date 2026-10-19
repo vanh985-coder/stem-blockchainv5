@@ -48,11 +48,11 @@ export function levelUrl(urls: AppUrls, id: VillageId, level: number): string {
 }
 
 /**
- * Địa chỉ vào một làng từ cổng ở chợ (spec 04 mục 3 "Cổng làng"): lúc chạy riêng từng làng là địa chỉ của làng (`<làng>/lang/<id>`); khi đã gộp web
- * (`VITE_MERGED=true`) là đường dẫn nội bộ `/lang/<id>` ngay trên hub.
+ * Địa chỉ thế giới mở ở hub (chợ và 4 làng trong một cảnh `/cho`), vào thẳng làng `id`, cạnh các biển gỗ: nút "Về làng" ở cuối mỗi màn, và `/`, `/lang/<id>` của vỏ làng. Khi đã gộp web
+ * (`VITE_MERGED=true`) là đường dẫn nội bộ.
  */
-export function gateUrl(urls: AppUrls, id: VillageId, merged: boolean): string {
-  return merged ? `/lang/${id}` : `${urls.villages[id]}/lang/${id}`;
+export function villageWorldUrl(urls: AppUrls, id: VillageId, merged: boolean): string {
+  return merged ? `/cho?tu=${id}` : `${urls.hub}/cho?tu=${id}`;
 }
 
 /** Web đã gộp (spec 10): đặt VITE_MERGED=true. */

@@ -96,7 +96,7 @@ export interface VillageModule {
 
 | Route | Nội dung |
 |---|---|
-| `/lang/<id>` | Cảnh làng (khu đi lại có 3 cổng màn) |
+| `/lang/<id>` | (Từ bước W1) chuyển sang thế giới mở ở hub: `VITE_HUB_URL/cho?tu=<id>` |
 | `/lang/<id>/man/<n>` | Từng màn |
 
 **Vỏ chạy riêng `apps/lang-*`:**
@@ -106,6 +106,7 @@ export interface VillageModule {
   - chỉ có route màn bài học `/lang/<id>/man/<n>`;
   - cuối bài chỉ có nút "Về bản đồ".
 - **Từ mốc 2:** trang `/` chuyển sang `/lang/<id>` (cảnh làng 3D, giữ nguyên phần `?query`); nút "Về chợ" (menu và cổng làng) mở `VITE_HUB_URL/cho?tu=<id>`, tức chuyển hẳn sang web chính, và ở chợ người chơi xuất hiện ngay trước cổng của làng đó (xem spec 04 mục 3). Cuối màn 1 có "Về làng" và "Chơi tiếp: [tên game 1]" (bỏ khi game 1 `coming-soon`). Mốc 2 mới có Làng Giấy; 3 làng còn lại giữ cách của mốc 1 cho tới mốc 3.
+- **Từ bước W1 (thế giới mở):** chợ và 4 làng nằm trong MỘT cảnh 3D ở hub, địa chỉ `/cho` (spec 03 mục 6 "`WorldScene`", spec 04 mục 3). Subdomain của làng chỉ còn **trang bài học và game** (`/lang/<id>/man/<n>`); `/` và `/lang/<id>` của vỏ làng chuyển sang hub `/cho?tu=<id>` (giữ nguyên phần `?query` khác). "Về làng" ở cuối mỗi màn và "Về chợ" đều mở `/cho?tu=<id>` (`villageWorldUrl` trong `config/urls.ts`); khi gộp web (`VITE_MERGED=true`) là đường dẫn nội bộ. `/ban-do` giữ nguyên. Cảnh làng 3D không còn nằm trong gói làng (`packages/village-*` chỉ giữ nội dung, bài học và game); bố cục Làng Giấy chuyển về `packages/core/src/three/world/villages/giay.ts`.
 
 **Web chính `apps/hub`:**
 - Lúc mới dựng, cổng mỗi làng trong chợ phiên trỏ tới subdomain của làng đó.

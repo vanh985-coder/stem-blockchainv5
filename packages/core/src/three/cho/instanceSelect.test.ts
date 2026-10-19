@@ -106,8 +106,12 @@ describe('so sánh hai lần chọn và khoảng theo mức chất lượng', ()
     expect(marketNearDistance('low')).toBe(5);
     expect(marketNearDistance('medium')).toBe(15);
     expect(marketNearDistance('high')).toBe(25);
-    // model 3 bậc: cổng làng 12 / 28 và giếng 6 / 14 ở mức Vừa / Cao, mức Thấp giữ 5
-    expect(marketNearDistance('low', 'env/cong-lang-giay')).toBe(5);
+    // model 3 bậc: cổng làng 12 / 28 và giếng 6 / 14 ở mức Vừa / Cao; mức Thấp: bản chính nặng chỉ khi thật sát (cổng 2,5; nhà và bụi tre 1,5; lều và khung cửi không bao giờ), còn lại 5
+    expect(marketNearDistance('low', 'env/cong-lang-giay')).toBe(2.5);
+    expect(marketNearDistance('low', 'env/leu-cho')).toBe(-1); // không bao giờ dùng bản chính
+    expect(marketNearDistance('low', 'env/nha-mai-ngoi')).toBe(1.5);
+    expect(marketNearDistance('low', 'env/bui-tre')).toBe(1.5);
+    expect(marketNearDistance('low', 'env/khung-cui')).toBe(-1);
     expect(marketNearDistance('medium', 'env/cong-lang-giay')).toBe(12);
     expect(marketNearDistance('high', 'env/cong-lang-bac')).toBe(28);
     expect(marketNearDistance('medium', 'env/leu-cho')).toBe(15);
@@ -116,6 +120,11 @@ describe('so sánh hai lần chọn và khoảng theo mức chất lượng', ()
     expect(marketNearDistance('low', 'env/gieng-lang')).toBe(5);
     expect(marketMaxDistance('low')).toBe(52);
     expect(marketMaxDistance('medium')).toBe(Infinity);
+    // bụi tre ở thế giới mở: Vừa 90, Cao 120; Thấp vẫn 52
+    expect(marketMaxDistance('medium', 'env/bui-tre')).toBe(90);
+    expect(marketMaxDistance('high', 'env/bui-tre')).toBe(120);
+    expect(marketMaxDistance('low', 'env/bui-tre')).toBe(52);
+    expect(marketMaxDistance('high', 'env/nha-mai-ngoi')).toBe(Infinity);
   });
 });
 

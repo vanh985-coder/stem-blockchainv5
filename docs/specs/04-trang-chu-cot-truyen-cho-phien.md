@@ -83,7 +83,7 @@ Cảnh đi lại chính, nằm giữa 4 làng.
 Xếp theo ảnh `concept-toan-canh` và `concept-cho-phien`. Phải **đủ đông đồ vật** để chợ trông tấp nập.
 
 **Bản làm ở mốc 2 (bước 7, route `/cho`, chưa nối từ trang chủ):** chợ ĐƠN GIẢN, đủ đồ vật chính; chợ đông đồ vật làm ở mốc 4.
-- **Từ làng về chợ** (`/cho?tu=<id làng>`): người chơi xuất hiện cách tâm cổng làng đó 3,8 về phía sân chợ, quay lưng về cổng, camera cũng quay theo (`marketSpawn` trong `marketQuest.ts`, có test). `tu` sai hoặc không có thì dùng chỗ xuất hiện mặc định dưới đây.
+- **Từ làng về chợ** (`/cho?tu=<id làng>`): **từ bước W1** người chơi xuất hiện TRONG làng đó, cạnh 3 biển gỗ (`villageSpawn` trong `worldLayout.ts`, có test); `tu` sai hoặc không có thì dùng chỗ xuất hiện mặc định dưới đây. (Trước W1: cách cổng 3,8 về phía sân chợ.)
 - **Tọa độ:** người chơi xuất hiện ở phía nam cây đa (0, −10) và nhìn về +Z, nên **Bắc = +Z, Nam = −Z, Tây = +X, Đông = −X**. Cây đa ở gốc. Vùng đi lại bán kính 42; cổng cách tâm 30; sân chợ bán kính 14; đường rộng 6.
 - **Cổng:** mặt trước quay về sân chợ. Bắc Giấy (0, 30), Nam Dệt (0, −30), Tây Khắc Dấu (30, 0), Đông Bạc (−30, 0). Hai bên cổng là vật cản, lối giữa đi qua được (cổng mở/khóa làm ở bước sau).
 - **Bao quanh:** 12 đến 15 lều chợ, giếng, 7 nhà mái ngói và 7 nhà mái tranh trở lên, 14 đến 20 bụi tre; đồ nhỏ do code dựng (chum vại, đống rơm, khóm hoa). Sinh bằng bộ ngẫu nhiên có seed (`three/cho/marketLayout.ts`, hàm thuần có test: không đè lên đường, không đè nhau, 4 cổng và bến tàu luôn tới được từ chỗ xuất hiện).
@@ -98,9 +98,7 @@ Xếp theo ảnh `concept-toan-canh` và `concept-cho-phien`. Phải **đủ đ�
 
 - **Mỗi làng một model riêng:** `env/cong-lang-giay`, `env/cong-lang-det`, `env/cong-lang-khac-dau`, `env/cong-lang-bac`. Không đổi màu.
 - **Cổng đã mở:**
-  - lúc dev, tương tác thì chuyển sang subdomain của làng;
-  - khi `VITE_MERGED=true`, chuyển nội bộ tới `/lang/<id>`.
-  - (Bước 8: `gateUrl(urls, id, merged)` trong `config/urls.ts`. Hiện trang gốc của làng `/lang/<id>` còn chuyển về bản đồ ở hub, cảnh làng 3D làm sau.)
+  - (Từ bước W1) cổng đã mở thì đi thẳng qua, không còn bấm E hay chuyển trang: làng nằm trong cùng cảnh `/cho`, sau cổng. Chỉ cổng đang đóng mới có vật tương tác. (Trước W1: `gateUrl` chuyển sang subdomain; nay thay bằng `villageWorldUrl(urls, id, merged)` dùng cho "Về làng" / "Về chợ".)
 - **Cổng còn khóa:** code thêm thanh then gỗ và dây đỏ chắn ngang vòm cổng. Tương tác thì hiện "Cổng làng đóng vì sổ đang lệch. Hãy giúp [làng trước] trước nhé."
   - (Bước 8: lời của Bi trong hộp thoại; thanh then gỗ, hai thanh ngang, hai sợi dây đỏ bắt chéo và chùm tua do code dựng (`GateBarrier.tsx`); cổng đóng có vật cản mỏng chắn kín lối đi. Cổng thứ k mở khi có k Trang Sổ Vàng (`computeUnlock().villageOpen`), tài khoản giáo viên mở hết; hàm thuần ở `three/cho/marketQuest.ts`. Lời nhắc: "E: Vào Làng Giấy" (mở) hay "E: Xem cổng Làng Dệt" (đóng).)
 
@@ -155,7 +153,17 @@ Bỏ qua được bằng nút "Bỏ qua".
 **Bản làm (mốc 2, bước 15a):**
 - **Cờ chiếu một lần**, mỗi làng một cờ trong `game_state.data` (chơi thử: một bit trong cookie `sc_guest`), hợp cờ khi gộp tiến độ: `goldenSeen` (cảnh người dẫn trao trang ở làng; cookie `gs`) và `gateOpenSeen` (hiệu ứng mở cổng ở chợ; cookie `go`). Hàm thuần `shouldShowGolden`, `pendingGateOpening` ở `progress/villageIntro.ts`, có test (`goldenFlags.test.ts`). Tài khoản giáo viên không chiếu.
 - **Ở làng** (spec 05 "Kết thúc làng"): người dẫn trao trang, hàng 4 ô Trang Sổ Vàng có trang vừa nhận bay vào, HUD nhấp sáng ô đó; lượt cuối nút "Về chợ" sang `/cho?mo=<id làng>`; "Bỏ qua" ở lại làng.
-- **Ở chợ** (`/cho?mo=<id làng>`, `MarketPage`): người chơi xuất hiện cách cổng vừa mở 8,5 đơn vị, quay mặt về cổng (`gateOpeningSpawn`, `marketQuest.ts`); chờ 0,9 giây; then gỗ và dây đỏ rơi xuống nằm trên đất (`barrierFall` ở `gateFall.ts`, hàm thuần có test: thanh trên rơi trước, rồi thanh dưới, dây đỏ và chùm tua; khoảng 1,9 giây, kèm tiếng vút và tiếng đập; bật "Giảm chuyển động" thì không có hoạt cảnh, cổng mở ngay); rồi Bi nói câu của bảng trên và dòng "Nhiệm vụ của {ten} bây giờ: …". Dòng nhiệm vụ và mũi tên chỉ đổi sang cổng mới sau khi Bi nói xong. Trạng thái chuỗi nằm ở `data-seq` của phần tử gốc (idle, wait, fall, talk, done) để kiểm tra bằng trình duyệt. Vào `/cho` bằng đường khác (không `?mo=`) mà hiệu ứng còn chờ thì Bi báo ngay, không có hoạt cảnh rơi (cổng đã mở sẵn). Chiếu xong ghi cờ `gateOpenSeen` nên không bao giờ chiếu lại.
+- **Ở thế giới mở** (từ bước W1, `WorldPage`; chạy khi người chơi tới gần cổng Dệt, cách dưới 12, lần đầu sau khi nhận Trang Sổ Vàng 1; `?mo=<id làng>` giữ làm cách kiểm tra: người chơi xuất hiện cách cổng 8,5 đơn vị, quay mặt về cổng, `gateApproachSpawn`): chờ 0,9 giây; then gỗ và dây đỏ rơi xuống nằm trên đất (`barrierFall` ở `gateFall.ts`, hàm thuần có test: thanh trên rơi trước, rồi thanh dưới, dây đỏ và chùm tua; khoảng 1,9 giây, kèm tiếng vút và tiếng đập; bật "Giảm chuyển động" thì không có hoạt cảnh, cổng mở ngay); rồi Bi nói câu của bảng trên và dòng "Nhiệm vụ của {ten} bây giờ: …". Dòng nhiệm vụ và mũi tên chỉ đổi sang cổng mới sau khi Bi nói xong. Trạng thái chuỗi nằm ở `data-seq` của phần tử gốc (idle, wait, fall, talk, done) để kiểm tra bằng trình duyệt. Vào `/cho` bằng đường khác (không `?mo=`) mà hiệu ứng còn chờ thì Bi báo ngay, không có hoạt cảnh rơi (cổng đã mở sẵn). Chiếu xong ghi cờ `gateOpenSeen` nên không bao giờ chiếu lại.
+
+## 5b. Thế giới mở (mốc 2, bước W1)
+
+Chợ và 4 làng nằm trong một cảnh 3D ở hub, địa chỉ vẫn `/cho` (kỹ thuật: spec 03 mục 6 "`WorldScene`").
+- **Sơ đồ** (nhìn từ trên, Bắc = +Z lên trên, Tây = +X sang trái màn hình khi nhìn từ phía nam): chợ ở giữa bán kính 42; Bắc Giấy, Nam Dệt, Tây Khắc Dấu, Đông Bạc; mỗi hướng một con đường đất dài 30 từ rìa chợ tới cổng làng (cách tâm chợ 72). Đường sang Bạc đi qua một cây cầu gỗ bắc qua sông ở phía đông chợ. Xem `/cho?cam=top` để nhìn cả thế giới từ trên cao.
+- **Cổng dời ra đầu mỗi làng.** Rìa chợ chỉ còn lối ra đường và **biển chỉ đường** gỗ ghi tên làng. Cổng làng chưa mở: có then gỗ, dây đỏ; thấy làng từ ngoài, không vào được; bấm E hiện "Cổng làng đóng…" như cũ.
+- **Mở đầu làng:** cảnh mở đầu và "Em có biết?" của làng chạy khi người chơi lần đầu bước qua cổng làng. Cảnh mở cổng Làng Dệt (bước 15a) chạy khi người chơi tới gần cổng Dệt lần đầu sau khi nhận Trang Sổ Vàng 1; dòng nhiệm vụ đổi ngay sau cảnh trao trang.
+- **Mũi tên dưới chân:** chỉ theo đường tới mục tiêu nhiệm vụ, ẩn khi gần mục tiêu; mũi tên trên đầu của chợ (bước 8) được thay bằng mũi tên này.
+- **3 làng chưa dựng** (Dệt, Khắc Dấu, Bạc): cổng đúng model, vài nhà, bụi tre và một biển "Học cùng [người dẫn]" dẫn vào bài học (màn 4, 7, 10); game để "Sắp ra mắt". Nội dung 3D của 3 làng này làm ở bước W2 và mốc 3.
+- **"Về làng" / "Về chợ"** cuối mỗi màn và trong menu đều mở `/cho?tu=<id>`; `/ban-do` giữ nguyên.
 
 ## 6. Làm sau (mốc 4)
 

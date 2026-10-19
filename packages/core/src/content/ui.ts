@@ -596,7 +596,6 @@ export const ui = {
     nutMenuNhan: 'Mở menu',
     /** Lời nhắc tương tác: "E: {vat}" ({nguoi} là tên người, {lang} là tên làng) */
     nhanNoiChuyen: 'Nói chuyện với {nguoi}',
-    nhanCongMo: 'Vào {lang}',
     nhanCongDong: 'Xem cổng {lang}',
     /** Cổng làng còn khóa: {truoc} là tên làng phải giúp trước */
     congDong: 'Cổng làng đóng vì sổ đang lệch. Hãy giúp {truoc} trước nhé.',
@@ -609,8 +608,6 @@ export const ui = {
       banDo: 'Bản đồ',
       veTrangChu: 'Về trang chủ',
       quayLai: 'Quay lại',
-      /** Chỉ có ở menu cảnh làng */
-      veCho: 'Về chợ',
     },
   },
 
@@ -619,7 +616,6 @@ export const ui = {
     /** Lời nhắc tương tác: "E: {vat}" ({bien} là chữ trên biển, {nguoi} là tên người) */
     nhanBien: 'Vào màn: {bien}',
     nhanBienKhoa: 'Xem biển: {bien}',
-    nhanCong: 'Về chợ',
     /** Dòng nhiệm vụ ({bien}: chữ trên biển; {lang}: tên làng) */
     nhiemVuMan: 'Đến biển "{bien}".',
     nhiemVuXong: '{lang} đã xong việc! Quay về chợ để sang làng kế tiếp.',
@@ -635,8 +631,14 @@ export const ui = {
     /** Nút ở cuối màn 1: về làng (mở cảnh làng) và chơi tiếp game 1 */
     veLang: 'Về làng',
     choiTiep: 'Chơi tiếp: {man}',
-    /** Cảnh trao Trang Sổ Vàng: nút ở lượt cuối (sang chợ xem cổng mở) */
-    traoVeCho: 'Về chợ',
+  },
+
+  /** Thế giới mở ở /cho (mốc 2, bước W1): chợ và 4 làng trong một cảnh */
+  thegioi: {
+    /** Mặt sau biển chỉ đường ở lối ra chợ (người đi về chợ đọc được) */
+    bienChoPhien: 'Chợ phiên',
+    /** Hiện ngắn khi tới cổng làng mà vùng làng chưa tải xong */
+    dangVaoLang: 'Đang vào làng…',
   },
 
   /** Trang /dev/walk (chỉ có khi chạy dev) */

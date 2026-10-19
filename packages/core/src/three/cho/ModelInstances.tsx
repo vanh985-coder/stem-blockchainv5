@@ -73,6 +73,56 @@ export function buildParts(scene: Object3D, scale: number, offsetY: number): Par
   return parts;
 }
 
+/**
+ * Bộ nhớ đệm các phần đã nướng (`buildParts`) theo từng bản model đã tải và hệ số phóng: các nơi dùng cùng một model (chợ, các vùng làng, hình dáng làng từ xa) DÙNG CHUNG hình học và vật liệu,
+ * không nướng lại và không nhân đôi bộ nhớ GPU. Vì thế dựng một vùng làng (cùng nhà, bụi tre, phên với chợ) chỉ tốn việc tạo InstancedMesh và ma trận, không khựng; vào ra làng nhiều lần không
+ * làm phình bộ nhớ. Đếm số nơi dùng: hết nơi dùng thì giải phóng hình học.
+ */
+interface CachedParts {
+  parts: Part[];
+  refs: number;
+}
+const partsCache = new Map<string, CachedParts>();
+const partsKey = (scene: Object3D, scale: number, offsetY: number) => `${scene.uuid}|${scale}|${offsetY}`;
+
+/** Lấy các phần của một bản model (nướng lần đầu, các lần sau dùng chung) KHÔNG tính số nơi dùng: dùng trong render. Nơi dùng gắn vào bằng `retainParts` (trong effect) và trả bằng `releaseParts`. */
+export function getParts(scene: Object3D, scale: number, offsetY: number): Part[] {
+  const key = partsKey(scene, scale, offsetY);
+  let e = partsCache.get(key);
+  if (!e) {
+    e = { parts: buildParts(scene, scale, offsetY), refs: 0 };
+    partsCache.set(key, e);
+  }
+  return e.parts;
+}
+
+/** Thêm một nơi dùng cho các phần `parts` (đã lấy bằng `getParts`); nếu mục đã bị xóa (StrictMode gắn, gỡ, gắn lại) thì đặt lại. */
+export function retainParts(scene: Object3D, scale: number, offsetY: number, parts: Part[]): void {
+  const key = partsKey(scene, scale, offsetY);
+  let e = partsCache.get(key);
+  if (!e) {
+    e = { parts, refs: 0 };
+    partsCache.set(key, e);
+  }
+  e.refs++;
+}
+
+export function releaseParts(scene: Object3D, scale: number, offsetY: number): void {
+  const key = partsKey(scene, scale, offsetY);
+  const e = partsCache.get(key);
+  if (!e) return;
+  if (--e.refs > 0) return;
+  for (const p of e.parts) p.geometry.dispose();
+  partsCache.delete(key);
+}
+
+/** Số bản đã nướng đang giữ và tổng số nơi dùng (để kiểm tra rò rỉ khi vào ra vùng làng). */
+export function partsCacheStats(): { entries: number; refs: number } {
+  let refs = 0;
+  partsCache.forEach((e) => (refs += e.refs));
+  return { entries: partsCache.size, refs };
+}
+
 /** Hệ số phóng và dịch cho một model theo cỡ thật trong bảng (đo khung bao của chính model). */
 export function fitOf(id: string, scene: Object3D) {
   scene.updateMatrixWorld(true);
@@ -98,7 +148,9 @@ interface InstanceSet {
   /** Khối cầu bao để cắt */
   centers: Float32Array;
   radii: Float32Array;
-  disposables: { dispose(): void }[];
+  /** Gắn vào các phần dùng chung (tăng số nơi dùng) và trả lại (giảm; hết nơi dùng thì giải phóng hình học) */
+  retain: () => void;
+  release: () => void;
 }
 
 export function newMesh(part: Part, capacity: number): InstancedMesh {
@@ -126,16 +178,17 @@ function newShadowMesh(part: Part, capacity: number): InstancedMesh {
   return mesh;
 }
 
-function buildSet(id: string, near: ModelData, mid: ModelData | null, far: ModelData, items: readonly Placement[]): InstanceSet {
-  const fit0 = fitOf(id, near.scene);
+function buildSet(id: string, near: ModelData | null, mid: ModelData | null, far: ModelData, items: readonly Placement[], farOnly: boolean): InstanceSet {
+  // chỉ bản xa (làng nhìn từ xa): cỡ lấy từ bản xa (cùng khung bao với bản chính)
+  const fit0 = fitOf(id, (near ?? far).scene);
   // một số model nhấc lên khỏi mặt đất (phên phơi giấy đặt trên giá): cộng `lift` vào độ dịch đứng
   const lift = sizeOf(id)?.lift ?? 0;
   const fit = { scale: fit0.scale, offsetY: fit0.offsetY + lift };
-  const nearParts = buildParts(near.scene, fit.scale, fit.offsetY);
+  const nearParts = near ? getParts(near.scene, fit.scale, fit.offsetY) : [];
   // bản xa dùng đúng hệ số phóng của bản chính để hai bản trùng khít
-  const farParts = buildParts(far.scene, fit.scale, fit.offsetY);
+  const farParts = getParts(far.scene, fit.scale, fit.offsetY);
   // bản vừa cũng dùng đúng hệ số phóng của bản chính
-  const midParts = mid ? buildParts(mid.scene, fit.scale, fit.offsetY) : [];
+  const midParts = mid ? getParts(mid.scene, fit.scale, fit.offsetY) : [];
   const n = items.length;
   const matrices = new Float32Array(n * 16);
   const colors = new Float32Array(n * 3);
@@ -163,8 +216,22 @@ function buildSet(id: string, near: ModelData, mid: ModelData | null, far: Model
   const midMeshes = midParts.map((p) => newMesh(p, n));
   const farMeshes = farParts.map((p) => newMesh(p, n));
   // Bụi tre (lá mảnh, bóng ít giá trị mà nặng 7.900 tam giác mỗi bụi) không đổ bóng
-  const shadowMeshes = NO_SHADOW_MODELS.has(id) ? [] : farParts.map((p) => newShadowMesh(p, n));
-  return { nearMeshes, midMeshes, farMeshes, shadowMeshes, count: n, matrices, colors, centers, radii, disposables: [...nearParts, ...midParts, ...farParts].map((p) => p.geometry) };
+  const shadowMeshes = NO_SHADOW_MODELS.has(id) || farOnly ? [] : farParts.map((p) => newShadowMesh(p, n));
+  return { nearMeshes, midMeshes, farMeshes, shadowMeshes, count: n, matrices,
+    colors,
+    centers,
+    radii,
+    retain: () => {
+      if (near) retainParts(near.scene, fit.scale, fit.offsetY, nearParts);
+      if (mid) retainParts(mid.scene, fit.scale, fit.offsetY, midParts);
+      retainParts(far.scene, fit.scale, fit.offsetY, farParts);
+    },
+    release: () => {
+      if (near) releaseParts(near.scene, fit.scale, fit.offsetY);
+      if (mid) releaseParts(mid.scene, fit.scale, fit.offsetY);
+      releaseParts(far.scene, fit.scale, fit.offsetY);
+    },
+  };
 }
 
 /** Chép các bản `idx[0..count)` vào InstancedMesh (ma trận và màu), cập nhật số bản và bật tải lại bộ đệm. Không cấp phát. */
@@ -203,6 +270,12 @@ export interface ModelInstancesProps {
   id: string;
   items: readonly Placement[];
   level: QualityLevel;
+  /** Chỉ dùng bản xa (không tải bản chính và bản vừa, không đổ bóng): hình dáng làng nhìn từ xa */
+  farOnly?: boolean;
+  /** Ghi đè khoảng cách xa nhất còn vẽ (mặc định theo mức chất lượng: Thấp 52, còn lại không giới hạn) */
+  maxDistance?: number;
+  /** Mặt nạ các bản không vẽ (1 là ẩn); nơi dùng sửa tại chỗ khi vùng làng tải hay dọn. Mỗi khung hình đọc lại. */
+  skip?: Uint8Array;
 }
 
 /**
@@ -211,28 +284,28 @@ export interface ModelInstancesProps {
  * bản chính / bản xa theo khoảng cách tới camera (xem `selectInstances`); số tam giác chỉ tính các bản đang thấy. Màu từng bản
  * được nhân thêm (đổi màu nhẹ). Cần Suspense phía trên (đọc model).
  */
-export function ModelInstances({ id, items, level }: ModelInstancesProps) {
+export function ModelInstances({ id, items, level, farOnly = false, maxDistance, skip }: ModelInstancesProps) {
   // Bản vừa (LOD giữa) chỉ có và chỉ tải khi model có bản vừa dùng được và mức này có bậc vừa (Vừa, Cao); xem `isUsableMid`.
-  const hasMid = isUsableMid(getManifest()?.[modelPath(midId(id))]?.tris) && marketFarDistance(level, id) > marketNearDistance(level, id);
-  const near = readModel(id);
+  const hasMid = !farOnly && isUsableMid(getManifest()?.[modelPath(midId(id))]?.tris) && marketFarDistance(level, id) > marketNearDistance(level, id);
+  const near = farOnly ? null : readModel(id);
   const mid = hasMid ? readModel(midId(id)) : null;
   const far = readModel(lodId(id));
   useEffect(() => {
-    const ids = hasMid ? [id, midId(id), lodId(id)] : [id, lodId(id)];
+    const ids = farOnly ? [lodId(id)] : hasMid ? [id, midId(id), lodId(id)] : [id, lodId(id)];
     for (const i of ids) retainModel(i);
     return () => {
       for (const i of ids) releaseModel(i);
     };
-  }, [id, hasMid]);
+  }, [id, hasMid, farOnly]);
 
-  const set = useMemo(() => buildSet(id, near, mid, far, items), [id, near, mid, far, items]);
-  useEffect(
-    () => () => {
+  const set = useMemo(() => buildSet(id, near, mid, far, items, farOnly), [id, near, mid, far, items, farOnly]);
+  useEffect(() => {
+    set.retain();
+    return () => {
       for (const m of [...set.nearMeshes, ...set.midMeshes, ...set.farMeshes, ...set.shadowMeshes]) m.dispose();
-      for (const d of set.disposables) d.dispose();
-    },
-    [set],
-  );
+      set.release();
+    };
+  }, [set]);
 
   const shadows = QUALITY_TABLE[level].shadow !== 'blob';
   // Bản chính và bản xa của lượt vẽ chính chỉ nhận bóng; bóng do `shadowMeshes` đổ (bản xa, chỉ vật trong vùng quanh người chơi).
@@ -268,11 +341,11 @@ export function ModelInstances({ id, items, level }: ModelInstancesProps) {
   );
   // Model mà bản chính chỉ nhẹ hơn bản xa chút ít (cây đa: 9.126 so với 8.000 tam giác) thì luôn dùng bản chính cho đẹp.
   const nearTris = getManifest()?.[modelPath(id)]?.tris ?? Infinity;
-  const nearDist = nearTris <= ALWAYS_NEAR_TRIS ? Infinity : marketNearDistance(level, id);
-  const maxDist = marketMaxDistance(level);
+  const nearDist = farOnly ? -Infinity : nearTris <= ALWAYS_NEAR_TRIS ? Infinity : marketNearDistance(level, id);
+  const maxDist = maxDistance ?? marketMaxDistance(level, id);
   const midDist = hasMid ? marketFarDistance(level, id) : nearDist;
-  const frame = useRef({ nearDist, midDist, maxDist, shadows });
-  frame.current = { nearDist, midDist, maxDist, shadows };
+  const frame = useRef({ nearDist, midDist, maxDist, shadows, skip });
+  frame.current = { nearDist, midDist, maxDist, shadows, skip };
 
   useFrame(({ camera }) => {
     camera.updateMatrixWorld();
@@ -281,7 +354,7 @@ export function ModelInstances({ id, items, level }: ModelInstancesProps) {
     const e = camera.matrixWorld.elements;
     const f = frame.current;
     selectInstances(
-      { camX: e[12], camY: e[13], camZ: e[14], planes: work.planes, centers: set.centers, radii: set.radii, count: set.count, nearDistance: f.nearDist, midDistance: f.midDist, maxDistance: f.maxDist },
+      { camX: e[12], camY: e[13], camZ: e[14], planes: work.planes, centers: set.centers, radii: set.radii, count: set.count, nearDistance: f.nearDist, midDistance: f.midDist, maxDistance: f.maxDist, skip: f.skip },
       work.nearIdx,
       work.farIdx,
       work.sel,

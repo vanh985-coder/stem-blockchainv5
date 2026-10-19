@@ -1,18 +1,20 @@
-import { Navigate, useLocation, useRoutes } from 'react-router';
+import { useRoutes } from 'react-router';
 import type { VillageModule } from '../village';
-import { HUB_MAP_URL } from '../config/urls';
+import { HUB_MAP_URL, URLS, villageWorldUrl } from '../config/urls';
 import { accountRoutes } from '../auth/routes';
 import { ExternalRedirect } from './ExternalRedirect';
 
-/** Vỏ chạy riêng của một làng: gắn gói làng dưới /lang/<id>; "/" và "/lang/<id>" chuyển về bản đồ ở hub (mốc 1). */
+/**
+ * Vỏ chạy riêng của một làng: chỉ còn trang bài học và game (gói làng gắn dưới /lang/<id>/man/<n>). Từ bước W1 (thế giới mở) chợ và 4 làng nằm trong một cảnh ở hub: `/` và `/lang/<id>` chuyển sang
+ * thế giới mở ở hub, vào thẳng làng này (`/cho?tu=<id>`, cạnh các biển gỗ).
+ */
 export function VillageApp({ village }: { village: VillageModule }) {
-  const { search } = useLocation();
+  const toWorld = <ExternalRedirect to={villageWorldUrl(URLS, village.id, false)} />;
   return useRoutes([
-    // Mốc 1: cả `/` và `/lang/<id>` về bản đồ ở hub. Từ mốc 2 (làng có cảnh 3D): `/` chuyển sang `/lang/<id>` và gói làng tự cung cấp route `index` (cảnh làng).
-    { path: '/', element: village.hasScene ? <Navigate to={{ pathname: `/lang/${village.id}`, search }} replace /> : <ExternalRedirect to={HUB_MAP_URL} /> },
+    { path: '/', element: toWorld },
     {
       path: `/lang/${village.id}`,
-      children: village.hasScene ? village.routes : [{ index: true, element: <ExternalRedirect to={HUB_MAP_URL} /> }, ...village.routes],
+      children: [{ index: true, element: toWorld }, ...village.routes],
     },
     ...accountRoutes,
     { path: '*', element: <ExternalRedirect to={HUB_MAP_URL} /> },

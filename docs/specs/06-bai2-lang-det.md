@@ -8,7 +8,7 @@
 
 **Loại cảnh:** cảnh làng là 3D đi lại; màn 4 là trang bài học 2D; màn 5 và màn 6 là 2.5D. Tên phản diện viết `{phanDien}` (hiện là Tí).
 
-## Cảnh làng (3D đi lại, `VillageScene`)
+## Cảnh làng (3D đi lại, vùng làng của `WorldScene` ở thế giới mở `/cho`; bước W1 chỉ có bản tối giản, nội dung đầy đủ làm sau)
 
 - **Cổng vào:** `env/cong-lang-det`.
 - **Bên trong:** nhà `env/nha-mai-ngoi` và `env/nha-mai-tranh`; vài `env/khung-cui` đặt dưới hiên.

@@ -2,8 +2,7 @@ import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties, typ
 import { onAnswer } from '../audio/answerSignal';
 import { asset, useManifest } from '../assets/store';
 import { useNavigate } from 'react-router';
-import { HUB_MAP_URL } from '../config/urls';
-import { hasVillageScene } from '../content/villageScene';
+import { MERGED, URLS, villageWorldUrl } from '../config/urls';
 import { VILLAGE_THEME } from '../content/nenTrangTri';
 import { fmt } from '../content/characters';
 import { VILLAGE_ORDER, levelById, levelsOfVillage } from '../content/levels';
@@ -172,14 +171,17 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
     setStage({ kind: 'stationDone', idx, result: r, coins: coinsEarned });
   };
 
-  // Làng có cảnh 3D (từ mốc 2): rời bài thì về làng (và có "Chơi tiếp: [game 1]" nếu game 1 đã làm xong); chưa có thì về bản đồ ở hub như mốc 1.
+  // Rời bài thì về làng trong thế giới mở ở hub (`/cho?tu=<làng>`, cạnh các biển gỗ), và có "Chơi tiếp: [game 1]" nếu game 1 đã làm xong.
   const navigate = useNavigate();
-  const hasScene = hasVillageScene(villageId);
-  const goVillage = () => navigate(`/lang/${villageId}`);
-  const goMap = hasScene ? goVillage : () => window.location.assign(HUB_MAP_URL);
-  const leaveLabel = hasScene ? ui.langScene.veLang : ui.baiHoc.veBanDo;
+  const goVillage = () => {
+    const url = villageWorldUrl(URLS, villageId, MERGED);
+    if (MERGED) navigate(url);
+    else window.location.assign(url);
+  };
+  const goMap = goVillage;
+  const leaveLabel = ui.langScene.veLang;
   const villageLevels = levelsOfVillage(villageId);
-  const nextGame = hasScene ? villageLevels[villageLevels.findIndex((l) => l.id === levelId) + 1] : undefined;
+  const nextGame = villageLevels[villageLevels.findIndex((l) => l.id === levelId) + 1];
   const playNextGame = nextGame && nextGame.status === 'ready' ? { label: fmt(ui.langScene.choiTiep, { man: fmt(nextGame.ten) }), onClick: () => navigate(`/lang/${villageId}/man/${nextGame.id}`) } : undefined;
 
   // Hai khung 3D hai bên bảng: ẩn khi màn hẹp, giảm chuyển động, máy yếu, tải lỗi hoặc FPS thấp (frames.ts).
@@ -304,12 +306,12 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
           timeSpentSec={Math.round(run.current.timeMs / 1000)}
           keyTakeaway={fmt(content.keyTakeaway)}
           onPlayAgain={restart}
-          hasNextLevel={awardNow || hasScene}
+          hasNextLevel
           nextLabel={awardNow ? ui.baiHoc.nhanTrang : leaveLabel}
-          nextLessonUrl={awardNow || hasScene ? undefined : HUB_MAP_URL}
+          nextLessonUrl={undefined}
           onNextLevel={() => {
             if (awardNow) setStage({ kind: 'award' });
-            else if (hasScene) goVillage();
+            else goVillage();
           }}
           extraAction={awardNow ? undefined : playNextGame}
         />
@@ -408,7 +410,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
             <Button variant="secondary" size="sm" className="max-[480px]:hidden" disabled={saving} onClick={goMap}>
               {leaveLabel}
             </Button>
-            <IconButton label={leaveLabel} icon={hasScene ? '🏡' : '🗺️'} disabled={saving} onClick={goMap} />
+            <IconButton label={leaveLabel} icon="🏡" disabled={saving} onClick={goMap} />
           </div>
         </header>
 

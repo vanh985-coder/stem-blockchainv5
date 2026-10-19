@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { assembleVillage, boardCollider, createVillageInteractables, parseVillageTarget, villageBiSlot, type VillageLayoutInput } from './villageLayout';
+import { assembleVillage, boardCollider, type VillageLayoutInput } from './villageLayout';
 
 const INPUT: VillageLayoutInput = {
   id: 'lang-giay',
@@ -31,23 +31,19 @@ describe('assembleVillage', () => {
     expect(v.fenceLayout).not.toBeNull();
     for (const r of v.fenceLayout!.posts) expect(Math.hypot(r.x - INPUT.gate.x, r.z - INPUT.gate.z)).toBeGreaterThanOrEqual(6);
   });
+  it('làng chưa có người dẫn thì không có vật cản người dẫn', () => {
+    const withGuide = assembleVillage(INPUT).colliders.length;
+    expect(assembleVillage({ ...INPUT, guide: undefined }).colliders.length).toBe(withGuide - 1);
+  });
+  it('hàng rào có tâm riêng: vòng rào quanh tâm làng, vẫn chừa lối quanh cổng', () => {
+    const center = { x: 0, z: 89.5 };
+    const v = assembleVillage({ ...INPUT, gate: { ...INPUT.gate, z: 72 }, fence: { radius: 19, gap: 6, center } });
+    for (const p of v.fenceLayout!.posts) {
+      expect(Math.hypot(p.x - center.x, p.z - center.z)).toBeCloseTo(19, 6);
+      expect(Math.hypot(p.x - INPUT.gate.x, p.z - 72)).toBeGreaterThanOrEqual(6);
+    }
+  });
   it('không có hàng rào khi bố cục không yêu cầu', () => {
     expect(assembleVillage({ ...INPUT, fence: undefined }).fenceLayout).toBeNull();
-  });
-});
-
-describe('vật tương tác của làng', () => {
-  const list = createVillageInteractables(INPUT);
-  it('biển, người dẫn, cổng, Bi theo thứ tự; Bi là vật dự phòng ở đúng chỉ số', () => {
-    expect(list.map((i) => i.id)).toEqual(['board:1', 'guide', 'gate', 'bi']);
-    expect(list[villageBiSlot(INPUT)].id).toBe('bi');
-    expect(list[villageBiSlot(INPUT)].fallback).toBe(true);
-  });
-  it('đọc id thành đích', () => {
-    expect(parseVillageTarget('board:3')).toEqual({ kind: 'board', level: 3 });
-    expect(parseVillageTarget('guide')).toEqual({ kind: 'guide' });
-    expect(parseVillageTarget('gate')).toEqual({ kind: 'gate' });
-    expect(parseVillageTarget('bi')).toEqual({ kind: 'bi' });
-    expect(parseVillageTarget('khac')).toBeNull();
   });
 });

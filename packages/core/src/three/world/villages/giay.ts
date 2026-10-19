@@ -1,4 +1,5 @@
-import type { Placement, PropKind, PropPlacement, VillageLayoutInput } from '@so-chung/core/three/index';
+import type { Placement, PropKind, PropPlacement } from '../../cho/marketLayout';
+import type { VillageGuideDef, VillageLayoutInput } from '../../village/villageLayout';
 
 /**
  * Bố cục cảnh Làng Giấy (spec 05 mục "Cảnh làng", xếp theo ảnh concept-lang-giay), khu đi lại bán kính 21. Chỉ là dữ liệu (không import three):
@@ -86,10 +87,10 @@ const legProps: PropPlacement[] = RACKS.flatMap((r) =>
   }),
 );
 
-export const LANG_GIAY_LAYOUT: VillageLayoutInput = {
+export const LANG_GIAY_LAYOUT: VillageLayoutInput & { guide: VillageGuideDef } = {
   id: 'lang-giay',
   radius: 21,
-  gate: { model: 'env/cong-lang-giay', x: 0, z: -17.5, yaw: 0 },
+  gate: { model: 'env/cong-lang-giay', x: 0, z: -17.5, yaw: Math.PI },
   start: { x: 0, z: -14, yaw: 0 },
   placements: PLACEMENTS,
   props: [...PROPS, ...legProps],

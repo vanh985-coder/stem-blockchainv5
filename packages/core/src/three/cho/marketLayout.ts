@@ -324,18 +324,18 @@ function marketFenceGap(x: number, z: number): boolean {
   return Math.abs(x) < gap || Math.abs(z) < gap || x < RIVER_X + 2;
 }
 
-/** Bố cục hàng rào tròn bán kính radius (mặc định chợ: WORLD_RADIUS − 0,7), bỏ những đoạn mà skip(x, z) đúng (chừa lối đi). Cảnh làng dùng lại với bán kính và lối riêng. */
-export function fenceLayout(radius: number = WORLD_RADIUS - 0.7, skip: (x: number, z: number) => boolean = marketFenceGap): FenceLayout {
+/** Bố cục hàng rào tròn bán kính radius quanh `center` (mặc định chợ: tâm gốc, WORLD_RADIUS − 0,7), bỏ những đoạn mà skip(x, z) đúng (chừa lối đi). Cảnh làng dùng lại với bán kính, tâm và lối riêng. */
+export function fenceLayout(radius: number = WORLD_RADIUS - 0.7, skip: (x: number, z: number) => boolean = marketFenceGap, center: { x: number; z: number } = { x: 0, z: 0 }): FenceLayout {
   const R = radius;
   const step = 2.2 / R;
   const posts: FenceLayout['posts'] = [];
   const segments: FenceLayout['segments'] = [];
   for (let a = 0; a < Math.PI * 2; a += step) {
-    const x = Math.cos(a) * R;
-    const z = Math.sin(a) * R;
+    const x = center.x + Math.cos(a) * R;
+    const z = center.z + Math.sin(a) * R;
     if (skip(x, z)) continue;
     posts.push({ x, z, yaw: -a });
-    segments.push({ x: Math.cos(a + step / 2) * R, z: Math.sin(a + step / 2) * R, yaw: -(a + step / 2) - Math.PI / 2 }); // thanh ngang nằm theo tiếp tuyến vòng (rotation.y của three: trục x của thanh quay về (cos yaw, −sin yaw))
+    segments.push({ x: center.x + Math.cos(a + step / 2) * R, z: center.z + Math.sin(a + step / 2) * R, yaw: -(a + step / 2) - Math.PI / 2 }); // thanh ngang nằm theo tiếp tuyến vòng (rotation.y của three: trục x của thanh quay về (cos yaw, −sin yaw))
   }
   return { posts, segments };
 }
@@ -369,12 +369,14 @@ function onBank(x: number, r: number): boolean {
 export interface MarketDensity {
   stalls: number;
   bamboo: number;
+  /** Phên phơi giấy của các làng (thế giới mở); bỏ trống là giữ hết */
+  racks?: number;
 }
 export const FULL_DENSITY: MarketDensity = { stalls: 1, bamboo: 1 };
 
-/** Mức Thấp bớt lều và bụi tre để giữ dưới 300.000 tam giác mỗi khung hình; Vừa và Cao đủ đồ vật. */
+/** Mức Thấp bớt lều, bụi tre và phên phơi giấy để giữ dưới 300.000 tam giác ở mọi chỗ đứng (chợ, đường, làng); Vừa và Cao đủ đồ vật. */
 export function densityFor(level: 'low' | 'medium' | 'high'): MarketDensity {
-  return level === 'low' ? { stalls: 0.75, bamboo: 0.6 } : FULL_DENSITY;
+  return level === 'low' ? { stalls: 0.6, bamboo: 0.45, racks: 0.6 } : FULL_DENSITY;
 }
 
 /** Giữ lại khoảng `keep` (0 đến 1) số phần tử, rải đều theo thứ tự (không dồn vào một chỗ). Hàm thuần, cùng đầu vào cùng kết quả. */
@@ -389,7 +391,22 @@ export function thinEvenly<T>(items: readonly T[], keep: number): T[] {
  * Sinh bố cục chợ. Cùng `seed` thì cùng kết quả. Không có vật nào nằm trên đường, đè lên vật khác, ra ngoài vùng đi lại hay
  * xuống sông; người chơi, dân làng và đường tới 4 cổng luôn đi được (có test).
  */
-export function generateMarket(seed = 20260101, density: MarketDensity = FULL_DENSITY): MarketLayout {
+/**
+ * Tùy chọn cho "thế giới mở" (mốc 2, bước W1: chợ và 4 làng trong một cảnh `/cho`). `world: true`: cổng làng không còn ở rìa chợ (mỗi cổng dời ra đầu làng của nó, kèm đồ gợi nghề), nên không có cổng, đồ
+ * gợi nghề và vùng trống quanh cổng ở chợ; chợ chừa một vòng đường đi quanh cây đa (`PLAZA_RING_RADIUS`, để mũi tên chỉ đường đi vòng giữa các lối ra); sông, cầu và vật cản nước do lớp thế giới dựng
+ * (`worldLayout.ts`) nên không có bến tàu ở đây.
+ */
+export interface MarketOptions {
+  world?: boolean;
+}
+
+/** Vòng đường đi quanh cây đa trong sân chợ (thế giới mở): lều và nhà tránh dải này, mũi tên chỉ đường đi vòng theo đó giữa 4 lối ra. */
+export const PLAZA_RING_RADIUS = 12.5;
+/** Nửa bề rộng dải vòng đường không đặt vật (tính tới mép vật). */
+export const PLAZA_RING_CLEAR = 1.7;
+
+export function generateMarket(seed = 20260101, density: MarketDensity = FULL_DENSITY, options: MarketOptions = {}): MarketLayout {
+  const world = options.world === true;
   const rng = createMulberry32(seed);
   const rand = (a: number, b: number) => a + rng() * (b - a);
   const placements: Placement[] = [];
@@ -409,13 +426,21 @@ export function generateMarket(seed = 20260101, density: MarketDensity = FULL_DE
   // Cố định: cây đa ở giữa, giếng ở góc đông nam sân chợ, 4 cổng.
   place({ model: MODEL_TREE, x: 0, z: 0, yaw: 0.35, scale: 1, tint: [1, 1, 1] });
   place({ model: MODEL_WELL, x: -6.4, z: -7.2, yaw: 0.6, scale: 1, tint: [1, 1, 1] });
-  for (const g of GATES) placements.push({ model: g.model, x: g.x, z: g.z, yaw: g.yaw, scale: 1, tint: [1, 1, 1] });
+  if (!world) for (const g of GATES) placements.push({ model: g.model, x: g.x, z: g.z, yaw: g.yaw, scale: 1, tint: [1, 1, 1] });
   // Chỗ người chơi xuất hiện, và lối thẳng tới cây đa: để trống.
   spots.push({ x: PLAYER_START[0], z: PLAYER_START[1], r: 2.2 });
+  // Thế giới mở: vòng đường đi quanh cây đa (dải trống cho mũi tên chỉ đường)
+  if (world) {
+    const n = 32;
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      spots.push({ x: Math.cos(a) * PLAZA_RING_RADIUS, z: Math.sin(a) * PLAZA_RING_RADIUS, r: PLAZA_RING_CLEAR });
+    }
+  }
 
   // Đồ gợi nghề của làng quanh mỗi cổng (đặt trước lều, nhà, tre để chúng tránh ra): model và đồ nhỏ do code dựng, hai bên đường.
   const decorRng = createMulberry32(seed ^ 0x9e3779b1);
-  for (const g of GATES) {
+  for (const g of world ? [] : GATES) {
     for (const d of GATE_DECOR[g.id]) {
       const w = gateDecorWorld(g, d);
       const scale = d.scale ?? 1;
@@ -468,7 +493,7 @@ export function generateMarket(seed = 20260101, density: MarketDensity = FULL_DE
       const model = (n + q) % 2 === 0 ? MODEL_HOUSE_TILE : MODEL_HOUSE_THATCH;
       const scale = rand(0.9, 1.15);
       const r = footprintRadius({ model, scale });
-      if (inRoadStrip(x, z, r, ROAD_HALF_CLEAR) || !onBank(x, r) || Math.hypot(x, z) + r > WORLD_RADIUS - 2.5 || nearGate(x, z) || !free(x, z, r, 1.6)) continue;
+      if (inRoadStrip(x, z, r, ROAD_HALF_CLEAR) || !onBank(x, r) || Math.hypot(x, z) + r > WORLD_RADIUS - 2.5 || (!world && nearGate(x, z)) || !free(x, z, r, 1.6)) continue;
       place({ model, x, z, yaw: Math.atan2(-x, -z) + rand(-0.5, 0.5), scale, tint: tint(0.14, 0.1) });
       n++;
     }
@@ -484,7 +509,7 @@ export function generateMarket(seed = 20260101, density: MarketDensity = FULL_DE
     const z = Math.sin(ang) * rho;
     const scale = rand(0.8, 1.25);
     const r = bambooR * scale;
-    if (inRoadStrip(x, z, r, ROAD_HALF_CLEAR) || !onBank(x, r) || Math.hypot(x, z) + r > WORLD_RADIUS - 1.5 || nearGate(x, z) || !free(x, z, r, 0.4)) continue;
+    if (inRoadStrip(x, z, r, ROAD_HALF_CLEAR) || !onBank(x, r) || Math.hypot(x, z) + r > WORLD_RADIUS - 1.5 || (!world && nearGate(x, z)) || !free(x, z, r, 0.4)) continue;
     place({ model: MODEL_BAMBOO, x, z, yaw: rand(0, Math.PI * 2), scale, tint: tint(0.2, 0.08) });
     bamboo++;
   }
@@ -560,15 +585,17 @@ export function generateMarket(seed = 20260101, density: MarketDensity = FULL_DE
   for (const c of fenceColliders()) colliders.push(c);
   // Sông: hai khối nước hai bên bến tàu, khối chắn cuối bến, và vách hai bên cầu tàu (dốc và sàn) để không bước lên sàn từ bên hông;
   // chỉ chừa lối lên cầu ở đầu dốc.
-  const waterH = 0.3;
-  const rail = (x0: number, x1: number, z0: number, z1: number) => ({ shape: box(x0, x1, z0, z1), height: DECK_TOP });
-  colliders.push(
-    { shape: box(-130, RIVER_X, DOCK_HALF_WIDTH, 130), height: waterH },
-    { shape: box(-130, RIVER_X, -130, -DOCK_HALF_WIDTH), height: waterH },
-    { shape: box(-130, DOCK_END_X, -DOCK_HALF_WIDTH, DOCK_HALF_WIDTH), height: waterH },
-    rail(RIVER_X, RAMP_START_X, DOCK_HALF_WIDTH, DOCK_HALF_WIDTH + 0.5),
-    rail(RIVER_X, RAMP_START_X, -DOCK_HALF_WIDTH - 0.5, -DOCK_HALF_WIDTH),
-  );
+  if (!world) {
+    const waterH = 0.3;
+    const rail = (x0: number, x1: number, z0: number, z1: number) => ({ shape: box(x0, x1, z0, z1), height: DECK_TOP });
+    colliders.push(
+      { shape: box(-130, RIVER_X, DOCK_HALF_WIDTH, 130), height: waterH },
+      { shape: box(-130, RIVER_X, -130, -DOCK_HALF_WIDTH), height: waterH },
+      { shape: box(-130, DOCK_END_X, -DOCK_HALF_WIDTH, DOCK_HALF_WIDTH), height: waterH },
+      rail(RIVER_X, RAMP_START_X, DOCK_HALF_WIDTH, DOCK_HALF_WIDTH + 0.5),
+      rail(RIVER_X, RAMP_START_X, -DOCK_HALF_WIDTH - 0.5, -DOCK_HALF_WIDTH),
+    );
+  }
 
   const villagerPaths = VILLAGER_PATHS.map((p) => p.map((q) => [q[0], q[1]] as [number, number]));
   const merchant = { ...MERCHANT };

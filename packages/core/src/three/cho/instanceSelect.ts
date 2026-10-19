@@ -64,6 +64,8 @@ export interface SelectParams {
    * Không đặt thì không có bậc vừa.
    */
   midDistance?: number;
+  /** Mặt nạ: bản i có skip[i] khác 0 thì không vẽ (vùng làng chưa tải, bản xa của làng đã tải); bỏ trống thì không bỏ bản nào */
+  skip?: ArrayLike<number>;
 }
 
 /**
@@ -76,6 +78,7 @@ export function selectInstances(p: SelectParams, outNear: Int32Array | number[],
   let mid = 0;
   const midDistance = outMid ? (p.midDistance ?? p.nearDistance) : p.nearDistance;
   for (let i = 0; i < p.count; i++) {
+    if (p.skip && p.skip[i]) continue;
     const x = p.centers[i * 3];
     const y = p.centers[i * 3 + 1];
     const z = p.centers[i * 3 + 2];
@@ -117,10 +120,26 @@ export const MARKET_NEAR_HEAVY: Readonly<Record<string, { medium: number; high: 
 };
 
 /**
+ * Mức Thấp: bản chính nặng (từ 40.000 tam giác: lều 67.000, nhà 50.000, cổng 50.000, bụi tre 41.700, khung cửi 134.000) chỉ dùng khi thật sát, vì một bản chính ở sát đã ăn 13% đến 45% ngân sách
+ * 300.000 tam giác của mức Thấp (thế giới mở giữ dưới 300.000 ở mọi chỗ đứng). Xa hơn dùng bản xa (8.000 tam giác).
+ */
+export const MARKET_NEAR_LOW_HEAVY: Readonly<Record<string, number>> = {
+  'env/leu-cho': -1, // −1: không bao giờ dùng bản chính (camera ở trong lều cũng vẫn là bản xa)
+  'env/nha-mai-ngoi': 1.5,
+  'env/nha-mai-tranh': 1.5,
+  'env/bui-tre': 1.5,
+  'env/cong-lang-': 2.5,
+  'env/khung-cui': -1,
+};
+
+/**
  * Mức "bản chính gần" ở chợ (spec 03 mục 2 đặt Thấp 12, Vừa 20, Cao 30 cho model chung; bản chính của nhà, lều, cổng nặng 50.000 đến 67.000 tam giác nên ở chợ đặt theo ngân sách
  * tam giác, kể cả lượt vẽ bóng). Model 3 bậc (cổng làng, giếng) có khoảng riêng (`MARKET_NEAR_3_TIER`); còn lại `MARKET_NEAR`.
  */
 export function marketNearDistance(level: 'low' | 'medium' | 'high', modelId?: string): number {
+  if (level === 'low' && modelId) {
+    for (const [prefix, d] of Object.entries(MARKET_NEAR_LOW_HEAVY)) if (modelId.startsWith(prefix)) return d;
+  }
   if (level !== 'low' && modelId) {
     for (const [prefix, d] of Object.entries(MARKET_NEAR_3_TIER)) if (modelId.startsWith(prefix)) return d[level];
     const heavy = MARKET_NEAR_HEAVY[modelId];
@@ -138,9 +157,16 @@ export function marketFarDistance(level: 'low' | 'medium' | 'high', modelId?: st
   return level === 'medium' ? 30 : 40;
 }
 
-/** Xa hơn khoảng này (tính tới mặt vật) thì không vẽ: Thấp 52 (sương che), còn lại vẽ hết. */
-export function marketMaxDistance(level: 'low' | 'medium' | 'high'): number {
-  return level === 'low' ? 52 : Infinity;
+/** Bụi tre (7.900 tam giác bản xa, nhiều nhất cảnh) ở thế giới mở chỉ vẽ tới khoảng này ở mức Vừa và Cao (sương đã nhạt, làng và chợ nhìn từ xa không cần thấy từng bụi tre). */
+export const BAMBOO_MAX_DISTANCE: Readonly<Record<'medium' | 'high', number>> = { medium: 90, high: 120 };
+
+/**
+ * Xa hơn khoảng này (tính tới mặt vật) thì không vẽ: Thấp 52 (sương che), còn lại vẽ hết; riêng bụi tre (`env/bui-tre`, truyền `modelId`) ở mức Vừa và Cao có tầm
+ * `BAMBOO_MAX_DISTANCE`.
+ */
+export function marketMaxDistance(level: 'low' | 'medium' | 'high', modelId?: string): number {
+  if (level === 'low') return 52;
+  return modelId === 'env/bui-tre' ? BAMBOO_MAX_DISTANCE[level] : Infinity;
 }
 
 export interface ShadowSelectParams {

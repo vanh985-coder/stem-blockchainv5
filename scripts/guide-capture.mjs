@@ -99,7 +99,7 @@ async function save(page, id, { crop } = {}) {
   console.log(`  ✓ ${id}`);
 }
 
-const waitMarket = (page) => page.waitForFunction(() => window.__marketStats && window.__marketStats.calls > 0 && window.__walkPlayer, { timeout: 120000 });
+const waitMarket = (page) => page.waitForFunction(() => window.__world && window.__marketStats && window.__marketStats.calls > 0 && window.__walkPlayer, { timeout: 180000 });
 const place = (page, x, z, yaw) =>
   page.evaluate(
     (x, z, yaw) => {
@@ -123,11 +123,12 @@ async function marketShots(browser) {
   await page.addStyleTag({ content: HIDE_WALK });
   await sleep(3500);
   await save(page, 'cho-di-lai');
-  await place(page, 0, -21.5, Math.PI);
-  await sleep(2500);
+  // thế giới mở (bước W1): cổng ở đầu làng, cách tâm chợ 72; đứng trên đường cách cổng 9
+  await place(page, 0, -63, Math.PI);
+  await sleep(5000);
   await save(page, 'cong-dong');
-  await place(page, 0, 21.5, 0);
-  await sleep(2500);
+  await place(page, 0, 63, 0);
+  await sleep(5000);
   await save(page, 'cong-mo');
   await page.browserContext().close();
 
@@ -149,12 +150,12 @@ async function marketShots(browser) {
 }
 
 async function villageShots(browser) {
-  // biển gỗ trong làng: ẩn HUD
+  // biển gỗ trong làng (thế giới mở: /cho?tu=<làng> xuất hiện cạnh các biển): ẩn HUD
   let page = await newPage(browser, 'none');
-  await page.goto(`${LANG}/lang/lang-giay?q=high`, { waitUntil: 'load' });
-  await page.waitForFunction(() => window.__marketStats && window.__marketStats.calls > 0 && window.__walkPlayer, { timeout: 120000 });
+  await page.goto(`${HUB}/cho?q=high&tu=lang-giay`, { waitUntil: 'load' });
+  await waitMarket(page);
   await page.addStyleTag({ content: HIDE_WALK });
-  await sleep(3500);
+  await sleep(6000);
   await save(page, 'bien-go');
   await page.browserContext().close();
 

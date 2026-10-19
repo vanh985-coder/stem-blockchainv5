@@ -10,7 +10,9 @@
 
 **Tên phản diện** luôn viết `{phanDien}` (hiện là Tí).
 
-## Cảnh làng (3D đi lại, `VillageScene`)
+## Cảnh làng (3D đi lại; từ bước W1 là một vùng của thế giới mở `/cho`, `WorldScene`)
+
+- **Trong thế giới mở (bước W1):** làng nằm ở phía bắc chợ, cổng làng ở đầu làng, cách tâm chợ 72 (đường đất dài 30 từ rìa chợ). Bố cục giữ nguyên cỡ (`three/world/villages/giay.ts`). Làng chỉ được tải khi người chơi cách rìa làng dưới 60 và dọn khi xa hơn 90; từ xa vẫn thấy hình làng nhẹ. Cảnh mở đầu và "Em có biết?" chạy khi lần đầu bước qua cổng làng. "Về làng" (cuối màn) mở `/cho?tu=lang-giay`: người chơi đứng trong làng cạnh 3 biển gỗ.
 
 - **Cổng vào:** `env/cong-lang-giay`.
 - **Bên trong:** nhà `env/nha-mai-ngoi` và `env/nha-mai-tranh`; `env/bui-tre`; nhiều tấm `env/phen-phoi-giay` xếp thành sân phơi giấy.
@@ -248,7 +250,7 @@ Trước vòng 2 và vòng 3, {phanDien} lẻn tới nhét trang giả vào xấ
 - **Sửa lỗi đống rơm ở màn 2 chỉ hiện một phần:** đã tái hiện bằng Chrome (đống rơm thấp, rơm đang bay, rơm đã rơi đều chỉ hiện hai "gò" rỗng). Nguyên nhân thật: `createHayStack` (`three/cho/marketGeometry.ts`) dựng `LatheGeometry` với đường viền đi từ ĐỈNH xuống ĐÁY, nên mọi mặt quay VÀO TRONG (thể tích có dấu −3,42); vật liệu một mặt chỉ vẽ mặt trong của thành phía sau. Các nghi vấn khác đã loại: `DynamicBoxes` và `newMesh` (bể bản của `DynamicModel`) đều đặt `frustumCulled = false` nên không bị cắt theo khung bao cũ; ma trận của mọi bản được ghi mỗi khung hình; mặt phẳng gần của camera không phải nguyên nhân (sau khi sửa, đống rơm đầy đủ ở mọi khoảng cách từ 2,6 đến 8,5 đơn vị trước người chơi). Sửa tận gốc: đường viền đi từ đáy lên đỉnh (đống rơm ở chợ phiên cũng được sửa vì dùng chung hình). Test: `signedVolume` (`three/geometryChecks.ts`) bắt mọi hình đặc dựng bằng code (đống rơm, chum, đồ gợi nghề, thân thuyền) phải có thể tích dương và đống rơm khớp thể tích khối tròn xoay; `newMesh` không cắt theo khung nhìn.
 
 **Bản làm (mốc 2, bước 15a):**
-- **Cảnh trao trang** (`VillageScene`): vào làng khi đã có Trang Sổ Vàng của làng này mà chưa chiếu (xong màn 3, hoặc đã có trang từ trước; nếu cảnh mở đầu làng cũng là lần đầu thì chiếu sau cảnh đó) thì bác An nói hai lượt (`villageScene.lang-giay.award.loi`: "Em đã mang các trang về và ghép lại cuốn sổ rồi đấy! Bác trao em Trang Sổ Vàng thứ nhất." rồi câu của spec). Lượt đầu có hàng 4 ô Trang Sổ Vàng (`GoldenPagesRow`): trang vừa nhận bay vào ô trang 1 (bật "Giảm chuyển động" thì nằm sẵn trong ô), ô trang 1 trên HUD nhấp sáng 3 lần (`animate-golden-glow`). Lượt cuối có nút "Về chợ" (sang `/cho?mo=lang-giay`, xem spec 04 mục 5); "Bỏ qua" ở lại làng.
+- **Cảnh trao trang** (`WorldPage`, trong làng): vào làng khi đã có Trang Sổ Vàng của làng này mà chưa chiếu (xong màn 3, hoặc đã có trang từ trước; nếu cảnh mở đầu làng cũng là lần đầu thì chiếu sau cảnh đó) thì bác An nói hai lượt (`villageScene.lang-giay.award.loi`: "Em đã mang các trang về và ghép lại cuốn sổ rồi đấy! Bác trao em Trang Sổ Vàng thứ nhất." rồi câu của spec). Lượt đầu có hàng 4 ô Trang Sổ Vàng (`GoldenPagesRow`): trang vừa nhận bay vào ô trang 1 (bật "Giảm chuyển động" thì nằm sẵn trong ô), ô trang 1 trên HUD nhấp sáng 3 lần (`animate-golden-glow`). Hết lượt thì hộp thoại đóng (từ bước W1 không còn nút "Về chợ" sang trang khác: người chơi đang ở trong thế giới mở, dòng nhiệm vụ và mũi tên dưới chân chỉ về cổng Làng Dệt; xem spec 04 mục 5b); "Bỏ qua" cũng đóng hộp thoại.
 - **Chiếu một lần, lưu theo tiến độ:** cờ `goldenSeen` trong `game_state.data` (chơi thử: trường `gs` của cookie `sc_guest`, một bit mỗi làng), hợp cờ khi gộp tiến độ; hàm thuần `shouldShowGolden` ở `progress/villageIntro.ts`, test `goldenFlags.test.ts`. Tài khoản giáo viên không chiếu.
 
 - [x] Test của Bài 1 (giai đoạn 1), `runnerLogic` và `rebuildLogic` đều ✅. (Bước 15a: `pnpm test` 103 file, 1180 test xanh.)
