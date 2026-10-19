@@ -12,6 +12,7 @@ import { nearestInteractable, type Interactable } from './interaction';
 import { RUN_SPEED, WALK_SPEED, animationFor, createPlayerState, jumpTimeScale, locomotionTimeScale, stepPlayer, type MoveInput, type PlayerState, type World } from './playerMotion';
 import { shadowFocus } from './shadowFocus';
 import { combineInput, type WalkApi } from './walkApi';
+import { PROBE } from '../lib/dev';
 
 /** Người chơi ở cảnh đi lại là học sinh (spec 03 mục 3.1). */
 export const WALK_PLAYER = 'characters/hoc-sinh-nam';
@@ -106,7 +107,7 @@ const CLEARANCE_OUT_RATE = 3;
  */
 function ChaseCamera({ api, player, blockers }: { api: WalkApi; player: PlayerState; blockers: readonly CameraBlocker[] }) {
   const camera = useThree((st) => st.camera);
-  if (import.meta.env.DEV) (window as unknown as { __walkCamera?: typeof camera }).__walkCamera = camera;
+  if (PROBE) (window as unknown as { __walkCamera?: typeof camera }).__walkCamera = camera;
   const tmp = useMemo(() => ({ off: { x: 0, y: 0, z: 0 } as Vec3Out, want: new Vector3(), look: new Vector3(), lookWant: new Vector3(), focus: new Vector3(), init: false, scale: 1 }), []);
   useFrame((_, dt) => {
     const a = api.camera;
@@ -208,7 +209,7 @@ function Player({ api, paused, world, interactables, onNearestChange, player, st
 export function WalkWorld({ api, paused, obstacles, boundsRadius, interactables, cameraBlockers = NO_BLOCKERS, groundHeight, onNearestChange, groundUrl, start = [0, 0], showGround = true, freeCamera = false, biTrack, startYaw = 0, children }: WalkWorldProps) {
   const player = useMemo(() => createPlayerState(start[0], start[1], startYaw), []); // eslint-disable-line react-hooks/exhaustive-deps
   // Chỉ khi chạy dev: mở trạng thái người chơi ra window để kiểm tra bằng trình duyệt.
-  if (import.meta.env.DEV) (window as unknown as { __walkPlayer?: PlayerState }).__walkPlayer = player;
+  if (PROBE) (window as unknown as { __walkPlayer?: PlayerState }).__walkPlayer = player;
   const world = useMemo<World>(() => ({ obstacles, boundsRadius, groundHeight }), [obstacles, boundsRadius, groundHeight]);
   return (
     <>

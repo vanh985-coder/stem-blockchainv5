@@ -1,4 +1,5 @@
 import { useFrame } from '@react-three/fiber';
+import { PROBE } from '../lib/dev';
 
 /** Số liệu mỗi khung hình của bộ dựng hình (tam giác, draw call...), đọc ở `window.__marketStats` để kiểm tra hiệu năng. */
 export interface MarketStats {
@@ -14,7 +15,7 @@ export function StatsProbe() {
   useFrame(({ gl, scene, camera }) => {
     const w = window as unknown as { __marketStats?: MarketStats; __r3f?: unknown };
     if (w.__marketStats !== stats) w.__marketStats = stats;
-    if (import.meta.env.DEV && !w.__r3f) w.__r3f = { scene, camera, gl }; // chỉ khi chạy dev: cho công cụ đo tam giác theo loại vật
+    if (PROBE && !w.__r3f) w.__r3f = { scene, camera, gl }; // chỉ khi chạy dev: cho công cụ đo tam giác theo loại vật
     const i = gl.info;
     stats.triangles = i.render.triangles;
     stats.calls = i.render.calls;

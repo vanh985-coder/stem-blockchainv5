@@ -6,7 +6,7 @@ import type { CharacterId } from '../../content/characters';
 import type { VillageId } from '../../village';
 import type { CameraBlocker } from '../cameraCollision';
 import { circle, obox, type Obstacle } from '../collision';
-import { cameraBlockersFor, collidersFor, fenceColliders, fenceLayout, propCollider, type FenceLayout, type Placement, type PropPlacement } from '../cho/marketLayout';
+import { cameraBlockersFor, collidersFor, fenceColliders, fenceLayout, fenceRun, propCollider, type FenceLayout, type Placement, type PropPlacement } from '../cho/marketLayout';
 
 /** Một biển gỗ chỉ màn `level` (số màn 1 đến 12), đặt ở (x, z), mặt trước quay về `yaw` (như rotation.y của three, mặt trước là +Z của biển). */
 export interface VillageBoardDef {
@@ -43,6 +43,47 @@ export interface VillageRoad {
   width: number;
 }
 
+/** Ao làng: hợp của các vũng tròn (mỗi vũng một hình tròn mặt nước, đi vào là bị chặn), bờ cỏ rộng thêm `POND_BANK` quanh vũng. */
+export interface VillagePond {
+  x: number;
+  z: number;
+  r: number;
+}
+/** Bề rộng bờ ao (đơn vị) quanh mặt nước. */
+export const POND_BANK = 1.3;
+
+/** Ruộng lúa ở rìa làng: hình chữ nhật nửa rộng hx (theo trục x của ruộng) và hz, xoay `yaw`; đi qua được (không có vật cản), chỉ là mặt đất. */
+export interface VillageField {
+  x: number;
+  z: number;
+  hx: number;
+  hz: number;
+  yaw: number;
+}
+
+/** Hàng rào tre thẳng ngắn (rào sân nhà, ranh ruộng): có vật cản như hàng rào quanh làng. */
+export interface VillageFenceRun {
+  x0: number;
+  z0: number;
+  x1: number;
+  z1: number;
+}
+
+/** Đường đi lại của dân làng: vòng các điểm [x, z] (xem `Villager`). */
+export type VillagerLoop = readonly (readonly [number, number])[];
+
+/**
+ * Đường đất nhỏ nối các khu làm đồ thị đường của mũi tên chỉ đường (tọa độ làng): các nút và các đoạn nối; `entry` là nút nối với cổng, `boardJoin` là nút nối tới chỗ đứng trước từng biển gỗ,
+ * `guideStand` là chỗ đứng trước người dẫn (nối từ nút `join`). Làng không khai báo thì dùng một nút ở ngã vào làng.
+ */
+export interface VillagePaths {
+  nodes: { id: string; x: number; z: number }[];
+  links: [string, string][];
+  entry: string;
+  boardJoin: string;
+  guideStand?: { x: number; z: number; join: string };
+}
+
 export interface VillageLayoutInput {
   id: VillageId;
   /** Bán kính khu đi lại (biên của WalkWorld) */
@@ -62,9 +103,18 @@ export interface VillageLayoutInput {
   roads: VillageRoad[];
   /** Hàng rào tre tròn quanh khu: bán kính; chừa lối quanh cổng (bán kính `gap` tính từ tâm cổng). Bỏ trống thì không có hàng rào. */
   fence?: { radius: number; gap: number; /** tâm vòng rào (mặc định gốc tọa độ; thế giới mở: tâm làng) */ center?: { x: number; z: number } };
+  /** Ao làng (hợp của các vũng tròn), ruộng lúa ở rìa, hàng rào tre ngắn, dân làng đi lại và đường đất nhỏ: Làng Giấy từ bước W2 */
+  ponds?: VillagePond[];
+  fields?: VillageField[];
+  fenceRuns?: VillageFenceRun[];
+  villagers?: VillagerLoop[];
+  paths?: VillagePaths;
   /** Hạt giống cho đồ nhỏ rải ngẫu nhiên (hoa, tint) */
   seed: number;
 }
+
+/** Chiều cao vật cản của mặt nước ao (để vẽ khung xem va chạm và chắn camera thấp); người chơi không đi xuống nước. */
+export const POND_COLLIDER_HEIGHT = 0.3;
 
 /** Biển gỗ: rộng 1,9 (nửa rộng 0,95), dày 0,28, cao 1,9; vật cản là một hộp xoay mỏng sát tấm biển. */
 export const BOARD_HALF_WIDTH = 0.95;
@@ -79,6 +129,7 @@ export interface VillageLayout extends VillageLayoutInput {
   blockers: CameraBlocker[];
   /** Mọi model cần tải (cổng và các model đặt trong làng, không trùng) */
   models: string[];
+  /** Hàng rào quanh làng và các hàng rào ngắn trong làng (gộp); null nếu không có */
   fenceLayout: FenceLayout | null;
 }
 
@@ -104,13 +155,21 @@ export function assembleVillage(input: VillageLayoutInput): VillageLayout {
   }
   for (const b of input.boards) colliders.push(boardCollider(b));
   if (input.guide) colliders.push({ shape: circle(input.guide.x, input.guide.z, GUIDE_RADIUS), height: 1.7 });
+  for (const p of input.ponds ?? []) colliders.push({ shape: circle(p.x, p.z, p.r), height: POND_COLLIDER_HEIGHT });
   let fence: FenceLayout | null = null;
   if (input.fence) {
     const g = input.gate;
     const gap = input.fence.gap;
     fence = fenceLayout(input.fence.radius, (x, z) => Math.hypot(x - g.x, z - g.z) < gap, input.fence.center);
-    for (const c of fenceColliders(fence)) colliders.push(c);
   }
+  if (input.fenceRuns && input.fenceRuns.length > 0) {
+    fence ??= { posts: [], segments: [] };
+    for (const r of input.fenceRuns) {
+      const run = fenceRun(r.x0, r.z0, r.x1, r.z1);
+      fence = { posts: [...fence.posts, ...run.posts], segments: [...fence.segments, ...run.segments] };
+    }
+  }
+  if (fence) for (const c of fenceColliders(fence)) colliders.push(c);
   const models = [...new Set([input.gate.model, ...input.placements.map((p) => p.model)])];
   return { ...input, colliders, obstacles: colliders.map((c) => c.shape), blockers, models, fenceLayout: fence };
 }

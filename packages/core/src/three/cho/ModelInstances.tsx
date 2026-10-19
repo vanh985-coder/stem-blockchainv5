@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { Box3, BufferAttribute, DynamicDrawUsage, Float32BufferAttribute, InstancedBufferAttribute, InstancedMesh, Matrix4, Quaternion, Vector3, type BufferGeometry, type Material, type Mesh, type Object3D } from 'three';
+import { Box3, BufferAttribute, DynamicDrawUsage, Float32BufferAttribute, InstancedBufferAttribute, InstancedMesh, Matrix3, Matrix4, Quaternion, Vector3, type BufferGeometry, type Material, type Mesh, type Object3D } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { getManifest } from '../../assets/store';
 import { isUsableMid, lodId, midId, modelPath } from '../modelIds';
@@ -10,6 +10,7 @@ import { QUALITY_TABLE, type QualityLevel } from '../quality';
 import { SHADOW_RANGE, shadowFocus } from '../shadowFocus';
 import { extractFrustumPlanes, marketFarDistance, marketMaxDistance, marketNearDistance, sameSelection, selectInstances, selectShadowCasters, type Selection, type ShadowSelectParams } from './instanceSelect';
 import type { Placement } from './marketLayout';
+import { PROBE } from '../../lib/dev';
 
 /** Một phần để vẽ: hình học đã nướng sẵn (vị trí trong cây node + phóng theo cỡ thật, chân ở y = 0) và vật liệu dùng chung. */
 export interface Part {
@@ -21,7 +22,7 @@ export interface Part {
  * Chuyển mọi thuộc tính hình học về Float32 (giải nén). File model nén meshopt thường lượng tử hóa vị trí, pháp tuyến và uv thành số
  * nguyên chuẩn hóa; nếu nướng ma trận node vào các thuộc tính đó thì tọa độ lớn bị kẹp về [−1, 1] và hình méo thành khối hộp.
  */
-function toFloat32(geometry: BufferGeometry): BufferGeometry {
+function* toFloat32(geometry: BufferGeometry): Generator<void, BufferGeometry> {
   for (const name of Object.keys(geometry.attributes)) {
     const a = geometry.getAttribute(name) as BufferAttribute;
     if (a.array instanceof Float32Array && !(a as { isInterleavedBufferAttribute?: boolean }).isInterleavedBufferAttribute) continue;
@@ -31,33 +32,70 @@ function toFloat32(geometry: BufferGeometry): BufferGeometry {
       if (a.itemSize > 1) out[i * a.itemSize + 1] = a.getY(i);
       if (a.itemSize > 2) out[i * a.itemSize + 2] = a.getZ(i);
       if (a.itemSize > 3) out[i * a.itemSize + 3] = a.getW(i);
+      if (i % BAKE_CHUNK === BAKE_CHUNK - 1) yield; // một mesh lớn (khung cửi 134.000 tam giác) không được chiếm cả khung hình
     }
     geometry.setAttribute(name, new Float32BufferAttribute(out, a.itemSize));
   }
   return geometry;
 }
 
+/** Số đỉnh xử lý giữa hai lần nhường khi nướng (mỗi lần chừng 1 đến 3 ms). */
+export const BAKE_CHUNK = 12000;
+const bakeV = new Vector3();
+const bakeNormalMatrix = new Matrix3();
+
+/** Nhân ma trận `m` lên vị trí và pháp tuyến của hình học (như `applyMatrix4`) theo từng đoạn BAKE_CHUNK đỉnh, nhường sau mỗi đoạn. Thuộc tính phải là Float32 (xem `toFloat32`). */
+export function* applyMatrixChunked(geometry: BufferGeometry, m: Matrix4): Generator<void> {
+  const pos = geometry.getAttribute('position') as BufferAttribute;
+  const nor = geometry.getAttribute('normal') as BufferAttribute | undefined;
+  bakeNormalMatrix.getNormalMatrix(m);
+  for (let i0 = 0; i0 < pos.count; i0 += BAKE_CHUNK) {
+    const i1 = Math.min(pos.count, i0 + BAKE_CHUNK);
+    for (let i = i0; i < i1; i++) {
+      bakeV.fromBufferAttribute(pos, i).applyMatrix4(m);
+      pos.setXYZ(i, bakeV.x, bakeV.y, bakeV.z);
+      if (nor) {
+        bakeV.fromBufferAttribute(nor, i).applyMatrix3(bakeNormalMatrix).normalize();
+        nor.setXYZ(i, bakeV.x, bakeV.y, bakeV.z);
+      }
+    }
+    if (i1 < pos.count) yield;
+  }
+  geometry.boundingBox = null;
+  geometry.boundingSphere = null;
+}
+
+const bakeMatrix = new Matrix4();
+const bakeScale = new Matrix4();
+
 /**
  * Gom mọi mesh (không xương) của model thành các phần theo vật liệu: nướng ma trận node vào hình học, phóng theo `scale`
  * và dịch `offsetY`; các mesh cùng vật liệu và cùng thuộc tính được gộp thành một hình học (một draw call cho cả cây tre 42 mảnh).
+ * Dạng bộ sinh: mỗi lần `next()` xử lý tối đa `BAKE_CHUNK` đỉnh (đổi hệ tọa độ bằng đúng một phép nhân ma trận lên mọi đỉnh, từng đoạn) hay gộp một vật liệu rồi nhường; lần cuối gộp theo vật liệu và trả các phần. Để nướng dần qua nhiều khung hình
+ * (xem `createPartsPrewarm`) mà không khựng; `buildParts` chạy một mạch.
  */
-export function buildParts(scene: Object3D, scale: number, offsetY: number): Part[] {
+export function* buildPartsSteps(scene: Object3D, scale: number, offsetY: number): Generator<void, Part[]> {
   scene.updateMatrixWorld(true);
-  const byMaterial = new Map<Material, BufferGeometry[]>();
+  const meshes: Mesh[] = [];
   scene.traverse((o) => {
     const mesh = o as Mesh;
-    if (!mesh.isMesh || (mesh as { isSkinnedMesh?: boolean }).isSkinnedMesh) return;
+    if (mesh.isMesh && !(mesh as { isSkinnedMesh?: boolean }).isSkinnedMesh) meshes.push(mesh);
+  });
+  const byMaterial = new Map<Material, BufferGeometry[]>();
+  for (const mesh of meshes) {
     const mat = (Array.isArray(mesh.material) ? mesh.material[0] : mesh.material) as Material;
-    const g = toFloat32(mesh.geometry.clone());
-    g.applyMatrix4(mesh.matrixWorld);
-    g.scale(scale, scale, scale);
-    g.translate(0, offsetY, 0);
+    const g = yield* toFloat32(mesh.geometry.clone());
+    // dịch · phóng · ma trận node: một lần duyệt thay vì ba (đúng như applyMatrix4, scale, translate liên tiếp)
+    bakeMatrix.copy(mesh.matrixWorld).premultiply(bakeScale.makeScale(scale, scale, scale)).premultiply(bakeScale.makeTranslation(0, offsetY, 0));
+    yield* applyMatrixChunked(g, bakeMatrix);
     const list = byMaterial.get(mat) ?? [];
     list.push(g);
     byMaterial.set(mat, list);
-  });
+    yield;
+  }
   const parts: Part[] = [];
   for (const [material, list] of byMaterial) {
+    yield; // gộp từng vật liệu một ở khung hình riêng
     if (list.length === 1) {
       parts.push({ geometry: list[0], material });
       continue;
@@ -71,6 +109,14 @@ export function buildParts(scene: Object3D, scale: number, offsetY: number): Par
     }
   }
   return parts;
+}
+
+export function buildParts(scene: Object3D, scale: number, offsetY: number): Part[] {
+  const gen = buildPartsSteps(scene, scale, offsetY);
+  for (;;) {
+    const r = gen.next();
+    if (r.done) return r.value;
+  }
 }
 
 /**
@@ -128,6 +174,67 @@ export function fitOf(id: string, scene: Object3D) {
   scene.updateMatrixWorld(true);
   const box = new Box3().setFromObject(scene);
   return fitToHeight(box.min.y, box.max.y, sizeOf(id)?.height ?? 1);
+}
+
+/** Model `id` có dùng bản vừa (LOD giữa) ở mức này không: model có bản vừa dùng được và mức có bậc vừa (Vừa, Cao); xem `isUsableMid`. */
+export function hasMidFor(id: string, level: QualityLevel): boolean {
+  return isUsableMid(getManifest()?.[modelPath(midId(id))]?.tris) && marketFarDistance(level, id) > marketNearDistance(level, id);
+}
+
+/** Các id model (bản chính, bản vừa, bản xa) mà `ModelInstances` của `id` sẽ đọc ở mức này. */
+export function instanceModelIds(id: string, level: QualityLevel): string[] {
+  return hasMidFor(id, level) ? [id, midId(id), lodId(id)] : [id, lodId(id)];
+}
+
+/**
+ * Nướng sẵn các phần của một model (bản chính, vừa, xa) TRƯỚC khi vùng dựng nó, chia nhỏ để không khựng: `step(ngânSáchMs)` nướng dần (mỗi lần một mesh) tới khi hết ngân sách thời gian của khung hình,
+ * trả true khi xong. Phần đã nướng được giữ (đếm tham chiếu như `ModelInstances`) nên lúc dựng thật chỉ lấy từ bộ nhớ đệm; `release` trả lại (nơi dùng thật vẫn giữ thì không bị giải phóng).
+ */
+export interface PartsPrewarm {
+  step: (budgetMs: number) => boolean;
+  release: () => void;
+}
+
+export function createPartsPrewarm(id: string, near: ModelData | null, mid: ModelData | null, far: ModelData): PartsPrewarm {
+  const fit0 = fitOf(id, (near ?? far).scene);
+  const scale = fit0.scale;
+  const offsetY = fit0.offsetY + (sizeOf(id)?.lift ?? 0);
+  const jobs = [far, near, mid].filter((d): d is ModelData => d !== null).map((d) => d.scene);
+  const held: Object3D[] = [];
+  let next = 0;
+  let gen: Generator<void, Part[]> | null = null;
+  let released = false;
+  return {
+    step(budgetMs) {
+      const t0 = performance.now();
+      if (PROBE && typeof window !== 'undefined') queueMicrotask(() => (((window as unknown as { __bakeLog?: unknown[] }).__bakeLog ??= []).push([id, Math.round(t0), +(performance.now() - t0).toFixed(1)])));
+      while (!released && next < jobs.length) {
+        const scene = jobs[next];
+        if (partsCache.has(partsKey(scene, scale, offsetY))) {
+          retainParts(scene, scale, offsetY, getParts(scene, scale, offsetY));
+          held.push(scene);
+          next++;
+          continue;
+        }
+        gen ??= buildPartsSteps(scene, scale, offsetY);
+        const r = gen.next();
+        if (r.done) {
+          retainParts(scene, scale, offsetY, r.value);
+          held.push(scene);
+          gen = null;
+          next++;
+        }
+        if (performance.now() - t0 >= budgetMs) break;
+      }
+      return released || next >= jobs.length;
+    },
+    release() {
+      released = true;
+      gen = null;
+      for (const scene of held) releaseParts(scene, scale, offsetY);
+      held.length = 0;
+    },
+  };
 }
 
 interface InstanceSet {
@@ -286,7 +393,7 @@ export interface ModelInstancesProps {
  */
 export function ModelInstances({ id, items, level, farOnly = false, maxDistance, skip }: ModelInstancesProps) {
   // Bản vừa (LOD giữa) chỉ có và chỉ tải khi model có bản vừa dùng được và mức này có bậc vừa (Vừa, Cao); xem `isUsableMid`.
-  const hasMid = !farOnly && isUsableMid(getManifest()?.[modelPath(midId(id))]?.tris) && marketFarDistance(level, id) > marketNearDistance(level, id);
+  const hasMid = !farOnly && hasMidFor(id, level);
   const near = farOnly ? null : readModel(id);
   const mid = hasMid ? readModel(midId(id)) : null;
   const far = readModel(lodId(id));

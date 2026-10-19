@@ -4,15 +4,19 @@ import { VILLAGE_ORDER } from '../../content/levels';
 import type { VillageId } from '../../village';
 import type { GateId } from '../cho/marketLayout';
 import { usePlayerState } from '../WalkWorld';
-import { GATE_TRIGGER_DISTANCE, insideVillage, nearGate, newZoneState, rimDistance, stepZone, type ZoneState } from './worldZones';
+import { GATE_TRIGGER_DISTANCE, insideVillage, nearGate, newZoneState, rimDistance, stepPrewarm, stepZone, type ZoneState } from './worldZones';
 import type { WorldVillage } from './worldLayout';
 
 export type LoadedZones = Readonly<Record<VillageId, boolean>>;
+/** Làng nào đang được chuẩn bị sẵn (xem `stepPrewarm`) */
+export type PrewarmZones = Readonly<Record<VillageId, boolean>>;
 
 export interface WorldTrackerProps {
   villages: readonly WorldVillage[];
   /** Báo khi một vùng làng được tải hay dọn (kèm trạng thái của cả 4 vùng) */
   onZones: (loaded: LoadedZones) => void;
+  /** Báo khi một làng bắt đầu hay thôi được chuẩn bị sẵn (kèm trạng thái của cả 4 làng) */
+  onPrewarm: (prewarm: PrewarmZones) => void;
   /** Báo khi người chơi bước qua cổng vào làng (hoặc ra khỏi làng: null) */
   onInside: (village: VillageId | null) => void;
   /** Báo khi tới gần một cổng trong `GATE_TRIGGER_DISTANCE` (hoặc rời xa: null) */
@@ -26,12 +30,12 @@ const TICK = 0.15;
  * Theo dõi người chơi ở thế giới mở: tải và dọn vùng làng theo khoảng cách tới rìa làng (`stepZone`, có độ trễ), biết đang ở trong làng nào (đã qua cổng) và đang gần cổng nào. Chỉ gọi nơi dùng khi giá trị
  * ĐỔI. Đặt trong <WalkWorld> (đọc vị trí người chơi). Không cấp phát trong useFrame.
  */
-export function WorldTracker({ villages, onZones, onInside, onNearGate }: WorldTrackerProps) {
+export function WorldTracker({ villages, onZones, onPrewarm, onInside, onNearGate }: WorldTrackerProps) {
   const player = usePlayerState();
   const zones = useMemo<ZoneState[]>(() => villages.map(() => newZoneState()), [villages]);
   const gates = useMemo(() => villages.map((v) => ({ id: v.gate.id, x: v.gate.x, z: v.gate.z })), [villages]);
-  const live = useRef({ onZones, onInside, onNearGate });
-  live.current = { onZones, onInside, onNearGate };
+  const live = useRef({ onZones, onPrewarm, onInside, onNearGate });
+  live.current = { onZones, onPrewarm, onInside, onNearGate };
   const st = useRef({ t: 0, tick: TICK, inside: null as VillageId | null, gate: null as GateId | null, loaded: villages.map(() => false) });
   const sent = useRef(false);
 
@@ -49,12 +53,14 @@ export function WorldTracker({ villages, onZones, onInside, onNearGate }: WorldT
     if (s.tick < TICK && sent.current) return;
     s.tick = 0;
     let changed = !sent.current;
+    let prewarmChanged = !sent.current;
     let inside: VillageId | null = null;
     for (let i = 0; i < villages.length; i++) {
       const v = villages[i];
       const rim = rimDistance(v.center.x, v.center.z, v.radius, player.x, player.z);
       if (stepZone(zones[i], rim, s.t)) changed = true;
-      if (insideVillage(v.center.x, v.center.z, player.x, player.z)) inside = v.id;
+      if (stepPrewarm(zones[i], rim)) prewarmChanged = true;
+      if (insideVillage(v.center.x, v.center.z, player.x, player.z, v.insideRadius)) inside = v.id;
     }
     const gate = nearGate(gates, player.x, player.z, GATE_TRIGGER_DISTANCE);
     if (changed) {
@@ -62,6 +68,7 @@ export function WorldTracker({ villages, onZones, onInside, onNearGate }: WorldT
       s.loaded = villages.map((_, i) => zones[i].loaded);
       live.current.onZones(loaded);
     }
+    if (prewarmChanged) live.current.onPrewarm(Object.fromEntries(VILLAGE_ORDER.map((id) => [id, zones[villages.findIndex((v) => v.id === id)].prewarm])) as Record<VillageId, boolean>);
     if (!sent.current || inside !== s.inside) {
       s.inside = inside;
       live.current.onInside(inside);

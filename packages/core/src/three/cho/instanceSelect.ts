@@ -130,6 +130,7 @@ export const MARKET_NEAR_LOW_HEAVY: Readonly<Record<string, number>> = {
   'env/bui-tre': 1.5,
   'env/cong-lang-': 2.5,
   'env/khung-cui': -1,
+  'env/phen-phoi-giay': -1, // phên: bản chính 30.000 tam giác cho một tấm phẳng, ở mức Thấp luôn dùng bản xa
 };
 
 /**
@@ -154,8 +155,21 @@ export function marketNearDistance(level: 'low' | 'medium' | 'high', modelId?: s
  */
 export function marketFarDistance(level: 'low' | 'medium' | 'high', modelId?: string): number {
   if (level === 'low') return marketNearDistance(level, modelId);
+  const o = modelId ? MARKET_FAR_OVERRIDE[modelId] : undefined;
+  if (o) return o[level];
   return level === 'medium' ? 30 : 40;
 }
+
+/**
+ * Phên phơi giấy (bước W2): làng có 14 phên đứng dày, bản vừa của phên nặng 15.000 tam giác và bản xa 8.000 cho một tấm phẳng nhỏ, nên bản vừa chỉ dùng thật gần (Vừa 14, Cao 22), xa hơn dùng bản xa. Giữ
+ * làng dưới 1.000.000 tam giác ở mức Vừa và 1.500.000 ở mức Cao.
+ */
+export const MARKET_FAR_OVERRIDE: Readonly<Record<string, { medium: number; high: number }>> = {
+  'env/phen-phoi-giay': { medium: 14, high: 22 },
+};
+
+/** Phên phơi giấy chỉ vẽ tới khoảng này (tấm phẳng nhỏ, ở xa không cần thấy từng phên): Thấp 40, Vừa 70, Cao 90. */
+export const RACK_MAX_DISTANCE: Readonly<Record<'low' | 'medium' | 'high', number>> = { low: 40, medium: 70, high: 90 };
 
 /** Bụi tre (7.900 tam giác bản xa, nhiều nhất cảnh) ở thế giới mở chỉ vẽ tới khoảng này ở mức Vừa và Cao (sương đã nhạt, làng và chợ nhìn từ xa không cần thấy từng bụi tre). */
 export const BAMBOO_MAX_DISTANCE: Readonly<Record<'medium' | 'high', number>> = { medium: 90, high: 120 };
@@ -165,6 +179,7 @@ export const BAMBOO_MAX_DISTANCE: Readonly<Record<'medium' | 'high', number>> = 
  * `BAMBOO_MAX_DISTANCE`.
  */
 export function marketMaxDistance(level: 'low' | 'medium' | 'high', modelId?: string): number {
+  if (modelId === 'env/phen-phoi-giay') return RACK_MAX_DISTANCE[level];
   if (level === 'low') return 52;
   return modelId === 'env/bui-tre' ? BAMBOO_MAX_DISTANCE[level] : Infinity;
 }

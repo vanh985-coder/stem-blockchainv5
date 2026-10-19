@@ -49,7 +49,7 @@ describe('hình học tự dựng của chợ', () => {
 });
 
 describe('đồ gợi nghề quanh cổng: hình dựng khớp PROP_SIZES (vật cản sát hình)', () => {
-  const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc'];
+  const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh'];
   for (const kind of crafts) {
     it(`${kind}: chân ở y = 0, cao đúng, vừa trong hình vật cản (hộp hoặc tròn)`, () => {
       const g = createCraftProp(kind)!;
@@ -59,7 +59,11 @@ describe('đồ gợi nghề quanh cổng: hình dựng khớp PROP_SIZES (vật
       const lift = k.lift ?? 0;
       expect(b.min.y).toBeCloseTo(lift, 6);
       expect(b.max.y).toBeCloseTo(lift + k.h, 6);
-      if (k.box) {
+      if (kind === 'dinh') {
+        // nền đá là vật cản (hộp 6,2 × 5,0); mái vươn ra ngoài nền 0,9 (x) và 0,8 (z) mỗi bên
+        expect(b.max.x - b.min.x).toBeCloseTo(k.box!.hx * 2 + 1.8, 6);
+        expect(b.max.z - b.min.z).toBeCloseTo(k.box!.hz * 2 + 1.6, 6);
+      } else if (k.box) {
         expect(b.max.x - b.min.x).toBeCloseTo(k.box.hx * 2, 6);
         expect(b.max.z - b.min.z).toBeCloseTo(k.box.hz * 2, 6);
       } else {
@@ -97,7 +101,7 @@ describe('mặt trước của hình đặc quay ra ngoài (vật liệu một m
   });
   it('chum vại và mọi đồ gợi nghề dựng bằng code: thể tích có dấu dương', () => {
     expect(signedVolume(createJar())).toBeGreaterThan(0);
-    const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc'];
+    const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh'];
     for (const kind of crafts) expect(signedVolume(createCraftProp(kind)!), kind).toBeGreaterThan(0);
   });
   it('thân thuyền: thể tích có dấu dương', () => {

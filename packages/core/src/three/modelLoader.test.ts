@@ -1,6 +1,6 @@
 import { BoxGeometry, Mesh, MeshStandardMaterial, Texture } from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { disposeModelScene, modelCacheStats, preloadModel, releaseModel, retainModel } from './modelLoader';
+import { decoderWorkerCount, disposeModelScene, modelCacheStats, preloadModel, releaseModel, retainModel } from './modelLoader';
 
 describe('giải phóng model khi rời cảnh', () => {
   afterEach(() => vi.useRealTimers());
@@ -67,5 +67,18 @@ describe('giải phóng model khi rời cảnh', () => {
     releaseModel(id);
     vi.advanceTimersByTime(2000);
     expect(modelCacheStats().entries).toBe(before - 1);
+  });
+});
+
+describe('giải mã meshopt ở luồng phụ', () => {
+  it('không có Worker (chạy test) thì không dùng luồng phụ', () => {
+    expect(decoderWorkerCount(8, false)).toBe(0);
+  });
+  it('chừa một lõi cho luồng chính, tối thiểu 1 và tối đa 3 luồng phụ', () => {
+    expect(decoderWorkerCount(1, true)).toBe(1);
+    expect(decoderWorkerCount(2, true)).toBe(1);
+    expect(decoderWorkerCount(4, true)).toBe(3);
+    expect(decoderWorkerCount(16, true)).toBe(3);
+    expect(decoderWorkerCount(undefined, true)).toBe(1);
   });
 });

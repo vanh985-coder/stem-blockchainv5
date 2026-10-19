@@ -38,6 +38,7 @@ import type { LoadedZones } from './WorldTracker';
 import { assembleWorld, gateApproachSpawn, villageSpawn } from './worldLayout';
 import { effectivePages, lastGiver, targetNodeId } from './worldQuest';
 import { composeTargets, createWorldBase, createZoneTargets, parseWorldTarget, type WorldTarget } from './worldTargets';
+import { PROBE } from '../../lib/dev';
 
 const DIRT_TEXTURE = 'ui/textures/duong-dat';
 /** Sương: trong vùng đi lại gần như không có, ngoài ruộng thì nhạt dần vào chân trời (làng ở xa 70 đến 130 vẫn thấy rõ). */
@@ -135,7 +136,7 @@ export function WorldPage() {
   const entering = inside !== null && !zoneReady.has(inside);
   const session = useWalkSession(api, dialog !== null || know !== null || guide !== null || entering);
   const dirtUrl = useMemo(() => (manifest ? asset(DIRT_TEXTURE) : null), [manifest]);
-  if (import.meta.env.DEV) Object.assign(window, { __walkApi: api, __progress: progress, __worldInside: inside, __worldSeq: seq });
+  if (PROBE) Object.assign(window, { __walkApi: api, __progress: progress, __worldInside: inside, __worldSeq: seq });
 
   // ---- tiến độ: cổng, trang, nhiệm vụ
   const data = progress.progress.game.data;
@@ -178,7 +179,7 @@ export function WorldPage() {
       closed,
     );
   }, [base, zoneTargets, loaded, gateOpen, world.gates]);
-  if (import.meta.env.DEV) Object.assign(window, { __worldInteractables: interactables });
+  if (PROBE) Object.assign(window, { __worldInteractables: interactables });
   const targets = useMemo<(WorldTarget | null)[]>(() => interactables.map((i) => parseWorldTarget(i.id)), [interactables]);
 
   const labelOf = (t: WorldTarget | null): string | null => {
@@ -374,7 +375,7 @@ export function WorldPage() {
   const menuKnow = inside && villageKnowCards(inside).length > 0 && VILLAGE_SCENE[inside] ? [{ label: ui.baiHoc.emCoBiet, onClick: openKnow }] : [];
 
   return (
-    <div className="fixed inset-0 bg-giay" data-testid="cho" data-seq={seq} data-inside={inside ?? ''}>
+    <div className="fixed inset-0 bg-giay" data-testid="cho" data-seq={seq} data-inside={inside ?? ''} data-ready={ready ? 'true' : 'false'}>
       <WalkControls
         api={api}
         paused={session.paused}

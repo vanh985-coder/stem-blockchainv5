@@ -105,7 +105,7 @@ export interface Placement {
 }
 
 /** Đồ vật nhỏ do code dựng (chum vại, đống rơm, khóm hoa). */
-export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc';
+export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc' | 'coi-gia' | 'bep-do' | 'dinh';
 export interface PropPlacement {
   kind: PropKind;
   x: number;
@@ -205,6 +205,10 @@ export const PROP_SIZES: Readonly<Record<PropKind, PropSize>> = {
   'so-chung': { r: 0.36, h: 0.12, box: { hx: 0.3, hz: 0.22 }, collide: false, lift: 0.85 },
   'be-ngam': { r: Math.hypot(1.4, 0.8), h: 0.75, box: { hx: 1.4, hz: 0.8 } },
   nuoc: { r: 1.4, h: 0.04, box: { hx: 1.2, hz: 0.6 }, collide: false, lift: 0.6 },
+  // xưởng làm giấy (bước W2): cối giã dó (cối đá và đòn gánh gỗ), bếp nấu dó (bệ đá, nồi lớn, ống khói) và đình làng nhỏ (nền đá, bốn cột, mái ngói). Đình: vật cản là nền đá (hộp 6,2 × 5,0); mái vươn ra ngoài nền.
+  'coi-gia': { r: Math.hypot(1.1, 0.45), h: 1.15, box: { hx: 1.1, hz: 0.45 } },
+  'bep-do': { r: Math.hypot(1.0, 0.6), h: 1.9, box: { hx: 1.0, hz: 0.6 } },
+  dinh: { r: Math.hypot(3.1, 2.5), h: 6, box: { hx: 3.1, hz: 2.5 } },
 };
 
 /** Vật cản của đồ nhỏ do code dựng: hình tròn hoặc hộp xoay sát hình; vật thấp (khóm hoa) và chi tiết dưới vật khác (chân giá) thì không có. */
@@ -340,6 +344,20 @@ export function fenceLayout(radius: number = WORLD_RADIUS - 0.7, skip: (x: numbe
   return { posts, segments };
 }
 
+/**
+ * Hàng rào tre thẳng từ (x0, z0) tới (x1, z1): cột cách đều (không quá 2,2), mỗi đoạn giữa hai cột có hai thanh ngang. Rào quanh sân nhà, ranh ruộng trong làng; ghép với `fenceLayout` thành một bố cục.
+ */
+export function fenceRun(x0: number, z0: number, x1: number, z1: number): FenceLayout {
+  const len = Math.hypot(x1 - x0, z1 - z0);
+  const n = Math.max(1, Math.ceil(len / 2.2));
+  const yaw = -Math.atan2(z1 - z0, x1 - x0); // trục x của thanh quay về (cos yaw, −sin yaw): dọc theo đường rào
+  const posts: FenceLayout['posts'] = [];
+  const segments: FenceLayout['segments'] = [];
+  for (let i = 0; i <= n; i++) posts.push({ x: x0 + ((x1 - x0) * i) / n, z: z0 + ((z1 - z0) * i) / n, yaw });
+  for (let i = 0; i < n; i++) segments.push({ x: x0 + ((x1 - x0) * (i + 0.5)) / n, z: z0 + ((z1 - z0) * (i + 0.5)) / n, yaw });
+  return { posts, segments };
+}
+
 /** Vật cản của hàng rào: một hộp xoay mỏng cho mỗi đoạn (chuỗi hộp theo đường cong), cao bằng cột. */
 export function fenceColliders(f: FenceLayout = fenceLayout()): CameraBlocker[] {
   return f.segments.map((s) => ({ shape: obox(s.x, s.z, FENCE_RAIL_LENGTH / 2, FENCE_HALF_THICKNESS, s.yaw), height: FENCE_POST_HEIGHT }));
@@ -374,9 +392,10 @@ export interface MarketDensity {
 }
 export const FULL_DENSITY: MarketDensity = { stalls: 1, bamboo: 1 };
 
-/** Mức Thấp bớt lều, bụi tre và phên phơi giấy để giữ dưới 300.000 tam giác ở mọi chỗ đứng (chợ, đường, làng); Vừa và Cao đủ đồ vật. */
+/** Mức Thấp bớt lều, bụi tre và phên phơi giấy để giữ dưới 300.000 tam giác ở mọi chỗ đứng (chợ, đường, làng); mức Vừa bớt một phần bụi tre và phên (làng Giấy ở bước W2 đông đồ vật, giữ dưới 1.000.000); Cao đủ đồ vật. */
 export function densityFor(level: 'low' | 'medium' | 'high'): MarketDensity {
-  return level === 'low' ? { stalls: 0.6, bamboo: 0.45, racks: 0.6 } : FULL_DENSITY;
+  if (level === 'medium') return { stalls: 1, bamboo: 0.75, racks: 0.8 };
+  return level === 'low' ? { stalls: 0.6, bamboo: 0.45, racks: 0.5 } : FULL_DENSITY;
 }
 
 /** Giữ lại khoảng `keep` (0 đến 1) số phần tử, rải đều theo thứ tự (không dồn vào một chỗ). Hàm thuần, cùng đầu vào cùng kết quả. */

@@ -284,9 +284,13 @@ describe('mật độ theo mức chất lượng', () => {
     for (let i = 1; i < kept.length; i++) expect(kept[i] - kept[i - 1]).toBeLessThanOrEqual(2);
     expect(thinEvenly([], 0.5)).toEqual([]);
   });
-  it('Vừa và Cao đủ đồ vật; Thấp bớt lều và bụi tre nhưng vẫn đủ nhà, cổng, cây, giếng', () => {
-    expect(densityFor('medium')).toEqual(FULL_DENSITY);
+  it('Cao đủ đồ vật; Vừa bớt một phần bụi tre và phên; Thấp bớt lều, bụi tre và phên nhưng vẫn đủ nhà, cổng, cây, giếng', () => {
     expect(densityFor('high')).toEqual(FULL_DENSITY);
+    expect(densityFor('medium')).toEqual({ stalls: 1, bamboo: 0.75, racks: 0.8 });
+    expect(densityFor('low')).toEqual({ stalls: 0.6, bamboo: 0.45, racks: 0.5 });
+    const med = generateMarket(20260101, densityFor('medium'));
+    expect(med.placements.filter((p) => p.model === MODEL_STALL)).toHaveLength(layout.placements.filter((p) => p.model === MODEL_STALL).length);
+    expect(med.placements.filter((p) => p.model === MODEL_BAMBOO).length).toBeLessThan(layout.placements.filter((p) => p.model === MODEL_BAMBOO).length);
     const low = generateMarket(20260101, densityFor('low'));
     const count = (l: MarketLayout, m: string) => l.placements.filter((p) => p.model === m).length;
     expect(count(low, MODEL_STALL)).toBeLessThan(count(layout, MODEL_STALL));

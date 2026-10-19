@@ -16,7 +16,7 @@ import {
   worldGroundHeight,
   worldRoads,
 } from './worldLayout';
-import { GATE_WORLD_DISTANCE, VILLAGE_FRAMES, VILLAGE_INSIDE_RADIUS, frameOf, localToWorld, placeVillage, rotateToWorld } from './worldFrames';
+import { GATE_WORLD_DISTANCE, VILLAGE_FRAMES, frameOf, localToWorld, placeVillage, rotateToWorld } from './worldFrames';
 import { LOCAL_VILLAGES } from './villages';
 
 const FULL = assembleWorld();
@@ -44,7 +44,7 @@ describe('hệ tọa độ làng và thế giới', () => {
     expect(p.x).toBeCloseTo(1, 9);
     expect(p.z).toBeCloseTo(0, 9);
   });
-  it('cổng của bố cục làng rơi đúng chỗ cổng thế giới; tâm làng nằm sâu trong làng (Làng Giấy ở (0; 89,5))', () => {
+  it('cổng của bố cục làng rơi đúng chỗ cổng thế giới; Làng Giấy (bước W2) có tâm ở (0; 107), ba làng nhỏ ở 89,5', () => {
     for (const f of VILLAGE_FRAMES) {
       const local = LOCAL_VILLAGES[f.village];
       const g = localToWorld(local, f, local.gate.x, local.gate.z);
@@ -55,7 +55,10 @@ describe('hệ tọa độ làng và thế giới', () => {
     }
     const giay = FULL.villages[0];
     expect(giay.center.x).toBeCloseTo(0, 9);
-    expect(giay.center.z).toBeCloseTo(89.5, 9);
+    expect(giay.center.z).toBeCloseTo(107, 9); // cổng ở 72, cổng cách tâm làng 35
+    expect(giay.radius).toBe(35);
+    expect(giay.insideRadius).toBeCloseTo(34, 9);
+    for (const v of FULL.villages.slice(1)) expect(Math.hypot(v.center.x, v.center.z)).toBeCloseTo(89.5, 9);
   });
   it('mọi biển gỗ quay mặt về phía chợ (mặt trước hướng về tâm chợ), ở cả 4 làng', () => {
     for (const v of FULL.villages) {
@@ -71,7 +74,7 @@ describe('hệ tọa độ làng và thế giới', () => {
     for (const v of FULL.villages) {
       const s = villageSpawn(FULL, v.id);
       expect(s).not.toBeNull();
-      expect(Math.hypot(s!.x - v.center.x, s!.z - v.center.z)).toBeLessThan(VILLAGE_INSIDE_RADIUS);
+      expect(Math.hypot(s!.x - v.center.x, s!.z - v.center.z)).toBeLessThan(v.insideRadius);
       expect(Math.sin(s!.yaw)).toBeCloseTo(v.frame.dirX, 6);
       expect(Math.cos(s!.yaw)).toBeCloseTo(v.frame.dirZ, 6);
       const b = v.layout.boards[0];

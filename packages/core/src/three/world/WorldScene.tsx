@@ -1,5 +1,5 @@
 import { useFrame, useThree } from '@react-three/fiber';
-import { Suspense, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { Group } from 'three';
 import { fmt } from '../../content/characters';
 import { levelById } from '../../content/levels';
@@ -25,15 +25,16 @@ import { Signposts } from './Signposts';
 import { VillageFar } from './VillageFar';
 import { VillageZone } from './VillageZone';
 import { WorldTerrain } from './WorldTerrain';
-import { WorldTracker, type LoadedZones } from './WorldTracker';
+import { WorldTracker, type LoadedZones, type PrewarmZones } from './WorldTracker';
+import { ZonePrewarm } from './ZonePrewarm';
 import { WORLD_BOUNDS } from './worldFrames';
 import { worldGroundHeight, type WorldLayout } from './worldLayout';
+import { PROBE } from '../../lib/dev';
+import { VILLAGER_CULL, withinCullDistance } from '../cullDistance';
 
 /** Người đi lại trên các con đường chợ: bà cụ và chú nông dân xen kẽ (clip walk, dừng thì idle). */
 const VILLAGER_MODELS = ['characters/dan-lang-ba-cu', 'characters/dan-lang-nong-dan', 'characters/dan-lang-nong-dan', 'characters/dan-lang-ba-cu'];
 const VILLAGER_RADIUS = 0.45;
-/** Dân làng xa người chơi hơn khoảng này thì không vẽ (ngân sách tam giác). */
-const VILLAGER_CULL = 38;
 
 export interface WorldSceneProps {
   world: WorldLayout;
@@ -110,8 +111,13 @@ export function WorldScene({
   onNearGate,
   onZoneReady,
 }: WorldSceneProps) {
-  if (import.meta.env.DEV) Object.assign(window, { __world: world, __loadedZones: loaded });
+  if (PROBE) Object.assign(window, { __world: world, __loadedZones: loaded });
   const market = world.market;
+  // làng nào đang được chuẩn bị sẵn (tải sẵn model, nướng hình học, làm ấm texture khi còn xa): xem WorldTracker và ZonePrewarm
+  const [prewarm, setPrewarm] = useState<PrewarmZones>({ 'lang-giay': false, 'lang-det': false, 'lang-khac-dau': false, 'lang-bac': false });
+  // làng nào đã chuẩn bị xong: vùng làng chỉ dựng khi chuẩn bị xong (hoặc chờ quá ZONE_PREWARM_WAIT giây)
+  const [prewarmed, setPrewarmed] = useState<ReadonlySet<VillageId>>(new Set());
+  const onPrewarmDone = useCallback((id: VillageId, done: boolean) => setPrewarmed((prev) => (prev.has(id) === done ? prev : done ? new Set(prev).add(id) : new Set([...prev].filter((x) => x !== id)))), []);
   const byModel = useMemo(() => MARKET_MODELS.map((id) => ({ id, items: market.placements.filter((p) => p.model === id) })), [market]);
   const gateItems = useMemo(() => world.gates.map((g) => ({ id: g.model, items: [{ model: g.model, x: g.x, z: g.z, yaw: g.yaw, scale: 1, tint: [1, 1, 1] as const } satisfies Placement] })), [world]);
   // dân làng: vật cản tròn đi theo từng người (mỗi khung hình Villager ghi vị trí vào đây)
@@ -119,9 +125,15 @@ export function WorldScene({
   const closedGates = useMemo(() => world.gates.filter((g) => !gateOpen[g.id]), [world, gateOpen]);
   const barriers = useMemo<Obstacle[]>(() => closedGates.flatMap((g) => gateBarrierObstacle(g.model, g.x, g.z, g.yaw) ?? []), [closedGates]);
   const loadedVillages = useMemo(() => world.villages.filter((v) => loaded[v.id]), [world, loaded]);
-  const obstacles = useMemo(() => [...world.baseObstacles, ...loadedVillages.flatMap((v) => v.layout.obstacles), ...barriers, ...villagers], [world, loadedVillages, barriers, villagers]);
+  // dân làng trong từng làng: vật cản tròn đi theo (tạo một lần mỗi làng; chỉ tính khi vùng đã tải)
+  const zoneVillagers = useMemo(() => new Map(world.villages.map((v) => [v.id, (v.layout.villagers ?? []).map((p) => circle(p[0][0], p[0][1], VILLAGER_RADIUS))])), [world]);
+  const obstacles = useMemo(
+    () => [...world.baseObstacles, ...loadedVillages.flatMap((v) => v.layout.obstacles), ...barriers, ...villagers, ...loadedVillages.flatMap((v) => zoneVillagers.get(v.id) ?? [])],
+    [world, loadedVillages, barriers, villagers, zoneVillagers],
+  );
   const blockers = useMemo(() => [...world.baseBlockers, ...loadedVillages.flatMap((v) => v.layout.blockers)], [world, loadedVillages]);
-  if (import.meta.env.DEV) Object.assign(window, { __worldObstacles: obstacles, __worldBarriers: barriers });
+  if (PROBE) Object.assign(window, { __worldObstacles: obstacles, __worldBarriers: barriers });
+  const dynamicColliders = useMemo(() => [...villagers, ...loadedVillages.flatMap((v) => zoneVillagers.get(v.id) ?? [])], [villagers, loadedVillages, zoneVillagers]);
   const colliders = useMemo(() => [...world.baseColliders, ...loadedVillages.flatMap((v) => v.layout.colliders)], [world, loadedVillages]);
   const start: readonly [number, number] = spawn ? [spawn.x, spawn.z] : PLAYER_START;
 
@@ -150,6 +162,7 @@ export function WorldScene({
       ))}
       <MarketProps layout={market} />
       <VillageFar villages={world.villages} level={level} loaded={loaded} />
+      {world.villages.map((v) => (prewarm[v.id] ? <ZonePrewarm key={`${v.id}|${level}`} village={v} level={level} onDone={onPrewarmDone} /> : null))}
       {loadedVillages.map((v) => (
         <VillageZone
           key={v.id}
@@ -160,13 +173,15 @@ export function WorldScene({
           states={levelStates}
           guideTalking={talkingGuide === v.id}
           talkAt={talkAt}
+          villagerColliders={zoneVillagers.get(v.id) ?? []}
+          prewarmed={prewarmed.has(v.id)}
           onReady={onZoneReady}
         />
       ))}
       {market.villagerPaths.map((path, i) => (
-        <Villager key={i} id={VILLAGER_MODELS[i % VILLAGER_MODELS.length]} waypoints={path} seed={101 + i * 17} start={i % path.length} collider={villagers[i]} track={villagerTracks[i]} hold={talkingVillager === i} cullDistance={VILLAGER_CULL} />
+        <Villager key={i} id={VILLAGER_MODELS[i % VILLAGER_MODELS.length]} waypoints={path} seed={101 + i * 17} start={i % path.length} collider={villagers[i]} track={villagerTracks[i]} hold={talkingVillager === i} cullDistance={VILLAGER_CULL[level]} />
       ))}
-      <CullGroup x={market.merchant.x} z={market.merchant.z} distance={VILLAGER_CULL + 6}>
+      <CullGroup x={market.merchant.x} z={market.merchant.z} distance={VILLAGER_CULL[level] + 6}>
         <Suspense fallback={null}>
           <Character id="characters/lai-buon" position={[market.merchant.x, 0, market.merchant.z]} rotation={[0, market.merchant.yaw, 0]} mood="idle" seed={9} />
         </Suspense>
@@ -174,8 +189,8 @@ export function WorldScene({
       <GateBarriers gates={closedGates} falling={fallingGate} onFallen={onGateFallen} animate={animate} />
       <Signposts signposts={world.signposts} />
       <GroundArrow graph={world.graph} target={arrowTarget} animate={animate} />
-      <WorldTracker villages={world.villages} onZones={onZones} onInside={onInside} onNearGate={onNearGate} />
-      {debugColliders && <ColliderDebug colliders={colliders} dynamic={villagers} />}
+      <WorldTracker villages={world.villages} onZones={onZones} onPrewarm={setPrewarm} onInside={onInside} onNearGate={onNearGate} />
+      {debugColliders && <ColliderDebug colliders={colliders} dynamic={dynamicColliders} />}
       <StatsProbe />
       {/* con cuối: nạp trước mọi bậc model của chợ và cổng lên GPU lúc còn màn hình tải (đổi mức chất lượng thì dựng lại) */}
       <SceneWarmup key={level} />
@@ -188,7 +203,7 @@ function CullGroup({ x, z, distance, children }: { x: number; z: number; distanc
   const player = usePlayerState();
   const ref = useRef<Group>(null);
   useFrame(() => {
-    if (ref.current && player) ref.current.visible = (x - player.x) ** 2 + (z - player.z) ** 2 < distance * distance;
+    if (ref.current && player) ref.current.visible = withinCullDistance(x, z, player.x, player.z, distance);
   });
   return <group ref={ref}>{children}</group>;
 }

@@ -5,7 +5,7 @@ import { Fence, Hills, Instances, useDispose, useImageTexture, type Item } from 
 import { createBoatCanopy, createBoatHull } from '../cho/marketGeometry';
 import { createEdgeAlphaTexture, createGrassTexture, createPaddyTexture, createPlankTexture, createWaterTexture } from '../cho/marketTextures';
 import { DECK_START_X, DECK_TOP, PLAZA_RADIUS, RAMP_START_X, WORLD_RADIUS } from '../cho/marketLayout';
-import type { VillageLayout } from '../village/villageLayout';
+import { POND_BANK, type VillageField, type VillageLayout } from '../village/villageLayout';
 import { BRIDGE_DECK_END_X, BRIDGE_HALF_WIDTH, BRIDGE_RAMP_END_X, RIVER_EAST_X, RIVER_HALF_LENGTH, RIVER_WEST_X, type WorldLayout, type WorldRoad } from './worldLayout';
 
 /** Nhân màu cho ảnh đất (ảnh gốc rất vàng): dịu bớt cho hợp cỏ và nhà. */
@@ -16,6 +16,13 @@ const YARD_Y = 0.03;
 const WATER_Y = 0.02;
 /** Cỏ làng phủ quanh khu: bán kính làng + bấy nhiêu. */
 const VILLAGE_GRASS_MARGIN = 3;
+/** Mỗi ô cỏ lặp lại trên chừng này đơn vị (làng càng rộng thì lặp càng nhiều để hoa văn không bị kéo giãn). */
+const GRASS_TILE = 8.3;
+const FIELD_Y = 0.012;
+const POND_Y = 0.014;
+const FIELD_BUND_COLOR = '#9C8A4F';
+const POND_BANK_COLOR = '#7C9150';
+const POND_WATER_COLOR = '#4F93A8';
 
 /** Bản sao texture (dùng chung ảnh và bản trên GPU) với số lần lặp riêng; giải phóng khi đổi hay rời cảnh. */
 function useRepeated(base: Texture | null, rx: number, ry: number): Texture | null {
@@ -45,15 +52,32 @@ function RoadStrip({ road, dirt, lateral }: { road: WorldRoad; dirt: Texture | n
 }
 
 /** Mặt đất của một làng (luôn có, rẻ: vài draw call): cỏ làng, sân đất nện mép mờ, đường đất trong làng và hàng rào tre quanh khu. Đồ vật của làng nằm ở vùng (VillageZone). */
-function VillageGround({ layout, dirt, grass, radial, lateral }: { layout: VillageLayout; dirt: Texture | null; grass: Texture; radial: Texture; lateral: Texture }) {
+function VillageGround({ layout, dirt, grass: grassBase, paddy, radial, lateral }: { layout: VillageLayout; dirt: Texture | null; grass: Texture; paddy: Texture; radial: Texture; lateral: Texture }) {
   const cx = layout.fence?.center?.x ?? 0;
   const cz = layout.fence?.center?.z ?? 0;
+  const rep = ((layout.radius + VILLAGE_GRASS_MARGIN) * 2) / GRASS_TILE;
+  const grass = useRepeated(grassBase, rep, rep) ?? grassBase;
   return (
     <group>
       <mesh position={[cx, 0.001, cz]} rotation-x={-Math.PI / 2} receiveShadow>
         <circleGeometry args={[layout.radius + VILLAGE_GRASS_MARGIN, 64]} />
         <meshStandardMaterial map={grass} roughness={1} />
       </mesh>
+      {layout.fields?.map((q, i) => (
+        <Field key={`f${i}`} field={q} paddy={paddy} />
+      ))}
+      {layout.ponds?.map((p, i) => (
+        <group key={`p${i}`} position={[p.x, 0, p.z]}>
+          <mesh position-y={POND_Y} rotation-x={-Math.PI / 2} receiveShadow>
+            <circleGeometry args={[p.r + POND_BANK, 40]} />
+            <meshStandardMaterial color={POND_BANK_COLOR} roughness={1} />
+          </mesh>
+          <mesh position-y={POND_Y + 0.008} rotation-x={-Math.PI / 2}>
+            <circleGeometry args={[p.r, 40]} />
+            <meshStandardMaterial color={POND_WATER_COLOR} roughness={0.15} metalness={0.05} />
+          </mesh>
+        </group>
+      ))}
       {layout.yards.map((y, i) => (
         <mesh key={`y${i}`} position={[y.x, YARD_Y + i * 0.001, y.z]} rotation-x={-Math.PI / 2} receiveShadow>
           <circleGeometry args={[y.r + 1.5, 40]} />
@@ -64,6 +88,23 @@ function VillageGround({ layout, dirt, grass, radial, lateral }: { layout: Villa
         <RoadStrip key={`r${i}`} road={r} dirt={dirt} lateral={lateral} />
       ))}
       {layout.fenceLayout && <Fence fence={layout.fenceLayout} />}
+    </group>
+  );
+}
+
+/** Ruộng lúa: bờ ruộng đất nâu viền quanh, mặt ruộng xanh có hàng lúa (cùng hoa văn ruộng lúa phủ ngoài biên, lặp theo cỡ). Đi qua được. */
+function Field({ field: q, paddy }: { field: VillageField; paddy: Texture }) {
+  const map = useRepeated(paddy, (q.hx * 2) / 8, (q.hz * 2) / 8);
+  return (
+    <group position={[q.x, 0, q.z]} rotation-y={q.yaw}>
+      <mesh position-y={FIELD_Y - 0.003} rotation-x={-Math.PI / 2} receiveShadow>
+        <planeGeometry args={[q.hx * 2 + 0.7, q.hz * 2 + 0.7]} />
+        <meshStandardMaterial color={FIELD_BUND_COLOR} roughness={1} />
+      </mesh>
+      <mesh position-y={FIELD_Y} rotation-x={-Math.PI / 2} receiveShadow>
+        <planeGeometry args={[q.hx * 2, q.hz * 2]} />
+        <meshStandardMaterial map={map ?? undefined} color={map ? '#FFFFFF' : '#A9C95F'} roughness={1} />
+      </mesh>
     </group>
   );
 }
@@ -165,7 +206,8 @@ export function WorldTerrain({ world, dirtUrl, animate }: WorldTerrainProps) {
     () => ({
       paddy: createPaddyTexture([1000 / 32, 1000 / 32]),
       grass: createGrassTexture([(WORLD_RADIUS + 8) / 5, (WORLD_RADIUS + 8) / 5]),
-      villageGrass: createGrassTexture([(21 + 8) / 5, (21 + 8) / 5]),
+      villageGrass: createGrassTexture([1, 1]),
+      fieldPaddy: createPaddyTexture([1, 1]),
       water: createWaterTexture([1, 30]),
       plank: createPlankTexture([4, 1]),
       lateral: createEdgeAlphaTexture('lateral'),
@@ -200,7 +242,7 @@ export function WorldTerrain({ world, dirtUrl, animate }: WorldTerrainProps) {
       <Fence />
       <Hills />
       {world.villages.map((v) => (
-        <VillageGround key={v.id} layout={v.layout} dirt={yardDirt} grass={tex.villageGrass} radial={tex.radial} lateral={tex.lateral} />
+        <VillageGround key={v.id} layout={v.layout} dirt={yardDirt} grass={tex.villageGrass} paddy={tex.fieldPaddy} radial={tex.radial} lateral={tex.lateral} />
       ))}
     </group>
   );

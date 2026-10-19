@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { GATE_TRIGGER_DISTANCE, ZONE_LOAD_DISTANCE, ZONE_UNLOAD_DELAY, ZONE_UNLOAD_DISTANCE, insideVillage, nearGate, newZoneState, rimDistance, stepZone } from './worldZones';
+import { GATE_TRIGGER_DISTANCE, ZONE_LOAD_DISTANCE, ZONE_PREWARM_DISTANCE, ZONE_PREWARM_RELEASE, ZONE_UNLOAD_DELAY, ZONE_UNLOAD_DISTANCE, insideVillage, nearGate, newZoneState, rimDistance, stepPrewarm, stepZone } from './worldZones';
 import { effectivePages, lastGiver, targetNodeId } from './worldQuest';
 import { assembleWorld } from './worldLayout';
 import { createRouter, type RouteStep } from './roadGraph';
+import { resolveCollisions } from '../collision';
 
 describe('vùng làng: tải và dọn có độ trễ', () => {
   it('khoảng cách tới rìa: 0 khi ở trong, đúng khoảng cách khi ở ngoài', () => {
@@ -111,3 +112,79 @@ describe('mũi tên đi theo đường trong thế giới thật', () => {
     expect(out.remaining).toBeCloseTo(52, 0); // dọc trục đông, qua cầu
   });
 });
+
+describe('chuẩn bị sẵn vùng làng (bước W2)', () => {
+  it('bật khi rìa dưới 110, giữ nguyên giữa 110 và 135, tắt khi xa hơn 135', () => {
+    const s = newZoneState();
+    expect(stepPrewarm(s, ZONE_PREWARM_DISTANCE)).toBe(false);
+    expect(s.prewarm).toBe(false);
+    expect(stepPrewarm(s, ZONE_PREWARM_DISTANCE - 0.1)).toBe(true);
+    expect(s.prewarm).toBe(true);
+    expect(stepPrewarm(s, 120)).toBe(false); // giữa hai ngưỡng: giữ
+    expect(s.prewarm).toBe(true);
+    expect(stepPrewarm(s, ZONE_PREWARM_RELEASE)).toBe(false);
+    expect(stepPrewarm(s, ZONE_PREWARM_RELEASE + 0.1)).toBe(true);
+    expect(s.prewarm).toBe(false);
+    expect(stepPrewarm(s, 120)).toBe(false); // vùng giữa mà chưa bật thì chưa bật
+    expect(s.prewarm).toBe(false);
+  });
+  it('vùng đang tải luôn được chuẩn bị', () => {
+    const s = newZoneState();
+    s.loaded = true;
+    expect(stepPrewarm(s, 500)).toBe(true);
+    expect(s.prewarm).toBe(true);
+  });
+  it('chuẩn bị bắt đầu trước khi tải và kết thúc sau khi dọn', () => {
+    expect(ZONE_PREWARM_DISTANCE).toBeGreaterThan(ZONE_LOAD_DISTANCE);
+    expect(ZONE_PREWARM_RELEASE).toBeGreaterThan(ZONE_UNLOAD_DISTANCE);
+    expect(ZONE_PREWARM_RELEASE).toBeGreaterThan(ZONE_PREWARM_DISTANCE);
+  });
+});
+
+describe('mũi tên trong Làng Giấy mở rộng (bước W2)', () => {
+  const w = assembleWorld();
+  const router = createRouter(w.graph);
+  const out: RouteStep = { x: 0, z: 0, remaining: 0, found: false };
+  const giay = w.villages[0];
+
+  it('từ cổng tới từng biển và tới chỗ đứng trước bác An đều có đường; tới bác An dài hơn tới biển 2 (phải vòng qua khoảng giữa các biển)', () => {
+    router.setTarget('board:2');
+    router.next(giay.gate.x, giay.gate.z, out);
+    expect(out.found).toBe(true);
+    const toBoard2 = out.remaining;
+    expect(toBoard2).toBeGreaterThan(20);
+    router.setTarget('guide:lang-giay');
+    router.next(giay.gate.x, giay.gate.z, out);
+    expect(out.found).toBe(true);
+    expect(out.remaining).toBeGreaterThan(toBoard2);
+    for (const l of [1, 2, 3]) {
+      router.setTarget(`board:${l}`);
+      router.next(giay.gate.x, giay.gate.z, out);
+      expect(out.found, `màn ${l}`).toBe(true);
+    }
+  });
+  it('đi theo điểm kế tiếp từ cổng vào tới biển 1: tới nơi trong số bước hợp lý và không bước nào xuyên vật cản (người chơi bán kính 0,4)', () => {
+    const obstacles = [...w.baseObstacles, ...giay.layout.obstacles];
+    router.setTarget('board:1');
+    let x = giay.gate.x;
+    let z = giay.gate.z; // đứng ngay ở cổng
+    let steps = 0;
+    for (; steps < 400; steps++) {
+      router.next(x, z, out);
+      if (out.remaining < 1.5) break;
+      const d = Math.hypot(out.x - x, out.z - z);
+      const stride = Math.min(1, d);
+      x += ((out.x - x) / d) * stride;
+      z += ((out.z - z) / d) * stride;
+      expect(obstacles.some((o) => resolveCollisionsFree(o, x, z)), `bước ${steps} (${x.toFixed(1)}, ${z.toFixed(1)})`).toBe(false);
+    }
+    expect(steps).toBeLessThan(120); // đường dài chừng 40 đơn vị
+    expect(Math.hypot(x - giay.boardStands[0].x, z - giay.boardStands[0].z)).toBeLessThan(2);
+  });
+});
+
+/** (x, z) nằm trong vật cản (bán kính người chơi 0,4)? */
+function resolveCollisionsFree(o: import('../collision').Obstacle, x: number, z: number): boolean {
+  const p = { x, z };
+  return resolveCollisions(p, 0.4, [o]) && Math.hypot(p.x - x, p.z - z) > 0.15;
+}

@@ -4,14 +4,18 @@ import { CHARACTERS } from '../../content/characters';
 import type { LevelState } from '../../progress/unlock';
 import type { VillageId } from '../../village';
 import { Character } from '../Character';
+import { Villager } from '../Villager';
+import { VILLAGER_CULL } from '../cullDistance';
+import type { CircleObstacle } from '../collision';
 import { MarketProps } from '../cho/MarketProcedural';
 import { ModelInstances } from '../cho/ModelInstances';
 import type { Placement } from '../cho/marketLayout';
 import type { QualityLevel } from '../quality';
 import { preloadModel, releaseModel, retainModel } from '../modelLoader';
-import { sceneTextures, textureUsable } from '../SceneWarmup';
 import { VillageBoards } from '../village/VillageBoards';
+import { isModelWarm, markModelWarm, usableTextures, warmTextures } from './warm';
 import type { WorldVillage } from './worldLayout';
+import { PROBE } from '../../lib/dev';
 
 export interface VillageZoneProps {
   village: WorldVillage;
@@ -23,38 +27,46 @@ export interface VillageZoneProps {
   /** Người dẫn đang được nói chuyện (đứng yên quay mặt về người chơi) */
   guideTalking: boolean;
   talkAt: readonly [number, number, number];
+  /** Vật cản tròn đi theo từng dân làng của làng (cùng thứ tự `layout.villagers`); `Villager` ghi vị trí vào đây mỗi khung hình */
+  villagerColliders: readonly CircleObstacle[];
+  /** Làng đã chuẩn bị xong (xem `ZonePrewarm`): chưa xong thì vùng chờ, tối đa `ZONE_PREWARM_WAIT` giây, rồi mới bắt đầu dựng */
+  prewarmed: boolean;
   /** Gọi một lần khi mọi phần của vùng đã dựng xong */
   onReady: (village: VillageId) => void;
 }
+
+/** Model dân làng theo thứ tự đi lại (bà cụ, chú nông dân xen kẽ). */
+export const ZONE_VILLAGER_MODELS = ['characters/dan-lang-ba-cu', 'characters/dan-lang-nong-dan'];
+
+/** Chờ làng chuẩn bị xong tối đa chừng này giây trước khi dựng vùng (mạng chậm thì vẫn dựng, có thể khựng). */
+export const ZONE_PREWARM_WAIT = 12;
 
 /** Cứ bấy nhiêu khung hình dựng thêm một phần (chia nhỏ để không khựng). */
 const FRAMES_PER_STAGE = 2;
 
 /**
- * Làm ấm một model nhân vật trước khi dựng: tải và giải mã (chạy ngầm), rồi đẩy từng texture lên GPU MỖI KHUNG HÌNH MỘT CÁI (`initTexture`), để lúc dựng nhân vật thật không phải tải hay đẩy texture 2048 trong
- * một khung hình (đó là chỗ khựng ~100 ms khi bác An hiện ra). Trả true khi xong. Giữ model trong lúc làm ấm.
+ * Làm ấm model nhân vật của người dẫn trước khi dựng: thường `ZonePrewarm` đã làm sẵn từ khi người chơi còn xa (`isModelWarm`); chưa kịp thì tự làm (tải, rồi đẩy từng texture lên GPU mỗi khung hình
+ * một cái, chờ sau texture 2048: xem `warmTextures`). Trả true khi xong. Giữ model trong lúc làm ấm.
  */
 function useWarmModel(id: string | null): boolean {
   const gl = useThree((s) => s.gl);
-  const [done, setDone] = useState<string | null>(null);
+  const [done, setDone] = useState<string | null>(id !== null && isModelWarm(id) ? id : null);
   useEffect(() => {
     if (!id) return;
+    if (isModelWarm(id)) {
+      setDone(id);
+      return;
+    }
     let cancelled = false;
     const promise = preloadModel(id);
     retainModel(id);
-    void promise.then((data) => {
-      if (cancelled) return;
-      const textures = sceneTextures(data.scene).filter(textureUsable);
-      let i = 0;
-      const step = () => {
+    void promise
+      .then((data) => warmTextures(gl, usableTextures([data.scene]), () => cancelled))
+      .then(() => {
         if (cancelled) return;
-        if (i < textures.length) {
-          gl.initTexture(textures[i++]);
-          requestAnimationFrame(step);
-        } else setDone(id);
-      };
-      requestAnimationFrame(step);
-    });
+        markModelWarm(id);
+        setDone(id);
+      });
     return () => {
       cancelled = true;
       releaseModel(id);
@@ -68,7 +80,7 @@ function useWarmModel(id: string | null): boolean {
  * trong một khung hình, để không khựng khi người chơi tới gần. Gỡ vùng (xa quá) thì mọi hình học, vật liệu riêng và texture biển được giải phóng bởi chính từng phần. Mặt đất, cổng và hình dáng nhìn từ xa
  * (bản xa) nằm ngoài vùng nên luôn có. Đặt trong <WalkWorld>.
  */
-export function VillageZone({ village, level, labels, icons, states, guideTalking, talkAt, onReady }: VillageZoneProps) {
+export function VillageZone({ village, level, labels, icons, states, guideTalking, talkAt, villagerColliders, prewarmed, onReady }: VillageZoneProps) {
   const layout = village.layout;
   const byModel = useMemo(() => {
     const out: { id: string; items: Placement[] }[] = [];
@@ -78,13 +90,17 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
   const guide = layout.guide;
   const guideModel = guide ? `characters/${CHARACTERS[guide.character].portrait}` : null;
   const guideWarm = useWarmModel(guideModel);
-  // các phần theo thứ tự: 1 đồ nhỏ, 2 biển, 3.. từng model, cuối cùng người dẫn (chỉ khi model đã làm ấm xong)
-  const total = 2 + byModel.length + (guide ? 1 : 0);
+  const loops = layout.villagers ?? [];
+  // các phần theo thứ tự: 1 đồ nhỏ, 2 biển, 3.. từng model, rồi người dẫn (chỉ khi model đã làm ấm xong), cuối cùng dân làng đi lại
+  const guideStage = 3 + byModel.length;
+  const total = 2 + byModel.length + (guide ? 1 : 0) + loops.length; // mỗi dân làng một phần riêng (dựng một nhân vật có xương mất chừng 15 ms)
   const [stage, setStage] = useState(0);
   const frames = useRef(0);
   const ready = useRef(false);
-  useFrame(() => {
-    if (guide && stage === total - 1 && !guideWarm) return; // chờ model người dẫn làm ấm xong rồi mới dựng
+  const waited = useRef(0);
+  useFrame((_, dt) => {
+    if (stage === 0 && !prewarmed && (waited.current += dt) < ZONE_PREWARM_WAIT) return; // chờ chuẩn bị xong rồi mới dựng (quá hạn thì dựng luôn)
+    if (guide && stage === guideStage - 1 && !guideWarm) return; // chờ model người dẫn làm ấm xong rồi mới dựng
     if (stage >= total) return;
     if (++frames.current >= FRAMES_PER_STAGE) {
       frames.current = 0;
@@ -92,12 +108,18 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
     }
   });
   useEffect(() => {
+    if (PROBE) {
+      const w = window as unknown as { __zoneLog?: [string, number, number][] };
+      (w.__zoneLog ??= []).push([village.id, stage, performance.now()]);
+    }
+  }, [stage, village.id]);
+  useEffect(() => {
     if (stage >= total && !ready.current) {
       ready.current = true;
       onReady(village.id);
     }
   }, [stage, total, village.id, onReady]);
-  if (import.meta.env.DEV) (window as unknown as { __zoneStage?: Record<string, number> }).__zoneStage = { ...((window as unknown as { __zoneStage?: Record<string, number> }).__zoneStage ?? {}), [village.id]: stage };
+  if (PROBE) (window as unknown as { __zoneStage?: Record<string, number> }).__zoneStage = { ...((window as unknown as { __zoneStage?: Record<string, number> }).__zoneStage ?? {}), [village.id]: stage };
 
   return (
     <group>
@@ -110,7 +132,7 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
           </Suspense>
         ) : null,
       )}
-      {guide && guideModel && guideWarm && stage >= 3 + byModel.length && (
+      {guide && guideModel && guideWarm && stage >= guideStage && (
         <Suspense fallback={null}>
           <Character
             id={guideModel}
@@ -121,6 +143,19 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
             seed={7}
           />
         </Suspense>
+      )}
+      {loops.map((path, i) =>
+        stage >= total - loops.length + 1 + i ? (
+          <Villager
+            key={i}
+            id={ZONE_VILLAGER_MODELS[i % ZONE_VILLAGER_MODELS.length]}
+            waypoints={path}
+            seed={211 + i * 23}
+            start={i % path.length}
+            collider={villagerColliders[i]}
+            cullDistance={VILLAGER_CULL[level]}
+          />
+        ) : null,
       )}
     </group>
   );

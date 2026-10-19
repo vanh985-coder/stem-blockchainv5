@@ -112,6 +112,7 @@ describe('so sánh hai lần chọn và khoảng theo mức chất lượng', ()
     expect(marketNearDistance('low', 'env/nha-mai-ngoi')).toBe(1.5);
     expect(marketNearDistance('low', 'env/bui-tre')).toBe(1.5);
     expect(marketNearDistance('low', 'env/khung-cui')).toBe(-1);
+    expect(marketNearDistance('low', 'env/phen-phoi-giay')).toBe(-1); // phên: ở mức Thấp luôn dùng bản xa
     expect(marketNearDistance('medium', 'env/cong-lang-giay')).toBe(12);
     expect(marketNearDistance('high', 'env/cong-lang-bac')).toBe(28);
     expect(marketNearDistance('medium', 'env/leu-cho')).toBe(15);
@@ -125,6 +126,10 @@ describe('so sánh hai lần chọn và khoảng theo mức chất lượng', ()
     expect(marketMaxDistance('high', 'env/bui-tre')).toBe(120);
     expect(marketMaxDistance('low', 'env/bui-tre')).toBe(52);
     expect(marketMaxDistance('high', 'env/nha-mai-ngoi')).toBe(Infinity);
+    // phên phơi giấy: tầm vẽ ngắn hơn ở cả ba mức
+    expect(marketMaxDistance('low', 'env/phen-phoi-giay')).toBe(40);
+    expect(marketMaxDistance('medium', 'env/phen-phoi-giay')).toBe(70);
+    expect(marketMaxDistance('high', 'env/phen-phoi-giay')).toBe(90);
   });
 });
 
@@ -218,5 +223,9 @@ describe('3 bậc: chính, vừa, xa', () => {
     expect(marketFarDistance('high', 'env/cong-lang-giay')).toBe(40);
     expect(marketFarDistance('low', 'env/cong-lang-giay')).toBe(marketNearDistance('low', 'env/cong-lang-giay'));
     for (const level of ['medium', 'high'] as const) expect(marketFarDistance(level)).toBeGreaterThan(marketNearDistance(level, 'env/cong-lang-giay'));
+    // phên phơi giấy: bản vừa chỉ thật gần (14 và 22), vẫn có bậc vừa (xa hơn gần)
+    expect(marketFarDistance('medium', 'env/phen-phoi-giay')).toBe(14);
+    expect(marketFarDistance('high', 'env/phen-phoi-giay')).toBe(22);
+    for (const level of ['medium', 'high'] as const) expect(marketFarDistance(level, 'env/phen-phoi-giay')).toBeGreaterThan(marketNearDistance(level, 'env/phen-phoi-giay'));
   });
 });

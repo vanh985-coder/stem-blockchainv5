@@ -12,16 +12,27 @@
 
 ## Cảnh làng (3D đi lại; từ bước W1 là một vùng của thế giới mở `/cho`, `WorldScene`)
 
-- **Trong thế giới mở (bước W1):** làng nằm ở phía bắc chợ, cổng làng ở đầu làng, cách tâm chợ 72 (đường đất dài 30 từ rìa chợ). Bố cục giữ nguyên cỡ (`three/world/villages/giay.ts`). Làng chỉ được tải khi người chơi cách rìa làng dưới 60 và dọn khi xa hơn 90; từ xa vẫn thấy hình làng nhẹ. Cảnh mở đầu và "Em có biết?" chạy khi lần đầu bước qua cổng làng. "Về làng" (cuối màn) mở `/cho?tu=lang-giay`: người chơi đứng trong làng cạnh 3 biển gỗ.
+- **Trong thế giới mở (bước W1, mở rộng ở bước W2):** làng nằm ở phía bắc chợ, cổng làng ở đầu làng, cách tâm chợ 72 (đường đất dài 30 từ rìa chợ); từ W2 làng bán kính 35 mở ra phía sau cổng nên tâm làng cách tâm chợ 107 (`three/world/villages/giay.ts`). Làng chỉ được tải khi người chơi cách rìa làng dưới 60 và dọn khi xa hơn 90; từ xa vẫn thấy hình làng nhẹ. Cảnh mở đầu và "Em có biết?" chạy khi lần đầu bước qua cổng làng. "Về làng" (cuối màn) mở `/cho?tu=lang-giay`: người chơi đứng trong làng cạnh 3 biển gỗ.
 
-- **Cổng vào:** `env/cong-lang-giay`.
-- **Bên trong:** nhà `env/nha-mai-ngoi` và `env/nha-mai-tranh`; `env/bui-tre`; nhiều tấm `env/phen-phoi-giay` xếp thành sân phơi giấy.
-- **Code tự dựng:** chồng giấy, bể ngâm, bàn chép sổ có cuốn Sổ Chung bìa tím.
-- **Bác An** đứng gần bàn chép sổ.
+- **Cổng vào:** `env/cong-lang-giay`, ở (0, −35) trong hệ tọa độ làng (gốc là tâm làng, +Z là phía bắc, người vào cổng nhìn về +Z).
+- **Model dùng:** nhà `env/nha-mai-ngoi` và `env/nha-mai-tranh`; `env/bui-tre`; `env/phen-phoi-giay`; `env/gieng-lang`; `env/cay-da` (cây lớn).
+- **Code tự dựng:** chồng giấy, bể ngâm dó (có mặt nước), **cối giã dó** (`coi-gia`: nền đá, cối đá, đòn gánh gỗ và chày), **bếp nấu dó** (`bep-do`: bệ đá, nồi lớn, ống khói gạch), **đình làng nhỏ** (`dinh`: nền đá, bốn cột gỗ, mái ngói bốn mái), bàn chép sổ có cuốn Sổ Chung bìa tím, chum vại, đống rơm, khóm hoa, **ao** (hợp của 3 vũng tròn có bờ cỏ), **ruộng lúa** ở rìa, hàng rào tre ngắn quanh sân nhà. Đồ nhiều màu trong một hình (đình, cối, bếp) dùng màu theo đỉnh để vẫn là một draw call.
+- **Bác An** đứng sau bàn chép sổ ở khu giữa làng.
 - Xếp theo ảnh `concept-lang-giay`.
+- **Bố cục bước W2** (tọa độ làng; xem `LANG_GIAY_LAYOUT` và sơ đồ ở báo cáo bước W2), chia khu nối bằng đường đất nhỏ:
+  - **Đại lộ** (rộng 4,4) từ cổng (0, −35) lên khu giữa làng, hai bên có nhà, bụi tre và khóm hoa.
+  - **Khu giữa làng**: sân đất ở (0, −7), ba biển gỗ ở z ≈ −10 và −8,8 quay mặt về cổng, bàn chép sổ (−6,5; −0,5) và bác An (−6,7; 1,2). Chỗ xuất hiện khi `?tu=lang-giay`: (0, −14,5) nhìn về +Z, ngay trước ba biển.
+  - **Xưởng làm giấy** (phía đông, +X): sân phơi giấy lớn 14 phên (8 phên ở phía nam đường ngang, 6 phên ở phía bắc; mỗi phên 4 chân giá), ba bể ngâm dó, hai bếp nấu dó, ba cối giã dó, chồng giấy thành phẩm trước hai nhà xưởng (một nhà ngói, một nhà tranh).
+  - **Khu nhà ở** (phía tây và dọc đại lộ): 10 nhà ngói và nhà tranh, mỗi nhà một tỉ lệ (0,94 đến 1,08), màu nhân và góc xoay riêng, quay mặt ra đường; sân đất, chum vại, rơm, khóm hoa, hàng rào tre ngắn.
+  - **Phía bắc**: ao làng (bờ cỏ rộng 1,3), đình nhỏ quay mặt ra ao, cây đa lớn (tỉ lệ 0,5), giếng.
+  - **Rìa làng**: hàng rào tre bán kính 36,5 (chừa lối quanh cổng), 4 mảnh ruộng lúa, bụi tre (13 bụi, bụi nhỏ lấp chỗ trống).
+  - **Dân làng**: 3 người đi lại giữa các khu (bà cụ quanh sân giữa làng và đại lộ; chú nông dân giữa sân phơi giấy và khu nhà ở; bà cụ dọc đường lên ao và đình), nhường đường người chơi như ở chợ.
+  - **Đường cho mũi tên** (`paths`): cổng → đại lộ → ngã ở sân → từng biển; sân → đường ngang đông tây; sân → đường lên phía bắc; sân → chỗ đứng trước bác An (nút `guide:lang-giay`).
+  - **Vật cản theo chân thật** cho mọi vật mới (xem `?debug=colliders`): nhà, phên, bể, bếp, cối, nền đình (hộp 6,2 × 5,0), ao (từng vũng tròn), giếng, cây đa (nền rễ), biển, bác An và hàng rào ngắn. Khóm hoa, ruộng, mặt nước trong bể thì đi qua được.
+- **Test** `villages/giay.test.ts`: đủ nhà, phên, bể, bếp, cối, đình; mọi món trong hàng rào và không chồng nhau; ao và đình chặn đúng, bờ ao đi được; đi được từ chỗ xuất hiện tới biển, bác An, cổng, giếng, đình, bể, bếp, cối, từng phên và từng nhà; mọi điểm và đoạn đi của dân làng không xuyên vật cản; các nút đường nhỏ trống và liền nhau.
 - **Cảnh mở đầu (lần đầu vào làng):** chiếu ảnh truyện số 6 kèm lời. Bác An: "Mỗi trang sổ có một mã, tính từ mã trang trước. Đêm qua có kẻ sửa trộm một trang, cả làng cãi nhau xem ai nợ ai!"
 - **3 biển gỗ:** "Học cùng bác An" (màn 1), "Đuổi theo {phanDien}" (màn 2), "Ghép lại cuốn sổ" (màn 3).
-- **Đã làm (mốc 2, bước 9):** bố cục ở `packages/village-lang-giay/src/scene/layout.ts` (bán kính khu 21, hàng rào tre bán kính 19,8; cổng ở phía nam (0, −17,5), con đường đất dẫn tới ba biển ở sân trước; bên +X sân phơi 6 phên xếp hai hàng, mỗi phên 4 chân giá; bên −X nhà ngói, bàn chép sổ và bác An; phía sau ba bể ngâm giữa hai nhà). Test `layout.test.ts`: mọi món trong hàng rào, không chồng nhau, tới được mọi biển. Màn 2 đã mở (mốc 2, bước 12), màn 3 hiện "Sắp ra mắt" cho tới khi làm xong; xong màn 1 thì nhiệm vụ là quay về chợ.
+- **Bản đầu (mốc 2, bước 9; đã thay bằng bố cục W2 ở trên, giữ lại để biết lịch sử):** bố cục ở `packages/village-lang-giay/src/scene/layout.ts` (bán kính khu 21, hàng rào tre bán kính 19,8; cổng ở phía nam (0, −17,5), con đường đất dẫn tới ba biển ở sân trước; bên +X sân phơi 6 phên xếp hai hàng, mỗi phên 4 chân giá; bên −X nhà ngói, bàn chép sổ và bác An; phía sau ba bể ngâm giữa hai nhà). Test `layout.test.ts`: mọi món trong hàng rào, không chồng nhau, tới được mọi biển. Màn 2 đã mở (mốc 2, bước 12), màn 3 hiện "Sắp ra mắt" cho tới khi làm xong; xong màn 1 thì nhiệm vụ là quay về chợ.
 
 ## Màn 1 — Game chính: "Trang nối trang" (trang bài học 2D)
 

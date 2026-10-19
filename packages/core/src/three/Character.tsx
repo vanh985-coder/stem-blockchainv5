@@ -87,11 +87,22 @@ export interface CharacterProps extends GroupProps {
   onReady?: (info: CharacterInfo) => void;
 }
 
-/** Đo khung bao (chính xác, có tính xương ở tư thế gốc) rồi tính phóng và dịch để cao đúng và chân ở y = 0. */
+const fitCache = new WeakMap<Object3D, Map<number, Fit>>();
+
+/**
+ * Đo khung bao (chính xác, có tính xương ở tư thế gốc) rồi tính phóng và dịch để cao đúng và chân ở y = 0. Kết quả chỉ phụ thuộc bản model dùng chung và chiều cao nên nhớ lại: nhiều người cùng một model (dân làng)
+ * không đo lại (mỗi lần đo xương chừng 20 ms, dựng 3 dân làng trong một khung hình từng gây khựng).
+ */
 function measureFit(scene: Object3D, height: number): Fit {
+  let byHeight = fitCache.get(scene);
+  if (!byHeight) fitCache.set(scene, (byHeight = new Map()));
+  const known = byHeight.get(height);
+  if (known) return known;
   scene.updateMatrixWorld(true);
   const box = new Box3().setFromObject(scene, true);
-  return fitToHeight(box.min.y, box.max.y, height);
+  const fit = fitToHeight(box.min.y, box.max.y, height);
+  byHeight.set(height, fit);
+  return fit;
 }
 
 function hasSkinnedMesh(scene: Object3D): boolean {

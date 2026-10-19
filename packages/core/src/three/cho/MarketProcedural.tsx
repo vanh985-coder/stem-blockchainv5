@@ -322,8 +322,8 @@ export const toItem = (p: PropPlacement, extra: Partial<Item> = {}): Item => ({ 
  * Mỗi loại một InstancedMesh dùng chung geometry và material.
  */
 /** Đồ gợi nghề quanh cổng (bước 8d): hình dựng (`createCraftProp`) và màu vật liệu; màu từng món nhân thêm màu `tint` của bố cục (cuộn vải nhiều màu). */
-const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc'] as const;
-const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughness: number }> = {
+const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh'] as const;
+const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughness: number; vertexColors?: boolean }> = {
   giay: { color: '#EFE6CC', roughness: 1 },
   vai: { color: '#FFFFFF', roughness: 0.95 },
   'khoi-da': { color: '#8E8E86', roughness: 1 },
@@ -335,13 +335,20 @@ const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughne
   'so-chung': { color: '#5B3FD6', roughness: 0.7 },
   'be-ngam': { color: '#8D8F8A', roughness: 1 },
   nuoc: { color: '#6FA3B8', roughness: 0.15 },
+  // nhiều bộ phận khác màu trong một hình học: màu theo đỉnh (xem marketGeometry)
+  'coi-gia': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
+  'bep-do': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
+  dinh: { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
 };
 
+/** Các loại đồ nhỏ do code dựng (kèm hình học và vật liệu) mà `MarketProps` vẽ: dùng cả để biên dịch trước shader (vật liệu màu theo đỉnh của đình, cối, bếp là chương trình shader mới). */
+export function craftMaterial(kind: (typeof CRAFT_KINDS)[number]): MeshStandardMaterial {
+  return new MeshStandardMaterial({ ...CRAFT_COLOR[kind], flatShading: kind === 'khoi-da' });
+}
+export { CRAFT_KINDS };
+
 export function MarketProps({ layout }: { layout: Pick<MarketLayout, 'props' | 'seed'> }) {
-  const crafts = useMemo(
-    () => CRAFT_KINDS.map((kind) => ({ kind, geo: createCraftProp(kind)!, mat: new MeshStandardMaterial({ ...CRAFT_COLOR[kind], flatShading: kind === 'khoi-da' }) })),
-    [],
-  );
+  const crafts = useMemo(() => CRAFT_KINDS.map((kind) => ({ kind, geo: createCraftProp(kind)!, mat: craftMaterial(kind) })), []);
   useDispose(useMemo(() => crafts.flatMap((c) => [c.geo, c.mat]), [crafts]));
   const craftItems = useMemo(() => crafts.map((c) => layout.props.filter((p) => p.kind === c.kind).map((p) => toItem(p))), [crafts, layout]);
 

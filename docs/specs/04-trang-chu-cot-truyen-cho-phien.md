@@ -162,6 +162,7 @@ Chợ và 4 làng nằm trong một cảnh 3D ở hub, địa chỉ vẫn `/cho`
 - **Cổng dời ra đầu mỗi làng.** Rìa chợ chỉ còn lối ra đường và **biển chỉ đường** gỗ ghi tên làng. Cổng làng chưa mở: có then gỗ, dây đỏ; thấy làng từ ngoài, không vào được; bấm E hiện "Cổng làng đóng…" như cũ.
 - **Mở đầu làng:** cảnh mở đầu và "Em có biết?" của làng chạy khi người chơi lần đầu bước qua cổng làng. Cảnh mở cổng Làng Dệt (bước 15a) chạy khi người chơi tới gần cổng Dệt lần đầu sau khi nhận Trang Sổ Vàng 1; dòng nhiệm vụ đổi ngay sau cảnh trao trang.
 - **Mũi tên dưới chân:** chỉ theo đường tới mục tiêu nhiệm vụ, ẩn khi gần mục tiêu; mũi tên trên đầu của chợ (bước 8) được thay bằng mũi tên này.
+- **Làng Giấy mở rộng (bước W2):** làng bán kính 35 mở ra phía sau cổng (cổng vẫn cách tâm chợ 72, tâm làng cách tâm chợ 107): đại lộ từ cổng, khu giữa làng (ba biển, bác An), xưởng làm giấy, khu nhà ở, ao, đình, cây đa, ruộng và 3 dân làng (chi tiết spec 05). Mũi tên dưới chân đi theo đường nhỏ trong làng tới từng biển và tới bác An. `?tu=lang-giay` đưa người chơi tới (0, −14,5) trong làng, ngay trước ba biển.
 - **3 làng chưa dựng** (Dệt, Khắc Dấu, Bạc): cổng đúng model, vài nhà, bụi tre và một biển "Học cùng [người dẫn]" dẫn vào bài học (màn 4, 7, 10); game để "Sắp ra mắt". Nội dung 3D của 3 làng này làm ở bước W2 và mốc 3.
 - **"Về làng" / "Về chợ"** cuối mỗi màn và trong menu đều mở `/cho?tu=<id>`; `/ban-do` giữ nguyên.
 

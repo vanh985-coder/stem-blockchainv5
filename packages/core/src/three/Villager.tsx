@@ -6,6 +6,7 @@ import { Character, type CharacterInfo } from './Character';
 import { usePlayerState } from './WalkWorld';
 import type { ClipName } from './clips';
 import { DEFAULT_WANDER, createWanderState, stepWander, type WanderParams, type Waypoint } from './wander';
+import { withinCullDistance } from './cullDistance';
 
 type GroupProps = Omit<ThreeElements['group'], 'id' | 'position' | 'rotation'>;
 
@@ -61,7 +62,7 @@ export function Villager({ id, waypoints, start = 0, seed = 1, wander, collider,
     stepWander(state, waypoints, params.current, Math.min(dt, 0.1), rng, player, holdRef.current);
     g.position.set(state.x, 0, state.z);
     g.rotation.y = state.yaw;
-    if (player && cullDistance !== Infinity) g.visible = (state.x - player.x) ** 2 + (state.z - player.z) ** 2 < cullDistance * cullDistance;
+    if (player && cullDistance !== Infinity) g.visible = withinCullDistance(state.x, state.z, player.x, player.z, cullDistance);
     if (collider) {
       collider.x = state.x;
       collider.z = state.z;

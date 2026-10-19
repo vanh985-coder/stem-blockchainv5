@@ -9,14 +9,19 @@
 import { VILLAGE_ORDER } from '../../content/levels';
 import type { VillageId } from '../../village';
 import { GATES, type Direction, type GateDef, type GateId, type Placement, type PropPlacement } from '../cho/marketLayout';
-import type { VillageBoardDef, VillageGateDef, VillageGuideDef, VillageLayoutInput, VillageRoad } from '../village/villageLayout';
+import type { VillageBoardDef, VillageFenceRun, VillageField, VillageGateDef, VillageGuideDef, VillageLayoutInput, VillagePaths, VillagePond, VillageRoad, VillagerLoop } from '../village/villageLayout';
 
 /** Cổng làng cách tâm chợ bấy nhiêu: từ rìa chợ (bán kính 42) tới cổng dài 30. */
 export const GATE_WORLD_DISTANCE = 72;
-/** Người chơi vào làng (đã qua cổng) khi cách tâm làng dưới bấy nhiêu (cổng nằm ở 17,5 nên phải bước qua cổng 1 đơn vị). */
+/** Người chơi vào làng (đã qua cổng) khi cách tâm làng dưới bấy nhiêu, với làng nhỏ có cổng cách tâm 17,5 (phải bước qua cổng 1 đơn vị). Làng khác: xem `insideRadiusOf`. */
 export const VILLAGE_INSIDE_RADIUS = 16.5;
-/** Biên đi lại của cả thế giới (hình tròn quanh tâm chợ): bao hết 4 làng (tâm ở 89,5, bán kính 21) và đồng ruộng quanh làng. */
-export const WORLD_BOUNDS = 150;
+/** Biên đi lại của cả thế giới (hình tròn quanh tâm chợ): bao hết 4 làng (Làng Giấy ở bước W2: tâm cách 107, hàng rào bán kính 36,5) và đồng ruộng quanh làng. */
+export const WORLD_BOUNDS = 158;
+
+/** Người chơi coi là đã vào làng khi cách tâm làng dưới bán kính này: bước qua cổng thêm 1 đơn vị (cổng cách tâm `hypot(gate.x, gate.z)`). */
+export function insideRadiusOf(local: Pick<VillageLayoutInput, 'gate'>): number {
+  return Math.hypot(local.gate.x, local.gate.z) - 1;
+}
 
 export interface VillageFrame {
   village: VillageId;
@@ -96,6 +101,22 @@ export function placeVillage(local: VillageLayoutInput, f: VillageFrame): WorldV
   const center = { x: ox, z: oz };
   const gate: VillageGateDef = { model: local.gate.model, x: f.gateX, z: f.gateZ, yaw: f.yaw + Math.PI };
   const s = at(local.start.x, local.start.z);
+  const pond = (p: VillagePond): VillagePond => ({ ...p, ...at(p.x, p.z) });
+  const field = (q: VillageField): VillageField => ({ ...q, ...at(q.x, q.z), yaw: q.yaw + f.yaw });
+  const run = (r: VillageFenceRun): VillageFenceRun => {
+    const a = at(r.x0, r.z0);
+    const b = at(r.x1, r.z1);
+    return { x0: a.x, z0: a.z, x1: b.x, z1: b.z };
+  };
+  const loop = (l: VillagerLoop): VillagerLoop => l.map(([x, z]) => {
+    const p = at(x, z);
+    return [p.x, p.z] as const;
+  });
+  const paths = (q: VillagePaths): VillagePaths => ({
+    ...q,
+    nodes: q.nodes.map((n) => ({ ...n, ...at(n.x, n.z) })),
+    guideStand: q.guideStand ? { ...q.guideStand, ...at(q.guideStand.x, q.guideStand.z) } : undefined,
+  });
   return {
     ...local,
     center,
@@ -108,6 +129,11 @@ export function placeVillage(local: VillageLayoutInput, f: VillageFrame): WorldV
     yards: local.yards.map((y) => ({ ...y, ...at(y.x, y.z) })),
     roads: local.roads.map(road),
     fence: local.fence ? { ...local.fence, center } : undefined,
+    ponds: local.ponds?.map(pond),
+    fields: local.fields?.map(field),
+    fenceRuns: local.fenceRuns?.map(run),
+    villagers: local.villagers?.map(loop),
+    paths: local.paths ? paths(local.paths) : undefined,
   };
 }
 

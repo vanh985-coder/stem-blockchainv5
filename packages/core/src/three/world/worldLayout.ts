@@ -11,11 +11,11 @@ import type { VillageId } from '../../village';
 import type { CameraBlocker } from '../cameraCollision';
 import { box, obox, type Obstacle } from '../collision';
 import { gateDecorWorld, generateMarket, propCollider, DECK_START_X, DECK_TOP, DOCK_HALF_WIDTH, GATE_DECOR, MODEL_PAPER_RACK, PLAZA_RADIUS, PLAZA_RING_RADIUS, RAMP_START_X, RIVER_X, ROAD_WIDTH, type GateDef, type GateId, type MarketDensity, type MarketLayout, type Placement, type PropPlacement, FULL_DENSITY } from '../cho/marketLayout';
-import { assembleVillage, type VillageLayout } from '../village/villageLayout';
+import { assembleVillage, type VillageLayout, type VillagePaths } from '../village/villageLayout';
 import { buildGraph, type GraphNode, type RoadGraph } from './roadGraph';
 import { thinEvenly } from '../cho/marketLayout';
 import { LOCAL_VILLAGES } from './villages';
-import { VILLAGE_FRAMES, localToWorld, placeVillage, worldGate, type VillageFrame } from './worldFrames';
+import { VILLAGE_FRAMES, insideRadiusOf, localToWorld, placeVillage, worldGate, type VillageFrame } from './worldFrames';
 
 // ---------------------------------------------------------------------------
 // Sông và cầu (đường sang Làng Bạc)
@@ -182,12 +182,15 @@ export interface WorldVillage {
   silhouette: Placement[];
   /** Chỗ đứng trước từng biển gỗ (nút đồ thị đường) */
   boardStands: { level: number; x: number; z: number }[];
-  /** Ngã nối từ cổng vào sân trước (nút đồ thị đường) */
-  junction: { x: number; z: number };
+  /** Người chơi đã vào làng khi cách tâm làng dưới bán kính này (xem `insideRadiusOf`) */
+  insideRadius: number;
+  /** Đường đất nhỏ trong làng ở tọa độ thế giới (nút và đoạn nối, nút nối cổng, nút nối các biển, chỗ đứng trước người dẫn); làng chưa dựng thì một nút ở sân trước */
+  nav: VillagePaths;
 }
 
-/** Từ cổng tới ngã trong làng (hệ làng): đi dọc con đường đất vào sân trước. */
+/** Làng không khai báo đường nhỏ (3 làng chưa dựng): từ cổng tới một ngã ở sân trước (hệ làng), đi dọc con đường đất vào. */
 const JUNCTION_LOCAL: readonly [number, number] = [0, -12];
+const FALLBACK_PATHS: VillagePaths = { nodes: [{ id: 'in', x: JUNCTION_LOCAL[0], z: JUNCTION_LOCAL[1] }], links: [], entry: 'in', boardJoin: 'in' };
 /** Đứng cách biển bấy nhiêu về phía mặt trước của biển. */
 const BOARD_STAND_DISTANCE = 1.2;
 
@@ -224,6 +227,7 @@ export function assembleWorldVillage(f: VillageFrame, seed: number, density: Mar
   const input = thinVillage({ ...placed, placements: [...placed.placements, ...decor.placements], props: [...placed.props, ...decor.props] }, density);
   const layout = assembleVillage(input);
   const at = (lx: number, lz: number) => localToWorld(local, f, lx, lz);
+  const nav = placed.paths ?? placeVillage({ ...local, paths: FALLBACK_PATHS }, f).paths!;
   const stands = local.boards.map((b) => {
     const p = at(b.x + Math.sin(b.yaw) * BOARD_STAND_DISTANCE, b.z + Math.cos(b.yaw) * BOARD_STAND_DISTANCE);
     return { level: b.level, x: p.x, z: p.z };
@@ -238,7 +242,8 @@ export function assembleWorldVillage(f: VillageFrame, seed: number, density: Mar
     start: placed.start,
     silhouette: silhouetteOf(input.placements),
     boardStands: stands,
-    junction: at(JUNCTION_LOCAL[0], JUNCTION_LOCAL[1]),
+    insideRadius: insideRadiusOf(local),
+    nav,
   };
 }
 
@@ -248,6 +253,9 @@ export function assembleWorldVillage(f: VillageFrame, seed: number, density: Mar
 /** Chỗ cổng thế giới: nút `gate:<id cổng>`. Nút biển gỗ: `board:<số màn>`. */
 export const gateNodeId = (id: GateId): string => `gate:${id}`;
 export const boardNodeId = (level: number): string => `board:${level}`;
+/** Nút trên đường nhỏ trong làng: `in:<id làng>:<id nút>`; chỗ đứng trước người dẫn: `guide:<id làng>`. */
+export const villageNodeId = (village: VillageId, id: string): string => `in:${village}:${id}`;
+export const guideNodeId = (village: VillageId): string => `guide:${village}`;
 
 const RING_NODES = 8;
 const ringId = (k: number) => `ring:${k}`;
@@ -278,12 +286,18 @@ export function buildWorldGraph(villages: readonly WorldVillage[]): RoadGraph {
       nodes.push({ id: 'bridge:west', x: RAMP_START_X - 1, z: 0 }, { id: 'bridge:east', x: BRIDGE_RAMP_END_X - 0.5, z: 0 });
       links.push([exitId, 'bridge:west'], ['bridge:west', 'bridge:east'], ['bridge:east', gateId]);
     } else links.push([exitId, gateId]);
-    const jId = `in:${f.village}`;
-    nodes.push({ id: jId, x: v.junction.x, z: v.junction.z });
-    links.push([gateId, jId]);
+    // đường đất nhỏ trong làng: cổng → nút vào → các nút khác; chỗ đứng trước từng biển; chỗ đứng trước người dẫn
+    for (const n of v.nav.nodes) nodes.push({ id: villageNodeId(f.village, n.id), x: n.x, z: n.z });
+    for (const [a, b] of v.nav.links) links.push([villageNodeId(f.village, a), villageNodeId(f.village, b)]);
+    links.push([gateId, villageNodeId(f.village, v.nav.entry)]);
+    const join = villageNodeId(f.village, v.nav.boardJoin);
     for (const s of v.boardStands) {
       nodes.push({ id: boardNodeId(s.level), x: s.x, z: s.z });
-      links.push([jId, boardNodeId(s.level)]);
+      links.push([join, boardNodeId(s.level)]);
+    }
+    if (v.nav.guideStand) {
+      nodes.push({ id: guideNodeId(f.village), x: v.nav.guideStand.x, z: v.nav.guideStand.z });
+      links.push([villageNodeId(f.village, v.nav.guideStand.join), guideNodeId(f.village)]);
     }
   }
   return buildGraph(nodes, links);

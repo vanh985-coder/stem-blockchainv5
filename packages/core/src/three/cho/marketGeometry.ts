@@ -2,7 +2,7 @@
  * Hình học do code dựng cho chợ phiên (không có model trong file): thuyền gỗ, mui thuyền, chum vại, đống rơm. Hàm tạo hình học
  * thuần của three (không cần canvas hay GPU), dựng một lần rồi dùng chung cho mọi bản nhân bản.
  */
-import { BoxGeometry, CylinderGeometry, IcosahedronGeometry, LatheGeometry, Vector2, type BufferGeometry } from 'three';
+import { BoxGeometry, Color, ConeGeometry, CylinderGeometry, Float32BufferAttribute, IcosahedronGeometry, LatheGeometry, Vector2, type BufferGeometry } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { PROP_SIZES, type PropKind } from './marketLayout';
 
@@ -84,6 +84,109 @@ function slab(w: number, h: number, d: number, dx = 0, dy = 0, dz = 0): BufferGe
   return g;
 }
 
+/** Tô cả hình học một màu (thuộc tính màu theo đỉnh): để gộp nhiều bộ phận khác màu (đá, gỗ, ngói) thành MỘT hình học và MỘT draw call; vật liệu dùng `vertexColors`. */
+function paint(g: BufferGeometry, hex: number): BufferGeometry {
+  const n = g.getAttribute('position').count;
+  const { r, g: gr, b } = new Color(hex); // màu sRGB đổi sang không gian tuyến tính của bộ dựng hình (màu theo đỉnh không tự đổi)
+  const c = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    c[i * 3] = r;
+    c[i * 3 + 1] = gr;
+    c[i * 3 + 2] = b;
+  }
+  g.setAttribute('color', new Float32BufferAttribute(c, 3));
+  return g;
+}
+
+const STONE = 0x9a9a90;
+const WOOD = 0x8a5a2b;
+const WOOD_DARK = 0x6b4526;
+const TILE = 0xc2592b;
+const POT = 0x2f2f2f;
+const BRICK = 0x9b5a45;
+
+/** Đặt hình học ở (x, y, z) (tâm hình). */
+function translated(g: BufferGeometry, x: number, y: number, z: number): BufferGeometry {
+  g.translate(x, y, z);
+  return g;
+}
+
+/** Hình chóp bốn mặt (mái ngói) rộng `w` (x) × sâu `d` (z) ở chân y, cao `h`: nón 4 cạnh xoay 45° rồi kéo giãn. */
+function pyramid(w: number, d: number, h: number, y: number): BufferGeometry {
+  const g = new ConeGeometry(Math.SQRT1_2, h, 4, 1);
+  g.rotateY(Math.PI / 4);
+  g.scale(w, 1, d);
+  g.translate(0, y + h / 2, 0);
+  return g;
+}
+
+/** Cột trụ đứng bán kính r cao h, chân ở y, tâm (x, z). */
+function post(r: number, h: number, x: number, y: number, z: number): BufferGeometry {
+  const g = new CylinderGeometry(r, r, h, 10);
+  g.translate(x, y + h / 2, z);
+  return g;
+}
+
+/**
+ * Cối giã dó (cối đạp): nền đá, cối đá hình trụ, đòn gánh gỗ gác lên cột, chày thả vào cối. Khung bao đúng hộp PROP_SIZES `coi-gia` (2,2 × 0,9, cao 1,15), tâm ở gốc.
+ */
+function createPounder(): BufferGeometry {
+  const k = PROP_SIZES['coi-gia'];
+  const hx = k.box!.hx;
+  const hz = k.box!.hz;
+  return mergeGeometries([
+    paint(slab(hx * 2, 0.25, hz * 2), STONE), // nền đá
+    paint(translated(new CylinderGeometry(0.4, 0.34, 0.45, 14), hx - 0.5, 0.25 + 0.225, 0), STONE), // cối đá
+    paint(translated(new CylinderGeometry(0.1, 0.1, 0.7, 8), hx - 0.5, 0.7, 0), WOOD_DARK), // chày
+    paint(post(0.09, k.h - 0.25 - 0.05, -0.35, 0.25, 0), WOOD_DARK), // cột đỡ đòn
+    paint(slab(hx * 2 - 0.2, 0.1, 0.18, 0, k.h - 0.1, 0), WOOD), // đòn gánh (đỉnh ở đúng chiều cao)
+  ])!;
+}
+
+/** Bếp nấu dó: bệ đá, nồi gang lớn trên bếp, cửa lò đen phía trước, ống khói gạch. Khung bao đúng hộp PROP_SIZES `bep-do` (2,0 × 1,2, cao 1,9). */
+function createStove(): BufferGeometry {
+  const k = PROP_SIZES['bep-do'];
+  const hx = k.box!.hx;
+  const hz = k.box!.hz;
+  return mergeGeometries([
+    paint(slab(hx * 2, 0.8, hz * 2), STONE), // bệ đá
+    paint(translated(new CylinderGeometry(0.5, 0.42, 0.38, 14), -0.3, 0.8 + 0.19, 0), POT), // nồi lớn
+    paint(slab(0.55, 0.62, 0.45, -0.3, 0, -hz + 0.225), POT), // cửa lò (sát mép trước, nằm trong khung bao)
+    paint(slab(0.5, k.h, 0.5, hx - 0.25, 0, hz - 0.3), BRICK), // ống khói (cao bằng khung bao)
+  ])!;
+}
+
+/**
+ * Đình làng nhỏ: nền đá cao 0,5, bốn cột gỗ, xà ngang, mái ngói bốn mái (hình chóp) vươn ra ngoài nền, đỉnh có nóc nhỏ. Khung bao của nền (vật cản) là hộp PROP_SIZES `dinh` (6,2 × 5,0), cao tổng 6.
+ */
+function createPavilion(): BufferGeometry {
+  const k = PROP_SIZES.dinh;
+  const hx = k.box!.hx;
+  const hz = k.box!.hz;
+  const plinth = 0.5;
+  const colH = 3.0;
+  const px = hx - 0.6;
+  const pz = hz - 0.6;
+  const roofY = plinth + colH;
+  const roofH = k.h - roofY - 0.3;
+  const parts: BufferGeometry[] = [
+    paint(slab(hx * 2, plinth, hz * 2), STONE),
+    ...[
+      [-px, -pz],
+      [px, -pz],
+      [-px, pz],
+      [px, pz],
+    ].map(([x, z]) => paint(post(0.2, colH, x, plinth, z), WOOD)),
+    paint(slab(px * 2 + 0.5, 0.25, 0.3, 0, roofY - 0.25, -pz), WOOD_DARK), // xà trước
+    paint(slab(px * 2 + 0.5, 0.25, 0.3, 0, roofY - 0.25, pz), WOOD_DARK), // xà sau
+    paint(slab(0.3, 0.25, pz * 2 + 0.5, -px, roofY - 0.25, 0), WOOD_DARK),
+    paint(slab(0.3, 0.25, pz * 2 + 0.5, px, roofY - 0.25, 0), WOOD_DARK),
+    paint(pyramid(hx * 2 + 1.8, hz * 2 + 1.6, roofH, roofY), TILE), // mái vươn ra ngoài nền 0,9 và 0,8
+    paint(post(0.14, 0.3, 0, roofY + roofH, 0), WOOD_DARK), // nóc nhỏ
+  ];
+  return mergeGeometries(parts)!;
+}
+
 /**
  * Đồ nhỏ gợi nghề quanh cổng làng (bước 8d), dựng bằng code, chân ở y = 0, đúng cỡ trong PROP_SIZES (có test): chồng giấy (hộp), cuộn vải (trụ đứng), khối đá (hộp), bàn đá khắc (mặt phiến và hai chân),
  * hòm gỗ (thân và nắp), thúng (trụ thon), chân giá phên phơi giấy (trụ mảnh). Kind khác (chum, rơm, hoa, đá) dựng ở nơi khác thì trả về null.
@@ -153,6 +256,12 @@ export function createCraftProp(kind: PropKind): BufferGeometry | null {
       g.translate(0, k.h / 2, 0);
       return g;
     }
+    case 'coi-gia':
+      return createPounder();
+    case 'bep-do':
+      return createStove();
+    case 'dinh':
+      return createPavilion();
     default:
       return null;
   }

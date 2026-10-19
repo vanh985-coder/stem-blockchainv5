@@ -33,9 +33,22 @@ let loader: GLTFLoader | null = null;
 /** Hoãn giải phóng một chút để StrictMode (gắn, gỡ, gắn lại) và chuyển cảnh nhanh không làm tải lại. */
 const DISPOSE_DELAY_MS = 1500;
 
-/** GLTFLoader dùng chung. File nén meshopt cần MeshoptDecoder (bản đóng gói cùng ứng dụng, không tải từ CDN). */
+/** Số luồng phụ giải mã meshopt: chừa một lõi cho luồng chính, tối đa 3 (0 nếu không có Worker, như khi chạy test). */
+export function decoderWorkerCount(cores: number | undefined, hasWorker: boolean): number {
+  if (!hasWorker) return 0;
+  return Math.max(1, Math.min(3, (cores ?? 2) - 1));
+}
+
+/**
+ * GLTFLoader dùng chung. File nén meshopt cần MeshoptDecoder (bản đóng gói cùng ứng dụng, không tải từ CDN). Giải mã ở luồng phụ (`useWorkers`) để luồng chính không đứng khi vùng làng tải model:
+ * trước đây giải mã chạy ngay trên luồng chính và là một nguồn gây khựng khi đi từ chợ vào làng.
+ */
 function getLoader(): GLTFLoader {
-  if (!loader) loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+  if (!loader) {
+    const n = decoderWorkerCount(typeof navigator === 'undefined' ? undefined : navigator.hardwareConcurrency, typeof Worker !== 'undefined');
+    if (n > 0) MeshoptDecoder.useWorkers(n);
+    loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+  }
   return loader;
 }
 
