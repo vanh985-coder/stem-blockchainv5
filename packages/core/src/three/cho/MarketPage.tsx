@@ -8,7 +8,10 @@ import { BI_NHAC_LAI, BI_NHAC_NHIEM, MARKET_TALKERS, NHIEM_VU } from '../../cont
 import { ui } from '../../content/ui';
 import { MERGED, URLS, gateUrl } from '../../config/urls';
 import { useProgress } from '../../progress/ProgressProvider';
+import { GUIDE_FIRST_SECTION } from '../../content/huongDan';
+import { shouldAutoOpenGuide } from '../../progress/guideFlags';
 import { pendingGateOpening } from '../../progress/villageIntro';
+import { GuideDialog } from '../../ui/GuideDialog';
 import type { VillageId } from '../../village';
 import { useSettings } from '../../settings/SettingsProvider';
 import { VnDialog, type VnTurn } from '../../ui/VnDialog';
@@ -94,7 +97,9 @@ export function MarketPage() {
   const { level } = useQuality(forced);
   const [near, setNear] = useState(-1);
   const [dialog, setDialog] = useState<DialogState | null>(null);
-  const session = useWalkSession(api, dialog !== null);
+  // "Hướng dẫn chơi": nút ? ở HUD, mục trong menu, và tự mở phần đầu một lần lúc vào chợ lần đầu
+  const [guide, setGuide] = useState<{ section?: string } | null>(null);
+  const session = useWalkSession(api, dialog !== null || guide !== null);
   const dirtUrl = useMemo(() => (manifest ? asset(DIRT_TEXTURE) : null), [manifest]);
   if (import.meta.env.DEV) (window as unknown as { __walkApi?: typeof api }).__walkApi = api;
 
@@ -221,6 +226,29 @@ export function MarketPage() {
 
   const onNearest = useCallback((i: number) => setNear(i), []);
 
+  const openGuide = useCallback(
+    (section?: string) => {
+      api.lock.exit(); // nhả khóa để bấm được hộp hướng dẫn
+      setGuide({ section });
+    },
+    [api],
+  );
+  const closeGuide = useCallback(() => {
+    setGuide(null);
+    session.dialogClosed(); // đóng bằng cú bấm thì khóa lại ngay trong chính sự kiện bấm đó
+  }, [session]);
+  // Lần đầu vào chợ tự mở phần "Đi lại và camera" (một lần, lưu theo tiến độ). Chờ chuỗi mở cổng (nếu có) xong, và không chen lên hộp thoại khác.
+  const guideChecked = useRef(false);
+  useEffect(() => {
+    if (!ready || !flagKnown || !started.current || guideChecked.current || dialog !== null || guide !== null) return;
+    if (seq !== 'idle' && seq !== 'done') return;
+    if (pendingGateOpening(progress.progress.game.data, progress.progress.game.goldenPages)) return;
+    guideChecked.current = true;
+    if (!shouldAutoOpenGuide(progress.progress.game.data, GUIDE_FIRST_SECTION)) return;
+    progress.markGuideSeen(GUIDE_FIRST_SECTION);
+    openGuide(GUIDE_FIRST_SECTION);
+  }, [ready, flagKnown, seq, dialog, guide, progress, openGuide]);
+
   return (
     <div className="fixed inset-0 bg-giay" data-testid="cho" data-seq={seq}>
       <WalkControls
@@ -264,7 +292,7 @@ export function MarketPage() {
           />
         </Scene3D>
 
-        <MarketHud quest={questText} pages={pages} glow={seqActive ? pages - 1 : undefined} onMenu={session.openMenu} />
+        <MarketHud quest={questText} pages={pages} glow={seqActive ? pages - 1 : undefined} onMenu={session.openMenu} onGuide={() => openGuide()} />
 
         {/* Lời nhắc tương tác ở máy tính (điện thoại hiện trên nút ✋) */}
         {label && !session.paused && (
@@ -288,7 +316,8 @@ export function MarketPage() {
       )}
 
       <WalkLockOverlay session={session} hideMenu />
-      <MarketMenu session={session} />
+      {guide && <GuideDialog section={guide.section} onClose={closeGuide} />}
+      <MarketMenu session={session} onGuide={() => openGuide()} />
     </div>
   );
 }

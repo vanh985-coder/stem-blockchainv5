@@ -18,6 +18,7 @@ Tất cả lệnh dưới đây chạy trong **PowerShell** trên server, trừ 
 **Có gì mới ở mốc 2 (chợ 3D, model `.glb`):**
 - Hub có trang `/cho` (chợ 3D, vào bằng đường dẫn `https://stem-block.blockchainptit.com/cho`; `/cho?tu=<id làng>` và `/cho?mo=<id làng>` là đường dẫn trong game). Không cần cấu hình thêm: Caddy trả `index.html` cho mọi đường dẫn không phải file. Các trang `/dev/*` (kể cả `/dev/portraits`) chỉ có khi chạy dev, không có trên bản deploy.
 - Model 3D (`.glb`) nằm trong `assets-build/models/` và được phục vụ bởi `sb-assets` như ảnh (cùng `VITE_ASSETS_URL`; không có biến `VITE_*` mới): `Content-Type: model/gltf-binary`, CORS `*`, tên có mã băm 8 ký tự thì `immutable`. `assets-build/` đã nặng khoảng 46 MB (40 MB là model), còn chợ phiên tải khoảng 22 đến 24 MB model ở lần vào đầu (tải theo cảnh, trình duyệt lưu lại).
+- Ảnh hướng dẫn chơi nằm ở `assets-build/ui/huong-dan/` (10 ảnh WebP, khoảng 0,7 MB), do `pnpm guide:capture` chụp từ game rồi `pnpm assets:build` nén; làm trên máy dev, server chỉ nhận qua `git pull`.
 - `assets-build/` được commit vào Git; **trên server không có `assets/` (bản gốc) nên không chạy `pnpm assets:build` ở server**. Mỗi lần đổi đồ họa: chạy `pnpm assets:build` trên máy dev, commit `assets-build/` (không có `_preview/`), rồi `git pull` và dựng lại trên server (mục f).
 
 Muốn đổi cổng (nếu bị trùng) thì sửa `HUB_PORT`, `LANG_GIAY_PORT`, `LANG_DET_PORT`, `LANG_KHAC_DAU_PORT`, `LANG_BAC_PORT`, `ASSETS_PORT` trong `deploy/.env` (mục a.2), rồi nhớ dùng đúng số mới ở mục (b).

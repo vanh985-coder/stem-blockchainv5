@@ -2,12 +2,14 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router';
 import { fmt } from '../content/characters';
 import { GAMES, gameUi } from '../content/games';
+import { guideSectionOfLevel, huongDan } from '../content/huongDan';
 import { levelById } from '../content/levels';
 import { gameResultOf, summarizeGame, type Medal, type MedalThresholds } from '../games/medals';
 import { formatNumber } from '../lib/format';
 import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
 import { Button } from './Button';
+import { GuideDialog } from './GuideDialog';
 import { Panel } from './Panel';
 import { PortraitFrame } from './PortraitFrame';
 import { Stars } from './Stars';
@@ -67,6 +69,8 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave }: MiniGame
   const text = GAMES[levelId];
   const [stage, setStage] = useState<Stage>({ kind: 'card' });
   const [attempt, setAttempt] = useState(0);
+  // "Hướng dẫn chơi" ở thẻ bắt đầu: mở thẳng phần của game này
+  const [guideOpen, setGuideOpen] = useState(false);
   const hidden = useTabHidden();
   // Tab bị ẩn lúc đang chơi thì dừng và giữ dừng cho tới khi em bấm "Tiếp tục" (khỏi chạy tiếp lúc em chưa nhìn).
   const [held, setHeld] = useState(false);
@@ -198,12 +202,16 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave }: MiniGame
           {best > 0 ? fmt(gameUi.diemCao, { diem: formatNumber(best) }) : gameUi.chuaChoi}
         </p>
         <p className="text-sm">{moc}</p>
-        <div className="flex justify-center sm:justify-end">
+        <div className="flex flex-col justify-center gap-3 sm:flex-row sm:justify-end">
+          <Button size="lg" variant="secondary" fullWidth className="sm:w-auto" onClick={() => setGuideOpen(true)}>
+            {huongDan.nut}
+          </Button>
           <Button size="lg" fullWidth className="sm:w-auto" onClick={start}>
             {gameUi.batDau}
           </Button>
         </div>
       </Panel>
+      {guideOpen && <GuideDialog section={guideSectionOfLevel(levelId) ?? undefined} onClose={() => setGuideOpen(false)} />}
     </div>
   );
 }

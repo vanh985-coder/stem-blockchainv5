@@ -111,6 +111,8 @@ Xếp theo ảnh `concept-toan-canh` và `concept-cho-phien`. Phải **đủ đ�
 - **Chỉ đường:** mũi tên trên đầu nhân vật chỉ về cổng cần tới.
 - (Bước 8: `MarketHud.tsx`. Nhiệm vụ lấy từ `content/dialogues.ts` (`NHIEM_VU`, mục 5; 0 trang là "Đến Làng Giấy ở phía bắc gặp bác An."; đủ 4 trang là "Cả làng đang mở hội. Hãy đến dự hội làng nhé!"). 4 ô Trang Sổ Vàng theo `unlock.goldenPages`. Mũi tên là mũi tên vàng dẹt bay nhấp nhô (đứng yên khi "Giảm chuyển động"), quay mượt về cổng của nhiệm vụ, ẩn khi tới gần cổng 6 đơn vị hoặc đủ 4 trang. Nút Menu: máy tính nhả khóa chuột rồi menu hiện ra, điện thoại bật menu.)
 
+- **Bước 16:** thêm nút **?** ("Hướng dẫn chơi") cạnh nút Menu (`onGuide`). Lần đầu vào `/cho` tự mở phần "Đi lại và camera" của Hướng dẫn chơi một lần (spec 03 mục 3.8; chờ chuỗi mở cổng xong nếu đang có).
+
 ### Nhân vật ở chợ
 
 - **Bi:** bay theo người chơi; nói chuyện với Bi thì Bi nhắc nhiệm vụ.
@@ -121,7 +123,7 @@ Xếp theo ảnh `concept-toan-canh` và `concept-cho-phien`. Phải **đủ đ�
 
 ### Menu
 
-Tiếp tục; Hồ sơ; Cài đặt (chất lượng, âm thanh, giảm chuyển động, chữ to, độ nhạy chuột); Đọc lại truyện; Bản đồ; Về trang chủ.
+Tiếp tục; Hồ sơ; Cài đặt (chất lượng, âm thanh, giảm chuyển động, chữ to, độ nhạy chuột); Đọc lại truyện; Bản đồ; **Hướng dẫn chơi** (bước 16, mở hộp hướng dẫn); Về trang chủ.
 
 (Bước 8: `MarketMenu.tsx`, thay hộp Menu tạm. Hiện khi nhả khóa chuột sau khi đã chơi, hoặc khi bấm nút Menu ở HUD (lúc chưa khóa thì hiện luôn). "Tiếp tục" khóa chuột lại ngay trong sự kiện bấm; bấm nền ngoài hộp cũng là tiếp tục. "Cài đặt" dùng lại `SettingsPanel` (có đủ 5 mục). Hồ sơ → `/ho-so`, Đọc lại truyện → `/truyen`, Bản đồ → `/ban-do`, Về trang chủ → `/`.)
 
@@ -200,5 +202,6 @@ Phần này để trống chỗ, **không làm trong đợt này**.
   - cảnh mở đầu chạy đúng và bỏ qua được; (CHƯA LÀM: mục 4 để mốc 4)
   - chỉ cổng Làng Giấy mở; (đạt, bước 15a: tài khoản mới: bấm E ở cổng Làng Dệt hiện "Cổng làng đóng vì sổ đang lệch. Hãy giúp Làng Giấy trước nhé.")
   - bấm cổng thì sang được subdomain Làng Giấy. (đạt, bước 15a: bấm E ở cổng Giấy sang `localhost:5174/lang/lang-giay`; subdomain thật cần thử trên server)
+- [x] Nút ? và mục "Hướng dẫn chơi" trong Menu mở hướng dẫn; lần đầu vào `/cho` tự mở phần "Đi lại và camera", tải lại thì không mở lại. (Bước 16, kiểm bằng Chrome.)
 - [x] HUD hiện đúng số Trang Sổ Vàng theo tiến độ đã lưu. (Bước 15a: tiến độ 0 trang thì 4 ô "Chưa nhận"; sau khi xong màn 3 thì ô 1 "Đã nhận", ô 2 đến 4 "Chưa nhận".)
 - [ ] Đạt ít nhất 30fps ở mức Thấp trên điện thoại tầm trung. (Bước 15a, `/cho` bản build trên máy tính, mức Thấp: 146 fps khi vsync 144 Hz, 519 fps không vsync, 161 fps khi làm chậm CPU 4 lần; 202 nghìn tam giác, 39 draw call. Còn cần thử trên điện thoại thật.)

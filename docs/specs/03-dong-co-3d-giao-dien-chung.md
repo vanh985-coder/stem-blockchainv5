@@ -367,6 +367,22 @@ Mỗi người lệch pha ngẫu nhiên để không nhún đồng loạt. Hàm 
 - **Camera tránh vật cản** (`cameraCollision.ts`, hàm thuần có test): từ điểm nhìn (ngang ngực nhân vật) tới vị trí camera mong muốn, nếu đoạn thẳng cắt một vật cao (nhà, cổng, cây, lều, tre, giếng, đống rơm; khối thẳng đứng nở thêm 0,5) thấp hơn đỉnh của nó thì kéo camera lại gần, dừng ở mép vật; không bao giờ gần nhân vật hơn 1,8. Vào nhanh, ra chậm (độ gắt 3), rồi kiểm tra lại vị trí đã làm mượt để không cắt góc tường. Cổng chỉ chắn ở hai bên (tháp và tường), lối giữa để trống. `WalkWorld` nhận `cameraBlockers`.
 - **Bi:** bay theo sau vai **phải** của người chơi. Nhân vật quay mặt +Z nên bên phải của họ là −X: `BI_FOLLOW_OFFSET = [−0,75, 2,0, −0,55]` (bước 3 từng đặt +0,75, là vai trái, đã sửa).
 
+### 3.8 Hướng dẫn chơi (mốc 2, bước 16)
+
+Hộp "Hướng dẫn chơi" (`ui/GuideDialog.tsx`) chia **phần**, mỗi phần **2 đến 4 trang**, mỗi trang **một hình và 1 đến 2 câu ngắn**. Nội dung ở `content/huongDan.ts` (`GUIDE_SECTIONS`), hàm thuần có test (`huongDan.test.ts`).
+- **6 phần:** Đi lại và camera; Nói chuyện, cổng làng, biển gỗ; Trang bài học; Màn 2 (đổi làn, nhảy, trượt, vật nhặt, câu hỏi); Màn 3 (kéo thẻ, soi công thức, rổ trang giả); Trang Sổ Vàng và tiến độ.
+- **Theo thiết bị:** mỗi trang có lời cho máy tính (`may`) và cho điện thoại (`dt`, bỏ trống thì dùng chung), hình cũng có thể khác (`hinhDt`: phím W A S D ↔ cần điều khiển, chuột ↔ vuốt, phím ← → ↔ vuốt ngang…). Nhận thiết bị bằng `(pointer: coarse)`; test kiểm lời điện thoại không nhắc phím hay chuột và lời chung không nhắc riêng một thiết bị.
+- **Hình:** (1) ảnh chụp thật từ game, `ui/huong-dan/<id>` (10 ảnh, WebP 960×540, quy tắc `assets:build` riêng, không dò dấu ngôi sao), do `pnpm guide:capture` tự chụp bằng Chrome (tự bật máy chủ dev còn thiếu, cookie khách đặt sẵn tiến độ và cờ "đã xem" để không hộp nào chen vào, ẩn HUD bằng thuộc tính `data-hud` và `data-walk-ui` khi chụp cảnh đi lại, riêng ảnh `hud-trang-vang` chụp cả HUD rồi cắt góc trên phải). Ảnh chụp trang 2D (trang bài học, màn 2, màn 3, bản đồ) vẫn có chữ của chính giao diện game; (2) hình minh họa SVG do code vẽ (`ui/GuideArt.tsx`, 16 hình trong khung 320×180: phím, chuột, cần điều khiển, vuốt, 3 làn, nhảy và trượt, kéo thẻ vào ô, soi thẻ, rổ trang giả, sao, bóng đèn, bốn trang): không có chữ trong hình ngoài tên phím (`huongDan.phim`). Xem tất cả ở `/dev/guide` (hub, chỉ khi chạy dev).
+- **Chỗ mở:** nút **?** ở HUD cạnh Menu (`MarketHud`, `onGuide`; chợ và cảnh làng), mục **"Hướng dẫn chơi"** trong Menu (`MarketMenu`, `onGuide`), và nút ở **thẻ bắt đầu của `MiniGameLevel`** (mở thẳng phần của game: `guideSectionOfLevel`, màn 2 và 3). Hộp có nút chọn phần, "Trước"/"Tiếp" (hoặc phím ← →), "Đã hiểu" ở trang cuối, Esc hoặc ✕ để đóng. Khi mở ở cảnh đi lại thì nhả khóa chuột, đóng thì khóa lại.
+- **Lần đầu vào chợ** tự mở phần "Đi lại và camera" một lần; lưu `game_state.data.guideSeen = { "<id phần>": true }` (chơi thử: trường `hd` của cookie `sc_guest`, một bit mỗi phần theo thứ tự `GUIDE_SECTION_IDS`; `progress/guideFlags.ts`, có test). Chờ chuỗi mở cổng (nếu có) xong, không chen lên hộp thoại khác.
+- **Thêm phần mới ở mốc 3, 4:** thêm một đối tượng vào CUỐI `GUIDE_SECTIONS` (id, nhãn, tiêu đề, trang, `man` nếu có màn mở thẳng phần đó); ảnh chụp mới thì thêm id vào `GUIDE_SHOT_IDS` và một bước chụp ở `scripts/guide-capture.mjs`; hình vẽ mới thì thêm id vào `GUIDE_ART_IDS` và một hàm vẽ ở `GuideArt.tsx`. Không đổi thứ tự hay xóa phần cũ (cờ lưu theo bit). Test bắt mọi hình chưa dùng, id sai, trang quá dài.
+
+### 3.9 "Em có biết?" khi vào làng (mốc 2, bước 16)
+
+- **Thành phần dùng chung `ui/EmCoBietDialog.tsx`** (trang bài học 2D và cảnh làng 3D dùng chung; nút "Em có biết?" ở trang bài học giữ nguyên): mỗi lần một thẻ, "Thẻ n/tổng", "Trước", "Tiếp", ở thẻ cuối nút đổi thành `finishLabel` ("Đóng" mặc định, "Vào làng" khi tự hiện lúc vào làng).
+- **Nội dung không viết lại:** `villageKnowCards(làng)` (`content/villageCards.ts`) trả `emCoBiet` của bài học làng đó (`bai1Lesson` … `bai4Lesson`); thẻ chỉ có ở trạm Khó (`emCoBietKho`) không đưa vào. Mốc 3 chỉ cần cảnh làng mới truyền đúng `VILLAGE_SCENE` của làng đó, thẻ đã có sẵn cho cả 4 làng.
+- **Cờ chiếu một lần:** `game_state.data.knowSeen` (chơi thử: trường `ks`, một bit mỗi làng), `shouldShowKnow` ở `progress/villageIntro.ts`, có test. Thứ tự lần đầu vào làng: cảnh mở đầu → "Em có biết?" → (nếu có Trang Sổ Vàng chưa trao) cảnh trao trang. Menu làng có mục "Em có biết?" xem lại bất cứ lúc nào.
+
 ## 4. Phản ứng khi chọn đáp án — `ChoiceReaction`
 
 Dùng ở mọi chỗ có lựa chọn: câu hỏi, Đồng ý/Từ chối, lựa chọn trong hội thoại.
@@ -539,4 +555,6 @@ Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút
 - [ ] `Scene25D` hiện nền, hình rời và nhân vật 3D đúng lớp, co giãn đúng 16:9.
 - [ ] Đổi tên `phanDien` trong `characters.ts` thì đổi ở mọi lời thoại và câu hỏi.
 - [ ] `pnpm check:text` không báo chữ hiển thị nào nằm ngoài `content/`; có file `HUONG-DAN-SUA-CHU.md`.
+- [x] Hướng dẫn chơi (bước 16): 6 phần, mỗi phần 2 đến 4 trang; lời và hình theo máy tính hoặc điện thoại; mở từ HUD (nút ?), Menu và thẻ bắt đầu của màn 2, màn 3 (mở thẳng phần của game); lần đầu vào chợ tự mở "Đi lại và camera" một lần. (Kiểm bằng Chrome ở máy tính 1280×720 và điện thoại ngang 844×390; có test ở `huongDan.test.ts`, `guideFlags.test.ts`, `apps/hub/src/guide.test.tsx`.)
+- [x] "Em có biết?" lần đầu vào làng (sau cảnh mở đầu, "Thẻ n/tổng", nút "Vào làng", một lần, xem lại ở menu làng). (Bước 16, kiểm bằng Chrome.)
 - [ ] Test va chạm và `unlock.ts` ✅. Mức Thấp ≥ 30fps. (Bước 15a: `collision.test.ts`, `unlock.test.ts` xanh; fps trên máy tính xem spec 04 và 05; điện thoại tầm trung thật chưa thử.)

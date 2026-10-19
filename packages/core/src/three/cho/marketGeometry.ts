@@ -60,16 +60,19 @@ export function createJar(): BufferGeometry {
   return new LatheGeometry(profile, 14);
 }
 
-/** Đống rơm: hình chóp bầu cao 2, bán kính chân 1. */
+/**
+ * Đống rơm: hình chóp bầu cao 2, bán kính chân 1. Đường viền đi từ ĐÁY lên ĐỈNH (như `createJar`): LatheGeometry quay mặt trước ra ngoài khi đường viền đi theo chiều đó.
+ * (Bản cũ đi từ đỉnh xuống đáy nên mọi mặt quay vào trong: vật liệu một mặt chỉ vẽ mặt trong của thành phía sau, đống rơm ở game chạy và ở chợ trông bị khuyết một nửa.)
+ */
 export function createHayStack(): BufferGeometry {
   const profile = [
-    [0, 2],
-    [0.18, 1.9],
-    [0.5, 1.5],
-    [0.84, 0.9],
-    [0.98, 0.35],
-    [1, 0],
     [0, 0],
+    [1, 0],
+    [0.98, 0.35],
+    [0.84, 0.9],
+    [0.5, 1.5],
+    [0.18, 1.9],
+    [0, 2],
   ].map(([r, y]) => new Vector2(r, y));
   return new LatheGeometry(profile, 14);
 }

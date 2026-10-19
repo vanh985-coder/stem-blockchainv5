@@ -357,6 +357,8 @@ export const ui = {
     /** Tên danh sách 3 trạm (đọc cho người dùng đọc màn hình) */
     cacTram: 'Các trạm của bài',
     emCoBiet: 'Em có biết?',
+    /** Nút ở thẻ "Em có biết?" cuối cùng khi tự hiện lúc vào làng lần đầu */
+    vaoLang: 'Vào làng',
     dong: 'Đóng',
     truoc: 'Trước',
     sau: 'Tiếp',

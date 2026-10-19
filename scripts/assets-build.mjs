@@ -46,6 +46,8 @@ function classify(key) {
   }
   if (key.startsWith('ui/icons/')) return { kind: 'icon', box: 256, quality: 85, cutout: true };
   if (key.startsWith('ui/portraits/')) return { kind: 'chan-dung', exact: 512, quality: 85 };
+  // Ảnh chụp thật từ game cho "Hướng dẫn chơi" (pnpm guide:capture, 960×540): không phải ảnh AI nên không dò dấu ngôi sao
+  if (key.startsWith('ui/huong-dan/')) return { kind: 'huong-dan', maxWidth: 960, quality: 82, noSparkle: true };
   return null;
 }
 
@@ -226,7 +228,7 @@ async function encode(file, rule) {
   let img = sharp(file).rotate();
   let cut = null;
   let wm = null;
-  if (!rule.autoCutout) {
+  if (!rule.autoCutout && !rule.noSparkle) {
     // Dấu ngôi sao của công cụ vẽ ảnh ở góc dưới phải: tìm trong ô góc cố định rồi xóa (scripts/lib/watermark.mjs). Không thấy dấu thì giữ nguyên ảnh.
     const meta = await sharp(file).metadata();
     const { data, info: raw } = await sharp(file).rotate().ensureAlpha().raw().toBuffer({ resolveWithObject: true });

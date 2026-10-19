@@ -9,10 +9,13 @@ import { ui } from '../../content/ui';
 import { VILLAGE_SCENE } from '../../content/villageScene';
 import { MERGED, URLS, hubPageUrl } from '../../config/urls';
 import { canSeeTeacherPage } from '../../auth/roles';
-import { shouldShowGolden, shouldShowScene } from '../../progress/villageIntro';
+import { villageKnowCards } from '../../content/villageCards';
+import { shouldShowGolden, shouldShowKnow, shouldShowScene } from '../../progress/villageIntro';
 import { gateOpenedAfter } from '../cho/marketQuest';
 import { useProgress } from '../../progress/ProgressProvider';
 import { useSettings } from '../../settings/SettingsProvider';
+import { EmCoBietDialog } from '../../ui/EmCoBietDialog';
+import { GuideDialog } from '../../ui/GuideDialog';
 import { VnDialog, type VnTurn } from '../../ui/VnDialog';
 import { Character } from '../Character';
 import { Scene3D } from '../Scene3D';
@@ -88,9 +91,12 @@ export function VillageScene({ input }: VillageSceneProps) {
   const { level } = useQuality(forced);
   const [near, setNear] = useState(-1);
   const [dialog, setDialog] = useState<DialogState | null>(null);
+  // Thẻ "Em có biết?" của làng (tự hiện lần đầu vào làng, xem lại ở menu) và "Hướng dẫn chơi"
+  const [know, setKnow] = useState<{ auto: boolean } | null>(null);
+  const [guide, setGuide] = useState<{ section?: string } | null>(null);
   const [ready, setReady] = useState(false);
   const [talkAt, setTalkAt] = useState<readonly [number, number, number]>([0, 1.4, 0]);
-  const session = useWalkSession(api, dialog !== null);
+  const session = useWalkSession(api, dialog !== null || know !== null || guide !== null);
   const dirtUrl = useMemo(() => (manifest ? asset(DIRT_TEXTURE) : null), [manifest]);
 
   const levelIds = useMemo(() => levelsOfVillage(input.id).map((l) => l.id), [input.id]);
@@ -220,12 +226,45 @@ export function VillageScene({ input }: VillageSceneProps) {
     api.lock.exit();
   }, [ready, flagKnown, text, progress.progress.game.data, input.id, ten, api]);
 
+  // Thẻ "Em có biết?" của làng: lần đầu vào làng, ngay sau cảnh mở đầu (ảnh truyện, lời người dẫn), mỗi lần một thẻ "n/tổng", thẻ cuối có nút "Vào làng". Chiếu một lần, lưu theo tiến độ.
+  // Chờ xong cảnh mở đầu; cảnh trao Trang Sổ Vàng (nếu có) chờ tiếp tới khi đóng thẻ.
+  const knowChecked = useRef(false);
+  const knowOn = useRef(false);
+  const knowCards = useMemo(() => villageKnowCards(input.id), [input.id]);
+  useEffect(() => {
+    if (!ready || !flagKnown || knowChecked.current || !text || dialog !== null) return;
+    if (shouldShowScene(progress.progress.game.data, input.id)) return;
+    knowChecked.current = true;
+    if (knowCards.length === 0 || !shouldShowKnow(progress.progress.game.data, input.id)) return;
+    knowOn.current = true;
+    progress.markKnowSeen(input.id);
+    api.lock.exit();
+    setKnow({ auto: true });
+  }, [ready, flagKnown, text, dialog, progress, input.id, knowCards, api]);
+  const closeKnow = useCallback(() => {
+    knowOn.current = false;
+    setKnow(null);
+    session.dialogClosed();
+  }, [session]);
+  const openKnow = useCallback(() => {
+    api.lock.exit();
+    setKnow({ auto: false });
+  }, [api]);
+  const openGuide = useCallback(() => {
+    api.lock.exit();
+    setGuide({});
+  }, [api]);
+  const closeGuide = useCallback(() => {
+    setGuide(null);
+    session.dialogClosed();
+  }, [session]);
+
   // Cảnh trao Trang Sổ Vàng: về làng sau khi nhận trang (xong màn ready cuối của làng), chiếu một lần, sau cảnh mở đầu nếu đó cũng là lần đầu. Bỏ qua được.
   const [glow, setGlow] = useState<number | undefined>(undefined);
   const goldenDone = useRef(false);
   const isTeacher = canSeeTeacherPage(profile?.role);
   useEffect(() => {
-    if (!ready || !flagKnown || goldenDone.current || !text || dialog !== null || isTeacher) return;
+    if (!ready || !flagKnown || goldenDone.current || !text || dialog !== null || know !== null || knowOn.current || isTeacher) return;
     if (shouldShowScene(progress.progress.game.data, input.id)) return;
     goldenDone.current = true;
     const pages = progress.progress.game.goldenPages;
@@ -242,7 +281,7 @@ export function VillageScene({ input }: VillageSceneProps) {
     setGlow(index);
     setDialog({ turns, guideTalking: true, golden: true });
     api.lock.exit();
-  }, [ready, flagKnown, text, dialog, isTeacher, progress.progress.game.data, progress.progress.game.goldenPages, input.id, ten, settings.reducedMotion, api]);
+  }, [ready, flagKnown, text, dialog, know, isTeacher, progress.progress.game.data, progress.progress.game.goldenPages, input.id, ten, settings.reducedMotion, api]);
 
   useEffect(() => {
     document.title = langName;
@@ -296,7 +335,7 @@ export function VillageScene({ input }: VillageSceneProps) {
           />
         </Scene3D>
 
-        <MarketHud quest={quest} pages={unlock.goldenPages} glow={glow} onMenu={session.openMenu} />
+        <MarketHud quest={quest} pages={unlock.goldenPages} glow={glow} onMenu={session.openMenu} onGuide={openGuide} />
 
         {label && !session.paused && (
           <div className="pointer-events-none absolute inset-x-0 bottom-8 z-10 hidden justify-center [@media(pointer:fine)]:flex">
@@ -322,8 +361,19 @@ export function VillageScene({ input }: VillageSceneProps) {
         </div>
       )}
 
+      {know && <EmCoBietDialog cards={knowCards} onClose={closeKnow} finishLabel={know.auto ? ui.baiHoc.vaoLang : undefined} />}
+      {guide && <GuideDialog section={guide.section} onClose={closeGuide} />}
+
       <WalkLockOverlay session={session} hideMenu />
-      <MarketMenu session={session} onGo={goHub} extraItems={[{ label: ui.cho.menu.veCho, onClick: () => goMarket() }]} />
+      <MarketMenu
+        session={session}
+        onGo={goHub}
+        onGuide={openGuide}
+        extraItems={[
+          ...(knowCards.length > 0 ? [{ label: ui.baiHoc.emCoBiet, onClick: openKnow }] : []),
+          { label: ui.cho.menu.veCho, onClick: () => goMarket() },
+        ]}
+      />
     </div>
   );
 }

@@ -7,7 +7,7 @@ Game phiêu lưu 3D trên web dạy blockchain cho học sinh THPT: 12 màn ở 
 - Luật và số liệu của 4 bài học: spec giai đoạn 1 trong `docs/specs/giai-doan-1/`.
 
 ## Lệnh
-- `pnpm install` · `pnpm test` · `pnpm build` · `pnpm check:text` · `pnpm crop-portraits`
+- `pnpm install` · `pnpm test` · `pnpm build` · `pnpm check:text` · `pnpm crop-portraits` · `pnpm guide:capture` (chụp ảnh thật cho Hướng dẫn chơi vào `assets/ui/huong-dan`, rồi `pnpm assets:build`)
 - `pnpm dev:hub` (5173), `pnpm dev:lang-giay` (5174), `pnpm dev:lang-det` (5175), `pnpm dev:lang-khac-dau` (5176), `pnpm dev:lang-bac` (5177), `pnpm dev:assets` (5180)
 - `pnpm assets:build`: nén đồ họa vào `assets-build/` và tạo `manifest.json`
 

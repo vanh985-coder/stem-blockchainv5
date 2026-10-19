@@ -20,7 +20,8 @@
     "assets:build": "node scripts/assets-build.mjs",
     "dev:assets": "node scripts/dev-assets.mjs",
     "check:text": "node scripts/check-text.mjs",
-    "rls:check": "node scripts/rls-check.mjs"
+    "rls:check": "node scripts/rls-check.mjs",
+    "guide:capture": "node scripts/guide-capture.mjs"
   },
   "devDependencies": {
     "@gltf-transform/core": "^4.5.1",
@@ -29,6 +30,7 @@
     "@supabase/supabase-js": "^2.117.2",
     "draco3dgltf": "^1.5.7",
     "meshoptimizer": "^1.3.0",
+    "puppeteer-core": "^25.14.0",
     "sharp": "^0.35.5",
     "typescript": "catalog:",
     "vitest": "catalog:"

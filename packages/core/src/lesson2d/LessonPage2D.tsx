@@ -14,6 +14,7 @@ import type { SaveStatus } from '../progress/manager';
 import { Button } from '../ui/Button';
 import { NenTrangTri } from '../ui/NenTrangTri';
 import { DialogueBox } from '../ui/DialogueBox';
+import { EmCoBietDialog } from '../ui/EmCoBietDialog';
 import { GuestBar } from '../ui/GuestBar';
 import { LevelComplete } from '../ui/LevelComplete';
 import { LevelFailed } from '../ui/LevelFailed';
@@ -421,7 +422,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
           </div>
         </div>
       )}
-      {showCards && <CardsDialog cards={onHard ? [...content.emCoBiet, ...(content.emCoBietKho ?? [])] : content.emCoBiet} onClose={() => setShowCards(false)} />}
+      {showCards && <EmCoBietDialog cards={onHard ? [...content.emCoBiet, ...(content.emCoBietKho ?? [])] : content.emCoBiet} onClose={() => setShowCards(false)} />}
       </div>
     </div>
   );
@@ -443,47 +444,3 @@ function IconButton({ label, icon, onClick, disabled }: { label: string; icon: s
   );
 }
 
-/** Hộp "Em có biết?": các thẻ kiến thức của bài, xem lần lượt. */
-function CardsDialog({ cards, onClose }: { cards: LessonContent['emCoBiet']; onClose: () => void }) {
-  const [i, setI] = useState(0);
-  const card = cards[i];
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
-
-  return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-chu/40 p-4" onClick={onClose}>
-      <Panel
-        role="dialog"
-        aria-modal="true"
-        aria-label={ui.baiHoc.emCoBiet}
-        className="w-full max-w-lg space-y-3"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <p className="text-sm font-bold uppercase tracking-wider text-nau-go-dam">
-          {ui.baiHoc.emCoBiet} · {fmt(ui.baiHoc.theSo, { n: i + 1, tong: cards.length })}
-        </p>
-        <h2 className="text-2xl">{fmt(card.title)}</h2>
-        <p className="text-lg leading-relaxed">{fmt(card.text)}</p>
-        {card.example && <p className="rounded-xl border-2 border-vang bg-vang/15 p-3 text-base">{fmt(card.example)}</p>}
-        <div className="flex flex-wrap justify-between gap-2 pt-1">
-          <Button variant="secondary" size="sm" disabled={i === 0} onClick={() => setI(i - 1)}>
-            {ui.baiHoc.truoc}
-          </Button>
-          {i < cards.length - 1 ? (
-            <Button size="sm" onClick={() => setI(i + 1)}>
-              {ui.baiHoc.sau}
-            </Button>
-          ) : (
-            <Button size="sm" autoFocus onClick={onClose}>
-              {ui.baiHoc.dong}
-            </Button>
-          )}
-        </div>
-      </Panel>
-    </div>
-  );
-}

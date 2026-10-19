@@ -1,5 +1,6 @@
 import { Box3 } from 'three';
 import { describe, expect, it } from 'vitest';
+import { signedVolume } from '../geometryChecks';
 import { BOAT_HEIGHT, BOAT_LENGTH, BOAT_WIDTH, createBoatCanopy, createBoatHull, createCraftProp, createHayStack, createJar } from './marketGeometry';
 import { PROP_SIZES, type PropKind } from './marketLayout';
 
@@ -69,5 +70,37 @@ describe('đồ gợi nghề quanh cổng: hình dựng khớp PROP_SIZES (vật
   }
   it('chum, rơm, hoa, đá dựng ở nơi khác: không có ở đây', () => {
     for (const kind of ['chum', 'rom', 'hoa', 'da'] as PropKind[]) expect(createCraftProp(kind)).toBeNull();
+  });
+});
+
+describe('mặt trước của hình đặc quay ra ngoài (vật liệu một mặt vẽ đủ hình, không bị khuyết)', () => {
+  it('đống rơm: thể tích có dấu dương, gần thể tích của khối tròn xoay đúng (π ∫ r² dy)', () => {
+    const v = signedVolume(createHayStack());
+    expect(v).toBeGreaterThan(0);
+    // đường viền: các đoạn thẳng nối (r, y); thể tích khối tròn xoay tính từng đoạn (hình nón cụt)
+    const pts = [
+      [1, 0],
+      [0.98, 0.35],
+      [0.84, 0.9],
+      [0.5, 1.5],
+      [0.18, 1.9],
+      [0, 2],
+    ];
+    let exact = 0;
+    for (let i = 0; i + 1 < pts.length; i++) {
+      const [r1, y1] = pts[i];
+      const [r2, y2] = pts[i + 1];
+      exact += (Math.PI * (y2 - y1) * (r1 * r1 + r1 * r2 + r2 * r2)) / 3;
+    }
+    expect(v).toBeGreaterThan(exact * 0.85); // 14 cạnh quanh trục nên nhỏ hơn khối tròn một chút
+    expect(v).toBeLessThanOrEqual(exact);
+  });
+  it('chum vại và mọi đồ gợi nghề dựng bằng code: thể tích có dấu dương', () => {
+    expect(signedVolume(createJar())).toBeGreaterThan(0);
+    const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc'];
+    for (const kind of crafts) expect(signedVolume(createCraftProp(kind)!), kind).toBeGreaterThan(0);
+  });
+  it('thân thuyền: thể tích có dấu dương', () => {
+    expect(signedVolume(createBoatHull())).toBeGreaterThan(0);
   });
 });

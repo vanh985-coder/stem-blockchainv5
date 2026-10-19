@@ -1,5 +1,6 @@
 import { AssetImage } from '../../assets/AssetImage';
 import { fmt } from '../../content/characters';
+import { huongDan } from '../../content/huongDan';
 import { ui } from '../../content/ui';
 import { MAX_PAGES } from './marketQuest';
 
@@ -12,15 +13,17 @@ export interface MarketHudProps {
   glow?: number;
   /** Bấm nút menu (máy tính: nhả khóa chuột rồi menu hiện ra; điện thoại: bật menu) */
   onMenu: () => void;
+  /** Bấm nút "Hướng dẫn chơi" (dấu ?) cạnh nút menu; bỏ trống thì không có nút */
+  onGuide?: () => void;
 }
 
 /**
  * HUD của chợ phiên (spec 04 mục 3 "HUD"): góc trên trái dòng "Nhiệm vụ: …", góc trên phải 4 ô Trang Sổ Vàng (icon \`trang-vang\`; trang chưa có thì mờ) và nút menu. Các phần
  * tử có \`data-walk-ui\` nên bấm vào không bắt đầu kéo camera hay cần điều khiển. Lớp phủ không bắt chuột ngoài các phần tử này.
  */
-export function MarketHud({ quest, pages, glow, onMenu }: MarketHudProps) {
+export function MarketHud({ quest, pages, glow, onMenu, onGuide }: MarketHudProps) {
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-2">
+    <div data-hud className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-2">
       <p data-walk-ui role="status" className="pointer-events-auto max-w-[min(26rem,58vw)] rounded-bang border-2 border-nau-go/60 bg-giay/90 px-3 py-2 font-display text-sm font-extrabold leading-snug shadow-md sm:text-base">
         {fmt(ui.cho.nhiemVu, { nd: quest })}
       </p>
@@ -43,6 +46,18 @@ export function MarketHud({ quest, pages, glow, onMenu }: MarketHudProps) {
             );
           })}
         </ul>
+        {onGuide && (
+          <button
+            type="button"
+            onClick={onGuide}
+            aria-label={huongDan.nutHud}
+            title={huongDan.nutHud}
+            data-testid="nut-huong-dan"
+            className="min-h-11 min-w-11 cursor-pointer rounded-nut border-2 border-nau-go bg-giay px-2 font-display text-base font-extrabold focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim"
+          >
+            {huongDan.kyHieuHud}
+          </button>
+        )}
         <button
           type="button"
           onClick={onMenu}

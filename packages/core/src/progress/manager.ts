@@ -4,7 +4,8 @@ import { mergeProgress, sameGame, sameLevel } from './merge';
 import { recordLevelResult, unlockOf, withGoldenPages, type ProgressOptions } from './record';
 import { emptyProgress, hasProgress, type GameState, type LevelProgress, type LevelResult, type Progress } from './types';
 import type { UnlockResult } from './unlock';
-import { hasSeenGateOpen, hasSeenGolden, hasSeenIntro, hasSeenScene, withGateOpenSeen, withGoldenSeen, withIntroSeen, withSceneSeen } from './villageIntro';
+import { hasSeenGuide, withGuideSeen } from './guideFlags';
+import { hasSeenGateOpen, hasSeenGolden, hasSeenIntro, hasSeenKnow, hasSeenScene, withGateOpenSeen, withGoldenSeen, withIntroSeen, withKnowSeen, withSceneSeen } from './villageIntro';
 import type { VillageId } from '../village';
 
 /** Nơi lưu trên máy cho tài khoản (localStorage). Thay bằng bản giả trong test. */
@@ -339,6 +340,24 @@ export class ProgressManager {
   markGoldenSeen(village: VillageId): void {
     if (this.mode === 'loading' || hasSeenGolden(this.progress.game.data, village)) return;
     this.progress = { ...this.progress, game: { ...this.progress.game, data: withGoldenSeen(this.progress.game.data, village), updatedAt: this.now() } };
+    this.persistLocal();
+    this.emit();
+    this.scheduleFlush();
+  }
+
+  /** Em đã xem các thẻ "Em có biết?" tự hiện lúc vào làng (bước 16): ghi cờ như `markVillageIntroSeen`. */
+  markKnowSeen(village: VillageId): void {
+    if (this.mode === 'loading' || hasSeenKnow(this.progress.game.data, village)) return;
+    this.progress = { ...this.progress, game: { ...this.progress.game, data: withKnowSeen(this.progress.game.data, village), updatedAt: this.now() } };
+    this.persistLocal();
+    this.emit();
+    this.scheduleFlush();
+  }
+
+  /** Phần Hướng dẫn chơi đã tự mở một lần (bước 16): không tự mở lại. */
+  markGuideSeen(section: string): void {
+    if (this.mode === 'loading' || hasSeenGuide(this.progress.game.data, section)) return;
+    this.progress = { ...this.progress, game: { ...this.progress.game, data: withGuideSeen(this.progress.game.data, section), updatedAt: this.now() } };
     this.persistLocal();
     this.emit();
     this.scheduleFlush();

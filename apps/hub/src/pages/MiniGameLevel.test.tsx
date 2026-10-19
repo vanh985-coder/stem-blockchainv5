@@ -18,6 +18,8 @@ const stateOf = (progress: Progress): ProgressState => ({
   markVillageSceneSeen: () => {},
   markGoldenSeen: () => {},
   markGateOpenSeen: () => {},
+  markKnowSeen: () => {},
+  markGuideSeen: () => {},
 });
 
 function render(progress: Progress): string {
@@ -43,6 +45,12 @@ describe('MiniGameLevel: thẻ bắt đầu', () => {
     expect(html).toContain('Mốc điểm: Đồng 200 · Bạc 380 · Vàng 520');
     expect(html).toContain('Bắt đầu');
     expect(html).not.toContain('GAME');
+  });
+
+  it('thẻ bắt đầu có nút "Hướng dẫn chơi" (mở thẳng phần của game); hộp chỉ hiện sau khi bấm', () => {
+    const html = render(empty);
+    expect(html).toContain('Hướng dẫn chơi');
+    expect(html).not.toContain('data-testid="huong-dan"');
   });
 
   it('chưa chơi: "Em chưa chơi màn này."; đã chơi: hiện điểm cao nhất', () => {

@@ -163,6 +163,21 @@ export const mergeGateSeen = (base: Record<string, unknown>, other: Record<strin
 export const gateMask = (data: Record<string, unknown> | undefined): number => maskOf(data, GATE_SEEN_KEY);
 export const gateDataFromMask = (mask: unknown): Record<string, unknown> => dataFromMask(mask, GATE_SEEN_KEY);
 
+// ---------------------------------------------------------------------------
+// Thẻ "Em có biết?" tự hiện lần đầu vào làng (mốc 2, bước 16): cờ riêng theo làng (game_state.data.knowSeen; cookie: trường "ks").
+
+/** Cờ "đã tự hiện các thẻ 'Em có biết?' của làng này khi vào làng lần đầu". Xem lại bất cứ lúc nào ở menu làng. */
+export const KNOW_SEEN_KEY = 'knowSeen';
+export const knowSeenOf = (data: Record<string, unknown> | undefined): IntroSeen => seenOf(data, KNOW_SEEN_KEY);
+export const hasSeenKnow = (data: Record<string, unknown> | undefined, village: VillageId): boolean => knowSeenOf(data)[village] === true;
+export const withKnowSeen = (data: Record<string, unknown> | undefined, village: VillageId): Record<string, unknown> => withSeen(data, KNOW_SEEN_KEY, village);
+export const mergeKnowSeen = (base: Record<string, unknown>, other: Record<string, unknown>): Record<string, unknown> => mergeSeen(base, other, KNOW_SEEN_KEY);
+export const knowMask = (data: Record<string, unknown> | undefined): number => maskOf(data, KNOW_SEEN_KEY);
+export const knowDataFromMask = (mask: unknown): Record<string, unknown> => dataFromMask(mask, KNOW_SEEN_KEY);
+
+/** Có tự hiện thẻ "Em có biết?" khi vào làng không: lần đầu thì có (sau cảnh mở đầu), đã hiện rồi thì không. */
+export const shouldShowKnow = (data: Record<string, unknown> | undefined, village: VillageId): boolean => !hasSeenKnow(data, village);
+
 /**
  * Có chiếu cảnh người dẫn trao Trang Sổ Vàng khi em vào làng này không: đã có Trang Sổ Vàng của làng (`goldenPages` ≥ số trang của làng) và chưa chiếu lần nào. Chiếu một lần, lưu theo tiến độ.
  * Mọi trường hợp nhận trang theo bảng mở khóa (chơi xong màn ready cuối của làng, hoặc làng chỉ còn bài học ready) đều làm `goldenPages` tăng nên đều qua hàm này.
