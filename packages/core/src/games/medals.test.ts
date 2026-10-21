@@ -5,12 +5,12 @@ import { emptyProgress } from '../progress/types';
 import { gameResultOf, medalOf, summarizeGame, type MedalThresholds } from './medals';
 
 const RUNNER: MedalThresholds = [200, 380, 520];
-const REBUILD: MedalThresholds = [150, 250, 330];
+const REBUILD: MedalThresholds = [200, 400, 500];
 
 describe('mốc điểm', () => {
   it('Đồng, Bạc, Vàng theo ngưỡng (≥ ngưỡng thì đạt); dưới Đồng là 0', () => {
     expect([0, 199, 200, 379, 380, 519, 520, 100000].map((s) => medalOf(s, RUNNER))).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
-    expect([149, 150, 249, 250, 329, 330].map((s) => medalOf(s, REBUILD))).toEqual([0, 1, 1, 2, 2, 3]);
+    expect([199, 200, 399, 400, 499, 500].map((s) => medalOf(s, REBUILD))).toEqual([0, 1, 1, 2, 2, 3]);
   });
   it('điểm không hợp lệ thì 0', () => {
     expect(medalOf(Number.NaN, RUNNER)).toBe(0);

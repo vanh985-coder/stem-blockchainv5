@@ -183,14 +183,14 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 
 Logic đặt trong `rebuildLogic.ts` (hàm thuần, có test).
 
-**Câu chuyện:** học sinh mang các trang lấy lại về bàn của bác An để ghép lại cuốn sổ như ban đầu. Nhưng {phanDien} đã nhét lẫn một trang giả.
+**Câu chuyện:** học sinh mang các trang lấy lại về bàn của bác An để ghép lại cuốn sổ như ban đầu. Nhưng {phanDien} đã nhét lẫn một trang giả. (Từ bước X2, vòng 3 là vòng giữ sổ: {phanDien} liên tục quay lại tráo trang trong chuỗi đã ghép xong, em phải sửa liên tục. Xem "Vòng 3 — giữ sổ 90 giây" ở dưới.)
 
 **Dựng bằng `Scene25D`:**
 - Nền: `scenes/man-03-xuong-giay`.
 - Hình rời: rổ trang giả `sprites/man-03-ghep-so/ro-trang-gia`, đặt ở góc phải.
 - **Trang sổ:** code vẽ thẻ giấy dó có chữ.
 - **Bác An:** model 3D đứng ở mép trái.
-- **{phanDien}:** trước vòng 2 và vòng 3, model 3D chạy vào (`run`), cười (`cheer`), thả trang giả vào xấp giấy rồi chạy ra.
+- **{phanDien}:** trước vòng 2, model 3D chạy vào (`run`), cười (`cheer`), thả trang giả vào xấp giấy rồi chạy ra. Ở vòng 3 (bước X2) nó chạy vào, tráo và chạy ra liên tục suốt 90 giây.
 
 **Bàn chơi:**
 - Bàn gỗ trong ảnh nền; bên trái là trang bìa có mã G.
@@ -211,17 +211,50 @@ Logic đặt trong `rebuildLogic.ts` (hàm thuần, có test).
 | 2 | 7 | 1 |
 | 3 | 9 | 1 |
 
-Trước vòng 2 và vòng 3, {phanDien} lẻn tới nhét trang giả vào xấp giấy, cười khúc khích.
+> **Đã thay ở bước X2:** vòng 3 không còn là "9 trang, 1 trang giả" mà là **vòng giữ sổ 90 giây** (6 trang đúng ngay từ đầu, {phanDien} tráo liên tục). **Lý do:** người dùng muốn {phanDien} tráo liên tục và học sinh phải sửa liên tục, thay vì một lần nhét trang giả rồi ghép xong. Bảng gốc giữ lại để thấy chỗ đổi; vòng 1 và 2 giữ nguyên luật và test.
+
+| Vòng (từ bước X2) | Số trang | Trang giả |
+|---|---|---|
+| 1 | 5 | Không |
+| 2 | 7 | 1 (nhét trước khi chơi) |
+| 3 — giữ sổ | 6 (đúng ngay từ đầu) | Tráo liên tục trong 90 giây, tối đa 3 cái cùng lúc (từ bước X2b: khoảng tráo 9 → 5 giây) |
+
+Trước vòng 2, {phanDien} lẻn tới nhét trang giả vào xấp giấy, cười khúc khích.
+
+**Vòng 3 — giữ sổ 90 giây (bước X2):**
+- Đầu vòng: chuỗi 6 trang **đúng** (tạo bằng `buildChain`, mã trang không trùng nhau). Mặt bàn trống. Thẻ giới thiệu "Vòng 3: Giữ sổ" nằm sẵn, bấm "Bắt đầu giữ sổ" thì đồng hồ 90 giây mới chạy.
+- **Lịch tráo:** lần đầu ở giây 6; sau mỗi lần tráo ở giây `t`, lần kế tiếp cách `9 − 4 × t/90` giây (khoảng cách giảm tuyến tính từ 9 giây xuống **5 giây** theo giờ chơi; bước X2: xuống 4 giây, **đổi ở bước X2b** vì 4 giây quá dồn). Không tráo trong 6 giây cuối (để trang nào bị tráo cũng còn thời gian sửa). Lịch đủ **12 lần**, ở giây 6; 14,7; 23,1; 31,1; 38,7; 46,0; 52,9; 59,6; 65,9; 72,0; 77,8; 83,3.
+- **Một lần tráo:** {phanDien} chạy vào (1 giây), cười và ném trang thật ra bàn (1,5 giây là đúng lúc tráo), chạy ra (xong lúc 2,9 giây, ngắn hơn khoảng cách nhỏ nhất 5 giây nên hai lần không chồng nhau). Một **trang thật** bất kỳ trong chuỗi (không bao giờ chọn ô đã là trang giả hay đang trống) thành **trang giả**; trang thật bị ném ra bàn, đi kèm **1 trang mồi**.
+- **Trang giả luôn phát hiện được bằng công thức:** nó giữ nguyên mã trang trước và mã trang của trang thật (nên mối nối với trang bên cạnh vẫn khớp, không lộ ô nào bị tráo) nhưng đổi nội dung. Vì `(trước × 2 + nội dung) mod 100` đổi theo nội dung, `pageCode(trước, nội dung) ≠ mã trang ghi trên thẻ`. Không có dấu hiệu nào khác: thanh trạng thái chỉ nói "Chuỗi đang lệch" khi còn ô chưa sửa xong, "Chuỗi đúng" khi cả 6 ô là trang thật; mọi trang trong chuỗi viền giống nhau.
+- **Trang mồi:** trang đúng công thức nhưng mã trang trước không phải mã của trang nào trong chuỗi (kể cả trang bìa), nên không ô nào nhận; đặt vào ô thì sai mã trước. Mỗi lần tráo kèm một trang mồi; khi ô đó được sửa xong, trang mồi đi cùng lần tráo ấy bị dọn khỏi bàn. Bàn có tối đa 3 trang thật + 3 trang mồi.
+- **Sửa một ô** = kéo trang giả (đang nằm trong chuỗi) vào rổ, ô thành ô trống, rồi kéo **đúng trang thật** (mã trước khớp ô đó) từ bàn vào ô trống. Mỗi ô là một vùng thả riêng. Chạm cũng được: chạm thẻ rồi chạm rổ hoặc chạm ô trống. Đặt trang vào ô còn trang thì không có gì xảy ra (Bi nhắc bỏ trang giả vào rổ trước), không phạt.
+- **Phạt tim (hết tim: xem bước X2b ở cuối):** trang thật (ở chuỗi hay ở bàn, kể cả trang mồi) bỏ vào rổ: thẻ bật về, **mất 1 tim**; đặt sai thẻ vào ô trống (mồi, hay trang thật của ô khác): thẻ bật về, **mất 1 tim**. Đã có **3 ô chưa sửa** (còn trang giả hoặc ô trống) mà đến lượt tráo: **không tráo, nhưng mất 1 tim**. Hết 3 tim thì hết ván như trước; vòng 3 dở dang không được tính điểm.
+- **Bi gợi ý:** một ô để quá **10 giây** chưa sửa thì Bi nói "nửa bên trái" (ô 1 đến 3) hoặc "nửa bên phải" (ô 4 đến 6) của chuỗi, chỉ một lần mỗi ô, không chỉ đúng ô.
+- **Điểm vòng 3:** **+20** mỗi ô sửa xong, thêm **+5** nếu sửa trong 5 giây kể từ lúc bị tráo; hết 90 giây mà ô chưa sửa xong (còn trang giả, hoặc đã bỏ trang giả vào rổ mà chưa đặt lại trang thật) thì **−10** mỗi ô. Điểm vòng không bị trừ theo "lỗi" như vòng 1, 2 (lỗi chỉ làm mất tim). **Hết tim giữa vòng (bước X2b):** ván kết thúc nhưng vẫn tính +20/+5 các ô đã sửa; **không** trừ −10 cho ô chưa sửa (chỉ trừ khi hết giờ).
+- **Điểm cao nhất:** 12 lần tráo × 25 = 300, nên tối đa 100 + 130 + 300 = **530** (bước X2: 13 lần, 325, 555).
 
 **Tim, điểm:**
 - 3 tim cho cả ván.
 - Điểm mỗi vòng = 100 − 10 × số lỗi, cộng 30 nếu bỏ đúng trang giả vào rổ.
 
-| Mốc | Điểm |
-|---|---|
-| Đồng | 150 |
-| Bạc | 250 |
-| Vàng | 330 |
+| Mốc | Điểm (gốc) | Điểm (từ bước X2) |
+|---|---|---|
+| Đồng | 150 | **200** |
+| Bạc | 250 | **400** |
+| Vàng | 330 | **500** (bước X2: 520; hạ ở bước X3) |
+
+**Mốc điểm (bước X2; Vàng hạ 520 → 500 ở bước X3) và vì sao:** vòng 3 mới cho nhiều điểm hơn vòng cũ (tối đa 300, vòng cũ 130), nên mốc cũ (tối đa 360 điểm) không còn đúng. Bước X2b đổi khoảng tráo nên tối đa còn 530; Vàng 520 chỉ dư 10 điểm (một lần sai là tụt Bạc), nên **bước X3 hạ Vàng xuống 500 (dư 30 điểm), Đồng 200 và Bạc 400 giữ nguyên**. Mô phỏng 300 ván mỗi bot (seed 1 đến 300, `rebuildBots.ts`, `rebuildBalance.test.ts`); bot chỉ dùng thao tác của học sinh:
+- **Bot giỏi:** vòng 1, 2 chơi hoàn hảo; vòng 3 sửa mỗi ô trong 3 đến 4 giây, không kéo nhầm.
+- **Bot trung bình:** vòng 3 sửa trong 6 đến 9 giây, 15% mỗi lần tráo kéo nhầm một trang thật vào rổ; vòng 1, 2 chơi hoàn hảo (mô tả bot ở bước X2 chỉ nói về vòng 3). Bản "độ nhạy" thêm lỗi ở vòng 1, 2: mỗi lần đặt thẻ có 8% đặt nhầm một thẻ sai mã trước, và ở vòng 2 có 15% đặt thẳng trang giả vào chuỗi trước khi bỏ vào rổ (bước X2 dùng bản này làm bot trung bình).
+
+| Bot | Điểm trung bình | Chưa đạt (< 200) | Đồng | Bạc | Vàng | Hết tim |
+|---|---|---|---|---|---|---|
+| Giỏi (bước X3, mốc 500) | 530 (cả 300 ván đúng 530) | 0% | 0% | 0% | **100%** | 0% |
+| **Trung bình chính (bước X3): có sai ở vòng 1, 2; vào vòng 3 hồi đủ tim** | 396,7 | 7,7% | 15,7% | 76,7% | 0% | **30,3%** (91 ván: 23 ở vòng 1, 2 và 68 ở vòng 3) |
+| Trung bình chơi hoàn hảo vòng 1, 2 (bot trung bình của bước X2b), hồi đủ tim | 430,1 | 0% | 15,0% | 85,0% | 0% | 23,7% (71 ván) |
+| *Trước (bước X2b): bot trung bình có sai ở vòng 1, 2, không hồi tim* | 366,2 | 7,7% | 34,3% | 58,0% | 0% | 50,3% |
+
+**Bước X3 — kết quả so với yêu cầu:** bot giỏi ≥ 90% Vàng (100%) đạt. Bot trung bình chính (có sai ở vòng 1, 2) hết tim **30,3%, chưa đạt yêu cầu ≤ 25%**: hồi tim đã đưa 50,3% xuống 30,3%, nhưng 23 ván (7,7%) hết tim ngay ở vòng 1, 2 vì sai của bot, và 68 ván hết tim ở vòng 3 chủ yếu do 15% kéo nhầm trang thật vào rổ (mỗi lần mất 1 tim, 12 lần tráo). Không tự đổi luật. Số thử thêm, chưa đưa vào luật: vòng 3 cho 4 tim thì hết tim còn 15,7% (47 ván); bỏ phạt "đầy 3 ô" thì không đổi (91 ván). Còn lại toàn Đồng, Bạc (92,3% cùng "chưa đạt" 7,7% ở vòng 1, 2), không có Vàng.
 
 **Quy tắc tạo đề:**
 - Chuỗi thật tạo bằng `buildChain`; các mã trang trong chuỗi không được trùng nhau (trùng thì tạo lại).
@@ -244,7 +277,7 @@ Trước vòng 2 và vòng 3, {phanDien} lẻn tới nhét trang giả vào xấ
 - API: `generateDeal(rng, số trang, có trang giả)`, `createRebuild(seed)`, `placeCard`, `binCard`, `insertFake`, `advance`, `inspectCard` ("Soi công thức": prev × 2, tổng, kết quả mod 100, khớp hay không), `checkPlacement(mã trang cuối, thẻ)` → ok | badPrev | fake, `roundScore`, `rebuildScore`, `rebuildMedal`. Trạng thái sửa tại chỗ như `runnerLogic`; `phase`: villain (chờ {phanDien} nhét trang giả, vòng 2 và 3) → play → roundDone → over.
 - Tạo đề: chuỗi thật bằng `buildChain`; mã trang không trùng nhau và không trùng mã trang bìa (chặt hơn spec một chút, để mỗi mã trước chỉ khớp đúng một trang thật); trang giả có mã trước là mã của một trang thật không phải trang cuối, nội dung ngẫu nhiên, mã khác `pageCode` và khác mọi mã thật. Phát hiện trang giả luôn bằng công thức, không đọc cờ `isFake`.
 - Chỗ spec chưa nói, tôi chọn: (1) trang thật bỏ vào rổ thì bật về và mất 1 tim (không thì kéo thử từng thẻ vào rổ là lộ trang giả không mất gì); (2) mã trước sai được xét trước mã trang sai (thẻ giả đặt sai chỗ là "sai mã trước"); (3) hết tim giữa vòng thì vòng dở không được điểm, các vòng đã xong vẫn tính; (4) vòng xong khi đủ trang thật, không bắt buộc bỏ trang giả vào rổ (không bỏ thì mất 30 điểm thưởng).
-- Điểm cao nhất 100 + 130 + 130 = 360. Có 3 tim và lỗi thứ 3 kết thúc ván, nên ván hoàn thành có tối đa 2 lỗi: thấp nhất 360 − 20 = 340 nếu bỏ đúng cả 2 trang giả (Vàng 330), còn không bỏ trang giả nào thì tối đa 300 − 20 = 280 (Bạc).
+- (Số liệu của bước 13, **đã thay ở bước X2**: vòng 3 mới tối đa 325 điểm, tổng tối đa 555, mốc 200 / 400 / 520.) Điểm cao nhất 100 + 130 + 130 = 360. Có 3 tim và lỗi thứ 3 kết thúc ván, nên ván hoàn thành có tối đa 2 lỗi: thấp nhất 360 − 20 = 340 nếu bỏ đúng cả 2 trang giả (Vàng 330), còn không bỏ trang giả nào thì tối đa 300 − 20 = 280 (Bạc).
 - Test `rebuildLogic.test.ts`: 5 ca của bảng test (giữ số thứ tự), 1000 đề giải được, 1000 đề trang giả luôn phát hiện được, vòng, tim, điểm, mốc, tất định.
 
 **Đã làm (mốc 2, bước 14 — giao diện và vòng chơi màn 3):** `packages/village-lang-giay/src/rebuild/` (`RebuildGame.tsx`, `RebuildCards.tsx`, `RebuildActors.tsx`, `rebuildLayout.ts` có test), trang `pages/Man3.tsx` bọc trong `MiniGameLevel`, route `man/3`; màn 3 là `ready` trong `levels.ts`.
@@ -255,6 +288,21 @@ Trước vòng 2 và vòng 3, {phanDien} lẻn tới nhét trang giả vào xấ
 - **Vòng, tim, điểm:** đúng `rebuildLogic`; thanh trên có tim, "Vòng x/3", điểm (đã chắc + vòng đang chơi); hết vòng hiện bảng "Vòng x xong" với nút "Vòng tiếp theo" hoặc "Xem kết quả"; hết tim thì "Hết tim rồi!". Màn kết quả liệt kê từng vòng (số lần sai → điểm) và dòng +30 khi bỏ đúng trang giả.
 - **Nạp trước:** ảnh và model nạp xong rồi giữ màn hình tải thêm khoảng 1,4 giây để chạy thử trước các chuyển động đầu (sad, point, cheer của học sinh; run, cheer của {phanDien}) rồi mới lộ cảnh (`Scene25D` có thêm prop `hold`).
 - **Khựng ở màn 3 (bước 14b):** đo bản build (Chrome, Intel UHD) với trace: khung 60 đến 240 ms lúc xong vòng và lúc {phanDien} chạy vào do tiến trình GPU vẽ lại các ô của lớp HTML (`RasterDecoderImpl::DoEndRasterCHROMIUM::Flush` 20 đến 70 ms), luồng chính chỉ 2 đến 6 ms. Thử chèn CSS: bỏ `box-shadow` toàn trang thì hết khựng (khung lâu nhất 28 ms); chỉ bỏ bóng mờ hoặc chỉ bỏ bóng cứng thì còn 55 đến 62 ms. Sửa: lớp phủ của `Scene25D` không có bóng đổ (xem spec 03), màn 3 tạo khối bằng viền dưới dày; thẻ đang kéo là một lớp dựng sẵn di chuyển bằng `transform` (không mount mới lúc bắt đầu kéo, không dàn trang lại mỗi lần chuột nhích). Một khung 60 đến 80 ms còn lại lúc bắt đầu kéo lần đầu mất khi thẻ kéo được dựng sẵn.
+**Đã làm (mốc 2, bước X2 — vòng 3 thành vòng giữ sổ 90 giây):** `packages/village-lang-giay/src/rebuild/`.
+- **Luật (`rebuildLogic.ts`, `rebuildConfig.ts` có `REBUILD_KEEP`):** `KeepState` và phase mới `keep`; hàm thuần `swapIntervalAt`, `swapSchedule`, `beginKeep`, `stepKeep(s, dt)` (bước thời gian, trả về các sự kiện swap / overflow / hint / timeout, xử lý đúng thứ tự dù `dt` lớn), `placeInSlot`, `binFromSlot`, `binFromTable`, `keepChainStatus`, `keepUnfixed`, `keepHalf`, `keepTimeLeft`; `scoreParts` có thêm các dòng `sua`, `nhanh`, `conLech` cho vòng 3. Số ngẫu nhiên từ `createMulberry32(seed)` nên cùng seed và cùng thao tác thì cùng kết quả.
+- **Test (`rebuildKeep.test.ts`, `rebuildBalance.test.ts`, sửa `rebuildLogic.test.ts` và `rebuildLayout.test.ts`):** lịch tráo giảm đúng từ 9 xuống 5 và đủ 12 lần; trang giả luôn sai công thức (300 ván) và giữ mã trước, mã trang; không tráo vào ô đã giả; không quá 3 ô chưa sửa; đầy 3 ô thì không tráo và mất 1 tim (hết tim thì hết ván); điểm +20, +5 (đúng 5 giây vẫn nhanh, 5,1 giây thì không), −10 mỗi ô khi hết giờ; gợi ý sau 10 giây đúng nửa chuỗi, một lần mỗi ô; trang mồi không ô nào nhận; tất định theo seed; mô phỏng 300 ván mỗi bot. Vòng 1, 2 và 5 ca của bảng test giữ nguyên.
+- **Giao diện:** `RebuildGame.tsx` chạy vòng 3 bằng vòng lặp `requestAnimationFrame` gọi `stepKeep` (không dùng `useFrame`). {phanDien} (Tí) chạy vào trước giờ tráo 1,5 giây để lần tráo rơi đúng lúc nó đứng cười (`KEEP_VILLAIN_TIMING`: vào 1,0 / tráo 1,5 / ra 2,1 / xong 2,9 giây; bật "giảm chuyển động" thì rút còn một phần tư). Thẻ úp bay ra bàn lúc nó cười rồi hai thẻ (trang thật và trang mồi, viền vàng) rơi vào khay. Thanh trên có đồng hồ m:ss (đỏ khi còn dưới 10 giây) và thanh trạng thái "Chuỗi đang lệch" / "Chuỗi đúng". `KeepChainRow` ở `RebuildCards.tsx`: mỗi ô là vùng thả `slot:N`, trang trong chuỗi kéo được vào rổ hoặc chạm chọn để soi công thức. Lớp phủ không có `box-shadow` hay `filter` (bước 14b). Màn kết quả có dòng: ô đã sửa xong, sửa trong 5 giây, ô còn lệch khi hết giờ.
+- **Hướng dẫn:** phần "Màn 3" của hộp hướng dẫn vẫn 4 trang; trang 3 gộp việc kéo trang giả vào rổ, trang 4 nói về vòng giữ sổ 90 giây (lời trong `content/huongDan.ts`, chữ giao diện trong `rebuildUi` ở `content/games.ts`).
+- **Chỗ spec chưa nói, tôi chọn:** (1) lần tráo đầu ở giây 6 và không tráo trong 6 giây cuối; (2) một ô "chưa sửa" gồm cả ô trống sau khi bỏ trang giả vào rổ, và giới hạn 3 tính trên số ô chưa sửa này (không thì bàn có thể đầy thẻ); (3) hết giờ thì ô trống chưa đặt lại cũng bị −10; (4) mỗi lần tráo kèm một trang mồi riêng, bị dọn khi ô đó sửa xong; (5) thẻ giới thiệu vòng 3 phải bấm "Bắt đầu giữ sổ" thì đồng hồ mới chạy; (6) đặt trang vào ô còn trang thì không phạt; (7) hết tim giữa vòng 3: bước X2 không tính điểm vòng 3, **bước X2b đổi thành vẫn tính các ô đã sửa**.
+
+**Đã làm (mốc 2, bước X3, phần màn 3):** vào vòng 3 được **hồi đủ 3 tim** (`startRound` đặt `hearts` về `SPEC.hearts`; có test), thẻ giới thiệu vòng 3 có thêm một câu động viên của bác An (`rebuildUi.bacAnDongVien`, hộp có `data-testid="bac-an-dong-vien"`). Bot trung bình chính là bot có sai ở vòng 1, 2 (`AVERAGE_BOT`; bot chơi hoàn hảo vòng 1, 2 đổi tên `AVERAGE_BOT_CLEAN`). Mốc Vàng 500. Kết quả mô phỏng và chỗ chưa đạt ở bảng trên.
+
+**Đã làm (mốc 2, bước X2b — chỉnh 4 điểm ở vòng 3):**
+1. **Hết tim giữa vòng 3:** ván kết thúc nhưng vẫn tính +20/+5 các ô đã sửa; không trừ −10 cho ô chưa sửa (chỉ trừ khi hết giờ). `addError` ghi phần điểm vòng 3 ngay lúc hết tim (`rebuildLogic.ts`); màn kết quả có dòng "ô đã sửa xong" (kể cả 0 điểm) và dòng "sửa trong 5 giây", không có dòng trừ điểm. Test mới trong `rebuildKeep.test.ts`.
+2. **Khoảng tráo ngắn nhất 5 giây** (`REBUILD_KEEP.intervalEnd`), lịch 12 lần; test lịch tráo cập nhật.
+3. **Mô phỏng lại** (bảng ở mục Tim, điểm): bot giỏi 100% Vàng; bot trung bình hết tim 23,7%, toàn Đồng/Bạc; mốc huy chương **giữ 200 / 400 / 520**.
+4. **Chống khựng lần đầu:** `KeepWarm` trong `RebuildGame.tsx` dựng sẵn (mờ 1%, góc dưới phải) đồng hồ đỏ, hai thanh trạng thái chuỗi, bong bóng lời Bi, ô trống nhấp nháy và nháy đỏ, thẻ mới/rung/đang chọn, bảng hết giờ; trạng thái chuỗi chuyển vào thanh trên (hết đè lên nút "Soi công thức" ở điện thoại). Tiếng không cần nạp trước: `AudioContext` đã có từ lần bấm nút đầu, mỗi tiếng chỉ tạo vài nút âm. Số đo ở báo cáo bước X2b.
+
 - **Mở khóa:** màn 3 sẵn sàng nên Trang Sổ Vàng 1 chỉ được trao khi chơi xong màn 3 (người đã có trang từ trước vẫn giữ); biển "Ghép lại cuốn sổ" mở sau khi chơi màn 2.
 
 ## Kết thúc làng
@@ -279,7 +327,7 @@ Trước vòng 2 và vòng 3, {phanDien} lẻn tới nhét trang giả vào xấ
   - có câu hỏi sau mỗi vòng;
   - chạy lên nóc xe được;
   - không bao giờ gặp hàng chắn kín 3 làn.
-- [ ] Màn 3: trang giả luôn phát hiện được bằng công thức; kéo thả dùng được trên điện thoại. (Bước 15a: `rebuildLogic.test.ts` xanh; chơi hết màn trên bản build bằng chuột và bằng chạm giả lập đều ra "Vàng 360 điểm", 144 fps, không khung nào quá 33 ms. Còn cần thử trên điện thoại thật.)
+- [ ] Màn 3: trang giả luôn phát hiện được bằng công thức; kéo thả dùng được trên điện thoại. (Bước X2: vòng 3 là vòng giữ sổ 90 giây, mốc 200 / 400 / 520; kiểm bằng Chrome, chuột và chạm giả lập đều chơi hết vòng 3 và ra "Vàng 545/555 điểm"; còn cần thử trên điện thoại thật.) (Bước 15a, **số điểm và mốc đã thay ở bước X2**: `rebuildLogic.test.ts` xanh; chơi hết màn trên bản build bằng chuột và bằng chạm giả lập đều ra "Vàng 360 điểm", 144 fps, không khung nào quá 33 ms. Còn cần thử trên điện thoại thật.)
 - [x] Xong màn 3: nhận Trang Sổ Vàng, về chợ thấy cổng Làng Dệt mở. (Bước 15a, kiểm bằng Chrome: ghi kết quả 3 màn, vào làng thì bác An trao trang, "Về chợ" sang `/cho?mo=lang-giay`, then gỗ và dây đỏ rơi, Bi nói "Một trang rồi! Cổng Làng Dệt đã mở.", nhiệm vụ đổi sang Làng Dệt; tải lại thì không chiếu lại.)
 - [x] Lần đầu vào làng: sau cảnh mở đầu hiện thẻ "Em có biết?" (Thẻ n/4, "Vào làng"), chỉ một lần, xem lại ở menu làng; nút "Hướng dẫn chơi" có ở HUD, menu làng và thẻ bắt đầu màn 2, màn 3. (Bước 16, kiểm bằng Chrome.)
 - [x] Đống rơm ở màn 2 hiện đủ khối ở cả ba trạng thái (thấp, đang bay, đã rơi). (Bước 16.)

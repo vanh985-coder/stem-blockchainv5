@@ -2,7 +2,7 @@ import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import type { Group } from 'three';
 import { Actor25D, Character, type Aim, type ClipName, type PoseRequest } from '@so-chung/core/three/index';
-import { ACTORS, REDUCED_MOTION_SCALE, VILLAIN_TIMING, villainFx, worldHeightOf, worldPoint, type VillainStage } from './rebuildLayout';
+import { ACTORS, REDUCED_MOTION_SCALE, VILLAIN_TIMING, villainFx, worldHeightOf, worldPoint, type VillainStage, type VillainTiming } from './rebuildLayout';
 
 /** Phản ứng của học sinh theo kết quả: sad (đặt sai), point (chỉ về rổ hay về {phanDien}), cheer (ghép xong chuỗi). `n` tăng mỗi lần để phát lại. */
 export interface Reaction {
@@ -44,7 +44,7 @@ const VILLAIN_CLIPS: readonly ClipName[] = ['idle', 'run', 'cheer'];
  * {phanDien} chạy vào từ bên phải dải giữa (run, quay mặt sang trái), đứng cười (cheer) để thả trang giả, rồi chạy ra (run, quay mặt sang phải). Vị trí cập nhật mỗi khung
  * bằng `villainFx` (không cấp phát); `startedAt` là mốc `performance.now()` lúc bắt đầu (0 = chưa bắt đầu, ẩn).
  */
-export function VillainActor({ stage, startedAt, reduced }: { stage: VillainStage; startedAt: number; reduced: boolean }) {
+export function VillainActor({ stage, startedAt, reduced, timing = VILLAIN_TIMING }: { stage: VillainStage; startedAt: number; reduced: boolean; timing?: VillainTiming }) {
   const group = useRef<Group>(null);
   const y = worldPoint(0, ACTORS.villainStop.fy).y;
   const scale = reduced ? REDUCED_MOTION_SCALE : 1;
@@ -59,18 +59,18 @@ export function VillainActor({ stage, startedAt, reduced }: { stage: VillainStag
     g.visible = visible;
     if (!visible) return;
     const t = (performance.now() - startedAt) / 1000;
-    g.position.x = worldPoint(villainFx(t, scale), 0).x;
+    g.position.x = worldPoint(villainFx(t, scale, timing), 0).x;
   });
   // đặt ngay vị trí đúng khi mới hiện (khung đầu tiên chưa kịp chạy useFrame)
   useEffect(() => {
     const g = group.current;
-    if (g && visible) g.position.x = worldPoint(villainFx((performance.now() - startedAt) / 1000, scale), 0).x;
-  }, [visible, startedAt, scale]);
+    if (g && visible) g.position.x = worldPoint(villainFx((performance.now() - startedAt) / 1000, scale, timing), 0).x;
+  }, [visible, startedAt, scale, timing]);
 
   return (
     <group ref={group} visible={false}>
       <Actor25D x={0} y={y} layer="actorsBack" height={worldHeightOf(ACTORS.villainStop.heightPct)} facing={facing}>
-        <Character id="characters/ti" animation={clip} trigger={stage === 'cheer' ? VILLAIN_TIMING.dropAt : 0} returnTo="idle" clips={VILLAIN_CLIPS} />
+        <Character id="characters/ti" animation={clip} trigger={stage === 'cheer' ? timing.dropAt : 0} returnTo="idle" clips={VILLAIN_CLIPS} />
       </Actor25D>
     </group>
   );

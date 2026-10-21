@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { ACTORS, REDUCED_MOTION_SCALE, VILLAIN_TIMING, villainFx, villainStageAt, AREAS, CARD_MAX_CQW, CARD_MIN_CQW, MIN_TOUCH_PX, PHONE_FRAME_PX, cardHeight, cardWidth, cqwToHeightPct, slotLeft, worldPoint, type Box } from './rebuildLayout';
-import { REBUILD_SPEC } from './rebuildConfig';
+import { ACTORS, KEEP_VILLAIN_TIMING, REDUCED_MOTION_SCALE, VILLAIN_TIMING, villainFx, villainStageAt, AREAS, CARD_MAX_CQW, CARD_MIN_CQW, GAP_CQW, MIN_TOUCH_PX, PHONE_FRAME_PX, cardHeight, cardWidth, cqwToHeightPct, slotLeft, worldPoint, type Box } from './rebuildLayout';
+import { REBUILD_KEEP, REBUILD_SPEC } from './rebuildConfig';
 
 const overlap = (a: Box, b: Box) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
 
@@ -76,5 +76,32 @@ describe('{phanDien} nhét trang giả', () => {
       expect(x).toBeLessThanOrEqual(prev + 1e-12);
       prev = x;
     }
+  });
+});
+
+describe('vòng 3: giữ sổ', () => {
+  it('mặt bàn chứa tối đa 3 trang thật và 3 trang mồi (6 thẻ) trong một hàng, thẻ vẫn đủ lớn để chạm', () => {
+    const keepRound = REBUILD_SPEC.rounds.find((r) => r.keep)!;
+    const w = cardWidth(keepRound.pages + 1);
+    const tableCards = REBUILD_KEEP.maxUnfixed * 2;
+    expect(tableCards * (w + GAP_CQW) - GAP_CQW).toBeLessThanOrEqual(AREAS.tray.x1 - AREAS.tray.x0 + 1e-9);
+    expect((w / 100) * PHONE_FRAME_PX).toBeGreaterThanOrEqual(MIN_TOUCH_PX);
+  });
+
+  it('nhịp {phanDien} ngắn hơn khoảng tráo nhỏ nhất (4 giây) nên hai nhịp không chồng nhau; thời điểm tráo nằm giữa lúc vào và lúc ra', () => {
+    expect(KEEP_VILLAIN_TIMING.end).toBeLessThan(REBUILD_KEEP.intervalEnd);
+    expect(KEEP_VILLAIN_TIMING.enterEnd).toBeLessThan(KEEP_VILLAIN_TIMING.dropAt);
+    expect(KEEP_VILLAIN_TIMING.dropAt).toBeLessThan(KEEP_VILLAIN_TIMING.exitStart);
+    expect(villainStageAt(0, 1, KEEP_VILLAIN_TIMING)).toBe('enter');
+    expect(villainStageAt(KEEP_VILLAIN_TIMING.dropAt, 1, KEEP_VILLAIN_TIMING)).toBe('cheer');
+    expect(villainStageAt(KEEP_VILLAIN_TIMING.exitStart + 0.01, 1, KEEP_VILLAIN_TIMING)).toBe('exit');
+    expect(villainStageAt(KEEP_VILLAIN_TIMING.end, 1, KEEP_VILLAIN_TIMING)).toBe('gone');
+  });
+
+  it('{phanDien} chạy từ ngoài khung tới điểm dừng đúng lúc hết "chạy vào", rồi ra lại', () => {
+    expect(villainFx(0, 1, KEEP_VILLAIN_TIMING)).toBeCloseTo(ACTORS.villainOffscreen.fx, 6);
+    expect(villainFx(KEEP_VILLAIN_TIMING.enterEnd, 1, KEEP_VILLAIN_TIMING)).toBeCloseTo(ACTORS.villainStop.fx, 6);
+    expect(villainFx(KEEP_VILLAIN_TIMING.dropAt, 1, KEEP_VILLAIN_TIMING)).toBeCloseTo(ACTORS.villainStop.fx, 6);
+    expect(villainFx(KEEP_VILLAIN_TIMING.end, 1, KEEP_VILLAIN_TIMING)).toBeCloseTo(ACTORS.villainOffscreen.fx, 6);
   });
 });

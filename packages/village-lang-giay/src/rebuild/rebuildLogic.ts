@@ -10,7 +10,7 @@
 import { buildChain, pageCode, randomContents, randomGenesis, solutionSteps } from '@so-chung/core/lessons/bai-1/logic';
 import { createMulberry32, randInt } from '@so-chung/core/lib/rng';
 import { medalOf, type Medal } from '@so-chung/core';
-import { REBUILD_CODE_MAX, REBUILD_SPEC as SPEC } from './rebuildConfig';
+import { REBUILD_CODE_MAX, REBUILD_KEEP as KEEP, REBUILD_SPEC as SPEC } from './rebuildConfig';
 
 /** Kết quả một vòng đã xong, để liệt kê ở màn kết quả; tổng điểm các vòng bằng `rebuildScore`. */
 export interface RoundPart {
@@ -19,6 +19,8 @@ export interface RoundPart {
   errors: number;
   fakeBinned: boolean;
   points: number;
+  /** Chỉ vòng giữ sổ (vòng 3): số ô sửa xong, số ô sửa nhanh (trong 5 giây), số ô còn chưa sửa khi hết giờ */
+  keep?: { fixed: number; fast: number; left: number };
 }
 
 /** Một thẻ trang. `isFake` là sự thật lúc tạo đề (để dựng hình và để test); luật kiểm tra luôn dùng công thức, không đọc cờ này. */
@@ -38,9 +40,30 @@ export interface Deal {
 }
 
 /**
- * villain: {phanDien} sắp nhét trang giả (vòng 2 và 3), chờ `insertFake`; play: đang ghép; roundDone: chuỗi đã đủ, chờ `advance`; over: hết ván.
+ * villain: {phanDien} sắp nhét trang giả (vòng 2), chờ `insertFake`; play: đang ghép (vòng 1, 2); keep: vòng giữ sổ 90 giây (vòng 3, chạy bằng `stepKeep`);
+ * roundDone: vòng đã xong, chờ `advance`; over: hết ván.
  */
-export type RebuildPhase = 'villain' | 'play' | 'roundDone' | 'over';
+export type RebuildPhase = 'villain' | 'play' | 'keep' | 'roundDone' | 'over';
+
+/** Trạng thái riêng của vòng giữ sổ. Mọi chỉ số ô (0 đến 5) tính từ trái sang phải; thời gian tính bằng giây. */
+export interface KeepState {
+  /** Chưa `beginKeep` thì đồng hồ đứng yên */
+  running: boolean;
+  elapsed: number;
+  nextSwapAt: number;
+  /** Số lần đã tráo (đặt mã cho trang giả) */
+  swapCount: number;
+  /** Ô của chuỗi: trang đang nằm ở đó, hoặc `null` khi ô trống (trang giả đã bỏ vào rổ, chưa đặt lại trang thật) */
+  slots: (Card | null)[];
+  /** Giờ bị tráo của ô chưa sửa xong; −1 nếu ô không cần sửa */
+  swappedAt: number[];
+  /** Ô đã được Bi gợi ý rồi (chỉ gợi ý một lần mỗi ô) */
+  hinted: boolean[];
+  /** Mã trang mồi đi cùng lần tráo của ô; trang mồi bị dọn khỏi bàn khi ô được sửa */
+  decoyOf: (string | null)[];
+  fixed: number;
+  fast: number;
+}
 
 export interface RebuildState {
   seed: number;
@@ -61,6 +84,8 @@ export interface RebuildState {
   fakeBinned: boolean;
   /** Kết quả từng vòng đã xong (vòng đang dở, hoặc dở dang vì hết tim, không được tính điểm) */
   parts: RoundPart[];
+  /** Có ở vòng giữ sổ (vòng 3); lúc đó `tray` là mặt bàn (trang thật bị ném ra và trang mồi) */
+  keep: KeepState | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -178,6 +203,15 @@ function startRound(s: RebuildState): void {
   s.tray = shuffledTray(s.deal.real, s.rng);
   s.errors = 0;
   s.fakeBinned = false;
+  s.keep = null;
+  if (r.keep) {
+    // vòng giữ sổ: chuỗi có đủ 6 trang đúng ngay từ đầu, mặt bàn trống; vào vòng 3 được hồi đủ tim (bước X3)
+    s.hearts = SPEC.hearts;
+    s.tray = [];
+    s.keep = newKeep(s.deal);
+    s.phase = 'keep';
+    return;
+  }
   s.phase = r.fake ? 'villain' : 'play';
 }
 
@@ -195,6 +229,7 @@ export function createRebuild(seed: number): RebuildState {
     errors: 0,
     fakeBinned: false,
     parts: [],
+    keep: null,
   };
   startRound(s);
   return s;
@@ -231,8 +266,14 @@ function addError(s: RebuildState): void {
   s.errors++;
   s.hearts = Math.max(0, s.hearts - 1);
   if (s.hearts === 0) {
+    const k = s.phase === 'keep' ? s.keep : null;
     s.phase = 'over';
     s.over = 'hearts';
+    if (k) {
+      // hết tim giữa vòng giữ sổ: vẫn tính điểm các ô đã sửa (+20/+5), không trừ −10 cho ô chưa sửa (bước X2b)
+      k.running = false;
+      s.parts.push({ round: s.round, errors: s.errors, fakeBinned: false, points: k.fixed * KEEP.fixPoints + k.fast * KEEP.fastBonus, keep: { fixed: k.fixed, fast: k.fast, left: 0 } });
+    }
   }
 }
 
@@ -318,10 +359,11 @@ export function inspectionLine(card: Pick<Card, 'prev' | 'content' | 'code'>): I
  * Vòng dở dang (hết tim) không có dòng nào.
  */
 export interface ScorePartRow {
-  key: 'vong' | 'trangGia';
+  /** vong, trangGia: vòng 1 và 2; sua, nhanh, conLech: vòng giữ sổ (vòng 3) */
+  key: 'vong' | 'trangGia' | 'sua' | 'nhanh' | 'conLech';
   /** Chỉ số vòng, 0 đến 2 */
   round: number;
-  /** vong: số lần sai; trangGia: 1 */
+  /** vong: số lần sai; trangGia: 1; sua: số ô sửa xong; nhanh: số ô sửa nhanh; conLech: số ô còn lệch khi hết giờ */
   count: number;
   points: number;
 }
@@ -329,8 +371,234 @@ export interface ScorePartRow {
 export function scoreParts(s: Pick<RebuildState, 'parts'>): ScorePartRow[] {
   const rows: ScorePartRow[] = [];
   for (const p of s.parts) {
+    if (p.keep) {
+      rows.push({ key: 'sua', round: p.round, count: p.keep.fixed, points: p.keep.fixed * KEEP.fixPoints });
+      if (p.keep.fast > 0) rows.push({ key: 'nhanh', round: p.round, count: p.keep.fast, points: p.keep.fast * KEEP.fastBonus });
+      if (p.keep.left > 0) rows.push({ key: 'conLech', round: p.round, count: p.keep.left, points: -p.keep.left * KEEP.leftPenalty });
+      continue;
+    }
     rows.push({ key: 'vong', round: p.round, count: p.errors, points: roundScore(p.errors, false) });
     if (p.fakeBinned) rows.push({ key: 'trangGia', round: p.round, count: 1, points: SPEC.fakeBonus });
   }
   return rows;
+}
+
+// ---------------------------------------------------------------------------
+// Vòng 3: giữ sổ 90 giây (bước X2)
+//
+// Chuỗi 6 trang đúng. {phanDien} liên tục chạy vào tráo một trang thật thành trang giả (trang thật bị ném ra bàn, kèm 1 trang mồi); khoảng cách giữa hai lần tráo giảm dần
+// từ 9 xuống 4 giây. Trang giả GIỮ NGUYÊN mã trang và mã trang trước của trang thật (nên các mối nối vẫn khớp, không lộ ô nào bị tráo) nhưng đổi nội dung, mà mã trang
+// là hàm một-một của nội dung khi đã biết mã trước, nên trang giả luôn sai công thức. Học sinh sửa một ô = kéo trang giả vào rổ + kéo đúng trang thật vào ô trống đó.
+
+/** Khoảng cách giữa hai lần tráo tại thời điểm `t` (giây): 9 ở giây 0, giảm tuyến tính tới 5 ở hết vòng, không ra ngoài [5, 9]. */
+export function swapIntervalAt(t: number): number {
+  const k = Math.min(1, Math.max(0, t / KEEP.seconds));
+  return KEEP.intervalStart + (KEEP.intervalEnd - KEEP.intervalStart) * k;
+}
+
+/** Các thời điểm tráo của một vòng, nếu không bị chặn (lần đầu ở `firstSwapAt`, rồi cộng khoảng cách tại thời điểm đó), bỏ những lần rơi vào `noSwapLast` giây cuối. */
+export function swapSchedule(): number[] {
+  const times: number[] = [];
+  for (let t: number = KEEP.firstSwapAt; t <= KEEP.seconds - KEEP.noSwapLast; t += swapIntervalAt(t)) times.push(t);
+  return times;
+}
+
+function newKeep(deal: Deal): KeepState {
+  const n = deal.real.length;
+  return {
+    running: false,
+    elapsed: 0,
+    nextSwapAt: KEEP.firstSwapAt,
+    swapCount: 0,
+    slots: deal.real.slice(),
+    swappedAt: new Array<number>(n).fill(-1),
+    hinted: new Array<boolean>(n).fill(false),
+    decoyOf: new Array<string | null>(n).fill(null),
+    fixed: 0,
+    fast: 0,
+  };
+}
+
+/** Bắt đầu chạy đồng hồ 90 giây (gọi khi thẻ "Vòng 3" đã đóng). */
+export function beginKeep(s: RebuildState): void {
+  if (s.phase === 'keep' && s.keep) s.keep.running = true;
+}
+
+/** Số ô chưa sửa xong (còn trang giả, hoặc đã bỏ trang giả vào rổ mà chưa đặt lại trang thật). */
+export function keepUnfixed(k: Pick<KeepState, 'swappedAt'>): number {
+  let n = 0;
+  for (const t of k.swappedAt) if (t >= 0) n++;
+  return n;
+}
+
+/** Thanh trạng thái của chuỗi: "đúng" khi cả 6 ô đều là trang thật, ngược lại "lệch". Không chỉ ra ô nào lệch. */
+export function keepChainStatus(k: Pick<KeepState, 'swappedAt'>): 'dung' | 'lech' {
+  return keepUnfixed(k) === 0 ? 'dung' : 'lech';
+}
+
+/** Số giây còn lại của vòng (không âm). */
+export function keepTimeLeft(k: Pick<KeepState, 'elapsed'>): number {
+  return Math.max(0, KEEP.seconds - k.elapsed);
+}
+
+/** Nửa của chuỗi chứa ô `slot`: 3 ô đầu là nửa trái, 3 ô sau là nửa phải. */
+export function keepHalf(slot: number, pages: number): 'left' | 'right' {
+  return slot < pages / 2 ? 'left' : 'right';
+}
+
+/** Trang giả thay cho `real`: cùng mã trước, cùng mã trang, khác nội dung (nên `pageCode(prev, nội dung) ≠ mã trang`). */
+function makeFakeOf(real: Card, rng: () => number, id: string): Card {
+  const content = (real.content + randInt(1, REBUILD_CODE_MAX, rng)) % (REBUILD_CODE_MAX + 1);
+  return { id, prev: real.prev, content, code: real.code, isFake: true };
+}
+
+/** Trang mồi: trang thật đúng công thức nhưng mã trang trước không phải mã của trang nào trong chuỗi (kể cả trang bìa), nên không ô nào nhận. */
+function makeDecoy(deal: Deal, rng: () => number, id: string): Card {
+  const taken = new Set<number>([deal.genesis, ...deal.real.map((c) => c.code)]);
+  let prev = randInt(0, REBUILD_CODE_MAX, rng);
+  while (taken.has(prev)) prev = (prev + 1) % (REBUILD_CODE_MAX + 1);
+  const content = randInt(0, REBUILD_CODE_MAX, rng);
+  return { id, prev, content, code: pageCode(prev, content), isFake: false };
+}
+
+export type KeepEvent =
+  /** {phanDien} tráo ô `slot`: `real` bị ném ra bàn cùng trang mồi `decoy` */
+  | { kind: 'swap'; slot: number; at: number; fake: Card; real: Card; decoy: Card }
+  /** Đến lượt tráo mà đã có đủ 3 ô chưa sửa: không tráo, học sinh mất 1 tim (hết tim thì ván kết thúc, vòng 3 vẫn có điểm các ô đã sửa) */
+  | { kind: 'overflow'; at: number; heartsLeft: number }
+  /** Một ô để quá 10 giây chưa sửa: Bi gợi ý nửa trái hay phải của chuỗi */
+  | { kind: 'hint'; half: 'left' | 'right'; at: number }
+  /** Hết 90 giây */
+  | { kind: 'timeout'; left: number; points: number };
+
+const NO_EVENTS: readonly KeepEvent[] = [];
+
+/** Điểm tạm tính của vòng giữ sổ (đã sửa trừ đi các ô còn lệch nếu hết giờ ngay lúc này). */
+export function keepScoreNow(k: KeepState): number {
+  return k.fixed * KEEP.fixPoints + k.fast * KEEP.fastBonus;
+}
+
+function finishKeep(s: RebuildState, k: KeepState): KeepEvent {
+  const left = keepUnfixed(k);
+  const points = k.fixed * KEEP.fixPoints + k.fast * KEEP.fastBonus - left * KEEP.leftPenalty;
+  s.parts.push({ round: s.round, errors: s.errors, fakeBinned: false, points, keep: { fixed: k.fixed, fast: k.fast, left } });
+  k.running = false;
+  s.phase = 'roundDone';
+  return { kind: 'timeout', left, points };
+}
+
+/**
+ * Chạy đồng hồ vòng giữ sổ thêm `dt` giây: tráo khi đến giờ (xử lý đúng thứ tự thời gian, dù `dt` lớn), gợi ý khi có ô để quá 10 giây, và kết thúc vòng ở giây 90.
+ * Trả về các sự kiện xảy ra trong bước này (mảng rỗng dùng chung nếu không có gì, để màn chơi không tạo object mới mỗi khung hình).
+ */
+export function stepKeep(s: RebuildState, dt: number): readonly KeepEvent[] {
+  const k = s.keep;
+  if (s.phase !== 'keep' || !k || !k.running || dt <= 0) return NO_EVENTS;
+  let events: KeepEvent[] | null = null;
+  const push = (e: KeepEvent): void => {
+    (events ??= []).push(e);
+  };
+  const end = Math.min(KEEP.seconds, k.elapsed + dt);
+  const n = k.slots.length;
+  while (k.nextSwapAt <= end && k.nextSwapAt <= KEEP.seconds - KEEP.noSwapLast) {
+    const at = k.nextSwapAt;
+    k.nextSwapAt = at + swapIntervalAt(at);
+    if (keepUnfixed(k) >= KEEP.maxUnfixed) {
+      addError(s);
+      push({ kind: 'overflow', at, heartsLeft: s.hearts });
+      if (s.phase !== 'keep') {
+        k.running = false;
+        return events ?? NO_EVENTS;
+      }
+      continue;
+    }
+    // chọn ngẫu nhiên một ô đang là trang thật (không bao giờ tráo vào ô đã giả hay đang trống)
+    const candidates: number[] = [];
+    for (let i = 0; i < n; i++) if (k.slots[i] && k.swappedAt[i] < 0) candidates.push(i);
+    const slot = candidates[randInt(0, candidates.length - 1, s.rng)];
+    const real = k.slots[slot] as Card;
+    k.swapCount++;
+    const fake = makeFakeOf(real, s.rng, `r3-fake-${k.swapCount}`);
+    const decoy = makeDecoy(s.deal, s.rng, `r3-decoy-${k.swapCount}`);
+    k.slots[slot] = fake;
+    k.swappedAt[slot] = at;
+    k.hinted[slot] = false;
+    k.decoyOf[slot] = decoy.id;
+    s.tray.splice(randInt(0, s.tray.length, s.rng), 0, real);
+    s.tray.splice(randInt(0, s.tray.length, s.rng), 0, decoy);
+    push({ kind: 'swap', slot, at, fake, real, decoy });
+  }
+  k.elapsed = end;
+  for (let i = 0; i < n; i++) {
+    if (k.swappedAt[i] >= 0 && !k.hinted[i] && end - k.swappedAt[i] >= KEEP.hintAfter) {
+      k.hinted[i] = true;
+      push({ kind: 'hint', half: keepHalf(i, n), at: end });
+    }
+  }
+  if (k.elapsed >= KEEP.seconds) push(finishKeep(s, k));
+  return events ?? NO_EVENTS;
+}
+
+export type KeepPlaceResult =
+  /** Đặt đúng trang thật vào ô trống: ô sửa xong, +20 (và +5 nếu nhanh) */
+  | { kind: 'fixed'; slot: number; points: number; fast: boolean; chainOk: boolean }
+  /** Mã trang trước không khớp ô này (trang mồi, hay trang thật của ô khác): thẻ bật về bàn, mất 1 tim */
+  | { kind: 'badPrev'; heartsLeft: number }
+  /** Ô đang có trang (chưa bỏ trang giả vào rổ) hoặc thao tác không hợp lệ: không phạt */
+  | { kind: 'ignored' };
+
+/** Học sinh đặt thẻ `cardId` (đang trên bàn) vào ô `slot`. Chỉ đặt được vào ô trống. */
+export function placeInSlot(s: RebuildState, cardId: string, slot: number): KeepPlaceResult {
+  const k = s.keep;
+  if (s.phase !== 'keep' || !k || !k.running || slot < 0 || slot >= k.slots.length || k.slots[slot] !== null) return { kind: 'ignored' };
+  const i = s.tray.findIndex((c) => c.id === cardId);
+  if (i < 0) return { kind: 'ignored' };
+  const card = s.tray[i];
+  if (checkPlacement(s.deal.real[slot].prev, card) !== 'ok') {
+    addError(s);
+    return { kind: 'badPrev', heartsLeft: s.hearts };
+  }
+  s.tray.splice(i, 1);
+  k.slots[slot] = card;
+  const fast = k.elapsed - k.swappedAt[slot] <= KEEP.fastWithin;
+  k.swappedAt[slot] = -1;
+  k.fixed++;
+  if (fast) k.fast++;
+  // dọn trang mồi đi cùng lần tráo này
+  const decoy = k.decoyOf[slot];
+  k.decoyOf[slot] = null;
+  if (decoy) {
+    const d = s.tray.findIndex((c) => c.id === decoy);
+    if (d >= 0) s.tray.splice(d, 1);
+  }
+  return { kind: 'fixed', slot, points: KEEP.fixPoints + (fast ? KEEP.fastBonus : 0), fast, chainOk: keepChainStatus(k) === 'dung' };
+}
+
+export type KeepBinResult =
+  /** Đúng trang giả (sai công thức): rời khỏi chuỗi, ô thành ô trống */
+  | { kind: 'binned'; slot: number }
+  /** Trang thật mà bỏ vào rổ (từ chuỗi hay từ bàn): thẻ bật về, mất 1 tim */
+  | { kind: 'realBack'; heartsLeft: number }
+  | { kind: 'ignored' };
+
+/** Học sinh kéo trang ở ô `slot` của chuỗi vào "Rổ trang giả". Trang giả được nhận ra bằng công thức, không bằng cờ `isFake`. */
+export function binFromSlot(s: RebuildState, slot: number): KeepBinResult {
+  const k = s.keep;
+  if (s.phase !== 'keep' || !k || !k.running || slot < 0 || slot >= k.slots.length) return { kind: 'ignored' };
+  const card = k.slots[slot];
+  if (!card) return { kind: 'ignored' };
+  if (formulaHolds(card)) {
+    addError(s);
+    return { kind: 'realBack', heartsLeft: s.hearts };
+  }
+  k.slots[slot] = null;
+  return { kind: 'binned', slot };
+}
+
+/** Học sinh kéo thẻ `cardId` ở trên bàn vào rổ: trên bàn chỉ có trang thật và trang mồi (đều đúng công thức) nên luôn mất 1 tim và thẻ bật về. */
+export function binFromTable(s: RebuildState, cardId: string): KeepBinResult {
+  const k = s.keep;
+  if (s.phase !== 'keep' || !k || !k.running || !s.tray.some((c) => c.id === cardId)) return { kind: 'ignored' };
+  addError(s);
+  return { kind: 'realBack', heartsLeft: s.hearts };
 }

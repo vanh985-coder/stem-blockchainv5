@@ -182,7 +182,7 @@ export const GUIDE_SECTIONS = [
     trang: [
       {
         hinh: shot('man-3-ban'),
-        may: 'Mỗi thẻ ghi mã trang trước, nội dung và mã trang. Em ghép các thẻ thành một chuỗi liền nhau.',
+        may: 'Mỗi thẻ ghi mã trang trước, nội dung và mã trang. Ở vòng 1 và 2, em ghép các thẻ thành một chuỗi liền nhau.',
       },
       {
         hinh: art('keo-the'),
@@ -191,12 +191,12 @@ export const GUIDE_SECTIONS = [
       },
       {
         hinh: art('soi-the'),
-        may: 'Bấm "Soi công thức" để tự tính mã trang. Thẻ nào có mã sai công thức là trang giả.',
-        dt: 'Chạm "Soi công thức" để tự tính mã trang. Thẻ nào có mã sai công thức là trang giả.',
+        may: 'Bấm "Soi công thức" để tự tính mã trang. Thẻ nào có mã sai công thức là trang giả, em kéo nó vào rổ.',
+        dt: 'Chạm "Soi công thức" để tự tính mã trang. Thẻ nào có mã sai công thức là trang giả, em kéo nó vào rổ.',
       },
       {
         hinh: art('ro-trang'),
-        may: 'Kéo trang giả vào rổ để được thêm điểm. Đặt sai thẻ vào chuỗi thì thẻ bật về và em mất một tim.',
+        may: 'Vòng 3 là giữ sổ trong 90 giây. {phanDien} liên tục tráo trang trong chuỗi: em kéo trang giả vào rổ rồi đặt đúng trang thật vào chỗ trống.',
       },
     ],
   },

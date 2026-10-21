@@ -86,29 +86,42 @@ export const VILLAIN_TIMING = {
   end: 3.8,
 } as const;
 
+export interface VillainTiming {
+  enterEnd: number;
+  dropAt: number;
+  exitStart: number;
+  end: number;
+}
+
+/**
+ * Nhịp của {phanDien} ở vòng 3 (giữ sổ), ngắn hơn vòng 2 vì ít nhất 4 giây lại có một lần tráo: chạy vào (1 giây) → đứng cười và ném trang thật ra bàn → tráo (`dropAt`, đúng giờ của
+ * lần tráo trong luật) → chạy ra. Cả nhịp `end` = 2,9 giây, nhỏ hơn khoảng cách tráo nhỏ nhất (4 giây), nên hai nhịp không chồng nhau.
+ */
+export const KEEP_VILLAIN_TIMING: VillainTiming = { enterEnd: 1.0, dropAt: 1.5, exitStart: 2.1, end: 2.9 };
+
 /** Chia thời gian khi bật "giảm chuyển động": rút ngắn còn một phần tư. */
 export const REDUCED_MOTION_SCALE = 0.25;
 
 export type VillainStage = 'idle' | 'enter' | 'cheer' | 'exit' | 'gone';
 
 /** Giai đoạn của {phanDien} sau `t` giây kể từ lúc bắt đầu (`scale` = 1 bình thường, REDUCED_MOTION_SCALE khi giảm chuyển động). */
-export function villainStageAt(t: number, scale = 1): VillainStage {
+export function villainStageAt(t: number, scale = 1, timing: VillainTiming = VILLAIN_TIMING): VillainStage {
   const k = scale;
   if (t < 0) return 'idle';
-  if (t < VILLAIN_TIMING.enterEnd * k) return 'enter';
-  if (t < VILLAIN_TIMING.exitStart * k) return 'cheer';
-  if (t < VILLAIN_TIMING.end * k) return 'exit';
+  if (t < timing.enterEnd * k) return 'enter';
+  if (t < timing.exitStart * k) return 'cheer';
+  if (t < timing.end * k) return 'exit';
   return 'gone';
 }
 
 /** Vị trí ngang (tỉ lệ khung) của {phanDien} sau `t` giây: chạy từ ngoài khung bên phải tới điểm dừng, đứng đó, rồi chạy ra lại. Làm mượt (ease in-out). */
-export function villainFx(t: number, scale = 1): number {
+export function villainFx(t: number, scale = 1, timing: VillainTiming = VILLAIN_TIMING): number {
   const k = scale;
   const a = ACTORS.villainOffscreen.fx;
   const b = ACTORS.villainStop.fx;
   const ease = (u: number) => u * u * (3 - 2 * u);
-  if (t < VILLAIN_TIMING.enterEnd * k) return a + (b - a) * ease(Math.max(0, t / (VILLAIN_TIMING.enterEnd * k)));
-  if (t < VILLAIN_TIMING.exitStart * k) return b;
-  const u = Math.min(1, (t - VILLAIN_TIMING.exitStart * k) / ((VILLAIN_TIMING.end - VILLAIN_TIMING.exitStart) * k));
+  if (t < timing.enterEnd * k) return a + (b - a) * ease(Math.max(0, t / (timing.enterEnd * k)));
+  if (t < timing.exitStart * k) return b;
+  const u = Math.min(1, (t - timing.exitStart * k) / ((timing.end - timing.exitStart) * k));
   return b + (a - b) * ease(u);
 }

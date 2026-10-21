@@ -64,7 +64,15 @@ export function CoverFace({ code, width }: { code: number; width: number }) {
 // ---------------------------------------------------------------------------
 // Kéo thả (chuột và ngón tay, qua Pointer Events) hoặc chạm chọn rồi chạm đặt
 
-export type DropTarget = 'chain' | 'basket';
+/** Vùng thả: cả hàng chuỗi (vòng 1, 2), rổ, hoặc một ô cụ thể của chuỗi `slot:3` (vòng 3, chỉ số ô từ 0). */
+export type DropTarget = 'chain' | 'basket' | `slot:${number}`;
+
+const SLOT_DROP = /^slot:\d+$/;
+
+/** Chỉ số ô từ vùng thả `slot:N`, hoặc −1 nếu không phải ô. */
+export function slotOfTarget(t: DropTarget | null): number {
+  return t && SLOT_DROP.test(t) ? Number(t.slice(5)) : -1;
+}
 
 export interface DragState {
   id: string;
@@ -84,6 +92,7 @@ export function dropTargetAt(x: number, y: number, doc: Pick<Document, 'elements
   for (const el of doc.elementsFromPoint(x, y)) {
     const v = (el as HTMLElement).dataset?.drop;
     if (v === 'chain' || v === 'basket') return v;
+    if (v && SLOT_DROP.test(v)) return v as DropTarget;
   }
   return null;
 }
@@ -246,6 +255,8 @@ export interface TrayProps {
   shake: { id: string; n: number } | null;
   /** Thẻ vừa được nhét vào khay (trang giả) hoặc vừa nhấc ra: id của thẻ mới */
   fresh: string | null;
+  /** Vòng 3: các thẻ vừa bị ném ra bàn (trang thật và trang mồi, không phân biệt) */
+  freshIds?: readonly string[];
   dragId: string | null;
   enabled: boolean;
   bind: (id: string) => Record<string, unknown>;
@@ -255,13 +266,13 @@ export interface TrayProps {
 }
 
 /** Khay các thẻ chưa ghép: mỗi thẻ là một nút (bàn phím: Enter hoặc Space để chọn) vừa chạm được vừa kéo được. */
-export const Tray = memo(function Tray({ cards, width, selected, shake, fresh, dragId, enabled, bind, onSelectKey, version }: TrayProps) {
+export const Tray = memo(function Tray({ cards, width, selected, shake, fresh, freshIds, dragId, enabled, bind, onSelectKey, version }: TrayProps) {
   void version;
   const h = cardHeight(width);
   return (
     <div role="group" aria-label={rebuildUi.khay} data-testid="khay" className="absolute" style={{ left: `${AREAS.tray.x0}cqw`, top: `${AREAS.tray.y0}%`, width: `${AREAS.tray.x1 - AREAS.tray.x0}cqw`, height: `${h + 1.6}cqw` }}>
       {cards.map((c, i) => {
-        const mood: CardMood = shake?.id === c.id ? 'shake' : selected === c.id ? 'selected' : fresh === c.id ? 'new' : 'normal';
+        const mood: CardMood = shake?.id === c.id ? 'shake' : selected === c.id ? 'selected' : fresh === c.id || freshIds?.includes(c.id) ? 'new' : 'normal';
         return (
           <button
             key={`${c.id}:${shake?.id === c.id ? shake.n : 0}`}
@@ -283,6 +294,93 @@ export const Tray = memo(function Tray({ cards, width, selected, shake, fresh, d
           >
             <CardFace card={c} width={width} mood={mood} />
           </button>
+        );
+      })}
+    </div>
+  );
+});
+
+export interface KeepChainRowProps {
+  width: number;
+  genesis: number;
+  /** Sáu ô của chuỗi: thẻ đang nằm ở đó, hoặc null khi ô trống */
+  slots: readonly (Card | null)[];
+  selected: string | null;
+  shake: { id: string; n: number } | null;
+  dragId: string | null;
+  enabled: boolean;
+  /** Đang chọn hay kéo một thẻ ở bàn: các ô trống nhấp nháy */
+  armed: boolean;
+  /** Ô đang nằm dưới thẻ kéo, hoặc −1 */
+  hoverSlot: number;
+  /** Ô vừa đặt sai (nháy đỏ), hoặc null */
+  badSlot: { slot: number; n: number } | null;
+  bind: (id: string) => Record<string, unknown>;
+  onSelectKey: (id: string) => void;
+  /** Bấm vào một ô trống (đặt thẻ đang chọn vào đó) */
+  onSlotActivate: (slot: number) => void;
+  version: number;
+}
+
+/**
+ * Hàng chuỗi của vòng 3: trang bìa rồi sáu ô; mỗi ô là một vùng thả riêng (`data-drop="slot:N"`). Ô có trang là nút kéo được (vào rổ) và chọn được (để soi công thức); ô trống là
+ * nút bấm được. Mọi trang trông giống nhau (viền nâu): không có dấu hiệu nào cho biết ô nào bị tráo, em phải soi công thức.
+ */
+export const KeepChainRow = memo(function KeepChainRow({ width, genesis, slots, selected, shake, dragId, enabled, armed, hoverSlot, badSlot, bind, onSelectKey, onSlotActivate, version }: KeepChainRowProps) {
+  void version;
+  const h = cardHeight(width);
+  return (
+    <div role="group" aria-label={rebuildUi.chuoiGiuSo} data-testid="chuoi" className="absolute" style={{ left: `${AREAS.chain.x0 - 1}cqw`, top: `${AREAS.chain.y0}%`, width: `${AREAS.chain.x1 - AREAS.chain.x0 + 2}cqw`, height: `${h + 1}cqw` }}>
+      <div style={{ position: 'absolute', left: `${slotLeft(0, width, AREAS.chain.x0) - (AREAS.chain.x0 - 1)}cqw`, top: '0.5cqw' }}>
+        <CoverFace code={genesis} width={width} />
+      </div>
+      {slots.map((card, i) => {
+        const left = slotLeft(i + 1, width, AREAS.chain.x0) - (AREAS.chain.x0 - 1);
+        const pos: CSSProperties = { position: 'absolute', left: `${left}cqw`, top: '0.5cqw', width: `${width}cqw`, height: `${h}cqw` };
+        if (card) {
+          const mood: CardMood = shake?.id === card.id ? 'shake' : selected === card.id ? 'selected' : 'normal';
+          return (
+            <div key={`s${i}`} style={pos} data-drop={`slot:${i}`} className={hoverSlot === i ? 'rounded-[0.9cqw] bg-vang/30' : ''}>
+              <button
+                key={`${card.id}:${shake?.id === card.id ? shake.n : 0}`}
+                type="button"
+                disabled={!enabled}
+                aria-label={fmt(rebuildUi.oChuoiCoThe, { so: i + 1, the: selected === card.id ? fmt(rebuildUi.theChon, { the: cardLabel(card) }) : cardLabel(card) })}
+                aria-pressed={selected === card.id}
+                data-card-id={card.id}
+                data-slot={i}
+                data-testid="o-chuoi-the"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelectKey(card.id);
+                  }
+                }}
+                className="absolute inset-0 cursor-grab touch-none rounded-[0.9cqw] p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-muc-tim"
+                style={{ opacity: dragId === card.id ? 0.25 : 1, touchAction: 'none' }}
+                {...bind(card.id)}
+              >
+                <CardFace card={card} width={width} mood={mood} />
+              </button>
+            </div>
+          );
+        }
+        return (
+          <div
+            key={`s${i}`}
+            role="button"
+            tabIndex={0}
+            style={pos}
+            data-drop={`slot:${i}`}
+            data-slot={i}
+            data-testid="o-chuoi-trong"
+            aria-label={fmt(rebuildUi.oChuoiTrong, { so: i + 1 })}
+            onClick={() => onSlotActivate(i)}
+            onKeyDown={enterOrSpace(() => onSlotActivate(i))}
+            className={`cursor-pointer rounded-[0.9cqw] border-[0.3cqw] border-dashed ${hoverSlot === i ? 'border-xanh-la bg-xanh-la/25' : armed ? 'animate-pulse border-muc-tim bg-muc-tim/15' : 'border-nau-go/70 bg-giay/40'}`}
+          >
+            {badSlot?.slot === i && <span key={badSlot.n} className="absolute inset-0 animate-shake rounded-[0.9cqw] bg-do-son/35" />}
+          </div>
         );
       })}
     </div>

@@ -141,4 +141,28 @@ export const rebuildUi = {
   /** Phần điểm ở màn kết quả: số lần sai và trang giả */
   phanVong: 'Vòng {so} (số lần sai)',
   phanTrangGia: 'Vòng {so}: bỏ đúng trang giả vào rổ',
+  /** Vòng 3 "giữ sổ" (bước X2): {phanDien} liên tục tráo trang, em sửa liên tục */
+  giuSoTieuDe: 'Vòng {so}: Giữ sổ',
+  giuSoLoi: '{phanDien} sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt {giay} giây. Em soi công thức, bỏ trang giả vào rổ, rồi đặt đúng trang thật vào chỗ trống. Sửa trong {nhanh} giây thì được thêm điểm.',
+  giuSoBatDau: 'Bắt đầu giữ sổ',
+  /** Bác An động viên trước vòng 3, kèm việc hồi đủ tim (bước X3) */
+  bacAnDongVien: 'Bác An: "Cố lên con! Cuốn sổ này nhờ con giữ đấy. Bác hồi lại đủ sức cho con rồi, các tim của con đầy cả."',
+  chuoiGiuSo: 'Chuỗi trang. Mỗi ô là một chỗ đặt trang.',
+  chuoiLech: 'Chuỗi đang lệch',
+  chuoiDung: 'Chuỗi đúng',
+  dongHo: 'Còn {giay} giây',
+  oChuoiTrong: 'Ô số {so} của chuỗi, đang trống. Bấm vào đây để đặt thẻ đang chọn.',
+  oChuoiCoThe: 'Ô số {so} của chuỗi: {the}',
+  biDaBat: 'Đúng trang giả rồi! Giờ em đặt trang thật vào chỗ trống nhé.',
+  biSuaXong: 'Sửa xong một ô! Em được thêm {diem} điểm.',
+  biChuoiDungLai: 'Chuỗi lại đúng rồi! Giữ vững nhé.',
+  biOCoTrang: 'Ô này đang có trang rồi. Nếu em nghĩ đó là trang giả, hãy bỏ nó vào rổ trước.',
+  biLechQua: 'Chuỗi lệch quá nhiều! {phanDien} cười khoái chí. Em mất 1 tim.',
+  biGoiYTrai: 'Bi thấy có gì lạ ở nửa bên trái của chuỗi.',
+  biGoiYPhai: 'Bi thấy có gì lạ ở nửa bên phải của chuỗi.',
+  hetGio: 'Hết giờ! Em sửa được {sua} ô, còn lệch {lech} ô. Vòng {so} được {diem} điểm.',
+  /** Phần điểm vòng 3 ở màn kết quả */
+  phanSua: 'Vòng {so}: ô đã sửa xong (+{diem} mỗi ô)',
+  phanNhanh: 'Vòng {so}: sửa trong {giay} giây (thêm +{diem} mỗi ô)',
+  phanConLech: 'Vòng {so}: ô còn lệch khi hết giờ (−{diem} mỗi ô)',
 } as const;

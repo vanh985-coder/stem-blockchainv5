@@ -196,11 +196,28 @@ async function runnerShots(browser) {
 }
 
 async function rebuildShots(browser) {
+  // Ảnh màn 3 chụp ở vòng giữ sổ (bước X2b): vòng 3 có chuỗi 6 trang, {phanDien} vừa tráo một trang (chuỗi đang lệch) và hai thẻ mới rơi ra bàn.
+  // Nhảy thẳng tới vòng 3 bằng cách đặt trạng thái 'vòng 2 xong' (cầu nối window.__rebuild có ở bản dev) rồi bấm 'Vòng tiếp theo' như người chơi.
   const page = await newPage(browser, 'oneGolden');
   await page.goto(`${LANG}/lang/lang-giay/man/3?q=high`, { waitUntil: 'load' });
   await sleep(1500);
   await page.evaluate(() => [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Bắt đầu')?.click());
-  await sleep(6000);
+  await page.waitForFunction(() => window.__rebuild &&document.querySelector('[data-testid=man3-khung]'), { timeout: 120000 });
+  await sleep(2500);
+  await page.evaluate(() => {
+    const s = window.__rebuild;
+    s.round = 1;
+    s.phase = 'roundDone';
+    s.parts.push({ round: 0, errors: 0, fakeBinned: false, points: 100 }, { round: 1, errors: 0, fakeBinned: true, points: 130 });
+    document.querySelector('[data-testid=nut-soi]')?.click(); // vẽ lại để hiện bảng 'Vòng 2 xong'
+  });
+  await sleep(500);
+  await page.evaluate(() => document.querySelector('[data-testid=nut-tiep]')?.click());
+  await page.evaluate(() => document.querySelector('[data-testid=nut-soi]')?.click()); // đóng lại ô soi công thức đã bật ở trên
+  await page.waitForFunction(() => window.__rebuild?.phase === 'keep', { timeout: 10000 });
+  await sleep(500);
+  await page.evaluate(() => document.querySelector('[data-testid=nut-bat-dau-giu-so]')?.click());
+  await page.waitForFunction(() => (window.__rebuild?.keep?.swapCount ?? 0) >= 1, { timeout: 20000 });
   await save(page, 'man-3-ban');
   await page.browserContext().close();
 }

@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { buildChain, pageCode } from '@so-chung/core/lessons/bai-1/logic';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
-import { REBUILD_SPEC as SPEC } from './rebuildConfig';
+import { REBUILD_KEEP, REBUILD_SPEC as SPEC } from './rebuildConfig';
 import {
   advance,
+  beginKeep,
   binCard,
+  binFromSlot,
   inspectionLine,
   checkPlacement,
   createRebuild,
@@ -13,10 +15,13 @@ import {
   insertFake,
   inspectCard,
   placeCard,
+  placeInSlot,
   rebuildMedal,
   rebuildScore,
   roundScore,
   scoreParts,
+  stepKeep,
+  swapSchedule,
   tailCode,
   type Card,
   type RebuildState,
@@ -30,6 +35,28 @@ function playPerfectRound(s: RebuildState): void {
   for (const c of s.tray.slice()) if (!formulaHolds(c)) binCard(s, c.id);
   for (const c of s.deal.real) placeCard(s, c.id);
 }
+
+/** Chơi hoàn hảo vòng giữ sổ: sửa mỗi ô ngay khi bị tráo (nên luôn được +20 +5). */
+function playPerfectKeep(s: RebuildState): void {
+  beginKeep(s);
+  let guard = 0;
+  while (s.phase === 'keep' && guard++ < 10000) {
+    for (const e of stepKeep(s, 0.1)) {
+      if (e.kind !== 'swap') continue;
+      expect(binFromSlot(s, e.slot)).toEqual({ kind: 'binned', slot: e.slot });
+      expect(placeInSlot(s, e.real.id, e.slot)).toMatchObject({ kind: 'fixed', slot: e.slot, fast: true });
+    }
+  }
+}
+
+/** Chơi hoàn hảo một vòng bất kỳ (vòng 3 là vòng giữ sổ). */
+function playPerfectAny(s: RebuildState): void {
+  if (s.phase === 'keep') playPerfectKeep(s);
+  else playPerfectRound(s);
+}
+
+/** Điểm hoàn hảo của vòng 3: mỗi lần tráo được 20 + 5. */
+const PERFECT_KEEP = swapSchedule().length * (REBUILD_KEEP.fixPoints + REBUILD_KEEP.fastBonus);
 
 describe('bảng test của spec 05, Màn 3 (giữ nguyên số thứ tự)', () => {
   it('ca 1: buildChain(10, [23, 45, 7, 88, 12]) → [43, 31, 69, 26, 64], không trùng', () => {
@@ -160,7 +187,7 @@ describe('vòng, tim, điểm', () => {
     expect(rebuildScore(s)).toBe(90);
   });
 
-  it('vòng 2 và 3: có chờ {phanDien} nhét trang giả; khay chỉ có trang giả sau insertFake; kéo vào rổ +30', () => {
+  it('vòng 2: có chờ {phanDien} nhét trang giả; khay chỉ có trang giả sau insertFake; kéo vào rổ +30', () => {
     const s = createRebuild(4);
     playPerfectRound(s);
     advance(s);
@@ -220,23 +247,25 @@ describe('vòng, tim, điểm', () => {
     expect(rebuildMedal(100)).toBe(0);
   });
 
-  it('chơi hoàn hảo cả 3 vòng: 100 + 130 + 130 = 360, Vàng, over = done', () => {
+  it('chơi hoàn hảo cả 3 vòng: 100 + 130 + vòng giữ sổ (12 lần tráo × 25), Vàng, over = done', () => {
     const s = createRebuild(8);
     for (let r = 0; r < 3; r++) {
-      playPerfectRound(s);
+      playPerfectAny(s);
       expect(s.phase).toBe('roundDone');
       advance(s);
     }
     expect(s.phase).toBe('over');
     expect(s.over).toBe('done');
     expect(s.hearts).toBe(3);
-    expect(s.deal.real).toHaveLength(9);
-    expect(rebuildScore(s)).toBe(360);
-    expect(rebuildMedal(360)).toBe(3);
+    expect(s.deal.real).toHaveLength(6);
+    expect(PERFECT_KEEP).toBe(300);
+    expect(rebuildScore(s)).toBe(100 + 130 + PERFECT_KEEP);
+    expect(rebuildMedal(rebuildScore(s))).toBe(3);
   });
 
-  it('mốc điểm đúng spec: 150 Đồng, 250 Bạc, 330 Vàng', () => {
-    expect([0, 149, 150, 249, 250, 329, 330, 400].map(rebuildMedal)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
+  it('mốc điểm (bước X3): 200 Đồng, 400 Bạc, 500 Vàng', () => {
+    expect(SPEC.medals).toEqual([200, 400, 500]);
+    expect([0, 199, 200, 399, 400, 499, 500, 600].map(rebuildMedal)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
   });
 
   it('roundScore không âm và đúng công thức', () => {
@@ -245,16 +274,18 @@ describe('vòng, tim, điểm', () => {
     expect(roundScore(11, false)).toBe(0);
   });
 
-  it('sai nhiều lần vẫn đạt Vàng nếu chỉ sai tối đa 2 lần và bỏ đúng 2 trang giả: 360 − 20 = 340', () => {
+  it('sai 2 lần ở vòng 1 (còn 1 tim) rồi chơi hoàn hảo hai vòng sau: 100 − 20 + 130 + vòng giữ sổ = 510, vẫn Vàng (500); vào vòng 3 được hồi đủ tim', () => {
     const s = createRebuild(9);
     placeCard(s, s.tray.find((c) => c.prev !== tailCode(s))!.id);
     placeCard(s, s.tray.find((c) => c.prev !== tailCode(s))!.id);
     for (let r = 0; r < 3; r++) {
-      playPerfectRound(s);
+      playPerfectAny(s);
       advance(s);
     }
     expect(s.over).toBe('done');
-    expect(rebuildScore(s)).toBe(340);
+    expect(s.hearts).toBe(SPEC.hearts); // bước X3: vào vòng 3 được hồi đủ tim
+    expect(rebuildScore(s)).toBe(80 + 130 + PERFECT_KEEP);
+    expect(rebuildScore(s)).toBe(510);
     expect(rebuildMedal(rebuildScore(s))).toBe(3);
   });
 
@@ -262,7 +293,7 @@ describe('vòng, tim, điểm', () => {
     const run = (): number => {
       const s = createRebuild(31);
       for (let r = 0; r < 3; r++) {
-        playPerfectRound(s);
+        playPerfectAny(s);
         advance(s);
       }
       return rebuildScore(s);
@@ -302,14 +333,16 @@ describe('các phần điểm cho màn kết quả', () => {
     playPerfectRound(s);
     advance(s);
     playPerfectRound(s); // vòng 2 có trang giả bỏ đúng
-    advance(s);
-    insertFake(s);
-    for (let i = 0; i < 2; i++) placeCard(s, s.tray.find((c) => c.prev !== tailCode(s) && formulaHolds(c))!.id);
+    advance(s); // sang vòng giữ sổ
+    beginKeep(s);
+    stepKeep(s, 300); // bỏ mặc: đầy ô rồi hết tim, vòng 3 dở dang
+    expect(s.over).toBe('hearts');
     const rows = scoreParts(s);
     expect(rows).toEqual([
       { key: 'vong', round: 0, count: 1, points: 90 },
       { key: 'vong', round: 1, count: 0, points: 100 },
       { key: 'trangGia', round: 1, count: 1, points: 30 },
+      { key: 'sua', round: 2, count: 0, points: 0 }, // hết tim ở vòng 3 chưa sửa ô nào: vẫn có dòng, 0 điểm, không có dòng trừ điểm
     ]);
     expect(rows.reduce((a, r) => a + r.points, 0)).toBe(rebuildScore(s));
   });
