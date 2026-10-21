@@ -4,7 +4,7 @@ import { VILLAGE_ORDER } from '../../content/levels';
 import type { VillageId } from '../../village';
 import type { GateId } from '../cho/marketLayout';
 import { usePlayerState } from '../WalkWorld';
-import { GATE_TRIGGER_DISTANCE, insideVillage, nearGate, newZoneState, rimDistance, stepPrewarm, stepZone, type ZoneState } from './worldZones';
+import { GATE_TRIGGER_DISTANCE, insideVillage, nearGate, newZoneState, onRoadTo, rimDistance, stepPrewarm, stepZone, type ZoneState } from './worldZones';
 import type { WorldVillage } from './worldLayout';
 
 export type LoadedZones = Readonly<Record<VillageId, boolean>>;
@@ -13,6 +13,8 @@ export type PrewarmZones = Readonly<Record<VillageId, boolean>>;
 
 export interface WorldTrackerProps {
   villages: readonly WorldVillage[];
+  /** Làng của nhiệm vụ hiện tại: luôn được chuẩn bị sẵn (null: đủ 4 trang, không có) */
+  mission: VillageId | null;
   /** Báo khi một vùng làng được tải hay dọn (kèm trạng thái của cả 4 vùng) */
   onZones: (loaded: LoadedZones) => void;
   /** Báo khi một làng bắt đầu hay thôi được chuẩn bị sẵn (kèm trạng thái của cả 4 làng) */
@@ -30,7 +32,9 @@ const TICK = 0.15;
  * Theo dõi người chơi ở thế giới mở: tải và dọn vùng làng theo khoảng cách tới rìa làng (`stepZone`, có độ trễ), biết đang ở trong làng nào (đã qua cổng) và đang gần cổng nào. Chỉ gọi nơi dùng khi giá trị
  * ĐỔI. Đặt trong <WalkWorld> (đọc vị trí người chơi). Không cấp phát trong useFrame.
  */
-export function WorldTracker({ villages, onZones, onPrewarm, onInside, onNearGate }: WorldTrackerProps) {
+export function WorldTracker({ villages, mission, onZones, onPrewarm, onInside, onNearGate }: WorldTrackerProps) {
+  const missionRef = useRef(mission);
+  missionRef.current = mission;
   const player = usePlayerState();
   const zones = useMemo<ZoneState[]>(() => villages.map(() => newZoneState()), [villages]);
   const gates = useMemo(() => villages.map((v) => ({ id: v.gate.id, x: v.gate.x, z: v.gate.z })), [villages]);
@@ -59,7 +63,7 @@ export function WorldTracker({ villages, onZones, onPrewarm, onInside, onNearGat
       const v = villages[i];
       const rim = rimDistance(v.center.x, v.center.z, v.radius, player.x, player.z);
       if (stepZone(zones[i], rim, s.t)) changed = true;
-      if (stepPrewarm(zones[i], rim)) prewarmChanged = true;
+      if (stepPrewarm(zones[i], rim, v.id === missionRef.current || onRoadTo(v.frame.dirX, v.frame.dirZ, player.x, player.z))) prewarmChanged = true;
       if (insideVillage(v.center.x, v.center.z, player.x, player.z, v.insideRadius)) inside = v.id;
     }
     const gate = nearGate(gates, player.x, player.z, GATE_TRIGGER_DISTANCE);

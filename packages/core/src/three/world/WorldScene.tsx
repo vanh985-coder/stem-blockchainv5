@@ -67,6 +67,8 @@ export interface WorldSceneProps {
   onGateFallen?: () => void;
   /** Nút đích của mũi tên dưới chân (xem `targetNodeId`), null thì không có mũi tên */
   arrowTarget: string | null;
+  /** Làng của nhiệm vụ hiện tại (luôn chuẩn bị sẵn); null nếu không có */
+  mission: VillageId | null;
   /** Vùng làng nào đã tải (do `WorldTracker` báo, nơi dùng giữ trạng thái) */
   loaded: LoadedZones;
   /** Trạng thái các màn (để vẽ biển gỗ) */
@@ -110,6 +112,7 @@ export function WorldScene({
   onInside,
   onNearGate,
   onZoneReady,
+  mission,
 }: WorldSceneProps) {
   if (PROBE) Object.assign(window, { __world: world, __loadedZones: loaded });
   const market = world.market;
@@ -119,7 +122,7 @@ export function WorldScene({
   const [prewarmed, setPrewarmed] = useState<ReadonlySet<VillageId>>(new Set());
   const onPrewarmDone = useCallback((id: VillageId, done: boolean) => setPrewarmed((prev) => (prev.has(id) === done ? prev : done ? new Set(prev).add(id) : new Set([...prev].filter((x) => x !== id)))), []);
   const byModel = useMemo(() => MARKET_MODELS.map((id) => ({ id, items: market.placements.filter((p) => p.model === id) })), [market]);
-  const gateItems = useMemo(() => world.gates.map((g) => ({ id: g.model, items: [{ model: g.model, x: g.x, z: g.z, yaw: g.yaw, scale: 1, tint: [1, 1, 1] as const } satisfies Placement] })), [world]);
+  const gateItems = useMemo(() => world.gates.map((g) => ({ id: g.model, village: world.villages.find((v) => v.gate.id === g.id)!.id, items: [{ model: g.model, x: g.x, z: g.z, yaw: g.yaw, scale: 1, tint: [1, 1, 1] as const } satisfies Placement] })), [world]);
   // dân làng: vật cản tròn đi theo từng người (mỗi khung hình Villager ghi vị trí vào đây)
   const villagers = useMemo<CircleObstacle[]>(() => market.villagerPaths.map((p) => circle(p[0][0], p[0][1], VILLAGER_RADIUS)), [market]);
   const closedGates = useMemo(() => world.gates.filter((g) => !gateOpen[g.id]), [world, gateOpen]);
@@ -157,9 +160,11 @@ export function WorldScene({
       {overview && <OverviewCamera kind={overview} />}
       <WorldTerrain world={world} dirtUrl={dirtUrl} animate={animate} />
       {byModel.map(({ id, items }) => (items.length > 0 ? <ModelInstances key={id} id={id} items={items} level={level} /> : null))}
-      {gateItems.map(({ id, items }) => (
-        <ModelInstances key={id} id={id} items={items} level={level} />
-      ))}
+      {gateItems.map(({ id, village, items }) => {
+        // cổng của làng chưa chuẩn bị xong chỉ vẽ bản xa: không tải bản chính và bản vừa (5 MB cho 3 cổng) cho tới khi người chơi tới gần
+        const full = prewarmed.has(village) || loaded[village]; // chỉ khi đã chuẩn bị xong (hình học bản chính và bản vừa đã nướng sẵn): dựng lúc đó mới không khựng
+        return <ModelInstances key={`${id}|${full ? 'f' : 'n'}`} id={id} items={items} level={level} farOnly={!full} />;
+      })}
       <MarketProps layout={market} />
       <VillageFar villages={world.villages} level={level} loaded={loaded} />
       {world.villages.map((v) => (prewarm[v.id] ? <ZonePrewarm key={`${v.id}|${level}`} village={v} level={level} onDone={onPrewarmDone} /> : null))}
@@ -189,7 +194,7 @@ export function WorldScene({
       <GateBarriers gates={closedGates} falling={fallingGate} onFallen={onGateFallen} animate={animate} />
       <Signposts signposts={world.signposts} />
       <GroundArrow graph={world.graph} target={arrowTarget} animate={animate} />
-      <WorldTracker villages={world.villages} onZones={onZones} onPrewarm={setPrewarm} onInside={onInside} onNearGate={onNearGate} />
+      <WorldTracker villages={world.villages} mission={mission} onZones={onZones} onPrewarm={setPrewarm} onInside={onInside} onNearGate={onNearGate} />
       {debugColliders && <ColliderDebug colliders={colliders} dynamic={dynamicColliders} />}
       <StatsProbe />
       {/* con cuối: nạp trước mọi bậc model của chợ và cổng lên GPU lúc còn màn hình tải (đổi mức chất lượng thì dựng lại) */}

@@ -29,7 +29,7 @@ import { useWalkSession } from '../useWalkSession';
 import { createWalkApi } from '../walkApi';
 import { MarketHud } from '../cho/MarketHud';
 import { MarketMenu } from '../cho/MarketMenu';
-import { GATE_VILLAGE, gateOpenedAfter, gateStates, previousVillage, questIndex } from '../cho/marketQuest';
+import { GATE_VILLAGE, gateOpenedAfter, gateStates, previousVillage, questGate, questIndex } from '../cho/marketQuest';
 import { densityFor, type GateId } from '../cho/marketLayout';
 import { GoldenPagesRow } from '../village/GoldenPagesRow';
 import { guideTopic, lockedBy, nextLevel } from '../village/villageQuest';
@@ -166,6 +166,9 @@ export function WorldPage() {
     if (inside && ceremonyPending) return fmt(ui.langScene.nhiemVuXong, { lang: insideName });
     return fmt(NHIEM_VU[questIndex(qPages)]);
   }, [inside, nextBoard, ceremonyPending, insideName, qPages]);
+  // làng của nhiệm vụ: đang ở trong làng nào thì làng đó, không thì làng có cổng của nhiệm vụ theo số Trang Sổ Vàng
+  const questG = questGate(effPages);
+  const missionVillage: VillageId | null = inside ?? (questG ? GATE_VILLAGE[questG] : null);
   const arrowTarget = seqActive ? null : targetNodeId({ inVillage: inside, nextBoard, pages: effPages });
 
   // ---- vật tương tác
@@ -419,6 +422,7 @@ export function WorldPage() {
             fallingGate={fallingGate}
             onGateFallen={onGateFallen}
             arrowTarget={arrowTarget}
+            mission={missionVillage}
             loaded={loaded}
             levelStates={levelStates}
             onZones={onZones}

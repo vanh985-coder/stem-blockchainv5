@@ -175,12 +175,15 @@ export const RACK_MAX_DISTANCE: Readonly<Record<'low' | 'medium' | 'high', numbe
 export const BAMBOO_MAX_DISTANCE: Readonly<Record<'medium' | 'high', number>> = { medium: 90, high: 120 };
 
 /**
- * Xa hơn khoảng này (tính tới mặt vật) thì không vẽ: Thấp 52 (sương che), còn lại vẽ hết; riêng bụi tre (`env/bui-tre`, truyền `modelId`) ở mức Vừa và Cao có tầm
+ * Xa hơn khoảng này (tính tới mặt vật) thì không vẽ: Thấp `LOW_MAX_DISTANCE` (sương che), còn lại vẽ hết; riêng bụi tre (`env/bui-tre`, truyền `modelId`) ở mức Vừa và Cao có tầm
  * `BAMBOO_MAX_DISTANCE`.
  */
+/** Mức Thấp không vẽ vật xa hơn khoảng này (tính tới mặt vật): 38 (bước W3, trước đó 52) để giữ dưới 270.000 tam giác; vật ở gần người chơi (có va chạm) không bị ảnh hưởng. */
+export const LOW_MAX_DISTANCE = 38;
+
 export function marketMaxDistance(level: 'low' | 'medium' | 'high', modelId?: string): number {
   if (modelId === 'env/phen-phoi-giay') return RACK_MAX_DISTANCE[level];
-  if (level === 'low') return 52;
+  if (level === 'low') return LOW_MAX_DISTANCE;
   return modelId === 'env/bui-tre' ? BAMBOO_MAX_DISTANCE[level] : Infinity;
 }
 

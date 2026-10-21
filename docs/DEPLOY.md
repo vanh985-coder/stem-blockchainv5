@@ -15,9 +15,11 @@ Tài liệu này dành cho người làm tay trên **Windows Server** đã cài 
 
 Tất cả lệnh dưới đây chạy trong **PowerShell** trên server, trừ khi ghi khác.
 
-**Có gì mới ở mốc 2 (chợ 3D, model `.glb`):**
-- Hub có trang `/cho` (chợ 3D, vào bằng đường dẫn `https://stem-block.blockchainptit.com/cho`; `/cho?tu=<id làng>` và `/cho?mo=<id làng>` là đường dẫn trong game). Không cần cấu hình thêm: Caddy trả `index.html` cho mọi đường dẫn không phải file. Các trang `/dev/*` (kể cả `/dev/portraits`) chỉ có khi chạy dev, không có trên bản deploy.
-- Model 3D (`.glb`) nằm trong `assets-build/models/` và được phục vụ bởi `sb-assets` như ảnh (cùng `VITE_ASSETS_URL`; không có biến `VITE_*` mới): `Content-Type: model/gltf-binary`, CORS `*`, tên có mã băm 8 ký tự thì `immutable`. `assets-build/` đã nặng khoảng 46 MB (40 MB là model), còn chợ phiên tải khoảng 22 đến 24 MB model ở lần vào đầu (tải theo cảnh, trình duyệt lưu lại).
+**Có gì mới ở mốc 2 (thế giới mở 3D, model `.glb`):**
+- **Thế giới mở (bước W1 đến W3):** chợ và 4 làng nằm trong MỘT cảnh 3D ở hub, địa chỉ `https://stem-block.blockchainptit.com/cho`. Đi từ chợ theo đường đất tới cổng từng làng rồi bước thẳng vào làng, không còn chuyển trang. **4 subdomain làng (`sb-lang-*`) chỉ còn là trang bài học và game** (`/lang/<id>/man/<n>`): `/` và `/lang/<id>` của subdomain làng tự chuyển sang `https://stem-block.blockchainptit.com/cho?tu=<id làng>` (nhờ `VITE_HUB_URL` trong `deploy/.env`); nút "Về làng" ở cuối mỗi màn cũng về đó. Không có cấu hình server, Caddy hay Cloudflare nào mới: vẫn 6 hostname, 6 cổng như cũ.
+- **Dung lượng tải của thế giới mở** (đo bằng Chrome, bản build): lần đầu vào `/cho` khoảng **16 MB lúc cảnh sẵn sàng và 20 đến 21,5 MB khi chuẩn bị xong làng của nhiệm vụ** (Làng Giấy lúc mới chơi); mỗi làng khác chỉ tải thêm khi người chơi đi tới gần (Làng Dệt khoảng 3,4 MB, Khắc Dấu 1,9 MB, Bạc 1,6 MB ở mức Cao). Trình duyệt lưu lại nên lần sau nhẹ hơn.
+- Hub có trang `/cho` (thế giới mở 3D, vào bằng đường dẫn `https://stem-block.blockchainptit.com/cho`; `/cho?tu=<id làng>` và `/cho?mo=<id làng>` là đường dẫn trong game). Không cần cấu hình thêm: Caddy trả `index.html` cho mọi đường dẫn không phải file. Các trang `/dev/*` (kể cả `/dev/portraits`) chỉ có khi chạy dev, không có trên bản deploy.
+- Model 3D (`.glb`) nằm trong `assets-build/models/` và được phục vụ bởi `sb-assets` như ảnh (cùng `VITE_ASSETS_URL`; không có biến `VITE_*` mới): `Content-Type: model/gltf-binary`, CORS `*`, tên có mã băm 8 ký tự thì `immutable`. `assets-build/` đã nặng khoảng 46 MB (40 MB là model), còn thế giới mở tải khoảng 20 đến 21,5 MB ở lần vào đầu (tải theo cảnh và theo làng, trình duyệt lưu lại).
 - Ảnh hướng dẫn chơi nằm ở `assets-build/ui/huong-dan/` (10 ảnh WebP, khoảng 0,7 MB), do `pnpm guide:capture` chụp từ game rồi `pnpm assets:build` nén; làm trên máy dev, server chỉ nhận qua `git pull`.
 - `assets-build/` được commit vào Git; **trên server không có `assets/` (bản gốc) nên không chạy `pnpm assets:build` ở server**. Mỗi lần đổi đồ họa: chạy `pnpm assets:build` trên máy dev, commit `assets-build/` (không có `_preview/`), rồi `git pull` và dựng lại trên server (mục f).
 
@@ -230,13 +232,82 @@ Xem nhật ký: `docker logs so-chung-web --tail 100`.
 - [ ] **Chơi thử không tài khoản:** mở cửa sổ ẩn danh, bấm "Chơi thử không cần tài khoản", chơi một trạm; cookie `sc_guest` có Domain `.blockchainptit.com` và Secure.
 - [ ] **Google:** bấm "Đăng nhập bằng Google" từ hub và từ một làng; đăng nhập xong quay về đúng trang đang đứng.
 - [ ] **Trang giáo viên:** đăng nhập tài khoản giáo viên, vào `/giao-vien`, tạo lớp, cho một học sinh nhập mã lớp, xem tiến độ, xuất CSV mở bằng Excel không lỗi dấu, **đặt lại mật khẩu** cho một học sinh dùng tên đăng nhập rồi đăng nhập thử bằng mật khẩu mới. Học sinh gõ `/giao-vien` thì bị đưa về trang chủ.
-- [ ] **Chợ 3D (mốc 2):** mở `https://stem-block.blockchainptit.com/cho` (gõ thẳng đường dẫn, không được 404): thanh tải chạy hết, đi được bằng W A S D (điện thoại: cần điều khiển bên trái), Bi bay theo. F12 → Network: các file `.glb` lấy từ `https://sb-assets.blockchainptit.com/models/...` trả 200, `Content-Type: model/gltf-binary`, `Access-Control-Allow-Origin: *`, `Cache-Control: public, max-age=31536000, immutable`; không lỗi CORS đỏ trong Console. Lần đầu mất khoảng 22 đến 24 MB.
-- [ ] **Cổng làng:** ở chợ, đứng sát cổng Làng Giấy bấm E thì sang `https://sb-lang-giay.blockchainptit.com/lang/lang-giay`; ba cổng còn lại có then gỗ và dây đỏ, bấm E thì Bi báo "Cổng làng đóng…".
-- [ ] **Trao Trang Sổ Vàng (dùng tài khoản học sinh mới hoặc chơi thử ẩn danh):** ở Làng Giấy chơi xong màn 3 rồi vào lại làng thì bác An trao trang (ô trang 1 sáng), bấm "Về chợ" thì sang hub `/cho` đứng trước cổng Làng Dệt, then gỗ và dây đỏ rơi, Bi nói "Một trang rồi! Cổng Làng Dệt đã mở."; tải lại không chiếu lại; ghi tiến độ rồi mở bằng máy khác cùng tài khoản cũng không chiếu lại.
+- [ ] **Thế giới mở (mốc 2):** mở `https://stem-block.blockchainptit.com/cho` (gõ thẳng đường dẫn, không được 404): thanh tải chạy hết, đi được bằng W A S D (điện thoại: cần điều khiển bên trái), Bi bay theo, có mũi tên vàng dưới chân chỉ đường tới Làng Giấy. F12 → Network: các file `.glb` lấy từ `https://sb-assets.blockchainptit.com/models/...` trả 200, `Content-Type: model/gltf-binary`, `Access-Control-Allow-Origin: *`, `Cache-Control: public, max-age=31536000, immutable`; không lỗi CORS đỏ trong Console. Lần đầu khoảng 20 đến 21,5 MB (xem cột "transferred").
+- [ ] **Đi từ chợ vào Làng Giấy:** từ chỗ xuất hiện đi theo mũi tên về phía bắc, qua biển chỉ đường "Làng Giấy", tới cổng; bước qua cổng là vào làng (không chuyển trang, không giật hình đáng kể). Lần đầu có cảnh mở đầu của bác An rồi 4 thẻ "Em có biết?"; thấy 3 biển gỗ, bác An, xưởng làm giấy, ao, đình. Ba cổng còn lại có then gỗ và dây đỏ, bấm E thì Bi báo "Cổng làng đóng…".
+- [ ] **Subdomain làng chuyển về hub:** mở `https://sb-lang-giay.blockchainptit.com/` và `https://sb-lang-giay.blockchainptit.com/lang/lang-giay`: cả hai tự chuyển sang `https://stem-block.blockchainptit.com/cho?tu=lang-giay` (đứng trong làng cạnh 3 biển). Bấm E ở biển màn 1 thì sang `https://sb-lang-giay.blockchainptit.com/lang/lang-giay/man/1` (trang bài học vẫn ở subdomain); cuối màn bấm "Về làng" thì quay lại đúng chỗ trong làng. Làm tương tự với `sb-lang-det`, `sb-lang-khac-dau`, `sb-lang-bac` (chỉ cần thấy chuyển về `/cho?tu=<id>`).
+- [ ] **Trao Trang Sổ Vàng (dùng tài khoản học sinh mới hoặc chơi thử ẩn danh):** ở Làng Giấy chơi xong màn 3 rồi vào lại làng (hoặc bước qua cổng) thì bác An trao trang (ô trang 1 sáng); xong cảnh thì dòng nhiệm vụ đổi thành "Đến Làng Dệt…", đi theo mũi tên về cổng Làng Dệt (phía nam chợ): tới gần cổng thì then gỗ và dây đỏ rơi, Bi nói "Một trang rồi! Cổng Làng Dệt đã mở."; tải lại không chiếu lại; ghi tiến độ rồi mở bằng máy khác cùng tài khoản cũng không chiếu lại.
+- [ ] **Mượt khi vào làng (cần máy thật):** trên máy tính và điện thoại, đi từ chợ vào Làng Giấy rồi sang Làng Dệt: không có chỗ nào khựng thấy rõ (đo trên máy dev: khung chậm nhất dưới 50 ms ở cả 3 mức chất lượng). Nếu có, ghi lại máy, mức chất lượng, và vào lúc nào.
 - [ ] **Điện thoại thật:** mở bằng 4G (không dùng Wi-Fi của server): đăng nhập, chơi Bài 1 đến hết, xoay ngang/dọc, không cuộn ngang trang.
 - [ ] **Dung lượng tải trang đầu:** F12 → Network → bỏ chọn "Disable cache" → tải lại (Ctrl+Shift+R) → xem dòng cuối "transferred": trang chủ hub khoảng 100 KB chữ + hình nền. Ghi lại con số để so sau này.
 - [ ] **Cache đúng:** F12 → Network, bấm một file trong `/assets/`: có `Cache-Control: public, max-age=31536000, immutable`; còn `index.html` và `manifest.json` là `no-cache`.
 - [ ] Sau khi khởi động lại server (mục e): trang tự lên lại khi đã có người đăng nhập Windows.
+
+---
+
+## (h) Danh sách lệnh chạy trên server (qua Remote Desktop) cho bản có thế giới mở
+
+Chỉ làm khi người code báo "xong, được deploy". Mỗi lệnh chạy trong **PowerShell** trên server; nếu một lệnh báo lỗi thì dừng lại, đọc lỗi và báo lại, không chạy tiếp.
+
+```powershell
+# 1. Vào thư mục mã nguồn, xem đang ở nhánh nào và chưa có thay đổi dở
+cd D:\so-chung
+git status
+git branch --show-current          # phải là main
+
+# 2. Lấy bản mới
+git pull
+
+# 3. Kiểm tra deploy/.env vẫn đủ 2 dòng Supabase, VITE_HUB_URL, VITE_ASSETS_URL, VITE_COOKIE_DOMAIN=.blockchainptit.com (KHÔNG in nội dung ra màn hình nơi người khác thấy)
+Select-String -Path deploy\.env -Pattern '^VITE_(HUB_URL|ASSETS_URL|COOKIE_DOMAIN|LANG_[A-Z_]+_URL)='
+
+# 4. Dựng lại và chạy (mất vài phút; test đỏ thì dừng, không tạo container mới)
+docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d --build
+docker image prune -f
+
+# 5. Kiểm tra tại chỗ: cả 6 cổng phải trả 200
+docker ps
+foreach ($p in 18081,18082,18083,18084,18085) { curl.exe -s -o NUL -w "$p %{http_code}`n" http://localhost:$p/ }
+curl.exe -I http://localhost:18086/manifest.json
+curl.exe -s -o NUL -w "cho %{http_code}`n" http://localhost:18081/cho                       # phải 200 (Caddy trả index.html)
+curl.exe -s -o NUL -w "man1 %{http_code}`n" http://localhost:18082/lang/lang-giay/man/1     # phải 200
+
+# 6. Kiểm tra từ ngoài (qua Cloudflare)
+curl.exe -s -o NUL -w "hub %{http_code}`n" https://stem-block.blockchainptit.com/cho
+curl.exe -s -o NUL -w "assets %{http_code}`n" https://sb-assets.blockchainptit.com/manifest.json
+
+# 7. Nếu cần khởi động lại tunnel (chỉ khi mục 6 báo 502/1033)
+Restart-Service Cloudflared
+Get-Service Cloudflared
+```
+
+Rồi làm các mục trong (g) bằng trình duyệt thật. **Quay lại bản cũ** nếu có lỗi nặng: `git log --oneline -5` để tìm mã commit trước, `git checkout <mã>`, chạy lại bước 4; khi muốn đi tiếp thì `git checkout main`.
+
+---
+
+## (i) Cloudflare: tạo Cache Rule cho `sb-assets` (làm tay trên trang web Cloudflare)
+
+Mặc định Cloudflare **không** lưu cache file `.glb` ở biên (chỉ lưu các đuôi file phổ biến như ảnh, CSS, JS). Không có rule này thì mỗi người chơi tải lại 20 MB model từ server của mình mỗi lần vào `/cho` (trình duyệt đã lưu thì nhẹ hơn, nhưng người chơi mới nào cũng chạm tới server). Rule này chỉ ảnh hưởng hostname `sb-assets`.
+
+1. Đăng nhập https://dash.cloudflare.com → chọn tên miền **blockchainptit.com**.
+2. Menu trái: **Caching → Cache Rules** (hoặc **Rules → Overview → Cache Rules**). Bấm **Create rule**.
+3. **Rule name:** `sb-assets: lưu cache model và ảnh`.
+4. **When incoming requests match…** chọn **Custom filter expression** → **Edit expression**, dán:
+   ```
+   (http.host eq "sb-assets.blockchainptit.com")
+   ```
+   (hoặc dùng ô chọn: Field = *Hostname*, Operator = *equals*, Value = `sb-assets.blockchainptit.com`).
+5. **Then…**
+   - **Cache eligibility:** *Eligible for cache*.
+   - **Edge TTL:** *Use cache-control header if present, cache request with Cloudflare's default TTL if not*. (Server đã gửi `immutable, max-age=31536000` cho file có mã băm và `no-cache` cho `manifest.json`, nên Cloudflare lưu file model lâu còn `manifest.json` luôn hỏi lại.)
+   - **Browser TTL:** *Respect origin TTL*.
+   - Các mục còn lại để mặc định.
+6. Bấm **Deploy** (hoặc **Save**). Quy tắc có hiệu lực sau vài giây.
+7. **Kiểm tra** (PowerShell, chạy 2 lần liên tiếp cho cùng một file; thay tên file bằng một file thật trong `https://sb-assets.blockchainptit.com/manifest.json`, ví dụ `models/env/gieng-lang`):
+   ```powershell
+   curl.exe -sI https://sb-assets.blockchainptit.com/models/env/gieng-lang.<mã-băm>.glb | findstr /i "cf-cache-status cache-control content-type"
+   ```
+   Lần 1 thường `cf-cache-status: MISS` (hoặc `DYNAMIC` nếu rule chưa nhận), lần 2 phải là **`HIT`**. Nếu lần 2 vẫn `DYNAMIC`/`BYPASS`: kiểm tra lại biểu thức ở bước 4 (đúng hostname) và rule đã **Deploy**.
+8. Nếu sau này đổi model: file mới có mã băm mới nên tự là bản mới; không cần xóa cache. Muốn ép xóa tất cả: **Caching → Configuration → Purge Cache → Custom purge → Hostname** `sb-assets.blockchainptit.com`.
 
 ---
 

@@ -210,7 +210,7 @@ Phần này để trống chỗ, **không làm trong đợt này**.
 - [ ] `/cho`:
   - cảnh mở đầu chạy đúng và bỏ qua được; (CHƯA LÀM: mục 4 để mốc 4)
   - chỉ cổng Làng Giấy mở; (đạt, bước 15a: tài khoản mới: bấm E ở cổng Làng Dệt hiện "Cổng làng đóng vì sổ đang lệch. Hãy giúp Làng Giấy trước nhé.")
-  - bấm cổng thì sang được subdomain Làng Giấy. (đạt, bước 15a: bấm E ở cổng Giấy sang `localhost:5174/lang/lang-giay`; subdomain thật cần thử trên server)
+  - cổng đã mở thì đi thẳng vào làng, không chuyển trang. (đạt, bước W1: làng nằm trong cùng cảnh; bài học và game vẫn ở subdomain của làng, cần thử trên server)
 - [x] Nút ? và mục "Hướng dẫn chơi" trong Menu mở hướng dẫn; lần đầu vào `/cho` tự mở phần "Đi lại và camera", tải lại thì không mở lại. (Bước 16, kiểm bằng Chrome.)
 - [x] HUD hiện đúng số Trang Sổ Vàng theo tiến độ đã lưu. (Bước 15a: tiến độ 0 trang thì 4 ô "Chưa nhận"; sau khi xong màn 3 thì ô 1 "Đã nhận", ô 2 đến 4 "Chưa nhận".)
 - [ ] Đạt ít nhất 30fps ở mức Thấp trên điện thoại tầm trung. (Bước 15a, `/cho` bản build trên máy tính, mức Thấp: 146 fps khi vsync 144 Hz, 519 fps không vsync, 161 fps khi làm chậm CPU 4 lần; 202 nghìn tam giác, 39 draw call. Còn cần thử trên điện thoại thật.)

@@ -119,12 +119,12 @@ describe('so sánh hai lần chọn và khoảng theo mức chất lượng', ()
     expect(marketNearDistance('medium', 'env/gieng-lang')).toBe(6);
     expect(marketNearDistance('high', 'env/gieng-lang')).toBe(14);
     expect(marketNearDistance('low', 'env/gieng-lang')).toBe(5);
-    expect(marketMaxDistance('low')).toBe(52);
+    expect(marketMaxDistance('low')).toBe(38);
     expect(marketMaxDistance('medium')).toBe(Infinity);
     // bụi tre ở thế giới mở: Vừa 90, Cao 120; Thấp vẫn 52
     expect(marketMaxDistance('medium', 'env/bui-tre')).toBe(90);
     expect(marketMaxDistance('high', 'env/bui-tre')).toBe(120);
-    expect(marketMaxDistance('low', 'env/bui-tre')).toBe(52);
+    expect(marketMaxDistance('low', 'env/bui-tre')).toBe(38);
     expect(marketMaxDistance('high', 'env/nha-mai-ngoi')).toBe(Infinity);
     // phên phơi giấy: tầm vẽ ngắn hơn ở cả ba mức
     expect(marketMaxDistance('low', 'env/phen-phoi-giay')).toBe(40);

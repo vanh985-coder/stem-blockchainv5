@@ -48,7 +48,7 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
   useEffect(() => {
     let cancelled = false;
     const isCancelled = () => cancelled;
-    const models = village.layout.models.filter((m) => m !== village.layout.gate.model);
+    const models = village.layout.models; // gồm cả model cổng (cổng chỉ vẽ bản xa cho tới khi làng được chuẩn bị)
     const guide = guideModelOf(village);
     const groups = models.map((id) => ({ id, ids: instanceModelIds(id, level) }));
     const allIds = [...new Set([...groups.flatMap((g) => g.ids), ...(guide ? [guide] : [])])];
