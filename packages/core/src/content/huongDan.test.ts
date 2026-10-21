@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GUIDE_ART_IDS, GUIDE_SECTIONS, GUIDE_SECTION_IDS, GUIDE_SHOT_IDS, guideFigure, guideSection, guideSectionOfLevel, guideText, huongDan, type GuidePage } from './huongDan';
+import { GUIDE_ART_IDS, GUIDE_SECTIONS, GUIDE_SECTION_IDS, GUIDE_SHOT_IDS, guideFigure, guideSection, guideSectionsFor, guideSectionOfLevel, guideText, huongDan, type GuidePage } from './huongDan';
 
 const pages: { section: string; page: GuidePage }[] = GUIDE_SECTIONS.flatMap((s) => (s.trang as readonly GuidePage[]).map((page) => ({ section: s.id, page })));
 const sentences = (t: string) => t.split(/(?<=[.!?])\s+/).filter(Boolean);
@@ -89,5 +89,24 @@ describe('chọn theo thiết bị và theo màn', () => {
   });
   it('nhãn phím trong hình là tên phím', () => {
     expect(Object.values(huongDan.phim)).toEqual(['W', 'A', 'S', 'D', 'E', 'Shift', 'Space', 'Esc']);
+  });
+});
+
+describe('hộp chung chỉ hiện các phần chung (bước X1)', () => {
+  it('thứ tự và mã các phần cũ không đổi (cờ lưu theo bit): di-lai, noi-chuyen, bai-hoc, man-2, man-3, trang-vang', () => {
+    expect([...GUIDE_SECTION_IDS]).toEqual(['di-lai', 'noi-chuyen', 'bai-hoc', 'man-2', 'man-3', 'trang-vang']);
+  });
+  it('hộp chung (không id, id lạ, id phần chung): chỉ Đi lại và Nói chuyện, đúng thứ tự', () => {
+    for (const id of [undefined, 'khong-co', 'di-lai', 'noi-chuyen']) expect(guideSectionsFor(id).map((s) => s.id)).toEqual(['di-lai', 'noi-chuyen']);
+  });
+  it('phần riêng (thẻ bắt đầu màn 2, màn 3): hộp chỉ có đúng phần đó; Bài học và Trang Sổ Vàng cũng là phần riêng, ẩn khỏi hộp chung', () => {
+    expect(guideSectionsFor('man-2').map((s) => s.id)).toEqual(['man-2']);
+    expect(guideSectionsFor('man-3').map((s) => s.id)).toEqual(['man-3']);
+    const rieng = GUIDE_SECTIONS.filter((s) => (s as { rieng?: true }).rieng).map((s) => s.id);
+    expect(rieng).toEqual(['bai-hoc', 'man-2', 'man-3', 'trang-vang']);
+    for (const id of rieng) expect(guideSectionsFor(undefined).some((s) => s.id === id)).toBe(false);
+  });
+  it('mọi phần mở từ thẻ bắt đầu của game (có man) là phần riêng: không lọt vào hộp chung', () => {
+    for (const s of GUIDE_SECTIONS) if ((s as { man?: readonly number[] }).man) expect((s as { rieng?: true }).rieng, s.id).toBe(true);
   });
 });

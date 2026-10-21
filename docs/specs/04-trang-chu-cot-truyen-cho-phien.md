@@ -44,10 +44,16 @@ Hiện 14 ảnh trong `assets/story/` (`01-ngu-guc` … `14-gio-tay`) theo kiể
 - ảnh truyện (16:9) ở phần trên, lời truyện ở dưới (đi qua `fmt()`); nền phía sau là **chính ảnh đang xem**, làm mờ;
 - "Tiếp ›" (hoặc →, Enter, Space) sang ảnh kế, "‹" (hoặc ←) lùi lại; tiến trình "x/14";
 - ảnh kế tiếp được tải trước; ảnh thiếu thì hiện khung trống kèm lời truyện, không lỗi;
-- "Bỏ qua" (hoặc Esc) đi thẳng vào `/ban-do`.
+- "Bỏ qua" (hoặc Esc) đi thẳng vào `/ban-do`. **Từ bước X1, lần đầu chơi không có "Bỏ qua" và Esc không làm gì** (xem "Đọc truyện bắt buộc lần đầu" bên dưới); chỉ khi đọc lại mới có.
 - Nền là màu ấm theo chủ đề đổi theo lượt (1–2 `mo`: tím than → tím nhạt; 3–11 `lang`: giấy dó → be ấm; 12–14 `hoi`: cam nhạt → vàng), không có lớp phủ tối; ảnh truyện đang xem làm mờ chỉ phủ khoảng 35%; icon trôi chậm của bộ. Đổi chủ đề thì màu và icon chuyển dần khoảng 0,6 giây (spec 03 mục 1, `NenTrangTri`).
 
-**Lượt cuối (ảnh 14):** nút kết thúc là **"Bắt đầu hành trình"**. Ở mốc 1 dẫn vào `/ban-do`; từ mốc 2 dẫn vào `/cho` (đã làm ở bước 8; "Bỏ qua" vẫn vào `/ban-do`).
+**Lượt cuối (ảnh 14):** nút kết thúc là **"Vào chợ phiên"** (bước X1; trước đó "Bắt đầu hành trình"), dẫn vào `/cho` và ghi cờ "đã đọc truyện". Ở mốc 1 dẫn vào `/ban-do`; từ mốc 2 dẫn vào `/cho` ("Bỏ qua", khi đọc lại, vẫn vào `/ban-do`).
+
+**Đọc truyện bắt buộc lần đầu (mốc 2, bước X1):**
+- Lần đầu chơi (sau khi đăng ký, đăng nhập lần đầu, hay bấm "Chơi thử"), vào `/cho` thì **chuyển về `/truyen`** (`RequireStory` ở `apps/hub/src/App.tsx` bọc route `/cho`: chuyển trang trước khi tải cảnh 3D). Lần đầu **không có nút "Bỏ qua"** (Esc cũng không làm gì: `VnDialog`, thuộc tính `noSkip`); phải lật hết 14 lượt; trang cuối có nút **"Vào chợ phiên"** mở `/cho`.
+- **Cờ "đã đọc truyện"** lưu cùng chỗ với các cờ đã có (cờ cảnh mở đầu, cờ hướng dẫn): `game_state.data.storySeen = true` (cột jsonb sẵn có, **không cần migration**, không đụng RLS); chơi thử: trường `st` (0 hay 1) của cookie `sc_guest`; gộp tiến độ thì bên nào đã đọc là đã đọc (`progress/storyFlags.ts`, có test).
+- **Ai không phải đọc** (hàm thuần `storyGate`): giáo viên và admin; ai đã đọc; tài khoản hay khách **đã có tiến độ từ trước** (có màn đã chơi, xu, Trang Sổ Vàng, hay đã có một cờ nào đó như đã xem giới thiệu làng hay hướng dẫn) coi như đã đọc. Đang tải phiên đăng nhập, hồ sơ hay tiến độ thì chờ (không chuyển trang nhầm, giáo viên không bị đưa vào truyện).
+- **Đọc lại** (liên kết "Đọc truyện" ở trang chủ): như cũ, có "Bỏ qua" vào `/ban-do`.
 
 Trang `/truyen` tải theo route (không nằm trong trang đầu của hub).
 
@@ -206,7 +212,7 @@ Phần này để trống chỗ, **không làm trong đợt này**.
 - [ ] `/ban-do`: 4 làng hiện đúng trạng thái từng màn theo tiến độ; bấm "Vào" mở đúng màn trên subdomain của làng.
 - [ ] Lần đầu bấm một làng thì hiện giới thiệu làng (lượt cuối có danh sách 3 màn); lần sau mở thẳng bảng làng; bảng làng có "Xem lại giới thiệu".
 - [ ] Trang chủ, `/ho-so`, `/dang-nhap`, `/dang-ky`, `/quyen-rieng-tu` có nền trang trí; bật "Giảm chuyển động" thì icon đứng yên (ẩn).
-- [ ] `/truyen` hiện đủ 14 lượt kiểu visual novel (nền là ảnh đang xem làm mờ); ảnh thiếu thì hiện khung trống có lời truyện, không lỗi trang; lượt cuối có nút "Bắt đầu hành trình" dẫn vào `/ban-do`.
+- [ ] `/truyen` hiện đủ 14 lượt kiểu visual novel (nền là ảnh đang xem làm mờ); ảnh thiếu thì hiện khung trống có lời truyện, không lỗi trang; lượt cuối có nút "Vào chợ phiên" dẫn vào `/cho`. (Bước X1: lần đầu không có "Bỏ qua", phải lật hết 14 lượt; vào thẳng `/cho` khi chưa đọc thì chuyển về `/truyen`; tài khoản cũ có tiến độ và giáo viên vào thẳng chợ.)
 - [ ] `/cho`:
   - cảnh mở đầu chạy đúng và bỏ qua được; (CHƯA LÀM: mục 4 để mốc 4)
   - chỉ cổng Làng Giấy mở; (đạt, bước 15a: tài khoản mới: bấm E ở cổng Làng Dệt hiện "Cổng làng đóng vì sổ đang lệch. Hãy giúp Làng Giấy trước nhé.")

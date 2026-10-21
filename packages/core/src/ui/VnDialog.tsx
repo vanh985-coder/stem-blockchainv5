@@ -35,6 +35,8 @@ export interface VnDialogProps {
   onFinish: () => void;
   /** "Bỏ qua" (hoặc Esc). Không có thì gọi onFinish. */
   onSkip?: () => void;
+  /** Không có nút "Bỏ qua" và Esc không làm gì: phải lật hết các lượt (cốt truyện đọc bắt buộc lần đầu, bước X1). */
+  noSkip?: boolean;
   /** Tên nút ở lượt cuối; không có thì vẫn là "Tiếp ›". */
   finishLabel?: string;
   /**
@@ -86,7 +88,7 @@ const smallBtn =
  * phần dưới là khung lời có tên người nói. Góc dưới trái "x/n", góc dưới phải "Tiếp ›"; góc trên có "‹" và "Bỏ qua".
  * Phím: → / Enter / Space tiếp, ← lùi, Esc bỏ qua.
  */
-export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, overlay, label, decor, backdrop, onTurnChange, className = '' }: VnDialogProps) {
+export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel, background, overlay, label, decor, backdrop, onTurnChange, className = '' }: VnDialogProps) {
   const [index, setIndex] = useState(0);
   const wide = useWide();
   const manifest = useManifest();
@@ -132,7 +134,9 @@ export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, ove
       else setIndex((i) => i + 1);
     },
     back: () => setIndex((i) => Math.max(0, i - 1)),
-    skip: () => (onSkip ?? onFinish)(),
+    skip: () => {
+      if (!noSkip) (onSkip ?? onFinish)();
+    },
   };
 
   // Mỗi lượt mới: đưa focus vào nút "Tiếp" để Enter/Space dùng được ngay; báo cho nơi gọi.
@@ -223,9 +227,11 @@ export function VnDialog({ turns, onFinish, onSkip, finishLabel, background, ove
         >
           {ui.vn.lui}
         </button>
-        <button type="button" onClick={() => handlers.current.skip()} className={`${smallBtn} absolute right-2 top-2 text-sm`}>
-          {ui.vn.boQua}
-        </button>
+        {!noSkip && (
+          <button type="button" onClick={() => handlers.current.skip()} className={`${smallBtn} absolute right-2 top-2 text-sm`}>
+            {ui.vn.boQua}
+          </button>
+        )}
       </div>
 
       {/* Khung lời */}

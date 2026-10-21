@@ -1,6 +1,6 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react';
 import { Route, Routes } from 'react-router';
-import { accountRoutes, ui } from '@so-chung/core';
+import { RequireStory, accountRoutes, ui } from '@so-chung/core';
 import { Home } from './pages/Home';
 
 // Trang tải theo route để trang đầu nhẹ (spec 04, spec 03 mục 9).
@@ -37,7 +37,14 @@ export function App() {
       <Route path="/" element={<Home />} />
       <Route path="/truyen" element={<Lazy page={Story} />} />
       <Route path="/ban-do" element={<Lazy page={BanDo} />} />
-      <Route path="/cho" element={<Lazy page={Cho} />} />
+      <Route
+        path="/cho"
+        element={
+          <RequireStory>
+            <Lazy page={Cho} />
+          </RequireStory>
+        }
+      />
       <Route path="/giao-vien" element={<Lazy page={Teacher} />} />
       <Route path="/giao-vien/:classId" element={<Lazy page={Teacher} />} />
       {accountRoutes.map((r) => (

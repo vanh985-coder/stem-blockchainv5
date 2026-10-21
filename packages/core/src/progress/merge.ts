@@ -1,4 +1,5 @@
 import { mergeGuideSeen } from './guideFlags';
+import { mergeStorySeen } from './storyFlags';
 import { mergeGateSeen, mergeGoldenSeen, mergeIntroSeen, mergeKnowSeen, mergeSceneSeen } from './villageIntro';
 import { emptyLevel, type GameState, type LevelProgress, type Progress, type StarKey, type Stars } from './types';
 
@@ -30,7 +31,7 @@ export function mergeGame(local: GameState, remote: GameState): GameState {
     goldenPages: Math.max(local.goldenPages, remote.goldenPages),
     coins: Math.max(local.coins, remote.coins),
     // Cờ "đã xem giới thiệu làng" thì hợp hai bên: xem ở máy nào cũng tính là đã xem.
-    data: mergeGuideSeen(mergeKnowSeen(mergeGateSeen(mergeGoldenSeen(mergeSceneSeen(mergeIntroSeen(winner.data, loser), loser), loser), loser), loser), loser),
+    data: mergeStorySeen(mergeGuideSeen(mergeKnowSeen(mergeGateSeen(mergeGoldenSeen(mergeSceneSeen(mergeIntroSeen(winner.data, loser), loser), loser), loser), loser), loser), loser),
     updatedAt: Math.max(local.updatedAt, remote.updatedAt),
   };
 }

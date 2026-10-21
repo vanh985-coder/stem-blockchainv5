@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AssetImage } from '../assets/AssetImage';
 import { fmt } from '../content/characters';
-import { GUIDE_SECTIONS, guideFigure, guideText, huongDan, type GuideDevice, type GuideFigure } from '../content/huongDan';
+import { guideFigure, guideSectionsFor, guideText, huongDan, type GuideDevice, type GuideFigure } from '../content/huongDan';
 import { Button } from './Button';
 import { GuideArt } from './GuideArt';
 import { Panel } from './Panel';
@@ -13,7 +13,7 @@ export function detectGuideDevice(): GuideDevice {
 }
 
 export interface GuideDialogProps {
-  /** Phần mở đầu tiên (id trong `GUIDE_SECTIONS`); không có hoặc không đúng thì phần đầu */
+  /** Phần mở đầu tiên (id trong `GUIDE_SECTIONS`); không có hoặc không đúng thì phần đầu. Id của một phần riêng (`rieng`, như "man-2") thì hộp chỉ có đúng phần đó (xem `guideSectionsFor`). */
   section?: string;
   onClose: () => void;
   /** Ép theo thiết bị (dùng khi xem thử); mặc định tự nhận */
@@ -39,10 +39,11 @@ export function GuideFigureView({ figure, className = '' }: { figure: GuideFigur
  */
 export function GuideDialog({ section, onClose, device }: GuideDialogProps) {
   const dev = useMemo<GuideDevice>(() => device ?? detectGuideDevice(), [device]);
-  const startIndex = Math.max(0, GUIDE_SECTIONS.findIndex((s) => s.id === section));
+  const sections = useMemo(() => guideSectionsFor(section), [section]);
+  const startIndex = Math.max(0, sections.findIndex((s) => s.id === section));
   const [si, setSi] = useState(startIndex);
   const [pi, setPi] = useState(0);
-  const sec = GUIDE_SECTIONS[si];
+  const sec = sections[si];
   const page = sec.trang[Math.min(pi, sec.trang.length - 1)];
   const last = pi >= sec.trang.length - 1;
 
@@ -76,8 +77,9 @@ export function GuideDialog({ section, onClose, device }: GuideDialogProps) {
             ✕
           </Button>
         </div>
+        {sections.length > 1 && (
         <div role="tablist" aria-label={huongDan.cacPhan} className="flex flex-wrap gap-1.5">
-          {GUIDE_SECTIONS.map((s, i) => (
+          {sections.map((s, i) => (
             <button
               key={s.id}
               type="button"
@@ -92,6 +94,7 @@ export function GuideDialog({ section, onClose, device }: GuideDialogProps) {
             </button>
           ))}
         </div>
+        )}
         <div className="grid items-center gap-3 [@media(max-height:500px)]:grid-cols-2" data-testid="huong-dan-trang">
           <GuideFigureView figure={guideFigure(page, dev)} />
           <div className="space-y-2 [@media(max-height:500px)]:space-y-1">

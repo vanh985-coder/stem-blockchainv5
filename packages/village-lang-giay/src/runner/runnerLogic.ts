@@ -213,7 +213,7 @@ function pickWeighted<K extends string>(s: { rng: number }, weights: Readonly<Re
 // ---------------------------------------------------------------------------
 // Số liệu theo luật
 
-/** Tốc độ theo giờ chạy: 8, tăng 0,25 mỗi 5 giây THEO BẬC (8 trong 5 giây đầu, 8,25 trong 5 giây kế…), tối đa 16 (spec 05). */
+/** Tốc độ theo giờ chạy: 10, tăng 0,3 mỗi 5 giây THEO BẬC (10 trong 5 giây đầu, 10,3 trong 5 giây kế…), tối đa 18 (spec 05, bước X1). */
 export function speedAt(time: number): number {
   const { start, add, everySec, max } = SPEC.speed;
   return Math.min(max, start + add * Math.floor(Math.max(0, time) / everySec + 1e-9));

@@ -41,9 +41,19 @@ describe('EmCoBietDialog (dùng chung cho trang bài học và cảnh làng)', (
 });
 
 describe('GuideDialog (Hướng dẫn chơi)', () => {
+  it('hộp chung (HUD, Menu): chỉ hiện hai phần Đi lại và Nói chuyện; các phần Bài học, Màn 2, Màn 3, Trang Sổ Vàng không có', () => {
+    const html = renderToStaticMarkup(<GuideDialog onClose={noop} device="may" />);
+    expect(html).toContain('>Đi lại<');
+    expect(html).toContain('>Nói chuyện<');
+    for (const hidden of ['>Bài học<', '>Màn 2<', '>Màn 3<', '>Trang Sổ Vàng<']) expect(html).not.toContain(hidden);
+    expect((html.match(/role="tab"/g) ?? []).length).toBe(2);
+    // mở chung bằng id của phần chung hay id lạ: vẫn là hộp chung
+    expect((renderToStaticMarkup(<GuideDialog section="noi-chuyen" onClose={noop} device="may" />).match(/role="tab"/g) ?? []).length).toBe(2);
+    expect((renderToStaticMarkup(<GuideDialog section="khong-co" onClose={noop} device="may" />).match(/role="tab"/g) ?? []).length).toBe(2);
+  });
   it('hiện tên các phần, trang đầu "Trang 1/n" và nút "Tiếp" (chưa phải trang cuối)', () => {
     const html = renderToStaticMarkup(<GuideDialog onClose={noop} device="may" />);
-    for (const s of GUIDE_SECTIONS) expect(html).toContain(s.nhan);
+    for (const s of GUIDE_SECTIONS.filter((q) => !(q as { rieng?: true }).rieng)) expect(html).toContain(s.nhan);
     expect(html).toContain('Hướng dẫn chơi');
     expect(html).toContain(`Trang 1/${GUIDE_SECTIONS[0].trang.length}`);
     expect(html).toContain('Đi lại và camera');
@@ -55,7 +65,24 @@ describe('GuideDialog (Hướng dẫn chơi)', () => {
     const html = renderToStaticMarkup(<GuideDialog section="man-2" onClose={noop} device="may" />);
     expect(html).toContain('Màn 2: Đuổi theo Tí');
     expect(html).not.toContain('{');
-    expect(html).toContain('aria-selected="true"');
+    // thẻ bắt đầu của game: hộp chỉ có đúng phần của game (không có hàng nút chọn phần)
+    expect(html).not.toContain('role="tab"');
+    expect(html).not.toContain('Đi lại và camera');
+  });
+  it('thẻ bắt đầu màn 3 mở thẳng phần Màn 3, chỉ có phần đó', () => {
+    const html = renderToStaticMarkup(<GuideDialog section="man-3" onClose={noop} device="may" />);
+    expect(html).toContain('Màn 3: Ghép lại cuốn sổ');
+    expect(html).not.toContain('role="tab"');
+  });
+  it('lời hướng dẫn khớp thế giới mở: cổng mở thì đi thẳng vào (không bấm E), cổng đóng bấm E để nghe lý do, mũi tên dưới chân', () => {
+    const texts = ['di-lai', 'noi-chuyen'].flatMap((id) => (GUIDE_SECTIONS.find((s) => s.id === id)!.trang as readonly GuidePage[]).flatMap((p) => [p.may, p.dt ?? '']));
+    const all = texts.join(' | ');
+    expect(all).toContain('mũi tên vàng dưới chân');
+    expect(all).not.toContain('mũi tên vàng trên đầu');
+    expect(all).toContain('đi thẳng qua cổng');
+    expect(all).toContain('bấm E để nghe lý do');
+    expect(all).toContain('bấm nút bàn tay để nghe lý do');
+    expect(all).not.toContain('đứng sát cổng và bấm E để vào làng');
   });
   it('id phần không đúng thì mở phần đầu', () => {
     expect(renderToStaticMarkup(<GuideDialog section="khong-co" onClose={noop} device="may" />)).toContain('Đi lại và camera');

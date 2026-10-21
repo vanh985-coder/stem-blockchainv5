@@ -1,6 +1,9 @@
 /**
  * "Hướng dẫn chơi" (mốc 2, bước 16): nội dung chia PHẦN, mỗi phần 2 đến 4 TRANG, mỗi trang một hình và 1 đến 2 câu ngắn. Mọi chữ của hướng dẫn nằm ở đây (không có chữ trong ảnh).
  *
+ * Hộp chung (nút ? ở HUD và mục trong Menu, bước X1) chỉ hiện các phần KHÔNG đánh dấu `rieng` (hiện là Đi lại, Nói chuyện); phần `rieng` chỉ mở từ nơi gắn riêng của nó (nút "Hướng dẫn chơi" ở thẻ bắt đầu màn 2, màn 3),
+ * khi đó hộp chỉ có đúng phần đó. Phần `rieng` vẫn giữ nguyên chỗ trong `GUIDE_SECTIONS` (cờ lưu theo bit).
+ *
  * Thêm phần mới ở mốc sau: thêm một đối tượng vào CUỐI `GUIDE_SECTIONS` (id mới, tiêu đề, trang). KHÔNG đổi thứ tự hay xóa phần cũ: cờ "đã mở tự động" lưu theo số bit theo thứ tự này
  * (xem `progress/guideFlags.ts`). Hình là ảnh chụp thật từ game (`shot`: `ui/huong-dan/<id>`, do `pnpm guide:capture` tạo) hoặc hình minh họa SVG do code vẽ (`art`: `ui/GuideArt.tsx`).
  * Mỗi trang có lời cho máy tính (`may`) và cho điện thoại (`dt`, bỏ trống thì dùng chung lời `may`); hình cũng có thể khác theo thiết bị (`hinhDt`).
@@ -63,6 +66,8 @@ export interface GuideSection {
   trang: readonly GuidePage[];
   /** Các màn (số màn 1 đến 12) mở thẳng phần này khi bấm "Hướng dẫn chơi" ở thẻ bắt đầu của game */
   man?: readonly number[];
+  /** Phần riêng của một nơi (bước X1): không có trong hộp chung ở HUD và Menu, chỉ mở từ nơi gắn riêng (thẻ bắt đầu game) */
+  rieng?: true;
 }
 
 const shot = (id: GuideShotId): GuideFigure => ({ shot: id });
@@ -88,7 +93,7 @@ export const GUIDE_SECTIONS = [
       },
       {
         hinh: shot('cho-di-lai'),
-        may: 'Đi theo mũi tên vàng trên đầu em để tới nơi cần đến. Dòng nhiệm vụ ở góc trên trái nhắc em việc cần làm.',
+        may: 'Đi theo mũi tên vàng dưới chân em để tới nơi cần đến, mũi tên chỉ đường đi dọc theo đường đất. Dòng nhiệm vụ ở góc trên trái nhắc em việc cần làm.',
       },
     ],
   },
@@ -105,17 +110,17 @@ export const GUIDE_SECTIONS = [
       },
       {
         hinh: shot('cong-dong'),
-        may: 'Cổng có then gỗ và dây đỏ là cổng chưa mở. Hãy giúp làng trước, cổng sẽ mở ra.',
+        may: 'Cổng có then gỗ và dây đỏ là cổng chưa mở, em không vào được. Đứng gần cổng và bấm E để nghe lý do. Hãy giúp làng trước, cổng sẽ mở ra.',
+        dt: 'Cổng có then gỗ và dây đỏ là cổng chưa mở, em không vào được. Đứng gần cổng và bấm nút bàn tay để nghe lý do. Hãy giúp làng trước, cổng sẽ mở ra.',
       },
       {
         hinh: shot('cong-mo'),
-        may: 'Cổng đã mở thì đứng sát cổng và bấm E để vào làng.',
-        dt: 'Cổng đã mở thì đứng sát cổng và bấm nút bàn tay để vào làng.',
+        may: 'Cổng đã mở thì em đi thẳng qua cổng để vào làng, không cần bấm gì. Đi theo biển chỉ đường gỗ để biết đường tới từng làng.',
       },
       {
         hinh: shot('bien-go'),
-        may: 'Trong làng, đứng trước biển gỗ và bấm E để vào màn chơi. Biển còn mờ nghĩa là màn chưa mở.',
-        dt: 'Trong làng, đứng trước biển gỗ và bấm nút bàn tay để vào màn chơi. Biển còn mờ nghĩa là màn chưa mở.',
+        may: 'Trong làng, đứng trước biển gỗ và bấm E để vào màn chơi. Biển còn mờ nghĩa là màn chưa mở. Bấm E ở bác An để nghe lời nhắc.',
+        dt: 'Trong làng, đứng trước biển gỗ và bấm nút bàn tay để vào màn chơi. Biển còn mờ nghĩa là màn chưa mở. Bấm nút bàn tay ở bác An để nghe lời nhắc.',
       },
     ],
   },
@@ -123,6 +128,7 @@ export const GUIDE_SECTIONS = [
     id: 'bai-hoc',
     nhan: 'Bài học',
     tieuDe: 'Trang bài học',
+    rieng: true,
     trang: [
       {
         hinh: shot('bai-hoc'),
@@ -143,6 +149,7 @@ export const GUIDE_SECTIONS = [
     nhan: 'Màn 2',
     tieuDe: 'Màn 2: Đuổi theo {phanDien}',
     man: [2],
+    rieng: true,
     trang: [
       {
         hinh: art('ba-lan-phim'),
@@ -171,6 +178,7 @@ export const GUIDE_SECTIONS = [
     nhan: 'Màn 3',
     tieuDe: 'Màn 3: Ghép lại cuốn sổ',
     man: [3],
+    rieng: true,
     trang: [
       {
         hinh: shot('man-3-ban'),
@@ -196,6 +204,7 @@ export const GUIDE_SECTIONS = [
     id: 'trang-vang',
     nhan: 'Trang Sổ Vàng',
     tieuDe: 'Trang Sổ Vàng và tiến độ',
+    rieng: true,
     trang: [
       {
         hinh: shot('hud-trang-vang'),
@@ -247,6 +256,16 @@ export function guideSection(id: string): GuideSection | undefined {
 /** Phần mở thẳng khi bấm "Hướng dẫn chơi" ở thẻ bắt đầu của màn `levelId`; màn không có phần riêng thì null (mở từ phần đầu) */
 export function guideSectionOfLevel(levelId: number): GuideSectionId | null {
   return (GUIDE_SECTIONS.find((s) => (s as GuideSection).man?.includes(levelId))?.id as GuideSectionId | undefined) ?? null;
+}
+
+/**
+ * Các phần hiện trong hộp "Hướng dẫn chơi" khi mở với phần `id`: id là một phần riêng (`rieng`, ví dụ "man-2" từ thẻ bắt đầu màn 2) thì chỉ có đúng phần đó; ngược lại (không có id, id lạ hay id của
+ * phần chung) là hộp chung: các phần không phải `rieng` theo thứ tự cố định.
+ */
+export function guideSectionsFor(id?: string): readonly GuideSection[] {
+  const own = id ? GUIDE_SECTIONS.find((s) => s.id === id) : undefined;
+  if (own && (own as GuideSection).rieng) return [own];
+  return GUIDE_SECTIONS.filter((s) => !(s as GuideSection).rieng);
 }
 
 /** Hình của trang theo thiết bị (điện thoại dùng `hinhDt` nếu có) */

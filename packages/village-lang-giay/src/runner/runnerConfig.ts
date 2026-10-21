@@ -13,8 +13,10 @@
 export const RUNNER_SPEC = {
   /** 3 làn: x = −2, 0, 2 (chỉ số làn 0, 1, 2) */
   laneX: [-2, 0, 2] as const,
-  /** Tốc độ bắt đầu 8, tăng 0,25 mỗi 5 giây (theo bậc: 8 trong 5 giây đầu, 8,25 trong 5 giây kế…), tối đa 16 */
-  speed: { start: 8, add: 0.25, everySec: 5, max: 16 },
+  /**
+   * Tốc độ bắt đầu 10, tăng 0,3 mỗi 5 giây (theo bậc: 10 trong 5 giây đầu, 10,3 trong 5 giây kế…), tối đa 18. Bước X1: trước đó là 8, 0,25 và 16; đổi vì người dùng thấy màn 2 chạy chậm.
+   */
+  speed: { start: 10, add: 0.3, everySec: 5, max: 18 },
   /** Nhảy: vận tốc đầu 7, trọng lực 22 (đỉnh ≈ 1,11, cả cú nhảy 0,64 giây); có guốc mộc thì vận tốc đầu 10 (0,91 giây) */
   jump: { v0: 7, v0Boots: 10, gravity: 22 },
   /** Trượt kéo dài 0,6 giây; khi trượt, thân cao 0,6 */

@@ -6,8 +6,10 @@ import { AVERAGE_BOT, GOOD_BOT, playBot, type BotProfile, type BotResult } from 
  * Kiểm tra cân bằng bằng mô phỏng (không vẽ): 300 ván mỗi loại bot trên cùng 300 seed.
  * Mục tiêu: bot giỏi đạt Vàng (≥ 520) ở ít nhất 90% số ván; bot trung bình chủ yếu Đồng hoặc Bạc.
  * Chỉ chỉnh được tần suất vật nhặt trong `runnerConfig.ts` (RUNNER_TUNING.chain, power, roof); KHÔNG đổi công thức điểm hay mốc điểm của spec.
- * Kết quả đã chạy với cấu hình hiện tại (300 ván mỗi bot, đã tính trang sổ {phanDien} làm rơi và tốc độ tăng từng bậc): bot giỏi Vàng 99,7% (điểm trung bình 688, thấp nhất 512);
- * bot trung bình điểm trung bình 314: chưa đạt mốc 27,3%, Đồng 35,3%, Bạc 24,7%, Vàng 12,7%. Đổi cấu hình thì chạy lại và cập nhật con số này.
+ * Kết quả đã chạy với cấu hình hiện tại (300 ván mỗi bot, đã tính trang sổ {phanDien} làm rơi và tốc độ tăng từng bậc), tốc độ bắt đầu 10, tăng 0,3 mỗi 5 giây, tối đa 18 (bước X1):
+ * bot giỏi Vàng 100% (điểm trung bình 720, thấp nhất 551); bot trung bình điểm trung bình 341: chưa đạt mốc 25,0%, Đồng 32,0%, Bạc 24,3%, Vàng 18,7%.
+ * Trước bước X1 (tốc độ 8, tăng 0,25, tối đa 16): bot giỏi Vàng 99,7% (trung bình 688, thấp nhất 512); bot trung bình trung bình 314: chưa đạt mốc 27,3%, Đồng 35,3%, Bạc 24,7%, Vàng 12,7%.
+ * Chạy nhanh hơn thì đường dài hơn (quãng đường trung bình của bot giỏi 1.081 lên 1.339 mét) nên điểm tăng. Đổi cấu hình thì chạy lại và cập nhật các con số này.
  */
 const GAMES = 300;
 
@@ -69,6 +71,8 @@ describe('cân bằng màn 2 bằng mô phỏng', () => {
     expect(mid / a.games, 'Đồng + Bạc phải là đa số').toBeGreaterThan(0.5);
     expect(mid, 'Đồng + Bạc lớn hơn từng nhóm còn lại').toBeGreaterThan(Math.max(a.medals.chua, a.medals.vang));
     expect(a.medals.vang / a.games).toBeLessThan(0.2);
+    // bước X1: tốc độ nhanh hơn không được làm bot trung bình "chưa đạt mốc" quá nhiều (quá 35% thì báo lại, không tự đổi mốc điểm)
+    expect(a.medals.chua / a.games, 'chưa đạt mốc phải không quá 35%').toBeLessThanOrEqual(0.35);
   });
 
   it('bot trung bình có va 1 đến 2 lần mỗi ván (khi đủ chướng ngại cần né) và có ván hết tim', () => {

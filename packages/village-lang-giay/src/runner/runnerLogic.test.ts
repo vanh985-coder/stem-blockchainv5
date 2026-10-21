@@ -148,8 +148,8 @@ describe('bảng test của spec 05, Màn 2 (9 ca)', () => {
     expect(s.grounded).toBe(true);
     expect(s.onRoof).toBe(true);
     expect(s.y).toBeCloseTo(SPEC.roofHeight, 6);
-    // và chạy được trên nóc suốt chiều dài xe, rồi rơi xuống đất ở cuối xe
-    for (let i = 0; i < 20; i++) stepRunner(s, {}, DT);
+    // và chạy được trên nóc suốt chiều dài xe, rồi rơi xuống đất ở cuối xe (bước X1 đổi tốc độ bắt đầu từ 8 lên 10 nên số bước từ 20 xuống 12: vẫn nằm trong chiều dài xe, quãng đường tổng 3,7 đơn vị thay vì 4,0)
+    for (let i = 0; i < 12; i++) stepRunner(s, {}, DT);
     expect(s.y).toBeCloseTo(SPEC.roofHeight, 6);
     for (let i = 0; i < 90; i++) stepRunner(s, {}, DT);
     expect(s.y).toBe(0);
@@ -192,18 +192,18 @@ describe('bảng test của spec 05, Màn 2 (9 ca)', () => {
 });
 
 describe('tốc độ, nhảy, trượt', () => {
-  it('tốc độ 8, tăng 0,25 mỗi 5 giây THEO BẬC (spec 05 dòng 50), tối đa 16', () => {
-    expect(speedAt(0)).toBe(8);
-    expect(speedAt(4.999)).toBe(8);
-    expect(speedAt(5)).toBeCloseTo(8.25, 9);
-    expect(speedAt(9.999)).toBeCloseTo(8.25, 9);
-    expect(speedAt(10)).toBeCloseTo(8.5, 9);
-    expect(speedAt(100)).toBeCloseTo(13, 9);
-    expect(speedAt(100 - 0.001)).toBeCloseTo(12.75, 9);
-    expect(speedAt(159.999)).toBeCloseTo(15.75, 9);
-    expect(speedAt(160)).toBe(16);
-    expect(speedAt(1000)).toBe(16);
-    expect(speedAt(-3)).toBe(8);
+  it('tốc độ 10, tăng 0,3 mỗi 5 giây THEO BẬC (spec 05 dòng 50, bước X1), tối đa 18', () => {
+    expect(speedAt(0)).toBe(10);
+    expect(speedAt(4.999)).toBe(10);
+    expect(speedAt(5)).toBeCloseTo(10.3, 9);
+    expect(speedAt(9.999)).toBeCloseTo(10.3, 9);
+    expect(speedAt(10)).toBeCloseTo(10.6, 9);
+    expect(speedAt(100)).toBeCloseTo(16, 9);
+    expect(speedAt(100 - 0.001)).toBeCloseTo(15.7, 9);
+    expect(speedAt(134.999)).toBeCloseTo(17.8, 9); // 26 bậc
+    expect(speedAt(135)).toBe(18); // bậc thứ 27 sẽ là 18,1: chặn ở 18
+    expect(speedAt(1000)).toBe(18);
+    expect(speedAt(-3)).toBe(10);
   });
 
   /** Nhảy một lần ở chỗ trống, trả về đỉnh cao và thời gian bay. */

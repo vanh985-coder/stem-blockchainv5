@@ -20,6 +20,7 @@ const stateOf = (progress: Progress): ProgressState => ({
   markGateOpenSeen: () => {},
   markKnowSeen: () => {},
   markGuideSeen: () => {},
+  markStoryRead: () => {},
 });
 
 function render(progress: Progress): string {

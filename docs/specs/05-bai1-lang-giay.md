@@ -62,7 +62,7 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 
 **Đường chạy:**
 - 3 làn (x = −2, 0, 2). Nhân vật tự chạy.
-- Tốc độ bắt đầu 8 đơn vị/giây, tăng 0,25 mỗi 5 giây, tối đa 16.
+- Tốc độ bắt đầu **10** đơn vị/giây, tăng **0,3** mỗi 5 giây (theo bậc), tối đa **18**. (Bước X1: trước đó 8, 0,25 và 16; **đổi vì người dùng thấy màn 2 chạy chậm**. Cân bằng chạy lại ở dưới.)
 - {phanDien} luôn chạy ở phía trước, xa xa.
 
 **Điều khiển:**
@@ -143,7 +143,15 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 
 **Đã làm (mốc 2, bước 12 — vật nhặt, rơm, câu hỏi, điểm):** màn 2 chơi trọn được, `levels.ts` màn 2 là "ready", biển "Đuổi theo {phanDien}" mở theo `unlock.ts`, cuối màn 1 có nút "Chơi tiếp: Đuổi theo {phanDien}".
 - **Ván 4 vòng:** mỗi vòng 25 giây; hết vòng thì chạy chậm lại, hiện QuizCard (ngân hàng câu hỏi Bài 1, tên phản diện lấy từ `{phanDien}`). Đúng +3 trang; sai −1 tim và hiện giải thích; trả lời xong bấm tiếp thì tăng tốc lại theo `runnerLogic`. Ván kết thúc sau vòng 4 hoặc khi hết tim.
-- **Tốc độ** đúng spec: bắt đầu 8, **cộng 0,25 mỗi 5 giây theo bậc** (không tăng liên tục), tối đa 16 (`speedAt`, có test).
+- **Tốc độ** đúng spec: bắt đầu 10, **cộng 0,3 mỗi 5 giây theo bậc** (không tăng liên tục), tối đa 18 (`speedAt`, có test; bước X1, trước đó 8, 0,25 và 16).
+- **Cân bằng sau khi tăng tốc (bước X1, 300 ván mỗi bot, cùng 300 seed; không đổi mốc điểm và tần suất vật nhặt):**
+
+  | | Bot giỏi: Vàng | Bot giỏi: điểm trung bình (thấp nhất) | Bot trung bình: chưa đạt mốc | Đồng | Bạc | Vàng | điểm trung bình |
+  |---|---|---|---|---|---|---|---|
+  | Trước (8, 0,25, 16) | 99,7% | 688 (512) | 27,3% | 35,3% | 24,7% | 12,7% | 314 |
+  | Sau (10, 0,3, 18) | 100% | 720 (551) | 25,0% | 32,0% | 24,3% | 18,7% | 341 |
+
+  Đạt: bot giỏi ≥ 90% Vàng; bot trung bình "chưa đạt mốc" 25,0% (không quá 35%, test `runnerBalance.test.ts` kiểm); Đồng + Bạc vẫn là đa số (56,3%) và Vàng của bot trung bình dưới 20% (18,7%, sát ngưỡng). Chạy nhanh hơn thì đường dài hơn (quãng đường trung bình của bot giỏi 1.081 lên 1.339 mét) nên điểm tăng. Chín ca test của spec giữ nguyên nội dung; chỉ ca 6 giảm số bước chạy trên nóc xe từ 20 xuống 12 (cùng tình huống, tốc độ cao hơn thì hết nóc xe sớm hơn) và test tốc độ `speedAt` đổi số.
 - **5 vật nhặt** (xoay nhẹ, nổ hạt lấp lánh khi nhặt; hạt dùng bể `ParticlePool`): trang sổ, tiền đồng, nón lá, guốc mộc, túi tiền. Nón lá, guốc, túi hiện biểu tượng và thời gian còn lại trên HUD.
 - **{phanDien} ném rơm:** theo `runnerLogic`, có động tác ném, đống rơm bay vòng cung (`runnerFlight.ts`) và bóng đen báo chỗ rơi trên làn sẽ có chướng ngại.
 - **Làm rơi trang (3b):** thỉnh thoảng {phanDien} làm rơi 2 đến 4 trang (động tác trượt tay, trang rơi lả tả, bóng báo chỗ rơi) xuống làn trống phía trước; chạm đất thì thành "trang sổ" thường (10 điểm, công thức điểm không đổi). Logic thuần ở `runnerLogic` (có test): chỉ rơi vào chỗ nhặt được (không trong chướng ngại, không trùng chỗ rơm) và **trừ vào ngân sách trang** (`pageDebt`: chuỗi trang sổ sau đó ít đi tương ứng).

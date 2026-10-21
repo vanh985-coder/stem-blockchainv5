@@ -5,6 +5,7 @@ import { recordLevelResult, unlockOf, withGoldenPages, type ProgressOptions } fr
 import { emptyProgress, hasProgress, type GameState, type LevelProgress, type LevelResult, type Progress } from './types';
 import type { UnlockResult } from './unlock';
 import { hasSeenGuide, withGuideSeen } from './guideFlags';
+import { hasReadStory, withStoryRead } from './storyFlags';
 import { hasSeenGateOpen, hasSeenGolden, hasSeenIntro, hasSeenKnow, hasSeenScene, withGateOpenSeen, withGoldenSeen, withIntroSeen, withKnowSeen, withSceneSeen } from './villageIntro';
 import type { VillageId } from '../village';
 
@@ -349,6 +350,15 @@ export class ProgressManager {
   markKnowSeen(village: VillageId): void {
     if (this.mode === 'loading' || hasSeenKnow(this.progress.game.data, village)) return;
     this.progress = { ...this.progress, game: { ...this.progress.game, data: withKnowSeen(this.progress.game.data, village), updatedAt: this.now() } };
+    this.persistLocal();
+    this.emit();
+    this.scheduleFlush();
+  }
+
+  /** Đã đọc hết cốt truyện (bước X1): ghi cờ (đăng nhập thì lên server, chơi thử thì vào cookie). */
+  markStoryRead(): void {
+    if (this.mode === 'loading' || hasReadStory(this.progress.game.data)) return;
+    this.progress = { ...this.progress, game: { ...this.progress.game, data: withStoryRead(this.progress.game.data), updatedAt: this.now() } };
     this.persistLocal();
     this.emit();
     this.scheduleFlush();

@@ -287,7 +287,8 @@ export const ui = {
   /** Trang cốt truyện /truyen (spec 04 mục 2) */
   truyen: {
     tieuDe: 'Cốt truyện',
-    batDauHanhTrinh: 'Bắt đầu hành trình',
+    /** Nút ở trang cuối của truyện: mở chợ phiên (bước X1) */
+    vaoChoPhien: 'Vào chợ phiên',
   },
 
   /** Bản đồ /ban-do (spec 04 mục 7) */
