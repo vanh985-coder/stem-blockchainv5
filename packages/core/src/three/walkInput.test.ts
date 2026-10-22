@@ -33,6 +33,7 @@ describe('ánh xạ phím', () => {
     expect(actionForKey('Space')).toBe('jump');
     expect(actionForKey('KeyE')).toBe('interact');
     expect(actionForKey('Escape')).toBe('menu');
+    expect(actionForKey('KeyM')).toBe('map');
     expect(actionForKey('KeyQ')).toBeNull();
   });
 });

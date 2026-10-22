@@ -25,6 +25,8 @@ export interface Settings {
   quality: QualityChoice;
   /** Độ nhạy chuột khi xoay camera (máy tính), xem `clampMouseSensitivity` */
   mouseSensitivity: number;
+  /** Bản đồ nhỏ xoay theo hướng nhìn (mặc định tắt: hướng bắc luôn ở trên), xem `MiniMap` */
+  rotateMap: boolean;
 }
 
 /** Những gì người dùng đã chọn rõ ràng. Mục nào chưa chọn thì không có. */
@@ -42,6 +44,7 @@ export function parseStored(raw: string | null | undefined): StoredSettings {
     if (typeof o.largeText === 'boolean') out.largeText = o.largeText;
     if (typeof o.soundEnabled === 'boolean') out.soundEnabled = o.soundEnabled;
     if (isQualityChoice(o.quality)) out.quality = o.quality;
+    if (typeof o.rotateMap === 'boolean') out.rotateMap = o.rotateMap;
     if (typeof o.mouseSensitivity === 'number' && Number.isFinite(o.mouseSensitivity)) out.mouseSensitivity = clampMouseSensitivity(o.mouseSensitivity);
     return out;
   } catch {
@@ -57,6 +60,7 @@ export function resolveSettings(stored: StoredSettings, prefersReducedMotion: bo
     soundEnabled: stored.soundEnabled ?? true,
     quality: stored.quality ?? 'auto',
     mouseSensitivity: stored.mouseSensitivity ?? MOUSE_SENSITIVITY_DEFAULT,
+    rotateMap: stored.rotateMap ?? false,
   };
 }
 

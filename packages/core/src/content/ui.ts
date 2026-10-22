@@ -429,6 +429,8 @@ export const ui = {
     doNhayChuot: 'Độ nhạy chuột',
     doNhayChuotGhiChu: 'Tốc độ xoay camera khi rê chuột ở cảnh đi lại (máy tính). Kéo sang phải để xoay nhanh hơn.',
     doNhayChuotGiaTri: '{so}×',
+    banDoXoay: 'Bản đồ xoay theo hướng nhìn',
+    banDoXoayGhiChu: 'Bản đồ nhỏ xoay để hướng em đang nhìn luôn ở phía trên. Tắt thì hướng bắc luôn ở phía trên.',
   },
 
   /** Màn hình tải cảnh 3D */

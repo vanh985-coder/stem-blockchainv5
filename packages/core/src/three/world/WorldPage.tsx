@@ -12,6 +12,7 @@ import { ui } from '../../content/ui';
 import { VILLAGE_SCENE } from '../../content/villageScene';
 import { villageKnowCards } from '../../content/villageCards';
 import { knowScrollUi } from '../../content/knowScrolls';
+import { banDoNho } from '../../content/minimap';
 import { MERGED, URLS, levelUrl } from '../../config/urls';
 import { shouldAutoOpenGuide } from '../../progress/guideFlags';
 import { countKnowCards, effectiveKnowMask } from '../../progress/knowCards';
@@ -37,6 +38,12 @@ import { GATE_VILLAGE, gateOpenedAfter, gateStates, previousVillage, questGate, 
 import { densityFor, type GateId } from '../cho/marketLayout';
 import { GoldenPagesRow } from '../village/GoldenPagesRow';
 import { guideTopic, lockedBy, nextLevel } from '../village/villageQuest';
+import { BigMap } from './map/BigMap';
+import { MiniMap } from './map/MiniMap';
+import { buildMapGeometry } from './map/mapGeometry';
+import { mapMarkers } from './map/mapMarkers';
+import { miniMapSize } from './map/mapProjection';
+import { villageProgress } from './map/mapProgress';
 import { WorldScene } from './WorldScene';
 import type { LoadedZones } from './WorldTracker';
 import { assembleWorld, gateApproachSpawn, villageSpawn } from './worldLayout';
@@ -142,7 +149,9 @@ export function WorldPage() {
   const giverRef = useRef(giver);
   giverRef.current = giver;
   const entering = inside !== null && !zoneReady.has(inside);
-  const session = useWalkSession(api, dialog !== null || know !== null || collection !== null || guide !== null || entering);
+  const [bigMap, setBigMap] = useState(false);
+  const [mapPlayer, setMapPlayer] = useState<{ x: number; z: number; yaw: number } | null>(null);
+  const session = useWalkSession(api, dialog !== null || know !== null || collection !== null || guide !== null || entering || bigMap);
   const dirtUrl = useMemo(() => (manifest ? asset(DIRT_TEXTURE) : null), [manifest]);
   const brickUrl = useMemo(() => (manifest ? asset(BRICK_TEXTURE) : null), [manifest]);
   if (PROBE) Object.assign(window, { __walkApi: api, __progress: progress, __worldInside: inside, __worldSeq: seq });
@@ -207,6 +216,38 @@ export function WorldPage() {
   const questG = questGate(effPages);
   const missionVillage: VillageId | null = inside ?? (questG ? GATE_VILLAGE[questG] : null);
   const arrowTarget = seqActive ? null : targetNodeId({ inVillage: inside, nextBoard, pages: effPages, scroll: insideGated ? scrollIdx : null });
+
+  // ---- bản đồ nhỏ và bản đồ lớn (bước X4): vẽ 2D từ bố cục có sẵn; ký hiệu và tiến độ tính bằng hàm thuần ở ./map
+  const mapGeo = useMemo(() => buildMapGeometry(world), [world]);
+  const mapNames = useMemo(() => Object.fromEntries(VILLAGE_ORDER.map((id) => [id, ui.lang[id]])) as Record<VillageId, string>, []);
+  const miniNames = banDoNho.tenNgan as Record<VillageId, string>;
+  const touch = useMemo(() => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches, []);
+  const targetPoint = useMemo(() => {
+    const n = arrowTarget ? world.graph.nodes.find((q) => q.id === arrowTarget) : undefined;
+    return n ? { x: n.x, z: n.z } : null;
+  }, [arrowTarget, world.graph]);
+  const markerInput = useMemo(() => ({ villages: world.villages, gateOpen, levelStates, inside, knowMasks, target: targetPoint }), [world.villages, gateOpen, levelStates, inside, knowMasks, targetPoint]);
+  const miniMarkers = useMemo(() => mapMarkers(markerInput, 'mini'), [markerInput]);
+  const bigMarkers = useMemo(() => (bigMap ? mapMarkers(markerInput, 'big') : []), [bigMap, markerInput]);
+  const mapProgress = useMemo(() => villageProgress({ levelStates, knowMasks, scrollTotals, goldenPages: pages }), [levelStates, knowMasks, scrollTotals, pages]);
+  const sessionRef = useRef(session);
+  sessionRef.current = session;
+  const mapLive = useRef({ bigMap, blocked: false });
+  mapLive.current = { bigMap, blocked: dialog !== null || know !== null || collection !== null || guide !== null || entering || seqActive || !ready || session.menuOpen };
+  const openMap = useCallback(() => {
+    const p = api.player;
+    setMapPlayer(p ? { x: p.x, z: p.z, yaw: api.camera.yaw } : null);
+    api.lock.exit(); // nhả khóa chuột để bấm được bản đồ; điều khiển tạm dừng vì `bigMap` tính như một hộp thoại đang mở
+    setBigMap(true);
+  }, [api]);
+  const closeMap = useCallback(() => {
+    setBigMap(false);
+    sessionRef.current.dialogClosed(); // đóng bằng phím M hay cú bấm thì khóa chuột lại ngay (Esc không cho khóa lại: hiện lời nhắc như các hộp thoại khác)
+  }, []);
+  const toggleMap = useCallback(() => {
+    if (mapLive.current.bigMap) closeMap();
+    else if (!mapLive.current.blocked) openMap();
+  }, [openMap, closeMap]);
 
   // ---- vật tương tác
   const base = useMemo(() => createWorldBase(world.villages), [world.villages]);
@@ -460,6 +501,7 @@ export function WorldPage() {
         interactLabel={label}
         onInteract={interact}
         onMenu={session.toggleMenu}
+        onMap={toggleMap}
         className="size-full"
       >
         <Scene3D
@@ -507,7 +549,14 @@ export function WorldPage() {
           />
         </Scene3D>
 
-        <MarketHud quest={questText} pages={pages} glow={glow} onMenu={session.openMenu} onGuide={() => openGuide()} />
+        <MarketHud
+          quest={questText}
+          pages={pages}
+          glow={glow}
+          onMenu={session.openMenu}
+          onGuide={() => openGuide()}
+          map={<MiniMap geo={mapGeo} markers={miniMarkers} names={miniNames} api={api} inside={inside} rotate={settings.rotateMap} size={miniMapSize(touch, settings.largeText)} touch={touch} reducedMotion={settings.reducedMotion} onOpen={() => !mapLive.current.blocked && !mapLive.current.bigMap && openMap()} />}
+        />
 
         {/* Lời nhắc tương tác ở máy tính (điện thoại hiện trên nút ✋) */}
         {label && !session.paused && (
@@ -548,6 +597,7 @@ export function WorldPage() {
         </div>
       )}
       {guide && <GuideDialog section={guide.section} onClose={closeGuide} />}
+      {bigMap && <BigMap geo={mapGeo} markers={bigMarkers} names={mapNames} player={mapPlayer} progress={mapProgress} quest={questText} touch={touch} reducedMotion={settings.reducedMotion} onClose={closeMap} />}
 
       <WalkLockOverlay session={session} hideMenu />
       <MarketMenu session={session} onGuide={() => openGuide()} extraItems={menuKnow} />

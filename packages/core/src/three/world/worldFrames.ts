@@ -100,7 +100,7 @@ export function placeVillage(local: VillageLayoutInput, f: VillageFrame): WorldV
   const road = (r: VillageRoad): VillageRoad => {
     const a = at(r.x0, r.z0);
     const b = at(r.x1, r.z1);
-    return { x0: a.x, z0: a.z, x1: b.x, z1: b.z, width: r.width };
+    return { x0: a.x, z0: a.z, x1: b.x, z1: b.z, width: r.width, kind: r.kind };
   };
   const center = { x: ox, z: oz };
   const gate: VillageGateDef = { model: local.gate.model, x: f.gateX, z: f.gateZ, yaw: f.yaw + Math.PI };

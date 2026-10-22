@@ -1,5 +1,5 @@
 /**
- * "Hướng dẫn chơi" (mốc 2, bước 16): nội dung chia PHẦN, mỗi phần 2 đến 4 TRANG, mỗi trang một hình và 1 đến 2 câu ngắn. Mọi chữ của hướng dẫn nằm ở đây (không có chữ trong ảnh).
+ * "Hướng dẫn chơi" (mốc 2, bước 16): nội dung chia PHẦN, mỗi phần 2 đến 5 TRANG, mỗi trang một hình và 1 đến 2 câu ngắn. Mọi chữ của hướng dẫn nằm ở đây (không có chữ trong ảnh).
  *
  * Hộp chung (nút ? ở HUD và mục trong Menu, bước X1) chỉ hiện các phần KHÔNG đánh dấu `rieng` (hiện là Đi lại, Nói chuyện); phần `rieng` chỉ mở từ nơi gắn riêng của nó (nút "Hướng dẫn chơi" ở thẻ bắt đầu màn 2, màn 3),
  * khi đó hộp chỉ có đúng phần đó. Phần `rieng` vẫn giữ nguyên chỗ trong `GUIDE_SECTIONS` (cờ lưu theo bit).
@@ -43,6 +43,7 @@ export const GUIDE_ART_IDS = [
   'bong-den',
   'bon-trang',
   'cuon-giay',
+  'ban-do-nho',
 ] as const;
 export type GuideArtId = (typeof GUIDE_ART_IDS)[number];
 
@@ -95,6 +96,11 @@ export const GUIDE_SECTIONS = [
       {
         hinh: shot('cho-di-lai'),
         may: 'Đi theo mũi tên vàng dưới chân em để tới nơi cần đến, mũi tên chỉ đường đi dọc theo đường đất. Dòng nhiệm vụ ở góc trên trái nhắc em việc cần làm.',
+      },
+      {
+        hinh: art('ban-do-nho'),
+        may: 'Bản đồ nhỏ ở góc trên trái cho em biết mình đang ở đâu, chữ B là hướng bắc. Bấm phím M để xem bản đồ lớn của cả thế giới.',
+        dt: 'Bản đồ nhỏ ở góc trên trái cho em biết mình đang ở đâu, chữ B là hướng bắc. Chạm vào bản đồ để xem bản đồ lớn của cả thế giới.',
       },
       {
         hinh: art('cuon-giay'),
@@ -251,7 +257,7 @@ export const huongDan = {
   xong: 'Đã hiểu',
   dong: 'Đóng',
   thieuHinh: 'Hình minh họa',
-  phim: { w: 'W', a: 'A', s: 'S', d: 'D', e: 'E', shift: 'Shift', space: 'Space', esc: 'Esc' },
+  phim: { w: 'W', a: 'A', s: 'S', d: 'D', e: 'E', m: 'M', shift: 'Shift', space: 'Space', esc: 'Esc' },
 } as const;
 
 /** Phần theo id; không có thì undefined */

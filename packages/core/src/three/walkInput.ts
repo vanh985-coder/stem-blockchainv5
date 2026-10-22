@@ -12,7 +12,7 @@ export const STICK_RADIUS = 56;
 /** Vùng bấm tối thiểu của nút trên điện thoại (pixel). */
 export const MIN_TOUCH_TARGET = 44;
 
-export type KeyAction = 'forward' | 'back' | 'left' | 'right' | 'run' | 'jump' | 'interact' | 'menu';
+export type KeyAction = 'forward' | 'back' | 'left' | 'right' | 'run' | 'jump' | 'interact' | 'menu' | 'map';
 
 /** Phím (KeyboardEvent.code) → hành động. */
 export const KEY_MAP: Readonly<Record<string, KeyAction>> = {
@@ -29,6 +29,7 @@ export const KEY_MAP: Readonly<Record<string, KeyAction>> = {
   Space: 'jump',
   KeyE: 'interact',
   Escape: 'menu',
+  KeyM: 'map',
 };
 
 export function actionForKey(code: string): KeyAction | null {

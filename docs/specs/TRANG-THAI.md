@@ -1,83 +1,94 @@
 # TRẠNG THÁI DỰ ÁN — Giấc mơ Sổ Chung
 
-Cuối mỗi cửa sổ chat, Claude viết lại toàn bộ file này. Bạn xóa bản cũ trong project và tải bản mới lên (cả trong repo: `docs/specs/TRANG-THAI.md`).
+Cuối mỗi cửa sổ chat, Claude viết lại toàn bộ file này. Bạn thay bản cũ trong project claude.ai và trong repo (`docs/specs/TRANG-THAI.md`).
 
 ## Thông tin chung
 
 | Mục | Giá trị |
 |---|---|
 | Web thật | https://stem-block.blockchainptit.com (hub) |
-| Subdomain làng | `sb-lang-giay`, `sb-lang-det`, `sb-lang-khac-dau`, `sb-lang-bac` · đồ họa: `sb-assets` (đều `.blockchainptit.com`) |
-| Hosting | Windows Server, Docker Desktop (WSL2) + Caddy, 1 container, cổng 18081–18086 (đổi trong `deploy/.env`); Cloudflare Tunnel (file `config.yml`, cloudflared là dịch vụ Windows). Hướng dẫn: `docs/DEPLOY.md` |
-| Cập nhật bản mới | Trên server: `git pull` → `docker compose -f deploy/docker-compose.yml up -d --build` |
-| Supabase | Project `zlqxwbgcyudybxaynluf` (Singapore), migrations 0001, 0002; Edge Function `teacher-reset-password` (secret `USERNAME_EMAIL_DOMAIN`) |
-| Email nội bộ | `<tên>@hs.blockchainptit.com`. **Bản ghi MX `hs` trên Cloudflare phải giữ mãi** (Supabase kiểm tra MX) |
-| Tài khoản | Admin: Google của chủ dự án. Giáo viên thử: `gva`, `gvb` (dùng cho `pnpm rls:check`). Học sinh thử: `thu01`, `thu02` |
-| Người code | Sonnet 5.5 qua Claude Code · nhịp 2–3 giờ/ngày, không hạn chót |
+| Subdomain | `sb-lang-giay`, `sb-lang-det`, `sb-lang-khac-dau`, `sb-lang-bac` (chỉ còn trang bài học và game) · đồ họa `sb-assets` |
+| Hosting | Windows Server, Docker Desktop (WSL2) + Caddy, cổng 18081–18086; Cloudflare Tunnel (cloudflared là dịch vụ Windows). Hướng dẫn: `docs/DEPLOY.md` mục (h) lệnh deploy, (i) luật cache |
+| Supabase | Project `zlqxwbgcyudybxaynluf` (Singapore), migrations 0001, 0002; Edge Function `teacher-reset-password` |
+| Email nội bộ | `<tên>@hs.blockchainptit.com`; **giữ mãi bản ghi MX `hs`** trên Cloudflare |
+| Tài khoản thử | Giáo viên `gva`, `gvb`; học sinh `thu01`, `thu02` |
+| Người code | Mốc 1–2: Claude Code (Sonnet 5.5). **Mốc 3: Gemini CLI, đọc `GEMINI.md` ở gốc repo.** AI không tự commit/push; chủ dự án tự commit |
 
-## Tiến độ theo mốc
+## Tiến độ
 
-| Mốc | Nội dung | Trạng thái |
-|---|---|---|
-| 0. Đồ họa | DO-HOA 01–06, danh-sach-assets3.txt | ✅ Xong |
-| 1. Lõi | Monorepo, ảnh + manifest, chân dung, giao diện chung, đăng nhập, tiến độ, trang chủ, truyện, bản đồ 2D, 4 bài học 2D, trang giáo viên, deploy Docker | ✅ **Xong, đã chạy trên mạng** (420 test xanh) |
-| 2. Làng mẫu | Động cơ 3D tối thiểu, nén model khi build, chợ đơn giản, Làng Giấy 3D, màn 2, màn 3, 2 nhân vật 3D ở trang bài học | Chưa làm |
-| 3. Nhân rộng | 3 làng còn lại; game 8 → 12 → 5 → 6 → 9 → 11; hội làng, bằng khen; gộp web và kiểm tra toàn bộ | Chưa làm |
-| 4. Trau chuốt | Nhân vật nhìn theo đáp án, tư thế sad/point, cảnh mở đầu, chợ đông, tiệm đồ | Chưa làm |
+| Mốc | Trạng thái |
+|---|---|
+| 0. Đồ họa | ✅ Xong |
+| 1. Lõi | ✅ Xong, đã chạy trên mạng |
+| 2. Làng mẫu | ✅ **Xong phần code** (≈1458 test xanh). ⏳ **Chưa deploy, chưa thử máy thật (15b)** |
+| 3. Nhân rộng | Chưa làm |
+| 4. Trau chuốt | Chưa làm |
 
-## Quyết định đã chốt
+## Việc phải làm đầu tiên (15b)
 
-**Từ trước:** bối cảnh Đại Việt thế kỷ XVI trong mơ; 4 loại cảnh; giữ subdomain; tên phản diện luôn `{phanDien}` (hiện là "Tí"); "Linh" ở Bài 3 đổi thành "Lan"; màn 5, 8, 9 như spec.
+1. **Web đang trả 530** (cả bản mốc 1): trên server kiểm `Get-Service cloudflared` (dừng thì `Start-Service cloudflared`) và `docker ps` (lỗi thì mở Docker Desktop).
+2. Deploy theo `docs/DEPLOY.md` mục (h); tạo Cache Rule cho `sb-assets` theo mục (i). File `.glb` lần 2 phải `cf-cache-status: HIT`.
+3. Thử thật: đăng nhập Google và bằng tên; giáo viên (vào thẳng chợ, không bị chặn thẻ); tài khoản cũ không bị bắt đọc truyện; trọn đường Làng Giấy.
+4. **Điện thoại tầm trung, mức Thấp ≥ 30 FPS**: đi lại, bản đồ, nhặt thẻ, màn 2 vuốt, màn 3 kéo thẻ. Chưa có số đo nào trên máy thật.
 
-**Hạ tầng và bảo mật (mốc 1):**
-- Bỏ Vercel. Deploy bằng Docker + Cloudflare Tunnel (spec 01 mục 7).
-- Cookie đăng nhập dùng chung `.blockchainptit.com`. Chủ dự án chấp nhận việc cookie cũng gửi sang dự án khác cùng tên miền. **Admin và giáo viên làm việc trên hồ sơ trình duyệt riêng.**
-- Supabase dùng bản trên mạng (không tự host). Mọi bảng bật RLS. `pnpm rls:check` kiểm tra 8 điều, phải 8/8.
-- Sửa SQL spec 02: `protect_profile` cho phép sửa từ Table Editor (`auth.uid()` rỗng); `handle_new_user` không lỗi khi tên rỗng.
-- Edge Function đặt lại mật khẩu: giáo viên của lớp hoặc admin; đuôi email lấy từ secret.
+## Quyết định đã chốt ở mốc 2
 
-**Tiến độ (spec 02):**
-- Chơi thử chỉ lưu ở cookie `sc_guest`. `sc_pending` là map theo `userId`, giữ lại khi đăng xuất lúc mất mạng.
-- Gộp xu lấy **số lớn hơn** (xu chỉ tăng). Nếu sau này có cửa hàng tiêu xu thì phải xem lại.
-- Vào lại bài học thì bắt đầu ở trạm đầu tiên chưa có sao; bấm được trạm đã mở.
+**Thế giới mở (thay một phần spec 01, 03, 04, 05):**
+- Chợ và 4 làng là **một cảnh 3D ở `/cho`**. Chợ bán kính 42 ở giữa; 4 đường dài 30 (Bắc Giấy, Nam Dệt, Tây Khắc Dấu, Đông Bạc qua cầu); cổng làng ở 72; **mỗi làng bán kính 125, tâm ở 197, bao bằng lũy tre**.
+- Subdomain làng: `/` và `/lang/<id>` chuyển về `/cho?tu=<id>`. "Về làng"/"Về chợ" về `/cho?tu=<id>`. `/ban-do` giữ cho máy yếu và giáo viên.
+- Tải theo vùng; `ZonePrewarm` chỉ chuẩn bị sẵn **làng nhiệm vụ** và làng mà người chơi đang đi đường tới.
+- Mũi tên **dưới chân** đi theo đồ thị đường; biển chỉ đường gỗ ở các ngã; **bản đồ nhỏ góc trái** (bắc ở trên, có tuỳ chọn xoay), **phím M / chạm** mở bản đồ lớn có tiến độ từng làng.
+- Làng chưa mở: thấy từ xa, cổng đóng. Cảnh cổng Dệt mở chạy khi lần đầu tới gần sau Trang Sổ Vàng 1.
 
-**Bài học (đã ghi vào spec 05, 08):**
-- Bài 1 trạm Dễ: nội dung trang do máy chọn ngẫu nhiên, học sinh chỉ tính mã trang.
-- Bài 4 trạm Trung bình phần 3: 2 cây (trong sổ / bây giờ). Học sinh soi từ gốc xuống theo nhánh lệch để tìm lá {phanDien} đã sửa.
-- Bài 4 ở mốc 1: thầy Linh trao trang thứ tư, Bi nói "Đủ 4 trang rồi! Cả làng đang mở hội.", hiện "Hội làng sắp mở".
+**Luồng người chơi:**
+- Lần đầu (đăng ký, đăng nhập, Chơi thử): **bắt đọc hết 14 trang truyện**, rồi "Vào chợ phiên". Giáo viên và người đã có tiến độ được miễn.
+- Lần đầu vào làng: cảnh mở đầu → **tìm 4 thẻ "Em có biết?" rải trong làng** (cột sáng, Bi gợi ý, dòng "Tìm thẻ n/4") → đủ thẻ mới vào được màn chơi. `/ban-do` cũng phải đọc đủ thẻ. Người đã xong màn 1 coi như có đủ thẻ.
+- Xong màn 3 → bác An trao Trang Sổ Vàng → cổng làng sau mở.
+- Hướng dẫn chơi chung chỉ còn **Đi lại** và **Nói chuyện** (gồm trang Tìm thẻ, Bản đồ nhỏ). Phần riêng của màn 2, 3 mở từ thẻ bắt đầu game.
 
-**Giao diện (đã ghi vào spec 03, 04):**
-- Mọi chữ hiển thị nằm trong `packages/core/src/content/`; `pnpm check:text` và test chuỗi thừa phải sạch. Cách sửa chữ: `content/HUONG-DAN-SUA-CHU.md`.
-- `VnDialog` (kiểu visual novel) dùng cho truyện, giới thiệu làng và lời thoại bài học. Chân dung thở và nhún, lời hiện dần. Câu có `mood: 'vui'` tự dùng ảnh `ui/portraits/<id>-cuoi` nếu có.
-- `/truyen`: 14 lượt dạng hộp thoại; nền ấm theo chủ đề (lượt 1–2 giấc mơ, 3–11 làng, 12–14 hội).
-- Giới thiệu làng: lần đầu bấm vào làng trên bản đồ (lời trong `content/villageIntro.ts`); có nút "Xem lại giới thiệu".
-- `NenTrangTri`: icon trôi theo chủ đề ở mọi trang. Trang bài học chỉ dùng 2 khoảng trống hai bên (từ khoảng 1300px); trang giáo viên icon đứng yên. Tắt khi bật "Giảm chuyển động".
-- Trang bài học phóng to 1,35 lần từ 1280px khi **không có** 2 khung 3D (máy yếu, "Giảm chuyển động", "Chữ to"); khi có khung thì bảng thu nhỏ để chừa chỗ: f = 14% chiều rộng màn (kẹp 180–280px), s = min(1,35, (màn − 2 × (f + 16)) / 872) — 1280px: f 180, s ≈ 1,0; 1366px: f ≈ 191; 1536px: f ≈ 215; 1920px: s = 1,35. Bố cục quyết định lúc mở trang, khung ẩn về sau thì bảng không nhảy. Lý do: bảng 1200px chừa quá ít chỗ (khung chỉ hiện từ 1512px). Bản đồ lấp đầy màn hình từ 1024px.
-- Ngân sách: trang đầu hub khoảng 89 KB gzip; trang bài học của 4 làng 117–125 KB gzip (giới hạn 150 KB; ba trạm của mỗi bài tải sau, lúc rảnh). Chunk 3D của 2 khung tải thêm sau khi trang đã hiện, chỉ khi có khung.
+**Đồ họa và model:**
+- `assets:build`: meshopt + WebP; **3 bậc model**: chính (giảm mặt chế độ chặt, sai số 3%, không Permissive), `-vua` (~15.000 tam giác, chỉ tạo khi chế độ chặt xuống ≤ 25.000), `-xa` (~8.000, texture 512).
+- Texture: 10 nhân vật 2048; cổng, cây đa, nhà 2048; đồ khác 1024.
+- Nhân vật chuẩn hoá **cao 1,7, chân ở y = 0**; cỡ đồ vật trong `modelSizes.ts`.
+- Ảnh hình rời: **tự tách nền ô vuông**; ảnh scenes/story/ui: **tự xoá dấu ngôi sao** của công cụ vẽ. Chân dung chụp từ model 3D (`/dev/portraits`).
 
-**Đồ họa:** 2 lớp nền màn 6 đã trong suốt sẵn, **bỏ việc tách nền trời**. Icon được tự tách nền khi build.
+**Hiệu năng (ngân sách):**
+- Tam giác: **Thấp ≤ 270.000**, Vừa < 1.000.000, Cao < 1.500.000. Mức Thấp chỉ vẽ trong khoảng 38.
+- Tải lần đầu `/cho` ≤ 25 MB (hiện 21–22 MB); mỗi vùng làng ≤ 15 MB (Làng Giấy 4–5 MB).
+- Khựng: tối đa 1 khung > 50 ms, không khung nào > 100 ms khi vào làng. Lớp HTML phủ cảnh 3D **không dùng box-shadow/filter**.
 
-## Việc của mốc 2 đã ghi sẵn trong spec
+**Điều khiển và giao diện:**
+- Máy tính kiểu PUBG: bấm để khoá chuột, rê chuột xoay camera, Esc nhả khoá và mở menu; có độ nhạy chuột. Điện thoại: cần điều khiển + vuốt.
+- Trang bài học: 2 khung 3D (học sinh trái, {phanDien} phải); **bảng thu nhỏ để chừa chỗ**: f = clamp(14% màn, 180, 280), s = min(1,35, (màn − 2(f+16)) / 872). Ẩn khi máy yếu, Giảm chuyển động, Chữ to.
 
-- **2 khung 3D ở trang bài học** (spec 03 mục 4): **đã làm** (mốc 2, bước 5 và 5b), từ 1280px, học sinh bên trái, {phanDien} bên phải, một Canvas dùng drei `View`. Đúng thì học sinh `cheer`, {phanDien} giữ `idle`; sai thì {phanDien} `cheer`, học sinh `sad` (`hurt` chỉ để dành cho màn 5). Bảng thu nhỏ để chừa chỗ (xem mục Giao diện). Ẩn khi máy yếu, màn dưới 1280px, "Giảm chuyển động", "Chữ to", tải lỗi hoặc FPS dưới 30 trong 3 giây đầu. Bớt icon nền còn 2 mỗi bên khi khung hiện.
-- Model `.glb` hiện khoảng 8 MB mỗi cái: phải nén trong `assets:build` trước khi dùng.
-- Sprite, thẻ, ô lá chưa trong suốt: xử lý theo từng game (màn 3 ở mốc 2, còn lại ở mốc 3).
+**Màn 2 (chạy):** tốc độ **10, +0,3 mỗi 5 giây, tối đa 18**; khoảng cách hàng ≥ tốc độ × 1,2; {phanDien} làm rơi trang (tính vào ngân sách trang); 4 vòng câu hỏi; mốc điểm giữ như spec.
+
+**Màn 3 (ghép sổ):** soi công thức hiện sẵn kết quả (đúng spec). Vòng 3 là **vòng giữ sổ 90 giây**: {phanDien} tráo trang 11 lần (9 → 6 giây), tối đa 3 ô chưa sửa, hồi đủ 3 tim đầu vòng 3, hết tim vẫn giữ điểm phần đã sửa. **Mốc 200 / 400 / 475** (tối đa 505).
 
 ## Việc để sau / cần theo dõi
 
-- **Nên làm trước mốc 2:** cho vài học sinh chơi thử bản trên mạng ở phòng máy trường, ghi lại lỗi và góp ý.
-- **Trước khi dùng thật với học sinh:** xóa các tài khoản `test_rls_*`, `thu01`, `thu02` trong Authentication → Users.
-- Docker Desktop chỉ chạy khi có người đăng nhập Windows. Server khởi động lại thì web báo 502 cho tới khi đăng nhập. Cân nhắc chạy Docker Engine trong Ubuntu WSL.
-- Supabase miễn phí tự tạm dừng sau khoảng 1 tuần không ai dùng (kỳ nghỉ): vào trang quản lý bấm khôi phục.
-- Admin chưa xóa được học sinh khỏi lớp (cần migration mới cho policy `members_delete`).
-- Chữ in đậm trong `rich()` không còn màu riêng (đỏ, tím).
-- Ảnh chân dung cười `<id>-cuoi.png`: tạo bằng ChatGPT nếu muốn.
-- Có thể đổi tên Tí thành "Cuội": chỉ sửa `characters.ts` và lời truyện.
-- Thư mục `_giai-doan-1/` đã hết dùng: xóa ở đầu mốc 2.
-- Tải các spec đã sửa trong mốc 1 lên project claude.ai: 00, 01, 02, 03, 04, 05, 08, 09.
+- **Repo Git phình**: mỗi lần build lại model thêm vài chục MB nhị phân vào lịch sử. Xem xét Git LFS hoặc kho riêng cho `assets-build/` trước khi lịch sử quá nặng.
+- Docker Desktop chỉ chạy khi có người đăng nhập Windows; cân nhắc Docker Engine trong WSL chạy như dịch vụ.
+- Màn 3: bot trung bình hết tim ~30% (do kéo nhầm). Xem lại khi có học sinh chơi thật.
+- Vào làng còn 1 cú khựng 55–76 ms lúc vùng làng gắn vào cảnh (mức Vừa, Cao).
+- Bản đồ lớn trên điện thoại ngang phải cuộn mới thấy cột tiến độ.
+- Mức Thấp: kiểm tra bằng mắt vật ở xa hiện ra (khoảng vẽ 38) có khó chịu không.
+- Bàn chép sổ và cuốn Sổ Chung còn thô (mốc 4).
+- Sửa chữ trên giao diện thì chạy lại `pnpm guide:capture`.
+- 3 làng chưa dựng tạm dùng luật thẻ cũ (`knowSeen`) cho tới khi dựng ở mốc 3.
+- `testTimeout` toàn monorepo là 30 giây (do máy bận lúc đo).
+- Trước khi dùng thật: xoá tài khoản `test_rls_*`, `thu01`, `thu02`. Supabase miễn phí tự tạm dừng sau ~1 tuần không dùng.
+- Từ mốc 1: admin chưa xoá được học sinh khỏi lớp (cần migration policy `members_delete`); chữ đậm trong `rich()` mất màu riêng.
+
+## Ghi chú cho mốc 3
+
+- Phạm vi (00-HUONG-DAN): cảnh 3 làng còn lại; game theo thứ tự **8 → 12 → 5 → 6 → 9 → 11**; hội làng, thử thách cuối, bằng khen; cuối mốc gộp web và kiểm tra toàn bộ (spec 10).
+- **Cần quyết đầu mốc:** 3 làng to như Làng Giấy (bán kính 125, thẻ rải, ~+15–25 giờ so với ước tính 35–45 giờ) hay bản gọn hơn.
+- Dùng lại: vùng làng, thẻ Em có biết, bản đồ nhỏ, Scene25D, MiniGameLevel, mẫu logic + test + mô phỏng bot. Khung cửi (Làng Dệt) nặng 134.000 tam giác, đo kỹ khi dựng.
+- Tải lên project claude.ai các spec mới từ `docs/specs/`: 00, 01, 03, 04, 05, 06, 07, 08 (và file này). Sửa phần A của Instructions: người code là Gemini CLI.
 
 ## Câu mở đầu cho cửa sổ tiếp theo
 
 ```
-Mốc 2 — Làng mẫu. Spec: 01 mục 5 (phần model), 03 (động cơ 3D, nhân vật và hoạt ảnh, mức chất lượng, 2 khung 3D ở trang bài học), 04 mục 3 (chợ phiên), 05 (cảnh Làng Giấy, màn 2, màn 3). Đọc TRANG-THAI.md và các spec này, chia mốc 2 thành các bước nhỏ cho Claude Code, rồi đưa mình lời giao việc cho bước đầu tiên.
+Mốc 3 — Nhân rộng. Người code là Gemini CLI (đọc GEMINI.md trong repo); AI không tự commit. Đọc TRANG-THAI.md và spec 06, 07, 08, 10, cùng 03, 04, 05 bản mới (thế giới mở). Trước hết hướng dẫn mình làm xong 15b (khôi phục server, deploy, thử điện thoại). Sau đó hỏi mình chọn làm 3 làng to như Làng Giấy hay bản gọn hơn, rồi chia mốc 3 thành các bước nhỏ và đưa lời giao việc cho bước đầu tiên.
 ```

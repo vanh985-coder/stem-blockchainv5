@@ -110,7 +110,7 @@ Xếp theo ảnh `concept-toan-canh` và `concept-cho-phien`. Phải **đủ đ�
 
 ### HUD
 
-- **Góc trên trái:** dòng "Nhiệm vụ: …".
+- **Góc trên trái:** (từ bước X4) **bản đồ nhỏ**, ngay dưới là dòng "Nhiệm vụ: …". Bản đồ nhỏ: hướng bắc ở trên (chữ B), thấy cả 4 lối ra khi ở chợ, thấy bán kính 60 quanh em khi ở trong làng; vẽ đường, chợ, viền các làng, tên làng, cổng (mở hoặc khóa), biển màn chơi (xong / đang mở / khóa / sắp ra mắt), điểm đến của nhiệm vụ (khớp mũi tên dưới chân) và thẻ "Em có biết?" chưa nhặt (chỉ trong làng đó). Bấm phím **M** hoặc chạm bản đồ nhỏ để mở **bản đồ lớn** (cả thế giới, chú thích, tiến độ từng làng, dòng "Việc tiếp theo"). Chi tiết kỹ thuật: spec 03 mục 3.10.
 - **Góc trên phải:** 4 ô Trang Sổ Vàng (icon `trang-vang`; trang chưa có thì mờ), nút menu.
 - **Chỉ đường:** mũi tên trên đầu nhân vật chỉ về cổng cần tới.
 - (Bước 8: `MarketHud.tsx`. Nhiệm vụ lấy từ `content/dialogues.ts` (`NHIEM_VU`, mục 5; 0 trang là "Đến Làng Giấy ở phía bắc gặp bác An."; đủ 4 trang là "Cả làng đang mở hội. Hãy đến dự hội làng nhé!"). 4 ô Trang Sổ Vàng theo `unlock.goldenPages`. Mũi tên là mũi tên vàng dẹt bay nhấp nhô (đứng yên khi "Giảm chuyển động"), quay mượt về cổng của nhiệm vụ, ẩn khi tới gần cổng 6 đơn vị hoặc đủ 4 trang. Nút Menu: máy tính nhả khóa chuột rồi menu hiện ra, điện thoại bật menu.)
@@ -172,6 +172,7 @@ Chợ và 4 làng nằm trong một cảnh 3D ở hub, địa chỉ vẫn `/cho`
 - **Làng Giấy dựng đủ (bước X3):** làng bán kính 125 với lũy tre, khu giữa làng (ba biển, bác An), xưởng làm giấy lớn, khu nhà ở 33 nhà, đình và sân đình, ao lớn có cầu ao, chợ làng nhỏ, giếng, vườn cây ăn quả, đồi tre, ruộng, 6 dân làng (chi tiết spec 05). Mũi tên dưới chân đi theo đường làng tới từng biển, tới bác An và tới cuộn giấy "Em có biết?" gần nhất chưa nhặt. `?tu=lang-giay` đưa người chơi tới (0, −99) trong làng, cách ba biển chừng 7.
 - **"Em có biết?" rải trong làng (bước X3):** 4 cuộn giấy phát sáng (chùm sáng mảnh nhìn từ xa) ở 4 khu xa nhau; nhặt đủ mới mở được biển bài học (người chơi cũ, giáo viên không bị chặn). Chi tiết: spec 03 mục 3.9.
 - **3 làng chưa dựng** (Dệt, Khắc Dấu, Bạc): cổng đúng model, vài nhà, bụi tre và một biển "Học cùng [người dẫn]" dẫn vào bài học (màn 4, 7, 10); game để "Sắp ra mắt". Phần còn lại của chỗ bán kính 125 là đất hoang: ruộng, 5 đồi và 40 bụi tre mỗi làng (`wildlands` ở `worldLayout.ts`, rải cách sông ít nhất 6, có vật cản). Nội dung 3D của 3 làng này làm ở mốc 3.
+- **Bản đồ trong thế giới mở (bước X4):** bản đồ nhỏ và bản đồ lớn thay thế việc phải mở `/ban-do` để xem mình đang ở đâu; trong Cài đặt có "Bản đồ xoay theo hướng nhìn" (mặc định tắt). Trang `/ban-do` (mục 7) vẫn giữ làm đường đi nhanh.
 - **"Về làng" / "Về chợ"** cuối mỗi màn và trong menu đều mở `/cho?tu=<id>`; `/ban-do` giữ nguyên.
 
 ## 6. Làm sau (mốc 4)

@@ -7,13 +7,13 @@ describe('cài đặt', () => {
   });
 
   it('chưa lưu gì: giảm chuyển động theo máy, chữ to tắt', () => {
-    expect(resolveSettings({}, true)).toEqual({ reducedMotion: true, largeText: false, soundEnabled: true, quality: 'auto', mouseSensitivity: 1 });
-    expect(resolveSettings({}, false)).toEqual({ reducedMotion: false, largeText: false, soundEnabled: true, quality: 'auto', mouseSensitivity: 1 });
+    expect(resolveSettings({}, true)).toEqual({ reducedMotion: true, largeText: false, soundEnabled: true, quality: 'auto', mouseSensitivity: 1, rotateMap: false });
+    expect(resolveSettings({}, false)).toEqual({ reducedMotion: false, largeText: false, soundEnabled: true, quality: 'auto', mouseSensitivity: 1, rotateMap: false });
   });
 
   it('đã chọn rõ thì ưu tiên lựa chọn, kể cả khi ngược với máy', () => {
     expect(resolveSettings({ reducedMotion: false }, true).reducedMotion).toBe(false);
-    expect(resolveSettings({ reducedMotion: true, largeText: true }, false)).toEqual({ reducedMotion: true, largeText: true, soundEnabled: true, quality: 'auto', mouseSensitivity: 1 });
+    expect(resolveSettings({ reducedMotion: true, largeText: true }, false)).toEqual({ reducedMotion: true, largeText: true, soundEnabled: true, quality: 'auto', mouseSensitivity: 1, rotateMap: false });
   });
 
   it('đọc dữ liệu hỏng thì bỏ qua', () => {

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { AssetImage } from '../../assets/AssetImage';
 import { fmt } from '../../content/characters';
 import { huongDan } from '../../content/huongDan';
@@ -15,18 +16,23 @@ export interface MarketHudProps {
   onMenu: () => void;
   /** Bấm nút "Hướng dẫn chơi" (dấu ?) cạnh nút menu; bỏ trống thì không có nút */
   onGuide?: () => void;
+  /** Bản đồ nhỏ (bước X4): đặt ở góc trên trái, dòng nhiệm vụ nằm ngay dưới */
+  map?: ReactNode;
 }
 
 /**
  * HUD của chợ phiên (spec 04 mục 3 "HUD"): góc trên trái dòng "Nhiệm vụ: …", góc trên phải 4 ô Trang Sổ Vàng (icon \`trang-vang\`; trang chưa có thì mờ) và nút menu. Các phần
  * tử có \`data-walk-ui\` nên bấm vào không bắt đầu kéo camera hay cần điều khiển. Lớp phủ không bắt chuột ngoài các phần tử này.
  */
-export function MarketHud({ quest, pages, glow, onMenu, onGuide }: MarketHudProps) {
+export function MarketHud({ quest, pages, glow, onMenu, onGuide, map }: MarketHudProps) {
   return (
     <div data-hud className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-2">
-      <p data-walk-ui role="status" className="pointer-events-auto max-w-[min(26rem,58vw)] rounded-bang border-2 border-nau-go/60 bg-giay/90 px-3 py-2 font-display text-sm font-extrabold leading-snug shadow-md sm:text-base">
-        {fmt(ui.cho.nhiemVu, { nd: quest })}
-      </p>
+      <div className="flex flex-col items-start gap-2">
+        {map}
+        <p data-walk-ui role="status" className="pointer-events-auto max-w-[min(26rem,58vw)] rounded-bang border-2 border-nau-go/60 bg-giay/90 px-3 py-2 font-display text-sm font-extrabold leading-snug shadow-md sm:text-base">
+          {fmt(ui.cho.nhiemVu, { nd: quest })}
+        </p>
+      </div>
       <div data-walk-ui className="pointer-events-auto flex items-center gap-1.5 rounded-bang border-2 border-nau-go/60 bg-giay/90 p-1.5 shadow-md">
         <ul className="flex items-center gap-1" aria-label={fmt(ui.moKhoa.trangSoVang, { so: pages, max: MAX_PAGES })}>
           {Array.from({ length: MAX_PAGES }, (_, i) => {

@@ -12,10 +12,10 @@ describe('cấu trúc Hướng dẫn chơi', () => {
     expect(new Set(GUIDE_SECTION_IDS).size).toBe(GUIDE_SECTION_IDS.length);
     expect(GUIDE_SECTION_IDS.length).toBeLessThanOrEqual(31); // cờ lưu theo số bit
   });
-  it('mỗi phần 2 đến 4 trang', () => {
+  it('mỗi phần 2 đến 5 trang (phần Đi lại có 5 trang từ bước X4)', () => {
     for (const s of GUIDE_SECTIONS) {
       expect(s.trang.length, s.id).toBeGreaterThanOrEqual(2);
-      expect(s.trang.length, s.id).toBeLessThanOrEqual(4);
+      expect(s.trang.length, s.id).toBeLessThanOrEqual(5);
     }
   });
   it('mỗi trang một hình và 1 đến 2 câu ngắn, cho cả hai thiết bị', () => {
@@ -88,7 +88,7 @@ describe('chọn theo thiết bị và theo màn', () => {
     expect(guideSection('khong-co')).toBeUndefined();
   });
   it('nhãn phím trong hình là tên phím', () => {
-    expect(Object.values(huongDan.phim)).toEqual(['W', 'A', 'S', 'D', 'E', 'Shift', 'Space', 'Esc']);
+    expect(Object.values(huongDan.phim)).toEqual(['W', 'A', 'S', 'D', 'E', 'M', 'Shift', 'Space', 'Esc']);
   });
 });
 

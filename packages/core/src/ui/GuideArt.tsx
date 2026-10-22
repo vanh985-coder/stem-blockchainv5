@@ -364,6 +364,38 @@ const ARTS: Record<GuideArtId, () => ReactNode> = {
       <path d="M96 60 l8 8 M224 60 l-8 8 M80 100 h-12 M240 100 h12 M160 40 v-14" stroke={C.gold} strokeWidth={5} strokeLinecap="round" />
     </g>
   ),
+  'ban-do-nho': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.sky} />
+      <circle cx={96} cy={94} r={70} fill="#cfe2a6" stroke={C.wood} strokeWidth={5} />
+      <clipPath id="gd-ban-do-nho">
+        <circle cx={96} cy={94} r={66} />
+      </clipPath>
+      <g clipPath="url(#gd-ban-do-nho)">
+        <circle cx={96} cy={94} r={34} fill="#ead9aa" />
+        <circle cx={96} cy={94} r={12} fill="#dcc78f" />
+        <path d="M96 20 V168 M26 94 H166" stroke="#c9915b" strokeWidth={9} />
+        <path d="M146 26 q-18 40 -2 70 q14 30 26 56" stroke="#6fb7d8" strokeWidth={15} fill="none" strokeLinecap="round" />
+      </g>
+      <rect x={90} y={26} width={12} height={12} rx={3} fill={C.green} stroke={C.ink} strokeWidth={1.5} />
+      <rect x={90} y={150} width={12} height={12} rx={3} fill="#9a948a" stroke={C.ink} strokeWidth={1.5} />
+      <rect x={32} y={88} width={12} height={12} rx={3} fill="#9a948a" stroke={C.ink} strokeWidth={1.5} />
+      <rect x={148} y={88} width={12} height={12} rx={3} fill="#9a948a" stroke={C.ink} strokeWidth={1.5} />
+      <circle cx={96} cy={32} r={13} fill="none" stroke={C.red} strokeWidth={3.5} />
+      <path d="M96 78 L108 108 L96 100 L84 108 Z" fill={C.purple} stroke="#fff" strokeWidth={2.5} strokeLinejoin="round" />
+      <circle cx={96} cy={24} r={10} fill="#fff" stroke={C.wood} strokeWidth={2} />
+      <path d="M96 17 L101 28 L91 28 Z" fill={C.ink} />
+      <rect x={196} y={20} width={104} height={78} rx={10} fill={C.paper} stroke={C.wood} strokeWidth={4} />
+      <circle cx={248} cy={34} r={8} fill="none" stroke="#7a9d57" strokeWidth={2} strokeDasharray="4 3" />
+      <circle cx={248} cy={84} r={8} fill="none" stroke="#7a9d57" strokeWidth={2} strokeDasharray="4 3" />
+      <circle cx={222} cy={59} r={8} fill="none" stroke="#7a9d57" strokeWidth={2} strokeDasharray="4 3" />
+      <circle cx={274} cy={59} r={8} fill="none" stroke="#7a9d57" strokeWidth={2} strokeDasharray="4 3" />
+      <circle cx={248} cy={59} r={6} fill="#ead9aa" />
+      <path d="M248 40 V78 M228 59 H268" stroke="#c9915b" strokeWidth={3} />
+      <Key x={226} y={118} w={44} h={44} label={K.m} />
+      <Arrow x1={248} y1={114} x2={248} y2={104} width={3} />
+    </g>
+  ),
   'bon-trang': () => (
     <g>
       <rect x={0} y={0} width={ART_W} height={ART_H} fill="#fbf1d6" />

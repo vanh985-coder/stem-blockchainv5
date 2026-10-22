@@ -210,6 +210,12 @@ export function WalkWorld({ api, paused, obstacles, boundsRadius, interactables,
   const player = useMemo(() => createPlayerState(start[0], start[1], startYaw), []); // eslint-disable-line react-hooks/exhaustive-deps
   // Chỉ khi chạy dev: mở trạng thái người chơi ra window để kiểm tra bằng trình duyệt.
   if (PROBE) (window as unknown as { __walkPlayer?: PlayerState }).__walkPlayer = player;
+  useEffect(() => {
+    api.player = player;
+    return () => {
+      api.player = null;
+    };
+  }, [api, player]);
   const world = useMemo<World>(() => ({ obstacles, boundsRadius, groundHeight }), [obstacles, boundsRadius, groundHeight]);
   return (
     <>

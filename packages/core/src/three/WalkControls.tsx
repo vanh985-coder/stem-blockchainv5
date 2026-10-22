@@ -27,6 +27,8 @@ export interface WalkControlsProps {
   onInteract: () => void;
   /** Esc: nơi gọi tự quyết định mở hay đóng menu */
   onMenu: () => void;
+  /** Phím M: nơi gọi tự quyết định mở hay đóng bản đồ lớn (bỏ trống thì phím M không làm gì) */
+  onMap?: () => void;
   className?: string;
   /** Khung 3D và các lớp giao diện (HUD...). Phần tử có thuộc tính `data-walk-ui` không bắt đầu kéo camera hay cần điều khiển. */
   children?: ReactNode;
@@ -49,13 +51,13 @@ function isTyping(target: EventTarget | null): boolean {
  *   nút ✋ ở góc phải (vùng bấm ≥ 44px). Chặn cuộn và phóng to trang khi chạm vào khung chơi.
  * Tạm dừng thì thả hết phím và cần điều khiển.
  */
-export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockChange, onLockError, interactLabel, onInteract, onMenu, className = '', children }: WalkControlsProps) {
+export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockChange, onLockError, interactLabel, onInteract, onMenu, onMap, className = '', children }: WalkControlsProps) {
   const root = useRef<HTMLDivElement>(null);
   const base = useRef<HTMLDivElement>(null);
   const knob = useRef<HTMLDivElement>(null);
   const [touchMode, setTouchMode] = useState(() => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches);
-  const live = useRef({ paused, lockMode, mouseSensitivity, onLockChange, onLockError, onInteract, onMenu });
-  live.current = { paused, lockMode, mouseSensitivity, onLockChange, onLockError, onInteract, onMenu };
+  const live = useRef({ paused, lockMode, mouseSensitivity, onLockChange, onLockError, onInteract, onMenu, onMap });
+  live.current = { paused, lockMode, mouseSensitivity, onLockChange, onLockError, onInteract, onMenu, onMap };
 
   // Tạm dừng: thả hết.
   useEffect(() => {
@@ -76,6 +78,11 @@ export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockCh
       if (!action) return;
       if (action === 'menu') {
         if (down && !e.repeat) live.current.onMenu();
+        e.preventDefault();
+        return;
+      }
+      if (action === 'map') {
+        if (down && !e.repeat) live.current.onMap?.();
         e.preventDefault();
         return;
       }

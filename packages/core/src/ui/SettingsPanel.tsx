@@ -122,7 +122,7 @@ export function MouseSensitivityRow({ value, onChange }: { value: number; onChan
   );
 }
 
-/** Bảng cài đặt "Giảm chuyển động", "Âm thanh", "Chữ to", "Chất lượng đồ họa" và "Độ nhạy chuột"; dùng ở các trang sau. */
+/** Bảng cài đặt "Giảm chuyển động", "Âm thanh", "Chữ to", "Bản đồ xoay theo hướng nhìn", "Chất lượng đồ họa" và "Độ nhạy chuột"; dùng ở các trang sau. */
 export function SettingsPanel({ className = '' }: { className?: string }) {
   const { settings, update } = useSettings();
   return (
@@ -146,6 +146,7 @@ export function SettingsPanel({ className = '' }: { className?: string }) {
         checked={settings.largeText}
         onChange={(v) => update({ largeText: v })}
       />
+      <SwitchRow label={ui.caiDat.banDoXoay} hint={ui.caiDat.banDoXoayGhiChu} checked={settings.rotateMap} onChange={(v) => update({ rotateMap: v })} />
       <QualityRow value={settings.quality} onChange={(v) => update({ quality: v })} />
       <MouseSensitivityRow value={settings.mouseSensitivity} onChange={(v) => update({ mouseSensitivity: v })} />
     </Panel>
