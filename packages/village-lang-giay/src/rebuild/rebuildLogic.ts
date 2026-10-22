@@ -387,10 +387,10 @@ export function scoreParts(s: Pick<RebuildState, 'parts'>): ScorePartRow[] {
 // Vòng 3: giữ sổ 90 giây (bước X2)
 //
 // Chuỗi 6 trang đúng. {phanDien} liên tục chạy vào tráo một trang thật thành trang giả (trang thật bị ném ra bàn, kèm 1 trang mồi); khoảng cách giữa hai lần tráo giảm dần
-// từ 9 xuống 4 giây. Trang giả GIỮ NGUYÊN mã trang và mã trang trước của trang thật (nên các mối nối vẫn khớp, không lộ ô nào bị tráo) nhưng đổi nội dung, mà mã trang
+// từ 9 xuống 6 giây. Trang giả GIỮ NGUYÊN mã trang và mã trang trước của trang thật (nên các mối nối vẫn khớp, không lộ ô nào bị tráo) nhưng đổi nội dung, mà mã trang
 // là hàm một-một của nội dung khi đã biết mã trước, nên trang giả luôn sai công thức. Học sinh sửa một ô = kéo trang giả vào rổ + kéo đúng trang thật vào ô trống đó.
 
-/** Khoảng cách giữa hai lần tráo tại thời điểm `t` (giây): 9 ở giây 0, giảm tuyến tính tới 5 ở hết vòng, không ra ngoài [5, 9]. */
+/** Khoảng cách giữa hai lần tráo tại thời điểm `t` (giây): 9 ở giây 0, giảm tuyến tính tới 6 ở hết vòng, không ra ngoài [6, 9]. */
 export function swapIntervalAt(t: number): number {
   const k = Math.min(1, Math.max(0, t / KEEP.seconds));
   return KEEP.intervalStart + (KEEP.intervalEnd - KEEP.intervalStart) * k;

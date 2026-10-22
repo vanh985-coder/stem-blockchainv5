@@ -21,6 +21,8 @@ import { MarketProps } from '../cho/MarketProcedural';
 import { ModelInstances } from '../cho/ModelInstances';
 import { MARKET_MODELS, PLAYER_START, type GateId, type Placement } from '../cho/marketLayout';
 import { GroundArrow } from './GroundArrow';
+import { ScatterProps } from '../village/ScatterProps';
+import { ScrollTargetPicker } from './ScrollTargetPicker';
 import { Signposts } from './Signposts';
 import { VillageFar } from './VillageFar';
 import { VillageZone } from './VillageZone';
@@ -43,6 +45,8 @@ export interface WorldSceneProps {
   level: QualityLevel;
   /** Đường dẫn ảnh đất (manifest); null thì dùng màu thay thế */
   dirtUrl: string | null;
+  /** Đường dẫn ảnh gạch cho đường gạch trong làng (manifest); null thì dùng màu thay thế */
+  brickUrl?: string | null;
   /** false ("Giảm chuyển động") thì nước sông không trôi, mũi tên không nhấp nhô */
   animate: boolean;
   /** Góc nhìn cố định để chụp ảnh hay kiểm tra (dev): "top" từ trên cao toàn thế giới, "oblique" chếch xuống, "free" do window.__freeCam đặt; bỏ trống thì camera bám theo người chơi */
@@ -78,6 +82,11 @@ export interface WorldSceneProps {
   onNearGate: (gate: GateId | null) => void;
   /** Vùng làng đã dựng xong (từng phần dựng dần) */
   onZoneReady: (village: VillageId) => void;
+  /** Mặt nạ bit các thẻ "Em có biết?" đã nhặt của từng làng (bước X3); thẻ chưa nhặt hiện cuộn giấy và cột sáng */
+  knowMasks: Readonly<Record<VillageId, number>>;
+  /** Làng người chơi đang ở trong (đã qua cổng) và báo chỉ số thẻ chưa nhặt gần nhất của làng đó (−1: không có) */
+  inside: VillageId | null;
+  onNearestScroll: (index: number) => void;
 }
 
 /**
@@ -91,6 +100,7 @@ export function WorldScene({
   paused,
   level,
   dirtUrl,
+  brickUrl = null,
   animate,
   overview,
   debugColliders = false,
@@ -113,6 +123,9 @@ export function WorldScene({
   onNearGate,
   onZoneReady,
   mission,
+  knowMasks,
+  inside,
+  onNearestScroll,
 }: WorldSceneProps) {
   if (PROBE) Object.assign(window, { __world: world, __loadedZones: loaded });
   const market = world.market;
@@ -158,7 +171,7 @@ export function WorldScene({
       freeCamera={!!overview}
     >
       {overview && <OverviewCamera kind={overview} />}
-      <WorldTerrain world={world} dirtUrl={dirtUrl} animate={animate} />
+      <WorldTerrain world={world} dirtUrl={dirtUrl} brickUrl={brickUrl} animate={animate} />
       {byModel.map(({ id, items }) => (items.length > 0 ? <ModelInstances key={id} id={id} items={items} level={level} /> : null))}
       {gateItems.map(({ id, village, items }) => {
         // cổng của làng chưa chuẩn bị xong chỉ vẽ bản xa: không tải bản chính và bản vừa (5 MB cho 3 cổng) cho tới khi người chơi tới gần
@@ -167,6 +180,7 @@ export function WorldScene({
       })}
       <MarketProps layout={market} />
       <VillageFar villages={world.villages} level={level} loaded={loaded} />
+      <ScatterProps scatter={world.wild} level={level} />
       {world.villages.map((v) => (prewarm[v.id] ? <ZonePrewarm key={`${v.id}|${level}`} village={v} level={level} onDone={onPrewarmDone} /> : null))}
       {loadedVillages.map((v) => (
         <VillageZone
@@ -179,6 +193,8 @@ export function WorldScene({
           guideTalking={talkingGuide === v.id}
           talkAt={talkAt}
           villagerColliders={zoneVillagers.get(v.id) ?? []}
+          collected={knowMasks[v.id] ?? 0}
+          animate={animate}
           prewarmed={prewarmed.has(v.id)}
           onReady={onZoneReady}
         />
@@ -195,6 +211,7 @@ export function WorldScene({
       <Signposts signposts={world.signposts} />
       <GroundArrow graph={world.graph} target={arrowTarget} animate={animate} />
       <WorldTracker villages={world.villages} mission={mission} onZones={onZones} onPrewarm={setPrewarm} onInside={onInside} onNearGate={onNearGate} />
+      <ScrollTargetPicker scrolls={inside ? world.villages.find((v) => v.id === inside)?.layout.scrolls : undefined} collected={inside ? (knowMasks[inside] ?? 0) : 0} onChange={onNearestScroll} />
       {debugColliders && <ColliderDebug colliders={colliders} dynamic={dynamicColliders} />}
       <StatsProbe />
       {/* con cuối: nạp trước mọi bậc model của chợ và cổng lên GPU lúc còn màn hình tải (đổi mức chất lượng thì dựng lại) */}

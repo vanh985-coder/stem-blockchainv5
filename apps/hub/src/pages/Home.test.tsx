@@ -51,6 +51,8 @@ const progressOf = (goldenPages: number): ProgressState => ({
   markGoldenSeen: () => {},
   markGateOpenSeen: () => {},
   markKnowSeen: () => {},
+  markKnowCard: () => {},
+  markAllKnowCards: () => {},
   markGuideSeen: () => {},
   markStoryRead: () => {},
 });

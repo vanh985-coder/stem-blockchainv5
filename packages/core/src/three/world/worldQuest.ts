@@ -7,6 +7,7 @@ import { VILLAGE_ORDER } from '../../content/levels';
 import type { VillageId } from '../../village';
 
 import { clampPages, questGate } from '../cho/marketQuest';
+import { scrollNodeId } from '../village/scrollTargets';
 import { boardNodeId, gateNodeId } from './worldLayout';
 
 /**
@@ -31,10 +32,13 @@ export interface TargetInput {
   nextBoard: number | null;
   /** Số Trang Sổ Vàng dùng cho nhiệm vụ (đã qua `effectivePages`) */
   pages: number;
+  /** Chỉ số thẻ "Em có biết?" chưa nhặt gần nhất trong làng đang ở (bước X3), hoặc null/bỏ trống nếu không còn thẻ phải tìm (hoặc không phải bắt tìm) */
+  scroll?: number | null;
 }
 
 /** Id nút đích của mũi tên (xem `buildWorldGraph`), hoặc null khi không có đích (đủ 4 trang, hội làng). */
 export function targetNodeId(i: TargetInput): string | null {
+  if (i.inVillage && i.scroll !== undefined && i.scroll !== null && i.scroll >= 0) return scrollNodeId(i.inVillage, i.scroll);
   if (i.inVillage && i.nextBoard !== null) return boardNodeId(i.nextBoard);
   const gate = questGate(i.pages);
   return gate ? gateNodeId(gate) : null;

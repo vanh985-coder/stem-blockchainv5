@@ -2,6 +2,7 @@ import { LEVELS, type LevelDef } from '../content/levels';
 import { emptyProgress, type Progress } from './types';
 import { guideDataFromMask, guideMask } from './guideFlags';
 import { storyDataFromMask, storyMask } from './storyFlags';
+import { knowCardsDataFromMask, knowCardsMask } from './knowCards';
 import { gateDataFromMask, gateMask, goldenDataFromMask, goldenMask, introDataFromMask, introMask, knowDataFromMask, knowMask, sceneDataFromMask, sceneMask } from './villageIntro';
 
 /**
@@ -34,6 +35,8 @@ interface CompactShape {
   hd?: number;
   /** 1 nếu đã đọc cốt truyện (bước X1, xem storyFlags.ts) */
   st?: number;
+  /** Thẻ "Em có biết?" đã nhặt: một số mỗi làng theo thứ tự làng, mỗi thẻ một bit (bước X3, xem knowCards.ts) */
+  kc?: number[];
 }
 
 const b = (v: boolean) => (v ? 1 : 0);
@@ -59,7 +62,8 @@ function toShape(p: Progress, levels: readonly LevelDef[]): CompactShape {
   const ks = knowMask(p.game.data);
   const hd = guideMask(p.game.data);
   const st = storyMask(p.game.data);
-  return { v: COMPACT_VERSION, lv, gp: p.game.goldenPages, c: p.game.coins, u, ...(vi ? { vi } : {}), ...(vs ? { vs } : {}), ...(gs ? { gs } : {}), ...(go ? { go } : {}), ...(ks ? { ks } : {}), ...(hd ? { hd } : {}), ...(st ? { st } : {}) };
+  const kc = knowCardsMask(p.game.data);
+  return { v: COMPACT_VERSION, lv, gp: p.game.goldenPages, c: p.game.coins, u, ...(vi ? { vi } : {}), ...(vs ? { vs } : {}), ...(gs ? { gs } : {}), ...(go ? { go } : {}), ...(ks ? { ks } : {}), ...(hd ? { hd } : {}), ...(st ? { st } : {}), ...(kc ? { kc } : {}) };
 }
 
 function fromShape(s: CompactShape, levels: readonly LevelDef[]): Progress {
@@ -76,7 +80,7 @@ function fromShape(s: CompactShape, levels: readonly LevelDef[]): Progress {
         ? { played, completed, stars: { de: int(arr[2], 3), tb: int(arr[3], 3), kho: int(arr[4], 3) }, bestScore: 0, updatedAt: u }
         : { played, completed, stars: { game: int(arr[2], 3) }, bestScore: int(arr[3]), updatedAt: u };
   }
-  p.game = { goldenPages: int(s.gp, 4), coins: int(s.c), data: { ...introDataFromMask(s.vi), ...sceneDataFromMask(s.vs), ...goldenDataFromMask(s.gs), ...gateDataFromMask(s.go), ...knowDataFromMask(s.ks), ...guideDataFromMask(s.hd), ...storyDataFromMask(s.st) }, updatedAt: u };
+  p.game = { goldenPages: int(s.gp, 4), coins: int(s.c), data: { ...introDataFromMask(s.vi), ...sceneDataFromMask(s.vs), ...goldenDataFromMask(s.gs), ...gateDataFromMask(s.go), ...knowDataFromMask(s.ks), ...guideDataFromMask(s.hd), ...storyDataFromMask(s.st), ...knowCardsDataFromMask(s.kc) }, updatedAt: u };
   return p;
 }
 
@@ -98,7 +102,7 @@ function parseShape(raw: string | null | undefined): CompactShape | null {
     if (!s || typeof s !== 'object') return null;
     const o = s as Partial<CompactShape>;
     if (o.v !== COMPACT_VERSION || !o.lv || typeof o.lv !== 'object' || Array.isArray(o.lv)) return null;
-    return { v: o.v, lv: o.lv, gp: int(o.gp), c: int(o.c), u: int(o.u), o: typeof o.o === 'string' ? o.o : undefined, vi: int(o.vi, 15), vs: int(o.vs, 15), gs: int(o.gs, 15), go: int(o.go, 15), ks: int(o.ks, 15), hd: int(o.hd, 0x7fffffff), st: int(o.st, 1) };
+    return { v: o.v, lv: o.lv, gp: int(o.gp), c: int(o.c), u: int(o.u), o: typeof o.o === 'string' ? o.o : undefined, vi: int(o.vi, 15), vs: int(o.vs, 15), gs: int(o.gs, 15), go: int(o.go, 15), ks: int(o.ks, 15), hd: int(o.hd, 0x7fffffff), st: int(o.st, 1), kc: Array.isArray(o.kc) ? o.kc.slice(0, 8).map((x) => int(x, 0xffff)) : undefined };
   } catch {
     return null;
   }

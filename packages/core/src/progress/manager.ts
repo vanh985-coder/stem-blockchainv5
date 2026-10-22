@@ -5,6 +5,7 @@ import { recordLevelResult, unlockOf, withGoldenPages, type ProgressOptions } fr
 import { emptyProgress, hasProgress, type GameState, type LevelProgress, type LevelResult, type Progress } from './types';
 import type { UnlockResult } from './unlock';
 import { hasSeenGuide, withGuideSeen } from './guideFlags';
+import { fullKnowMask, hasKnowCard, knowCardMaskOf, withAllKnowCards, withKnowCard } from './knowCards';
 import { hasReadStory, withStoryRead } from './storyFlags';
 import { hasSeenGateOpen, hasSeenGolden, hasSeenIntro, hasSeenKnow, hasSeenScene, withGateOpenSeen, withGoldenSeen, withIntroSeen, withKnowSeen, withSceneSeen } from './villageIntro';
 import type { VillageId } from '../village';
@@ -350,6 +351,27 @@ export class ProgressManager {
   markKnowSeen(village: VillageId): void {
     if (this.mode === 'loading' || hasSeenKnow(this.progress.game.data, village)) return;
     this.progress = { ...this.progress, game: { ...this.progress.game, data: withKnowSeen(this.progress.game.data, village), updatedAt: this.now() } };
+    this.persistLocal();
+    this.emit();
+    this.scheduleFlush();
+  }
+
+  /** Em đã nhặt thẻ "Em có biết?" số `index` (từ 0) của làng (bước X3): ghi cờ (đăng nhập thì lên server, chơi thử thì vào cookie). */
+  markKnowCard(village: VillageId, index: number): void {
+    if (this.mode === 'loading' || hasKnowCard(knowCardMaskOf(this.progress.game.data, village), index)) return;
+    const data = withKnowCard(this.progress.game.data, village, index);
+    if (data === this.progress.game.data) return;
+    this.progress = { ...this.progress, game: { ...this.progress.game, data, updatedAt: this.now() } };
+    this.persistLocal();
+    this.emit();
+    this.scheduleFlush();
+  }
+
+  /** Em đã đọc đủ `total` thẻ của làng ở khung giới thiệu trên /ban-do (bước X3): ghi cờ như `markKnowCard`. */
+  markAllKnowCards(village: VillageId, total: number): void {
+    const full = fullKnowMask(total);
+    if (this.mode === 'loading' || full === 0 || (knowCardMaskOf(this.progress.game.data, village) & full) === full) return;
+    this.progress = { ...this.progress, game: { ...this.progress.game, data: withAllKnowCards(this.progress.game.data, village, total), updatedAt: this.now() } };
     this.persistLocal();
     this.emit();
     this.scheduleFlush();

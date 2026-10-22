@@ -5,17 +5,12 @@ import {
   ExtrudeGeometry,
   Shape,
   CylinderGeometry,
-  Color,
   IcosahedronGeometry,
-  InstancedMesh,
-  Matrix4,
   MeshStandardMaterial,
-  Quaternion,
   RepeatWrapping,
   SRGBColorSpace,
   SphereGeometry,
   TextureLoader,
-  Vector3,
   type BufferGeometry,
   type Material,
   type Texture,
@@ -23,43 +18,11 @@ import {
 import { createMulberry32 } from '../../lib/rng';
 import { FENCE_POST_HEIGHT, FENCE_RAIL_LENGTH, fenceLayout, type FenceLayout, DECK_START_X, DECK_TOP, DOCK_END_X, DOCK_HALF_WIDTH, PLAZA_RADIUS, RAMP_START_X, RIVER_X, ROAD_WIDTH, WORLD_RADIUS, type MarketLayout, type PropPlacement } from './marketLayout';
 import { createBoatCanopy, createBoatHull, createCraftProp, createHayStack, createJar } from './marketGeometry';
+import { buildInstanced, type Item } from './instancing';
+import { ChunkedInstances } from '../village/ChunkedInstances';
 import { createEdgeAlphaTexture, createGrassTexture, createPaddyTexture, createPlankTexture, createWaterTexture } from './marketTextures';
 
-/** Một bản nhân bản tĩnh: vị trí, góc xoay, tỉ lệ (đều hoặc từng trục), nhân màu. */
-export interface Item {
-  x: number;
-  y?: number;
-  z: number;
-  yaw?: number;
-  scale?: number;
-  sx?: number;
-  sy?: number;
-  sz?: number;
-  color?: readonly [number, number, number];
-}
-
-const tmp = { m: new Matrix4(), q: new Quaternion(), p: new Vector3(), s: new Vector3(), c: new Color(), axisY: new Vector3(0, 1, 0) };
-
-/** Dựng InstancedMesh từ danh sách bản (chạy một lần, ngoài useFrame). Dùng chung một geometry và một material cho mọi bản. */
-function buildInstanced(geometry: BufferGeometry, material: Material, items: readonly Item[], cast: boolean, receive: boolean): InstancedMesh {
-  const mesh = new InstancedMesh(geometry, material, Math.max(1, items.length));
-  mesh.count = items.length;
-  items.forEach((it, i) => {
-    tmp.p.set(it.x, it.y ?? 0, it.z);
-    tmp.q.setFromAxisAngle(tmp.axisY, it.yaw ?? 0);
-    const k = it.scale ?? 1;
-    tmp.s.set(it.sx ?? k, it.sy ?? k, it.sz ?? k);
-    tmp.m.compose(tmp.p, tmp.q, tmp.s);
-    mesh.setMatrixAt(i, tmp.m);
-    if (it.color) mesh.setColorAt(i, tmp.c.setRGB(it.color[0], it.color[1], it.color[2]));
-  });
-  mesh.instanceMatrix.needsUpdate = true;
-  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  mesh.castShadow = cast;
-  mesh.receiveShadow = receive;
-  mesh.frustumCulled = false;
-  return mesh;
-}
+export { buildInstanced, type Item };
 
 export function Instances({ geometry, material, items, cast = false, receive = false }: { geometry: BufferGeometry; material: Material; items: readonly Item[]; cast?: boolean; receive?: boolean }) {
   const mesh = useMemo(() => buildInstanced(geometry, material, items, cast, receive), [geometry, material, items, cast, receive]);
@@ -296,8 +259,11 @@ export function Fence({ fence }: { fence?: FenceLayout } = {}) {
   );
 }
 
-/** Dãy đồi xa quanh chân trời (khối cầu dẹt, sương làm nhạt dần). */
-export function Hills() {
+/**
+ * Dãy đồi xa quanh chân trời (khối cầu dẹt, sương làm nhạt dần): 9 đồi cách tâm chợ từ `minDistance` thêm tới `spread`. Chợ riêng lẻ dùng mặc định (210 đến 250); thế giới mở từ bước X3 đẩy ra ngoài biên đi lại
+ * (làng bán kính 125 chiếm tới 322 quanh chợ) và làm to hơn cho còn thấy qua sương.
+ */
+export function Hills({ minDistance = 210, spread = 40, size = 40, sizeVar = 40, height = 12, heightVar = 10 }: { minDistance?: number; spread?: number; size?: number; sizeVar?: number; height?: number; heightVar?: number } = {}) {
   const geo = useMemo(() => new SphereGeometry(1, 20, 10), []);
   const mat = useMemo(() => new MeshStandardMaterial({ color: '#6FA66A', roughness: 1 }), []);
   useDispose(useMemo(() => [geo, mat], [geo, mat]));
@@ -306,12 +272,12 @@ export function Hills() {
     const out: Item[] = [];
     for (let i = 0; i < 9; i++) {
       const a = (i / 9) * Math.PI * 2 + rng() * 0.3;
-      const d = 210 + rng() * 40;
-      const s = 40 + rng() * 40;
-      out.push({ x: Math.cos(a) * d, z: Math.sin(a) * d, y: -4, sx: s * 1.4, sy: 12 + rng() * 10, sz: s, yaw: rng() * 3 });
+      const d = minDistance + rng() * spread;
+      const s = size + rng() * sizeVar;
+      out.push({ x: Math.cos(a) * d, z: Math.sin(a) * d, y: -4, sx: s * 1.4, sy: height + rng() * heightVar, sz: s, yaw: rng() * 3 });
     }
     return out;
-  }, []);
+  }, [minDistance, spread, size, sizeVar, height, heightVar]);
   return <Instances geometry={geo} material={mat} items={items} />;
 }
 
@@ -347,7 +313,13 @@ export function craftMaterial(kind: (typeof CRAFT_KINDS)[number]): MeshStandardM
 }
 export { CRAFT_KINDS };
 
-export function MarketProps({ layout }: { layout: Pick<MarketLayout, 'props' | 'seed'> }) {
+/** Chia mảnh và chỉ vẽ phần trong tầm (làng lớn có hàng trăm đồ nhỏ): ô lưới và tầm vẽ xa nhất. Bỏ trống thì vẽ hết (chợ). */
+export interface PropsCull {
+  cell: number;
+  maxDistance: number;
+}
+
+export function MarketProps({ layout, cull }: { layout: Pick<MarketLayout, 'props' | 'seed'>; cull?: PropsCull }) {
   const crafts = useMemo(() => CRAFT_KINDS.map((kind) => ({ kind, geo: createCraftProp(kind)!, mat: craftMaterial(kind) })), []);
   useDispose(useMemo(() => crafts.flatMap((c) => [c.geo, c.mat]), [crafts]));
   const craftItems = useMemo(() => crafts.map((c) => layout.props.filter((p) => p.kind === c.kind).map((p) => toItem(p))), [crafts, layout]);
@@ -384,13 +356,19 @@ export function MarketProps({ layout }: { layout: Pick<MarketLayout, 'props' | '
     return { hay, jar, bush, bloom };
   }, [layout]);
 
+  const draw = (key: string, geometry: BufferGeometry, material: Material, list: readonly Item[], radius: number, cast: boolean, receive: boolean) =>
+    cull ? (
+      <ChunkedInstances key={key} geometry={geometry} material={material} items={list} cell={cull.cell} maxDistance={cull.maxDistance} itemRadius={radius} cast={cast} receive={receive} />
+    ) : (
+      <Instances key={key} geometry={geometry} material={material} items={list} cast={cast} receive={receive} />
+    );
   return (
     <>
-      <Instances geometry={res.geos.hay} material={res.mats.hay} items={items.hay} cast receive />
-      <Instances geometry={res.geos.jar} material={res.mats.jar} items={items.jar} cast receive />
-      <Instances geometry={res.geos.bush} material={res.mats.bush} items={items.bush} cast receive />
-      <Instances geometry={res.geos.bloom} material={res.mats.bloom} items={items.bloom} />
-      {crafts.map((c, i) => (craftItems[i].length > 0 ? <Instances key={c.kind} geometry={c.geo} material={c.mat} items={craftItems[i]} cast={c.kind !== 'chan'} receive /> : null))}
+      {draw('hay', res.geos.hay, res.mats.hay, items.hay, 1.3, true, true)}
+      {draw('jar', res.geos.jar, res.mats.jar, items.jar, 0.7, true, true)}
+      {draw('bush', res.geos.bush, res.mats.bush, items.bush, 1, true, true)}
+      {draw('bloom', res.geos.bloom, res.mats.bloom, items.bloom, 1, false, false)}
+      {crafts.map((c, i) => (craftItems[i].length > 0 ? draw(c.kind, c.geo, c.mat, craftItems[i], c.kind === 'dinh' ? 5 : 2.2, c.kind !== 'chan', true) : null))}
     </>
   );
 }

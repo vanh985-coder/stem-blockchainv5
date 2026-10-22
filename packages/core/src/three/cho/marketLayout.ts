@@ -417,6 +417,8 @@ export function thinEvenly<T>(items: readonly T[], keep: number): T[] {
  */
 export interface MarketOptions {
   world?: boolean;
+  /** Không rải đá bờ sông ở chợ (thế giới mở từ bước X3: sông uốn nhánh nên `worldLayout` tự rải đá dọc theo đường tim sông) */
+  noBankRocks?: boolean;
 }
 
 /** Vòng đường đi quanh cây đa trong sân chợ (thế giới mở): lều và nhà tránh dải này, mũi tên chỉ đường đi vòng theo đó giữa 4 lối ra. */
@@ -579,7 +581,7 @@ export function generateMarket(seed = 20260101, density: MarketDensity = FULL_DE
 
   // Đá bờ sông (vật cản thật, không đi xuyên được)
   const rockRng = createMulberry32(seed ^ 0x2545f491);
-  for (let i = 0; i < 24; i++) {
+  for (let i = 0; i < 24 && options.noBankRocks !== true; i++) {
     const z = -60 + (i / 23) * 120;
     if (Math.abs(z) < DOCK_HALF_WIDTH + 2.5) continue;
     const scale = 0.6 + rockRng() * 0.9;

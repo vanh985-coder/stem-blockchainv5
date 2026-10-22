@@ -1,9 +1,13 @@
 import { useThree } from '@react-three/fiber';
-import type { BufferGeometry, MeshStandardMaterial } from 'three';
+import type { BufferGeometry, Material, MeshStandardMaterial } from 'three';
 import { useEffect, useRef } from 'react';
 import { CHARACTERS } from '../../content/characters';
 import { CRAFT_KINDS, craftMaterial } from '../cho/MarketProcedural';
 import { createCraftProp } from '../cho/marketGeometry';
+import { createScrollResources } from '../village/KnowScrolls';
+import { scatterMaterial } from '../village/ScatterProps';
+import { SCATTER_KINDS } from '../village/scatter';
+import { createScatterGeometry } from '../village/scatterGeometry';
 import { createPartsPrewarm, instanceModelIds, type PartsPrewarm } from '../cho/ModelInstances';
 import { lodId } from '../modelIds';
 import { preloadModel, releaseModel, retainModel, type ModelData } from '../modelLoader';
@@ -55,6 +59,9 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
     for (const id of allIds) retainModel(id);
     const tasks: PartsPrewarm[] = [];
     const crafts: { kind: string; geometry: BufferGeometry; material: MeshStandardMaterial }[] = [];
+    /** Đồ rải dựng bằng code và thẻ "Em có biết?" (bước X3): vật liệu mẫu để biên dịch trước shader, giữ tới khi bỏ chuẩn bị */
+    const extras: { geometry: BufferGeometry; material: Material }[] = [];
+    let scrollRes: ReturnType<typeof createScrollResources> | null = null;
     let raf = 0;
 
     const mark = (phase: string) => {
@@ -98,7 +105,14 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
       const kinds = new Set(village.layout.props.map((p) => p.kind));
       // giữ vật liệu mẫu tới khi bỏ chuẩn bị: vật liệu bị giải phóng thì three bỏ luôn chương trình shader vừa biên dịch (hết nơi dùng), và vùng dựng sau phải biên dịch lại
       for (const k of CRAFT_KINDS) if (kinds.has(k)) crafts.push({ kind: k, geometry: createCraftProp(k)!, material: craftMaterial(k) as MeshStandardMaterial });
-      await compileAhead(gl, camera, scene, [...crafts, ...materialsOf([...loaded.values()].map((d) => d.scene))], isCancelled);
+      // đồ rải của làng lớn: mỗi loại có mặt trong làng một vật liệu (màu theo đỉnh) là một chương trình shader mới; thẻ Em có biết: cuộn phát sáng, cột sáng và vầng sáng (vật liệu cộng sáng)
+      const scat = new Set((village.layout.scatter ?? []).map((p) => p.kind));
+      for (const k of SCATTER_KINDS) if (scat.has(k)) extras.push({ geometry: createScatterGeometry(k), material: scatterMaterial(k) });
+      if ((village.layout.scrolls ?? []).length > 0) {
+        scrollRes = createScrollResources();
+        extras.push({ geometry: scrollRes.scroll, material: scrollRes.scrollMat }, { geometry: scrollRes.beam, material: scrollRes.beamMat }, { geometry: scrollRes.disc, material: scrollRes.discMat });
+      }
+      await compileAhead(gl, camera, scene, [...crafts, ...extras, ...materialsOf([...loaded.values()].map((d) => d.scene))], isCancelled);
       if (cancelled) return;
       mark('compiled');
       // texture: người dẫn trước (cần cho cảnh đầu tiên), rồi các model của làng
@@ -123,6 +137,11 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
         c.geometry.dispose();
         c.material.dispose();
       }
+      for (const e of extras) {
+        e.geometry.dispose();
+        e.material.dispose();
+      }
+      void scrollRes;
       if (guide) unmarkModelWarm(guide);
       for (const id of allIds) releaseModel(id);
     };

@@ -1,4 +1,4 @@
-import { AssetImage, Button, LEVELS, fmt, levelById, levelUrl, URLS, ui, type LevelDef, type LevelState, type LevelUnlock, type Progress } from '@so-chung/core';
+import { AssetImage, Button, LEVELS, fmt, knowScrollUi, levelById, levelUrl, URLS, ui, type LevelDef, type LevelState, type LevelUnlock, type Progress } from '@so-chung/core';
 
 /** Chữ và hình cho từng trạng thái: phân biệt bằng hình và chữ, không chỉ bằng màu. */
 export const STATE_TEXT: Record<LevelState, string> = {
@@ -45,6 +45,7 @@ export function VillageDetails({
   goldenEarned,
   onClose,
   onReplayIntro,
+  know,
 }: {
   villageId: LevelDef['lang'];
   unlockLevels: LevelUnlock[];
@@ -53,7 +54,10 @@ export function VillageDetails({
   onClose?: () => void;
   /** Mở lại lời giới thiệu làng */
   onReplayIntro?: () => void;
+  /** Thẻ "Em có biết?" của làng (bước X3): chưa đọc đủ thì chưa vào được bài; `onRead` mở các thẻ để đọc */
+  know?: { got: number; total: number; onRead: () => void };
 }) {
+  const knowLocked = !!know && know.total > 0 && know.got < know.total;
   const levels = LEVELS.filter((l) => l.lang === villageId);
   return (
     <div className="space-y-3">
@@ -78,12 +82,20 @@ export function VillageDetails({
           {ui.banDo.xemLaiGioiThieu}
         </Button>
       )}
+      {knowLocked && know && (
+        <div className="space-y-2 rounded-2xl border-2 border-vang bg-vang/15 p-3" data-testid="can-doc-the">
+          <p className="text-sm font-semibold">{fmt(knowScrollUi.banDoCan, { n: know.got, tong: know.total })}</p>
+          <Button size="sm" onClick={know.onRead}>
+            {knowScrollUi.banDoDoc}
+          </Button>
+        </div>
+      )}
       <ul className="space-y-2">
         {levels.map((def) => {
           const u = unlockLevels.find((x) => x.id === def.id) ?? { id: def.id, state: 'locked' as const };
           const blocker = u.lockedBy ? levelById(u.lockedBy) : undefined;
           const stars = starsOf(def, progress);
-          const canEnter = u.state === 'open' || u.state === 'done';
+          const canEnter = (u.state === 'open' || u.state === 'done') && !knowLocked;
           return (
             <li key={def.id} className="space-y-1 rounded-2xl border-2 border-nau-go/60 bg-white/50 p-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-nau-go-dam">

@@ -1,12 +1,13 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
-import { BoxGeometry, CylinderGeometry, ExtrudeGeometry, IcosahedronGeometry, MeshStandardMaterial, Shape, type Texture } from 'three';
+import { BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, ExtrudeGeometry, IcosahedronGeometry, MeshStandardMaterial, Shape, type Texture } from 'three';
 import { Fence, Hills, Instances, useDispose, useImageTexture, type Item } from '../cho/MarketProcedural';
 import { createBoatCanopy, createBoatHull } from '../cho/marketGeometry';
 import { createEdgeAlphaTexture, createGrassTexture, createPaddyTexture, createPlankTexture, createWaterTexture } from '../cho/marketTextures';
 import { DECK_START_X, DECK_TOP, PLAZA_RADIUS, RAMP_START_X, WORLD_RADIUS } from '../cho/marketLayout';
 import { POND_BANK, type VillageField, type VillageLayout } from '../village/villageLayout';
-import { BRIDGE_DECK_END_X, BRIDGE_HALF_WIDTH, BRIDGE_RAMP_END_X, RIVER_EAST_X, RIVER_HALF_LENGTH, RIVER_WEST_X, type WorldLayout, type WorldRoad } from './worldLayout';
+import { RIVER_TRUNK_HALF, ribbonOf, riverBranch, type RiverPoint } from './river';
+import { BRIDGE_DECK_END_X, BRIDGE_HALF_WIDTH, BRIDGE_RAMP_END_X, RIVER_EAST_X, RIVER_WEST_X, type WorldLayout, type WorldRoad } from './worldLayout';
 
 /** Nhân màu cho ảnh đất (ảnh gốc rất vàng): dịu bớt cho hợp cỏ và nhà. */
 const DIRT_TINT = '#DCC9A2';
@@ -37,22 +38,40 @@ function useRepeated(base: Texture | null, rx: number, ry: number): Texture | nu
   return tex;
 }
 
-function RoadStrip({ road, dirt, lateral }: { road: WorldRoad; dirt: Texture | null; lateral: Texture }) {
+/** Đường gạch (đại lộ, lối lên đình; bước X3): ô gạch vuông cạnh 3 đơn vị, hơi đỏ hơn đất. */
+const BRICK_TILE = 3;
+const BRICK_TINT = '#E3CDBB';
+
+function RoadStrip({ road, dirt, lateral, brick = null }: { road: WorldRoad & { kind?: 'dat' | 'gach' }; dirt: Texture | null; lateral: Texture; brick?: Texture | null }) {
   const len = Math.hypot(road.x1 - road.x0, road.z1 - road.z0);
   const yaw = Math.atan2(road.x1 - road.x0, road.z1 - road.z0);
-  const map = useRepeated(dirt, road.width / 3, len * 0.7);
+  const isBrick = road.kind === 'gach';
+  const map = useRepeated(isBrick ? brick : dirt, isBrick ? road.width / BRICK_TILE : road.width / 3, isBrick ? len / BRICK_TILE : len * 0.7);
   return (
     <group position={[(road.x0 + road.x1) / 2, ROAD_Y, (road.z0 + road.z1) / 2]} rotation-y={yaw}>
       <mesh rotation-x={-Math.PI / 2} receiveShadow>
         <planeGeometry args={[road.width, len]} />
-        <meshStandardMaterial key={map ? 'a' : 'b'} map={map ?? undefined} color={map ? DIRT_TINT : '#C9A064'} alphaMap={lateral} transparent depthWrite={false} roughness={1} />
+        <meshStandardMaterial key={map ? 'a' : 'b'} map={map ?? undefined} color={map ? (isBrick ? BRICK_TINT : DIRT_TINT) : isBrick ? '#B98466' : '#C9A064'} alphaMap={lateral} transparent depthWrite={false} roughness={1} />
       </mesh>
     </group>
   );
 }
 
+/** Sân đất nện: hình tròn mép mờ; ô đất lặp theo cỡ sân (mỗi ô ${YARD_TILE} đơn vị) để sân rộng không bị kéo giãn thành vằn lớn. */
+const YARD_TILE = 6;
+function YardDisc({ yard, y, dirt, radial }: { yard: { x: number; z: number; r: number }; y: number; dirt: Texture | null; radial: Texture }) {
+  const rep = ((yard.r + 1.5) * 2) / YARD_TILE;
+  const map = useRepeated(dirt, rep, rep);
+  return (
+    <mesh position={[yard.x, y, yard.z]} rotation-x={-Math.PI / 2} receiveShadow>
+      <circleGeometry args={[yard.r + 1.5, 40]} />
+      <meshStandardMaterial key={map ? 'a' : 'b'} map={map ?? undefined} color={map ? DIRT_TINT : '#C9A064'} alphaMap={radial} transparent depthWrite={false} roughness={1} />
+    </mesh>
+  );
+}
+
 /** Mặt đất của một làng (luôn có, rẻ: vài draw call): cỏ làng, sân đất nện mép mờ, đường đất trong làng và hàng rào tre quanh khu. Đồ vật của làng nằm ở vùng (VillageZone). */
-function VillageGround({ layout, dirt, grass: grassBase, paddy, radial, lateral }: { layout: VillageLayout; dirt: Texture | null; grass: Texture; paddy: Texture; radial: Texture; lateral: Texture }) {
+function VillageGround({ layout, dirt, brick, grass: grassBase, paddy, radial, lateral }: { layout: VillageLayout; dirt: Texture | null; brick: Texture | null; grass: Texture; paddy: Texture; radial: Texture; lateral: Texture }) {
   const cx = layout.fence?.center?.x ?? 0;
   const cz = layout.fence?.center?.z ?? 0;
   const rep = ((layout.radius + VILLAGE_GRASS_MARGIN) * 2) / GRASS_TILE;
@@ -79,13 +98,10 @@ function VillageGround({ layout, dirt, grass: grassBase, paddy, radial, lateral 
         </group>
       ))}
       {layout.yards.map((y, i) => (
-        <mesh key={`y${i}`} position={[y.x, YARD_Y + i * 0.001, y.z]} rotation-x={-Math.PI / 2} receiveShadow>
-          <circleGeometry args={[y.r + 1.5, 40]} />
-          <meshStandardMaterial key={dirt ? 'a' : 'b'} map={dirt ?? undefined} color={dirt ? DIRT_TINT : '#C9A064'} alphaMap={radial} transparent depthWrite={false} roughness={1} />
-        </mesh>
+        <YardDisc key={`y${i}`} yard={y} y={YARD_Y + i * 0.001} dirt={dirt} radial={radial} />
       ))}
       {layout.roads.map((r, i) => (
-        <RoadStrip key={`r${i}`} road={r} dirt={dirt} lateral={lateral} />
+        <RoadStrip key={`r${i}`} road={r} dirt={dirt} brick={brick} lateral={lateral} />
       ))}
       {layout.fenceLayout && <Fence fence={layout.fenceLayout} />}
     </group>
@@ -109,7 +125,20 @@ function Field({ field: q, paddy }: { field: VillageField; paddy: Texture }) {
   );
 }
 
-/** Sông phía đông (−X) giữa hai bờ, cầu gỗ cho đường sang Làng Bạc, đá hai bờ, thuyền gỗ. */
+/** Mặt lưới dải nước từ đường tim đã làm mượt (xem `ribbonOf`): nằm ngang (pháp tuyến +y), uv chạy dọc dòng chảy. */
+function ribbonGeometry(points: readonly RiverPoint[], uvLength: number, widen = 0): BufferGeometry {
+  const r = ribbonOf(widen > 0 ? points.map((p) => ({ ...p, w: p.w + widen })) : points, uvLength);
+  const g = new BufferGeometry();
+  g.setAttribute('position', new BufferAttribute(r.positions, 3));
+  g.setAttribute('uv', new BufferAttribute(r.uvs, 2));
+  const normals = new Float32Array(r.positions.length);
+  for (let i = 1; i < normals.length; i += 3) normals[i] = 1;
+  g.setAttribute('normal', new BufferAttribute(normals, 3));
+  g.setIndex(new BufferAttribute(r.indices, 1));
+  return g;
+}
+
+/** Sông phía đông (−X): đoạn thân thẳng giữa hai bờ có cầu gỗ cho đường sang Làng Bạc, hai nhánh uốn qua khe giữa các làng (xem river.ts), đá hai bờ, thuyền gỗ. */
 function River({ world, water, plank }: { world: WorldLayout; water: Texture; plank: Texture }) {
   const hull = useMemo(createBoatHull, []);
   const canopy = useMemo(createBoatCanopy, []);
@@ -151,22 +180,41 @@ function River({ world, water, plank }: { world: WorldLayout; water: Texture; pl
   }, []);
   const rocks = useMemo<Item[]>(
     () =>
-      [...world.market.props.filter((q) => q.kind === 'da'), ...world.eastRocks].map((q) => ({ x: q.x, z: q.z, y: 0.2 * q.scale, sx: q.scale * 1.3, sy: q.scale * 0.7, sz: q.scale, yaw: q.yaw, color: q.tint })),
+      world.riverRocks.map((q) => ({ x: q.x, z: q.z, y: 0.2 * q.scale, sx: q.scale * 1.3, sy: q.scale * 0.7, sz: q.scale, yaw: q.yaw, color: q.tint })),
     [world],
   );
   const waterWidth = RIVER_WEST_X - RIVER_EAST_X;
   const midX = (RIVER_WEST_X + RIVER_EAST_X) / 2;
+  const trunkLen = RIVER_TRUNK_HALF * 2;
+  const branches = useMemo(() => {
+    const out = (['ne', 'se'] as const).map((side) => {
+      const pts = riverBranch(side);
+      return { water: ribbonGeometry(pts, 13.3), bank: ribbonGeometry(pts, 13.3, 1.6) };
+    });
+    return out;
+  }, []);
+  useDispose(useMemo(() => branches.flatMap((b) => [b.water, b.bank]), [branches]));
+  const bankMat = useMemo(() => new MeshStandardMaterial({ color: '#A98652', roughness: 1 }), []);
+  useDispose(useMemo(() => [bankMat], [bankMat]));
   return (
     <group>
       <mesh rotation-x={-Math.PI / 2} position={[midX, WATER_Y, 0]}>
-        <planeGeometry args={[waterWidth, RIVER_HALF_LENGTH * 2]} />
+        <planeGeometry args={[waterWidth, trunkLen]} />
         <meshStandardMaterial map={water} roughness={0.2} metalness={0.05} />
       </mesh>
       {[RIVER_WEST_X + 0.35, RIVER_EAST_X - 0.35].map((x) => (
         <mesh key={x} position={[x, -0.02, 0]}>
-          <boxGeometry args={[1.1, 0.06, RIVER_HALF_LENGTH * 2]} />
+          <boxGeometry args={[1.1, 0.06, trunkLen]} />
           <meshStandardMaterial color="#A98652" roughness={1} />
         </mesh>
+      ))}
+      {branches.map((b, i) => (
+        <group key={i}>
+          <mesh geometry={b.bank} material={bankMat} position-y={-0.012} />
+          <mesh geometry={b.water} position-y={WATER_Y}>
+            <meshStandardMaterial map={water} roughness={0.2} metalness={0.05} />
+          </mesh>
+        </group>
       ))}
       <Instances geometry={rockGeo} material={rockMat} items={rocks} cast />
       {/* cầu: sàn đặc cao DECK_TOP (người đứng trên mặt sàn: xem worldGroundHeight), hai dốc ở hai đầu, cột hai bên */}
@@ -190,6 +238,8 @@ export interface WorldTerrainProps {
   world: WorldLayout;
   /** Đường dẫn ảnh đất (ui/textures/duong-dat) lấy từ manifest; null thì dùng màu thay thế */
   dirtUrl: string | null;
+  /** Đường dẫn ảnh gạch (ui/textures/san-gach) cho đường gạch trong làng; null thì dùng màu thay thế */
+  brickUrl?: string | null;
   /** false (Giảm chuyển động) thì nước không trôi */
   animate: boolean;
 }
@@ -198,10 +248,11 @@ export interface WorldTerrainProps {
  * Mặt đất của cả thế giới (do code dựng): ruộng lúa phủ rộng, cỏ chợ, sân chợ, 4 con đường dài ra cổng làng, sông có cầu, hàng rào chợ, đồi xa, và mặt đất của 4 làng (cỏ, sân, đường, hàng rào).
  * Tất cả rẻ (vài chục draw call) nên luôn có; đồ vật của làng thì tải theo vùng (VillageZone). Rời cảnh thì giải phóng texture.
  */
-export function WorldTerrain({ world, dirtUrl, animate }: WorldTerrainProps) {
+export function WorldTerrain({ world, dirtUrl, brickUrl = null, animate }: WorldTerrainProps) {
   const dirt = useImageTexture(dirtUrl, [(PLAZA_RADIUS * 2) / 3, (PLAZA_RADIUS * 2) / 3]);
   const roadDirt = useImageTexture(dirtUrl, [1, 1]);
-  const yardDirt = useImageTexture(dirtUrl, [8, 8]);
+  const yardDirt = useImageTexture(dirtUrl, [1, 1]);
+  const brick = useImageTexture(brickUrl, [1, 1]);
   const tex = useMemo(
     () => ({
       paddy: createPaddyTexture([1000 / 32, 1000 / 32]),
@@ -240,9 +291,9 @@ export function WorldTerrain({ world, dirtUrl, animate }: WorldTerrainProps) {
       ))}
       <River world={world} water={tex.water} plank={tex.plank} />
       <Fence />
-      <Hills />
+      <Hills minDistance={400} spread={60} size={80} sizeVar={60} height={28} heightVar={20} />
       {world.villages.map((v) => (
-        <VillageGround key={v.id} layout={v.layout} dirt={yardDirt} grass={tex.villageGrass} paddy={tex.fieldPaddy} radial={tex.radial} lateral={tex.lateral} />
+        <VillageGround key={v.id} layout={v.layout} dirt={yardDirt} brick={brick} grass={tex.villageGrass} paddy={tex.fieldPaddy} radial={tex.radial} lateral={tex.lateral} />
       ))}
     </group>
   );

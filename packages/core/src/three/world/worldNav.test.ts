@@ -214,3 +214,32 @@ function resolveCollisionsFree(o: import('../collision').Obstacle, x: number, z:
   const p = { x, z };
   return resolveCollisions(p, 0.4, [o]) && Math.hypot(p.x - x, p.z - z) > 0.15;
 }
+
+describe('thẻ Em có biết trong đồ thị đường và đích mũi tên (bước X3)', () => {
+  const w = assembleWorld();
+  const ids = new Set(w.graph.nodes.map((n) => n.id));
+
+  it('mỗi thẻ có một nút chỗ đứng trong đồ thị, nối liền với đường làng', () => {
+    for (let i = 0; i < 4; i++) expect(ids.has(`scroll:lang-giay:${i}`), `thẻ ${i}`).toBe(true);
+    expect(ids.has('scroll:lang-det:0')).toBe(false); // làng chưa dựng chưa có thẻ
+  });
+
+  it('mũi tên: trong làng còn thẻ thì dẫn tới thẻ; hết thẻ thì như cũ (biển màn tiếp, hoặc cổng); ngoài làng thì không dẫn tới thẻ', () => {
+    expect(targetNodeId({ inVillage: 'lang-giay', nextBoard: 1, pages: 0, scroll: 2 })).toBe('scroll:lang-giay:2');
+    expect(targetNodeId({ inVillage: 'lang-giay', nextBoard: 1, pages: 0, scroll: null })).toBe('board:1');
+    expect(targetNodeId({ inVillage: 'lang-giay', nextBoard: 1, pages: 0, scroll: -1 })).toBe('board:1');
+    expect(targetNodeId({ inVillage: 'lang-giay', nextBoard: 1, pages: 0 })).toBe('board:1');
+    expect(targetNodeId({ inVillage: null, nextBoard: null, pages: 0, scroll: 2 })).toBe('gate:giay');
+  });
+
+  it('từ cổng đi theo mũi tên tới từng thẻ được (có đường), độ dài đi bộ hợp lý (từ 60 đến 330)', () => {
+    const r = createRouter(w.graph);
+    for (let i = 0; i < 4; i++) {
+      r.setTarget(`scroll:lang-giay:${i}`);
+      const d = r.distanceFrom('gate:giay');
+      expect(Number.isFinite(d), `thẻ ${i}`).toBe(true);
+      expect(d).toBeGreaterThan(60);
+      expect(d).toBeLessThan(330);
+    }
+  });
+});

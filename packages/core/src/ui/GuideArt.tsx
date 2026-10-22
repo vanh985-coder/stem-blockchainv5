@@ -349,6 +349,21 @@ const ARTS: Record<GuideArtId, () => ReactNode> = {
       <path d="M160 18 v-10 M108 34 l-8 -8 M212 34 l8 -8 M90 80 h-12 M230 80 h12" stroke={C.gold} strokeWidth={5} strokeLinecap="round" />
     </g>
   ),
+  'cuon-giay': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.sky} />
+      <rect x={0} y={138} width={ART_W} height={42} fill={C.grass} />
+      <polygon points="146,0 174,0 190,148 130,148" fill="#ffe27a" opacity={0.55} />
+      <ellipse cx={160} cy={150} rx={44} ry={9} fill="#ffe27a" opacity={0.8} />
+      <g transform="rotate(-14 160 108)">
+        <rect x={118} y={92} width={84} height={30} rx={14} fill="#fff1c2" stroke={C.goldDark} strokeWidth={3} />
+        <rect x={110} y={88} width={14} height={38} rx={6} fill={C.wood} />
+        <rect x={196} y={88} width={14} height={38} rx={6} fill={C.wood} />
+        <path d="M132 102 h56 M132 112 h40" stroke={C.purple} strokeWidth={4} strokeLinecap="round" />
+      </g>
+      <path d="M96 60 l8 8 M224 60 l-8 8 M80 100 h-12 M240 100 h12 M160 40 v-14" stroke={C.gold} strokeWidth={5} strokeLinecap="round" />
+    </g>
+  ),
   'bon-trang': () => (
     <g>
       <rect x={0} y={0} width={ART_W} height={ART_H} fill="#fbf1d6" />

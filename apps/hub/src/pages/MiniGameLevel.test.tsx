@@ -19,6 +19,8 @@ const stateOf = (progress: Progress): ProgressState => ({
   markGoldenSeen: () => {},
   markGateOpenSeen: () => {},
   markKnowSeen: () => {},
+  markKnowCard: () => {},
+  markAllKnowCards: () => {},
   markGuideSeen: () => {},
   markStoryRead: () => {},
 });

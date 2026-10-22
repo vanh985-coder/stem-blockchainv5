@@ -8,9 +8,11 @@ import {
   fmt,
   goldenPageNumber,
   introTasks,
+  knowScrollUi,
   speakerLabel,
   ui,
   villageIntroTexts,
+  villageKnowCards,
   type LevelUnlock,
   type VillageId,
   type VnTurn,
@@ -45,13 +47,20 @@ function TaskList({ village, unlockLevels }: { village: VillageId; unlockLevels:
  * Giới thiệu làng kiểu visual novel (lần đầu bấm vào làng trên /ban-do): chân dung lớn của người dẫn,
  * nền là ảnh scenes/bai-hoc-<làng> làm mờ; lượt cuối có danh sách 3 màn. Xong hoặc bỏ qua đều gọi onDone.
  */
-export default function VillageIntro({ village, unlockLevels, onDone }: { village: VillageId; unlockLevels: readonly LevelUnlock[]; onDone: () => void }) {
+export default function VillageIntro({ village, unlockLevels, onDone, onCardsRead }: { village: VillageId; unlockLevels: readonly LevelUnlock[]; onDone: () => void; /** Đọc hết các lượt (bấm nút ở lượt cuối, không phải "Bỏ qua"): đã đọc đủ các thẻ Em có biết của làng */ onCardsRead?: () => void }) {
   const turns = useMemo<VnTurn[]>(() => {
     const { guide, turns: lines } = VILLAGE_INTRO[village];
     const base = { speaker: speakerLabel(guide), portrait: CHARACTERS[guide].portrait };
+    const cards = villageKnowCards(village);
     return [
       // Lượt đầu là lời chào nên người dẫn tươi cười (nếu có ảnh cười)
       ...lines.map((text, i) => ({ ...base, text: fmt(text), mood: i === 0 ? ('vui' as const) : undefined })),
+      // các thẻ "Em có biết?" của làng (bước X3): đọc đủ mới vào được bài
+      ...cards.map((c, i) => ({
+        ...base,
+        text: `${fmt(knowScrollUi.banDoThe, { n: i + 1, tong: cards.length })}. ${fmt(c.title)}. ${fmt(c.text)}`,
+        extra: c.example ? <p className="rounded-xl border-2 border-vang bg-vang/15 p-3 text-base">{fmt(c.example)}</p> : undefined,
+      })),
       { ...base, text: fmt(T.lanCuoi, { so: goldenPageNumber(village) }), extra: <TaskList village={village} unlockLevels={unlockLevels} /> },
     ];
   }, [village, unlockLevels]);
@@ -59,7 +68,10 @@ export default function VillageIntro({ village, unlockLevels, onDone }: { villag
   return (
     <VnDialog
       turns={turns}
-      onFinish={onDone}
+      onFinish={() => {
+        onCardsRead?.();
+        onDone();
+      }}
       onSkip={onDone}
       finishLabel={T.ketThuc}
       background={`scenes/bai-hoc-${village}`}

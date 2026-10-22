@@ -34,6 +34,10 @@ export interface ProgressState {
   markGoldenSeen: (village: VillageId) => void;
   markGateOpenSeen: (village: VillageId) => void;
   markKnowSeen: (village: VillageId) => void;
+  /** Đã nhặt thẻ "Em có biết?" số index (từ 0) của làng (bước X3) */
+  markKnowCard: (village: VillageId, index: number) => void;
+  /** Đã đọc đủ `total` thẻ của làng ở khung giới thiệu /ban-do (bước X3) */
+  markAllKnowCards: (village: VillageId, total: number) => void;
   markGuideSeen: (section: string) => void;
   /** Đã đọc hết cốt truyện (bước X1) */
   markStoryRead: () => void;
@@ -67,6 +71,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const markGoldenSeen = useCallback((village: VillageId) => progressManager.markGoldenSeen(village), []);
   const markGateOpenSeen = useCallback((village: VillageId) => progressManager.markGateOpenSeen(village), []);
   const markKnowSeen = useCallback((village: VillageId) => progressManager.markKnowSeen(village), []);
+  const markKnowCard = useCallback((village: VillageId, index: number) => progressManager.markKnowCard(village, index), []);
+  const markAllKnowCards = useCallback((village: VillageId, total: number) => progressManager.markAllKnowCards(village, total), []);
   const markGuideSeen = useCallback((section: string) => progressManager.markGuideSeen(section), []);
   const markStoryRead = useCallback(() => progressManager.markStoryRead(), []);
 
@@ -87,10 +93,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       markGoldenSeen,
       markGateOpenSeen,
       markKnowSeen,
+      markKnowCard,
+      markAllKnowCards,
       markGuideSeen,
       markStoryRead,
     }),
-    [snap, unlock, record, saveNow, startGuest, markVillageIntroSeen, markVillageSceneSeen, markGoldenSeen, markGateOpenSeen, markKnowSeen, markGuideSeen, markStoryRead],
+    [snap, unlock, record, saveNow, startGuest, markVillageIntroSeen, markVillageSceneSeen, markGoldenSeen, markGateOpenSeen, markKnowSeen, markKnowCard, markAllKnowCards, markGuideSeen, markStoryRead],
   );
 
   return (
@@ -117,6 +125,8 @@ const FALLBACK: ProgressState = {
   markGoldenSeen: () => {},
   markGateOpenSeen: () => {},
   markKnowSeen: () => {},
+  markKnowCard: () => {},
+  markAllKnowCards: () => {},
   markGuideSeen: () => {},
   markStoryRead: () => {},
 };

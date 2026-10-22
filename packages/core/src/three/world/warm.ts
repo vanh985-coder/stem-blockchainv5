@@ -6,7 +6,10 @@ import { Color, InstancedMesh, Scene, type BufferGeometry, type Camera, type Mat
 import { sceneTextures, textureSize, textureUsable } from '../SceneWarmup';
 
 /** Chờ chừng này (ms) sau khi đẩy một texture từ 2048 điểm ảnh trở lên, để GPU làm xong trước khi đẩy cái tiếp theo hay dựng nhân vật. */
-export const WARM_GAP_MS = 140;
+export const WARM_GAP_MS = 240;
+/** Khung hình trước chậm hơn chừng này (ms) thì GPU đang bận (cảnh nặng, vừa đẩy xong thứ gì): hoãn việc đẩy texture lớn, nhưng không hoãn quá `WARM_CALM_MAX_WAIT_MS` mỗi texture (bước X3: một lần đẩy texture 2048 lúc GPU bận có thể tốn 80 mili giây). */
+export const WARM_CALM_FRAME_MS = 13;
+export const WARM_CALM_MAX_WAIT_MS = 700;
 /** Cạnh dài từ đây trở lên thì coi là texture lớn. */
 export const BIG_TEXTURE = 2048;
 
@@ -30,14 +33,29 @@ export function warmTextures(gl: WebGLRenderer, textures: readonly Texture[], is
   return new Promise((resolve) => {
     let i = 0;
     let readyAt = 0;
+    let last = 0;
+    let waitedSince = 0;
     const step = () => {
       if (isCancelled()) return resolve();
       const now = performance.now();
+      const frame = last === 0 ? 0 : now - last;
+      last = now;
       if (now < readyAt) {
         requestAnimationFrame(step);
         return;
       }
       if (i >= textures.length) return resolve();
+      // texture lớn: chỉ đẩy khi khung hình trước nhẹ (hoặc đã chờ đủ lâu)
+      const next = textures[i];
+      const big = warmGapMs(textureSize(next).width, textureSize(next).height) > 0;
+      if (big && frame > WARM_CALM_FRAME_MS) {
+        if (waitedSince === 0) waitedSince = now;
+        if (now - waitedSince < WARM_CALM_MAX_WAIT_MS) {
+          requestAnimationFrame(step);
+          return;
+        }
+      }
+      waitedSince = 0;
       const t = textures[i++];
       gl.initTexture(t);
       const { width, height } = textureSize(t);
@@ -54,19 +72,21 @@ export function warmTextures(gl: WebGLRenderer, textures: readonly Texture[], is
  */
 export async function compileAhead(gl: WebGLRenderer, camera: Camera, scene: Scene, items: readonly { geometry: BufferGeometry; material: Material }[], isCancelled: () => boolean): Promise<void> {
   if (items.length === 0 || isCancelled()) return;
-  const tmp = new Scene();
-  const meshes = items.map(({ geometry, material }) => {
+  // MỖI LẦN MỘT vật liệu, nghỉ một khung hình giữa hai lần (bước X3): gộp cả chục chương trình vào một lần compileAsync thì phần đồng bộ (dịch và liên kết shader qua ANGLE) dồn vào một khung hình tốn 80 mili giây trên máy yếu
+  for (const { geometry, material } of items) {
+    if (isCancelled()) return;
+    const tmp = new Scene();
     const m = new InstancedMesh(geometry, material, 1);
     m.setColorAt(0, new Color(1, 1, 1));
     m.castShadow = true; // như lúc vẽ thật (đồ vật vừa đổ vừa nhận bóng): cùng chương trình shader
     m.receiveShadow = true;
     tmp.add(m);
-    return m;
-  });
-  try {
-    await gl.compileAsync(tmp, camera, scene);
-  } finally {
-    for (const m of meshes) m.dispose(); // chỉ giải phóng bộ đệm bản nhân bản; hình học và vật liệu do nơi gọi giữ
+    try {
+      await gl.compileAsync(tmp, camera, scene);
+    } finally {
+      m.dispose(); // chỉ giải phóng bộ đệm bản nhân bản; hình học và vật liệu do nơi gọi giữ
+    }
+    await new Promise<void>((r) => requestAnimationFrame(() => r()));
   }
 }
 

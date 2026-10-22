@@ -42,6 +42,7 @@ export const GUIDE_ART_IDS = [
   'sao',
   'bong-den',
   'bon-trang',
+  'cuon-giay',
 ] as const;
 export type GuideArtId = (typeof GUIDE_ART_IDS)[number];
 
@@ -94,6 +95,11 @@ export const GUIDE_SECTIONS = [
       {
         hinh: shot('cho-di-lai'),
         may: 'Đi theo mũi tên vàng dưới chân em để tới nơi cần đến, mũi tên chỉ đường đi dọc theo đường đất. Dòng nhiệm vụ ở góc trên trái nhắc em việc cần làm.',
+      },
+      {
+        hinh: art('cuon-giay'),
+        may: 'Trong làng có cuộn giấy phát sáng, cột sáng nhìn thấy từ xa. Đến gần và bấm E để đọc thẻ "Em có biết?". Nhặt đủ thẻ mới vào được các màn chơi.',
+        dt: 'Trong làng có cuộn giấy phát sáng, cột sáng nhìn thấy từ xa. Đến gần và bấm nút bàn tay để đọc thẻ "Em có biết?". Nhặt đủ thẻ mới vào được các màn chơi.',
       },
     ],
   },

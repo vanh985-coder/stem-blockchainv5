@@ -3,6 +3,7 @@ import { VILLAGE_ORDER } from '../../content/levels';
 import { PLAYER_RADIUS, resolveCollisions, type Obstacle, type Point2 } from '../collision';
 import { densityFor, DECK_TOP, ROAD_WIDTH, WORLD_RADIUS } from '../cho/marketLayout';
 import { sampleEdges } from './roadGraph';
+import { riverEdgeDistance } from './river';
 import {
   BRIDGE_DECK_END_X,
   BRIDGE_RAMP_END_X,
@@ -16,7 +17,7 @@ import {
   worldGroundHeight,
   worldRoads,
 } from './worldLayout';
-import { GATE_WORLD_DISTANCE, VILLAGE_FRAMES, frameOf, localToWorld, placeVillage, rotateToWorld } from './worldFrames';
+import { GATE_WORLD_DISTANCE, VILLAGE_FRAMES, VILLAGE_RADIUS, WORLD_BOUNDS, frameOf, localToWorld, placeVillage, rotateToWorld } from './worldFrames';
 import { LOCAL_VILLAGES } from './villages';
 
 const FULL = assembleWorld();
@@ -44,7 +45,7 @@ describe('hệ tọa độ làng và thế giới', () => {
     expect(p.x).toBeCloseTo(1, 9);
     expect(p.z).toBeCloseTo(0, 9);
   });
-  it('cổng của bố cục làng rơi đúng chỗ cổng thế giới; Làng Giấy (bước W2) có tâm ở (0; 107), ba làng nhỏ ở 89,5', () => {
+  it('cổng của bố cục làng rơi đúng chỗ cổng thế giới; Làng Giấy (bước X3) có tâm ở (0; 197) bán kính 125, ba làng nhỏ ở 89,5', () => {
     for (const f of VILLAGE_FRAMES) {
       const local = LOCAL_VILLAGES[f.village];
       const g = localToWorld(local, f, local.gate.x, local.gate.z);
@@ -55,9 +56,9 @@ describe('hệ tọa độ làng và thế giới', () => {
     }
     const giay = FULL.villages[0];
     expect(giay.center.x).toBeCloseTo(0, 9);
-    expect(giay.center.z).toBeCloseTo(107, 9); // cổng ở 72, cổng cách tâm làng 35
-    expect(giay.radius).toBe(35);
-    expect(giay.insideRadius).toBeCloseTo(34, 9);
+    expect(giay.center.z).toBeCloseTo(197, 9); // cổng ở 72, cổng cách tâm làng 125
+    expect(giay.radius).toBe(125);
+    expect(giay.insideRadius).toBeCloseTo(124, 9);
     for (const v of FULL.villages.slice(1)) expect(Math.hypot(v.center.x, v.center.z)).toBeCloseTo(89.5, 9);
   });
   it('mọi biển gỗ quay mặt về phía chợ (mặt trước hướng về tâm chợ), ở cả 4 làng', () => {
@@ -92,12 +93,35 @@ describe('hệ tọa độ làng và thế giới', () => {
 });
 
 describe('bố cục thế giới', () => {
+  it('4 làng đều có chỗ bán kính 125 sau cổng (tâm cách chợ 197), các chỗ dành riêng không đè nhau và không đè chợ', () => {
+    const reserved = VILLAGE_FRAMES.map((f) => ({ id: f.village, x: f.dirX * (GATE_WORLD_DISTANCE + VILLAGE_RADIUS), z: f.dirZ * (GATE_WORLD_DISTANCE + VILLAGE_RADIUS) }));
+    for (const r of reserved) {
+      expect(Math.hypot(r.x, r.z)).toBeCloseTo(197, 9);
+      expect(Math.hypot(r.x, r.z) - VILLAGE_RADIUS).toBeGreaterThan(WORLD_RADIUS + 25);
+    }
+    for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) expect(Math.hypot(reserved[i].x - reserved[j].x, reserved[i].z - reserved[j].z) - 2 * VILLAGE_RADIUS, `${reserved[i].id}-${reserved[j].id}`).toBeGreaterThan(25);
+    // biên đi lại bao hết cả 4 chỗ dành riêng và lũy tre
+    for (const r of reserved) expect(Math.hypot(r.x, r.z) + VILLAGE_RADIUS).toBeLessThan(WORLD_BOUNDS);
+  });
+  it('đất hoang của ba làng chưa dựng: 5 đồi + 40 bụi tre mỗi làng, trong chỗ dành riêng, cách xa sông, không đè nhà/biển/cổng của làng; Làng Giấy không có', () => {
+    expect(FULL.wild.filter((p) => p.kind === 'doi')).toHaveLength(15);
+    expect(FULL.wild.filter((p) => p.kind === 'tre')).toHaveLength(120);
+    for (const f of VILLAGE_FRAMES) {
+      const c = { x: f.dirX * (GATE_WORLD_DISTANCE + VILLAGE_RADIUS), z: f.dirZ * (GATE_WORLD_DISTANCE + VILLAGE_RADIUS) };
+      const mine = FULL.wild.filter((p) => Math.hypot(p.x - c.x, p.z - c.z) < VILLAGE_RADIUS);
+      expect(mine.length, f.village).toBe(f.village === 'lang-giay' ? 0 : 45);
+    }
+    for (const p of FULL.wild) {
+      expect(riverEdgeDistance(p.x, p.z)).toBeGreaterThan(6);
+      for (const v of FULL.villages) for (const pl of v.layout.placements) expect(Math.hypot(pl.x - p.x, pl.z - p.z)).toBeGreaterThan(8);
+    }
+  });
   it('có 4 làng không đè lên nhau, không đè lên chợ, đủ bố cục: nhà, bụi tre, biển, cổng đúng model', () => {
     expect(FULL.villages).toHaveLength(4);
     for (let i = 0; i < 4; i++) {
       const v = FULL.villages[i];
       expect(Math.hypot(v.center.x, v.center.z) - v.radius, v.id).toBeGreaterThan(WORLD_RADIUS + 5);
-      for (let j = i + 1; j < 4; j++) expect(Math.hypot(v.center.x - FULL.villages[j].center.x, v.center.z - FULL.villages[j].center.z)).toBeGreaterThan(v.radius * 2 + 10);
+      for (let j = i + 1; j < 4; j++) expect(Math.hypot(v.center.x - FULL.villages[j].center.x, v.center.z - FULL.villages[j].center.z)).toBeGreaterThan(v.radius + FULL.villages[j].radius + 10);
       expect(v.layout.placements.length, v.id).toBeGreaterThanOrEqual(8);
       expect(v.layout.boards.length, v.id).toBeGreaterThanOrEqual(1);
       expect(v.gate.model, v.id).toMatch(/^env\/cong-lang-/);

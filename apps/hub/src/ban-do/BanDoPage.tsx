@@ -8,11 +8,17 @@ import {
   NenTrangTri,
   PAGE_THEME,
   Panel,
+  EmCoBietDialog,
   VILLAGE_ORDER,
+  effectiveKnowMask,
   fmt,
+  hasSeenKnow,
+  knowScrollUi,
+  countKnowCards,
   levelsOfVillage,
   shouldShowIntro,
   ui,
+  villageKnowCards,
   useAuth,
   useManifest,
   useProgress,
@@ -92,9 +98,10 @@ export default function BanDoPage() {
   const stageRef = useRef<HTMLDivElement>(null);
   const manifest = useManifest();
   const { profile } = useAuth();
-  const { unlock, progress, goldenPages, mode, synced, markVillageIntroSeen } = useProgress();
+  const { unlock, progress, goldenPages, mode, synced, markVillageIntroSeen, markAllKnowCards } = useProgress();
   const [selected, setSelected] = useState<VillageId | null>(null);
   const [intro, setIntro] = useState<VillageId | null>(null);
+  const [reading, setReading] = useState<VillageId | null>(null);
   // Biết chắc đã xem hay chưa: chơi thử, hoặc đã kéo xong dữ liệu từ máy chủ (tránh hiện lại ở máy khác).
   const introKnown = mode === 'guest' || (mode === 'user' && synced);
 
@@ -118,6 +125,14 @@ export default function BanDoPage() {
   const sc = markerScale(fit?.w ?? 0);
   const name = profile?.display_name ?? fmt('{Ten}');
 
+  // thẻ "Em có biết?" của làng (bước X3): đã đọc (hoặc nhặt trong làng 3D) đủ chưa; người đã xong màn 1 hay đã xem hộp cũ coi như đủ
+  const knowOf = (id: VillageId) => {
+    const total = villageKnowCards(id).length;
+    const first = levelsOfVillage(id)[0]?.id;
+    const lessonDone = first !== undefined && unlock.levels.find((u) => u.id === first)?.state === 'done';
+    const mask = effectiveKnowMask({ data: progress.game.data, village: id, total, lessonDone, seenOld: hasSeenKnow(progress.game.data, id) });
+    return { got: countKnowCards(mask, total), total };
+  };
   const details = selected && (
     <VillageDetails
       villageId={selected}
@@ -126,6 +141,7 @@ export default function BanDoPage() {
       goldenEarned={VILLAGE_ORDER.indexOf(selected) < goldenPages}
       onClose={wide ? undefined : () => setSelected(null)}
       onReplayIntro={() => setIntro(selected)}
+      know={{ ...knowOf(selected), onRead: () => setReading(selected) }}
     />
   );
 
@@ -240,8 +256,16 @@ export default function BanDoPage() {
 
       {intro && (
         <Suspense fallback={null}>
-          <VillageIntro village={intro} unlockLevels={unlock.levels} onDone={endIntro} />
+          <VillageIntro village={intro} unlockLevels={unlock.levels} onDone={endIntro} onCardsRead={() => markAllKnowCards(intro, villageKnowCards(intro).length)} />
         </Suspense>
+      )}
+      {reading && (
+        <EmCoBietDialog
+          cards={villageKnowCards(reading)}
+          onClose={() => setReading(null)}
+          onFinish={() => markAllKnowCards(reading, villageKnowCards(reading).length)}
+          finishLabel={knowScrollUi.catVaoSo}
+        />
       )}
     </div>
   );

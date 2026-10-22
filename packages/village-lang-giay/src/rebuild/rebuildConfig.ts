@@ -14,8 +14,8 @@ export const REBUILD_SPEC = {
   roundBase: 100,
   perError: 10,
   fakeBonus: 30,
-  /** Đồng, Bạc, Vàng (tổng điểm cả ván; chỉnh ở bước X2 theo mô phỏng 300 ván mỗi bot, Vàng hạ 520 → 500 ở bước X3; xem spec 05) */
-  medals: [200, 400, 500] as const,
+  /** Đồng, Bạc, Vàng (tổng điểm cả ván; chỉnh ở bước X2 theo mô phỏng 300 ván mỗi bot, Vàng hạ 520 → 500 ở bước X3, rồi 500 → 475 vì khoảng tráo 6 giây làm điểm tối đa còn 505; xem spec 05) */
+  medals: [200, 400, 475] as const,
 } as const;
 
 /**
@@ -27,9 +27,9 @@ export const REBUILD_KEEP = {
   seconds: 90,
   /** Lần tráo đầu tiên */
   firstSwapAt: 6,
-  /** Khoảng cách giữa hai lần tráo giảm tuyến tính theo giờ chơi, từ 9 giây (lúc 0) xuống 5 giây (lúc hết vòng); bước X2b: trước đó xuống 4 giây */
+  /** Khoảng cách giữa hai lần tráo giảm tuyến tính theo giờ chơi, từ 9 giây (lúc 0) xuống 6 giây (lúc hết vòng); bước X2b: xuống 5 (trước đó 4), bước X3: xuống 6 */
   intervalStart: 9,
-  intervalEnd: 5,
+  intervalEnd: 6,
   /** Không tráo trong những giây cuối, để trang nào bị tráo cũng còn thời gian sửa */
   noSwapLast: 6,
   /** Tối đa 3 ô chưa sửa xong cùng lúc; tới hạn mà đến lượt tráo thì không tráo nhưng học sinh mất 1 tim */

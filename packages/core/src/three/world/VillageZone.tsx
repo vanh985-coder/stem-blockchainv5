@@ -8,6 +8,10 @@ import { Villager } from '../Villager';
 import { VILLAGER_CULL } from '../cullDistance';
 import type { CircleObstacle } from '../collision';
 import { MarketProps } from '../cho/MarketProcedural';
+import { KnowScrolls } from '../village/KnowScrolls';
+import { ScatterProps } from '../village/ScatterProps';
+import { SCATTER_CELL } from '../village/ScatterProps';
+import { PROPS_MAX_DISTANCE, SCATTER_KINDS, VILLAGE_MODEL_MAX_DISTANCE } from '../village/scatter';
 import { ModelInstances } from '../cho/ModelInstances';
 import type { Placement } from '../cho/marketLayout';
 import type { QualityLevel } from '../quality';
@@ -29,6 +33,10 @@ export interface VillageZoneProps {
   talkAt: readonly [number, number, number];
   /** Vật cản tròn đi theo từng dân làng của làng (cùng thứ tự `layout.villagers`); `Villager` ghi vị trí vào đây mỗi khung hình */
   villagerColliders: readonly CircleObstacle[];
+  /** Mặt nạ bit các thẻ "Em có biết?" đã nhặt (bước X3): thẻ chưa nhặt hiện cuộn giấy và cột sáng */
+  collected: number;
+  /** false ("Giảm chuyển động") thì cuộn giấy không xoay */
+  animate: boolean;
   /** Làng đã chuẩn bị xong (xem `ZonePrewarm`): chưa xong thì vùng chờ, tối đa `ZONE_PREWARM_WAIT` giây, rồi mới bắt đầu dựng */
   prewarmed: boolean;
   /** Gọi một lần khi mọi phần của vùng đã dựng xong */
@@ -80,7 +88,7 @@ function useWarmModel(id: string | null): boolean {
  * trong một khung hình, để không khựng khi người chơi tới gần. Gỡ vùng (xa quá) thì mọi hình học, vật liệu riêng và texture biển được giải phóng bởi chính từng phần. Mặt đất, cổng và hình dáng nhìn từ xa
  * (bản xa) nằm ngoài vùng nên luôn có. Đặt trong <WalkWorld>.
  */
-export function VillageZone({ village, level, labels, icons, states, guideTalking, talkAt, villagerColliders, prewarmed, onReady }: VillageZoneProps) {
+export function VillageZone({ village, level, labels, icons, states, guideTalking, talkAt, villagerColliders, collected, animate, prewarmed, onReady }: VillageZoneProps) {
   const layout = village.layout;
   const byModel = useMemo(() => {
     const out: { id: string; items: Placement[] }[] = [];
@@ -91,9 +99,11 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
   const guideModel = guide ? `characters/${CHARACTERS[guide.character].portrait}` : null;
   const guideWarm = useWarmModel(guideModel);
   const loops = layout.villagers ?? [];
-  // các phần theo thứ tự: 1 đồ nhỏ, 2 biển, 3.. từng model, rồi người dẫn (chỉ khi model đã làm ấm xong), cuối cùng dân làng đi lại
-  const guideStage = 3 + byModel.length;
-  const total = 2 + byModel.length + (guide ? 1 : 0) + loops.length; // mỗi dân làng một phần riêng (dựng một nhân vật có xương mất chừng 15 ms)
+  // các phần theo thứ tự: 1 đồ nhỏ, 2 biển, 3 thẻ "Em có biết?", rồi từng loại đồ rải dựng bằng code (mỗi loại một phần: dựng hình học và các mảnh của cả loại trong một khung hình tốn chừng 15 đến 40 ms), rồi từng model, rồi người dẫn (chỉ khi model đã làm ấm xong), cuối cùng dân làng đi lại
+  const scatterKinds = useMemo(() => SCATTER_KINDS.filter((k) => layout.scatter?.some((p) => p.kind === k)), [layout]);
+  const firstModel = 4 + scatterKinds.length;
+  const guideStage = firstModel + byModel.length;
+  const total = firstModel - 1 + byModel.length + (guide ? 1 : 0) + loops.length; // mỗi dân làng một phần riêng (dựng một nhân vật có xương mất chừng 15 ms)
   const [stage, setStage] = useState(0);
   const frames = useRef(0);
   const ready = useRef(false);
@@ -123,12 +133,14 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
 
   return (
     <group>
-      {stage >= 1 && <MarketProps layout={layout} />}
+      {stage >= 1 && <MarketProps layout={layout} cull={{ cell: SCATTER_CELL, maxDistance: PROPS_MAX_DISTANCE[level] }} />}
       {stage >= 2 && <VillageBoards boards={layout.boards} labels={labels} icons={icons} states={states} />}
+      {stage >= 3 && layout.scrolls && layout.scrolls.length > 0 && <KnowScrolls scrolls={layout.scrolls} collected={collected} animate={animate} />}
+      {layout.scatter && scatterKinds.map((k, j) => (stage >= 4 + j ? <ScatterProps key={k} scatter={layout.scatter ?? []} level={level} only={k} /> : null))}
       {byModel.map(({ id, items }, i) =>
-        stage >= 3 + i ? (
+        stage >= firstModel + i ? (
           <Suspense key={id} fallback={null}>
-            <ModelInstances id={id} items={items} level={level} />
+            <ModelInstances id={id} items={items} level={level} maxDistance={level === 'low' ? undefined : VILLAGE_MODEL_MAX_DISTANCE[level]} />
           </Suspense>
         ) : null,
       )}

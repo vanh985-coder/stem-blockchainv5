@@ -247,7 +247,7 @@ describe('vòng, tim, điểm', () => {
     expect(rebuildMedal(100)).toBe(0);
   });
 
-  it('chơi hoàn hảo cả 3 vòng: 100 + 130 + vòng giữ sổ (12 lần tráo × 25), Vàng, over = done', () => {
+  it('chơi hoàn hảo cả 3 vòng: 100 + 130 + vòng giữ sổ (11 lần tráo × 25), Vàng, over = done', () => {
     const s = createRebuild(8);
     for (let r = 0; r < 3; r++) {
       playPerfectAny(s);
@@ -258,14 +258,14 @@ describe('vòng, tim, điểm', () => {
     expect(s.over).toBe('done');
     expect(s.hearts).toBe(3);
     expect(s.deal.real).toHaveLength(6);
-    expect(PERFECT_KEEP).toBe(300);
+    expect(PERFECT_KEEP).toBe(275);
     expect(rebuildScore(s)).toBe(100 + 130 + PERFECT_KEEP);
     expect(rebuildMedal(rebuildScore(s))).toBe(3);
   });
 
-  it('mốc điểm (bước X3): 200 Đồng, 400 Bạc, 500 Vàng', () => {
-    expect(SPEC.medals).toEqual([200, 400, 500]);
-    expect([0, 199, 200, 399, 400, 499, 500, 600].map(rebuildMedal)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
+  it('mốc điểm (bước X3): 200 Đồng, 400 Bạc, 475 Vàng (tối đa 505, dư 30)', () => {
+    expect(SPEC.medals).toEqual([200, 400, 475]);
+    expect([0, 199, 200, 399, 400, 474, 475, 600].map(rebuildMedal)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
   });
 
   it('roundScore không âm và đúng công thức', () => {
@@ -274,7 +274,7 @@ describe('vòng, tim, điểm', () => {
     expect(roundScore(11, false)).toBe(0);
   });
 
-  it('sai 2 lần ở vòng 1 (còn 1 tim) rồi chơi hoàn hảo hai vòng sau: 100 − 20 + 130 + vòng giữ sổ = 510, vẫn Vàng (500); vào vòng 3 được hồi đủ tim', () => {
+  it('sai 2 lần ở vòng 1 (còn 1 tim) rồi chơi hoàn hảo hai vòng sau: 100 − 20 + 130 + vòng giữ sổ = 485, vẫn Vàng (475); vào vòng 3 được hồi đủ tim', () => {
     const s = createRebuild(9);
     placeCard(s, s.tray.find((c) => c.prev !== tailCode(s))!.id);
     placeCard(s, s.tray.find((c) => c.prev !== tailCode(s))!.id);
@@ -285,7 +285,7 @@ describe('vòng, tim, điểm', () => {
     expect(s.over).toBe('done');
     expect(s.hearts).toBe(SPEC.hearts); // bước X3: vào vòng 3 được hồi đủ tim
     expect(rebuildScore(s)).toBe(80 + 130 + PERFECT_KEEP);
-    expect(rebuildScore(s)).toBe(510);
+    expect(rebuildScore(s)).toBe(485);
     expect(rebuildMedal(rebuildScore(s))).toBe(3);
   });
 

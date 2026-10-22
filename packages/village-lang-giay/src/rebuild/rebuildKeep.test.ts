@@ -38,37 +38,37 @@ function swaps(events: readonly KeepEvent[]): Extract<KeepEvent, { kind: 'swap' 
   return events.filter((e): e is Extract<KeepEvent, { kind: 'swap' }> => e.kind === 'swap');
 }
 
-describe('lịch tráo: khoảng cách giảm từ 9 giây xuống 5 giây', () => {
-  it('khoảng cách tại giây 0 là 9, giữa vòng 7, hết vòng 5; luôn nằm trong [5, 9] và không tăng', () => {
+describe('lịch tráo: khoảng cách giảm từ 9 giây xuống 6 giây', () => {
+  it('khoảng cách tại giây 0 là 9, giữa vòng 7, hết vòng 6; luôn nằm trong [6, 9] và không tăng', () => {
     expect(swapIntervalAt(0)).toBe(9);
-    expect(swapIntervalAt(45)).toBeCloseTo(7, 10);
-    expect(swapIntervalAt(90)).toBe(5);
+    expect(swapIntervalAt(45)).toBeCloseTo(7.5, 10);
+    expect(swapIntervalAt(90)).toBe(6);
     expect(swapIntervalAt(-5)).toBe(9);
-    expect(swapIntervalAt(500)).toBe(5);
+    expect(swapIntervalAt(500)).toBe(6);
     let prev = Infinity;
     for (let t = 0; t <= 90; t += 0.5) {
       const v = swapIntervalAt(t);
-      expect(v).toBeGreaterThanOrEqual(5);
+      expect(v).toBeGreaterThanOrEqual(6);
       expect(v).toBeLessThanOrEqual(9);
       expect(v).toBeLessThanOrEqual(prev);
       prev = v;
     }
   });
 
-  it('lịch tráo: bắt đầu ở giây 6, các khoảng giảm dần và nằm trong [5, 9], không tráo trong 6 giây cuối', () => {
+  it('lịch tráo: bắt đầu ở giây 6, các khoảng giảm dần và nằm trong [6, 9], không tráo trong 6 giây cuối', () => {
     const times = swapSchedule();
     expect(times[0]).toBe(6);
-    expect(times.length).toBe(12);
-    expect(times.map((t) => Math.round(t * 10) / 10)).toEqual([6, 14.7, 23.1, 31.1, 38.7, 46, 52.9, 59.6, 65.9, 72, 77.8, 83.3]);
+    expect(times.length).toBe(11);
+    expect(times.map((t) => Math.round(t * 10) / 10)).toEqual([6, 14.8, 23.3, 31.5, 39.5, 47.2, 54.6, 61.8, 68.7, 75.4, 81.9]);
     const gaps = times.slice(1).map((t, i) => t - times[i]);
     for (let i = 0; i < gaps.length; i++) {
-      expect(gaps[i]).toBeGreaterThanOrEqual(5);
+      expect(gaps[i]).toBeGreaterThanOrEqual(6);
       expect(gaps[i]).toBeLessThanOrEqual(9);
       if (i > 0) expect(gaps[i]).toBeLessThan(gaps[i - 1]);
     }
     expect(gaps[0]).toBeGreaterThan(8);
-    expect(gaps[gaps.length - 1]).toBeLessThan(5.6);
-    expect(gaps[gaps.length - 1]).toBeGreaterThan(5);
+    expect(gaps[gaps.length - 1]).toBeLessThan(6.6);
+    expect(gaps[gaps.length - 1]).toBeGreaterThan(6);
     expect(times[times.length - 1]).toBeLessThanOrEqual(K.seconds - K.noSwapLast);
   });
 
@@ -333,7 +333,7 @@ describe('vòng 3: điểm và hết giờ', () => {
     const part = s.parts.find((p) => p.round === 2)!;
     expect(part.keep).toEqual({ fixed: total - 2, fast: total - 2, left: 2 });
     expect(part.points).toBe((total - 2) * 25 - 2 * 10);
-    expect(rebuildScore(s)).toBe(230);
+    expect(rebuildScore(s)).toBe(205);
     advance(s);
     expect(s.phase).toBe('over');
     expect(s.over).toBe('done');
@@ -352,7 +352,7 @@ describe('vòng 3: điểm và hết giờ', () => {
         if (e.kind === 'timeout') timeout = e;
       }
     }
-    expect(timeout).toEqual({ kind: 'timeout', left: 0, points: 300 });
+    expect(timeout).toEqual({ kind: 'timeout', left: 0, points: 275 });
   });
 
   it('hết tim giữa vòng 3 (bước X2b): ván kết thúc nhưng vẫn tính +20/+5 các ô đã sửa, không trừ −10 cho ô chưa sửa', () => {
@@ -411,12 +411,12 @@ describe('vòng 3: điểm và hết giờ', () => {
     const rows = scoreParts(s);
     expect(rows.map((r) => r.key)).toEqual(['vong', 'vong', 'trangGia', 'sua', 'nhanh', 'conLech']);
     expect(rows.slice(3)).toEqual([
-      { key: 'sua', round: 2, count: 10, points: 200 },
-      { key: 'nhanh', round: 2, count: 10, points: 50 },
+      { key: 'sua', round: 2, count: 9, points: 180 },
+      { key: 'nhanh', round: 2, count: 9, points: 45 },
       { key: 'conLech', round: 2, count: 2, points: -20 },
     ]);
     expect(rows.reduce((a, r) => a + r.points, 0)).toBe(rebuildScore(s));
-    expect(rebuildScore(s)).toBe(100 + 130 + 230);
+    expect(rebuildScore(s)).toBe(100 + 130 + 205);
   });
 
   it('tất định: cùng seed và cùng thao tác thì cùng các sự kiện, điểm và tim; khác seed thì khác', () => {

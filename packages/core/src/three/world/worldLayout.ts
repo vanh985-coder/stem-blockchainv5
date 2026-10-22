@@ -10,25 +10,25 @@ import { createMulberry32 } from '../../lib/rng';
 import type { VillageId } from '../../village';
 import type { CameraBlocker } from '../cameraCollision';
 import { box, obox, type Obstacle } from '../collision';
-import { gateDecorWorld, generateMarket, propCollider, DECK_START_X, DECK_TOP, DOCK_HALF_WIDTH, GATE_DECOR, MODEL_PAPER_RACK, PLAZA_RADIUS, PLAZA_RING_RADIUS, RAMP_START_X, RIVER_X, ROAD_WIDTH, type GateDef, type GateId, type MarketDensity, type MarketLayout, type Placement, type PropPlacement, FULL_DENSITY } from '../cho/marketLayout';
+import { gateDecorWorld, generateMarket, propCollider, DECK_START_X, DECK_TOP, DOCK_HALF_WIDTH, GATE_DECOR, MODEL_PAPER_RACK, PLAZA_RADIUS, PLAZA_RING_RADIUS, RAMP_START_X, ROAD_WIDTH, type GateDef, type GateId, type MarketDensity, type MarketLayout, type Placement, type PropPlacement, FULL_DENSITY } from '../cho/marketLayout';
 import { assembleVillage, type VillageLayout, type VillagePaths } from '../village/villageLayout';
 import { buildGraph, type GraphNode, type RoadGraph } from './roadGraph';
 import { thinEvenly } from '../cho/marketLayout';
 import { LOCAL_VILLAGES } from './villages';
-import { VILLAGE_FRAMES, insideRadiusOf, localToWorld, placeVillage, worldGate, type VillageFrame } from './worldFrames';
+import { GATE_WORLD_DISTANCE, VILLAGE_FRAMES, VILLAGE_RADIUS, insideRadiusOf, localToWorld, placeVillage, worldGate, type VillageFrame } from './worldFrames';
+import { scrollNodeId } from '../village/scrollTargets';
+import { RIVER_EAST_X, RIVER_WEST_X, riverEdgeDistance, riverRocks, riverWaterColliders } from './river';
+import { scatterCollider, scatterRadius, type ScatterPlacement } from '../village/scatter';
+
+export { RIVER_EAST_X, RIVER_WEST_X };
 
 // ---------------------------------------------------------------------------
 // Sông và cầu (đường sang Làng Bạc)
 
-/** Bờ sông phía chợ (như bến tàu cũ) và bờ bên kia; giữa hai bờ là nước. */
-export const RIVER_WEST_X = RIVER_X;
-export const RIVER_EAST_X = -52;
 /** Mặt cầu cao `DECK_TOP`, từ `DECK_START_X` (trên bờ chợ, sau dốc lên) tới `BRIDGE_DECK_END_X` (trên bờ bên kia, trước dốc xuống); dốc xuống tới `BRIDGE_RAMP_END_X` là mặt đất. */
 export const BRIDGE_DECK_END_X = -54;
 export const BRIDGE_RAMP_END_X = -56;
 export const BRIDGE_HALF_WIDTH = DOCK_HALF_WIDTH;
-/** Sông dài tới đâu (±z) để vẽ nước và đặt vật cản nước. */
-export const RIVER_HALF_LENGTH = 200;
 
 /**
  * Độ cao mặt đi được tại (x, z): mặt đất là 0; mặt cầu `DECK_TOP` từ `DECK_START_X` tới `BRIDGE_DECK_END_X`; hai đầu cầu có dốc ngắn (tuyến tính). Ngoài dải cầu (|z| > nửa bề rộng cầu) là 0.
@@ -41,13 +41,13 @@ export function worldGroundHeight(x: number, z: number): number {
   return (DECK_TOP * (x - BRIDGE_RAMP_END_X)) / (BRIDGE_DECK_END_X - BRIDGE_RAMP_END_X);
 }
 
-/** Vật cản của sông: hai khối nước hai bên cầu (người chơi không xuống nước) và vách hai bên hai đầu dốc (không bước lên cầu từ bên hông). */
+/**
+ * Vật cản của sông: hai khối nước hai bên cầu ở đoạn thân và chuỗi hộp phủ hai nhánh (xem `river.ts`; người chơi không xuống nước), cùng vách hai bên hai đầu dốc cầu (không bước lên cầu từ bên hông).
+ */
 export function riverColliders(): CameraBlocker[] {
-  const waterH = 0.3;
   const rail = (x0: number, x1: number, z0: number, z1: number) => ({ shape: box(Math.min(x0, x1), Math.max(x0, x1), z0, z1), height: DECK_TOP });
   return [
-    { shape: box(RIVER_EAST_X, RIVER_WEST_X, BRIDGE_HALF_WIDTH, RIVER_HALF_LENGTH), height: waterH },
-    { shape: box(RIVER_EAST_X, RIVER_WEST_X, -RIVER_HALF_LENGTH, -BRIDGE_HALF_WIDTH), height: waterH },
+    ...riverWaterColliders(),
     rail(RIVER_WEST_X, RAMP_START_X, BRIDGE_HALF_WIDTH, BRIDGE_HALF_WIDTH + 0.5),
     rail(RIVER_WEST_X, RAMP_START_X, -BRIDGE_HALF_WIDTH - 0.5, -BRIDGE_HALF_WIDTH),
     rail(RIVER_EAST_X, BRIDGE_RAMP_END_X, BRIDGE_HALF_WIDTH, BRIDGE_HALF_WIDTH + 0.5),
@@ -55,19 +55,6 @@ export function riverColliders(): CameraBlocker[] {
   ];
 }
 
-/** Đá bờ đông (bờ tây do `generateMarket` rải): vật cản tròn như đá bờ tây. */
-export function eastBankRocks(seed: number): PropPlacement[] {
-  const rng = createMulberry32(seed ^ 0x68e31da4);
-  const out: PropPlacement[] = [];
-  for (let i = 0; i < 24; i++) {
-    const z = -60 + (i / 23) * 120;
-    if (Math.abs(z) < BRIDGE_HALF_WIDTH + 2.5) continue;
-    const scale = 0.6 + rng() * 0.9;
-    const grey = 0.8 + rng() * 0.2;
-    out.push({ kind: 'da', x: RIVER_EAST_X - 0.9 - rng() * 0.8, z: z + (rng() - 0.5) * 3, yaw: rng() * 6, scale, tint: [grey, grey, grey] });
-  }
-  return out;
-}
 
 // ---------------------------------------------------------------------------
 // Đường đất từ chợ ra cổng làng
@@ -248,6 +235,57 @@ export function assembleWorldVillage(f: VillageFrame, seed: number, density: Mar
 }
 
 // ---------------------------------------------------------------------------
+// Đất hoang quanh ba làng chưa dựng (bước X3)
+
+/** Tâm chỗ dành riêng (bán kính 125) của một làng: cách tâm chợ `GATE_WORLD_DISTANCE + VILLAGE_RADIUS` về phía làng. */
+export function reservedCenter(f: Pick<VillageFrame, 'dirX' | 'dirZ'>): { x: number; z: number } {
+  return { x: f.dirX * (GATE_WORLD_DISTANCE + VILLAGE_RADIUS), z: f.dirZ * (GATE_WORLD_DISTANCE + VILLAGE_RADIUS) };
+}
+
+/**
+ * Ba làng chưa dựng (Dệt, Khắc Dấu, Bạc) giữ phần tạm như bước W1 ở sát cổng (cổng, vài nhà, biển "Học cùng…"); phần còn lại của chỗ dành riêng bán kính 125 là ruộng lúa (mặt đất phủ rộng), đồi và tre:
+ * mỗi làng 5 đồi nhỏ và 40 bụi tre rải ở phía xa cổng (cách hướng ra cổng từ 60° trở lên, tránh sông), dựng bằng đồ rải nhẹ (xem `scatter.ts`). Cùng `seed` cùng kết quả. Làng Giấy không có phần này
+ * (đã dựng đủ, có đồi tre riêng).
+ */
+export function wildlands(seed: number): ScatterPlacement[] {
+  const out: ScatterPlacement[] = [];
+  for (const f of VILLAGE_FRAMES) {
+    if (f.village === 'lang-giay') continue;
+    const rng = createMulberry32(seed ^ 0x3c6ef372 ^ Math.round(f.yaw * 1000));
+    const c = reservedCenter(f);
+    const toGate = Math.atan2(-f.dirZ, -f.dirX);
+    const angle = () => toGate + ((60 + rng() * 240) * Math.PI) / 180;
+    const free = (x: number, z: number, r: number) => riverEdgeDistance(x, z) > r + 6 && out.every((o) => Math.hypot(o.x - x, o.z - z) > scatterRadius(o) * (o.kind === 'tre' ? 0.7 : 1) + r + 0.5);
+    for (let k = 0; k < 5; k++) {
+      for (let tries = 0; tries < 30; tries++) {
+        const a = toGate + ((70 + (k + rng() * 0.6) * 44) * Math.PI) / 180;
+        const R = 8 + rng() * 5;
+        const d = 62 + rng() * (104 - R - 62);
+        const x = c.x + Math.cos(a) * d;
+        const z = c.z + Math.sin(a) * d;
+        if (!free(x, z, R)) continue;
+        const g = 0.12 + rng() * 0.06;
+        out.push({ kind: 'doi', x, z, yaw: rng() * 3, scale: R, sy: 0.42 + rng() * 0.16, tint: [g, 0.38 + rng() * 0.06, 0.08 + rng() * 0.04] });
+        break;
+      }
+    }
+    for (let k = 0; k < 40; k++) {
+      for (let tries = 0; tries < 30; tries++) {
+        const a = angle();
+        const d = 50 + rng() * 64;
+        const x = c.x + Math.cos(a) * d;
+        const z = c.z + Math.sin(a) * d;
+        const s = 0.85 + rng() * 0.5;
+        if (!free(x, z, 1.4 * s)) continue;
+        out.push({ kind: 'tre', x, z, yaw: rng() * 6.28, scale: s, tint: [0.94 + rng() * 0.06, 1, 0.94 + rng() * 0.06] });
+        break;
+      }
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
 // Đồ thị đường
 
 /** Chỗ cổng thế giới: nút `gate:<id cổng>`. Nút biển gỗ: `board:<số màn>`. */
@@ -299,6 +337,12 @@ export function buildWorldGraph(villages: readonly WorldVillage[]): RoadGraph {
       nodes.push({ id: guideNodeId(f.village), x: v.nav.guideStand.x, z: v.nav.guideStand.z });
       links.push([villageNodeId(f.village, v.nav.guideStand.join), guideNodeId(f.village)]);
     }
+    // chỗ đứng cạnh từng thẻ "Em có biết?" (bước X3)
+    (v.nav.scrollStands ?? []).forEach((s, i) => {
+      const index = v.layout.scrolls?.[i]?.index ?? i;
+      nodes.push({ id: scrollNodeId(f.village, index), x: s.x, z: s.z });
+      links.push([villageNodeId(f.village, s.join), scrollNodeId(f.village, index)]);
+    });
   }
   return buildGraph(nodes, links);
 }
@@ -313,8 +357,10 @@ export interface WorldLayout {
   roads: WorldRoad[];
   signposts: SignpostDef[];
   graph: RoadGraph;
-  /** Đá bờ đông (đồ nhỏ do code dựng) */
-  eastRocks: PropPlacement[];
+  /** Đồ rải ở đất hoang của ba làng chưa dựng (đồi, tre; bước X3), luôn có, có vật cản */
+  wild: ScatterPlacement[];
+  /** Đá hai bờ sông, dọc theo đường tim (đồ nhỏ do code dựng, có vật cản) */
+  riverRocks: PropPlacement[];
   /** Vật cản luôn có (chợ, sông và cầu, biển chỉ đường); vật cản của làng thuộc về làng (chỉ tính khi vùng đó đã tải) */
   baseColliders: CameraBlocker[];
   baseObstacles: Obstacle[];
@@ -326,16 +372,23 @@ export const WORLD_SEED = 20260101;
 
 /** Dựng cả thế giới. `density` là mật độ lều và bụi tre của chợ theo mức chất lượng. Cùng đầu vào cùng kết quả. */
 export function assembleWorld(density: MarketDensity = FULL_DENSITY, seed: number = WORLD_SEED): WorldLayout {
-  const market = generateMarket(seed, density, { world: true });
+  const market = generateMarket(seed, density, { world: true, noBankRocks: true });
   const villages = VILLAGE_FRAMES.map((f) => assembleWorldVillage(f, seed, density));
   const gates = villages.map((v) => v.gate);
-  const eastRocks = eastBankRocks(seed);
+  const rocks = riverRocks(seed);
+  const wild = wildlands(seed);
   const sp = signposts();
   const baseColliders: CameraBlocker[] = [...market.colliders, ...riverColliders()];
   const baseBlockers: CameraBlocker[] = [...market.blockers];
-  for (const p of eastRocks) {
+  for (const p of rocks) {
     const c = propCollider(p);
     if (c) baseColliders.push(c);
+  }
+  for (const p of wild) {
+    const c = scatterCollider(p);
+    if (!c) continue;
+    baseColliders.push(c);
+    if (p.kind === 'doi') baseBlockers.push(c);
   }
   for (const s of sp) {
     const cs = signpostColliders(s);
@@ -349,7 +402,8 @@ export function assembleWorld(density: MarketDensity = FULL_DENSITY, seed: numbe
     roads: worldRoads(),
     signposts: sp,
     graph: buildWorldGraph(villages),
-    eastRocks,
+    riverRocks: rocks,
+    wild,
     baseColliders,
     baseObstacles: baseColliders.map((c) => c.shape),
     baseBlockers,

@@ -1,5 +1,6 @@
 /**
  * Thế giới mở (mốc 2, bước W1): chợ ở giữa (bán kính 42), 4 con đường đất dài 30 đơn vị từ rìa chợ ra cổng 4 làng (Bắc Giấy, Nam Dệt, Tây Khắc Dấu, Đông Bạc; đường sang Bạc qua cầu bắc qua sông).
+ * Từ bước X3 mỗi làng có chỗ bán kính `VILLAGE_RADIUS` = 125 sau cổng (tâm làng cách tâm chợ 72 + 125 = 197); Làng Giấy dùng hết chỗ đó, ba làng kia giữ phần tạm như W1 ở sát cổng (cổng, vài nhà, biển).
  * Hàm thuần, không import three. Hệ tọa độ như chợ: Bắc = +Z, Nam = −Z, Tây = +X, Đông = −X.
  *
  * Mỗi làng có bố cục riêng viết ở hệ tọa độ CỦA LÀNG (cổng ở phía nam của làng, người vào làng nhìn về +Z; xem `villages/giay.ts`). `VillageFrame` đổi hệ của làng sang hệ thế giới: xoay quanh
@@ -9,14 +10,17 @@
 import { VILLAGE_ORDER } from '../../content/levels';
 import type { VillageId } from '../../village';
 import { GATES, type Direction, type GateDef, type GateId, type Placement, type PropPlacement } from '../cho/marketLayout';
-import type { VillageBoardDef, VillageFenceRun, VillageField, VillageGateDef, VillageGuideDef, VillageLayoutInput, VillagePaths, VillagePond, VillageRoad, VillagerLoop } from '../village/villageLayout';
+import type { VillageBoardDef, VillageFenceRun, VillageField, VillageGateDef, VillageGuideDef, VillageLayoutInput, VillagePaths, VillagePond, VillageRoad, VillageScroll, VillagerLoop } from '../village/villageLayout';
+import type { ScatterPlacement } from '../village/scatter';
 
 /** Cổng làng cách tâm chợ bấy nhiêu: từ rìa chợ (bán kính 42) tới cổng dài 30. */
 export const GATE_WORLD_DISTANCE = 72;
 /** Người chơi vào làng (đã qua cổng) khi cách tâm làng dưới bấy nhiêu, với làng nhỏ có cổng cách tâm 17,5 (phải bước qua cổng 1 đơn vị). Làng khác: xem `insideRadiusOf`. */
 export const VILLAGE_INSIDE_RADIUS = 16.5;
-/** Biên đi lại của cả thế giới (hình tròn quanh tâm chợ): bao hết 4 làng (Làng Giấy ở bước W2: tâm cách 107, hàng rào bán kính 36,5) và đồng ruộng quanh làng. */
-export const WORLD_BOUNDS = 158;
+/** Bán kính chỗ dành cho mỗi làng sau cổng (bước X3). Cổng cách tâm làng bấy nhiêu. */
+export const VILLAGE_RADIUS = 125;
+/** Biên đi lại của cả thế giới (hình tròn quanh tâm chợ): bao hết 4 làng (tâm cách 197, bán kính 125, lũy tre bán kính 122,5: xa nhất 322) và đồng ruộng quanh làng (bước X3; trước đó 158). */
+export const WORLD_BOUNDS = 345;
 
 /** Người chơi coi là đã vào làng khi cách tâm làng dưới bán kính này: bước qua cổng thêm 1 đơn vị (cổng cách tâm `hypot(gate.x, gate.z)`). */
 export function insideRadiusOf(local: Pick<VillageLayoutInput, 'gate'>): number {
@@ -116,7 +120,10 @@ export function placeVillage(local: VillageLayoutInput, f: VillageFrame): WorldV
     ...q,
     nodes: q.nodes.map((n) => ({ ...n, ...at(n.x, n.z) })),
     guideStand: q.guideStand ? { ...q.guideStand, ...at(q.guideStand.x, q.guideStand.z) } : undefined,
+    scrollStands: q.scrollStands?.map((s) => ({ ...s, ...at(s.x, s.z) })),
   });
+  const scatter = (p: ScatterPlacement): ScatterPlacement => ({ ...p, ...at(p.x, p.z), yaw: p.yaw + f.yaw });
+  const scroll = (q: VillageScroll): VillageScroll => ({ ...q, ...at(q.x, q.z) });
   return {
     ...local,
     center,
@@ -134,6 +141,9 @@ export function placeVillage(local: VillageLayoutInput, f: VillageFrame): WorldV
     fenceRuns: local.fenceRuns?.map(run),
     villagers: local.villagers?.map(loop),
     paths: local.paths ? paths(local.paths) : undefined,
+    scatter: local.scatter?.map(scatter),
+    scrolls: local.scrolls?.map(scroll),
+    wall: local.wall ? { ...local.wall, center } : undefined,
   };
 }
 

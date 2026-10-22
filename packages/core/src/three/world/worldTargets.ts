@@ -7,9 +7,11 @@ import type { VillageId } from '../../village';
 import { GATES, VILLAGER_PATHS, type GateId } from '../cho/marketLayout';
 import { BI_TARGET_ID, gateTargetId, parseTarget, villagerTargetId, type MarketTarget } from '../cho/marketTargets';
 import type { Interactable } from '../interaction';
+import { hasKnowCard } from '../../progress/knowCards';
+import { parseScrollTarget, scrollTargetId } from '../village/scrollTargets';
 import type { WorldVillage } from './worldLayout';
 
-export type WorldTarget = MarketTarget | { kind: 'board'; village: VillageId; level: number } | { kind: 'guide'; village: VillageId };
+export type WorldTarget = MarketTarget | { kind: 'board'; village: VillageId; level: number } | { kind: 'guide'; village: VillageId } | { kind: 'scroll'; village: VillageId; index: number };
 
 export const boardTargetId = (village: VillageId, level: number): string => `board:${village}:${level}`;
 export const guideTargetId = (village: VillageId): string => `guide:${village}`;
@@ -19,6 +21,8 @@ export function parseWorldTarget(id: string): WorldTarget | null {
   if (b) return { kind: 'board', village: b[1] as VillageId, level: Number(b[2]) };
   const g = /^guide:(lang-[a-z-]+)$/.exec(id);
   if (g) return { kind: 'guide', village: g[1] as VillageId };
+  const sc = parseScrollTarget(id);
+  if (sc) return { kind: 'scroll', village: sc.village, index: sc.index };
   return parseTarget(id);
 }
 
@@ -40,11 +44,20 @@ export function createWorldBase(villages: readonly Pick<WorldVillage, 'gate'>[])
   };
 }
 
-/** Vật tương tác của một làng: các biển gỗ (theo thứ tự trong bố cục) rồi người dẫn (nếu có). Tạo một lần cho mỗi làng. */
+/** Vật tương tác của một làng: các biển gỗ (theo thứ tự trong bố cục), người dẫn (nếu có), rồi các thẻ "Em có biết?" (bước X3). Tạo một lần cho mỗi làng. */
 export function createZoneTargets(v: Pick<WorldVillage, 'id' | 'layout'>): Interactable[] {
   const out: Interactable[] = v.layout.boards.map((b) => ({ id: boardTargetId(v.id, b.level), x: b.x, z: b.z }));
   if (v.layout.guide) out.push({ id: guideTargetId(v.id), x: v.layout.guide.x, z: v.layout.guide.z });
+  for (const s of v.layout.scrolls ?? []) out.push({ id: scrollTargetId(v.id, s.index), x: s.x, z: s.z });
   return out;
+}
+
+/** Bỏ khỏi danh sách vật tương tác của một làng những thẻ đã nhặt (mặt nạ bit collected); thẻ đã nhặt không còn trên mặt đất. Không sửa danh sách vào. */
+export function withoutCollectedScrolls(list: readonly Interactable[], collected: number): Interactable[] {
+  return list.filter((t) => {
+    const sc = parseScrollTarget(t.id);
+    return !(sc && hasKnowCard(collected, sc.index));
+  });
 }
 
 /**

@@ -11,13 +11,15 @@ export interface EmCoBietDialogProps {
   onClose: () => void;
   /** Chữ nút ở thẻ cuối (mặc định "Đóng"; vào làng lần đầu là "Vào làng") */
   finishLabel?: string;
+  /** Gọi khi bấm nút ở thẻ cuối (đã đọc hết các thẻ), ngay trước `onClose`; không gọi khi đóng bằng Esc hay bấm ra ngoài */
+  onFinish?: () => void;
 }
 
 /**
  * Hộp "Em có biết?" dùng chung (trang bài học 2D và cảnh làng 3D; mốc 3 dùng lại cho 3 làng còn lại): các thẻ kiến thức xem lần lượt, mỗi lần một thẻ, "Thẻ n/tổng",
  * nút "Trước" và "Tiếp", ở thẻ cuối nút đổi thành `finishLabel`. Nội dung thẻ lấy từ `content/` (xem `villageKnowCards`), không viết lại ở đây.
  */
-export function EmCoBietDialog({ cards, onClose, finishLabel }: EmCoBietDialogProps) {
+export function EmCoBietDialog({ cards, onClose, finishLabel, onFinish }: EmCoBietDialogProps) {
   const [i, setI] = useState(0);
   const card = cards[Math.min(i, cards.length - 1)];
 
@@ -46,7 +48,14 @@ export function EmCoBietDialog({ cards, onClose, finishLabel }: EmCoBietDialogPr
               {ui.baiHoc.sau}
             </Button>
           ) : (
-            <Button size="sm" autoFocus onClick={onClose}>
+            <Button
+              size="sm"
+              autoFocus
+              onClick={() => {
+                onFinish?.();
+                onClose();
+              }}
+            >
               {finishLabel ?? ui.baiHoc.dong}
             </Button>
           )}

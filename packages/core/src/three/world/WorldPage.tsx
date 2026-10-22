@@ -11,12 +11,16 @@ import { STORY } from '../../content/story';
 import { ui } from '../../content/ui';
 import { VILLAGE_SCENE } from '../../content/villageScene';
 import { villageKnowCards } from '../../content/villageCards';
+import { knowScrollUi } from '../../content/knowScrolls';
 import { MERGED, URLS, levelUrl } from '../../config/urls';
 import { shouldAutoOpenGuide } from '../../progress/guideFlags';
+import { countKnowCards, effectiveKnowMask } from '../../progress/knowCards';
 import { useProgress } from '../../progress/ProgressProvider';
-import { pendingGateOpening, shouldShowGolden, shouldShowKnow, shouldShowScene } from '../../progress/villageIntro';
+import type { LevelState } from '../../progress/unlock';
+import { hasSeenKnow, pendingGateOpening, shouldShowGolden, shouldShowKnow, shouldShowScene } from '../../progress/villageIntro';
 import { useSettings } from '../../settings/SettingsProvider';
 import { EmCoBietDialog } from '../../ui/EmCoBietDialog';
+import { KnowCollectionDialog } from '../../ui/KnowCollectionDialog';
 import { GuideDialog } from '../../ui/GuideDialog';
 import { VnDialog, type VnTurn } from '../../ui/VnDialog';
 import type { VillageId } from '../../village';
@@ -37,10 +41,11 @@ import { WorldScene } from './WorldScene';
 import type { LoadedZones } from './WorldTracker';
 import { assembleWorld, gateApproachSpawn, villageSpawn } from './worldLayout';
 import { effectivePages, lastGiver, targetNodeId } from './worldQuest';
-import { composeTargets, createWorldBase, createZoneTargets, parseWorldTarget, type WorldTarget } from './worldTargets';
+import { composeTargets, createWorldBase, createZoneTargets, parseWorldTarget, withoutCollectedScrolls, type WorldTarget } from './worldTargets';
 import { PROBE } from '../../lib/dev';
 
 const DIRT_TEXTURE = 'ui/textures/duong-dat';
+const BRICK_TEXTURE = 'ui/textures/san-gach';
 /** Sương: trong vùng đi lại gần như không có, ngoài ruộng thì nhạt dần vào chân trời (làng ở xa 70 đến 130 vẫn thấy rõ). */
 const FOG: [number, number] = [90, 300];
 const NONE_LOADED: LoadedZones = { 'lang-giay': false, 'lang-det': false, 'lang-khac-dau': false, 'lang-bac': false };
@@ -118,7 +123,10 @@ export function WorldPage() {
 
   const [near, setNear] = useState(-1);
   const [dialog, setDialog] = useState<DialogState | null>(null);
-  const [know, setKnow] = useState<{ village: VillageId; auto: boolean } | null>(null);
+  const [know, setKnow] = useState<{ village: VillageId; auto: boolean; /** thẻ nhặt được (chỉ số), đọc xong thì cất vào sổ */ scroll?: number } | null>(null);
+  const [collection, setCollection] = useState<VillageId | null>(null);
+  const [scrollIdx, setScrollIdx] = useState(-1);
+  const [toast, setToast] = useState<string | null>(null);
   const [guide, setGuide] = useState<{ section?: string } | null>(null);
   const [ready, setReady] = useState(false);
   const [loaded, setLoaded] = useState<LoadedZones>(NONE_LOADED);
@@ -134,8 +142,9 @@ export function WorldPage() {
   const giverRef = useRef(giver);
   giverRef.current = giver;
   const entering = inside !== null && !zoneReady.has(inside);
-  const session = useWalkSession(api, dialog !== null || know !== null || guide !== null || entering);
+  const session = useWalkSession(api, dialog !== null || know !== null || collection !== null || guide !== null || entering);
   const dirtUrl = useMemo(() => (manifest ? asset(DIRT_TEXTURE) : null), [manifest]);
+  const brickUrl = useMemo(() => (manifest ? asset(BRICK_TEXTURE) : null), [manifest]);
   if (PROBE) Object.assign(window, { __walkApi: api, __progress: progress, __worldInside: inside, __worldSeq: seq });
 
   // ---- tiến độ: cổng, trang, nhiệm vụ
@@ -156,20 +165,48 @@ export function WorldPage() {
   const fallingGate = seq === 'fall' ? openingGate : null;
 
   const stateOf = useCallback((id: number) => unlock.levels.find((u) => u.id === id)?.state, [unlock.levels]);
-  const levelStates = useMemo(() => Object.fromEntries(unlock.levels.map((u) => [u.id, u.state])), [unlock.levels]);
+  // ---- thẻ "Em có biết?" rải trong làng (bước X3): mặt nạ hiệu lực theo làng (đã nhặt, hoặc coi như đủ nếu đã xong màn 1 hay đã xem hộp cũ), số thẻ cần nhặt và việc có chặn biển hay không
+  const scrollTotals = useMemo(() => Object.fromEntries(world.villages.map((v) => [v.id, v.layout.scrolls?.length ?? 0])) as Record<VillageId, number>, [world.villages]);
+  const knowMasks = useMemo(
+    () =>
+      Object.fromEntries(
+        VILLAGE_ORDER.map((id) => {
+          const first = levelsOfVillage(id)[0]?.id;
+          return [id, effectiveKnowMask({ data, village: id, total: scrollTotals[id], lessonDone: first !== undefined && stateOf(first) === 'done', seenOld: hasSeenKnow(data, id) })];
+        }),
+      ) as Record<VillageId, number>,
+    [data, scrollTotals, stateOf],
+  );
+  const knowGot = (id: VillageId): number => countKnowCards(knowMasks[id], scrollTotals[id]);
+  /** Làng còn thẻ phải nhặt trước khi vào màn (giáo viên không bị chặn) */
+  const knowGated = (id: VillageId): boolean => !isTeacher && scrollTotals[id] > 0 && knowGot(id) < scrollTotals[id];
+  const levelStates = useMemo(
+    () =>
+      Object.fromEntries(
+        unlock.levels.map((u) => {
+          const gated = u.state === 'open' && !isTeacher && VILLAGE_ORDER.some((id) => scrollTotals[id] > 0 && knowGot(id) < scrollTotals[id] && levelsOfVillage(id).some((l) => l.id === u.id));
+          return [u.id, gated ? 'locked' : u.state];
+        }),
+      ) as Record<number, LevelState | undefined>,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [unlock.levels, isTeacher, scrollTotals, knowMasks],
+  );
+  const insideGated = inside !== null && knowGated(inside);
   const insideLevelIds = useMemo(() => (inside ? levelsOfVillage(inside).map((l) => l.id) : []), [inside]);
   const nextBoard = inside ? nextLevel(insideLevelIds, stateOf) : null;
   const insideName = inside ? ui.lang[inside] : '';
   const qPages = seqActive ? Math.max(0, effPages - 1) : effPages;
   const questText = useMemo(() => {
+    if (inside && insideGated) return fmt(knowScrollUi.nhiemVu, { n: knowGot(inside), tong: scrollTotals[inside] });
     if (inside && nextBoard !== null) return fmt(ui.langScene.nhiemVuMan, { bien: fmt(levelById(nextBoard)?.bien ?? '') });
     if (inside && ceremonyPending) return fmt(ui.langScene.nhiemVuXong, { lang: insideName });
     return fmt(NHIEM_VU[questIndex(qPages)]);
-  }, [inside, nextBoard, ceremonyPending, insideName, qPages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inside, insideGated, knowMasks, scrollTotals, nextBoard, ceremonyPending, insideName, qPages]);
   // làng của nhiệm vụ: đang ở trong làng nào thì làng đó, không thì làng có cổng của nhiệm vụ theo số Trang Sổ Vàng
   const questG = questGate(effPages);
   const missionVillage: VillageId | null = inside ?? (questG ? GATE_VILLAGE[questG] : null);
-  const arrowTarget = seqActive ? null : targetNodeId({ inVillage: inside, nextBoard, pages: effPages });
+  const arrowTarget = seqActive ? null : targetNodeId({ inVillage: inside, nextBoard, pages: effPages, scroll: insideGated ? scrollIdx : null });
 
   // ---- vật tương tác
   const base = useMemo(() => createWorldBase(world.villages), [world.villages]);
@@ -178,10 +215,10 @@ export function WorldPage() {
     const closed = new Set(world.gates.filter((g) => !gateOpen[g.id]).map((g) => g.id));
     return composeTargets(
       base,
-      VILLAGE_ORDER.filter((id) => loaded[id]).map((id) => zoneTargets[id]),
+      VILLAGE_ORDER.filter((id) => loaded[id]).map((id) => withoutCollectedScrolls(zoneTargets[id], knowMasks[id])),
       closed,
     );
-  }, [base, zoneTargets, loaded, gateOpen, world.gates]);
+  }, [base, zoneTargets, loaded, gateOpen, world.gates, knowMasks]);
   if (PROBE) Object.assign(window, { __worldInteractables: interactables });
   const targets = useMemo<(WorldTarget | null)[]>(() => interactables.map((i) => parseWorldTarget(i.id)), [interactables]);
 
@@ -191,8 +228,9 @@ export function WorldPage() {
     if (t.kind === 'villager') return fmt(ui.cho.nhanNoiChuyen, { nguoi: fmt(CHARACTERS[MARKET_TALKERS[t.index].speaker].name) });
     if (t.kind === 'gate') return fmt(ui.cho.nhanCongDong, { lang: ui.lang[GATE_VILLAGE[t.gate]] });
     if (t.kind === 'guide') return fmt(ui.cho.nhanNoiChuyen, { nguoi: fmt(CHARACTERS[VILLAGE_SCENE[t.village]?.guide ?? 'bacAn'].name) });
+    if (t.kind === 'scroll') return knowScrollUi.nhanThe;
     const st = stateOf(t.level);
-    return fmt(st === 'open' || st === 'done' ? ui.langScene.nhanBien : ui.langScene.nhanBienKhoa, { bien: fmt(levelById(t.level)?.bien ?? '') });
+    return fmt((st === 'open' || st === 'done') && !knowGated(t.village) ? ui.langScene.nhanBien : ui.langScene.nhanBienKhoa, { bien: fmt(levelById(t.level)?.bien ?? '') });
   };
   const label = near >= 0 ? labelOf(targets[near] ?? null) : null;
 
@@ -200,8 +238,8 @@ export function WorldPage() {
   nearRef.current = near;
   const dialogRef = useRef(dialog);
   dialogRef.current = dialog;
-  const live = useRef({ gateOpen, pages: effPages, ten, targets, inside, nextBoard });
-  live.current = { gateOpen, pages: effPages, ten, targets, inside, nextBoard };
+  const live = useRef({ gateOpen, pages: effPages, ten, targets, inside, nextBoard, gated: insideGated, got: 0, total: 0, scrollIdx, knowMasks, scrollsOf: (id: VillageId) => world.villages.find((v) => v.id === id)?.layout.scrolls ?? [], knowGated });
+  live.current = { gateOpen, pages: effPages, ten, targets, inside, nextBoard, gated: insideGated, got: inside ? knowGot(inside) : 0, total: inside ? scrollTotals[inside] : 0, scrollIdx, knowMasks, scrollsOf: (id: VillageId) => world.villages.find((v) => v.id === id)?.layout.scrolls ?? [], knowGated };
 
   const biTurn = useCallback((text: string): VnTurn => ({ speaker: speakerLabel('bi'), portrait: CHARACTERS.bi.portrait, text }), []);
 
@@ -217,6 +255,11 @@ export function WorldPage() {
       const talker = MARKET_TALKERS[t.index];
       const portrait = CHARACTERS[talker.speaker].portrait;
       setDialog({ turns: talker.lines.map((line) => ({ speaker: speakerLabel(talker.speaker), portrait, text: fmt(line, { ten: l.ten }) })), villager: t.index });
+    } else if (t.kind === 'scroll') {
+      setKnow({ village: t.village, auto: false, scroll: t.index });
+    } else if (t.kind === 'board' && (stateOf(t.level) === 'open' || stateOf(t.level) === 'done') && l.knowGated(t.village)) {
+      // chưa đủ thẻ "Em có biết?" của làng: biển gỗ báo, chưa vào được màn (giáo viên không bị chặn)
+      setDialog({ turns: [{ speaker: knowScrollUi.bienNguoiNoi, text: fmt(knowScrollUi.bienBao, { n: l.got, tong: l.total }) }], villager: null });
     } else if (t.kind === 'board') {
       const st = stateOf(t.level);
       if (st === 'open' || st === 'done') {
@@ -241,7 +284,12 @@ export function WorldPage() {
       setDialog({ turns: [{ speaker: speakerLabel(text?.guide ?? 'bacAn'), portrait, text: fmt(line, { ten: l.ten }) }], villager: null, village: t.village, guideTalking: true });
     } else {
       const k = questIndex(l.pages);
-      if (l.inside) {
+      if (l.inside && l.gated) {
+        // Bi gợi ý khu có thẻ "Em có biết?" gần nhất chưa nhặt (không chỉ đúng chỗ)
+        const sc = l.scrollsOf(l.inside).find((q) => q.index === l.scrollIdx);
+        const khu = sc ? ((knowScrollUi.khu as Record<string, string>)[sc.zone] ?? sc.zone) : '';
+        setDialog({ turns: [biTurn(fmt(knowScrollUi.biGoiY, { con: l.total - l.got, khu, ten: l.ten }))], villager: null });
+      } else if (l.inside) {
         const n = l.nextBoard;
         const lang = ui.lang[l.inside];
         setDialog({ turns: [biTurn(n !== null ? fmt(ui.langScene.biNhacMan, { lang, bien: fmt(levelById(n)?.bien ?? ''), ten: l.ten }) : fmt(ui.langScene.biNhacXong, { lang, ten: l.ten }))], villager: null });
@@ -281,7 +329,7 @@ export function WorldPage() {
       api.lock.exit();
       return;
     }
-    if (cards.length > 0 && shouldShowKnow(data, inside)) {
+    if (cards.length > 0 && scrollTotals[inside] === 0 && shouldShowKnow(data, inside)) {
       progress.markKnowSeen(inside);
       setKnow({ village: inside, auto: true });
       api.lock.exit();
@@ -301,7 +349,7 @@ export function WorldPage() {
       setDialog({ turns, villager: null, village: inside, guideTalking: true, golden: true });
       api.lock.exit();
     }
-  }, [inside, ready, flagKnown, dialog, know, guide, seqActive, data, pages, isTeacher, ten, settings.reducedMotion, progress, api]);
+  }, [inside, ready, flagKnown, dialog, know, guide, seqActive, data, pages, isTeacher, ten, settings.reducedMotion, progress, api, scrollTotals]);
 
   // ---- hiệu ứng mở cổng: tới gần cổng làng kế tiếp lần đầu sau khi nhận trang (và đã xem cảnh trao trang): chờ → then gỗ và dây đỏ rơi → Bi nói → nhiệm vụ mới
   useEffect(() => {
@@ -328,12 +376,34 @@ export function WorldPage() {
     const v = live.current.inside;
     if (!v) return;
     api.lock.exit();
-    setKnow({ village: v, auto: false });
+    if (live.current.scrollsOf(v).length > 0) setCollection(v);
+    else setKnow({ village: v, auto: false });
   }, [api]);
+  const knowRef = useRef(know);
+  knowRef.current = know;
   const closeKnow = useCallback(() => {
+    const k = knowRef.current;
     setKnow(null);
+    if (k && k.scroll !== undefined) {
+      // đọc xong thẻ nhặt được: cất vào sổ, cột sáng tắt, báo số thẻ
+      const total = live.current.scrollsOf(k.village).length;
+      const mask = live.current.knowMasks[k.village] | (1 << k.scroll);
+      progress.markKnowCard(k.village, k.scroll);
+      const n = countKnowCards(mask, total);
+      setToast(fmt(n >= total ? knowScrollUi.nhatDu : knowScrollUi.nhatXong, { n, tong: total }));
+    }
+    session.dialogClosed();
+  }, [session, progress]);
+  const closeCollection = useCallback(() => {
+    setCollection(null);
     session.dialogClosed();
   }, [session]);
+  // thông báo nhặt thẻ tự tắt sau vài giây
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4200);
+    return () => clearTimeout(t);
+  }, [toast]);
   const openGuide = useCallback(
     (section?: string) => {
       api.lock.exit();
@@ -374,7 +444,8 @@ export function WorldPage() {
     document.title = ui.cho.tieuDe;
   }, []);
 
-  const knowCards = know ? villageKnowCards(know.village) : [];
+  const allKnowCards = know ? villageKnowCards(know.village) : [];
+  const knowCards = know && know.scroll !== undefined ? allKnowCards.slice(know.scroll, know.scroll + 1) : allKnowCards;
   const menuKnow = inside && villageKnowCards(inside).length > 0 && VILLAGE_SCENE[inside] ? [{ label: ui.baiHoc.emCoBiet, onClick: openKnow }] : [];
 
   return (
@@ -407,6 +478,7 @@ export function WorldPage() {
             paused={session.paused}
             level={level}
             dirtUrl={dirtUrl}
+            brickUrl={brickUrl}
             animate={!settings.reducedMotion}
             overview={overview}
             debugColliders={debugColliders}
@@ -429,6 +501,9 @@ export function WorldPage() {
             onInside={setInside}
             onNearGate={setNearGate}
             onZoneReady={onZoneReady}
+            knowMasks={knowMasks}
+            inside={inside}
+            onNearestScroll={setScrollIdx}
           />
         </Scene3D>
 
@@ -463,7 +538,15 @@ export function WorldPage() {
         </div>
       )}
 
-      {know && <EmCoBietDialog cards={knowCards} onClose={closeKnow} finishLabel={know.auto ? ui.baiHoc.vaoLang : undefined} />}
+      {know && <EmCoBietDialog cards={knowCards} onClose={closeKnow} finishLabel={know.scroll !== undefined ? knowScrollUi.catVaoSo : know.auto ? ui.baiHoc.vaoLang : undefined} />}
+      {collection && <KnowCollectionDialog cards={villageKnowCards(collection)} mask={knowMasks[collection]} total={scrollTotals[collection]} onClose={closeCollection} />}
+      {toast && (
+        <div data-hud className="pointer-events-none fixed inset-x-0 top-24 z-40 flex justify-center px-3">
+          <span role="status" data-testid="thong-bao-the" className="rounded-nut border-2 border-vang bg-black/75 px-4 py-2 text-center font-display text-lg font-extrabold text-white">
+            {toast}
+          </span>
+        </div>
+      )}
       {guide && <GuideDialog section={guide.section} onClose={closeGuide} />}
 
       <WalkLockOverlay session={session} hideMenu />

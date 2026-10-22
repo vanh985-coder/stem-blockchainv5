@@ -7,6 +7,7 @@ import type { VillageId } from '../../village';
 import type { CameraBlocker } from '../cameraCollision';
 import { circle, obox, type Obstacle } from '../collision';
 import { cameraBlockersFor, collidersFor, fenceColliders, fenceLayout, fenceRun, propCollider, type FenceLayout, type Placement, type PropPlacement } from '../cho/marketLayout';
+import { ringColliders, scatterCollider, type ScatterPlacement } from './scatter';
 
 /** Một biển gỗ chỉ màn `level` (số màn 1 đến 12), đặt ở (x, z), mặt trước quay về `yaw` (như rotation.y của three, mặt trước là +Z của biển). */
 export interface VillageBoardDef {
@@ -34,13 +35,32 @@ export interface VillageGateDef {
   yaw: number;
 }
 
-/** Con đường đất từ (x0, z0) tới (x1, z1), rộng `width`. */
+/** Con đường từ (x0, z0) tới (x1, z1), rộng `width`: đường đất (mặc định) hay đường gạch (bước X3: đại lộ và quanh sân). */
 export interface VillageRoad {
   x0: number;
   z0: number;
   x1: number;
   z1: number;
   width: number;
+  kind?: 'dat' | 'gach';
+}
+
+/**
+ * Một thẻ "Em có biết?" đặt trong làng (bước X3): cuộn giấy phát sáng có cột sáng. `index` là số thứ tự thẻ (từ 0, ứng với thẻ `index` của `villageKnowCards`), `zone` là khu (khóa trong content/
+ * knowScrolls.ts) để Bi gợi ý khu có thẻ mà không chỉ đúng chỗ.
+ */
+export interface VillageScroll {
+  index: number;
+  x: number;
+  z: number;
+  zone: string;
+}
+
+/** Hàng rào lũy tre bao quanh làng (bước X3): bán kính, chỗ chừa lối quanh cổng, tâm. Vẽ bằng bụi tre dựng bằng code (`scatter`), vật cản là chuỗi hộp. */
+export interface VillageWall {
+  radius: number;
+  gap: number;
+  center?: { x: number; z: number };
 }
 
 /** Ao làng: hợp của các vũng tròn (mỗi vũng một hình tròn mặt nước, đi vào là bị chặn), bờ cỏ rộng thêm `POND_BANK` quanh vũng. */
@@ -82,6 +102,8 @@ export interface VillagePaths {
   entry: string;
   boardJoin: string;
   guideStand?: { x: number; z: number; join: string };
+  /** Chỗ đứng cạnh từng thẻ "Em có biết?" (theo `scrolls`, cùng chỉ số) và nút nối tới (bước X3) */
+  scrollStands?: { x: number; z: number; join: string }[];
 }
 
 export interface VillageLayoutInput {
@@ -109,6 +131,12 @@ export interface VillageLayoutInput {
   fenceRuns?: VillageFenceRun[];
   villagers?: VillagerLoop[];
   paths?: VillagePaths;
+  /** Đồ rải dựng bằng code (bụi tre, cây ăn quả, phên, cầu ao, đồi): làng lớn từ bước X3 */
+  scatter?: ScatterPlacement[];
+  /** Thẻ "Em có biết?" rải trong làng (bước X3); làng chưa có thì không có thẻ để nhặt */
+  scrolls?: VillageScroll[];
+  /** Lũy tre bao quanh làng (bước X3), thay cho hàng rào tròn `fence` ở làng lớn */
+  wall?: VillageWall;
   /** Hạt giống cho đồ nhỏ rải ngẫu nhiên (hoa, tint) */
   seed: number;
 }
@@ -156,6 +184,19 @@ export function assembleVillage(input: VillageLayoutInput): VillageLayout {
   for (const b of input.boards) colliders.push(boardCollider(b));
   if (input.guide) colliders.push({ shape: circle(input.guide.x, input.guide.z, GUIDE_RADIUS), height: 1.7 });
   for (const p of input.ponds ?? []) colliders.push({ shape: circle(p.x, p.z, p.r), height: POND_COLLIDER_HEIGHT });
+  for (const p of input.scatter ?? []) {
+    const c = scatterCollider(p);
+    if (!c) continue;
+    colliders.push(c);
+    if (p.kind === 'doi') blockers.push(c);
+  }
+  if (input.wall) {
+    const w = input.wall;
+    for (const c of ringColliders(w.center ?? { x: 0, z: 0 }, w.radius, input.gate, w.gap)) {
+      colliders.push(c);
+      blockers.push(c);
+    }
+  }
   let fence: FenceLayout | null = null;
   if (input.fence) {
     const g = input.gate;
