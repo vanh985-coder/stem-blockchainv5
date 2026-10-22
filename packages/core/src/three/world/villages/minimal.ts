@@ -1,17 +1,16 @@
+import { levelsOfVillage } from '../../../content/levels';
 import type { VillageId } from '../../../village';
 import type { Placement, PropKind, PropPlacement } from '../../cho/marketLayout';
-import type { VillageLayoutInput } from '../../village/villageLayout';
+import type { VillageBoardDef, VillageLayoutInput } from '../../village/villageLayout';
 
 /**
- * Làng chưa dựng đủ (Dệt, Khắc Dấu, Bạc: nội dung 3D ở bước W2 và mốc 3): cổng đúng model, vài nhà và bụi tre, vài đồ nhỏ, một sân trước và MỘT biển gỗ "Học cùng [người dẫn]" dẫn vào bài học
- * của làng (màn 4, 7, 10); các game còn "sắp ra mắt" nên chưa có biển. Cùng cỡ và cùng cách đặt cổng, đường và hàng rào với Làng Giấy (bán kính 21, cổng ở (0, −17,5)) để hàm đổi hệ tọa độ và
+ * Làng chưa dựng đủ (Dệt, Khắc Dấu, Bạc: nội dung 3D ở bước W2 và mốc 3): cổng đúng model, vài nhà và bụi tre, vài đồ nhỏ, một sân trước và ĐỦ 3 biển gỗ của làng (bài học và 2 game, lấy
+ * từ levels.ts) đứng thành vòng cung ở sân trước, quay mặt về cổng; biển game "sắp ra mắt" vẫn đứng đó (chỉ báo, không chặn). Cùng cỡ và cùng cách đặt cổng, đường và hàng rào với Làng Giấy (bán kính 21, cổng ở (0, −17,5)) để hàm đổi hệ tọa độ và
  * đồ thị đường dùng chung. Xếp theo vị trí đã kiểm của Làng Giấy (không chồng nhau, nằm trong hàng rào), lật trái phải ở làng `mirror`.
  */
 export interface MinimalVillageOptions {
   id: VillageId;
   gateModel: string;
-  /** Số màn của bài học (biển "Học cùng …") */
-  lessonLevel: number;
   /** Lật trái phải (cho các làng không giống hệt nhau) */
   mirror?: boolean;
   /** Mái của 3 ngôi nhà: ngói hay tranh */
@@ -20,6 +19,23 @@ export interface MinimalVillageOptions {
 }
 
 const HOUSE = { ngoi: 'env/nha-mai-ngoi', tranh: 'env/nha-mai-tranh' } as const;
+/** Icon trên biển: bài học là Trang Sổ Vàng, game là ngôi sao (mốc Đồng/Bạc/Vàng). */
+const BOARD_ICON = { lesson: 'ui/icons/trang-vang', game: 'ui/icons/ngoi-sao' } as const;
+/** Ba chỗ biển ở sân trước (hệ làng, không lật theo `mirror` để thứ tự luôn là bài học, game 1, game 2 từ trái sang phải khi nhìn vào làng): vòng cung như Làng Giấy, biển giữa nhô lên trước. */
+const BOARD_SPOTS: readonly (readonly [number, number])[] = [
+  [3.3, -8.6],
+  [0, -8.2],
+  [-3.3, -8.6],
+];
+
+/** 3 biển gỗ của làng theo levels.ts, mặt trước quay về tâm cổng (0, −17,5). */
+export function minimalBoards(id: VillageId, gateZ: number): VillageBoardDef[] {
+  return levelsOfVillage(id).map((l, i) => {
+    const [x, z] = BOARD_SPOTS[i];
+    return { level: l.id, icon: BOARD_ICON[l.kind], x, z, yaw: Math.atan2(0 - x, gateZ - z) };
+  });
+}
+
 const prop = (kind: PropKind, x: number, z: number, scale = 1, tint: readonly [number, number, number] = [1, 1, 1]): PropPlacement => ({ kind, x, z, yaw: 0, scale, tint });
 
 export function minimalVillage(o: MinimalVillageOptions): VillageLayoutInput {
@@ -56,8 +72,7 @@ export function minimalVillage(o: MinimalVillageOptions): VillageLayoutInput {
       prop('hoa', 10.3, -8.3),
       prop('hoa', -4.8, -14),
     ].map((p) => ({ ...p, x: p.x * sx })),
-    // một biển gỗ ở sân trước, mặt quay về phía nam (về người vào làng)
-    boards: [{ level: o.lessonLevel, icon: 'ui/icons/trang-vang', x: 0, z: -8.2, yaw: Math.PI }],
+    boards: minimalBoards(o.id, -17.5),
     yards: [{ x: 0, z: -7.5, r: 5.2 }],
     roads: [{ x0: 0, z0: -19, x1: 0, z1: -6, width: 4.4 }],
     fence: { radius: 19.8, gap: 6.5 },

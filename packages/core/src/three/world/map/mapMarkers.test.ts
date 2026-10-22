@@ -39,13 +39,13 @@ describe('ký hiệu trên bản đồ', () => {
     expect(g.z).toBeCloseTo(72, 9);
   });
 
-  it('biển: bản đồ lớn hiện cả 4 làng (3 + 1 + 1 + 1 biển); bản đồ nhỏ ở ngoài làng không hiện biển, trong làng chỉ hiện biển của làng đó', () => {
-    expect(of(mapMarkers(base(), 'big'), 'board')).toHaveLength(6);
+  it('biển: bản đồ lớn hiện cả 4 làng (3 biển mỗi làng); bản đồ nhỏ ở ngoài làng không hiện biển, trong làng chỉ hiện biển của làng đó', () => {
+    expect(of(mapMarkers(base(), 'big'), 'board')).toHaveLength(12);
     expect(of(mapMarkers(base(), 'mini'), 'board')).toHaveLength(0);
     const inGiay = of(mapMarkers(base({ inside: 'lang-giay' }), 'mini'), 'board');
     expect(inGiay.map((b) => [b.level, b.mark])).toEqual([[1, 'open'], [2, 'locked'], [3, 'locked']]);
     const inDet = of(mapMarkers(base({ inside: 'lang-det' }), 'mini'), 'board');
-    expect(inDet.map((b) => b.level)).toEqual([4]);
+    expect(inDet.map((b) => b.level)).toEqual([4, 5, 6]);
   });
 
   it('trạng thái biển theo màn: xong, đang mở, khóa, sắp ra mắt', () => {

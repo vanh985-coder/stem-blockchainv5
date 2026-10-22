@@ -87,6 +87,9 @@ export function cardFonts(cardPx: number, largeText: boolean): { label: number; 
   return { label, number: Math.max(label * 1.5, cardPx * 0.3) };
 }
 
+/** Vệt tím lúc {phanDien} tráo: mặt phẳng cùng tâm thẻ, cạnh bằng cạnh thẻ nhân số này (rộng hơn thẻ 6% mỗi cạnh); viền sáng vẽ sát mép thẻ, tỏa ra phần dư. */
+export const GLOW_SCALE = 1.12;
+
 /** Chọn khung theo kích thước màn hình: cao hơn rộng thì dọc. */
 export function frameOf(width: number, height: number): MemoryFrame {
   return height > width ? 'portrait' : 'landscape';

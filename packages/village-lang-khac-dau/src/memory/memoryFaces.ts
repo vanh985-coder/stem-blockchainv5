@@ -63,7 +63,7 @@ const PANEL = { w: 0.86, h: 0.8 };
 const FALLBACK = { khuon: '#6b3fa0', mau: '#2f5bb5', back: '#5b2d8c' } as const;
 /** Ảnh thẻ gốc: mép trắng chiếm chừng 3,5% mỗi cạnh; góc bo chừng 9% cạnh thẻ. */
 const ART_TRIM = 0.035;
-const CORNER = 0.09;
+export const CORNER = 0.09;
 
 /** Vẽ ảnh thẻ (hay màu thay thế) vào ô, cắt mép trắng và bo góc. */
 function drawCardArt(ctx: CanvasRenderingContext2D, img: CanvasImageSource | null, color: string, x0: number, y0: number, cell: number): void {
@@ -161,4 +161,38 @@ export function fitFaceText(
     if (ok || size <= minLabel) return { label: size, number, lines, height: text + number };
     size = Math.max(minLabel, size - 0.5);
   }
+}
+
+/**
+ * Vẽ vệt tím (viền sáng bo góc) vào canvas vuông `size` điểm ảnh, cho mặt phẳng rộng `scale` lần cạnh thẻ: mép thẻ nằm ở `glowInset(scale)` mỗi cạnh; viền tím sáng chạy sát mép thẻ, ánh
+ * sáng tỏa ra phần dư ngoài thẻ và hơi vào trong, giữa thẻ chỉ phủ một lớp tím rất nhạt. Góc ngoài trong suốt.
+ */
+export function drawGlowRing(canvas: HTMLCanvasElement, size: number, scale: number): void {
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  const m = glowInset(scale) * size;
+  const side = size - 2 * m;
+  const r = side * CORNER;
+  ctx.clearRect(0, 0, size, size);
+  ctx.beginPath();
+  ctx.roundRect(m, m, side, side, r);
+  ctx.fillStyle = 'rgba(190, 100, 255, 0.3)';
+  ctx.fill();
+  ctx.shadowColor = 'rgba(170, 70, 255, 1)';
+  ctx.shadowBlur = m * 0.9;
+  ctx.strokeStyle = 'rgba(200, 120, 255, 1)';
+  ctx.lineWidth = Math.max(2, m * 0.8);
+  for (let k = 0; k < 3; k++) ctx.stroke();
+  // đường sáng mảnh ở giữa viền
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = 'rgba(245, 225, 255, 1)';
+  ctx.lineWidth = Math.max(1, m * 0.22);
+  ctx.stroke();
+}
+
+/** Phần dư của vệt tím ngoài mép thẻ, tính theo cạnh mặt phẳng vệt (0 đến 0,5). */
+export function glowInset(scale: number): number {
+  return (scale - 1) / 2 / scale;
 }

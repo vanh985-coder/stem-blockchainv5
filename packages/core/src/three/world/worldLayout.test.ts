@@ -127,8 +127,8 @@ describe('bố cục thế giới', () => {
       expect(v.gate.model, v.id).toMatch(/^env\/cong-lang-/);
     }
   });
-  it('ba làng chưa dựng chỉ có MỘT biển: bài học (màn 4, 7, 10); Làng Giấy có 3 biển (màn 1, 2, 3)', () => {
-    expect(FULL.villages.map((v) => v.layout.boards.map((b) => b.level))).toEqual([[1, 2, 3], [4], [7], [10]]);
+  it('làng nào cũng đủ 3 biển theo levels.ts: bài học và 2 game (cả ba làng chưa dựng)', () => {
+    expect(FULL.villages.map((v) => v.layout.boards.map((b) => b.level))).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]]);
   });
   it('chợ không còn cổng ở rìa: không có model cổng nào trong chợ; 4 cổng ở đầu làng', () => {
     expect(FULL.market.placements.some((p) => p.model.startsWith('env/cong-lang-'))).toBe(false);

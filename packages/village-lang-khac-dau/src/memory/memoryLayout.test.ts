@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { fitFrame } from '@so-chung/core/three/scene25d/layout25d';
 import { MEMORY_ROUNDS } from './memoryConfig';
-import { GRID_AREA, HUD_AREA, VILLAIN_SPOT, WORLD, cardFonts, frameOf, gridLayout, pxPerUnit, type MemoryFrame } from './memoryLayout';
+import { glowInset } from './memoryFaces';
+import { GLOW_SCALE, GRID_AREA, HUD_AREA, VILLAIN_SPOT, WORLD, cardFonts, frameOf, gridLayout, pxPerUnit, type MemoryFrame } from './memoryLayout';
 
 /** Ba cỡ màn hình phải vừa một màn hình, không cuộn. */
 const SCREENS = [
@@ -71,6 +72,20 @@ describe('bố cục màn 8', () => {
           // Nhãn tối đa 2 dòng cộng một dòng số phải lọt khoảng 80% chiều cao thẻ
           expect(f.label * 1.2 * 2 + f.number).toBeLessThanOrEqual(px * 0.8 + 1);
         }
+      }
+    }
+  });
+
+  it('vệt tím lúc tráo: rộng hơn thẻ không quá 6% mỗi cạnh, mép thẻ nằm đúng chỗ viền trên texture; không đè thẻ bên cạnh quá khe giữa hai thẻ', () => {
+    expect(GLOW_SCALE).toBeGreaterThan(1);
+    expect((GLOW_SCALE - 1) / 2).toBeLessThanOrEqual(0.06 + 1e-12);
+    // mép thẻ trên texture: phần dư chia cho cạnh mặt phẳng vệt
+    expect(glowInset(GLOW_SCALE) * GLOW_SCALE).toBeCloseTo(0.06, 12);
+    for (const frame of ['landscape', 'portrait'] as MemoryFrame[]) {
+      for (const r of MEMORY_ROUNDS) {
+        const g = gridLayout(frame, r.cols, r.rows);
+        // khe giữa hai thẻ = cell − card; phần dư một cạnh của vệt tím nằm gọn trong khe, không phủ lên thẻ bên cạnh
+        expect((g.card * (GLOW_SCALE - 1)) / 2).toBeLessThanOrEqual(g.cell - g.card + 1e-9);
       }
     }
   });
