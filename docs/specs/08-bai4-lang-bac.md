@@ -228,7 +228,7 @@ Code ở `packages/village-lang-bac/src/climb/` (`climbConfig.ts`, `climbLogic.t
 - Nhãn trên tay nắm: hai dòng "Sổ: …" / "Nay: …" cùng màu, không đánh dấu nhánh nào lệch. Đo: 17,3 px ở 360 × 640 và 844 × 390, 36,3 px ở 1366 × 768 (không dưới 14 px, "Chữ to" nhân 1,15).
 - Cú bật nhận ở `pointerdown` và `keydown` (Space không cuộn trang). Nắm được thì tay nắm kéo về giữa thân trong 0,3 giây (chỉ là hình). Ngõ cụt: "Ngõ cụt!", {phanDien} `cheer`, nhân vật tụt về. Bắt được: {phanDien} `jump`, sau 1,1 giây hiện "Bắt được {phanDien}!" và "Em chỉ leo d tầng thay vì kiểm tra cả 2^d lá!".
 - Lần đầu vào màn Bi nói câu "Trên bảng thì gốc vẽ ở trên cùng…"; cờ `gameTipSeen` (`progress/gameTips.ts`, cookie `gt`, bit số màn − 1).
-- **Tư thế treo (sửa sau B4):** clip `hang` trong file `hoc-sinh-nam` sai (ở `/dev/3d` cho tư thế ngồi co, tay ôm mặt) nên màn 12 dùng tư thế `hang` dựng bằng code (spec 03 mục 3.3): hai tay giơ thẳng, thân thẳng, chân thả lỏng, đung đưa ±4° (tắt khi Giảm chuyển động). Người chơi đặt sao cho lòng bàn tay (cao 0,95 × chiều cao) ở dưới thanh 0,3; chân ở `feetY(k)`.
+- **Tư thế treo (sửa sau B4, chỉnh lại ở B5):** clip `hang` trong file `hoc-sinh-nam` sai (ở `/dev/3d` cho tư thế ngồi co, tay ôm mặt) nên màn 12 dùng tư thế `hang` dựng bằng code (spec 03 mục 3.3): xương đòn nâng 30°, hai tay giơ thẳng, khuỷu thẳng, hai bàn tay khép lại nằm hẳn trên đỉnh đầu, thân thẳng, chân thả lỏng, đung đưa ±4° (tắt khi Giảm chuyển động). Hai lòng bàn tay (cao 0,985 × chiều cao) nắm vào đáy thân đèn lồng của `tay-nam`, ở dưới thanh 0,95; đầu nằm hẳn dưới đèn; chân ở `feetY(k)`.
 
 **Cân bằng (300 ván mỗi bot, seed 1 đến 300, mốc 250 / 450 / 570):**
 

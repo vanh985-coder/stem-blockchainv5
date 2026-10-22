@@ -326,8 +326,25 @@ describe('tư thế treo (hang), dựng bằng code thay cho clip hang sai trong
     // hai chân hơi khép: đùi trái quay âm quanh Z, đùi phải dương
     expect(getRot(f, 'leftUpLeg', 'z')).toBeLessThan(0);
     expect(getRot(f, 'rightUpLeg', 'z')).toBeGreaterThan(0);
-    // thân thẳng: không xoay thân, đầu, cổ
-    for (const b of ['spine', 'spine1', 'spine2', 'neck', 'head', 'hips'] as const) for (const ax of ['x', 'y', 'z'] as const) expect(getRot(f, b, ax)).toBe(0);
+    // thân thẳng: không xoay thân và hông; đầu và cổ chỉ cúi nhẹ quanh X (để bàn tay nằm hẳn trên đỉnh đầu)
+    for (const b of ['spine', 'spine1', 'spine2', 'hips'] as const) for (const ax of ['x', 'y', 'z'] as const) expect(getRot(f, b, ax)).toBe(0);
+    expect(getRot(f, 'head', 'x')).toBeGreaterThan(0);
+    expect(getRot(f, 'head', 'x') + getRot(f, 'neck', 'x')).toBeLessThanOrEqual(35);
+    for (const b of ['neck', 'head'] as const) for (const ax of ['y', 'z'] as const) expect(getRot(f, b, ax)).toBe(0);
+  });
+
+  it('xương đòn nâng 20° đến 30° (trái quay dương quanh Z, phải âm) để tay với cao hơn; hai cánh tay khép vào để hai bàn tay gần nhau; khớp vai cho phép tới góc đó', () => {
+    const f = createPoseFrame();
+    addHang(f, 1);
+    expect(getRot(f, 'leftShoulder', 'z')).toBeGreaterThanOrEqual(20);
+    expect(getRot(f, 'leftShoulder', 'z')).toBeLessThanOrEqual(30);
+    expect(getRot(f, 'rightShoulder', 'z')).toBe(-getRot(f, 'leftShoulder', 'z'));
+    expect(JOINT_LIMITS.leftShoulder.z[1]).toBeGreaterThanOrEqual(30);
+    expect(JOINT_LIMITS.rightShoulder.z[0]).toBeLessThanOrEqual(-30);
+    // nâng vai làm hai cánh tay dang ra bằng đúng góc nâng, nên phải khép vào thêm chừng đó
+    expect(HANG.armInLeft).toBeGreaterThan(getRot(f, 'leftShoulder', 'z'));
+    expect(HANG.armInRight).toBeGreaterThan(getRot(f, 'leftShoulder', 'z'));
+    expect(getRot(f, 'leftArm', 'x')).toBe(getRot(f, 'rightArm', 'x'));
   });
 
   it('trọng số nửa thì góc nửa; trọng số 0 hay âm thì không thêm gì; nằm trong giới hạn khớp không cần chặn', () => {
@@ -373,7 +390,10 @@ describe('tư thế treo (hang), dựng bằng code thay cho clip hang sai trong
     for (let t = 0; t < 3.2; t += 0.1) expect(hangSway(t, false)).toBe(0);
   });
 
-  it('tỉ lệ độ cao hai bàn tay (đo ở /dev/3d: lòng bàn tay 1,62 trên chiều cao 1,7)', () => {
-    expect(HANG.handsRatio).toBeCloseTo(1.62 / 1.7, 2);
+  it('tỉ lệ độ cao hai bàn tay (đo ở /dev/3d: lòng bàn tay 1,68, đỉnh ngón tay 1,77, đỉnh đầu 1,60 trên chiều cao 1,7)', () => {
+    expect(HANG.handsRatio).toBeCloseTo(1.68 / 1.7, 2);
+    expect(HANG.fingersRatio).toBeCloseTo(1.77 / 1.7, 2);
+    // bàn tay nằm hẳn trên đỉnh đầu: lòng bàn tay cao hơn đỉnh đầu ít nhất 0,05 (đỉnh đầu 1,60 khi cúi nhẹ)
+    expect((HANG.handsRatio - 1.6 / 1.7) * 1.7).toBeGreaterThanOrEqual(0.05);
   });
 });

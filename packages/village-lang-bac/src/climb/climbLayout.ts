@@ -31,14 +31,14 @@ export const LABEL = { width: 2.7, height: 1.2, above: 0.82 } as const;
 export const labelY = (k: number): number => barY(k) + LABEL.above;
 /**
  * Người chơi: cao `height`, treo bằng tư thế `hang` dựng bằng code (core/three/poses.ts): hai lòng bàn tay ở độ cao `HANG.handsRatio` × chiều cao trên chân, nên chân ở
- * `feetY(k)` = chỗ nắm − `HANG.handsRatio` × `height`. Chỗ nắm ở dưới thanh `GRIP_BELOW_BAR` (hai bàn tay nắm quai tay nắm). Đỉnh ngón tay cao hơn lòng bàn tay chừng 0,1 chiều cao.
+ * `feetY(k)` = chỗ nắm − `HANG.handsRatio` × `height`. Chỗ nắm ở dưới thanh `GRIP_BELOW_BAR` = 0,95: đáy thân đèn lồng của `tay-nam` (đèn cao 1,3, thân đèn tới 0,94 dưới đỉnh); hai bàn tay nắm vào đó và đầu nằm hẳn dưới đèn (đỉnh đầu thấp hơn chỗ nắm chừng 0,1).
  */
 export const PLAYER = { height: 2.0 } as const;
-export const GRIP_BELOW_BAR = 0.3;
+export const GRIP_BELOW_BAR = 0.95;
 export const handsY = (k: number): number => barY(k) - GRIP_BELOW_BAR;
 export const feetY = (k: number): number => handsY(k) - HANG.handsRatio * PLAYER.height;
 /** Điểm cao nhất của người chơi lúc treo ở tầng k (đỉnh ngón tay giữa; đầu thấp hơn chút). */
-export const playerTopY = (k: number): number => handsY(k) + (1.71 / 1.7 - HANG.handsRatio) * PLAYER.height;
+export const playerTopY = (k: number): number => handsY(k) + (HANG.fingersRatio - HANG.handsRatio) * PLAYER.height;
 /** Cú bật: tới đỉnh thì tay lên gần tới tầng trên (tỉ lệ khoảng cách tầng). */
 export const JUMP_RISE = 0.82;
 

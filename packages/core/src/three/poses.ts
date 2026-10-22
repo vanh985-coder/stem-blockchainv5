@@ -116,8 +116,8 @@ export const JOINT_LIMITS: Readonly<Record<BoneKey, JointLimit>> = {
   spine2: { x: [-50, 50], y: [-45, 45], z: [-30, 30] },
   neck: { x: [-40, 40], y: [-60, 60], z: [-30, 30] },
   head: { x: [-45, 50], y: [-80, 80], z: [-35, 35] },
-  leftShoulder: { x: [-20, 20], y: [-20, 20], z: [-25, 25] },
-  rightShoulder: { x: [-20, 20], y: [-20, 20], z: [-25, 25] },
+  leftShoulder: { x: [-20, 20], y: [-20, 20], z: [-40, 40] },
+  rightShoulder: { x: [-20, 20], y: [-20, 20], z: [-40, 40] },
   leftArm: { x: [-200, 70], y: [-90, 90], z: [-100, 100] },
   rightArm: { x: [-200, 70], y: [-90, 90], z: [-100, 100] },
   leftForeArm: { x: [-150, 90], y: [-30, 30], z: [-30, 30] },
@@ -193,8 +193,8 @@ export const SWING_TO = -20;
 // Tư thế treo (hang): tư thế GIỮ như point (vào 0,1 giây, giữ tới khi thả), dùng ở màn 12
 
 /**
- * Tư thế treo tay (mốc 3, sửa sau B4). Clip "hang" trong file hoc-sinh-nam sai (nhân vật ngồi co ôm mặt) nên không dùng nữa; tư thế này dựng bằng xoay xương: hai tay giơ thẳng lên
- * trên đầu (giống điểm đầu của swing, −175° quanh X), cẳng tay thẳng, hai bàn tay gần nhau; thân thẳng; hai chân duỗi, thả lỏng, hơi khép, mũi chân chúc xuống. Đung đưa nhẹ quanh điểm
+ * Tư thế treo tay (mốc 3, sửa sau B4, chỉnh lại ở B5). Clip "hang" trong file hoc-sinh-nam sai (nhân vật ngồi co ôm mặt) nên không dùng nữa; tư thế này dựng bằng xoay xương: hai xương đòn
+ * nâng 30°, hai tay giơ thẳng lên trên đầu (giống điểm đầu của swing, −175° quanh X), cẳng tay thẳng, hai bàn tay khép lại cách nhau 0,12 và nằm hẳn trên đỉnh đầu (đầu cúi nhẹ); thân thẳng; hai chân duỗi, thả lỏng, hơi khép, mũi chân chúc xuống. Đung đưa nhẹ quanh điểm
  * nắm (xoay cả người quanh bàn tay, do PoseLayer làm): ±`HANG.swayDeg` độ, chu kỳ `HANG.swaySeconds` giây.
  */
 export const HANG = {
@@ -202,9 +202,14 @@ export const HANG = {
    * Cánh tay giơ lên (độ quanh X; −175 như SWING_FROM, thêm 10° vì tay idle của học sinh hơi chúi tới trước) và độ khép vào trong của hai cánh tay (độ quanh Z; hai tay idle không đối xứng
    * nên khác nhau): đo ở /dev/3d: hai bàn tay cách nhau chừng 0,25 và hai cánh tay gần thẳng đứng.
    */
+  /** Xương đòn (vai) nâng lên (độ quanh Z; trái +, phải −) để tay với cao hơn đầu */
+  shoulderUp: 30,
   armX: -185,
-  armInLeft: 18,
-  armInRight: 17,
+  armInLeft: 52,
+  armInRight: 54,
+  /** Đầu cúi nhẹ (độ quanh X của đầu và cổ) để đỉnh đầu thấp xuống, bàn tay nằm hẳn trên đỉnh đầu */
+  headX: 18,
+  neckX: 10,
   /** Cẳng tay trái khép thêm (clip idle để cẳng tay trái hơi dang) */
   foreArmInLeft: 7,
   /** Cẳng tay: bù cho độ gập tự nhiên của clip idle để cẳng tay thẳng */
@@ -217,8 +222,12 @@ export const HANG = {
   /** Đung đưa quanh điểm nắm */
   swayDeg: 4,
   swaySeconds: 1.6,
-  /** Độ cao lòng bàn tay (giữa cổ tay 1,54 và đầu ngón giữa 1,70) so với chiều cao nhân vật 1,7 khi treo, đo ở /dev/3d: chỗ đặt tay nắm và điểm quay của đung đưa */
-  handsRatio: 0.95,
+  /**
+   * Độ cao lòng bàn tay (cách cổ tay 0,4 chiều dài bàn tay) và đỉnh ngón tay giữa so với chiều cao nhân vật 1,7 khi treo, đo ở /dev/3d: lòng bàn tay 1,68, đỉnh ngón tay 1,77, đỉnh đầu 1,60.
+   * handsRatio là chỗ đặt tay nắm và điểm quay của đung đưa.
+   */
+  handsRatio: 0.985,
+  fingersRatio: 1.04,
 } as const;
 
 /**
@@ -235,6 +244,10 @@ export function hangSway(t: number, on: boolean = true): number {
 /** Cộng tư thế treo vào khung với trọng số `w` (không gồm đung đưa, xem `hangSway`). */
 export function addHang(f: PoseFrame, w: number): void {
   if (w <= 0) return;
+  addRot(f, 'leftShoulder', 'z', HANG.shoulderUp * w);
+  addRot(f, 'rightShoulder', 'z', -HANG.shoulderUp * w);
+  addRot(f, 'head', 'x', HANG.headX * w);
+  addRot(f, 'neck', 'x', HANG.neckX * w);
   addRot(f, 'leftArm', 'x', HANG.armX * w);
   addRot(f, 'rightArm', 'x', HANG.armX * w);
   addRot(f, 'leftArm', 'z', -HANG.armInLeft * w);
