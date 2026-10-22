@@ -1,6 +1,6 @@
 /**
- * Hình của màn 12: nạp hình rời theo manifest (thiếu file thì null, cảnh dùng màu thay thế), cắt theo khung có hình, tách nền trắng của hai hình lá (ảnh lá không có nền trong suốt),
- * vẽ trời bằng dải màu chuyển và vẽ nhãn "Sổ / Nay" của tay nắm. Dùng canvas của trình duyệt; phần tính toán thuần nằm ở climbLayout.ts.
+ * Hình của màn 12: nạp hình rời theo manifest (thiếu file thì null, cảnh dùng màu thay thế), cắt theo khung có hình, vẽ trời bằng dải màu chuyển và vẽ nhãn "Sổ / Nay" của tay nắm.
+ * Hai hình lá (ui/tiles/la-*) đã được pipeline assets:build tách nền (scripts/assets-build.mjs), không tách ở đây nữa. Dùng canvas của trình duyệt; phần tính toán thuần nằm ở climbLayout.ts.
  */
 import { useEffect, useMemo, useState } from 'react';
 import { CanvasTexture, LinearFilter, SRGBColorSpace, Texture } from 'three';
@@ -19,9 +19,6 @@ export const ART = {
   coin: 'ui/icons/tien-dong',
 } as const;
 export type ArtKey = keyof typeof ART;
-/** Hai hình lá có nền trắng đục: tách nền khi nạp. */
-const KEY_WHITE: ReadonlySet<ArtKey> = new Set(['fakeLeaf', 'leaf']);
-
 export type ClimbTextures = { [K in ArtKey]: Texture | null } & { done: boolean };
 
 function prepare(t: Texture): Texture {
@@ -38,24 +35,6 @@ function crop(t: Texture, c: { u0: number; u1: number; v0: number; v1: number })
   t.repeat.set(c.u1 - c.u0, c.v1 - c.v0);
   t.offset.set(c.u0, 1 - c.v1);
   return t;
-}
-
-/** Ảnh lá nền trắng: điểm gần trắng thành trong suốt (mép mềm), vẽ ra canvas. */
-function keyWhite(img: HTMLImageElement): HTMLCanvasElement {
-  const c = document.createElement('canvas');
-  c.width = img.width;
-  c.height = img.height;
-  const ctx = c.getContext('2d', { willReadFrequently: true });
-  if (!ctx) return c;
-  ctx.drawImage(img, 0, 0);
-  const d = ctx.getImageData(0, 0, c.width, c.height);
-  const p = d.data;
-  for (let i = 0; i < p.length; i += 4) {
-    const m = Math.min(p[i], p[i + 1], p[i + 2]);
-    if (m > 232) p[i + 3] = Math.max(0, Math.round(((255 - m) / 23) * 255));
-  }
-  ctx.putImageData(d, 0, 0);
-  return c;
 }
 
 /** Nạp mọi hình của màn (một lần), giải phóng khi rời màn. */
@@ -75,7 +54,7 @@ export function useClimbTextures(): ClimbTextures {
         img.crossOrigin = 'anonymous';
         img.decoding = 'async';
         img.onload = () => {
-          const t = prepare(KEY_WHITE.has(key) ? new CanvasTexture(keyWhite(img)) : new Texture(img));
+          const t = prepare(new Texture(img));
           if (key === 'trunk') crop(t, CROPS.trunk);
           if (key === 'bar') crop(t, CROPS.bar);
           if (key === 'handle') crop(t, CROPS.handle);

@@ -7,6 +7,9 @@ import {
   POSE_DURATION,
   POSE_FADE,
   POSE_NAMES,
+  HANG,
+  HANG_PINNED_BONES,
+  addHang,
   addPose,
   addRot,
   addSquatLegs,
@@ -15,6 +18,7 @@ import {
   clearPoseFrame,
   createAimSplit,
   createPoseFrame,
+  hangSway,
   heldWeight,
   poseWeight,
   splitAim,
@@ -71,11 +75,19 @@ export class PoseLayer {
   private readonly aimCur: Aim = { az: 0, el: 0 };
   private aimOnAt = -1;
   private aimOffAt = -1;
+  private hangOnAt = -1;
+  private hangOffAt = -1;
+  private hangPending: { has: boolean; on: boolean; sway: boolean } = { has: false, on: false, sway: true };
+  private hangSwayOn = true;
+  /** Chiều cao nhân vật trong hệ của `frameObj` (để tính điểm quay đung đưa quanh bàn tay) */
+  private readonly height: number;
   private dirty = false;
 
   // giá trị gốc của các xương đã bị chỉnh trong khung này (để `restore`)
   private readonly modified: boolean[];
   private readonly savedQ: Quaternion[];
+  /** Xoay cục bộ gốc của các xương giữ thẳng khi treo (`HANG_PINNED_BONES`), chụp lúc dựng lớp; null nếu không phải xương đó */
+  private readonly restQ: (Quaternion | null)[];
   private readonly savedHipsPos = new Vector3();
   private hipsModified = false;
   private readonly armIndex: number;
@@ -101,8 +113,10 @@ export class PoseLayer {
    * @param motion nhóm mà <Character> dùng để nảy lên và quay cả người
    * @param facing góc xoay mặt của model (radian), giữ nguyên khi không có tư thế
    * @param fitScale hệ số phóng của model (để đổi độ dài trong cảnh sang độ dài trong file)
+   * @param height chiều cao nhân vật trong cảnh (đơn vị cảnh; điểm quay đung đưa của tư thế treo là `HANG.handsRatio` × chiều cao)
    */
-  constructor(root: Object3D, frameObj: Object3D, motion: Object3D, facing: number, fitScale: number) {
+  constructor(root: Object3D, frameObj: Object3D, motion: Object3D, facing: number, fitScale: number, height: number = 1.7) {
+    this.height = height;
     this.frameObj = frameObj;
     this.motion = motion;
     this.facing = facing;
@@ -110,6 +124,7 @@ export class PoseLayer {
     this.bones = BONE_KEYS.map((k) => findBone(root, MIXAMO_BONE_NAME[k]));
     this.modified = BONE_KEYS.map(() => false);
     this.savedQ = BONE_KEYS.map(() => new Quaternion());
+    this.restQ = BONE_KEYS.map((k, i) => (HANG_PINNED_BONES.includes(k) && this.bones[i] ? this.bones[i].quaternion.clone() : null));
     this.armIndex = BONE_KEYS.indexOf('rightArm');
     this.foreArmIndex = BONE_KEYS.indexOf('rightForeArm');
     this.rightArm = this.bone('rightArm');
@@ -136,6 +151,16 @@ export class PoseLayer {
     if (!this.ok) return;
     this.pendingAim.has = true;
     this.pendingAim.aim = aim;
+  }
+
+  /**
+   * Treo tay (giữ đến khi gọi lại với false). `sway` false (Giảm chuyển động) thì không đung đưa. Có hiệu lực ở lần `update` kế tiếp.
+   */
+  setHang(on: boolean, sway: boolean = true): void {
+    if (!this.ok) return;
+    this.hangPending.has = true;
+    this.hangPending.on = on;
+    this.hangPending.sway = sway;
   }
 
   /** Trả các xương đã chỉnh ở khung trước về giá trị gốc. Gọi mỗi khung hình, trước `mixer.update`. */
@@ -190,6 +215,20 @@ export class PoseLayer {
       }
     }
 
+    if (this.hangPending.has) {
+      this.hangPending.has = false;
+      this.hangSwayOn = this.hangPending.sway;
+      if (this.hangPending.on) {
+        if (this.hangOnAt < 0) this.hangOnAt = now;
+        else if (this.hangOffAt >= 0) {
+          // treo lại khi đang thả: vào lại từ trọng số hiện có, không nhảy
+          const w0 = heldWeight(now - this.hangOnAt, now - this.hangOffAt);
+          this.hangOnAt = now - w0 * POSE_FADE;
+        }
+        this.hangOffAt = -1;
+      } else if (this.hangOnAt >= 0 && this.hangOffAt < 0) this.hangOffAt = now;
+    }
+
     const f = this.frame;
     clearPoseFrame(f);
     let any = false;
@@ -202,6 +241,18 @@ export class PoseLayer {
       }
       addPose(f, p, t, poseWeight(t, POSE_DURATION[p]));
       any = true;
+    }
+
+    let hangW = 0;
+    if (this.hangOnAt >= 0) {
+      hangW = heldWeight(now - this.hangOnAt, this.hangOffAt >= 0 ? now - this.hangOffAt : undefined);
+      if (this.hangOffAt >= 0 && hangW <= 0) {
+        this.hangOnAt = -1;
+        this.hangOffAt = -1;
+      } else {
+        addHang(f, hangW);
+        any = true;
+      }
     }
 
     let aimW = 0;
@@ -218,6 +269,8 @@ export class PoseLayer {
     if (!any) {
       if (this.dirty) {
         this.motion.position.y = 0;
+        this.motion.position.z = 0;
+        this.motion.rotation.x = 0;
         this.motion.rotation.y = this.facing;
         this.dirty = false;
       }
@@ -245,10 +298,36 @@ export class PoseLayer {
     }
     addSquatLegs(f, this.legLength);
     clampFrame(f);
-    this.motion.position.y = f.lift;
+    // đung đưa của tư thế treo: xoay cả người quanh bàn tay (điểm quay cách chân `handsRatio` × chiều cao), ±4°
+    if (hangW > 0) {
+      const th = hangSway(now - this.hangOnAt, this.hangSwayOn) * hangW * RAD;
+      const ph = HANG.handsRatio * this.height;
+      this.motion.rotation.x = th;
+      this.motion.position.y = f.lift + ph * (1 - Math.cos(th));
+      this.motion.position.z = 0 - ph * Math.sin(th); // (0 − …: tránh −0)
+    } else {
+      this.motion.rotation.x = 0;
+      this.motion.position.y = f.lift;
+      this.motion.position.z = 0;
+    }
 
+    if (hangW > 0) this.pinForHang(hangW);
     this.applyFrame();
     if (aimW > 0) this.applyPoint(aimW);
+  }
+
+  /** Kéo thân và hai chân về tư thế gốc của bộ xương theo trọng số `w` (xem `HANG_PINNED_BONES`); `restore()` trả lại khung sau. */
+  private pinForHang(w: number): void {
+    for (let i = 0; i < this.restQ.length; i++) {
+      const rest = this.restQ[i];
+      const b = this.bones[i];
+      if (!rest || !b) continue;
+      if (!this.modified[i]) {
+        this.savedQ[i].copy(b.quaternion);
+        this.modified[i] = true;
+      }
+      b.quaternion.slerp(rest, w);
+    }
   }
 
   /** local' = P⁻¹ · C · R · C⁻¹ · P · local (R đã đặt sẵn trong qR). Ghi vào quaternion của `bone`. */

@@ -8,7 +8,6 @@ import {
   HANDLE,
   LABEL,
   LEVEL_GAP,
-  PLAYER,
   ROOT,
   TRUNK,
   WORLD,
@@ -16,7 +15,9 @@ import {
   cameraY,
   coinSpots,
   frameOf,
-  handsY,
+  feetY,
+  heldLabelVisible,
+  playerTopY,
   labelFontPx,
   labelY,
   pxPerUnit,
@@ -46,7 +47,9 @@ describe('bố cục màn 12', () => {
       // nhãn tầng k + 1 nằm dưới tay nắm tầng k + 2
       expect(labelY(k + 1) + LABEL.height / 2).toBeLessThan(barY(k + 2) - HANDLE.height + 0.2);
       // chân người chơi treo ở tầng k + 1 ở trên thanh tầng k
-      expect(handsY(k + 1) - PLAYER.drop).toBeGreaterThan(barY(k) + BAR.height / 2);
+      expect(feetY(k + 1)).toBeGreaterThan(barY(k) + BAR.height / 2);
+      // người chơi treo ở tầng k không che nhãn trên thanh của tầng k (đỉnh ngón tay dưới đáy nhãn)
+      expect(playerTopY(k)).toBeLessThan(labelY(k) - LABEL.height / 2);
     }
   });
 
@@ -57,7 +60,7 @@ describe('bố cục màn 12', () => {
         const cy = cameraY(frame, k);
         const bottom = cy - H / 2;
         const top = cy + H / 2;
-        expect(handsY(k) - PLAYER.drop, `${frame} tầng ${k}: chân`).toBeGreaterThanOrEqual(bottom - 0.15);
+        expect(feetY(k), `${frame} tầng ${k}: chân`).toBeGreaterThanOrEqual(bottom - 0.15);
         expect(labelY(k + 1) + LABEL.height / 2, `${frame} tầng ${k}: nhãn tầng trên`).toBeLessThanOrEqual(top - (frame === 'portrait' ? 0.8 : 0.4)); // chừa thanh HUD (khung ngang: HUD ở hai góc, giữa trống)
       }
     }
@@ -79,6 +82,19 @@ describe('bố cục màn 12', () => {
         expect(f * 1.2 * 2, `${s.w}x${s.h} chiều cao`).toBeLessThanOrEqual(LABEL.height * ppu);
       }
     }
+  });
+
+  it('nhãn tay nắm đang giữ: ẩn từ lúc bật lên tới khi người chơi về xong chỗ treo; hiện lại khi về tay nắm cũ hay sang tầng mới', () => {
+    // đang treo, đoạn chuyển động đã xong
+    expect(heldLabelVisible(null, 5000, 4000)).toBe(true);
+    // vừa bật lên (cú bật đang bay tới đỉnh): ẩn
+    expect(heldLabelVisible(5350, 5100, 4000)).toBe(false);
+    // tới đỉnh, nắm trượt (ngõ cụt hay hụt): người chơi đang tụt về (320 ms): vẫn ẩn, hết đoạn tụt thì hiện
+    expect(heldLabelVisible(null, 5400, 5350 + 320)).toBe(false);
+    expect(heldLabelVisible(null, 5700, 5350 + 320)).toBe(true);
+    // nắm được, sang tầng mới (160 ms kéo về chỗ treo): ẩn rồi hiện
+    expect(heldLabelVisible(null, 5400, 5350 + 160)).toBe(false);
+    expect(heldLabelVisible(null, 5600, 5350 + 160)).toBe(true);
   });
 
   it('thân cây liền từ gốc tới ngọn ở cả 4 vòng (các khúc chồng nhau, không hở)', () => {

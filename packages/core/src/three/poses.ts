@@ -66,11 +66,13 @@ export const BONE_KEYS = [
   'rightUpLeg',
   'leftLeg',
   'rightLeg',
+  'leftFoot',
+  'rightFoot',
 ] as const;
 export type BoneKey = (typeof BONE_KEYS)[number];
 
-/** Xương chỉ để đo (hướng cẳng tay, chiều dài chân), không xoay. */
-export type ReferenceBoneKey = 'rightHand' | 'leftFoot';
+/** Xương chỉ để đo (hướng cẳng tay), không xoay. */
+export type ReferenceBoneKey = 'rightHand';
 
 export const MIXAMO_BONE_NAME: Readonly<Record<BoneKey | ReferenceBoneKey, string>> = {
   hips: 'Hips',
@@ -89,8 +91,9 @@ export const MIXAMO_BONE_NAME: Readonly<Record<BoneKey | ReferenceBoneKey, strin
   rightUpLeg: 'RightUpLeg',
   leftLeg: 'LeftLeg',
   rightLeg: 'RightLeg',
-  rightHand: 'RightHand',
   leftFoot: 'LeftFoot',
+  rightFoot: 'RightFoot',
+  rightHand: 'RightHand',
 };
 
 export const boneIndex = (b: BoneKey): number => BONE_KEYS.indexOf(b);
@@ -123,6 +126,8 @@ export const JOINT_LIMITS: Readonly<Record<BoneKey, JointLimit>> = {
   rightUpLeg: { x: [-110, 40], y: [-45, 45], z: [-40, 40] },
   leftLeg: { x: [0, 150], y: [-10, 10], z: [-10, 10] },
   rightLeg: { x: [0, 150], y: [-10, 10], z: [-10, 10] },
+  leftFoot: { x: [-45, 60], y: [-20, 20], z: [-20, 20] },
+  rightFoot: { x: [-45, 60], y: [-20, 20], z: [-20, 20] },
 };
 
 const clampTo = (v: number, [lo, hi]: Range) => Math.min(hi, Math.max(lo, v));
@@ -183,6 +188,69 @@ export const SLIDE_HIPS_DROP = 0.5;
 /** Góc cánh tay (độ quanh X) lúc đầu và cuối cú vung của `swing`: từ trên cao (-175) quét xuống trước người (-20). */
 export const SWING_FROM = -175;
 export const SWING_TO = -20;
+
+// ---------------------------------------------------------------------------
+// Tư thế treo (hang): tư thế GIỮ như point (vào 0,1 giây, giữ tới khi thả), dùng ở màn 12
+
+/**
+ * Tư thế treo tay (mốc 3, sửa sau B4). Clip "hang" trong file hoc-sinh-nam sai (nhân vật ngồi co ôm mặt) nên không dùng nữa; tư thế này dựng bằng xoay xương: hai tay giơ thẳng lên
+ * trên đầu (giống điểm đầu của swing, −175° quanh X), cẳng tay thẳng, hai bàn tay gần nhau; thân thẳng; hai chân duỗi, thả lỏng, hơi khép, mũi chân chúc xuống. Đung đưa nhẹ quanh điểm
+ * nắm (xoay cả người quanh bàn tay, do PoseLayer làm): ±`HANG.swayDeg` độ, chu kỳ `HANG.swaySeconds` giây.
+ */
+export const HANG = {
+  /**
+   * Cánh tay giơ lên (độ quanh X; −175 như SWING_FROM, thêm 10° vì tay idle của học sinh hơi chúi tới trước) và độ khép vào trong của hai cánh tay (độ quanh Z; hai tay idle không đối xứng
+   * nên khác nhau): đo ở /dev/3d: hai bàn tay cách nhau chừng 0,25 và hai cánh tay gần thẳng đứng.
+   */
+  armX: -185,
+  armInLeft: 18,
+  armInRight: 17,
+  /** Cẳng tay trái khép thêm (clip idle để cẳng tay trái hơi dang) */
+  foreArmInLeft: 7,
+  /** Cẳng tay: bù cho độ gập tự nhiên của clip idle để cẳng tay thẳng */
+  foreArmX: 28,
+  /** Chân thả lỏng: đùi hơi ra trước, gối hơi gập, mũi chân chúc xuống; hai chân hơi khép */
+  upLegX: -3,
+  legX: 8,
+  footX: 12,
+  legsIn: 4,
+  /** Đung đưa quanh điểm nắm */
+  swayDeg: 4,
+  swaySeconds: 1.6,
+  /** Độ cao lòng bàn tay (giữa cổ tay 1,54 và đầu ngón giữa 1,70) so với chiều cao nhân vật 1,7 khi treo, đo ở /dev/3d: chỗ đặt tay nắm và điểm quay của đung đưa */
+  handsRatio: 0.95,
+} as const;
+
+/**
+ * Xương giữ thẳng khi treo: thân (Hips, Spine, Spine1, Spine2) và hai chân (đùi, cẳng, bàn chân) về tư thế gốc của bộ xương (đứng thẳng, hai chân duỗi) rồi mới cộng độ lệch của `addHang`.
+ * Nếu không thì clip idle (đang chạy bên dưới) đổi chân liên tục: hai bàn chân lúc dang lúc khép trong khoảng 0,2.
+ */
+export const HANG_PINNED_BONES: readonly BoneKey[] = ['hips', 'spine', 'spine1', 'spine2', 'leftUpLeg', 'rightUpLeg', 'leftLeg', 'rightLeg', 'leftFoot', 'rightFoot'];
+
+/** Góc đung đưa (độ) lúc `t` giây; `on` false (Giảm chuyển động) thì đứng yên. */
+export function hangSway(t: number, on: boolean = true): number {
+  return on ? HANG.swayDeg * Math.sin((2 * Math.PI * t) / HANG.swaySeconds) : 0;
+}
+
+/** Cộng tư thế treo vào khung với trọng số `w` (không gồm đung đưa, xem `hangSway`). */
+export function addHang(f: PoseFrame, w: number): void {
+  if (w <= 0) return;
+  addRot(f, 'leftArm', 'x', HANG.armX * w);
+  addRot(f, 'rightArm', 'x', HANG.armX * w);
+  addRot(f, 'leftArm', 'z', -HANG.armInLeft * w);
+  addRot(f, 'rightArm', 'z', HANG.armInRight * w);
+  addRot(f, 'leftForeArm', 'z', HANG.foreArmInLeft * w);
+  addRot(f, 'leftForeArm', 'x', HANG.foreArmX * w);
+  addRot(f, 'rightForeArm', 'x', HANG.foreArmX * w);
+  addRot(f, 'leftUpLeg', 'x', HANG.upLegX * w);
+  addRot(f, 'rightUpLeg', 'x', HANG.upLegX * w);
+  addRot(f, 'leftUpLeg', 'z', -HANG.legsIn * w);
+  addRot(f, 'rightUpLeg', 'z', HANG.legsIn * w);
+  addRot(f, 'leftLeg', 'x', HANG.legX * w);
+  addRot(f, 'rightLeg', 'x', HANG.legX * w);
+  addRot(f, 'leftFoot', 'x', HANG.footX * w);
+  addRot(f, 'rightFoot', 'x', HANG.footX * w);
+}
 
 /**
  * Cộng tư thế `name` vào khung. `t`: giây kể từ lúc bắt đầu; `w`: trọng số 0..1 (xem `poseWeight`).

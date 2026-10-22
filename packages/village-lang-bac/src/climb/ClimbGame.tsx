@@ -8,7 +8,7 @@ import { ART, drawLabels, useClimbTextures } from './climbArt';
 import { CLIMB_SPEC } from './climbConfig';
 import { JUMP_RISE, LEVEL_GAP, pxPerUnit, type ClimbFrame } from './climbLayout';
 import { advanceRound, climbScore, createClimbGame, jump, nextCenter, nodeLabel, stepClimb, type ClimbEvent, type ClimbState } from './climbLogic';
-import { ClimbStage, STUDENT_HANG_CLIP, hangFeetY, newAnim, tweenAt, type ClimbAnim } from './ClimbStage';
+import { ClimbStage, hangFeetY, newAnim, tweenAt, type ClimbAnim } from './ClimbStage';
 
 /** Số màn của game này (để lưu cờ "đã nghe Bi giới thiệu"). */
 const LEVEL_ID = 12;
@@ -86,7 +86,7 @@ export function ClimbGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
   const [say, setSay] = useState<Say>(null);
   const [tip, setTip] = useState(() => !hasSeenGameTip(progress.game.data, LEVEL_ID));
   const [warm, setWarm] = useState(false);
-  const [clips, setClips] = useState<{ student: ClipName; sn: number; villain: ClipName; vn: number }>({ student: STUDENT_HANG_CLIP, sn: 0, villain: 'idle', vn: 0 });
+  const [clips, setClips] = useState<{ student: ClipName; sn: number; hang: boolean; villain: ClipName; vn: number }>({ student: 'idle', sn: 0, hang: true, villain: 'idle', vn: 0 });
   const finished = useRef(false);
 
   const textures = useClimbTextures();
@@ -109,9 +109,9 @@ export function ClimbGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
 
   // Nạp trước clip bật (học sinh), cười và giật mình ({phanDien}) lúc màn hình tải còn che cảnh
   const warmUp = useCallback(() => {
-    setClips((c) => ({ ...c, student: 'jump', sn: c.sn + 1, villain: 'cheer', vn: c.vn + 1 }));
+    setClips((c) => ({ ...c, student: 'jump', sn: c.sn + 1, hang: false, villain: 'cheer', vn: c.vn + 1 }));
     setTimeout(() => setClips((c) => ({ ...c, villain: 'jump', vn: c.vn + 1 })), 400);
-    setTimeout(() => setClips((c) => ({ ...c, student: STUDENT_HANG_CLIP, sn: c.sn + 1, villain: 'idle', vn: c.vn + 1 })), 800);
+    setTimeout(() => setClips((c) => ({ ...c, student: 'idle', sn: c.sn + 1, hang: true, villain: 'idle', vn: c.vn + 1 })), 800);
     setTimeout(() => setWarm(true), 1100);
   }, []);
 
@@ -162,6 +162,8 @@ export function ClimbGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
           setTimeout(() => setBanner({ kind: 'lost' }), 700);
         }
       }
+      // chạm lại tay nắm (lên tầng, ngõ cụt, hụt): về tư thế treo
+      if (events.some((e) => e.kind === 'up' || e.kind === 'deadEnd' || e.kind === 'miss')) setClips((c) => ({ ...c, student: 'idle', sn: c.sn + 1, hang: true }));
       bump();
     },
     [anim, state],
@@ -195,7 +197,7 @@ export function ClimbGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
     const c = nextCenter(state, state.peakAt ?? state.time);
     anim.pull.fromX = Math.abs(c - CLIMB_SPEC.halfGap) < Math.abs(c + CLIMB_SPEC.halfGap) ? c - CLIMB_SPEC.halfGap : c + CLIMB_SPEC.halfGap;
     sound.playWhoosh();
-    setClips((cl) => ({ ...cl, student: 'jump', sn: cl.sn + 1 }));
+    setClips((cl) => ({ ...cl, student: 'jump', sn: cl.sn + 1, hang: false }));
   }, [anim, holdLoop, state]);
 
   // Space (không cuộn trang) và chạm/bấm chuột (pointerdown, không đợi click)
@@ -215,7 +217,7 @@ export function ClimbGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
     if (!advanceRound(state)) return;
     Object.assign(anim, newAnim(state.tree.depth));
     setBanner(null);
-    setClips((c) => ({ ...c, student: STUDENT_HANG_CLIP, sn: c.sn + 1, villain: 'idle', vn: c.vn + 1 }));
+    setClips((c) => ({ ...c, student: 'idle', sn: c.sn + 1, hang: true, villain: 'idle', vn: c.vn + 1 }));
     bump();
   }, [anim, state]);
 
@@ -328,6 +330,7 @@ export function ClimbGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
           reduced={reduced}
           studentClip={clips.student}
           studentTrigger={clips.sn}
+          hanging={clips.hang}
           villainClip={clips.villain}
           villainTrigger={clips.vn}
         />

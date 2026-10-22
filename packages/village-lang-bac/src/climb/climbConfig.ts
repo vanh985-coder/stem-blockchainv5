@@ -26,8 +26,12 @@ export const CLIMB_SPEC = {
   codeDigits: 4,
   /** Điểm = số vòng xong × 100 + số tiền đồng × 1 + số tim còn × 50 */
   points: { perRound: 100, perCoin: 1, perHeart: 50 },
-  /** Mốc điểm cả ván: Đồng, Bạc, Vàng (khai báo theo chuẩn màn 2, 3, 8) */
-  medals: [250, 400, 520] as const,
+  /**
+   * Mốc điểm cả ván: Đồng, Bạc, Vàng (khai báo theo chuẩn màn 2, 3, 8). Nghĩa (đổi ở bước sửa sau B4, theo lời chủ dự án): Đồng 250 là qua được 3 vòng (3 × 100 cộng đồng nhặt được);
+   * Bạc 450 là leo hết 4 vòng, nhầm nhánh tối đa 2 lần (hoàn hảo 586, mỗi ngõ cụt trừ 50 điểm tim và 2 đồng: 482 khi nhầm 2 lần, 430 khi nhầm 3 lần);
+   * Vàng 570 là không nhầm nhánh lần nào (hoàn hảo 586; trượt không mất tim chỉ mất 2 đồng mỗi lần nên 570 cho phép trượt tối đa 8 lần).
+   */
+  medals: [250, 450, 570] as const,
 } as const;
 
 export const CLIMB_ROUNDS = CLIMB_SPEC.rounds;

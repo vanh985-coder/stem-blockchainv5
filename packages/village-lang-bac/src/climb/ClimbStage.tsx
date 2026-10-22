@@ -18,7 +18,9 @@ import {
   barY,
   cameraY,
   coinSpots,
+  feetY,
   handleY,
+  heldLabelVisible,
   labelY,
   rootY,
   topY,
@@ -61,8 +63,8 @@ export interface ClimbAnim {
   coins: CoinAnim[];
 }
 
-/** Độ cao chân người chơi khi treo ở tầng k. */
-export const hangFeetY = (k: number): number => barY(k) - HANDLE.height + 0.15 - PLAYER.drop;
+/** Độ cao chân người chơi khi treo ở tầng k (hai bàn tay nắm tay nắm). */
+export const hangFeetY = (k: number): number => feetY(k);
 export const PULL_MS = 300;
 const FLY_MS = 450;
 const FALL_MS = 800;
@@ -97,12 +99,13 @@ export interface ClimbStageProps {
   reduced: boolean;
   studentClip: ClipName;
   studentTrigger: number;
+  /** Đang treo tay (tư thế `hang`); false lúc bật lên */
+  hanging: boolean;
   villainClip: ClipName;
   villainTrigger: number;
 }
 
-/** Clip lúc treo: `hang` của file model đang sai (tư thế ngồi co, xem climbLayout PLAYER), tạm dùng `idle`. */
-export const STUDENT_HANG_CLIP: ClipName = 'idle';
+/** Lúc treo dùng clip `idle` cộng tư thế `hang` dựng bằng code (clip `hang` trong file model sai: ngồi co ôm mặt, xem spec 03 mục 3.2); lúc bật dùng clip `jump`. */
 const STUDENT_CLIPS: readonly ClipName[] = ['idle', 'jump'];
 const VILLAIN_CLIPS: readonly ClipName[] = ['idle', 'cheer', 'jump'];
 
@@ -111,13 +114,14 @@ const VILLAIN_CLIPS: readonly ClipName[] = ['idle', 'cheer', 'jump'];
  * Mọi tấm hình dùng chung một hình học (mặt phẳng 1 × 1); thân, cành, tay nắm, đồng mỗi loại một vật liệu. Tay nắm tầng trên trượt theo `nextCenter` của logic; vị trí cập nhật mỗi khung,
  * không cấp phát. Rời màn thì giải phóng hình học, vật liệu và texture trời.
  */
-export function ClimbStage({ state, anim, frame, textures, labels, version, reduced, studentClip, studentTrigger, villainClip, villainTrigger }: ClimbStageProps) {
+export function ClimbStage({ state, anim, frame, textures, labels, version, reduced, studentClip, studentTrigger, hanging, villainClip, villainTrigger }: ClimbStageProps) {
   const depth = state.tree.depth;
   const tree = useRef<Group>(null);
   const player = useRef<Group>(null);
   const pairL = useRef<Group>(null);
   const pairR = useRef<Group>(null);
   const held = useRef<Group>(null);
+  const heldLabel = useRef<Mesh>(null);
   const coinRefs = useRef<(Mesh | null)[]>([]);
   const cam = useRef(cameraY(frame, 0));
 
@@ -182,6 +186,8 @@ export function ClimbStage({ state, anim, frame, textures, labels, version, redu
       held.current.position.x = p.level === state.level ? p.fromX * (1 - u) : 0;
       held.current.position.y = barY(state.level);
     }
+    // nhãn của tay nắm đang giữ: ẩn từ lúc bật lên tới khi người chơi về chỗ treo (nhãn nằm trên thanh, đúng chỗ người chơi bay qua khi bật)
+    if (heldLabel.current) heldLabel.current.visible = heldLabelVisible(state.peakAt, now, anim.player.start + anim.player.dur);
     // cặp tay nắm tầng trên trượt theo logic
     const show = state.level < depth;
     if (pairL.current && pairR.current) {
@@ -260,7 +266,7 @@ export function ClimbStage({ state, anim, frame, textures, labels, version, redu
         {/* tay nắm đang giữ và nhãn của nó */}
         <group ref={held} position={[0, barY(level), 0]}>
           <mesh geometry={geo} material={handleMat(level)} position={[0, handleOffset(level), Z.handle]} scale={handleScale(level)} />
-          <mesh geometry={geo} material={labelMats[0]} position={[0, labelY(level) - barY(level), Z.label]} scale={[LABEL.width, LABEL.height, 1]} />
+          <mesh ref={heldLabel} geometry={geo} material={labelMats[0]} position={[0, labelY(level) - barY(level), Z.label]} scale={[LABEL.width, LABEL.height, 1]} />
         </group>
         {/* cặp tay nắm tầng trên */}
         {[pairL, pairR].map((ref, j) => (
@@ -287,7 +293,7 @@ export function ClimbStage({ state, anim, frame, textures, labels, version, redu
         {/* học sinh treo ở x = 0, dưới tay nắm đang giữ */}
         <group ref={player} position={[0, hangFeetY(0), 0]}>
           <Actor25D x={0} y={0} layer="actors" height={PLAYER.height}>
-            <Character id="characters/hoc-sinh-nam" animation={studentClip} trigger={studentTrigger} returnTo={STUDENT_HANG_CLIP} clips={STUDENT_CLIPS} />
+            <Character id="characters/hoc-sinh-nam" animation={studentClip} trigger={studentTrigger} returnTo="idle" clips={STUDENT_CLIPS} hang={hanging} hangSway={!reduced} />
           </Actor25D>
         </group>
       </group>

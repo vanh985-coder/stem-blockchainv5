@@ -243,7 +243,7 @@ Tên hiển thị **không viết cứng**. Toàn bộ nằm trong `content/char
 
 **Tốc độ ngầm:** clip `walk` của học sinh tiến ~0,9 đơn vị/giây trong cảnh, bà cụ ~0,66, chú nông dân ~0,71; clip `run` ~3,3–3,6. Dân làng đi đúng tốc độ này (đo từ khoảng dịch của hông trước khi khóa, nhân với hệ số phóng) nên chân không trượt.
 
-**Clip `hang`:** hông ở thấp hơn hẳn (y ≈ −0,07 trong file, so với 0,44 của clip khác) vì nhân vật treo mình dưới xà; khi dùng, code phải nâng nhân vật lên.
+**Clip `hang` (KHÔNG dùng nữa, mốc 3 sửa sau B4):** hông ở thấp hơn hẳn (y ≈ −0,07 trong file, so với 0,44 của clip khác). Xem ở `/dev/3d` thì clip "hanging from a horizontal bar with both arms straight up above" của `hoc-sinh-nam` cho tư thế **ngồi co, tay ôm mặt**, không phải treo tay dưới xà, nên không dùng được. Tư thế treo do code dựng bằng xoay xương: `hang` ở mục 3.3 (màn 12). Clip vẫn nằm trong file model và trong `CLIP_NAMES`, chỉ không có chỗ nào phát nó.
 
 **Dùng chung clip:** mọi model có xương đều là bộ xương Mixamo 65 xương, cùng tên. Vì vậy clip của model này phát được trên model khác. Ví dụ Tí cần `walk` thì mượn của học sinh. `<Character clips={[…]}>` chỉ tải model cho mượn khi thiếu clip (thứ tự cho mượn: học sinh, Tí, bà cụ, chú nông dân); nên liệt kê đúng các clip cần dùng.
 
@@ -256,6 +256,7 @@ Tên hiển thị **không viết cứng**. Toàn bộ nằm trong `content/char
 | `slide` | Ngả `Spine` về sau 35°, hạ `Hips` xuống 0,5 | 0,6 giây |
 | `swing` | `RightArm` quét một vòng cung từ trên cao xuống | 0,25 giây |
 | `hurt` (Tí) | Nảy lên 0,3; hai tay vòng ra sau, ôm mông; rung | 0,6 giây |
+| `hang` (học sinh, màn 12) | Hai tay (`LeftArm`, `RightArm`) giơ thẳng lên trên đầu (−185° quanh X: −175° của điểm đầu `swing` cộng 10° vì tay idle hơi chúi tới trước), hai bàn tay cách nhau chừng 0,25, cẳng tay thẳng; thân thẳng; hai chân duỗi, thả lỏng, hơi khép, mũi chân chúc xuống; đung đưa quanh bàn tay ±4°, chu kỳ 1,6 giây | Đến khi thả (như `point`) |
 
 Mỗi tư thế trộn với clip đang chạy, vào ra mượt trong 0,1 giây.
 
@@ -266,6 +267,9 @@ Mỗi tư thế trộn với clip đang chạy, vào ra mượt trong 0,1 giây.
 - Số độ cao tính theo đơn vị cảnh (nhân vật cao 1,7): `slide` hạ `Hips` 0,5, `hurt` nảy 0,3. **Thêm so với bảng:** khi `Hips` hạ thì đùi ra trước góc a và gối gập 2a (a = arccos((L − hạ)/L), tối đa 75°, L là chiều dài chân) để bàn chân vẫn chạm đất, nếu không chân lún dưới sàn.
 - `swing`: `RightArm` quét từ -175° (trên cao) xuống -20° (trước người) quanh trục X của nhân vật trong 0,25 giây, thêm khuỷu và thân hơi theo.
 - `hurt` chỉ có tác dụng với Tí (`isPoseAllowed`).
+- `hang` (`<Character hang hangSway>`, `three/poses.ts` `HANG`, `addHang`, `hangSway`, `three/PoseLayer.ts` `setHang`): tư thế GIỮ như `point` (vào 0,1 giây, giữ đến khi `hang` = false), không nằm trong `POSE_NAMES`. Làm trên clip `idle`. Mọi xoay đo ở `/dev/3d` (nút "hang", đo vị trí xương bàn tay sau khi đặt tư thế): hai bàn tay cách 0,245; cánh tay lệch khỏi phương thẳng đứng không quá 9° sang bên và 4° ra trước; lòng bàn tay cao 1,62 trên chiều cao 1,7 (`HANG.handsRatio` = 0,95: chỗ đặt tay nắm là độ cao chân + 0,95 × chiều cao).
+  - **Thân và chân được ghim** (`HANG_PINNED_BONES`: `Hips`, `Spine`, `Spine1`, `Spine2`, đùi, cẳng chân, bàn chân) về xoay gốc của bộ xương trước khi cộng độ lệch, vì clip `idle` bên dưới đổi chân liên tục (hai bàn chân lúc dang lúc khép trong khoảng 0,2). Vì thế thêm `leftFoot`, `rightFoot` vào `BONE_KEYS`.
+  - **Đung đưa** xoay cả người quanh bàn tay: `motion.rotation.x` = ±4° × sin(2π t / 1,6) và dời `motion` để điểm quay (cách chân `handsRatio` × chiều cao) đứng yên. "Giảm chuyển động" thì không đung đưa (`hangSway={false}`); tư thế vẫn giữ.
 - **Giới hạn khớp** (`JOINT_LIMITS`): mọi góc được chặn sau khi cộng dồn (ví dụ gối 0°–150°, đầu ±80° quanh trục đứng) để tay chân không gãy khi nhiều tư thế chồng nhau.
 - `<Character pose={{ name, n }}>` phát tư thế (đổi `n` để phát lại); `<Character aim={{ az, el }}>` là hướng nhìn và chỉ (mục 4).
 

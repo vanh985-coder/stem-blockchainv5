@@ -6,6 +6,8 @@
  * Tiền đồng: 2 đồng treo trên thân giữa hai tầng. Hình cắt theo khung chứa phần có hình của ảnh gốc (ảnh 1024 × 572 có viền trống).
  */
 
+import { HANG } from '@so-chung/core/three/poses';
+
 export type ClimbFrame = 'portrait' | 'landscape';
 
 export const WORLD: Record<ClimbFrame, { width: number; height: number }> = {
@@ -28,11 +30,15 @@ export const handleY = (k: number): number => barY(k) - HANDLE.height / 2 + 0.05
 export const LABEL = { width: 2.7, height: 1.2, above: 0.82 } as const;
 export const labelY = (k: number): number => barY(k) + LABEL.above;
 /**
- * Người chơi: tay ở đáy tay nắm, cao `height`; hai chân thấp hơn tay `drop`. Clip `hang` trong file hoc-sinh-nam hiện cho tư thế ngồi co ôm mặt (kiểm ở /dev/3d, bước B4) nên
- * tạm dùng clip `idle`: đầu ngay dưới tay nắm (`drop` ≈ chiều cao). Sửa xong clip thì đổi `STUDENT_HANG_CLIP` (ClimbStage.tsx) và `drop`.
+ * Người chơi: cao `height`, treo bằng tư thế `hang` dựng bằng code (core/three/poses.ts): hai lòng bàn tay ở độ cao `HANG.handsRatio` × chiều cao trên chân, nên chân ở
+ * `feetY(k)` = chỗ nắm − `HANG.handsRatio` × `height`. Chỗ nắm ở dưới thanh `GRIP_BELOW_BAR` (hai bàn tay nắm quai tay nắm). Đỉnh ngón tay cao hơn lòng bàn tay chừng 0,1 chiều cao.
  */
-export const PLAYER = { height: 2.0, drop: 2.05 } as const;
-export const handsY = (k: number): number => barY(k) - HANDLE.height + 0.15;
+export const PLAYER = { height: 2.0 } as const;
+export const GRIP_BELOW_BAR = 0.3;
+export const handsY = (k: number): number => barY(k) - GRIP_BELOW_BAR;
+export const feetY = (k: number): number => handsY(k) - HANG.handsRatio * PLAYER.height;
+/** Điểm cao nhất của người chơi lúc treo ở tầng k (đỉnh ngón tay giữa; đầu thấp hơn chút). */
+export const playerTopY = (k: number): number => handsY(k) + (1.71 / 1.7 - HANG.handsRatio) * PLAYER.height;
 /** Cú bật: tới đỉnh thì tay lên gần tới tầng trên (tỉ lệ khoảng cách tầng). */
 export const JUMP_RISE = 0.82;
 
@@ -98,6 +104,12 @@ export function labelFontPx(ppu: number, largeText: boolean, widthAt1px: number)
   const fitW = (LABEL.width * ppu * 0.9) / Math.max(widthAt1px, 1e-6);
   return Math.max(floor, Math.min(want, fitW));
 }
+
+/**
+ * Nhãn của tay nắm đang giữ có hiện không: ẩn từ lúc bật lên (`peakAt` khác null) tới khi người chơi về xong chỗ treo (`tweenEnd`: lúc kết thúc đoạn chuyển động của người chơi, ms), vì nhãn
+ * nằm trên thanh đúng chỗ người chơi bay qua khi bật hay tụt về. Về tay nắm cũ (ngõ cụt, hụt) hay sang tầng mới thì hiện lại.
+ */
+export const heldLabelVisible = (peakAt: number | null, now: number, tweenEnd: number): boolean => peakAt === null && now >= tweenEnd;
 
 /** Chọn khung theo kích thước màn hình: cao hơn rộng thì dọc. */
 export const frameOf = (width: number, height: number): ClimbFrame => (height > width ? 'portrait' : 'landscape');

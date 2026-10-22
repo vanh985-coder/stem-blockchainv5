@@ -3,10 +3,14 @@ import {
   AIM_LIMITS,
   AIM_REFERENCE_PX,
   BONE_KEYS,
+  HANG,
+  HANG_PINNED_BONES,
+  MIXAMO_BONE_NAME,
   JOINT_LIMITS,
   POSE_DURATION,
   POSE_FADE,
   POSE_NAMES,
+  addHang,
   addPose,
   addSquatLegs,
   aimDirection,
@@ -17,6 +21,7 @@ import {
   createAimSplit,
   createPoseFrame,
   getRot,
+  hangSway,
   heldWeight,
   isPoseAllowed,
   poseWeight,
@@ -292,5 +297,83 @@ describe('hướng nhìn/chỉ về đáp án', () => {
     expect(Math.abs(s.headYaw) / DEG).toBeLessThanOrEqual(JOINT_LIMITS.head.y[1]);
     expect(Math.abs(s.spineTwist) / DEG / 3).toBeLessThanOrEqual(JOINT_LIMITS.spine.y[1]);
     expect(Math.abs(s.headPitch) / DEG).toBeLessThanOrEqual(Math.abs(JOINT_LIMITS.head.x[0]));
+  });
+});
+
+describe('tư thế treo (hang), dựng bằng code thay cho clip hang sai trong file model', () => {
+  it('là tư thế giữ như point: không nằm trong POSE_NAMES (tư thế có thời lượng); vào 0,1 giây rồi giữ mức 1', () => {
+    expect((POSE_NAMES as readonly string[]).includes('hang')).toBe(false);
+    expect(heldWeight(0.05, undefined)).toBeCloseTo(0.5, 9);
+    expect(heldWeight(3, undefined)).toBe(1);
+  });
+
+  it('hai tay giơ thẳng lên trên đầu (gần −175° của điểm đầu swing), khép vào trong, hai bên đối nhau; cẳng tay thẳng; chân thả lỏng, mũi chân chúc xuống', () => {
+    const f = createPoseFrame();
+    addHang(f, 1);
+    expect(HANG.armX).toBeLessThanOrEqual(-175);
+    expect(HANG.armX).toBeGreaterThanOrEqual(-195);
+    expect(getRot(f, 'leftArm', 'x')).toBe(HANG.armX);
+    expect(getRot(f, 'rightArm', 'x')).toBe(HANG.armX);
+    // khép vào trong: tay trái (phía +X) quay âm quanh Z, tay phải quay dương
+    expect(getRot(f, 'leftArm', 'z')).toBeLessThan(0);
+    expect(getRot(f, 'rightArm', 'z')).toBeGreaterThan(0);
+    // chân: đùi hơi ra trước, gối hơi gập (không ngược), mũi chân chúc xuống (đưa bàn chân thêm góc dương quanh X)
+    expect(getRot(f, 'leftUpLeg', 'x')).toBeLessThanOrEqual(0);
+    expect(getRot(f, 'leftLeg', 'x')).toBeGreaterThan(0);
+    expect(getRot(f, 'leftLeg', 'x')).toBeLessThan(20);
+    expect(getRot(f, 'leftFoot', 'x')).toBeGreaterThan(0);
+    expect(getRot(f, 'rightFoot', 'x')).toBe(getRot(f, 'leftFoot', 'x'));
+    // hai chân hơi khép: đùi trái quay âm quanh Z, đùi phải dương
+    expect(getRot(f, 'leftUpLeg', 'z')).toBeLessThan(0);
+    expect(getRot(f, 'rightUpLeg', 'z')).toBeGreaterThan(0);
+    // thân thẳng: không xoay thân, đầu, cổ
+    for (const b of ['spine', 'spine1', 'spine2', 'neck', 'head', 'hips'] as const) for (const ax of ['x', 'y', 'z'] as const) expect(getRot(f, b, ax)).toBe(0);
+  });
+
+  it('trọng số nửa thì góc nửa; trọng số 0 hay âm thì không thêm gì; nằm trong giới hạn khớp không cần chặn', () => {
+    const half = createPoseFrame();
+    addHang(half, 0.5);
+    expect(getRot(half, 'leftArm', 'x')).toBeCloseTo(HANG.armX / 2, 9);
+    const none = createPoseFrame();
+    addHang(none, 0);
+    addHang(none, -1);
+    expect(Array.from(none.rot).every((v) => v === 0)).toBe(true);
+    const f = createPoseFrame();
+    addHang(f, 1);
+    const before = Array.from(f.rot);
+    clampFrame(f);
+    expect(Array.from(f.rot)).toEqual(before);
+  });
+
+  it('có xương bàn chân trong BONE_KEYS (đủ giới hạn khớp, đủ tên Mixamo); xương giữ thẳng đều là xương có thật, gồm thân và hai chân', () => {
+    for (const k of ['leftFoot', 'rightFoot'] as const) {
+      expect(BONE_KEYS).toContain(k);
+      expect(JOINT_LIMITS[k]).toBeDefined();
+      expect(MIXAMO_BONE_NAME[k]).toMatch(/Foot$/);
+    }
+    for (const b of HANG_PINNED_BONES) expect(BONE_KEYS).toContain(b);
+    for (const b of ['hips', 'spine', 'spine2', 'leftUpLeg', 'rightLeg', 'leftFoot'] as const) expect(HANG_PINNED_BONES).toContain(b);
+    // BONE_KEYS vẫn theo thứ tự từ gốc ra ngọn: xương con sau xương cha
+    const order = (k: (typeof BONE_KEYS)[number]) => BONE_KEYS.indexOf(k);
+    expect(order('leftLeg')).toBeLessThan(order('leftFoot'));
+    expect(order('rightLeg')).toBeLessThan(order('rightFoot'));
+  });
+
+  it('đung đưa ±4°, chu kỳ 1,6 giây, đứng yên khi Giảm chuyển động', () => {
+    expect(HANG.swayDeg).toBe(4);
+    expect(HANG.swaySeconds).toBe(1.6);
+    expect(hangSway(0)).toBeCloseTo(0, 9);
+    expect(hangSway(0.4)).toBeCloseTo(4, 9);
+    expect(hangSway(0.8)).toBeCloseTo(0, 9);
+    expect(hangSway(1.2)).toBeCloseTo(-4, 9);
+    expect(hangSway(1.6 + 0.3)).toBeCloseTo(hangSway(0.3), 9);
+    let max = 0;
+    for (let t = 0; t < 3.2; t += 0.01) max = Math.max(max, Math.abs(hangSway(t)));
+    expect(max).toBeLessThanOrEqual(4 + 1e-9);
+    for (let t = 0; t < 3.2; t += 0.1) expect(hangSway(t, false)).toBe(0);
+  });
+
+  it('tỉ lệ độ cao hai bàn tay (đo ở /dev/3d: lòng bàn tay 1,62 trên chiều cao 1,7)', () => {
+    expect(HANG.handsRatio).toBeCloseTo(1.62 / 1.7, 2);
   });
 });

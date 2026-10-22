@@ -147,7 +147,7 @@ Logic đặt trong `climbLogic.ts` (hàm thuần, có test).
 - **Thân cây:** ghép nối từ `sprites/man-12-leo-cay/than-cay` theo chiều dọc; dưới cùng là `goc-cay`, trên cùng là `ngon-cay`.
 - **Mỗi tầng:** thanh `canh-ngang`; hai tay nắm dùng `tay-nam`, số ghi trên tay nắm do code vẽ.
 - **Nền trời:** code vẽ dải màu chuyển; tiền đồng dùng `ui/icons/tien-dong`.
-- **Học sinh:** model 3D, clip `hang` khi đang treo, `jump` khi bật lên.
+- **Học sinh:** model 3D, tư thế `hang` dựng bằng code (clip `idle` cộng tư thế treo, xem spec 03 mục 3.3; clip `hang` trong file model sai nên không dùng) khi đang treo, clip `jump` khi bật lên.
 - **{phanDien}:** model 3D ngồi trên ngọn cây ôm chiếc lá giả.
 - **Khung nhìn:** chơi được cả khung dọc lẫn ngang. Khung ngang thì để cây ở giữa, hai bên là bầu trời.
 
@@ -193,8 +193,14 @@ Logic đặt trong `climbLogic.ts` (hàm thuần, có test).
 | Mốc | Điểm |
 |---|---|
 | Đồng | 250 |
-| Bạc | 400 |
-| Vàng | 520 |
+| Bạc | 450 |
+| Vàng | 570 |
+
+**Nghĩa của mốc** (đổi ở bước sửa sau B4; điểm hoàn hảo là 586 = 400 + 36 đồng + 150 điểm tim):
+- **Đồng (250):** qua được 3 vòng (3 × 100 cộng đồng nhặt được); hết tim ở vòng 4 vẫn được Đồng (324 điểm khi nhầm 3 lần ở tầng đầu vòng 4).
+- **Bạc (450):** leo hết 4 vòng, nhầm nhánh tối đa 2 lần (hai ngõ cụt: 482 điểm; ba ngõ cụt đã hết tim nên không leo hết 4 vòng).
+- **Vàng (570):** không nhầm nhánh lần nào (586). Trượt (không nắm được gì) chỉ mất 2 đồng mỗi lần nên vẫn còn Vàng khi trượt tối đa 8 lần.
+- Hết tim ở vòng 3 (mới xong 2 vòng) là 214 điểm: chưa đạt mốc.
 
 ### Cảnh cao trào (sau vòng 4, bỏ qua được)
 
@@ -218,20 +224,20 @@ Code ở `packages/village-lang-bac/src/climb/` (`climbConfig.ts`, `climbLogic.t
 
 **Đã làm (mốc 3, bước B4: cảnh, chưa có cao trào; màn 12 vẫn `coming-soon`, chơi thử ở `/dev/man-12` của vỏ lang-bac khi chạy dev):**
 - Code: `climbLayout.ts` (bố cục thuần, có test), `climbArt.ts` (nạp hình, cắt khung, tách nền trắng của hai hình lá, vẽ trời và nhãn), `ClimbStage.tsx` (cảnh trong Scene25D), `ClimbGame.tsx` (màn chơi), `pages/Man12.tsx`, `climbBots.ts` + `climbBalance.test.ts`. Scene25D nhận `background={null}` để cảnh tự vẽ trời.
-- Cảnh: cây ghép từ `than-cay` (cắt bỏ hai đầu tròn), `goc-cay` dưới cùng, `ngon-cay` trên cùng; mỗi tầng một `canh-ngang`, tay nắm `tay-nam` (tầng lá dùng `ui/tiles/la-da`), {phanDien} trên ngọn ôm `ui/tiles/la-gia`. Hai hình lá có nền trắng đục nên code tách nền khi nạp. Khoảng cách tầng 3,6 đơn vị; camera đi theo tầng người chơi đang giữ (Giảm chuyển động: nhảy thẳng).
+- Cảnh: cây ghép từ `than-cay` (cắt bỏ hai đầu tròn), `goc-cay` dưới cùng, `ngon-cay` trên cùng; mỗi tầng một `canh-ngang`, tay nắm `tay-nam` (tầng lá dùng `ui/tiles/la-da`), {phanDien} trên ngọn ôm `ui/tiles/la-gia`. Hai hình lá (`ui/tiles/la-gia`, `la-da`) in sẵn nền trắng vào ảnh nên `pnpm assets:build` tách nền (xem spec 01); vẫn còn một vệt bóng xám nhạt dưới lá. Khoảng cách tầng 3,6 đơn vị; camera đi theo tầng người chơi đang giữ (Giảm chuyển động: nhảy thẳng).
 - Nhãn trên tay nắm: hai dòng "Sổ: …" / "Nay: …" cùng màu, không đánh dấu nhánh nào lệch. Đo: 17,3 px ở 360 × 640 và 844 × 390, 36,3 px ở 1366 × 768 (không dưới 14 px, "Chữ to" nhân 1,15).
 - Cú bật nhận ở `pointerdown` và `keydown` (Space không cuộn trang). Nắm được thì tay nắm kéo về giữa thân trong 0,3 giây (chỉ là hình). Ngõ cụt: "Ngõ cụt!", {phanDien} `cheer`, nhân vật tụt về. Bắt được: {phanDien} `jump`, sau 1,1 giây hiện "Bắt được {phanDien}!" và "Em chỉ leo d tầng thay vì kiểm tra cả 2^d lá!".
 - Lần đầu vào màn Bi nói câu "Trên bảng thì gốc vẽ ở trên cùng…"; cờ `gameTipSeen` (`progress/gameTips.ts`, cookie `gt`, bit số màn − 1).
-- **Clip `hang` của `hoc-sinh-nam` đang sai:** ở `/dev/3d` clip "hanging from a horizontal bar with both arms straight up above" cho tư thế ngồi co, tay ôm mặt, không phải treo tay. Tạm dùng `idle` (đầu ngay dưới tay nắm, `STUDENT_HANG_CLIP` trong `ClimbStage.tsx`), chờ quyết định sửa file đồ họa hay dựng tư thế treo bằng code.
+- **Tư thế treo (sửa sau B4):** clip `hang` trong file `hoc-sinh-nam` sai (ở `/dev/3d` cho tư thế ngồi co, tay ôm mặt) nên màn 12 dùng tư thế `hang` dựng bằng code (spec 03 mục 3.3): hai tay giơ thẳng, thân thẳng, chân thả lỏng, đung đưa ±4° (tắt khi Giảm chuyển động). Người chơi đặt sao cho lòng bàn tay (cao 0,95 × chiều cao) ở dưới thanh 0,3; chân ở `feetY(k)`.
 
-**Cân bằng (300 ván mỗi bot, seed 1 đến 300, mốc 250 / 400 / 520):**
+**Cân bằng (300 ván mỗi bot, seed 1 đến 300, mốc 250 / 450 / 570):**
 
 | Bot | Điểm trung bình | Chưa đạt | Đồng | Bạc | Vàng | Hết tim |
 |---|---|---|---|---|---|---|
 | Giỏi: lệch giờ σ 0,04 giây, không đọc nhầm | 586 | 0% | 0% | 0% | 100% | 0% |
-| Trung bình: lệch giờ σ 0,12 giây, đọc nhầm số 10% số lần | 441,9 (2 đến 586) | 12,0% | 18,7% | 28,3% | 41,0% | 30,7% |
+| Trung bình: lệch giờ σ 0,12 giây, đọc nhầm số 10% số lần | 441,9 (2 đến 586) | 12,0% | 18,7% | 55,7% | 13,7% | 30,7% |
 
-Bot trung bình CHƯA đạt tiêu chí (Đồng hoặc Bạc ≥ 80%, Vàng dưới 10%): mốc giữ nguyên, chờ chủ dự án quyết. Thử thêm (không đưa vào luật): bỏ đọc nhầm (σ 0,12) thì 100% Vàng; σ 0,2 và đọc nhầm 10% thì Vàng 43,3%; đọc nhầm 20% thì Vàng 5,7% nhưng hết tim 80,7%. Lệch giờ gần như không đổi kết quả (trượt chỉ mất 2 đồng); kết quả do số lần đọc nhầm quyết định (mỗi lần mất 1 tim, 50 điểm, và có thể hết tim).
+Bot giỏi 100% Vàng (có assert). Bot trung bình chỉ in bảng tỉ lệ, KHÔNG assert ngưỡng Đồng/Bạc ≥ 80% và Vàng < 10% cho màn này: ngưỡng chỉnh khi học sinh chơi thật. Kết quả do số lần đọc nhầm số quyết định (mỗi lần mất 1 tim và có thể hết tim); lệch giờ gần như không đổi kết quả vì trượt chỉ mất 2 đồng.
 
 ## Checklist nghiệm thu
 

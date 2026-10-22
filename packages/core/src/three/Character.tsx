@@ -71,6 +71,13 @@ export interface CharacterProps extends GroupProps {
    * null hoặc bỏ trống thì thả.
    */
   aim?: Aim | null;
+  /**
+   * Tư thế treo tay dựng bằng code (xem `HANG` trong poses.ts): hai tay giơ thẳng lên, đung đưa nhẹ quanh bàn tay. Giữ đến khi false. Hai bàn tay ở độ cao `HANG.handsRatio` × chiều cao
+   * trên chân. Dùng cho màn 12 (clip `hang` trong file model sai).
+   */
+  hang?: boolean;
+  /** Đung đưa khi treo (tắt khi "Giảm chuyển động"); mặc định bật */
+  hangSway?: boolean;
 
   // --- Nhân vật đứng yên ---
   /** "talking": nghiêng đầu và quay mặt về `lookAt` */
@@ -134,6 +141,8 @@ export function Character({
   onClipEnd,
   pose,
   aim,
+  hang = false,
+  hangSway = true,
   mood = 'idle',
   happyTrigger,
   lookAt,
@@ -181,6 +190,8 @@ export function Character({
           onClipEnd={onClipEnd}
           pose={pose}
           aim={aim}
+          hang={hang}
+          hangSway={hangSway}
           onReady={onReady}
         />
       ) : (
@@ -211,12 +222,14 @@ interface RigAnimatorProps {
   timeScale: number;
   pose?: PoseRequest;
   aim?: Aim | null;
+  hang: boolean;
+  hangSway: boolean;
   onClipEnd?: (clip: ClipName) => void;
   onReady?: (info: CharacterInfo) => void;
 }
 
 /** Không vẽ gì; điều khiển AnimationMixer và lớp tư thế của nhân vật có xương. */
-function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing, animation, trigger, returnTo, clips, clipConfig, fade, timeScale, pose, aim, onClipEnd, onReady }: RigAnimatorProps) {
+function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing, animation, trigger, returnTo, clips, clipConfig, fade, timeScale, pose, aim, hang, hangSway, onClipEnd, onReady }: RigAnimatorProps) {
   // Mượn clip của model khác nếu thiếu. Hỏi tên clip của model cho mượn một cách lười: chỉ tải khi thật sự cần.
   const ownNames = animations.map((a) => a.name);
   const sources = borrowClips(id, (mid) => (mid === id ? ownNames : readModel(mid).animations.map((a) => a.name)), clips);
@@ -247,10 +260,10 @@ function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing
   const host = useMemo(() => new CharacterRig<PoseLayer>(), []);
   const [version, setVersion] = useState(0);
   useEffect(() => {
-    host.build(scene, playable, () => new PoseLayer(scene, outer.current ?? scene, motion.current ?? scene, facing, fit.scale));
+    host.build(scene, playable, () => new PoseLayer(scene, outer.current ?? scene, motion.current ?? scene, facing, fit.scale, height));
     setVersion((v) => v + 1);
     return () => host.dispose();
-  }, [host, scene, playable, outer, motion, facing, fit.scale]);
+  }, [host, scene, playable, outer, motion, facing, fit.scale, height]);
 
   const scale = useRef(timeScale);
   scale.current = timeScale;
@@ -287,6 +300,10 @@ function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing
   useEffect(() => {
     host.layer?.setAim(aim ?? null);
   }, [host, version, aim?.az, aim?.el, aim === null || aim === undefined]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    host.layer?.setHang(hang, hangSway);
+  }, [host, version, hang, hangSway]);
 
   useFrame((state, dt) => host.update(state.clock.elapsedTime, dt));
 

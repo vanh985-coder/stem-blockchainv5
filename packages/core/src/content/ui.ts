@@ -560,6 +560,7 @@ export const ui = {
     tuThe: 'Tư thế code dựng',
     tuTheGhiChu: 'Trộn lên clip đang chạy, vào ra 0,1 giây. hurt chỉ có tác dụng với Tí.',
     tuThePoint: 'point (chỉ về bên phải, phía trên)',
+    tuTheHang: 'hang (treo tay, đung đưa)',
     phanUngTieuDe: 'Thử ChoiceReaction',
     phanUngHuongDan: 'Rê chuột hoặc Tab vào một đáp án thì học sinh quay đầu và người về phía đó và chỉ. Bấm (hoặc chạm: chỉ 0,3 giây rồi mới ra kết quả) thì kết quả đúng hoặc sai ngẫu nhiên.',
     phanUngDapAn: 'Đáp án {x}',

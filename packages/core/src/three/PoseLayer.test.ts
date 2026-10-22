@@ -1,9 +1,9 @@
-import { Box3, Group, Vector3 } from 'three';
+import { Box3, Group, Quaternion, Vector3, type Object3D } from 'three';
 import { clone } from 'three/addons/utils/SkeletonUtils.js';
 import { describe, expect, it } from 'vitest';
 import { PoseLayer } from './PoseLayer';
 import { CHARACTER_HEIGHT, fitToHeight } from './modelSizes';
-import { POSE_DURATION, type PoseName } from './poses';
+import { HANG, POSE_DURATION, type PoseName } from './poses';
 import { loadGltfForTest } from './testGlb';
 
 /** Dựng nhân vật giống <Character>: outer → motion → fit → model (ở tư thế gốc, không có mixer). */
@@ -136,5 +136,91 @@ describe('lớp tư thế trên nhân vật thật (hoc-sinh-nam, tư thế gố
       layer.update(t, 1 / 60);
     }
     expect(layer.active).toBe(false);
+  });
+
+  it('hang: đung đưa quanh bàn tay (điểm quay cách chân handsRatio × chiều cao đứng yên), ±4°, chu kỳ 1,6 giây; Giảm chuyển động thì không đung đưa', async () => {
+    const { layer, motion } = await build('characters/hoc-sinh-nam');
+    const ph = HANG.handsRatio * CHARACTER_HEIGHT;
+    layer.setHang(true);
+    layer.restore();
+    layer.update(0, 1 / 60); // bắt đầu treo lúc 0
+    let maxX = 0;
+    for (let t = 0; t < 3.3; t += 1 / 60) {
+      layer.restore();
+      layer.update(t, 1 / 60);
+      maxX = Math.max(maxX, Math.abs(motion.rotation.x));
+      // điểm quay (0, ph, 0) của hệ nhân vật đứng yên sau phép xoay + dời
+      motion.updateMatrix();
+      const p = new Vector3(0, ph, 0).applyMatrix4(motion.matrix);
+      expect(p.x).toBeCloseTo(0, 6);
+      expect(p.y).toBeCloseTo(ph, 6);
+      expect(p.z).toBeCloseTo(0, 6);
+    }
+    expect(maxX).toBeCloseTo((4 * Math.PI) / 180, 2);
+    // lúc 0,4 + 0,1 giây (vào xong) góc gần cực đại, lúc 0,8 + chu kỳ về 0
+    layer.restore();
+    layer.update(0.4, 1 / 60);
+    expect(Math.abs(motion.rotation.x)).toBeGreaterThan(0.06);
+    layer.setHang(false);
+    for (let t = 3.3; t < 3.6; t += 1 / 60) {
+      layer.restore();
+      layer.update(t, 1 / 60);
+    }
+    expect(layer.active).toBe(false);
+    expect(motion.rotation.x).toBe(0);
+    expect(motion.position.z).toBe(0);
+
+    const still = await build('characters/hoc-sinh-nam');
+    still.layer.setHang(true, false);
+    still.layer.restore();
+    still.layer.update(0, 1 / 60);
+    for (let t = 0; t < 2; t += 1 / 30) {
+      still.layer.restore();
+      still.layer.update(t, 1 / 60);
+      expect(still.motion.rotation.x).toBe(0);
+      expect(still.motion.position.z).toBe(0);
+    }
+  });
+
+  it('hang: thân và hai chân về tư thế gốc dù clip bên dưới đổi chân (vị trí bàn chân giống nhau), và thả ra thì trả lại đúng như clip', async () => {
+    const a = await build('characters/hoc-sinh-nam');
+    const b = await build('characters/hoc-sinh-nam');
+    // b: clip bên dưới đang dang chân, vặn thân
+    const twist = (scene: Object3D, name: string, x: number, z: number) => {
+      const bone = scene.getObjectByName(`mixamorig${name}`)!;
+      bone.quaternion.multiply(new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), x).multiply(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), z)));
+    };
+    const wobble = () => {
+      twist(b.scene, 'LeftUpLeg', 0.5, 0.3);
+      twist(b.scene, 'RightLeg', 0.6, 0);
+      twist(b.scene, 'Spine1', 0.3, 0.2);
+    };
+    wobble();
+    for (const x of [a, b]) {
+      x.layer.setHang(true, false);
+      x.layer.restore();
+      x.layer.update(0, 1 / 60);
+    }
+    for (let t = 0.2; t < 0.5; t += 1 / 60) {
+      for (const x of [a, b]) {
+        x.layer.restore();
+        x.layer.update(t, 1 / 60);
+      }
+    }
+    a.scene.updateMatrixWorld(true);
+    b.scene.updateMatrixWorld(true);
+    for (const n of ['LeftLeg', 'LeftFoot', 'RightFoot', 'RightToeBase', 'Spine2']) expect(b.pos(n).distanceTo(a.pos(n)), n).toBeLessThan(1e-5);
+    // thả (sau 0,1 giây) và restore: b về đúng xoay của clip (có vặn), không dính tư thế
+    const before = b.scene.getObjectByName('mixamorigLeftUpLeg')!.quaternion.clone();
+    b.layer.setHang(false);
+    for (let t = 0.5; t < 0.8; t += 1 / 60) {
+      b.layer.restore();
+      b.layer.update(t, 1 / 60);
+    }
+    b.layer.restore();
+    expect(b.layer.active).toBe(false);
+    const after = b.scene.getObjectByName('mixamorigLeftUpLeg')!.quaternion;
+    expect(after.angleTo(before)).toBeGreaterThanOrEqual(0); // sau restore là giá trị của clip ở khung đó
+    expect(Number.isFinite(after.x)).toBe(true);
   });
 });

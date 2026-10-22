@@ -59,10 +59,11 @@ function CameraPreset({ group }: { group: boolean }) {
 /** Số liệu dev để kiểm tra rò rỉ bộ nhớ (chỉ khi chạy dev): window.__sochung3d. */
 interface DevProbe {
   gl: RootState['gl'];
+  scene: RootState['scene'];
   cache: typeof modelCacheStats;
 }
 const exposeProbe = (st: RootState) => {
-  if (import.meta.env.DEV) (window as unknown as { __sochung3d?: DevProbe }).__sochung3d = { gl: st.gl, cache: modelCacheStats };
+  if (import.meta.env.DEV) (window as unknown as { __sochung3d?: DevProbe }).__sochung3d = { gl: st.gl, scene: st.scene, cache: modelCacheStats };
 };
 
 const ANSWERS = ['A', 'B', 'C', 'D'] as const;
@@ -160,6 +161,7 @@ export function DevModelViewer() {
   const [config, setConfig] = useState<ClipConfigTable>(CLIP_CONFIG);
   const [poseReq, setPoseReq] = useState<PoseRequest | undefined>(undefined);
   const [pointOn, setPointOn] = useState(false);
+  const [hangOn, setHangOn] = useState(false);
   const [exported, setExported] = useState<{ text: string; copied: boolean } | null>(null);
   const { level } = useQuality(choice);
 
@@ -262,6 +264,9 @@ export function DevModelViewer() {
                     <button type="button" aria-pressed={pointOn} onClick={() => setPointOn((v) => !v)} className={`${BTN} ${on(pointOn)}`}>
                       {ui.dev3d.tuThePoint}
                     </button>
+                    <button type="button" aria-pressed={hangOn} onClick={() => setHangOn((v) => !v)} className={`${BTN} ${on(hangOn)}`}>
+                      {ui.dev3d.tuTheHang}
+                    </button>
                   </div>
                   <p className="mt-1 text-sm">{ui.dev3d.tuTheGhiChu}</p>
                 </fieldset>
@@ -363,7 +368,7 @@ export function DevModelViewer() {
           ) : (
             <Bounds key={id} fit margin={1.6}>
               {isChar ? (
-                <Character id={id} animation={anim.clip} trigger={anim.n} clipConfig={config} pose={poseReq} aim={pointOn ? sampleAim : null} mood={mood} happyTrigger={happyN} lookAt={[0, 1, 10]} />
+                <Character id={id} animation={anim.clip} trigger={anim.n} clipConfig={config} pose={poseReq} aim={pointOn ? sampleAim : null} hang={hangOn} mood={mood} happyTrigger={happyN} lookAt={[0, 1, 10]} />
               ) : (
                 <Model id={id} lod={activeLod} castShadow receiveShadow />
               )}

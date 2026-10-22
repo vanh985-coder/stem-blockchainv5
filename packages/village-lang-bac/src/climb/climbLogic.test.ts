@@ -239,19 +239,21 @@ describe('bước B3: bot canh đúng và điểm', () => {
     expect(jump(l)).toBe(false);
   });
 
-  it('điểm: 4 vòng, 10 đồng, 2 tim → 510; mốc 250 / 400 / 520', () => {
+  it('điểm: 4 vòng, 10 đồng, 2 tim → 510; mốc 250 / 450 / 570', () => {
     expect(climbScore({ roundsDone: 4, coins: 10, hearts: 2 })).toBe(510);
     const s = createClimbGame(1);
     addCoins(s, 3);
     addCoins(s);
     addCoins(s, -5);
     expect(s.coins).toBe(4);
-    expect(CLIMB_SPEC.medals).toEqual([250, 400, 520]);
+    expect(CLIMB_SPEC.medals).toEqual([250, 450, 570]);
     expect(climbMedal(249)).toBe(0);
     expect(climbMedal(250)).toBe(1);
-    expect(climbMedal(400)).toBe(2);
+    expect(climbMedal(449)).toBe(1);
+    expect(climbMedal(450)).toBe(2);
     expect(climbMedal(510)).toBe(2);
-    expect(climbMedal(520)).toBe(3);
+    expect(climbMedal(569)).toBe(2);
+    expect(climbMedal(570)).toBe(3);
   });
 
   it('cùng seed thì cùng cây (và cùng pha tay nắm); khác seed thì (gần như) khác', () => {
@@ -341,5 +343,89 @@ describe('bước B4: tiền đồng', () => {
     const good2 = isMismatch(s.tree, 2, 2 * s.index) ? 'left' : 'right';
     expect(jumpAt(s, timeToJump(s, good2, Math.max(s.time, s.lockUntil), 0.1))[0]).toMatchObject({ kind: 'up', coins: 2, lostCoins: 0 });
     expect(s.coins).toBe(2);
+  });
+});
+
+type Slip = { round: number; level: number; kind: 'deadEnd' | 'miss' };
+
+/** Chơi hết ván, canh đúng mọi lần trừ các lần sai trong `slips` (mỗi phần tử một lần sai, theo thứ tự; cùng (vòng, tầng) lặp nhiều lần được). */
+function playSlips(seed: number, slips: Slip[]) {
+  const s = createClimbGame(seed);
+  const todo = [...slips];
+  let guard = 0;
+  while (s.phase !== 'won' && s.phase !== 'lost' && guard++ < 400) {
+    if (s.phase === 'roundDone') {
+      advanceRound(s);
+      continue;
+    }
+    const good = isMismatch(s.tree, s.level + 1, 2 * s.index) ? 'left' : 'right';
+    const from = Math.max(s.time, s.lockUntil);
+    const next = todo[0];
+    if (next && next.round === s.round && next.level === s.level) {
+      todo.shift();
+      if (next.kind === 'deadEnd') jumpAt(s, timeToJump(s, good === 'left' ? 'right' : 'left', from, 0.1));
+      else {
+        let t = from;
+        while (Math.abs(nextCenter(s, t + CLIMB_SPEC.jumpPeak)) > 0.05) t += 0.001;
+        jumpAt(s, t);
+      }
+      continue;
+    }
+    jumpAt(s, timeToJump(s, good, from, CLIMB_ROUNDS[s.round].reach * 0.5));
+  }
+  return s;
+}
+
+describe('mốc 250 / 450 / 570: Đồng qua 3 vòng, Bạc leo hết 4 vòng nhầm tối đa 2 lần, Vàng không nhầm lần nào', () => {
+  const dead = (round: number, level: number): Slip => ({ round, level, kind: 'deadEnd' });
+
+  it('leo hoàn hảo: 586 điểm → Vàng', () => {
+    const s = playSlips(1, []);
+    expect(s.phase).toBe('won');
+    expect(climbScore(s)).toBe(586);
+    expect(climbMedal(climbScore(s))).toBe(3);
+  });
+
+  it('trượt (không nhầm nhánh) nhiều lần vẫn Vàng nếu đủ 570: 8 lần trượt ở 8 tầng khác nhau → 570', () => {
+    const slips: Slip[] = [0, 1, 2].map((level) => ({ round: 0, level, kind: 'miss' as const })).concat([0, 1, 2, 3].map((level) => ({ round: 1, level, kind: 'miss' as const })), [{ round: 2, level: 0, kind: 'miss' as const }]);
+    const s = playSlips(2, slips);
+    expect(s.hearts).toBe(3);
+    expect(climbScore(s)).toBe(586 - 16);
+    expect(climbMedal(climbScore(s))).toBe(3);
+  });
+
+  it('1 lần ngõ cụt: 534 → Bạc', () => {
+    const s = playSlips(3, [dead(1, 1)]);
+    expect(s.phase).toBe('won');
+    expect(climbScore(s)).toBe(534);
+    expect(climbMedal(climbScore(s))).toBe(2);
+  });
+
+  it('2 lần ngõ cụt (ở hai tầng khác nhau) hết 4 vòng: 482 → Bạc', () => {
+    const s = playSlips(4, [dead(0, 0), dead(3, 2)]);
+    expect(s.phase).toBe('won');
+    expect(s.hearts).toBe(1);
+    expect(s.roundsDone).toBe(4);
+    expect(climbScore(s)).toBe(400 + 32 + 50);
+    expect(climbMedal(climbScore(s))).toBe(2);
+  });
+
+  it('hết tim ở vòng 4 (đã xong 3 vòng) → Đồng', () => {
+    const s = playSlips(5, [dead(3, 0), dead(3, 0), dead(3, 0)]);
+    expect(s.phase).toBe('lost');
+    expect(s.roundsDone).toBe(3);
+    expect(s.hearts).toBe(0);
+    const score = climbScore(s);
+    expect(score).toBe(300 + 24); // 3 vòng: 6 + 8 + 10 đồng, 0 tim
+    expect(climbMedal(score)).toBe(1);
+  });
+
+  it('hết tim ở vòng 3 (mới xong 2 vòng) → chưa đạt', () => {
+    const s = playSlips(6, [dead(2, 0), dead(2, 0), dead(2, 0)]);
+    expect(s.phase).toBe('lost');
+    expect(s.roundsDone).toBe(2);
+    const score = climbScore(s);
+    expect(score).toBe(200 + 14);
+    expect(climbMedal(score)).toBe(0);
   });
 });
