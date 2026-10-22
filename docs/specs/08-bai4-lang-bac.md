@@ -155,17 +155,18 @@ Logic đặt trong `climbLogic.ts` (hàm thuần, có test).
 
 - **Cây mọc như cây thật:** gốc ở dưới, lá ở trên. Lần đầu vào màn, Bi giải thích: "Trên bảng thì gốc vẽ ở trên cùng; còn ở cây thật thì gốc ở dưới. Vẫn là một cây thôi!"
 - **Thanh ngang:** mỗi tầng cây là một thanh ngang có **2 tay nắm** (`tay-nam`), ứng với nhánh trái và nhánh phải.
-  - Hai tay nắm trượt qua lại đối xứng nhau, mỗi cái ở một nửa thanh.
   - Mỗi tay nắm ghi 2 số: **số trong sổ / số hiện tại**.
-- **Nhân vật** treo dưới tay nắm đang giữ (hoạt ảnh `hang`).
-- **Bật lên:** chạm, bấm chuột hoặc Space.
-  - Ở đỉnh cú nhảy, nếu tay cách một tay nắm của tầng trên không quá **0,6** thì nắm được tay nắm đó.
-  - Như vậy học sinh chọn nhánh bằng cách **canh lúc bật lên**: chờ tay nắm của nhánh lệch trôi tới ngay trên đầu.
-- **Nắm trúng nhánh lệch:** leo tiếp lên tầng trên.
-- **Nắm nhầm nhánh khớp:** "Ngõ cụt!", {phanDien} cười; nhân vật tụt về tầng trước và mất 1 tim.
-- **Không nắm được gì:** rơi về tay nắm cũ, mất khoảng 1 giây, không mất tim.
-- **Tầng trên cùng là các chiếc lá:** nắm được lá giả là bắt được {phanDien} đang ngồi trên ngọn cây.
-- Giữa các tầng có tiền đồng để nhặt.
+- **Mô hình leo (mốc 3, bước B3; thay câu cũ "mỗi tay nắm ở một nửa thanh, trượt đối xứng", vì câu đó làm người chơi ở nửa trái không bao giờ với được nhánh phải):**
+  - Tầng 0 là gốc (người chơi bắt đầu ở đây); ở tầng k, cặp tay nắm phía trên là 2 con của nút người chơi đang giữ; tầng trên cùng là các lá.
+  - Người chơi treo ở x = 0 (giữa thân cây). Mỗi lần nắm được thì coi như kéo về giữa (hoạt cảnh làm ở bước B4).
+  - Cặp tay nắm tầng trên trượt cùng nhau: x_trái = c(t) − 1,5, x_phải = c(t) + 1,5. c(t) là sóng tam giác trong [−1,5; 1,5], tốc độ |dc/dt| bằng tốc độ của vòng, pha ban đầu ngẫu nhiên mỗi tầng. Chu kỳ = 6 / tốc độ.
+  - **Bật lên** (chạm, bấm chuột hoặc Space) lúc t: xét ở đỉnh cú bật, lúc t + 0,35 giây. Tay nắm nào có |x| ≤ tầm với thì nắm được. Hai tay nắm cách nhau 3 > 2 × tầm với nên không bao giờ nắm được cả hai.
+  - Học sinh chọn nhánh bằng cách **canh lúc bật lên**: tay nắm trái tới ngay trên đầu khi c ở gần +1,5, tay phải khi c ở gần −1,5. Mỗi chu kỳ, mỗi tay nắm ở trong tầm với 2 × tầm với / tốc độ giây: vòng 1 là 1,0 giây, vòng 2 là 0,69 giây, vòng 3 là 0,5 giây, vòng 4 là 0,375 giây (chu kỳ 5; 3,75; 3; 2,5 giây).
+- **Nắm trúng nhánh lệch:** lên tầng trên.
+- **Nắm nhầm nhánh khớp:** "Ngõ cụt!", {phanDien} cười; ở lại tầng cũ, mất 1 tim, không bật được trong 1 giây.
+- **Không nắm được gì:** ở lại tầng cũ, không mất tim, không bật được trong 1 giây.
+- **Tầng trên cùng là các chiếc lá:** nắm được lá lệch (lá giả) là bắt được {phanDien} đang ngồi trên ngọn cây, xong vòng. Xong vòng 4 là thắng. Hết tim thì kết thúc game (Bi vào giúp, vẫn sang cao trào: bước B5).
+- Giữa các tầng có tiền đồng để nhặt. Logic chỉ có biến đếm và hàm cộng đồng (`addCoins`); vị trí và cách nhặt làm ở bước B4.
 
 ### 4 vòng
 
@@ -176,7 +177,12 @@ Logic đặt trong `climbLogic.ts` (hàm thuần, có test).
 | 3 | 32 | 5 | 2,0 | 0,5 | Mã rút gọn 4 chữ số |
 | 4 | 64 | 6 | 2,4 | 0,45 | Mã rút gọn 4 chữ số |
 
-- **Mã rút gọn (vòng 3–4):** ở nhánh lệch, hai số chỉ khác nhau 1–2 chữ số (đổi một chữ số, hoặc đảo hai chữ số liền nhau), cho khó nhận ra hơn.
+- **Cây mỗi vòng:** lá là chữ số 1–9; chọn đúng 1 lá bị {phanDien} tráo, đổi sang chữ số 1–9 khác. "Số trong sổ" là cây dựng từ lá gốc, "số hiện tại" là cây dựng từ lá đã tráo, cả hai bằng `buildTree` của Bài 4. Các nút lệch đúng là các nút trên đường từ lá bị tráo lên gốc.
+- **Mã rút gọn (vòng 3–4):** ở nhánh lệch, hai số chỉ khác nhau 1–2 chữ số, cho khó nhận ra hơn. Cách sinh (bước B3):
+  - Mã trong sổ = 4 chữ số cuối của giá trị trong sổ (đệm 0 bên trái).
+  - Nút khớp: mã hiện tại = mã trong sổ.
+  - Nút lệch: mã hiện tại biến đổi từ mã trong sổ bằng rng: hoặc đổi 1 chữ số sang chữ số khác, hoặc đảo 2 chữ số liền nhau KHÁC nhau (mã không có cặp như vậy thì đổi 1 chữ số). Luôn khác mã trong sổ.
+  - KHÔNG lấy mã hiện tại từ 4 chữ số cuối của giá trị hiện tại: lá bị sửa ở sâu thì độ lệch bị nhân 10^k, nên 4 chữ số cuối có thể trùng nhau.
 - **Hết mỗi vòng**, hiện: "Em chỉ leo d tầng thay vì kiểm tra cả 2^d lá!", trong đó d là số tầng, 2^d là số lá.
 
 ### Tim, điểm
@@ -205,8 +211,10 @@ Logic đặt trong `climbLogic.ts` (hàm thuần, có test).
 | Sinh 500 cây | Trên đường từ gốc tới lá giả, mỗi tầng có đúng một nhánh lệch; mọi nút ngoài đường đi đều khớp |
 | Mã rút gọn của nhánh lệch | Khác 1–2 chữ số so với số trong sổ, và luôn khác số trong sổ |
 | Tay cách tay nắm 0,5 khi tầm với là 0,6 | Nắm được |
-| Nắm nhầm nhánh khớp | Tụt về tầng trước, mất 1 tim |
-| Không nắm được gì | Giữ nguyên tầng, tim không đổi |
+| Nắm nhầm nhánh khớp | Ở lại tầng cũ, mất 1 tim, khóa bật 1 giây |
+| Không nắm được gì | Giữ nguyên tầng, tim không đổi, khóa bật 1 giây |
+
+Code ở `packages/village-lang-bac/src/climb/` (`climbConfig.ts`, `climbLogic.ts`, `climbLogic.test.ts`). Ngoài bảng trên, test còn có: sinh 500 cây mỗi vòng, mã rút gọn của 500 cây, c(t) luôn trong [−1,5; 1,5] và cửa sổ nắm được đúng 2 × tầm với / tốc độ ở cả 4 vòng, bot canh đúng leo hết 4 vòng không mất tim với 300 seed, điểm (4 vòng, 10 đồng, 2 tim → 510), cùng seed thì cùng cây.
 
 ## Checklist nghiệm thu
 
