@@ -106,7 +106,7 @@ function parseShape(raw: string | null | undefined): CompactShape | null {
     if (!s || typeof s !== 'object') return null;
     const o = s as Partial<CompactShape>;
     if (o.v !== COMPACT_VERSION || !o.lv || typeof o.lv !== 'object' || Array.isArray(o.lv)) return null;
-    return { v: o.v, lv: o.lv, gp: int(o.gp), c: int(o.c), u: int(o.u), o: typeof o.o === 'string' ? o.o : undefined, vi: int(o.vi, 15), vs: int(o.vs, 15), gs: int(o.gs, 15), go: int(o.go, 15), ks: int(o.ks, 15), hd: int(o.hd, 0x7fffffff), st: int(o.st, 1), kc: Array.isArray(o.kc) ? o.kc.slice(0, 8).map((x) => int(x, 0xffff)) : undefined, gt: int(o.gt, 0xfff) };
+    return { v: o.v, lv: o.lv, gp: int(o.gp), c: int(o.c), u: int(o.u), o: typeof o.o === 'string' ? o.o : undefined, vi: int(o.vi, 15), vs: int(o.vs, 15), gs: int(o.gs, 15), go: int(o.go, 15), ks: int(o.ks, 15), hd: int(o.hd, 0x7fffffff), st: int(o.st, 1), kc: Array.isArray(o.kc) ? o.kc.slice(0, 8).map((x) => int(x, 0xffff)) : undefined, gt: int(o.gt, 0x1fff) };
   } catch {
     return null;
   }

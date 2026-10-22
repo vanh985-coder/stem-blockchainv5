@@ -197,7 +197,7 @@ describe('nhân vật "sống" trong VnDialog', () => {
       expect(dau[0].mood).toBe('vui');
       expect(dau.slice(1).every((t) => t.mood === undefined)).toBe(true);
       expect(withMoods(lesson.dialogue.cuoiBai, 'cuoiBai').every((t) => t.mood === 'vui')).toBe(true);
-      expect(withMoods(lesson.award.loi, 'award').every((t) => t.mood === 'vui')).toBe(true);
+      if (lesson.award) expect(withMoods(lesson.award.loi, 'award').every((t) => t.mood === 'vui')).toBe(true); // Bài 4 không còn cảnh trao trang sau bài học (bước B5)
       // lời giữa bài (trước Trung bình, trước Khó) không đổi tâm trạng
       expect(withMoods(lesson.dialogue.truocTb, 'truocTb')).toEqual(lesson.dialogue.truocTb);
       expect(withMoods(lesson.dialogue.truocKho, 'truocKho')).toEqual(lesson.dialogue.truocKho);

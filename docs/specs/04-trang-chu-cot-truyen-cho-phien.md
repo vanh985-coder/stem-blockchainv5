@@ -156,6 +156,8 @@ Bỏ qua được bằng nút "Bỏ qua".
 | 3 | "Ba trang! Chỉ còn Làng Bạc thôi." | Đến Làng Bạc ở phía đông gặp thầy Linh |
 | 4 | "Đủ 4 trang rồi! Cả làng đang mở hội." | Chuyển sang `/hoi-lang` (spec 10) |
 
+**Trang Sổ Vàng 4 (mốc 3, bước B5):** không trao ở thế giới mở và không trao ngay sau màn 10. Trang thứ tư trao trong **cảnh cao trào sau màn 12** (spec 08): thầy Linh trao, hàng 4 ô, Bi nói "Đủ 4 trang rồi! Cả làng đang mở hội.", dòng "Hội làng sắp mở". Vì vậy Làng Bạc không có cảnh trao trang riêng ở thế giới mở (`VILLAGE_SCENE` không có `lang-bac`) và không có hiệu ứng mở cổng nào sau trang 4.
+
 **Bản làm (mốc 2, bước 15a):**
 - **Cờ chiếu một lần**, mỗi làng một cờ trong `game_state.data` (chơi thử: một bit trong cookie `sc_guest`), hợp cờ khi gộp tiến độ: `goldenSeen` (cảnh người dẫn trao trang ở làng; cookie `gs`) và `gateOpenSeen` (hiệu ứng mở cổng ở chợ; cookie `go`). Hàm thuần `shouldShowGolden`, `pendingGateOpening` ở `progress/villageIntro.ts`, có test (`goldenFlags.test.ts`). Tài khoản giáo viên không chiếu.
 - **Ở làng** (spec 05 "Kết thúc làng"): người dẫn trao trang, hàng 4 ô Trang Sổ Vàng có trang vừa nhận bay vào, HUD nhấp sáng ô đó; lượt cuối nút "Về chợ" sang `/cho?mo=<id làng>`; "Bỏ qua" ở lại làng.

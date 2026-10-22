@@ -13,9 +13,9 @@ describe('levels', () => {
     expect(VILLAGE_ORDER).toEqual(['lang-giay', 'lang-det', 'lang-khac-dau', 'lang-bac']);
   });
 
-  it('mốc 3 bước B2: màn 1, 2, 3 (làng Giấy trọn vẹn), 4, 7, 8, 10 là ready; 5 màn còn lại là coming-soon', () => {
-    expect(LEVELS.filter((l) => l.status === 'ready').map((l) => l.id)).toEqual([1, 2, 3, 4, 7, 8, 10]);
-    expect(LEVELS.filter((l) => l.status === 'coming-soon')).toHaveLength(5);
+  it('mốc 3 bước B5: màn 1, 2, 3 (làng Giấy trọn vẹn), 4, 7, 8, 10, 12 là ready; 4 màn còn lại là coming-soon', () => {
+    expect(LEVELS.filter((l) => l.status === 'ready').map((l) => l.id)).toEqual([1, 2, 3, 4, 7, 8, 10, 12]);
+    expect(LEVELS.filter((l) => l.status === 'coming-soon').map((l) => l.id)).toEqual([5, 6, 9, 11]);
   });
 
   it('có tên màn và tên biển gỗ, chỗ giữ tên hợp lệ', () => {

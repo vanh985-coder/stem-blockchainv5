@@ -532,6 +532,9 @@ Dùng ở mọi chỗ có lựa chọn: câu hỏi, Đồng ý/Từ chối, lự
 | Màn 2 và màn 3 đều `coming-soon`; xong màn 1 | Nhận Trang Sổ Vàng 1; màn 4 mở |
 | Đã có Trang Sổ Vàng 1, sau đó màn 3 đổi sang `ready` | Vẫn giữ trang; màn 3 mở để chơi |
 | Màn 11 là `coming-soon`, màn 12 là `ready`; xong màn 10 | Màn 12 mở |
+| Màn 11 là `coming-soon`, màn 12 là `ready` (từ bước B5); xong màn 10 nhưng chưa chơi màn 12 | Màn 12 mở; chưa có Trang Sổ Vàng 4 (chỉ 3) |
+| Đã xong màn 10 và đã chơi màn 12 (thắng hay hết tim đều tính là đã chơi) | `golden_pages` = 4, ghi cùng kết quả ván (đóng tab giữa cảnh cao trào vẫn giữ trang) |
+| Tài khoản đã có `golden_pages` = 4 từ trước (luật mốc 1: trao ngay sau màn 10) | Giữ nguyên, không thu lại; màn 12 mở; cảnh cao trào bỏ bước trao trang |
 
 ## 7. Mọi chữ hiển thị nằm trong một thư mục (`packages/core/src/content/`)
 

@@ -35,7 +35,10 @@ export interface StationResult {
 
 export interface LessonContent {
   dialogue: LessonDialogue;
-  award: GoldenAward;
+  /**
+   * Cảnh trao Trang Sổ Vàng ngay sau bài học. Bài không có (Bài 4, từ mốc 3 bước B5: trang thứ tư trao sau cảnh cao trào của màn 12) thì xong bài chỉ mở màn kế tiếp.
+   */
+  award?: GoldenAward;
   stations: Record<StationId, StationMeta>;
   /** "Điều em vừa học" ở màn hoàn thành cả bài */
   keyTakeaway: string;

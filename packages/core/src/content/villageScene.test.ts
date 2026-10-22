@@ -6,6 +6,9 @@ describe('chữ của cảnh làng 3D', () => {
   it('chỉ Làng Giấy có chữ cảnh mở đầu và trao trang ở mốc 2 (3 làng kia điền ở mốc 3)', () => {
     expect(Object.keys(VILLAGE_SCENE)).toEqual(['lang-giay']);
   });
+  it('Làng Bạc không có cảnh trao trang riêng ở thế giới mở (bước B5): Trang Sổ Vàng thứ tư đã trao trong cảnh cao trào sau màn 12 (WorldPage chỉ chiếu cảnh trao trang cho làng có chữ ở đây)', () => {
+    expect(VILLAGE_SCENE['lang-bac']).toBeUndefined();
+  });
   it('không viết cứng tên phản diện; tên lấy qua {phanDien}', () => {
     const t = VILLAGE_SCENE['lang-giay']!;
     const all = [t.opening, ...Object.values(t.guideNext)];

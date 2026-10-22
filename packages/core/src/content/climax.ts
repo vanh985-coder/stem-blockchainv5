@@ -1,0 +1,21 @@
+/**
+ * Chữ của cảnh cao trào sau màn 12 (spec 08 mục "Cảnh cao trào", mốc 3 bước B5). Mọi câu đi qua fmt() ({phanDien}, {ten}). Lời của ảnh truyện số 10 và 11 lấy từ `content/story.ts`
+ * (STORY, cùng chữ với trang /truyen), không viết lại ở đây.
+ */
+export const climaxUi = {
+  /** Nhãn đọc cho người dùng đọc màn hình */
+  khung: 'Cảnh cuối của câu chuyện',
+  /** Bước b: dưới gốc đa */
+  loiPhanDien: 'Sửa trang thì cả chuỗi lệch, gian thì mất cọc, giả dấu thì bị soi ra, tráo lá thì số gốc đổi… Hóa ra làm thật mới có lời.',
+  loiCuBinh: 'Biết sai thì sửa. Làng đang cần thêm người giữ sổ cẩn thận. {phanDien} có muốn làm không?',
+  loiPhanDienCoA: 'Có ạ!',
+  /** Bước d: Thầy Linh trao Trang Sổ Vàng thứ tư */
+  traoTrang: 'Thầy Linh trao Trang Sổ Vàng thứ tư.',
+  biDuTrang: 'Đủ 4 trang rồi! Cả làng đang mở hội.',
+  hoiLangSapMo: 'Hội làng sắp mở',
+  /** Nút ở lượt cuối */
+  xemKetQua: 'Xem kết quả',
+  xong: 'Xong',
+  /** Nút ở màn kết quả của màn 12 */
+  xemLai: 'Xem lại cảnh cuối',
+} as const;

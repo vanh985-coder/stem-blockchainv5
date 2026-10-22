@@ -50,8 +50,8 @@ describe('content/lessons/bai-2.ts', () => {
   });
 
   it('lời trao trang là lời "Kết thúc làng" của spec 06', () => {
-    expect(bai2Lesson.award.chuThich).toBe('Cụ Bình trao Trang Sổ Vàng thứ hai.');
-    expect(bai2Lesson.award.loi).toEqual([
+    expect(bai2Lesson.award!.chuThich).toBe('Cụ Bình trao Trang Sổ Vàng thứ hai.');
+    expect(bai2Lesson.award!.loi).toEqual([
       {
         characterId: 'cuBinh',
         text: 'Sổ thì ai cũng kiểm được. Nhưng làm sao biết giấy nợ đúng là người đó viết? Sang Làng Khắc Dấu hỏi chú Dũng.',

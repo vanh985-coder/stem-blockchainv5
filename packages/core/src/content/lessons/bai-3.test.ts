@@ -59,8 +59,8 @@ describe('content/lessons/bai-3.ts', () => {
   });
 
   it('lời trao trang là lời "Kết thúc làng" của spec 07', () => {
-    expect(bai3Lesson.award.chuThich).toBe('Chú Dũng trao Trang Sổ Vàng thứ ba.');
-    expect(bai3Lesson.award.loi).toEqual([
+    expect(bai3Lesson.award!.chuThich).toBe('Chú Dũng trao Trang Sổ Vàng thứ ba.');
+    expect(bai3Lesson.award!.loi).toEqual([
       { characterId: 'chuDung', text: 'Không giả dấu được nữa, {phanDien} chuyển sang trò trộn giao dịch ở Làng Bạc rồi.' },
     ]);
   });

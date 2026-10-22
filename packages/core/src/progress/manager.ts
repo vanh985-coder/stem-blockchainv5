@@ -7,7 +7,7 @@ import type { UnlockResult } from './unlock';
 import { hasSeenGuide, withGuideSeen } from './guideFlags';
 import { fullKnowMask, hasKnowCard, knowCardMaskOf, withAllKnowCards, withKnowCard } from './knowCards';
 import { hasReadStory, withStoryRead } from './storyFlags';
-import { hasSeenGameTip, withGameTipSeen } from './gameTips';
+import { hasSeenClimax, hasSeenGameTip, withClimaxSeen, withGameTipSeen } from './gameTips';
 import { hasSeenGateOpen, hasSeenGolden, hasSeenIntro, hasSeenKnow, hasSeenScene, withGateOpenSeen, withGoldenSeen, withIntroSeen, withKnowSeen, withSceneSeen } from './villageIntro';
 import type { VillageId } from '../village';
 
@@ -392,6 +392,15 @@ export class ProgressManager {
   markGameTipSeen(levelId: number): void {
     if (this.mode === 'loading' || hasSeenGameTip(this.progress.game.data, levelId)) return;
     this.progress = { ...this.progress, game: { ...this.progress.game, data: withGameTipSeen(this.progress.game.data, levelId), updatedAt: this.now() } };
+    this.persistLocal();
+    this.emit();
+    this.scheduleFlush();
+  }
+
+  /** Đã chiếu cảnh cao trào sau màn 12 (hết cảnh hay bấm "Bỏ qua"; bước B5); đã có cờ thì không làm gì. */
+  markClimaxSeen(): void {
+    if (this.mode === 'loading' || hasSeenClimax(this.progress.game.data)) return;
+    this.progress = { ...this.progress, game: { ...this.progress.game, data: withClimaxSeen(this.progress.game.data), updatedAt: this.now() } };
     this.persistLocal();
     this.emit();
     this.scheduleFlush();

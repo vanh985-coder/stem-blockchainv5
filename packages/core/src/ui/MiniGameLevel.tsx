@@ -32,6 +32,18 @@ export interface MiniGameRenderProps {
   onFinish: (score: number, parts?: readonly ScorePart[]) => void;
 }
 
+/**
+ * Cảnh cuối của một game phụ (màn 12: cảnh cao trào), chạy giữa lúc ván kết thúc và màn kết quả. Kết quả đã được ghi vào tiến độ TRƯỚC cảnh (đóng tab giữa chừng vẫn giữ kết quả và Trang Sổ Vàng).
+ */
+export interface MiniGameFinale {
+  /** Có tự chiếu ngay sau ván này không (lần đầu: cờ chưa ghi). Xét đúng lúc ván kết thúc. */
+  auto: boolean;
+  /** Vẽ cảnh. Xong hay "Bỏ qua" đều gọi `onDone` (sang màn kết quả); `replay` true khi em bấm xem lại ở màn kết quả. */
+  render: (p: { replay: boolean; onDone: () => void }) => ReactNode;
+  /** Chữ nút xem lại ở màn kết quả ("Xem lại cảnh cuối") */
+  replayLabel: string;
+}
+
 export interface MiniGameLevelProps {
   /** Số màn (1 đến 12) của game này */
   levelId: number;
@@ -41,9 +53,12 @@ export interface MiniGameLevelProps {
   renderGame: (props: MiniGameRenderProps) => ReactNode;
   /** Bấm "Về làng": mặc định về làng của màn này trong thế giới mở ở hub (`/cho?tu=<làng>`) */
   onLeave?: () => void;
+  /** Cảnh cuối sau ván (tùy game) */
+  finale?: MiniGameFinale;
 }
 
-type Stage = { kind: 'card' } | { kind: 'play' } | { kind: 'result'; score: number; medal: Medal; newBest: boolean; coins: number; parts: readonly ScorePart[] };
+type ResultStage = { kind: 'result'; score: number; medal: Medal; newBest: boolean; coins: number; parts: readonly ScorePart[] };
+type Stage = { kind: 'card' } | { kind: 'play' } | ResultStage | { kind: 'finale'; result: ResultStage; replay: boolean };
 
 /** Theo dõi tab có đang bị ẩn không (đọc lại khi đổi trạng thái). */
 function useTabHidden(): boolean {
@@ -63,7 +78,7 @@ function useTabHidden(): boolean {
  * Chơi xong (thắng hay thua) ghi `played = true`, `best_score` lấy số lớn hơn, `stars {"game": 0 đến 3}` theo mốc, qua lớp tiến độ có sẵn (đăng nhập hay khách):
  * `record` ghi vào máy ngay, đẩy lên máy chủ sau (như các trạm bài học). Tab bị ẩn thì tạm dừng và chờ em bấm "Tiếp tục".
  */
-export function MiniGameLevel({ levelId, medals, renderGame, onLeave }: MiniGameLevelProps) {
+export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: MiniGameLevelProps) {
   const { progress, record, saveNow } = useProgress();
   const navigate = useNavigate();
   const def = levelById(levelId);
@@ -89,9 +104,10 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave }: MiniGame
       const { coinsEarned } = record(levelId, gameResultOf(score, medals));
       void saveNow();
       const sum = summarizeGame(score, medals, before);
-      setStage({ kind: 'result', score: sum.score, medal: sum.medal, newBest: sum.newBest, coins: coinsEarned, parts });
+      const result: ResultStage = { kind: 'result', score: sum.score, medal: sum.medal, newBest: sum.newBest, coins: coinsEarned, parts };
+      setStage(finale?.auto ? { kind: 'finale', result, replay: false } : result);
     },
-    [levelId, medals, record, saveNow],
+    [levelId, medals, record, saveNow, finale?.auto],
   );
 
   const start = () => {
@@ -130,6 +146,11 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave }: MiniGame
         )}
       </div>
     );
+  }
+
+  if (stage.kind === 'finale' && finale) {
+    const result = stage.result;
+    return <div data-testid="man-cuoi">{finale.render({ replay: stage.replay, onDone: () => setStage(result) })}</div>;
   }
 
   if (stage.kind === 'result') {
@@ -172,6 +193,11 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave }: MiniGame
               <Button size="lg" variant="secondary" onClick={leave}>
                 {gameUi.veLang}
               </Button>
+              {finale && (
+                <Button size="lg" variant="secondary" data-testid="xem-lai-canh-cuoi" onClick={() => setStage({ kind: 'finale', result: stage, replay: true })}>
+                  {finale.replayLabel}
+                </Button>
+              )}
             </div>
           </div>
         </Panel>

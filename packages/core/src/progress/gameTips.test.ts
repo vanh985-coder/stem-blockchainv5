@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { decodeProgress, encodeProgress } from './compact';
-import { gameTipDataFromMask, gameTipMask, hasSeenGameTip, mergeGameTipSeen, withGameTipSeen } from './gameTips';
+import { gameTipDataFromMask, gameTipMask, hasSeenClimax, hasSeenGameTip, mergeGameTipSeen, withClimaxSeen, withGameTipSeen } from './gameTips';
 import { withGuideSeen } from './guideFlags';
 import { mergeGame } from './merge';
 import { emptyProgress } from './types';
@@ -46,5 +46,38 @@ describe('cờ "đã nghe lời giới thiệu lần đầu của game phụ" (b
     const remote = { goldenPages: 0, coins: 0, data: withGameTipSeen({}, 12), updatedAt: 1 };
     expect(hasSeenGameTip(mergeGame(local, remote).data, 12)).toBe(true);
     expect(hasSeenGameTip(mergeGame(remote, local).data, 12)).toBe(true);
+  });
+
+  it('cờ cao trào (bước B5): chưa chiếu thì không; withClimaxSeen giữ khóa khác; bit 12 của "gt" khứ hồi (kể cả khách); gộp hai bên', () => {
+    expect(hasSeenClimax({})).toBe(false);
+    expect(hasSeenClimax(undefined)).toBe(false);
+    expect(hasSeenClimax({ climaxSeen: 1 })).toBe(false);
+    const data = withGameTipSeen({}, 12);
+    const copy = JSON.stringify(data);
+    const seen = withClimaxSeen(data);
+    expect(hasSeenClimax(seen)).toBe(true);
+    expect(hasSeenGameTip(seen, 12)).toBe(true);
+    expect(JSON.stringify(data)).toBe(copy);
+    // cookie
+    expect(gameTipMask(seen)).toBe((1 << 11) | (1 << 12));
+    expect(gameTipMask(withClimaxSeen({}))).toBe(1 << 12);
+    expect(gameTipDataFromMask(1 << 12)).toEqual({ climaxSeen: true });
+    expect(gameTipDataFromMask((1 << 12) | (1 << 11))).toEqual({ gameTipSeen: { '12': true }, climaxSeen: true });
+    const p = emptyProgress();
+    p.game.data = withClimaxSeen({});
+    const raw = encodeProgress(p);
+    expect(JSON.parse(raw).gt).toBe(1 << 12);
+    const back = decodeProgress(raw).game.data;
+    expect(hasSeenClimax(back)).toBe(true);
+    expect(hasSeenGameTip(back, 12)).toBe(false);
+    // gộp: một bên đã chiếu thì tính là đã chiếu, ở máy nào cũng vậy
+    expect(hasSeenClimax(mergeGameTipSeen({}, withClimaxSeen({})))).toBe(true);
+    expect(hasSeenClimax(mergeGameTipSeen(withClimaxSeen({}), {}))).toBe(true);
+    const base = { x: 1 };
+    expect(mergeGameTipSeen(base, {})).toBe(base);
+    const local = { goldenPages: 0, coins: 0, data: {}, updatedAt: 5 };
+    const remote = { goldenPages: 0, coins: 0, data: withClimaxSeen({}), updatedAt: 1 };
+    expect(hasSeenClimax(mergeGame(local, remote).data)).toBe(true);
+    expect(hasSeenClimax(mergeGame(remote, local).data)).toBe(true);
   });
 });

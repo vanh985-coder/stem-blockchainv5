@@ -54,14 +54,9 @@ Thay cho nút "Sửa giao dịch & xem gốc đổi" ở bản cũ. Công thức
 - Cuối phần: "Em soi {so} ô. Đi theo nhánh đỏ thì chỉ cần 2 ô mỗi tầng." ({so} đếm các ô em đã bấm; gốc hiện sẵn không tính.)
 - Logic soi là hàm thuần trong `lessons/bai-4/inspect.ts` (dùng `combine`, `buildTree`): soi từng ô, ô nào bấm được theo trạng thái soi, trúng lá bị sửa thì xong, đếm số lần soi. Có test.
 
-### Ở mốc 1
+### Sau màn 10 (đã thay ở mốc 3, bước B5)
 
-Cao trào (mốc 3) và hội làng (mốc 4) chưa có, nên ngay sau màn 10 chỉ có cảnh trao trang đơn giản, qua `LessonPage2D`:
-- Dòng chú thích: "Thầy Linh trao Trang Sổ Vàng thứ tư." Trang giấy vàng bay vào ô thứ tư (bỏ hiệu ứng bay khi bật "Giảm chuyển động").
-- Bi nói: "Đủ 4 trang rồi! Cả làng đang mở hội."
-- Dòng "Hội làng sắp mở", rồi nút **"Về bản đồ"**.
-- Trang Sổ Vàng thứ tư được trao một lần, ngay khi xong màn 10 (màn 11, 12 còn `coming-soon`). Học lại thì không trao nữa.
-- Từ mốc 3: cao trào thay cho cảnh này, và Trang Sổ Vàng thứ tư chỉ trao sau cao trào.
+Cảnh trao trang tạm của mốc 1 (`LessonPage2D`: "Thầy Linh trao Trang Sổ Vàng thứ tư…", nút "Về bản đồ") đã bỏ (`bai4Lesson.award` không còn). Xong màn 10 chỉ mở màn 12 (màn 11 còn `coming-soon`; nút "Chơi tiếp" của bài trỏ tới game đã ra mắt kế tiếp, tức màn 12). Trang Sổ Vàng thứ tư chỉ trao sau cảnh cao trào của màn 12 (mục "Cảnh cao trào"); xong màn 10 mà chưa chơi màn 12 thì mới có 3 trang.
 
 ## Màn 11 — Game phụ 1: "Ghép lá cây sổ" (kiểu Candy Crush)
 
@@ -202,12 +197,24 @@ Logic đặt trong `climbLogic.ts` (hàm thuần, có test).
 - **Vàng (570):** không nhầm nhánh lần nào (586). Trượt (không nắm được gì) chỉ mất 2 đồng mỗi lần nên vẫn còn Vàng khi trượt tối đa 8 lần.
 - Hết tim ở vòng 3 (mới xong 2 vòng) là 214 điểm: chưa đạt mốc.
 
-### Cảnh cao trào (sau vòng 4, bỏ qua được)
+### Cảnh cao trào (sau màn 12, bỏ qua được)
 
-1. Học sinh tóm được {phanDien} trên ngọn cây (ảnh truyện số 10, rồi cảnh 3D).
-2. {phanDien} cúi đầu: "Sửa trang thì cả chuỗi lệch, gian thì mất cọc, giả dấu thì bị soi ra, tráo lá thì số gốc đổi… Hóa ra làm thật mới có lời."
-3. Cụ Bình: "Biết sai thì sửa. Làng đang cần thêm người giữ sổ cẩn thận. {phanDien} có muốn làm không?" {phanDien}: "Có ạ!" (ảnh truyện số 11).
-4. Thầy Linh trao **Trang Sổ Vàng thứ tư**. Sau đó về chợ và chuyển sang `/hoi-lang` (spec 10).
+Chạy ngay sau khi màn 12 kết thúc (hết vòng 4, hoặc hết tim sau khi Bi nói "Để Bi giúp em!") và trước màn kết quả. Mọi bước có nút "Bỏ qua" (kết thúc cả cảnh). Code: `packages/village-lang-bac/src/climax/` (`climaxFlow.ts` thuần có test, `ClimaxScene.tsx`), chữ ở `content/climax.ts` (lời ảnh truyện 10 và 11 lấy từ `content/story.ts`, cùng chữ với `/truyen`), nối vào `pages/Man12.tsx` qua `finale` của `MiniGameLevel`.
+
+1. **a.** Ảnh truyện số 10 kèm lời ({phanDien} tráo một chiếc lá giao dịch… con số gốc đã báo lệch…).
+2. **b.** Cảnh 3D nhỏ dưới gốc đa (`Scene25D`, nền `scenes/bai-hoc-lang-bac`): học sinh, {phanDien} (tư thế `sad`, cúi đầu, lặp mỗi 1,4 giây cho tới hết lượt; nhảy cẫng `cheer` khi nói "Có ạ!"), cụ Bình và thầy Linh (nhân vật không xương, nhún nhẹ, nghiêng đầu khi nói; spec 03 mục 3.4). Lời qua `VnDialog` có chân dung: {phanDien} cúi đầu: "Sửa trang thì cả chuỗi lệch, gian thì mất cọc, giả dấu thì bị soi ra, tráo lá thì số gốc đổi… Hóa ra làm thật mới có lời."; cụ Bình: "Biết sai thì sửa. Làng đang cần thêm người giữ sổ cẩn thận. {phanDien} có muốn làm không?"; {phanDien}: "Có ạ!".
+3. **c.** Ảnh truyện số 11 kèm lời ("Hóa ra làm thật mới có lời." {phanDien} xin được làm người giữ sổ của làng).
+4. **d.** Thầy Linh trao **Trang Sổ Vàng thứ tư**: hàng 4 ô (`GoldenPagesRow`, trang bay vào ô thứ 4; "Giảm chuyển động" thì nằm sẵn); Bi: "Đủ 4 trang rồi! Cả làng đang mở hội."; dòng "Hội làng sắp mở" (hội làng chưa làm, mốc 4). Nút lượt cuối "Xem kết quả".
+
+**Tự chạy một lần, xem lại được:**
+- Cờ `climaxSeen` (`progress/gameTips.ts`; `game_state.data.climaxSeen`; chơi thử: bit 12 của trường "gt" trong cookie `sc_guest`; hợp cờ khi gộp tiến độ). Hết cảnh hay bấm "Bỏ qua" đều ghi cờ. Lần đầu cảnh tự chạy; những lần sau không tự chạy, màn kết quả có nút "Xem lại cảnh cuối" (xem lại thì không ghi cờ và luôn có bước d).
+- Sau cảnh là màn kết quả của `MiniGameLevel` như thường; "Về làng" mở `/cho?tu=lang-bac`.
+
+**Trang Sổ Vàng thứ tư:**
+- Trao khi đã xong màn 10 và đã chơi màn 12 (kể cả hết tim: `doneLevels` tính game đã chơi). Giá trị `golden_pages` = 4 được ghi cùng kết quả ván, TRƯỚC cảnh, nên đóng tab giữa cảnh vẫn giữ trang. Chỉ hiện ở HUD thế giới mở khi người chơi về làng.
+- Xong màn 10 mà chưa chơi màn 12: chưa có trang 4.
+- Tài khoản đã có trang 4 từ trước (luật mốc 1): giữ nguyên, không trao lại; cảnh cao trào lần đầu bỏ bước d (chụp số trang trước ván ở `Man12.tsx`); xem lại thì có bước d.
+- Ở thế giới mở, Làng Bạc không chiếu thêm cảnh trao trang riêng (`VILLAGE_SCENE` không có `lang-bac`).
 
 ### Test (`climbLogic.ts`)
 

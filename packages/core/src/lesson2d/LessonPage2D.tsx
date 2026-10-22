@@ -133,10 +133,10 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
       const status = await saveNow();
       const after = progressManager.getSnapshot().progress.game.goldenPages;
       setSaveStatus(status);
-      setAwardNow(goldenPageAwarded(run.current.goldenBefore, after, villageIndex));
+      setAwardNow(content.award !== undefined && goldenPageAwarded(run.current.goldenBefore, after, villageIndex));
       setStage({ kind: 'outro' });
     })();
-  }, [stage.kind, attempt, saveNow, villageIndex]);
+  }, [stage.kind, attempt, saveNow, villageIndex, content.award]);
 
   /** Bắt đầu một lần học mới từ trạm `idx` (Chơi lại, hoặc chọn trạm trên thanh trên). */
   const startAt = (idx: number) => {
@@ -181,8 +181,9 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   const goMap = goVillage;
   const leaveLabel = ui.langScene.veLang;
   const villageLevels = levelsOfVillage(villageId);
-  const nextGame = villageLevels[villageLevels.findIndex((l) => l.id === levelId) + 1];
-  const playNextGame = nextGame && nextGame.status === 'ready' ? { label: fmt(ui.langScene.choiTiep, { man: fmt(nextGame.ten) }), onClick: () => navigate(`/lang/${villageId}/man/${nextGame.id}`) } : undefined;
+  // Game kế tiếp đã ra mắt trong làng (bỏ qua màn 'coming-soon': Làng Bạc, xong màn 10 thì mở màn 12 vì màn 11 chưa có)
+  const nextGame = villageLevels.slice(villageLevels.findIndex((l) => l.id === levelId) + 1).find((l) => l.status === 'ready');
+  const playNextGame = nextGame ? { label: fmt(ui.langScene.choiTiep, { man: fmt(nextGame.ten) }), onClick: () => navigate(`/lang/${villageId}/man/${nextGame.id}`) } : undefined;
 
   // Hai khung 3D hai bên bảng: ẩn khi màn hẹp, giảm chuyển động, máy yếu, tải lỗi hoặc FPS thấp (frames.ts).
   // Có khung thì bảng thu nhỏ để chừa chỗ (quyết định lúc mở trang, giữ nguyên khi khung bị ẩn về sau).
@@ -323,7 +324,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
       </>
     );
   } else {
-    body = <GoldenPageScene villageId={villageId} award={content.award} onLeave={goMap} leaveLabel={leaveLabel} />;
+    body = content.award ? <GoldenPageScene villageId={villageId} award={content.award} onLeave={goMap} leaveLabel={leaveLabel} /> : null;
   }
 
   const currentIdx = 'idx' in stage ? stage.idx : stage.kind === 'saving' ? 2 : -1;

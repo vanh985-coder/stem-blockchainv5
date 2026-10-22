@@ -29,15 +29,7 @@ export const bai4Lesson: LessonContent = {
   /** Lúc {phanDien} tráo giao dịch ở trạm Trung bình (trạm gọi onTwist khi gốc đổi) */
   twist: [{ characterId: 'thayLinh', text: 'Thấy chưa, chỉ đổi một lá mà con số đổi lan lên tận gốc.' }],
 
-  /**
-   * Mốc 1: trang thứ tư được trao ngay sau màn 10 (cao trào ở mốc 3, hội làng ở mốc 4).
-   * Spec 04 mục 5: Bi nói "Đủ 4 trang rồi! Cả làng đang mở hội."
-   */
-  award: {
-    chuThich: 'Thầy Linh trao Trang Sổ Vàng thứ tư.',
-    loi: [{ characterId: 'bi', text: 'Đủ 4 trang rồi! Cả làng đang mở hội.' }],
-    ghiChuCuoi: 'Hội làng sắp mở',
-  },
+  // Không có `award`: từ mốc 3 bước B5 trang thứ tư trao sau cảnh cao trào của màn 12 (content/climax.ts), không trao ngay sau màn 10.
 
   /** Giới thiệu từng trạm (LevelIntro); mẹo do Bi nói */
   stations: {

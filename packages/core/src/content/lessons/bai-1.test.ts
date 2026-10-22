@@ -64,8 +64,8 @@ describe('content/lessons/bai-1.ts', () => {
   });
 
   it('lời trao trang là lời "Kết thúc làng" của spec 05', () => {
-    expect(bai1Lesson.award.chuThich).toBe('Bác An trao Trang Sổ Vàng thứ nhất.');
-    expect(bai1Lesson.award.loi).toEqual([
+    expect(bai1Lesson.award!.chuThich).toBe('Bác An trao Trang Sổ Vàng thứ nhất.');
+    expect(bai1Lesson.award!.loi).toEqual([
       {
         characterId: 'bacAn',
         text: 'Một mình giữ sổ thì kẻ gian vẫn ngồi sửa cả đêm được. Vì thế các làng không bao giờ để sổ ở một nơi. Xuống Làng Dệt mà xem.',

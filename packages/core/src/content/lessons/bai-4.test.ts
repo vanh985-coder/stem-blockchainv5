@@ -65,10 +65,8 @@ describe('content/lessons/bai-4.ts', () => {
     ]);
   });
 
-  it('trao trang thứ tư ở mốc 1: thầy Linh trao, Bi nói, "Hội làng sắp mở"', () => {
-    expect(bai4Lesson.award.chuThich).toBe('Thầy Linh trao Trang Sổ Vàng thứ tư.');
-    expect(bai4Lesson.award.loi).toEqual([{ characterId: 'bi', text: 'Đủ 4 trang rồi! Cả làng đang mở hội.' }]);
-    expect(bai4Lesson.award.ghiChuCuoi).toBe('Hội làng sắp mở');
+  it('không còn cảnh trao trang tạm của mốc 1 sau màn 10 (trang thứ tư trao sau cảnh cao trào của màn 12)', () => {
+    expect(bai4Lesson.award).toBeUndefined();
   });
 
   it('phần 3 "Khám phá bí mật": lời {phanDien} không nói lá nào, các câu soi đúng như spec', () => {
