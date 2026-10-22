@@ -26,6 +26,7 @@ const progressOf = (progress: Progress, mode: ProgressState['mode'] = 'guest'): 
   markAllKnowCards: () => {},
   markGuideSeen: () => {},
   markStoryRead: () => {},
+  markGameTipSeen: () => {},
 });
 const read = (): Progress => {
   const p = decodeProgress(null);

@@ -139,6 +139,8 @@ export interface ClimbState {
   peakAt: number | null;
   /** Không bật được trước thời điểm này */
   lockUntil: number;
+  /** Chưa trượt hay ngõ cụt lần nào ở tầng đang giữ: leo qua được thì nhặt tiền đồng của khoảng đó */
+  cleanTry: boolean;
   hearts: number;
   coins: number;
   roundsDone: number;
@@ -146,7 +148,8 @@ export interface ClimbState {
 }
 
 export type ClimbEvent =
-  | { kind: 'up'; level: number; index: number }
+  /** Lên tầng trên; `coins` là số đồng nhặt được ở khoảng vừa leo qua, `lostCoins` là số đồng mất (đã trượt hay ngõ cụt ở tầng dưới) */
+  | { kind: 'up'; level: number; index: number; coins: number; lostCoins: number }
   | { kind: 'deadEnd'; level: number; index: number; hearts: number }
   | { kind: 'miss' }
   | { kind: 'roundDone'; round: number }
@@ -174,6 +177,7 @@ export function createClimbGame(seed: number): ClimbState {
     time: 0,
     peakAt: null,
     lockUntil: 0,
+    cleanTry: true,
     hearts: CLIMB_SPEC.hearts,
     coins: 0,
     roundsDone: 0,
@@ -200,6 +204,7 @@ function resolvePeak(s: ClimbState, at: number, out: ClimbEvent[]): void {
   s.peakAt = null;
   const side = grabAt(nextCenter(s, at), roundSpec(s).reach);
   if (!side) {
+    s.cleanTry = false;
     s.lockUntil = at + CLIMB_SPEC.lockAfterFail;
     out.push({ kind: 'miss' });
     return;
@@ -208,6 +213,7 @@ function resolvePeak(s: ClimbState, at: number, out: ClimbEvent[]): void {
   const index = 2 * s.index + (side === 'left' ? 0 : 1);
   if (!isMismatch(s.tree, level, index)) {
     // ngõ cụt: ở lại tầng cũ, mất 1 tim
+    s.cleanTry = false;
     s.hearts = Math.max(0, s.hearts - 1);
     s.lockUntil = at + CLIMB_SPEC.lockAfterFail;
     out.push({ kind: 'deadEnd', level, index, hearts: s.hearts });
@@ -219,7 +225,10 @@ function resolvePeak(s: ClimbState, at: number, out: ClimbEvent[]): void {
   }
   s.level = level;
   s.index = index;
-  out.push({ kind: 'up', level, index });
+  const coins = s.cleanTry ? CLIMB_SPEC.coinsPerGap : 0;
+  addCoins(s, coins);
+  s.cleanTry = true;
+  out.push({ kind: 'up', level, index, coins, lostCoins: CLIMB_SPEC.coinsPerGap - coins });
   if (level === s.tree.depth) {
     // nắm được lá lệch: bắt được {phanDien}
     s.roundsDone++;
@@ -252,11 +261,12 @@ export function advanceRound(s: ClimbState): boolean {
   s.time = 0;
   s.peakAt = null;
   s.lockUntil = 0;
+  s.cleanTry = true;
   s.phase = 'playing';
   return true;
 }
 
-/** Cộng tiền đồng nhặt được (vị trí và cách nhặt làm ở bước B4). */
+/** Cộng tiền đồng nhặt được (luật nhặt: xem `coinsPerGap`; hình đồng treo trên thân cây ở cảnh). */
 export function addCoins(s: ClimbState, n = 1): void {
   if (n > 0) s.coins += n;
 }

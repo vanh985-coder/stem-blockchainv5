@@ -51,6 +51,19 @@ export const GAMES: Readonly<Partial<Record<number, GameText>>> = {
       dienThoai: 'Chạm vào thẻ',
     },
   },
+  12: {
+    ten: 'Leo cây tìm lá giả',
+    luat: [
+      '{phanDien} vừa tráo một lá trên cây đa nên số gốc bị lệch. Em leo từ gốc lên, theo nhánh lệch để bắt {phanDien}!',
+      'Mỗi tay nắm ghi số trong sổ và số bây giờ. Hãy nắm tay nắm có hai số khác nhau.',
+      'Bật lên đúng lúc tay nắm tới ngay trên đầu em. Nắm nhầm nhánh khớp là mất 1 tim.',
+      'Leo qua mỗi tầng ngay lần đầu thì được 2 tiền đồng.',
+    ],
+    dieuKhien: {
+      mayTinh: 'Bấm chuột hoặc phím Space để bật lên',
+      dienThoai: 'Chạm màn hình để bật lên',
+    },
+  },
 };
 
 /** Tên các phần điểm ở màn kết quả của màn 2 (điểm = trang × 10 + tiền đồng + quãng đường ÷ 10 + câu đúng × 30). */
@@ -214,4 +227,34 @@ export const modCalcUi = {
   ketQua: '5^{x} mod 23 = {y}',
   loi: 'Em nhập một số nguyên từ 1 đến 22 nhé.',
   dong: 'Đóng',
+} as const;
+
+/** Chữ trong màn 12 "Leo cây tìm lá giả" (spec 08 mục Màn 12). Số trên tay nắm do code vẽ: hai dòng, không tô màu, không đánh dấu nhánh nào lệch. */
+export const climbUi = {
+  vong: 'Vòng {so}/{max}',
+  dong: 'Tiền đồng: {so}',
+  /** Hai dòng trên tay nắm: số trong sổ và số bây giờ (vòng 3–4 là mã 4 chữ số) */
+  so: 'Sổ: {so}',
+  nay: 'Nay: {so}',
+  /** Nhãn đọc cho người dùng đọc màn hình */
+  khung: 'Cây đa. Chạm, bấm chuột hoặc phím Space để bật lên.',
+  tayNam: 'Tay nắm {nhan}: số trong sổ {so}, số bây giờ {so2}',
+  trai: 'bên trái',
+  phai: 'bên phải',
+  nguCut: 'Ngõ cụt!',
+  truot: 'Hụt rồi, em canh lại nhé.',
+  /** Bi giải thích lần đầu vào màn (spec 08) */
+  biGocCay: 'Trên bảng thì gốc vẽ ở trên cùng; còn ở cây thật thì gốc ở dưới. Vẫn là một cây thôi!',
+  hieuRoi: 'Em hiểu rồi',
+  /** Bắt được {phanDien} ở lá trên cùng: hết vòng */
+  batDuoc: 'Bắt được {phanDien}!',
+  vongXong: 'Em chỉ leo {so} tầng thay vì kiểm tra cả {so2} lá!',
+  vongTiep: 'Vòng tiếp theo',
+  xemKetQua: 'Xem kết quả',
+  /** Hết tim */
+  biGiup: 'Để Bi giúp em!',
+  /** Phần điểm ở màn kết quả */
+  phanVong: 'Vòng leo xong (× {diem})',
+  phanDong: 'Tiền đồng',
+  phanTim: 'Tim còn lại (× {diem})',
 } as const;

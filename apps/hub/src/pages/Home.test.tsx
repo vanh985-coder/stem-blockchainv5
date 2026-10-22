@@ -55,6 +55,7 @@ const progressOf = (goldenPages: number): ProgressState => ({
   markAllKnowCards: () => {},
   markGuideSeen: () => {},
   markStoryRead: () => {},
+  markGameTipSeen: () => {},
 });
 
 function render(ui: ReactElement, auth: AuthState, golden = 0): string {

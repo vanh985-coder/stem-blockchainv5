@@ -8,4 +8,7 @@ export const langBac: VillageModule = {
   routes: [guardedRoute('man/10', 10, () => import('./pages/Man10'))],
 };
 
+/** Trang màn 12 (tải lười): màn còn coming-soon nên chưa có route cho người chơi; vỏ lang-bac gắn vào /dev/man-12 khi chạy dev (bước B4). */
+export const loadMan12 = () => import('./pages/Man12');
+
 export default langBac;

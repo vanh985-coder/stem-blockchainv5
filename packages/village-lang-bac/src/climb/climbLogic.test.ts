@@ -219,7 +219,7 @@ describe('bước B3: bot canh đúng và điểm', () => {
       for (let k = 0; k < s.tree.depth; k++) {
         const side = isMismatch(s.tree, s.level + 1, 2 * s.index) ? 'left' : 'right';
         const ev = jumpAt(s, timeToJump(s, side, Math.max(s.time, s.lockUntil), 0.1));
-        expect(ev[0]).toEqual({ kind: 'up', level: k + 1, index: s.index });
+        expect(ev[0]).toEqual({ kind: 'up', level: k + 1, index: s.index, coins: 2, lostCoins: 0 });
       }
       expect(s.index).toBe(s.tree.tamperedIndex);
       expect(s.phase).toBe(r < 3 ? 'roundDone' : 'won');
@@ -270,5 +270,76 @@ describe('bước B3: bot canh đúng và điểm', () => {
       const m = mutateCode('0000', rng);
       expect(diffDigits('0000', m)).toBe(1);
     }
+  });
+});
+
+/** Chơi hết ván, canh đúng mọi lần trừ một lần sai ở tầng `atLevel` của vòng `atRound` (`kind`: ngõ cụt hay trượt). */
+function playWithOneSlip(seed: number, atRound: number, atLevel: number, kind: 'deadEnd' | 'miss' | null) {
+  const s = createClimbGame(seed);
+  let slipped = kind === null;
+  let guard = 0;
+  while (s.phase !== 'won' && s.phase !== 'lost' && guard++ < 200) {
+    if (s.phase === 'roundDone') {
+      advanceRound(s);
+      continue;
+    }
+    const good = isMismatch(s.tree, s.level + 1, 2 * s.index) ? 'left' : 'right';
+    const from = Math.max(s.time, s.lockUntil);
+    if (!slipped && s.round === atRound && s.level === atLevel) {
+      slipped = true;
+      if (kind === 'deadEnd') {
+        jumpAt(s, timeToJump(s, good === 'left' ? 'right' : 'left', from, 0.1));
+      } else {
+        let t = from;
+        while (Math.abs(nextCenter(s, t + CLIMB_SPEC.jumpPeak)) > 0.05) t += 0.001;
+        jumpAt(s, t);
+      }
+      continue;
+    }
+    jumpAt(s, timeToJump(s, good, from, CLIMB_ROUNDS[s.round].reach * 0.5));
+  }
+  return s;
+}
+
+describe('bước B4: tiền đồng', () => {
+  it('mỗi khoảng giữa hai tầng có 2 đồng, tối đa 36 đồng; leo hoàn hảo → 586 điểm', () => {
+    expect(CLIMB_SPEC.coinsPerGap * CLIMB_ROUNDS.reduce((a, r) => a + r.depth, 0)).toBe(36);
+    for (const seed of [1, 7, 42]) {
+      const s = playWithOneSlip(seed, 0, 0, null);
+      expect(s.coins).toBe(36);
+      expect(climbScore(s)).toBe(586);
+    }
+  });
+
+  it('một lần ngõ cụt → mất 2 đồng của khoảng đó và 1 tim: 534 điểm', () => {
+    const s = playWithOneSlip(5, 2, 3, 'deadEnd');
+    expect(s.phase).toBe('won');
+    expect(s.coins).toBe(34);
+    expect(s.hearts).toBe(2);
+    expect(climbScore(s)).toBe(534);
+  });
+
+  it('một lần trượt → mất 2 đồng của khoảng đó, không mất tim: 584 điểm', () => {
+    const s = playWithOneSlip(6, 1, 0, 'miss');
+    expect(s.coins).toBe(34);
+    expect(s.hearts).toBe(3);
+    expect(climbScore(s)).toBe(584);
+  });
+
+  it('sự kiện lên tầng báo số đồng nhặt được và số đồng mất; sai nhiều lần ở cùng tầng chỉ mất 2 đồng của khoảng đó', () => {
+    const s = createClimbGame(8);
+    const good = isMismatch(s.tree, 1, 0) ? 'left' : 'right';
+    for (let k = 0; k < 2; k++) {
+      let t = Math.max(s.time, s.lockUntil);
+      while (Math.abs(nextCenter(s, t + CLIMB_SPEC.jumpPeak)) > 0.05) t += 0.001;
+      jumpAt(s, t);
+    }
+    const ev = jumpAt(s, timeToJump(s, good, Math.max(s.time, s.lockUntil), 0.1));
+    expect(ev[0]).toMatchObject({ kind: 'up', level: 1, coins: 0, lostCoins: 2 });
+    expect(s.coins).toBe(0);
+    // tầng mới: lần đầu leo qua thì nhặt lại được
+    const good2 = isMismatch(s.tree, 2, 2 * s.index) ? 'left' : 'right';
+    expect(jumpAt(s, timeToJump(s, good2, Math.max(s.time, s.lockUntil), 0.1))[0]).toMatchObject({ kind: 'up', coins: 2, lostCoins: 0 });
+    expect(s.coins).toBe(2);
   });
 });

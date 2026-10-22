@@ -41,6 +41,8 @@ export interface ProgressState {
   markGuideSeen: (section: string) => void;
   /** Đã đọc hết cốt truyện (bước X1) */
   markStoryRead: () => void;
+  /** Đã nghe lời giới thiệu lần đầu của game phụ (bước B4) */
+  markGameTipSeen: (levelId: number) => void;
 }
 
 /** Chỉ để test: dựng ProgressContext giả. */
@@ -75,6 +77,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const markAllKnowCards = useCallback((village: VillageId, total: number) => progressManager.markAllKnowCards(village, total), []);
   const markGuideSeen = useCallback((section: string) => progressManager.markGuideSeen(section), []);
   const markStoryRead = useCallback(() => progressManager.markStoryRead(), []);
+  const markGameTipSeen = useCallback((levelId: number) => progressManager.markGameTipSeen(levelId), []);
 
   const value = useMemo<ProgressState>(
     () => ({
@@ -97,8 +100,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       markAllKnowCards,
       markGuideSeen,
       markStoryRead,
+      markGameTipSeen,
     }),
-    [snap, unlock, record, saveNow, startGuest, markVillageIntroSeen, markVillageSceneSeen, markGoldenSeen, markGateOpenSeen, markKnowSeen, markKnowCard, markAllKnowCards, markGuideSeen, markStoryRead],
+    [snap, unlock, record, saveNow, startGuest, markVillageIntroSeen, markVillageSceneSeen, markGoldenSeen, markGateOpenSeen, markKnowSeen, markKnowCard, markAllKnowCards, markGuideSeen, markStoryRead, markGameTipSeen],
   );
 
   return (
@@ -129,6 +133,7 @@ const FALLBACK: ProgressState = {
   markAllKnowCards: () => {},
   markGuideSeen: () => {},
   markStoryRead: () => {},
+  markGameTipSeen: () => {},
 };
 
 export function useProgress(): ProgressState {

@@ -54,8 +54,8 @@ export interface Sprite25D {
 }
 
 export interface Scene25DProps {
-  /** Ảnh nền, đường dẫn trong manifest (ví dụ "scenes/man-03-xuong-giay"), phủ kín khung kiểu `cover` */
-  background: string;
+  /** Ảnh nền, đường dẫn trong manifest (ví dụ "scenes/man-03-xuong-giay"), phủ kín khung kiểu `cover`; null khi cảnh tự vẽ nền (ví dụ trời của màn 12) */
+  background: string | null;
   /** Hình rời 2D xếp lớp */
   sprites?: readonly Sprite25D[];
   /** Phần tử R3F của cảnh: nhân vật 3D (`Actor25D`), hình code vẽ... đặt theo cùng hệ tọa độ */
@@ -288,7 +288,7 @@ function Scene25DInner({ background, sprites = [], children, overlay, allowPortr
   const dpr = effectiveDpr(level, typeof window === 'undefined' ? 1 : window.devicePixelRatio);
   const [sceneReady, setSceneReady] = useState(false);
   const spriteKey = sprites.map((s) => s.asset).join('|');
-  const paths = useMemo(() => [background, ...(spriteKey === '' ? [] : spriteKey.split('|'))], [background, spriteKey]);
+  const paths = useMemo(() => [...(background ? [background] : []), ...(spriteKey === '' ? [] : spriteKey.split('|'))], [background, spriteKey]);
   const textures = useSceneTextures(paths);
   const ready = sceneReady && textures.done;
   const notified = useRef(false);
@@ -327,7 +327,7 @@ function Scene25DInner({ background, sprites = [], children, overlay, allowPortr
               <hemisphereLight args={['#fff4dc', '#8a6a4a', 1.6]} />
               <directionalLight position={[4, 8, 10]} intensity={2.4} />
               <Suspense fallback={null}>
-                <Backdrop texture={textures.get(background)} world={world} />
+                {background && <Backdrop texture={textures.get(background)} world={world} />}
                 {sprites.map((s) => (
                   <SpriteMesh key={s.key} sprite={s} texture={textures.get(s.asset)} />
                 ))}

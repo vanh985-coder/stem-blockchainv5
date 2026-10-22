@@ -23,6 +23,7 @@ const stateOf = (progress: Progress): ProgressState => ({
   markAllKnowCards: () => {},
   markGuideSeen: () => {},
   markStoryRead: () => {},
+  markGameTipSeen: () => {},
 });
 
 function render(progress: Progress): string {

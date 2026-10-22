@@ -166,7 +166,7 @@ Logic đặt trong `climbLogic.ts` (hàm thuần, có test).
 - **Nắm nhầm nhánh khớp:** "Ngõ cụt!", {phanDien} cười; ở lại tầng cũ, mất 1 tim, không bật được trong 1 giây.
 - **Không nắm được gì:** ở lại tầng cũ, không mất tim, không bật được trong 1 giây.
 - **Tầng trên cùng là các chiếc lá:** nắm được lá lệch (lá giả) là bắt được {phanDien} đang ngồi trên ngọn cây, xong vòng. Xong vòng 4 là thắng. Hết tim thì kết thúc game (Bi vào giúp, vẫn sang cao trào: bước B5).
-- Giữa các tầng có tiền đồng để nhặt. Logic chỉ có biến đếm và hàm cộng đồng (`addCoins`); vị trí và cách nhặt làm ở bước B4.
+- **Tiền đồng (bước B4):** mỗi khoảng giữa hai tầng có 2 đồng treo trên thân. Chỉ nhặt được khi leo qua khoảng đó ngay lần bật đầu tiên ở tầng đó (chưa trượt, chưa ngõ cụt ở tầng đó); không thì 2 đồng đó rơi mất. Tối đa 2 × (3 + 4 + 5 + 6) = 36 đồng. Leo hoàn hảo: 400 + 36 + 150 = 586 điểm; một lần ngõ cụt: 534; một lần trượt: 584. Logic: `coinsPerGap` trong `climbConfig.ts`, sự kiện `up` báo `coins` và `lostCoins`.
 
 ### 4 vòng
 
@@ -215,6 +215,23 @@ Logic đặt trong `climbLogic.ts` (hàm thuần, có test).
 | Không nắm được gì | Giữ nguyên tầng, tim không đổi, khóa bật 1 giây |
 
 Code ở `packages/village-lang-bac/src/climb/` (`climbConfig.ts`, `climbLogic.ts`, `climbLogic.test.ts`). Ngoài bảng trên, test còn có: sinh 500 cây mỗi vòng, mã rút gọn của 500 cây, c(t) luôn trong [−1,5; 1,5] và cửa sổ nắm được đúng 2 × tầm với / tốc độ ở cả 4 vòng, bot canh đúng leo hết 4 vòng không mất tim với 300 seed, điểm (4 vòng, 10 đồng, 2 tim → 510), cùng seed thì cùng cây.
+
+**Đã làm (mốc 3, bước B4: cảnh, chưa có cao trào; màn 12 vẫn `coming-soon`, chơi thử ở `/dev/man-12` của vỏ lang-bac khi chạy dev):**
+- Code: `climbLayout.ts` (bố cục thuần, có test), `climbArt.ts` (nạp hình, cắt khung, tách nền trắng của hai hình lá, vẽ trời và nhãn), `ClimbStage.tsx` (cảnh trong Scene25D), `ClimbGame.tsx` (màn chơi), `pages/Man12.tsx`, `climbBots.ts` + `climbBalance.test.ts`. Scene25D nhận `background={null}` để cảnh tự vẽ trời.
+- Cảnh: cây ghép từ `than-cay` (cắt bỏ hai đầu tròn), `goc-cay` dưới cùng, `ngon-cay` trên cùng; mỗi tầng một `canh-ngang`, tay nắm `tay-nam` (tầng lá dùng `ui/tiles/la-da`), {phanDien} trên ngọn ôm `ui/tiles/la-gia`. Hai hình lá có nền trắng đục nên code tách nền khi nạp. Khoảng cách tầng 3,6 đơn vị; camera đi theo tầng người chơi đang giữ (Giảm chuyển động: nhảy thẳng).
+- Nhãn trên tay nắm: hai dòng "Sổ: …" / "Nay: …" cùng màu, không đánh dấu nhánh nào lệch. Đo: 17,3 px ở 360 × 640 và 844 × 390, 36,3 px ở 1366 × 768 (không dưới 14 px, "Chữ to" nhân 1,15).
+- Cú bật nhận ở `pointerdown` và `keydown` (Space không cuộn trang). Nắm được thì tay nắm kéo về giữa thân trong 0,3 giây (chỉ là hình). Ngõ cụt: "Ngõ cụt!", {phanDien} `cheer`, nhân vật tụt về. Bắt được: {phanDien} `jump`, sau 1,1 giây hiện "Bắt được {phanDien}!" và "Em chỉ leo d tầng thay vì kiểm tra cả 2^d lá!".
+- Lần đầu vào màn Bi nói câu "Trên bảng thì gốc vẽ ở trên cùng…"; cờ `gameTipSeen` (`progress/gameTips.ts`, cookie `gt`, bit số màn − 1).
+- **Clip `hang` của `hoc-sinh-nam` đang sai:** ở `/dev/3d` clip "hanging from a horizontal bar with both arms straight up above" cho tư thế ngồi co, tay ôm mặt, không phải treo tay. Tạm dùng `idle` (đầu ngay dưới tay nắm, `STUDENT_HANG_CLIP` trong `ClimbStage.tsx`), chờ quyết định sửa file đồ họa hay dựng tư thế treo bằng code.
+
+**Cân bằng (300 ván mỗi bot, seed 1 đến 300, mốc 250 / 400 / 520):**
+
+| Bot | Điểm trung bình | Chưa đạt | Đồng | Bạc | Vàng | Hết tim |
+|---|---|---|---|---|---|---|
+| Giỏi: lệch giờ σ 0,04 giây, không đọc nhầm | 586 | 0% | 0% | 0% | 100% | 0% |
+| Trung bình: lệch giờ σ 0,12 giây, đọc nhầm số 10% số lần | 441,9 (2 đến 586) | 12,0% | 18,7% | 28,3% | 41,0% | 30,7% |
+
+Bot trung bình CHƯA đạt tiêu chí (Đồng hoặc Bạc ≥ 80%, Vàng dưới 10%): mốc giữ nguyên, chờ chủ dự án quyết. Thử thêm (không đưa vào luật): bỏ đọc nhầm (σ 0,12) thì 100% Vàng; σ 0,2 và đọc nhầm 10% thì Vàng 43,3%; đọc nhầm 20% thì Vàng 5,7% nhưng hết tim 80,7%. Lệch giờ gần như không đổi kết quả (trượt chỉ mất 2 đồng); kết quả do số lần đọc nhầm quyết định (mỗi lần mất 1 tim, 50 điểm, và có thể hết tim).
 
 ## Checklist nghiệm thu
 

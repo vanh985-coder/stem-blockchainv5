@@ -20,6 +20,8 @@ export const CLIMB_SPEC = {
   jumpPeak: 0.35,
   /** Nắm nhầm nhánh khớp (ngõ cụt) hay không nắm được gì: khóa bật bấy nhiêu giây kể từ đỉnh cú bật (bước B3) */
   lockAfterFail: 1,
+  /** Mỗi khoảng giữa hai tầng có bấy nhiêu tiền đồng; chỉ nhặt khi leo qua khoảng đó ngay lần bật đầu tiên ở tầng đó (không trượt, không ngõ cụt trước đó), không thì mất (bước B4). Tối đa 2 × (3 + 4 + 5 + 6) = 36 đồng. */
+  coinsPerGap: 2,
   /** Mã rút gọn: số chữ số cuối của giá trị trong sổ */
   codeDigits: 4,
   /** Điểm = số vòng xong × 100 + số tiền đồng × 1 + số tim còn × 50 */

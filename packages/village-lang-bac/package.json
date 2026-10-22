@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@so-chung/core": "workspace:*"
+    "@so-chung/core": "workspace:*",
+    "@react-three/fiber": "^9.8.1",
+    "three": "^0.186.1"
   },
   "peerDependencies": {
     "react": "^19.0.0",
@@ -21,7 +23,8 @@
     "react": "catalog:",
     "react-router": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:"
+    "vite": "catalog:",
+    "@types/three": "^0.186.0"
   },
   "sideEffects": false
 }

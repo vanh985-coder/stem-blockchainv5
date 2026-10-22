@@ -7,6 +7,7 @@ import type { UnlockResult } from './unlock';
 import { hasSeenGuide, withGuideSeen } from './guideFlags';
 import { fullKnowMask, hasKnowCard, knowCardMaskOf, withAllKnowCards, withKnowCard } from './knowCards';
 import { hasReadStory, withStoryRead } from './storyFlags';
+import { hasSeenGameTip, withGameTipSeen } from './gameTips';
 import { hasSeenGateOpen, hasSeenGolden, hasSeenIntro, hasSeenKnow, hasSeenScene, withGateOpenSeen, withGoldenSeen, withIntroSeen, withKnowSeen, withSceneSeen } from './villageIntro';
 import type { VillageId } from '../village';
 
@@ -387,6 +388,15 @@ export class ProgressManager {
   }
 
   /** Phần Hướng dẫn chơi đã tự mở một lần (bước 16): không tự mở lại. */
+  /** Đã nghe lời giới thiệu lần đầu của game phụ màn `levelId` (bước B4); đã có cờ thì không làm gì. */
+  markGameTipSeen(levelId: number): void {
+    if (this.mode === 'loading' || hasSeenGameTip(this.progress.game.data, levelId)) return;
+    this.progress = { ...this.progress, game: { ...this.progress.game, data: withGameTipSeen(this.progress.game.data, levelId), updatedAt: this.now() } };
+    this.persistLocal();
+    this.emit();
+    this.scheduleFlush();
+  }
+
   markGuideSeen(section: string): void {
     if (this.mode === 'loading' || hasSeenGuide(this.progress.game.data, section)) return;
     this.progress = { ...this.progress, game: { ...this.progress.game, data: withGuideSeen(this.progress.game.data, section), updatedAt: this.now() } };
