@@ -38,6 +38,19 @@ export const GAMES: Readonly<Partial<Record<number, GameText>>> = {
       dienThoai: 'Kéo thẻ bằng ngón tay, hoặc chạm chọn thẻ rồi chạm vào chuỗi hoặc rổ · chạm "Soi công thức" để tự tính mã trang.',
     },
   },
+  8: {
+    ten: 'Lật thẻ tìm cặp khóa',
+    luat: [
+      'Bộ khuôn tập của chú Dũng bị {phanDien} trộn lung tung. Em ghép lại từng khuôn với mẫu công khai của nó nhé!',
+      'Lật 2 thẻ mỗi lượt. Thẻ Khuôn tập x ghép với thẻ Mẫu công khai 5^x mod 23.',
+      'Có Máy tính mod ở góc màn hình. Mỗi lần lật sai mất 10 điểm.',
+      'Vòng 3: cứ 20 giây {phanDien} tráo chỗ 2 thẻ đang úp.',
+    ],
+    dieuKhien: {
+      mayTinh: 'Bấm chuột, hoặc phím mũi tên và Enter',
+      dienThoai: 'Chạm vào thẻ',
+    },
+  },
 };
 
 /** Tên các phần điểm ở màn kết quả của màn 2 (điểm = trang × 10 + tiền đồng + quãng đường ÷ 10 + câu đúng × 30). */
@@ -165,4 +178,40 @@ export const rebuildUi = {
   phanSua: 'Vòng {so}: ô đã sửa xong (+{diem} mỗi ô)',
   phanNhanh: 'Vòng {so}: sửa trong {giay} giây (thêm +{diem} mỗi ô)',
   phanConLech: 'Vòng {so}: ô còn lệch khi hết giờ (−{diem} mỗi ô)',
+} as const;
+
+/** Chữ trong màn 8 "Lật thẻ tìm cặp khóa" (spec 07 mục Màn 8). Thẻ chỉ ghi số: không tên, không chân dung. */
+export const memoryUi = {
+  vong: 'Vòng {so}/{max}',
+  diem: 'Điểm: {so}',
+  sai: 'Lật sai: {so}',
+  /** Chữ trên mặt thẻ (code vẽ): nhãn ở trên, số ở dưới */
+  nhanKhuon: 'Khuôn tập',
+  nhanMau: 'Mẫu công khai',
+  /** Nhãn đọc cho người dùng đọc màn hình */
+  luoi: 'Bàn thẻ. Dùng phím mũi tên để chọn thẻ, Enter để lật.',
+  theUp: 'Thẻ úp, hàng {so}, cột {so2}',
+  theKhuon: 'Khuôn tập: {x}',
+  theMau: 'Mẫu công khai: {y}',
+  daKhop: '{nhan}, đã khớp',
+  /** Dòng hiện khi ghép đúng một cặp */
+  khop: '5^{x} mod 23 = {y}',
+  khopLoi: 'Khớp rồi!',
+  saiLoi: 'Chưa khớp, hai thẻ sẽ úp lại.',
+  trao: '{phanDien} vừa tráo chỗ 2 thẻ đang úp!',
+  vongXong: 'Vòng {so} xong! Em lật sai {k} lần, được {diem} điểm.',
+  vongTiep: 'Vòng tiếp theo',
+  xemKetQua: 'Xem kết quả',
+  /** Phần điểm ở màn kết quả: mỗi vòng một dòng, số lượng là số lần lật sai */
+  phanVong: 'Vòng {so} (số lần lật sai)',
+} as const;
+
+/** Chữ của Máy tính mod (màn 8, màn 9): nhập khuôn x, ra mẫu công khai 5^x mod 23. */
+export const modCalcUi = {
+  nut: 'Máy tính mod',
+  tieuDe: 'Máy tính mod',
+  nhap: 'Nhập x (số nguyên từ 1 đến 22)',
+  ketQua: '5^{x} mod 23 = {y}',
+  loi: 'Em nhập một số nguyên từ 1 đến 22 nhé.',
+  dong: 'Đóng',
 } as const;

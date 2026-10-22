@@ -77,12 +77,12 @@ describe('unlock: 9 tình huống của spec 03 mục 6', () => {
 });
 
 describe('unlock: các trường hợp bổ sung', () => {
-  it('bảng status mặc định (bước 14): màn 1, 2, 3, 4, 7, 10 là ready; màn 2 khóa cho tới khi xong màn 1', () => {
+  it('bảng status mặc định (mốc 3 bước B2): màn 1, 2, 3, 4, 7, 8, 10 là ready; màn 2 khóa cho tới khi xong màn 1', () => {
     const r = computeUnlock({ doneLevels: [] });
     expect(r.levels.map((l) => l.state)).toEqual([
       'open', 'locked', 'locked',
       'locked', 'coming-soon', 'coming-soon',
-      'locked', 'coming-soon', 'coming-soon',
+      'locked', 'locked', 'coming-soon',
       'locked', 'coming-soon', 'coming-soon',
     ]);
     expect(computeUnlock({ doneLevels: [1] }).goldenPages).toBe(0); // xong bài học chưa đủ: còn màn 2 và 3
@@ -90,7 +90,11 @@ describe('unlock: các trường hợp bổ sung', () => {
     const after = computeUnlock({ doneLevels: [1, 2, 3] });
     expect(after.goldenPages).toBe(1);
     expect(after.levels.find((l) => l.id === 4)!.state).toBe('open');
-    const all = computeUnlock({ doneLevels: [1, 2, 3, 4, 7, 10] });
+    // Làng Khắc Dấu: màn 9 còn coming-soon nên Trang Sổ Vàng 3 trao sau khi chơi màn 8 (spec 03 mục 6), chưa trao khi mới xong màn 7
+    expect(computeUnlock({ doneLevels: [1, 2, 3, 4, 7] }).goldenPages).toBe(2);
+    expect(computeUnlock({ doneLevels: [1, 2, 3, 4, 7] }).levels.find((l) => l.id === 8)!.state).toBe('open');
+    expect(computeUnlock({ doneLevels: [1, 2, 3, 4, 7, 8] }).goldenPages).toBe(3);
+    const all = computeUnlock({ doneLevels: [1, 2, 3, 4, 7, 8, 10] });
     expect(all.goldenPages).toBe(4);
   });
 

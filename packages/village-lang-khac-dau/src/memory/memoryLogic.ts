@@ -21,14 +21,8 @@ export interface MemoryCard {
   isMatched: boolean;
 }
 
-export type SwapPair = [number, number] & {
-  indexA: number;
-  indexB: number;
-  cardA: MemoryCard;
-  cardB: MemoryCard;
-  indices: [number, number];
-  cards: [MemoryCard, MemoryCard];
-};
+/** Hai vị trí thẻ {phanDien} chọn để tráo. */
+export type SwapPair = [number, number];
 
 export type FlipResult =
   | { kind: 'first'; index: number; card: MemoryCard }
@@ -158,68 +152,22 @@ export function memoryMedal(score: number): Medal {
  * Dưới 2 thẻ như vậy trả về null.
  * Không bao giờ chọn thẻ đã khớp hoặc thẻ đang lật mở.
  */
-export function pickSwap(
-  state: {
-    cards?: MemoryCard[];
-    deck?: MemoryCard[];
-    flippedIndices?: number[];
-    matchedIndices?: any;
-  },
-  rng: () => number,
-): SwapPair | null {
-  const cards = state.cards ?? state.deck;
-  if (!cards || cards.length < 2) return null;
-
+export function pickSwap(state: Pick<MemoryState, 'cards'>, rng: () => number): SwapPair | null {
   const eligible: number[] = [];
-  for (let i = 0; i < cards.length; i++) {
-    const c = cards[i] as any;
-    const isFlipped =
-      c.isFlipped === true ||
-      c.flipped === true ||
-      c.isFaceUp === true ||
-      (Array.isArray(state.flippedIndices) && state.flippedIndices.includes(i));
-    const isMatched =
-      c.isMatched === true ||
-      c.matched === true ||
-      (state.matchedIndices?.has
-        ? state.matchedIndices.has(i)
-        : Array.isArray(state.matchedIndices)
-        ? state.matchedIndices.includes(i)
-        : false);
-
-    if (!isFlipped && !isMatched) {
-      eligible.push(i);
-    }
-  }
-
-  if (eligible.length < 2) {
-    return null;
-  }
-
-  const shuffled = shuffle(eligible, rng);
-  const first = shuffled[0];
-  const second = shuffled[1];
-
-  const pair = [first, second] as SwapPair;
-  pair.indexA = first;
-  pair.indexB = second;
-  pair.cardA = cards[first];
-  pair.cardB = cards[second];
-  pair.indices = [first, second];
-  pair.cards = [cards[first], cards[second]];
-  return pair;
+  state.cards.forEach((c, i) => {
+    if (!c.isFlipped && !c.isMatched) eligible.push(i);
+  });
+  if (eligible.length < 2) return null;
+  const [first, second] = shuffle(eligible, rng);
+  return [first, second];
 }
 
 /**
  * Tráo vị trí 2 thẻ trong danh sách.
  */
-export function swapCards(
-  state: { cards?: MemoryCard[]; deck?: MemoryCard[] },
-  indexA: number,
-  indexB: number,
-): boolean {
-  const cards = state.cards ?? state.deck;
-  if (!cards || indexA < 0 || indexA >= cards.length || indexB < 0 || indexB >= cards.length) {
+export function swapCards(state: Pick<MemoryState, 'cards'>, indexA: number, indexB: number): boolean {
+  const cards = state.cards;
+  if (indexA < 0 || indexA >= cards.length || indexB < 0 || indexB >= cards.length) {
     return false;
   }
   const temp = cards[indexA];
@@ -373,11 +321,18 @@ export function advanceRound(state: MemoryState): boolean {
   return true;
 }
 
+/** Tùy chọn của một bước thời gian. */
+export interface StepOptions {
+  /** false: không đếm đồng hồ tráo ở bước này (mặc định đếm) */
+  swapClock?: boolean;
+}
+
 /**
  * Bước thời gian cho đồng hồ úp lại (800ms) và đồng hồ tráo thẻ ở vòng 3 (20000ms).
  * dt tính bằng ms (cùng đơn vị với MEMORY_SPEC).
+ * `swapClock: false` giữ nguyên đồng hồ tráo (em đang mở Máy tính mod, hay đang chiếu hoạt cảnh tráo); đồng hồ úp lại vẫn chạy.
  */
-export function stepMemory(state: MemoryState, dt: number): MemoryEvent[] {
+export function stepMemory(state: MemoryState, dt: number, opts: StepOptions = {}): MemoryEvent[] {
   const dtMs = Number.isFinite(dt) && dt > 0 ? dt : 0;
   const events: MemoryEvent[] = [];
 
@@ -398,18 +353,15 @@ export function stepMemory(state: MemoryState, dt: number): MemoryEvent[] {
   }
 
   // 2. Vòng 3: {phanDien} tráo bài mỗi 20 giây (20000ms)
-  if (state.round === 2) {
+  if (state.round === 2 && opts.swapClock !== false) {
     state.swapTimerMs += dtMs;
     if (state.swapTimerMs >= MEMORY_SPEC.swapIntervalMs) {
       state.swapTimerMs -= MEMORY_SPEC.swapIntervalMs;
       const pair = pickSwap(state, state.rng);
       if (pair) {
+        const cards: [MemoryCard, MemoryCard] = [state.cards[pair[0]], state.cards[pair[1]]];
         swapCards(state, pair[0], pair[1]);
-        events.push({
-          kind: 'swap',
-          indices: [pair[0], pair[1]],
-          cards: [pair.cardA, pair.cardB],
-        });
+        events.push({ kind: 'swap', indices: pair, cards });
       }
     }
   }

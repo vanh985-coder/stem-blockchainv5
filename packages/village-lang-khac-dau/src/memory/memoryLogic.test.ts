@@ -623,3 +623,18 @@ describe('rà bước B1: điểm, mốc, hết vòng', () => {
     expect(memoryMedal(memoryScore(state))).toBe(3);
   });
 });
+
+describe('bước B2: tạm dừng đồng hồ tráo (Máy tính mod đang mở)', () => {
+  it('swapClock: false giữ nguyên đồng hồ tráo nhưng đồng hồ úp lại vẫn chạy', () => {
+    const state = round3State(61);
+    const [a, b] = mismatchPair(state.cards);
+    flipCard(state, a);
+    flipCard(state, b);
+    const ev = stepMemory(state, 25000, { swapClock: false });
+    expect(ev.map((e) => e.kind)).toEqual(['flipBack']);
+    expect(state.swapTimerMs).toBe(0);
+    // Đóng máy tính: đồng hồ tráo chạy tiếp từ chỗ cũ
+    expect(stepMemory(state, 19999)).toHaveLength(0);
+    expect(stepMemory(state, 1).map((e) => e.kind)).toEqual(['swap']);
+  });
+});

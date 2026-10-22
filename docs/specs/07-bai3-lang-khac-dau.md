@@ -112,6 +112,25 @@ Mỗi vòng chọn ngẫu nhiên các khuôn trong bộ khuôn tập.
 | Điểm vòng: lật sai 3 lần / 35 lần | 270 / 0 |
 | {phanDien} tráo bài | Chỉ đụng thẻ đang úp và chưa khớp |
 
+**Đã làm (mốc 3, bước B1–B2):**
+- Code ở `packages/village-lang-khac-dau/src/memory/`: `memoryConfig.ts` (`MEMORY_SPEC`, mốc `medals` truyền thẳng vào `MiniGameLevel`), `memoryLogic.ts` (luật), `memoryLayout.ts` (bố cục khung ngang và dọc), `memoryFaces.ts` (vẽ mặt thẻ), `MemoryBoard.tsx` (thẻ và {phanDien} trong Scene25D), `MemoryGame.tsx` (màn chơi), `memoryBots.ts` + `memoryBalance.test.ts`. Trang `pages/Man8.tsx`, route `man/8`. Máy tính mod dùng chung cho màn 9: `src/ui/ModCalculator.tsx`.
+- `stepMemory(state, dt, { swapClock })` tính `dt` bằng ms. Mở Máy tính mod hay đang chiếu hoạt cảnh tráo thì đồng hồ tráo đứng yên (`swapClock: false`), đồng hồ úp lại 0,8 giây vẫn chạy.
+- Thẻ: mặt phẳng hai mặt trong một nhóm xoay 180°. Mặt sau `ui/cards/the-mat-sau`; mặt trước lấy nền `ui/cards/the-khuon-rieng` hay `ui/cards/the-mau-cong-khai`, code vẽ khung giấy với nhãn "Khuôn tập" hay "Mẫu công khai" và số bên dưới (không tên, không chân dung). 24 mặt trước và mặt sau vẽ chung một atlas 5 × 5 (một texture). Ảnh gốc có nền trắng ở góc nên khi vẽ được cắt mép 3,5% và bo góc.
+- Chữ trên thẻ ≥ 14 px trên màn hình (vẽ theo cỡ thẻ thật, vẽ lại khi cỡ thẻ đổi); "Chữ to" nhân 1,15, thẻ hẹp quá thì thu về không dưới 14 px. Đo: thẻ 82,8 px ở 360 × 640 (khung dọc 9:16), 86,6 đến 90,6 px ở 844 × 390, 170,6 đến 178,5 px ở 1366 × 768.
+- Khung ngang: cột trái có nút Máy tính mod, vòng, điểm, số lần sai, dòng kết quả; {phanDien} ló ra mép phải. Khung dọc (điện thoại xoay dọc, `allowPortrait`): dải trên là thanh trên, {phanDien} ló ra ở góc dưới phải.
+- Tráo bài: vệt tím (quầng tím sau thẻ và lớp tím phủ lên thẻ) hiện 1 giây ở chỗ cũ, rồi hai thẻ trượt sang chỗ mới trong 0,45 giây; lúc này chưa bấm được thẻ. {phanDien} ló ra và cười (`cheer`). "Giảm chuyển động": lật không xoay, đổi chỗ ngay sau 1 giây vệt tím, {phanDien} không ló ra.
+- Bàn phím: phím mũi tên đi giữa các thẻ (viền rõ khi chọn bằng phím), Enter hay Space để lật. Mỗi thẻ có nhãn cho trình đọc màn hình ("Thẻ úp, hàng 1, cột 2" hoặc mặt thẻ khi đã mở).
+- Màn kết quả: điểm = tổng 3 vòng, mỗi vòng một dòng (số lần lật sai → điểm).
+
+**Cân bằng (300 ván mỗi bot, seed 1 đến 300, mốc 300 / 550 / 750):**
+
+| Bot | Lật sai trung bình (vòng 1 / 2 / 3) | Điểm trung bình | Chưa đạt | Đồng | Bạc | Vàng |
+|---|---|---|---|---|---|---|
+| Giỏi: nhớ hết, tính đúng, để ý thẻ bị tráo | 1,92 / 3,16 / 4,52 | 804,0 (thấp nhất 780) | 0% | 0% | 0% | 100% |
+| Trung bình: quên 30% thẻ đã thấy sau mỗi lượt, 15% lật nhầm thẻ bên cạnh, không để ý thẻ bị tráo | 3,40 / 7,13 / 13,35 | 661,3 (490 đến 800) | 0% | 5,3% | 90,0% | 4,7% |
+
+Đạt tiêu chí như màn 2, 3 (bot giỏi ≥ 90% Vàng; bot trung bình Đồng hoặc Bạc ≥ 80%, Vàng dưới 10%). Màn này không có tim nên không có tỉ lệ hết tim. Hồ sơ bot trung bình là tự chọn.
+
 ## Màn 9 — Game phụ 2: "Chữa đàn gà" (bắn ná)
 
 Logic đặt trong `chickenLogic.ts` (hàm thuần, có test).
