@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Avatar, Button, Card, Modal, NumberInput, fmt, sound, useAuth, type StationResult, rich } from '@so-chung/core';
+import { Avatar, Button, Card, Modal, NumberInput, fmt, sound, useAuth, type StationResult, formatPower, plainPower, rich } from '@so-chung/core';
 import { bai3Texts } from '@so-chung/core/content/lessons/bai-3';
 import { formatNumber, formatDecimal, formatTime } from '@so-chung/core/lib/format';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
@@ -485,7 +485,10 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
                         }
                       `}
                     >
-                      <span>5^{h.x} mod 23 =</span>
+                      <span>
+                        <span className="sr-only">{plainPower(`${formatPower(5, h.x)} mod 23 =`)}</span>
+                        <span aria-hidden="true">{rich(`${formatPower(5, h.x)} mod 23 =`)}</span>
+                      </span>
                       <span>{h.val}</span>
                       <span>{h.isMatch ? '✓' : '✗'}</span>
                     </div>
@@ -640,7 +643,8 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
                         `}
                       >
                         <span>
-                          2^{formatNumber(h.x)} mod 1.000.003 = {formatNumber(h.val)}
+                          <span className="sr-only">{plainPower(`${formatPower(2, formatNumber(h.x))} mod 1.000.003 = ${formatNumber(h.val)}`)}</span>
+                          <span aria-hidden="true">{rich(`${formatPower(2, formatNumber(h.x))} mod 1.000.003 = ${formatNumber(h.val)}`)}</span>
                         </span>
                         <span className={h.isMatch ? 'text-xanh-la-dam' : 'text-do-son-dam'}>
                           {h.isMatch ? T.dung : T.sai}
