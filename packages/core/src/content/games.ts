@@ -229,7 +229,7 @@ export const whackUi = {
   khung: 'Sân dệt. Phím D F J K hoặc chạm vào làn để đập chuột giấy.',
   diem: 'Điểm: {so}',
   xu: 'Xu: {so}',
-  trum: 'Trùm {so}/{max}',
+  trum: 'Trùm: {so}/{max}',
   /** Nhãn đọc màn hình của hàng chấm vết mực */
   muc: 'Vết mực trên sổ: {so}/{max}',
   /** Lượt trùm: tiêu đề, thời gian, kết quả */

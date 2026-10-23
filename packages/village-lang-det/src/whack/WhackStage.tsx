@@ -1,13 +1,14 @@
 /**
  * Cảnh 3D/2.5D của màn 5 (Scene25D, camera trực giao): chuột giấy, vệt sáng vùng đập, vết mực trên sổ, tiền đồng (hình rời, DÙNG POOL: tạo sẵn một lần, mỗi khung hình chỉ đổi vị trí, cỡ, hiện/ẩn;
  * không tạo object mới trong useFrame), học sinh cầm quạt nan, {phanDien} làm trùm và cô Chi (model 3D, đặt trong Actor25D).
- * Vị trí mọi thứ đọc từ \`WhackView\` (đối tượng đổi tại chỗ do vòng lặp của \`WhackGame\` giữ); ở đây không có luật chơi.
+ * Vị trí mọi thứ đọc từ `WhackView` (đối tượng đổi tại chỗ do vòng lặp của `WhackGame` giữ); ở đây không có luật chơi. Chỗ đứng của nhân vật và hình thang vệt sáng tính ở `whackLayout.ts`, `man05Lanes.ts` (hàm thuần có test).
  */
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { Color, Group, Mesh, MeshBasicMaterial, PlaneGeometry, type Material, type Object3D, type Texture } from 'three';
+import { BufferAttribute, BufferGeometry, Color, Group, Mesh, MeshBasicMaterial, PlaneGeometry, type Material, type Object3D, type Texture } from 'three';
 import { Actor25D, Character, type Aim, type PoseRequest } from '@so-chung/core/three/index';
-import { BOOK_POINT, imageToWorld, laneHeading, lanePose } from './man05Lanes';
+import { BOOK_POINT, imageToWorld, laneHeading, lanePose, laneQuad } from './man05Lanes';
+import { BOSS_HEIGHT, BOSS_WAIT_POS, CHI, STUDENT, bossPose, studentHome } from './whackLayout';
 import { MOUSE_ASPECT, makeGlowTexture, type WhackTextures } from './whackArt';
 import { WHACK_SPEC, type MouseKind } from './whackConfig';
 import type { WhackState } from './whackLogic';
@@ -43,23 +44,18 @@ export function createView(state: WhackState, reduced: boolean): WhackView {
     reduced,
     laneFlash: new Float32Array(WHACK_SPEC.lanes),
     inkPop: new Float32Array(WHACK_SPEC.inkMax),
-    student: { x: STUDENT_HOME.x, y: STUDENT_HOME.y, tx: STUDENT_HOME.x, ty: STUDENT_HOME.y },
+    student: { x: studentHome(), y: STUDENT.feetY, tx: studentHome(), ty: STUDENT.feetY },
     boss: { show: false, lane: 0, pos: 0, yaw: 0 },
     warm: false,
   };
 }
 
-/** Chỗ đứng ban đầu của học sinh (chân, tọa độ thế giới của khung 16 × 9): dưới cùng, hơi lệch về phía các làn */
-export const STUDENT_HOME = { x: -1.5, y: -4.2 } as const;
-/** Cỡ chiều cao nhân vật trên màn (đơn vị thế giới; khung cao 9) */
-export const STUDENT_HEIGHT = 3.2;
-export const BOSS_HEIGHT = 2.9;
-const CHI_SPOT = { x: 6.9, y: -2.9, height: 3.0 } as const;
-
 const POOL = 20;
 const BASE_W = 2.5;
 const KIND_SCALE: Record<MouseKind, number> = { thuong: 1, doiLan: 1, nhanh: 0.8, to: 1.5 };
 const Z = { glow: -1.7, ink: -1.0, mouse: -1.2, coin: -0.9 } as const;
+/** Thứ tự vẽ của chuột, đồng, vệt sáng: sau mọi nhân vật và tắt kiểm tra độ sâu, nên nếu giao nhau thì chúng vẽ đè lên nhân vật (sửa sau B7) */
+const ORDER = { glow: 8, mouse: 9, coin: 10 } as const;
 /** Chỗ các vết mực trên sổ (lệch so với tâm sổ, đơn vị thế giới) */
 const INK_SPOTS: readonly (readonly [number, number, number])[] = [
   [-0.55, 0.1, 0.7],
@@ -74,7 +70,7 @@ const INK_SPOTS: readonly (readonly [number, number, number])[] = [
 
 const KIND_ORDER: readonly MouseKind[] = ['thuong', 'doiLan', 'nhanh', 'to'];
 const POSE = { x: 0, y: 0, scale: 1 };
-const POSE2 = { x: 0, y: 0, scale: 1 };
+const BOSS_POSE = { x: 0, y: 0, height: 0, scale: 1 };
 const BOOK = imageToWorld(BOOK_POINT.u, BOOK_POINT.v);
 
 export interface WhackStageProps {
@@ -97,43 +93,43 @@ export function WhackStage({ view, textures, studentPose, studentAim, fan, villa
     const glowTex = makeGlowTexture();
     const basic = (map: Texture | null, color = '#ffffff', extra: Partial<ConstructorParameters<typeof MeshBasicMaterial>[0]> = {}) =>
       new MeshBasicMaterial({ map, color: new Color(color), transparent: true, depthWrite: false, toneMapped: false, ...extra });
+    // chuột, đồng và vệt sáng vẽ đè lên nhân vật (không kiểm tra độ sâu); vết mực nằm trên sổ nên vẫn bị nhân vật che
+    const over = (map: Texture | null, color = '#ffffff', extra: Partial<ConstructorParameters<typeof MeshBasicMaterial>[0]> = {}) => basic(map, color, { depthTest: false, ...extra });
     const mice: Record<MouseKind, MeshBasicMaterial> = {
-      thuong: basic(textures.thuong),
-      doiLan: basic(textures.doiLan),
-      nhanh: basic(textures.nhanh),
-      to: basic(textures.to),
+      thuong: over(textures.thuong),
+      doiLan: over(textures.doiLan),
+      nhanh: over(textures.nhanh),
+      to: over(textures.to),
     };
     // chuột to khựng và chớp sáng: cùng hình, nhân màu lên (toneMapped tắt nên > 1 thành sáng hơn)
-    const toFlash = basic(textures.to, '#ffffff');
+    const toFlash = over(textures.to, '#ffffff');
     toFlash.color.setRGB(1.9, 1.9, 1.9);
-    const toGlow = basic(textures.to, '#ffffff');
+    const toGlow = over(textures.to, '#ffffff');
     toGlow.color.setRGB(1.35, 1.35, 1.35);
     const ink = basic(textures.vetMuc);
-    const coin = basic(textures.dong);
-    const glow = Array.from({ length: WHACK_SPEC.lanes }, () => basic(glowTex, '#fff3a0', { opacity: 0.6 }));
-    return { geo, glowTex, mice, toFlash, toGlow, ink, coin, glow };
+    const coin = over(textures.dong);
+    const glow = Array.from({ length: WHACK_SPEC.lanes }, () => over(glowTex, '#fff6c8', { opacity: 0.6 }));
+    // vệt sáng của từng làn: hình thang bám hai mép dải vải (thu vào 5% mỗi bên để không tràn sang làn bên); UV dọc: mép trên 1, mép dưới 0
+    const zoneGeo = Array.from({ length: WHACK_SPEC.lanes }, (_, lane) => {
+      const q = laneQuad(lane, WHACK_SPEC.zoneStart, WHACK_SPEC.zoneEnd, 0.05);
+      const g = new BufferGeometry();
+      g.setAttribute('position', new BufferAttribute(new Float32Array(q.flatMap((p) => [p.x, p.y, 0])), 3));
+      g.setAttribute('uv', new BufferAttribute(new Float32Array([0, 1, 1, 1, 1, 0, 0, 0]), 2));
+      g.setIndex([0, 3, 2, 0, 2, 1]);
+      return g;
+    });
+    return { geo, glowTex, mice, toFlash, toGlow, ink, coin, glow, zoneGeo };
   }, [textures]);
   useEffect(
     () => () => {
       kit.geo.dispose();
       kit.glowTex.dispose();
+      for (const g of kit.zoneGeo) g.dispose();
       for (const m of [...Object.values(kit.mice), kit.toFlash, kit.toGlow, kit.ink, kit.coin, ...kit.glow] as Material[]) m.dispose();
     },
     [kit],
   );
 
-  // Vệt sáng vùng đập của từng làn: vị trí, góc, cỡ tính một lần (khung thế giới cố định 16 × 9)
-  const zones = useMemo(
-    () =>
-      Array.from({ length: WHACK_SPEC.lanes }, (_, lane) => {
-        const a = lanePose(lane, WHACK_SPEC.zoneStart, { x: 0, y: 0, scale: 1 });
-        const b = lanePose(lane, WHACK_SPEC.zoneEnd, { x: 0, y: 0, scale: 1 });
-        const dx = b.x - a.x;
-        const dy = b.y - a.y;
-        return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, length: Math.hypot(dx, dy) + 0.55, width: 1.7 * ((a.scale + b.scale) / 2), rot: Math.atan2(dy, dx) - Math.PI / 2 };
-      }),
-    [],
-  );
   const headings = useMemo(() => Array.from({ length: WHACK_SPEC.lanes }, (_, l) => laneHeading(l)), []);
 
   const mouseMeshes = useRef<(Mesh | null)[]>([]);
@@ -144,7 +140,6 @@ export function WhackStage({ view, textures, studentPose, studentAim, fan, villa
   const slotX = useRef(new Float32Array(POOL));
   const slotY = useRef(new Float32Array(POOL));
   const inkMeshes = useRef<(Mesh | null)[]>([]);
-  const glowMeshes = useRef<(Mesh | null)[]>([]);
   const coinMesh = useRef<Mesh>(null);
   const studentGroup = useRef<Group>(null);
   const villainGroup = useRef<Group>(null);
@@ -307,32 +302,18 @@ export function WhackStage({ view, textures, studentPose, studentAim, fan, villa
       const shown = b.show || v.warm;
       vg.visible = shown;
       if (shown) {
-        const lane = v.warm ? 1 : b.lane;
-        const pos = v.warm ? 8 : b.pos;
-        const p = lanePose(lane, pos, POSE2);
-        vg.position.set(p.x, p.y - 0.2, 0);
-        vg.scale.setScalar(0.45 + 0.55 * p.scale);
+        const bp = bossPose(v.warm ? 1 : b.lane, v.warm ? BOSS_WAIT_POS : b.pos, BOSS_POSE);
+        vg.position.set(bp.x, bp.y, 0);
+        vg.scale.setScalar(bp.scale);
         vg.rotation.y = b.yaw;
       }
     }
   });
 
-  const front = { x: 0, y: 0 };
   return (
     <>
-      {zones.map((z, l) => (
-        <mesh
-          key={`g${l}`}
-          ref={(m) => {
-            glowMeshes.current[l] = m;
-          }}
-          geometry={kit.geo}
-          material={kit.glow[l]}
-          position={[z.x, z.y, Z.glow]}
-          rotation-z={z.rot}
-          scale={[z.width, z.length, 1]}
-          renderOrder={-6}
-        />
+      {kit.zoneGeo.map((geo, l) => (
+        <mesh key={`g${l}`} geometry={geo} material={kit.glow[l]} position={[0, 0, Z.glow]} renderOrder={ORDER.glow} />
       ))}
       {INK_SPOTS.map((spot, i) => (
         <mesh
@@ -357,23 +338,23 @@ export function WhackStage({ view, textures, studentPose, studentAim, fan, villa
           geometry={kit.geo}
           material={kit.mice.thuong}
           visible={false}
-          renderOrder={-4}
+          renderOrder={ORDER.mouse}
         />
       ))}
-      <mesh ref={coinMesh} geometry={kit.geo} material={kit.coin} visible={false} renderOrder={-2} />
+      <mesh ref={coinMesh} geometry={kit.geo} material={kit.coin} visible={false} renderOrder={ORDER.coin} />
 
-      <Actor25D x={CHI_SPOT.x} y={CHI_SPOT.y} height={CHI_SPOT.height} layer="actorsBack">
+      <Actor25D x={CHI.x} y={CHI.feetY} height={CHI.height} layer="actorsBack">
         <Character id="characters/co-chi" happyTrigger={chiHappy} />
       </Actor25D>
 
       <group ref={villainGroup} visible={false}>
-        <Actor25D x={front.x} y={front.y} height={BOSS_HEIGHT} layer="actors">
+        <Actor25D x={0} y={0} height={BOSS_HEIGHT} layer="actors">
           <Character id="characters/ti" animation={villain.clip} trigger={villain.n} returnTo="idle" clips={VILLAIN_CLIPS} pose={villain.pose} />
         </Actor25D>
       </group>
 
       <group ref={studentGroup}>
-        <Actor25D x={0} y={0} height={STUDENT_HEIGHT} layer="actorsFront">
+        <Actor25D x={0} y={0} height={STUDENT.height} layer="actorsFront">
           <Character id="characters/hoc-sinh-nam" clips={STUDENT_CLIPS} pose={studentPose} aim={studentAim} heldProp={fan} />
         </Actor25D>
       </group>

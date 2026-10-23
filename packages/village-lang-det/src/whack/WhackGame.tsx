@@ -8,7 +8,8 @@ import { makeFan, useWhackTextures } from './whackArt';
 import { WHACK_SPEC } from './whackConfig';
 import { hintFor } from './whackHint';
 import { answerBoss, bossPoints, collectCoin, createWhackGame, hitLane, tickWhack, type BossResult, type WhackEvent } from './whackLogic';
-import { STUDENT_HOME, WhackStage, createView, type WhackView } from './WhackStage';
+import { BOSS_HIT_POS, BOSS_WAIT_POS, STUDENT, bossPose, bossViewPos, studentHome, studentStand } from './whackLayout';
+import { WhackStage, createView, type WhackView } from './WhackStage';
 
 const LEVEL_ID = 5;
 const BACKGROUND = 'scenes/man-05-san-det';
@@ -23,12 +24,13 @@ function forcedQuality(): QualityChoice | undefined {
 /** Phím đập: D F J K hoặc 1 2 3 4 (hàng số và bàn phím số) cho làn 1 đến 4 */
 const KEY_LANE: Readonly<Record<string, number>> = { KeyD: 0, KeyF: 1, KeyJ: 2, KeyK: 3, Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Numpad1: 0, Numpad2: 1, Numpad3: 2, Numpad4: 3 };
 
-/** Chỗ {phanDien} dừng giữa vùng đập */
-const BOSS_STOP = (WHACK_SPEC.zoneStart + WHACK_SPEC.zoneEnd) / 2;
-/** Mốc thời gian (giây, đồng hồ hoạt cảnh) của hoạt cảnh sau khi trả lời */
-const T = { swing: 0.3, hurt: 0.45, exitUp: 1.3, exitUpSeconds: 1.1, cheer: 0.6, runDown: 1.3, runDownSeconds: 0.7 } as const;
+/**
+ * Mốc thời gian (giây, đồng hồ hoạt cảnh) của hoạt cảnh sau khi trả lời. Đúng: trùm chạy từ chỗ chờ xuống cuối làn (`comeSeconds`), học sinh đét (`swing`), trùm `hurt`, rồi chạy ngược lên.
+ * Sai: trùm cúi, trêu, chạy xuống sổ. Chỗ chờ, chỗ bị đét ở `whackLayout.ts`.
+ */
+const T = { comeSeconds: 0.55, swing: 0.3, hurt: 0.45, exitUp: 1.3, exitUpSeconds: 1.2, cheer: 0.6, runDown: 1.3, runDownSeconds: 0.9 } as const;
 
-type BossStage = 'none' | 'hit' | 'exit' | 'dodge' | 'drop';
+type BossStage = 'none' | 'come' | 'hit' | 'exit' | 'dodge' | 'drop';
 interface BossAnim {
   stage: BossStage;
   t: number;
@@ -38,6 +40,8 @@ interface BossAnim {
 }
 
 interface QuizUi {
+  /** Bảng câu hỏi nằm bên nào của khung: trùm ở làn 1 hay 2 (bên trái) thì bảng sang phải để không che trùm, ngược lại nằm trái */
+  side: 'left' | 'right';
   index: number;
   total: number;
   /** Giây còn lại (làm tròn lên, để hiện) */
@@ -49,10 +53,10 @@ type Ending = null | 'ink' | 'complete';
 type Bubble = { left: number; top: number } | null;
 type Villain = { clip: 'idle' | 'run' | 'cheer'; n: number; pose?: PoseRequest };
 
-/** Vị trí (phần trăm khung) của một điểm trên làn, để đặt bong bóng chữ */
-function laneToPercent(lane: number, pos: number): { left: number; top: number } {
-  const p = lanePose(lane, pos, { x: 0, y: 0, scale: 1 });
-  return { left: (p.x / WORLD_FRAME.width + 0.5) * 100, top: (0.5 - p.y / WORLD_FRAME.height) * 100 };
+/** Vị trí (phần trăm khung) ngay trên đầu {phanDien} đang đứng ở chỗ bị đét của làn `lane`, để đặt bong bóng chữ */
+function bubbleAt(lane: number): { left: number; top: number } {
+  const b = bossPose(lane, BOSS_HIT_POS);
+  return { left: (b.x / WORLD_FRAME.width + 0.5) * 100, top: (0.5 - (b.y + b.height) / WORLD_FRAME.height) * 100 - 7 };
 }
 
 /**
@@ -149,11 +153,11 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
             setVillain((c) => ({ clip: 'run', n: c.n + 1 }));
             break;
           case 'bossQuiz': {
-            v.boss.pos = BOSS_STOP;
+            v.boss.pos = BOSS_WAIT_POS;
             setVillain((c) => ({ clip: 'cheer', n: c.n + 1 }));
             quizLeft.current = e.boss.answerSeconds;
             shownLeft.current = e.boss.answerSeconds;
-            setQuiz({ index: e.boss.index, total: e.boss.answerSeconds, left: e.boss.answerSeconds, answered: null });
+            setQuiz({ side: e.boss.lane <= 1 ? 'right' : 'left', index: e.boss.index, total: e.boss.answerSeconds, left: e.boss.answerSeconds, answered: null });
             break;
           }
           case 'bossAnswer':
@@ -189,7 +193,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
       const events = tickWhack(state, dt, false);
       if (events.length > 0) handleEvents(events);
       // trùm: vị trí chạy xuống theo logic
-      if (state.phase === 'bossRun' && state.boss) v.boss.pos = state.boss.pos;
+      if (state.phase === 'bossRun' && state.boss) v.boss.pos = bossViewPos(state.boss.pos);
       // đồng hồ trả lời: chỉ đếm khi bảng câu hỏi mở và em chưa trả lời
       if (quizLeft.current > 0 && !pending.current && state.phase === 'quiz') {
         quizLeft.current = Math.max(0, quizLeft.current - dt);
@@ -213,7 +217,14 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
       const v = view.current;
       b.t += dt;
       const lane = v.boss.lane;
-      if (b.stage === 'hit') {
+      if (b.stage === 'come') {
+        v.boss.pos = BOSS_WAIT_POS + ((BOSS_HIT_POS - BOSS_WAIT_POS) * Math.min(1, b.t / T.comeSeconds));
+        if (b.t >= T.comeSeconds) {
+          b.stage = 'hit';
+          b.t = 0;
+          setVillain((c) => ({ clip: 'idle', n: c.n + 1, pose: c.pose }));
+        }
+      } else if (b.stage === 'hit') {
         if (!b.swung && b.t >= T.swing) {
           b.swung = true;
           setSwingN((n) => n + 1);
@@ -222,9 +233,8 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
         if (!b.hurt && b.t >= T.hurt) {
           b.hurt = true;
           if (!reduced) setVillain((c) => ({ ...c, pose: { name: 'hurt', n: (c.pose?.n ?? 0) + 1 } }));
-          const bp = laneToPercent(lane, BOSS_STOP);
-          setBubble({ left: bp.left, top: Math.max(4, bp.top - 22) });
-          setChiHappy((n) => n + 1);
+          const bp = bubbleAt(lane);
+          setBubble({ left: bp.left, top: Math.max(4, bp.top) });
           sound.playCorrect();
         }
         if (b.t >= T.exitUp) {
@@ -233,11 +243,11 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
           setBubble(null);
           v.boss.yaw = Math.PI;
           setVillain((c) => ({ clip: 'run', n: c.n + 1, pose: c.pose }));
-          v.student.tx = STUDENT_HOME.x;
-          v.student.ty = STUDENT_HOME.y;
+          v.student.tx = studentHome();
+          v.student.ty = STUDENT.feetY;
         }
       } else if (b.stage === 'exit') {
-        v.boss.pos = Math.max(0, BOSS_STOP * (1 - b.t / T.exitUpSeconds));
+        v.boss.pos = Math.max(0, BOSS_HIT_POS * (1 - b.t / T.exitUpSeconds));
         if (b.t >= T.exitUpSeconds) {
           v.boss.show = false;
           b.stage = 'none';
@@ -253,7 +263,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
           setVillain((c) => ({ clip: 'run', n: c.n + 1, pose: c.pose }));
         }
       } else if (b.stage === 'drop') {
-        v.boss.pos = BOSS_STOP + ((WHACK_SPEC.laneLength - BOSS_STOP) * b.t) / T.runDownSeconds;
+        v.boss.pos = BOSS_WAIT_POS + ((WHACK_SPEC.laneLength - BOSS_WAIT_POS) * b.t) / T.runDownSeconds;
         if (b.t >= T.runDownSeconds) {
           v.boss.show = false;
           b.stage = 'none';
@@ -262,12 +272,12 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     };
     const beginBossAnim = (stage: 'hit' | 'dodge') => {
       const v = view.current;
-      boss.current = { stage, t: 0, swung: false, hurt: false, cheered: false };
+      boss.current = { stage: stage === 'hit' ? 'come' : stage, t: 0, swung: false, hurt: false, cheered: false };
       if (stage === 'hit') {
-        // học sinh lướt tới sau lưng trùm
-        const p = lanePose(v.boss.lane, BOSS_STOP, { x: 0, y: 0, scale: 1 });
-        v.student.tx = p.x - 0.95;
-        v.student.ty = p.y - 1.5;
+        // học sinh lướt tới chân làn của trùm; trùm chạy xuống cuối làn, ngay trên học sinh
+        v.student.tx = studentStand(v.boss.lane);
+        v.student.ty = STUDENT.feetY;
+        setVillain((c) => ({ clip: 'run', n: c.n + 1, pose: c.pose }));
       } else {
         setVillain((c) => ({ clip: 'idle', n: c.n + 1, pose: { name: 'sad', n: (c.pose?.n ?? 0) + 1 } }));
       }
@@ -285,9 +295,8 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
       const events = hitLane(state, lane);
       const e = events[0];
       if (!e || e.type === 'blocked') return;
-      const p = lanePose(lane, WHACK_SPEC.laneLength, { x: 0, y: 0, scale: 1 });
-      v.student.tx = p.x;
-      v.student.ty = STUDENT_HOME.y;
+      v.student.tx = studentStand(lane);
+      v.student.ty = STUDENT.feetY;
       setSwingN((n) => n + 1);
       if (e.type === 'hit') {
         v.laneFlash[lane] = 1;
@@ -354,6 +363,8 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     pending.current = null;
     quizLeft.current = 0;
     setQuiz(null);
+    // bảng câu hỏi che cô Chi (ở bên trái) nên cô chỉ nhún vui khi em bấm "Chơi tiếp", lúc thấy lại sân
+    if (p.result === 'correct') setChiHappy((n) => n + 1);
     handleEvents(answerBoss(state, p.result, p.left));
   }, [state, handleEvents]);
 
@@ -399,7 +410,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
             data-phase={state.phase}
             onPointerDown={onPointerDown}
           >
-            <div className="pointer-events-none absolute right-14 top-2 flex flex-col items-end space-y-1" data-testid="hud">
+            <div className={`pointer-events-none absolute top-2 flex flex-col space-y-1 ${quiz?.side === 'right' ? 'left-2 items-start' : 'right-14 items-end'}`} data-testid="hud">
               <div className="flex items-center gap-1 rounded-2xl border-2 border-nau-go bg-giay px-2 py-1" role="img" aria-label={fmt(whackUi.muc, { so: state.ink, max: WHACK_SPEC.inkMax })} data-testid="cham-muc">
                 {Array.from({ length: WHACK_SPEC.inkMax }, (_, i) => {
                   const on = i < state.ink;
@@ -411,7 +422,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
               <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 rounded-2xl border-2 border-nau-go bg-giay px-2 py-0.5 text-sm font-display font-extrabold">
                 <span data-testid="diem">{fmt(whackUi.diem, { so: state.score })}</span>
                 <span data-testid="xu">{fmt(whackUi.xu, { so: state.coins })}</span>
-                <span data-testid="trum">{fmt(whackUi.trum, { so: Math.min(state.bossesDone + 1, WHACK_SPEC.boss.count), max: WHACK_SPEC.boss.count })}</span>
+                <span data-testid="trum">{fmt(whackUi.trum, { so: state.bossesDone, max: WHACK_SPEC.boss.count })}</span>
               </div>
             </div>
 
@@ -422,16 +433,18 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
             )}
 
             {quiz && question && (
-              <div data-whack-ui className="absolute inset-y-1 left-1 z-20 w-[37%] min-w-[15rem] space-y-1 overflow-y-auto" data-testid="trum-cau-hoi" onPointerDown={(e) => e.stopPropagation()}>
-                <p className="rounded-nut bg-giay/95 px-2 py-0.5 text-center font-display text-sm font-bold">{fmt(whackUi.cauHoi, { so: quiz.index + 1, max: WHACK_SPEC.boss.count })}</p>
-                {quiz.answered === null && (
-                  <div className="rounded-nut bg-giay/95 px-2 py-0.5">
-                    <p className="text-xs font-semibold" data-testid="con-gio">
-                      {fmt(whackUi.conGio, { giay: quiz.left })}
-                    </p>
-                    <ProgressBar current={quiz.left} max={quiz.total} />
-                  </div>
-                )}
+              <div data-whack-ui className={`absolute inset-y-1 z-20 w-[45%] min-w-[15rem] space-y-1 overflow-y-auto ${quiz.side === 'right' ? 'right-1' : 'left-1'}`} data-testid="trum-cau-hoi" onPointerDown={(e) => e.stopPropagation()}>
+                <div className={`rounded-nut bg-giay/95 px-2 py-0.5 ${quiz.side === 'right' ? 'pr-12' : ''}`}>
+                  <p className="text-center font-display text-sm font-bold leading-snug">{fmt(whackUi.cauHoi, { so: quiz.index + 1, max: WHACK_SPEC.boss.count })}</p>
+                  {quiz.answered === null && (
+                    <div className="flex items-center gap-2">
+                      <p className="shrink-0 text-sm font-semibold" data-testid="con-gio">
+                        {fmt(whackUi.conGio, { giay: quiz.left })}
+                      </p>
+                      <ProgressBar current={quiz.left} max={quiz.total} className="min-w-0 flex-1" />
+                    </div>
+                  )}
+                </div>
                 {quiz.answered === 'timeout' ? (
                   <Panel className="space-y-1.5 !p-2.5 text-sm" role="alert" data-testid="het-gio">
                     <p className="font-bold text-do-son-dam">{whackUi.hetGio}</p>

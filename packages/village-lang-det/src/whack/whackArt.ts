@@ -68,29 +68,25 @@ export function useWhackTextures(): WhackTextures {
   return tex;
 }
 
-/** Dải sáng mờ của vùng đập: mép mềm hai bên và hai đầu, vẽ một lần (trắng; màu do vật liệu quyết định). */
+/**
+ * Vệt sáng của vùng đập (hình thang bám dải vải, phần hình vẽ ở `zoneGeometry`): viền sáng rõ ở mép trên và mép dưới, phần trong mờ nhẹ, không tối ở hai bên (vệt không loang ra ngoài hình thang).
+ * Vẽ một lần (trắng; màu do vật liệu quyết định). Trục dọc của hình: từ mép trên (đầu vùng đập) tới mép dưới.
+ */
 export function makeGlowTexture(): CanvasTexture {
   const c = document.createElement('canvas');
-  c.width = 64;
+  c.width = 4;
   c.height = 128;
   const ctx = c.getContext('2d');
   if (ctx) {
-    const g = ctx.createLinearGradient(0, 0, 64, 0);
-    g.addColorStop(0, 'rgba(255,255,255,0)');
-    g.addColorStop(0.14, 'rgba(255,255,255,1)');
-    g.addColorStop(0.86, 'rgba(255,255,255,1)');
-    g.addColorStop(1, 'rgba(255,255,255,0)');
+    const g = ctx.createLinearGradient(0, 0, 0, 128);
+    g.addColorStop(0, 'rgba(255,255,255,1)');
+    g.addColorStop(0.06, 'rgba(255,255,255,1)');
+    g.addColorStop(0.15, 'rgba(255,255,255,0.3)');
+    g.addColorStop(0.85, 'rgba(255,255,255,0.3)');
+    g.addColorStop(0.94, 'rgba(255,255,255,1)');
+    g.addColorStop(1, 'rgba(255,255,255,1)');
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, 64, 128);
-    // làm mờ hai đầu dải
-    ctx.globalCompositeOperation = 'destination-in';
-    const v = ctx.createLinearGradient(0, 0, 0, 128);
-    v.addColorStop(0, 'rgba(0,0,0,0)');
-    v.addColorStop(0.12, 'rgba(0,0,0,1)');
-    v.addColorStop(0.88, 'rgba(0,0,0,1)');
-    v.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = v;
-    ctx.fillRect(0, 0, 64, 128);
+    ctx.fillRect(0, 0, 4, 128);
   }
   return prepare(new CanvasTexture(c)) as CanvasTexture;
 }

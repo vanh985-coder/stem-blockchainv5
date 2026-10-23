@@ -24,13 +24,34 @@ export interface LaneSegment {
   bottom: LanePoint2;
 }
 
-/** Giá trị ban đầu do xem ảnh đặt: đường giữa của từng dải vải (đỏ, xanh đen, vàng, xanh lá), từ cổng đình xuống bàn đặt sổ. */
+/**
+ * Giá trị ban đầu do xem ảnh đặt: đường giữa của từng dải vải (đỏ, xanh đen, vàng, xanh lá), từ cổng đình xuống bàn đặt sổ.
+ * Sửa sau B7: đầu dưới làn 2 và làn 4 dời cho nằm giữa dải vải (đo lại bằng màu trên ảnh; làn 4 trước lệch xuống mép dưới của dải xanh lá chừng 50 điểm ảnh).
+ */
 export const MAN05_LANES: readonly [LaneSegment, LaneSegment, LaneSegment, LaneSegment] = [
   { top: { u: 0.323, v: 0.384 }, bottom: { u: 0.411, v: 0.742 } },
-  { top: { u: 0.374, v: 0.38 }, bottom: { u: 0.527, v: 0.762 } },
+  { top: { u: 0.374, v: 0.38 }, bottom: { u: 0.538, v: 0.762 } },
   { top: { u: 0.43, v: 0.378 }, bottom: { u: 0.65, v: 0.714 } },
-  { top: { u: 0.485, v: 0.367 }, bottom: { u: 0.734, v: 0.683 } },
+  { top: { u: 0.485, v: 0.367 }, bottom: { u: 0.77, v: 0.683 } },
 ];
+
+/**
+ * Mép trái và mép phải của từng dải vải (đỏ, xanh đen, vàng, xanh lá), đo trên ảnh nền bằng màu: u (0 đến 1) của mỗi mép ở hai hàng ảnh `CLOTH_ROWS` (v), nội suy và ngoại suy tuyến tính theo v
+ * ở giữa làn và gần sổ (nơi vẽ vùng đập). Chỉ để vẽ vệt sáng vùng đập bám đúng dải vải; đường chạy của chuột vẫn là `MAN05_LANES`.
+ */
+export const CLOTH_ROWS = [0.5729, 0.7031] as const;
+export interface ClothEdges {
+  left: readonly [number, number];
+  right: readonly [number, number];
+}
+export const MAN05_CLOTH: readonly [ClothEdges, ClothEdges, ClothEdges, ClothEdges] = [
+  { left: [0.3227, 0.3488], right: [0.4019, 0.4506] },
+  { left: [0.4099, 0.4658], right: [0.4891, 0.569] },
+  { left: [0.5065, 0.5894], right: [0.5908, 0.6962] },
+  { left: [0.6221, 0.7377], right: [0.7071, 0.8445] },
+];
+/** Mép trước (cuối) của dải vải nghiêng nhẹ so với hàng ngang: độ dốc dv/du tính theo điểm ảnh (mép phải cao hơn mép trái) */
+export const CLOTH_TILT = 0.17;
 
 /** Hệ số cỡ hình theo phối cảnh: ở đầu làn (cổng đình, xa) nhỏ, ở sổ (gần) cỡ đầy đủ. */
 export const LANE_SCALE = { top: 0.45, bottom: 1 } as const;
@@ -90,6 +111,31 @@ export function laneHeading(lane: number, lanes: readonly LaneSegment[] = MAN05_
   const dx = (seg.bottom.u - seg.top.u) * IMAGE_WORLD.width;
   const dy = -(seg.bottom.v - seg.top.v) * IMAGE_WORLD.height;
   return Math.atan2(-dy, -dx);
+}
+
+const edgeU = (e: readonly [number, number], v: number): number => e[0] + ((e[1] - e[0]) * (v - CLOTH_ROWS[0])) / (CLOTH_ROWS[1] - CLOTH_ROWS[0]);
+
+/**
+ * Hình thang của làn `lane` từ vị trí `posA` tới `posB` (pos của logic, `posA` < `posB`), bám hai mép dải vải, tọa độ thế giới. Thứ tự đỉnh: trái ở `posA`, phải ở `posA`, phải ở `posB`, trái ở `posB`
+ * (y hướng lên nên cạnh `posA` ở phía trên). `inset` thu hai mép vào (tỉ lệ bề rộng dải mỗi bên) để vệt sáng không tràn ra ngoài vải. Hai cạnh ngang nghiêng theo `CLOTH_TILT`.
+ */
+export function laneQuad(lane: number, posA: number, posB: number, inset = 0, lanes: readonly LaneSegment[] = MAN05_LANES): [WorldXY, WorldXY, WorldXY, WorldXY] {
+  const i = Math.min(Math.max(Math.round(lane), 0), lanes.length - 1);
+  const seg = lanes[i];
+  const cloth = MAN05_CLOTH[i];
+  const corner = (pos: number, side: 'left' | 'right'): WorldXY => {
+    const t = Math.min(Math.max(pos / WHACK_SPEC.laneLength, 0), 1.2);
+    const v = seg.top.v + (seg.bottom.v - seg.top.v) * t;
+    const uL = edgeU(cloth.left, v);
+    const uR = edgeU(cloth.right, v);
+    const half = (uR - uL) / 2;
+    const mid = uL + half;
+    const u = side === 'left' ? mid - half * (1 - inset) : mid + half * (1 - inset);
+    // nghiêng: bên trái thấp hơn, bên phải cao hơn (dv = dốc × dx tính theo điểm ảnh, đổi về đơn vị v)
+    const dv = CLOTH_TILT * (u - mid) * (MAN05_IMAGE.width / MAN05_IMAGE.height);
+    return imageToWorld(u, v - dv);
+  };
+  return [corner(posA, 'left'), corner(posA, 'right'), corner(posB, 'right'), corner(posB, 'left')];
 }
 
 /** Làn gần điểm (x, y) của thế giới nhất (khoảng cách tới đường thẳng của làn, kéo dài hai đầu); `maxDistance` thế giới, xa hơn thì −1. Dùng để chạm hay bấm chuột vào làn. */

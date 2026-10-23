@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { AssetImage } from '@so-chung/core';
-import { IMAGE_WORLD, LANE_SCALE, MAN05_IMAGE, MAN05_LANES, lanesSource, type LaneSegment } from './man05Lanes';
+import { IMAGE_WORLD, LANE_SCALE, MAN05_IMAGE, MAN05_LANES, laneQuad, lanesSource, worldToImage, type LaneSegment } from './man05Lanes';
 import { WHACK_SPEC } from './whackConfig';
 
 /**
@@ -75,8 +75,11 @@ export default function DevMan05Lanes() {
             const b = at(l, 1);
             const z0 = at(l, WHACK_SPEC.zoneStart / WHACK_SPEC.laneLength);
             const z1 = at(l, WHACK_SPEC.zoneEnd / WHACK_SPEC.laneLength);
+            // hit-zone glow quad as drawn in the game (follows the cloth edges from `MAN05_CLOTH`, not the lane line)
+            const quad = laneQuad(i, WHACK_SPEC.zoneStart, WHACK_SPEC.zoneEnd, 0.05, lanes).map((p) => worldToImage(p.x, p.y));
             return (
               <g key={i}>
+                <polygon points={quad.map((p) => `${p.u * W},${p.v * H}`).join(' ')} fill="#ffffff" fillOpacity={0.22} stroke={COLORS[i]} strokeWidth={2} />
                 <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={COLORS[i]} strokeWidth={3} strokeDasharray="10 6" />
                 <line x1={z0.x} y1={z0.y} x2={z1.x} y2={z1.y} stroke="#ffffff" strokeOpacity={0.85} strokeWidth={14} strokeLinecap="round" />
                 <line x1={z0.x} y1={z0.y} x2={z1.x} y2={z1.y} stroke={COLORS[i]} strokeWidth={6} strokeLinecap="round" />

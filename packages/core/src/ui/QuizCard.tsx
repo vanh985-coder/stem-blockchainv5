@@ -72,13 +72,13 @@ export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, 
   };
 
   return (
-    <Panel className={['w-full max-w-2xl', compact ? '!p-2.5' : '', className].join(' ')} role="group" aria-labelledby={titleId}>
+    <Panel className={['w-full max-w-2xl', compact ? '!p-2' : '', className].join(' ')} role="group" aria-labelledby={titleId}>
       {caption && <p className="mb-1 text-sm font-semibold text-nau-go-dam">{caption}</p>}
-      <h2 id={titleId} className={compact ? 'mb-2 text-base leading-snug' : 'mb-4 text-xl leading-snug sm:text-2xl'}>
+      <h2 id={titleId} className={compact ? 'mb-1.5 text-[0.95rem] font-bold leading-snug' : 'mb-4 text-xl leading-snug sm:text-2xl'}>
         {fmt(question.text, vars)}
       </h2>
 
-      <ul className={compact ? 'space-y-1.5' : 'space-y-3'}>
+      <ul className={compact ? 'space-y-1' : 'space-y-3'}>
         {question.options.map((option, i) => {
           const isRight = answered && i === question.correctIndex;
           const isWrongPick = answered && i === chosen && !isRight;
