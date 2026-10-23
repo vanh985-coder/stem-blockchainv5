@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { Button, fmt, modCalcUi } from '@so-chung/core';
+import { Button, fmt, modCalcUi, plainPower, rich } from '@so-chung/core';
 import { publicKey } from '@so-chung/core/lessons/bai-3/logic';
 import { parseModInput } from './modInput';
 
@@ -62,7 +62,12 @@ export function ModCalculator({ open, onOpenChange, className = '', style }: Mod
             data-testid="o-nhap-x"
           />
           <p role="status" aria-live="polite" className="min-h-[1.5em] font-display text-lg font-extrabold" data-testid="ket-qua-mod">
-            {x !== null ? fmt(modCalcUi.ketQua, { x, y: publicKey(x) }) : text.trim() !== '' ? <span className="text-base font-bold text-do-son-dam">{modCalcUi.loi}</span> : null}
+            {x !== null ? (
+              <>
+                <span className="sr-only">{plainPower(fmt(modCalcUi.ketQua, { x, y: publicKey(x) }))}</span>
+                <span aria-hidden="true">{rich(modCalcUi.ketQua, { x, y: publicKey(x) })}</span>
+              </>
+            ) : text.trim() !== '' ? <span className="text-base font-bold text-do-son-dam">{modCalcUi.loi}</span> : null}
           </p>
           <Button size="sm" variant="secondary" className="min-h-11" onClick={() => onOpenChange(false)}>
             {modCalcUi.dong}

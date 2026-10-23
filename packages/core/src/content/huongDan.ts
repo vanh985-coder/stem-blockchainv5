@@ -9,6 +9,8 @@
  * Mỗi trang có lời cho máy tính (`may`) và cho điện thoại (`dt`, bỏ trống thì dùng chung lời `may`); hình cũng có thể khác theo thiết bị (`hinhDt`).
  */
 
+import { HUONG_DAN_GAME } from './huongDanGame';
+
 /** Hình chụp thật từ game: đường dẫn trong assets là `ui/huong-dan/<id>` */
 export const GUIDE_SHOT_IDS = [
   'cho-di-lai',
@@ -84,6 +86,11 @@ export interface GuideSection {
 }
 
 const shot = (id: GuideShotId): GuideFigure => ({ shot: id });
+/** Phần riêng của một game: chữ (nhãn, tiêu đề, các trang) lấy từ `content/huongDanGame.ts`, mở từ thẻ bắt đầu của màn `levelId` */
+const ownSection = <I extends string, N extends 2 | 3 | 8 | 12>(id: I, levelId: N) => {
+  const g = HUONG_DAN_GAME[levelId];
+  return { id, nhan: g.nhan, tieuDe: g.tieuDe, trang: g.trang, man: [levelId] as const, rieng: true as const };
+};
 const art = (id: GuideArtId): GuideFigure => ({ art: id });
 
 export const GUIDE_SECTIONS = [
@@ -167,62 +174,8 @@ export const GUIDE_SECTIONS = [
       },
     ],
   },
-  {
-    id: 'man-2',
-    nhan: 'Màn 2',
-    tieuDe: 'Màn 2: Đuổi theo {phanDien}',
-    man: [2],
-    rieng: true,
-    trang: [
-      {
-        hinh: art('ba-lan-phim'),
-        hinhDt: art('ba-lan-vuot'),
-        may: 'Đường chạy có ba làn. Bấm phím ← → hoặc A D để đổi làn.',
-        dt: 'Đường chạy có ba làn. Vuốt sang trái hoặc phải để đổi làn.',
-      },
-      {
-        hinh: art('nhay-truot-phim'),
-        hinhDt: art('nhay-truot-vuot'),
-        may: 'Phím ↑, W hoặc Space để nhảy qua vật thấp như đống rơm. Phím ↓ hoặc S để trượt qua sào cao.',
-        dt: 'Vuốt lên để nhảy qua vật thấp như đống rơm. Vuốt xuống để trượt qua sào cao.',
-      },
-      {
-        hinh: shot('man-2-chay'),
-        may: 'Nhặt trang sổ và tiền đồng. Nón lá, guốc mộc và túi tiền giúp em chạy tốt hơn.',
-      },
-      {
-        hinh: shot('man-2-cau-hoi'),
-        may: 'Hết mỗi vòng có một câu hỏi. Trả lời đúng em được thêm trang, trả lời sai thì mất một tim.',
-      },
-    ],
-  },
-  {
-    id: 'man-3',
-    nhan: 'Màn 3',
-    tieuDe: 'Màn 3: Ghép lại cuốn sổ',
-    man: [3],
-    rieng: true,
-    trang: [
-      {
-        hinh: shot('man-3-ban'),
-        may: 'Mỗi thẻ ghi mã trang trước, nội dung và mã trang. Ở vòng 1 và 2, em ghép các thẻ thành một chuỗi liền nhau.',
-      },
-      {
-        hinh: art('keo-the'),
-        may: 'Kéo thẻ vào ô kế tiếp của chuỗi, hoặc bấm chọn thẻ rồi bấm vào ô đó.',
-        dt: 'Kéo thẻ bằng ngón tay vào ô kế tiếp, hoặc chạm chọn thẻ rồi chạm vào ô đó.',
-      },
-      {
-        hinh: art('soi-the'),
-        may: 'Bấm "Soi công thức" để tự tính mã trang. Thẻ nào có mã sai công thức là trang giả, em kéo nó vào rổ.',
-        dt: 'Chạm "Soi công thức" để tự tính mã trang. Thẻ nào có mã sai công thức là trang giả, em kéo nó vào rổ.',
-      },
-      {
-        hinh: art('ro-trang'),
-        may: 'Vòng 3 là giữ sổ trong 90 giây. {phanDien} liên tục tráo trang trong chuỗi: em kéo trang giả vào rổ rồi đặt đúng trang thật vào chỗ trống.',
-      },
-    ],
-  },
+  ownSection('man-2', 2),
+  ownSection('man-3', 3),
   {
     id: 'trang-vang',
     nhan: 'Trang Sổ Vàng',
@@ -243,59 +196,8 @@ export const GUIDE_SECTIONS = [
       },
     ],
   },
-  {
-    id: 'man-8',
-    nhan: 'Màn 8',
-    tieuDe: 'Màn 8: Lật thẻ tìm cặp khóa',
-    man: [8],
-    rieng: true,
-    trang: [
-      {
-        hinh: art('lat-hai-the'),
-        may: 'Bấm vào thẻ, hoặc dùng phím mũi tên và Enter, để lật. Mỗi lượt lật 2 thẻ: ghép đúng thì thẻ ở lại, không thì úp xuống và em mất 10 điểm.',
-        dt: 'Chạm vào thẻ để lật. Mỗi lượt lật 2 thẻ: ghép đúng thì thẻ ở lại, không thì úp xuống và em mất 10 điểm.',
-      },
-      {
-        hinh: art('cap-the'),
-        may: 'Thẻ Khuôn tập x ghép với thẻ Mẫu công khai 5^x mod 23. Ví dụ Khuôn tập 3 ghép với Mẫu công khai 10, vì 5^3 mod 23 = 10.',
-      },
-      {
-        hinh: art('may-tinh-mod'),
-        may: 'Máy tính mod ở góc màn hình giúp em tính 5^x mod 23: nhập x là ra số của thẻ Mẫu công khai cần tìm.',
-      },
-      {
-        hinh: art('tran-the'),
-        may: 'Ở vòng 3, cứ 20 giây {phanDien} lại tráo chỗ 2 thẻ đang úp. Em nhớ vị trí mới của chúng nhé.',
-      },
-    ],
-  },
-  {
-    id: 'man-12',
-    nhan: 'Màn 12',
-    tieuDe: 'Màn 12: Leo cây tìm lá giả',
-    man: [12],
-    rieng: true,
-    trang: [
-      {
-        hinh: art('den-long-so-nay'),
-        may: 'Mỗi đèn lồng ghi số Sổ và số Nay. Em chọn đèn lồng có hai số khác nhau: đó là nhánh bị tráo.',
-      },
-      {
-        hinh: art('bat-len-phim'),
-        hinhDt: art('bat-len-cham'),
-        may: 'Đèn lồng cứ trượt qua lại. Khi nó tới ngay trên đầu em, bấm chuột hoặc phím Space để bật lên.',
-        dt: 'Đèn lồng cứ trượt qua lại. Khi nó tới ngay trên đầu em, chạm vào màn hình để bật lên.',
-      },
-      {
-        hinh: art('tim-dong'),
-        may: 'Nắm nhầm đèn lồng có hai số giống nhau thì em mất 1 tim. Bật trượt thì em mất 2 đồng của tầng đó.',
-      },
-      {
-        hinh: art('tang-la'),
-        may: 'Tới tầng lá, hãy nắm chiếc lá bị tráo để bắt {phanDien}. Mỗi vòng cây cao thêm một tầng.',
-      },
-    ],
-  },
+  ownSection('man-8', 8),
+  ownSection('man-12', 12),
 ] as const satisfies readonly GuideSection[];
 
 export type GuideSectionId = (typeof GUIDE_SECTIONS)[number]['id'];

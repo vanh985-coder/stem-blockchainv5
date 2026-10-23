@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { fmt } from './characters';
 import { GUIDE_ART_IDS, GUIDE_SECTIONS, GUIDE_SECTION_IDS, GUIDE_SHOT_IDS, guideFigure, guideSection, guideSectionsFor, guideSectionOfLevel, guideText, huongDan, type GuidePage } from './huongDan';
 
 const pages: { section: string; page: GuidePage }[] = GUIDE_SECTIONS.flatMap((s) => (s.trang as readonly GuidePage[]).map((page) => ({ section: s.id, page })));
@@ -130,15 +131,15 @@ describe('hướng dẫn riêng của màn 8 và màn 12 (bước HD)', () => {
     }
   });
   it('màn 8 nói đủ: lật 2 thẻ mỗi lượt, Khuôn tập x ghép Mẫu công khai 5^x mod 23 (ví dụ 3 và 10), Máy tính mod, vòng 3 tráo 2 thẻ đang úp', () => {
-    const all = man8.trang.map((p) => guideText(p, 'may')).join(' ');
+    const all = fmt(man8.trang.map((p) => guideText(p, 'may')).join(' '));
     expect(all).toMatch(/lật 2 thẻ/);
-    expect(all).toMatch(/Khuôn tập x ghép với thẻ Mẫu công khai 5\^x mod 23/);
+    expect(all).toMatch(/Khuôn tập x ghép với thẻ Mẫu công khai 5\^\^x\^\^ mod 23/);
     expect(all).toMatch(/Khuôn tập 3 ghép với Mẫu công khai 10/);
     expect(5 ** 3 % 23).toBe(10);
     expect(all).toMatch(/Máy tính mod/);
     expect(all).toMatch(/vòng 3/i);
     expect(all).toMatch(/tráo chỗ 2 thẻ đang úp/);
-    expect(all).toContain('{phanDien}');
+    expect(all).toContain('Tí');
   });
   it('màn 12 nói đủ: đèn lồng ghi Sổ và Nay, chọn cái có hai số khác nhau, bật đúng lúc đèn tới trên đầu, nắm nhầm mất 1 tim, trượt mất 2 đồng, tầng lá bắt {phanDien}', () => {
     const all = man12.trang.map((p) => guideText(p, 'may')).join(' ');

@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { gameHints } from '@so-chung/core';
+import { HUONG_DAN_GAME, hintText } from '@so-chung/core';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { createRunner, type RunnerState } from './runnerLogic';
 import { RunnerSession } from './runnerSession';
 import { FIRST_SECONDS, hintFor } from './runnerHint';
 
-const h = gameHints.man2;
+const h = HUONG_DAN_GAME[2].nhac;
+const say = (s: Parameters<typeof hintFor>[0]) => hintText(2, hintFor(s));
 const ALLOWED = new Set<string>(Object.values(h));
 
 /** Ván ở trạng thái ngẫu nhiên: chạy với lệnh ngẫu nhiên một lúc, đôi khi gán trạng thái để phủ mọi pha. */
@@ -26,29 +27,33 @@ function randomState(seed: number): RunnerState {
 describe('màn 2: câu nhắc của nút "?" (hintFor)', () => {
   it('đúng câu theo trạng thái: đầu ván, chạy, một tim, đồ hỗ trợ, chạy chậm, câu hỏi, đã trả lời, chạy tiếp', () => {
     const s = createRunner({ seed: 3 });
-    expect(hintFor(s)).toBe(h.dauVan);
+    expect(hintFor(s)).toEqual(['dauVan']);
+    expect(say(s)).toBe(h.dauVan);
     s.roundTime = FIRST_SECONDS + 1;
-    expect(hintFor(s)).toBe(h.chay);
+    expect(hintFor(s)).toEqual(['chay']);
     s.magnet = 5;
-    expect(hintFor(s)).toBe(h.hoTro);
+    expect(hintFor(s)).toEqual(['hoTro']);
     s.hearts = 1;
-    expect(hintFor(s)).toBe(h.motTim);
+    expect(hintFor(s)).toEqual(['motTim']);
     s.phase = 'slow';
-    expect(hintFor(s)).toBe(h.chamLai);
+    expect(hintFor(s)).toEqual(['chamLai']);
     s.phase = 'quiz';
     s.quiz = { round: 0, timeLeft: 10, answered: null, timedOut: false };
-    expect(hintFor(s)).toBe(h.hoi);
+    expect(hintFor(s)).toEqual(['hoi']);
     s.quiz = { round: 0, timeLeft: 5, answered: true, timedOut: false };
-    expect(hintFor(s)).toBe(h.daTraLoi);
+    expect(hintFor(s)).toEqual(['daTraLoi']);
     s.phase = 'resume';
-    expect(hintFor(s)).toBe(h.chayLai);
+    expect(hintFor(s)).toEqual(['chayLai']);
     s.phase = 'over';
-    expect(hintFor(s)).toBe(h.het);
+    expect(hintFor(s)).toEqual(['hetVan']);
+    expect(say(s)).toBe(h.hetVan);
   });
 
   it('200 trạng thái ngẫu nhiên: câu nhắc luôn thuộc danh sách có sẵn, không có số, không nói làn nào, vật cản nào sắp tới hay đáp án', () => {
     for (let seed = 1; seed <= 200; seed++) {
-      const text = hintFor(randomState(seed));
+      const keys = hintFor(randomState(seed));
+      const text = hintText(2, keys);
+      for (const k of keys) expect(Object.keys(h), `seed ${seed}`).toContain(k);
       expect(ALLOWED.has(text), `seed ${seed}: ${text}`).toBe(true);
       expect(text, `seed ${seed}`).not.toMatch(/\d/);
       expect(text, `seed ${seed}`).not.toMatch(/làn (trái|phải|giữa)|bên trái|bên phải|đáp án (A|B|C|D)|chọn (A|B|C|D)/);

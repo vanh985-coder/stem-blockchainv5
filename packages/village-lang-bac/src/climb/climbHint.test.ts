@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { gameHints } from '@so-chung/core';
+import { HUONG_DAN_GAME, fmt, hintText } from '@so-chung/core';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { createClimbGame, jump, stepClimb, tickClimb, advanceRound, type ClimbState } from './climbLogic';
 import { LOOK_SECONDS, hintFor } from './climbHint';
 
-const h = gameHints.man12;
+const h = HUONG_DAN_GAME[12].nhac;
+const say = (s: Parameters<typeof hintFor>[0]) => fmt(hintText(12, hintFor(s)));
 const ALLOWED = new Set<string>(Object.values(h));
 
 /** Ván ở trạng thái ngẫu nhiên: bật bừa vài lần ở giờ ngẫu nhiên, đôi khi sang vòng khác. */
@@ -26,24 +27,29 @@ function randomState(seed: number): ClimbState {
 describe('màn 12: câu nhắc của nút "?" (hintFor)', () => {
   it('đúng câu theo trạng thái: mới lên tầng thì so Sổ và Nay, sau đó canh giờ, còn một tim, tầng lá', () => {
     const s = createClimbGame(1);
-    expect(hintFor(s)).toBe('So Sổ và Nay trên 2 đèn lồng phía trên, chọn cái có hai số khác nhau.');
+    expect(hintFor(s)).toEqual(['soSanh']);
+    expect(say(s)).toBe('So Sổ và Nay trên 2 đèn lồng phía trên, chọn cái có hai số khác nhau.');
     s.time = s.arrivedAt + LOOK_SECONDS + 0.1;
-    expect(hintFor(s)).toBe('Chờ đèn lồng đó tới ngay trên đầu rồi chạm (máy tính: Space).');
+    expect(hintFor(s)).toEqual(['canGio']);
+    expect(say(s)).toBe('Chờ đèn lồng đó tới ngay trên đầu rồi chạm (máy tính: Space).');
     s.hearts = 1;
-    expect(hintFor(s)).toBe(h.motTim);
+    expect(hintFor(s)).toEqual(['motTim']);
+    expect(hintText(12, hintFor(s))).toBe(h.motTim);
     s.level = s.tree.depth - 1; // tầng ngay dưới lá: cặp đèn lồng phía trên là hai chiếc lá
-    expect(hintFor(s)).toBe('Đây là tầng lá: nắm chiếc lá bị tráo để bắt {phanDien}!');
+    expect(hintFor(s)).toEqual(['tangLa']);
+    expect(say(s)).toBe('Đây là tầng lá: nắm chiếc lá bị tráo để bắt Tí!');
     s.phase = 'roundDone';
-    expect(hintFor(s)).toBe(h.xongVong);
+    expect(hintFor(s)).toEqual(['xongVong']);
     s.phase = 'lost';
-    expect(hintFor(s)).toBe(h.het);
+    expect(hintFor(s)).toEqual(['hetVan']);
   });
 
   it('200 trạng thái ngẫu nhiên: câu nhắc luôn thuộc danh sách có sẵn, không có số nào, không nói đèn lồng trái hay phải, tầng hay số của đáp án', () => {
     for (let seed = 1; seed <= 200; seed++) {
       const s = randomState(seed);
-      const text = hintFor(s);
+      const text = hintText(12, hintFor(s));
       expect(ALLOWED.has(text), `seed ${seed}: ${text}`).toBe(true);
+      for (const k of hintFor(s)) expect(Object.keys(h), `seed ${seed}`).toContain(k);
       expect(text, `seed ${seed}`).not.toMatch(/\d{2,}/);
       expect(text, `seed ${seed}`).not.toMatch(/bên trái|bên phải|tay nắm|trái|phải/);
       // chỉ tầng lá mới nói tầng lá

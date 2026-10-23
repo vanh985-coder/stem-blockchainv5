@@ -231,7 +231,7 @@ export function RebuildGame({ paused, attempt, onFinish, setHint }: MiniGameRend
   const [version, bump] = useReducer((n: number) => n + 1, 0);
   const overlayRef = useRef<HTMLDivElement>(null);
   // Nút "?": câu nhắc theo trạng thái ván (không lộ đáp án)
-  useGameHint(setHint, () => hintFor(state));
+  useGameHint(setHint, 3, () => hintFor(state));
 
   const [selected, setSelected] = useState<string | null>(null);
   const [shake, setShake] = useState<{ id: string; n: number } | null>(null);

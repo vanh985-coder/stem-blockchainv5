@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { CanvasTexture, LinearFilter, SRGBColorSpace, type Texture } from 'three';
-import { ASSETS_URL, Button, fmt, lookupAsset, memoryUi, sound, useGameHint, useManifest, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import { ASSETS_URL, Button, fmt, lookupAsset, memoryUi, sound, plainPower, rich, useGameHint, useManifest, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { Scene25D, isQualityChoice, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
@@ -176,7 +176,7 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
   // Nút "?": câu nhắc theo trạng thái ván (không lộ đáp án)
-  useGameHint(setHint, () => hintFor(state));
+  useGameHint(setHint, 8, () => hintFor(state));
   const calcRef = useRef(false);
   calcRef.current = calcOpen;
   const handleEvents = useCallback(
@@ -330,7 +330,8 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
                 </div>
               </div>
               <p role="status" aria-live="polite" className={`rounded-2xl border-2 px-3 py-1 font-display font-extrabold ${lineText ? '' : 'invisible'} ${line?.kind === 'khop' ? 'border-xanh-la bg-giay text-xanh-la-dam' : line?.kind === 'trao' ? 'border-muc-tim bg-giay text-muc-tim-dam' : 'border-do-son bg-giay text-do-son-dam'}`} data-testid="dong-ket-qua">
-                {lineText || ' '}
+                <span className="sr-only">{plainPower(lineText)}</span>
+                <span aria-hidden="true">{rich(lineText || ' ')}</span>
               </p>
             </div>
 

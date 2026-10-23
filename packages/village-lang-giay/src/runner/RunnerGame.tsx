@@ -148,7 +148,7 @@ export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
   // Nút "?": câu nhắc theo trạng thái ván (không lộ đáp án)
-  useGameHint(setHint, () => hintFor(session.state));
+  useGameHint(setHint, 2, () => hintFor(session.state));
   const [ready, setReady] = useState(false);
   const [hud, setHud] = useState<RunnerHud>(INITIAL_HUD);
   const [quiz, setQuiz] = useState<QuizView | null>(null);

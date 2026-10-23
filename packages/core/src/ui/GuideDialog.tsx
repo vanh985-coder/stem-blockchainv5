@@ -5,6 +5,7 @@ import { guideFigure, guideSectionsFor, guideText, huongDan, type GuideDevice, t
 import { Button } from './Button';
 import { GuideArt } from './GuideArt';
 import { Panel } from './Panel';
+import { rich } from './rich';
 
 /** Điện thoại hay máy tính: cảm ứng là con trỏ thô (`pointer: coarse`). */
 export function detectGuideDevice(): GuideDevice {
@@ -99,7 +100,7 @@ export function GuideDialog({ section, onClose, device }: GuideDialogProps) {
           <GuideFigureView figure={guideFigure(page, dev)} />
           <div className="space-y-2 [@media(max-height:500px)]:space-y-1">
             <h3 className="text-lg text-muc-tim-dam sm:text-xl [@media(max-height:500px)]:text-base">{fmt(sec.tieuDe)}</h3>
-            <p className="text-lg leading-relaxed [@media(max-height:500px)]:text-base [@media(max-height:500px)]:leading-snug">{fmt(guideText(page, dev))}</p>
+            <p className="text-lg leading-relaxed [@media(max-height:500px)]:text-base [@media(max-height:500px)]:leading-snug">{rich(guideText(page, dev))}</p>
           </div>
         </div>
         <div className="flex items-center justify-between gap-2">

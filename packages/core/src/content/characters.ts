@@ -1,4 +1,5 @@
 import { devWarn } from '../lib/dev';
+import { POWER_NAMES } from '../lib/power';
 
 /**
  * Tên phản diện. MUỐN ĐỔI TÊN (ví dụ thành "Cuội") CHỈ SỬA ĐÚNG DÒNG NÀY.
@@ -55,7 +56,7 @@ export function characterNames(table: Record<CharacterId, CharacterInfo> = CHARA
 }
 
 /** Chỗ giữ số và chữ khác mà lời thoại, nhãn được phép dùng (ngoài {ten}, {Ten} và tên nhân vật). */
-export const EXTRA_VARS = ['so', 'diem', 'kb', 'muc', 'earned', 'max', 'bai', 'man', 'lang', 'path', 'src', 'loi', 'trangThai', 'x', 'y', 'n', 'truoc', 'nd', 'ma', 'gapDoi', 'tong', 's', 'sau', 'k', 'tram', 'tenTram', 'sao', 'nguoi', 'phieu', 'chiTiet', 'cacPhan', 'tao', 'cuoi', 'dung', 'cu', 'moi', 'luot', 'so2', 'so3', 'myName', 'nextN', 'nextK', 'wrongNames', 'attempts', 'secs', 'm', 'days', 'wrongExplanation', 'testedKey', 'supercomputerTriesPerSec', 'supercomputerYears', 'smartSteps', 'smartYears', 'universeMultiplier', 'so4', 'id', 'id2', 'value', 'value2', 'inputValue', 'inputVal', 'expectedValue', 'expected', 'pairLabel', 'label', 'hintFormula', 'nodeLabel', 'rightVal', 'leftVal', 'reverseVal', 'level', 'placedVal', 'accumK', 'accumN', 'checkCount', 'msDisplay', 'p1Prediction', 'priv', 'tamperedNewValue', 'nhan', 'ketQua', 'la', 'vat', 'bien', 'dapAn', 'giay'] as const;
+export const EXTRA_VARS = ['so', 'diem', 'kb', 'muc', 'earned', 'max', 'bai', 'man', 'lang', 'path', 'src', 'loi', 'trangThai', 'x', 'y', 'n', 'truoc', 'nd', 'ma', 'gapDoi', 'tong', 's', 'sau', 'k', 'tram', 'tenTram', 'sao', 'nguoi', 'phieu', 'chiTiet', 'cacPhan', 'tao', 'cuoi', 'dung', 'cu', 'moi', 'luot', 'so2', 'so3', 'myName', 'nextN', 'nextK', 'wrongNames', 'attempts', 'secs', 'm', 'days', 'wrongExplanation', 'testedKey', 'supercomputerTriesPerSec', 'supercomputerYears', 'smartSteps', 'smartYears', 'universeMultiplier', 'so4', 'id', 'id2', 'value', 'value2', 'inputValue', 'inputVal', 'expectedValue', 'expected', 'pairLabel', 'label', 'hintFormula', 'nodeLabel', 'rightVal', 'leftVal', 'reverseVal', 'level', 'placedVal', 'accumK', 'accumN', 'checkCount', 'msDisplay', 'p1Prediction', 'priv', 'tamperedNewValue', 'nhan', 'ketQua', 'la', 'vat', 'bien', 'dapAn', 'giay', 'congThuc', 'viDu', 'viDuX', 'viDuY'] as const;
 
 export type FmtVars = { ten?: string } & Record<string, string | number | undefined>;
 
@@ -88,7 +89,8 @@ export function formatText(text: string, names: NameTable, vars: FmtVars = {}): 
 
 /** Tạo fmt dùng một bảng tên riêng (dùng trong test: đổi phanDien thì mọi chuỗi đổi theo). */
 export function makeFmt(names: NameTable) {
-  return (text: string, vars?: FmtVars): string => formatText(text, names, vars);
+  const all = { ...POWER_NAMES, ...names };
+  return (text: string, vars?: FmtVars): string => formatText(text, all, vars);
 }
 
 export const fmt = makeFmt(characterNames());

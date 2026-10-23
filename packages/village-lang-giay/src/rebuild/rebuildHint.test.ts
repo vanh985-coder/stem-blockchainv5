@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { gameHints } from '@so-chung/core';
+import { HUONG_DAN_GAME, hintText } from '@so-chung/core';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { advance, beginKeep, binCard, binFromSlot, createRebuild, insertFake, placeCard, placeInSlot, stepKeep, type RebuildState } from './rebuildLogic';
 import { hintFor } from './rebuildHint';
 
-const h = gameHints.man3;
+const h = HUONG_DAN_GAME[3].nhac;
 const ALLOWED = new Set<string>(Object.values(h));
 
 /** Ván ở trạng thái ngẫu nhiên: chơi ngẫu nhiên qua các vòng bằng thao tác của học sinh. */
@@ -41,19 +41,20 @@ describe('màn 3: câu nhắc của nút "?" (hintFor)', () => {
   it('đúng câu theo trạng thái: nhét trang, bắt đầu, ghép, có trang giả, giữ sổ chưa chạy, ô trống, giữ sổ, xong vòng, hết ván', () => {
     const s = createRebuild(4);
     expect(s.phase).toBe('play');
-    expect(hintFor(s)).toBe(h.batDau);
+    expect(hintFor(s)).toEqual(['batDau']);
+    expect(hintText(3, hintFor(s))).toBe(h.batDau);
     s.chain = [s.deal.real[0]];
-    expect(hintFor(s)).toBe(h.ghep);
+    expect(hintFor(s)).toEqual(['ghep']);
     s.deal = { ...s.deal, fake: s.deal.real[1] };
-    expect(hintFor(s)).toBe(h.coTrangGia);
+    expect(hintFor(s)).toEqual(['coTrangGia']);
     s.fakeBinned = true;
-    expect(hintFor(s)).toBe(h.ghep);
+    expect(hintFor(s)).toEqual(['ghep']);
     s.phase = 'villain';
-    expect(hintFor(s)).toBe(h.nhetTrang);
+    expect(hintFor(s)).toEqual(['nhetTrang']);
     s.phase = 'roundDone';
-    expect(hintFor(s)).toBe(h.xongVong);
+    expect(hintFor(s)).toEqual(['xongVong']);
     s.phase = 'over';
-    expect(hintFor(s)).toBe(h.het);
+    expect(hintFor(s)).toEqual(['hetVan']);
   });
 
   it('vòng giữ sổ: chưa bắt đầu, có ô trống, chuỗi đầy', () => {
@@ -61,17 +62,18 @@ describe('màn 3: câu nhắc của nút "?" (hintFor)', () => {
     s.round = 2;
     s.phase = 'keep';
     s.keep = { running: false, elapsed: 0, nextSwapAt: 6, swapCount: 0, slots: [...s.deal.real], swappedAt: s.deal.real.map(() => -1), hinted: s.deal.real.map(() => false), decoyOf: s.deal.real.map(() => null), fixed: 0, fast: 0 };
-    expect(hintFor(s)).toBe(h.giuSoChuaChay);
+    expect(hintFor(s)).toEqual(['giuSoChuaChay']);
     s.keep.running = true;
-    expect(hintFor(s)).toBe(h.giuSo);
+    expect(hintFor(s)).toEqual(['giuSo']);
     s.keep.slots[2] = null;
-    expect(hintFor(s)).toBe(h.oTrong);
+    expect(hintFor(s)).toEqual(['oTrong']);
   });
 
   it('200 trạng thái ngẫu nhiên: câu nhắc luôn thuộc danh sách có sẵn, không có số, không nói thẻ nào hay ô nào', () => {
     for (let seed = 1; seed <= 200; seed++) {
       const s = randomState(seed);
-      const text = hintFor(s);
+      const text = hintText(3, hintFor(s));
+      for (const k of hintFor(s)) expect(Object.keys(h), `seed ${seed}`).toContain(k);
       expect(ALLOWED.has(text), `seed ${seed}: ${text}`).toBe(true);
       expect(text, `seed ${seed}`).not.toMatch(/\d/);
       expect(text, `seed ${seed}`).not.toMatch(/ô (thứ|số) |thẻ (thứ|số) |bên trái|bên phải/);

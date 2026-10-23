@@ -1,19 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { fmt, gameHints } from '@so-chung/core';
+import { HUONG_DAN_GAME, fmt, hintText } from '@so-chung/core';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { MEMORY_SPEC } from './memoryConfig';
 import { advanceRound, createMemoryGame, flipCard, makeDeck, stepMemory, tickMemory, type MemoryState } from './memoryLogic';
 import { hintFor } from './memoryHint';
 
-const h = gameHints.man8;
+const h = HUONG_DAN_GAME[8].nhac;
+/** Câu nhắc sau khi tra khóa và điền chỗ giữ tên (như người chơi thấy, số mũ còn dấu ^^) */
+const say = (s: Parameters<typeof hintFor>[0]) => fmt(hintText(8, hintFor(s)));
 const ALLOWED = new Set<string>([
   h.chuaLat,
-  h.catKhuon,
-  h.catMau,
-  h.luatSai,
+  h.dangCamKhuon,
+  h.dangCamMau,
+  h.choUp,
   h.xongVong,
-  h.het,
-  ...[h.chuaLat, h.catKhuon, h.catMau, h.luatSai].map((s) => `${s} ${h.vong3}`),
+  h.hetVan,
+  ...[h.chuaLat, h.dangCamKhuon, h.dangCamMau, h.choUp].map((s) => `${s} ${h.vong3}`),
 ]);
 /** Số có trong câu nhắc đều là số của luật (5^x mod 23, 20 giây, lật 2 thẻ), không phải số của đáp án */
 const RULE_NUMBERS = new Set(['2', '5', '20', '23']);
@@ -41,26 +43,31 @@ function randomState(seed: number): MemoryState {
 describe('màn 8: câu nhắc của nút "?" (hintFor)', () => {
   it('đúng câu theo trạng thái: chưa lật, đang cầm Khuôn tập, đang cầm Mẫu công khai; vòng 3 thêm câu tráo thẻ', () => {
     const s = createMemoryGame(5);
-    expect(hintFor(s)).toBe('Lật 2 thẻ. Tìm cặp Khuôn tập x và Mẫu công khai 5^x mod 23.');
+    expect(say(s)).toBe('Lật 2 thẻ. Tìm cặp Khuôn tập x và Mẫu công khai 5^^x^^ mod 23.');
     const khuon = s.cards.findIndex((c) => c.type === 'khuon');
     flipCard(s, khuon);
-    expect(hintFor(s)).toBe('Em đang cầm Khuôn tập. Tìm thẻ Mẫu công khai bằng 5^x mod 23 — bấm Máy tính mod nếu cần.');
+    expect(say(s)).toBe('Em đang cầm Khuôn tập. Tìm thẻ Mẫu công khai bằng 5^^x^^ mod 23 — bấm Máy tính mod nếu cần.');
+    expect(hintFor(s)).toEqual(['dangCamKhuon']);
     s.flippedIndices = [];
     s.cards[khuon].isFlipped = false;
     flipCard(s, s.cards.findIndex((c) => c.type === 'mau'));
-    expect(hintFor(s)).toBe('Tìm thẻ Khuôn tập x có 5^x mod 23 bằng số này.');
+    expect(say(s)).toBe('Tìm thẻ Khuôn tập x có 5^^x^^ mod 23 bằng số này.');
+    expect(hintFor(s)).toEqual(['dangCamMau']);
     s.round = 2;
-    expect(fmt(hintFor(s), { phanDien: 'Tí' })).toBe('Tìm thẻ Khuôn tập x có 5^x mod 23 bằng số này. Tí tráo 2 thẻ đang úp mỗi 20 giây.');
-    expect(hintFor({ ...s, round: 0, phase: 'roundDone' })).toBe(h.xongVong);
+    expect(hintFor(s)).toEqual(['dangCamMau', 'vong3']);
+    expect(say(s)).toBe('Tìm thẻ Khuôn tập x có 5^^x^^ mod 23 bằng số này. Tí tráo 2 thẻ đang úp mỗi 20 giây.');
+    expect(hintFor({ ...s, round: 0, phase: 'roundDone' })).toEqual(['xongVong']);
+    expect(hintText(8, hintFor({ ...s, round: 0, phase: 'roundDone' }))).toBe(h.xongVong);
   });
 
   it('200 trạng thái ngẫu nhiên: câu nhắc luôn thuộc danh sách có sẵn, chỉ chứa số của luật, không nói thẻ, số hay vị trí của đáp án', () => {
     for (let seed = 1; seed <= 200; seed++) {
       const s = randomState(seed);
-      const text = hintFor(s);
+      const text = hintText(8, hintFor(s));
       expect(ALLOWED.has(text), `seed ${seed}: ${text}`).toBe(true);
-      for (const n of text.match(/\d+/g) ?? []) expect(RULE_NUMBERS.has(n), `seed ${seed}: ${text}`).toBe(true);
-      expect(text, `seed ${seed}`).not.toMatch(/hàng|cột|thứ nhất|thứ hai|bên trái|bên phải|ô số/);
+      for (const n of fmt(text).match(/\d+/g) ?? []) expect(RULE_NUMBERS.has(n), `seed ${seed}: ${text}`).toBe(true);
+      for (const k of hintFor(s)) expect(Object.keys(h), `seed ${seed}`).toContain(k);
+      expect(fmt(text), `seed ${seed}`).not.toMatch(/hàng|cột|thứ nhất|thứ hai|bên trái|bên phải|ô số/);
       // vòng 3 mới có câu tráo thẻ
       expect(text.includes(h.vong3), `seed ${seed}`).toBe(s.round === 2 && s.phase !== 'roundDone' && s.phase !== 'gameOver');
     }
@@ -68,7 +75,7 @@ describe('màn 8: câu nhắc của nút "?" (hintFor)', () => {
 
   it('câu nhắc không đổi theo thẻ nào đang úp ở đâu: cùng trạng thái lật thì cùng câu với mọi ván (không lộ đáp án qua vị trí)', () => {
     const outs = new Set<string>();
-    for (let seed = 1; seed <= 60; seed++) outs.add(hintFor(createMemoryGame(seed)));
+    for (let seed = 1; seed <= 60; seed++) outs.add(hintFor(createMemoryGame(seed)).join('|'));
     expect(outs.size).toBe(1);
   });
 });

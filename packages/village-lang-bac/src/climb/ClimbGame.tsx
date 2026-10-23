@@ -175,7 +175,7 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
   // Nút "?": câu nhắc theo trạng thái ván (không lộ đáp án)
-  useGameHint(setHint, () => hintFor(state));
+  useGameHint(setHint, 12, () => hintFor(state));
   useEffect(() => {
     if (holdLoop) return;
     let raf = 0;

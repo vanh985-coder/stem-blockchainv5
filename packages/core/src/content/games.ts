@@ -3,6 +3,9 @@
  * Mọi câu đi qua fmt() trước khi hiện ({phanDien}, {diem}…). Số mốc điểm không nằm ở đây mà do từng game truyền cho `MiniGameLevel`.
  */
 
+import { formatPower } from '../lib/power';
+import { HUONG_DAN_GAME } from './huongDanGame';
+
 export interface GameText {
   /** Tên game, ví dụ "Đuổi theo {phanDien}" */
   ten: string;
@@ -12,58 +15,15 @@ export interface GameText {
   dieuKhien: { mayTinh: string; dienThoai: string };
 }
 
-/** Chữ từng game phụ, theo số màn (1 đến 12). Màn 2 làm ở mốc 2 bước 10; các game khác thêm khi làm tới. */
+/**
+ * Chữ từng game phụ, theo số màn (1 đến 12): tên game ở đây; luật và cách điều khiển lấy từ `content/huongDanGame.ts` (chủ dự án sửa chữ ở đó). Chỉ có các màn đã ra mắt.
+ */
+const textOf = (levelId: 2 | 3 | 8 | 12, ten: string): GameText => ({ ten, luat: HUONG_DAN_GAME[levelId].luat, dieuKhien: HUONG_DAN_GAME[levelId].dieuKhien });
 export const GAMES: Readonly<Partial<Record<number, GameText>>> = {
-  2: {
-    ten: 'Đuổi theo {phanDien}',
-    luat: [
-      '{phanDien} ôm xấp trang bị trộm chạy qua làng. Em chạy theo, nhặt lại trang sổ và tiền đồng.',
-      'Tránh chướng ngại bằng cách đổi làn, nhảy hoặc trượt. Em có 3 tim, mỗi lần va chạm mất 1 tim.',
-      'Hết mỗi vòng có một câu hỏi: trả lời đúng được thêm 3 trang, sai thì mất 1 tim.',
-    ],
-    dieuKhien: {
-      mayTinh: '← → hoặc A D để đổi làn · ↑ W hoặc Space để nhảy · ↓ hoặc S để trượt.',
-      dienThoai: 'Vuốt sang trái hoặc phải để đổi làn · vuốt lên để nhảy · vuốt xuống để trượt.',
-    },
-  },
-  3: {
-    ten: 'Ghép lại cuốn sổ',
-    luat: [
-      'Em mang các trang lấy lại về bàn của bác An, ghép lại cuốn sổ như ban đầu. Mỗi thẻ ghi: mã trang trước · nội dung · mã trang.',
-      'Thẻ đặt vào ô kế tiếp phải có mã trang trước bằng mã của trang cuối chuỗi, và mã trang phải đúng công thức. Đặt sai thì thẻ bật về và em mất 1 tim.',
-      '{phanDien} hay nhét một trang giả vào xấp giấy: mã trang trước khớp nhưng mã trang sai công thức. Kéo trang giả vào rổ để được thêm 30 điểm.',
-    ],
-    dieuKhien: {
-      mayTinh: 'Kéo thẻ vào chuỗi hoặc vào rổ, hoặc bấm chọn thẻ rồi bấm vào chuỗi hoặc rổ · nút "Soi công thức" để tự tính mã trang.',
-      dienThoai: 'Kéo thẻ bằng ngón tay, hoặc chạm chọn thẻ rồi chạm vào chuỗi hoặc rổ · chạm "Soi công thức" để tự tính mã trang.',
-    },
-  },
-  8: {
-    ten: 'Lật thẻ tìm cặp khóa',
-    luat: [
-      'Bộ khuôn tập của chú Dũng bị {phanDien} trộn lung tung. Em ghép lại từng khuôn với mẫu công khai của nó nhé!',
-      'Lật 2 thẻ mỗi lượt. Thẻ Khuôn tập x ghép với thẻ Mẫu công khai 5^x mod 23.',
-      'Có Máy tính mod ở góc màn hình. Mỗi lần lật sai mất 10 điểm.',
-      'Vòng 3: cứ 20 giây {phanDien} tráo chỗ 2 thẻ đang úp.',
-    ],
-    dieuKhien: {
-      mayTinh: 'Bấm chuột, hoặc phím mũi tên và Enter',
-      dienThoai: 'Chạm vào thẻ',
-    },
-  },
-  12: {
-    ten: 'Leo cây tìm lá giả',
-    luat: [
-      '{phanDien} vừa tráo một lá trên cây đa nên số gốc bị lệch. Em leo từ gốc lên, theo nhánh lệch để bắt {phanDien}!',
-      'Mỗi tay nắm ghi số trong sổ và số bây giờ. Hãy nắm tay nắm có hai số khác nhau.',
-      'Bật lên đúng lúc tay nắm tới ngay trên đầu em. Nắm nhầm nhánh khớp là mất 1 tim.',
-      'Leo qua mỗi tầng ngay lần đầu thì được 2 tiền đồng.',
-    ],
-    dieuKhien: {
-      mayTinh: 'Bấm chuột hoặc phím Space để bật lên',
-      dienThoai: 'Chạm màn hình để bật lên',
-    },
-  },
+  2: textOf(2, 'Đuổi theo {phanDien}'),
+  3: textOf(3, 'Ghép lại cuốn sổ'),
+  8: textOf(8, 'Lật thẻ tìm cặp khóa'),
+  12: textOf(12, 'Leo cây tìm lá giả'),
 };
 
 /** Tên các phần điểm ở màn kết quả của màn 2 (điểm = trang × 10 + tiền đồng + quãng đường ÷ 10 + câu đúng × 30). */
@@ -211,7 +171,7 @@ export const memoryUi = {
   theMau: 'Mẫu công khai: {y}',
   daKhop: '{nhan}, đã khớp',
   /** Dòng hiện khi ghép đúng một cặp */
-  khop: '5^{x} mod 23 = {y}',
+  khop: `${formatPower(5, '{x}')} mod 23 = {y}`,
   khopLoi: 'Khớp rồi!',
   saiLoi: 'Chưa khớp, hai thẻ sẽ úp lại.',
   trao: '{phanDien} vừa tráo chỗ 2 thẻ đang úp!',
@@ -227,7 +187,7 @@ export const modCalcUi = {
   nut: 'Máy tính mod',
   tieuDe: 'Máy tính mod',
   nhap: 'Nhập x (số nguyên từ 1 đến 22)',
-  ketQua: '5^{x} mod 23 = {y}',
+  ketQua: `${formatPower(5, '{x}')} mod 23 = {y}`,
   loi: 'Em nhập một số nguyên từ 1 đến 22 nhé.',
   dong: 'Đóng',
 } as const;

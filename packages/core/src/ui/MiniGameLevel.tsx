@@ -11,6 +11,7 @@ import { formatNumber } from '../lib/format';
 import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
 import { Button } from './Button';
+import { rich } from './rich';
 import { GuideDialog } from './GuideDialog';
 import { Panel } from './Panel';
 import { PortraitFrame } from './PortraitFrame';
@@ -191,7 +192,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
           <div role="dialog" aria-modal="true" aria-label={gameHints.tieuDe} data-testid="hop-goi-y" className="fixed inset-0 z-40 grid place-items-center bg-black/50 p-4">
             <Panel className="w-full max-w-md space-y-4 text-center [@media(max-height:500px)]:space-y-2 [@media(max-height:500px)]:p-3">
               <p className="text-lg font-semibold leading-relaxed [@media(max-height:500px)]:text-base" data-testid="viec-cua-em">
-                {hint}
+                {rich(hint)}
               </p>
               <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
                 <Button size="md" variant="secondary" className="min-h-11 whitespace-nowrap" onClick={() => setPlayGuide(true)}>
@@ -292,7 +293,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
               <h3 className="mb-2 text-lg text-muc-tim-dam">{gameUi.luat}</h3>
               <ul className="list-disc space-y-1 pl-5">
                 {text.luat.map((line) => (
-                  <li key={line}>{fmt(line)}</li>
+                  <li key={line}>{rich(line)}</li>
                 ))}
               </ul>
             </section>
