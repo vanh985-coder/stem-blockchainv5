@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import type { Texture } from 'three';
-import { AssetImage, BiAvatar, Button, Hearts, climbUi, fmt, hasSeenGameTip, sound, useProgress, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import { AssetImage, BiAvatar, Button, Hearts, climbUi, fmt, hasSeenGameTip, sound, useGameHint, useProgress, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { Scene25D, isQualityChoice, type ClipName, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
 import { ART, drawLabels, useClimbTextures } from './climbArt';
 import { CLIMB_SPEC } from './climbConfig';
 import { JUMP_RISE, LEVEL_GAP, pxPerUnit, type ClimbFrame } from './climbLayout';
-import { advanceRound, climbScore, createClimbGame, jump, nextCenter, nodeLabel, stepClimb, type ClimbEvent, type ClimbState } from './climbLogic';
+import { advanceRound, climbScore, createClimbGame, jump, nextCenter, nodeLabel, tickClimb, type ClimbEvent, type ClimbState } from './climbLogic';
+import { hintFor } from './climbHint';
 import { ClimbStage, hangFeetY, newAnim, tweenAt, type ClimbAnim } from './ClimbStage';
 
 /** Số màn của game này (để lưu cờ "đã nghe Bi giới thiệu"). */
@@ -72,7 +73,7 @@ type Say = { text: string; n: number; tone: 'xau' | 'tin' } | null;
  * Màn 12 "Leo cây tìm lá giả" (spec 08): Scene25D khung dọc (khung ngang thì cây ở giữa, hai bên là trời), cây mọc từ dưới lên, camera đi theo người chơi; học sinh và {phanDien} là model 3D.
  * Luật nằm hết ở `climbLogic`; ở đây chỉ nối thao tác, hoạt cảnh, âm thanh vào luật. Cú bật nhận ngay ở pointerdown và keydown (không đợi click) để bớt trễ trên điện thoại.
  */
-export function ClimbGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
+export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRenderProps) {
   const { settings } = useSettings();
   const { progress, markGameTipSeen } = useProgress();
   const reduced = settings.reducedMotion;
@@ -171,6 +172,10 @@ export function ClimbGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
 
   // Vòng lặp thời gian (requestAnimationFrame, không dùng useFrame nên không đụng cảnh 3D): tay nắm trượt theo đồng hồ của logic
   const holdLoop = paused || !ready || tip || banner !== null;
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
+  // Nút "?": câu nhắc theo trạng thái ván (không lộ đáp án)
+  useGameHint(setHint, () => hintFor(state));
   useEffect(() => {
     if (holdLoop) return;
     let raf = 0;
@@ -180,7 +185,7 @@ export function ClimbGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
       const dt = Math.min(0.1, (now - last) / 1000);
       last = now;
       if (state.phase !== 'playing') return;
-      const events = stepClimb(state, dt);
+      const events = tickClimb(state, dt, pausedRef.current);
       if (events.length > 0) handleEvents(events);
     };
     raf = requestAnimationFrame(tick);
@@ -267,7 +272,7 @@ export function ClimbGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
               tryJump();
             }}
           >
-            <div className="pointer-events-none absolute inset-x-2 top-2 flex items-center justify-between gap-2" data-testid="hud">
+            <div className="pointer-events-none absolute inset-x-2 top-2 flex items-center justify-between gap-2 pr-12" data-testid="hud">
               <div className="flex items-center gap-3 rounded-2xl border-2 border-nau-go bg-giay px-3 py-1 font-display font-extrabold">
                 <span data-testid="vong">{fmt(climbUi.vong, { so: state.round + 1, max: CLIMB_SPEC.rounds.length })}</span>
                 <Hearts current={state.hearts} max={CLIMB_SPEC.hearts} size="sm" />

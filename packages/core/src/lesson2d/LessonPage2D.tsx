@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 import { MERGED, URLS, villageWorldUrl } from '../config/urls';
 import { VILLAGE_THEME } from '../content/nenTrangTri';
 import { fmt } from '../content/characters';
-import { VILLAGE_ORDER, levelById, levelsOfVillage } from '../content/levels';
+import { VILLAGE_ORDER, levelById, nextReadyLevel } from '../content/levels';
 import { ui } from '../content/ui';
 import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
@@ -180,9 +180,8 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   };
   const goMap = goVillage;
   const leaveLabel = ui.langScene.veLang;
-  const villageLevels = levelsOfVillage(villageId);
   // Game kế tiếp đã ra mắt trong làng (bỏ qua màn 'coming-soon': Làng Bạc, xong màn 10 thì mở màn 12 vì màn 11 chưa có)
-  const nextGame = villageLevels.slice(villageLevels.findIndex((l) => l.id === levelId) + 1).find((l) => l.status === 'ready');
+  const nextGame = nextReadyLevel(levelId);
   const playNextGame = nextGame ? { label: fmt(ui.langScene.choiTiep, { man: fmt(nextGame.ten) }), onClick: () => navigate(`/lang/${villageId}/man/${nextGame.id}`) } : undefined;
 
   // Hai khung 3D hai bên bảng: ẩn khi màn hẹp, giảm chuyển động, máy yếu, tải lỗi hoặc FPS thấp (frames.ts).

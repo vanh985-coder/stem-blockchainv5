@@ -44,6 +44,17 @@ export const GUIDE_ART_IDS = [
   'bon-trang',
   'cuon-giay',
   'ban-do-nho',
+  // màn 8 (bước HD)
+  'lat-hai-the',
+  'cap-the',
+  'may-tinh-mod',
+  'tran-the',
+  // màn 12 (bước HD)
+  'den-long-so-nay',
+  'bat-len-phim',
+  'bat-len-cham',
+  'tim-dong',
+  'tang-la',
 ] as const;
 export type GuideArtId = (typeof GUIDE_ART_IDS)[number];
 
@@ -229,6 +240,59 @@ export const GUIDE_SECTIONS = [
       {
         hinh: art('bon-trang'),
         may: 'Đủ bốn Trang Sổ Vàng thì cuốn sổ chung trọn vẹn và em tỉnh dậy khỏi giấc mơ.',
+      },
+    ],
+  },
+  {
+    id: 'man-8',
+    nhan: 'Màn 8',
+    tieuDe: 'Màn 8: Lật thẻ tìm cặp khóa',
+    man: [8],
+    rieng: true,
+    trang: [
+      {
+        hinh: art('lat-hai-the'),
+        may: 'Bấm vào thẻ, hoặc dùng phím mũi tên và Enter, để lật. Mỗi lượt lật 2 thẻ: ghép đúng thì thẻ ở lại, không thì úp xuống và em mất 10 điểm.',
+        dt: 'Chạm vào thẻ để lật. Mỗi lượt lật 2 thẻ: ghép đúng thì thẻ ở lại, không thì úp xuống và em mất 10 điểm.',
+      },
+      {
+        hinh: art('cap-the'),
+        may: 'Thẻ Khuôn tập x ghép với thẻ Mẫu công khai 5^x mod 23. Ví dụ Khuôn tập 3 ghép với Mẫu công khai 10, vì 5^3 mod 23 = 10.',
+      },
+      {
+        hinh: art('may-tinh-mod'),
+        may: 'Máy tính mod ở góc màn hình giúp em tính 5^x mod 23: nhập x là ra số của thẻ Mẫu công khai cần tìm.',
+      },
+      {
+        hinh: art('tran-the'),
+        may: 'Ở vòng 3, cứ 20 giây {phanDien} lại tráo chỗ 2 thẻ đang úp. Em nhớ vị trí mới của chúng nhé.',
+      },
+    ],
+  },
+  {
+    id: 'man-12',
+    nhan: 'Màn 12',
+    tieuDe: 'Màn 12: Leo cây tìm lá giả',
+    man: [12],
+    rieng: true,
+    trang: [
+      {
+        hinh: art('den-long-so-nay'),
+        may: 'Mỗi đèn lồng ghi số Sổ và số Nay. Em chọn đèn lồng có hai số khác nhau: đó là nhánh bị tráo.',
+      },
+      {
+        hinh: art('bat-len-phim'),
+        hinhDt: art('bat-len-cham'),
+        may: 'Đèn lồng cứ trượt qua lại. Khi nó tới ngay trên đầu em, bấm chuột hoặc phím Space để bật lên.',
+        dt: 'Đèn lồng cứ trượt qua lại. Khi nó tới ngay trên đầu em, chạm vào màn hình để bật lên.',
+      },
+      {
+        hinh: art('tim-dong'),
+        may: 'Nắm nhầm đèn lồng có hai số giống nhau thì em mất 1 tim. Bật trượt thì em mất 2 đồng của tầng đó.',
+      },
+      {
+        hinh: art('tang-la'),
+        may: 'Tới tầng lá, hãy nắm chiếc lá bị tráo để bắt {phanDien}. Mỗi vòng cây cao thêm một tầng.',
       },
     ],
   },

@@ -202,8 +202,10 @@ Logic đặt trong `chickenLogic.ts` (hàm thuần, có test).
 - [ ] Test Bài 3 (giai đoạn 1), `memoryLogic` và `chickenLogic` đều ✅.
 - [ ] Màn 7: máy soi dấu chỉ đúng người đã đóng dấu; dò số với p = 1.000.003 không làm đơ giao diện.
 - [ ] Màn 8: {phanDien} tráo bài có hoạt cảnh rõ ràng, không bao giờ đụng thẻ đã khớp.
+  - [x] **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng"). (đã làm ở bước HD: phần `man-8`, `memoryHint.ts`, "Chơi tiếp" không có vì làng chưa có màn sau.)
 - [ ] Màn 9:
   - nạp đạn chỉ tính xuôi;
   - bắn đúng thuốc thì gà khỏi bệnh chạy về chuồng;
   - gà trùm có {phanDien} cưỡi.
+  - **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
 - [ ] Xong màn 9: nhận Trang Sổ Vàng; cổng Làng Bạc mở.

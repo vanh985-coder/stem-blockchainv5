@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router';
 import { MERGED, URLS, villageWorldUrl } from '../config/urls';
 import { fmt } from '../content/characters';
 import { GAMES, gameUi } from '../content/games';
+import { gameHints } from '../content/gameHints';
 import { guideSectionOfLevel, huongDan } from '../content/huongDan';
-import { levelById } from '../content/levels';
+import { levelById, nextReadyLevel } from '../content/levels';
 import { gameResultOf, summarizeGame, type Medal, type MedalThresholds } from '../games/medals';
 import { formatNumber } from '../lib/format';
 import { progressManager } from '../progress/singleton';
@@ -30,6 +31,8 @@ export interface MiniGameRenderProps {
   attempt: number;
   /** Game gọi khi chơi xong (thắng hay thua đều gọi một lần) kèm điểm (và, nếu có, từng phần của điểm để hiện ở màn kết quả); khung ghi tiến độ rồi hiện màn kết quả */
   onFinish: (score: number, parts?: readonly ScorePart[]) => void;
+  /** Game đăng ký hàm trả câu nhắc "Việc của em lúc này" cho nút "?" (gọi `useGameHint`); khung chỉ gọi hàm đó lúc em bấm "?", khi `paused` đã true */
+  setHint: (fn: (() => string) | null) => void;
 }
 
 /**
@@ -87,13 +90,50 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
   const [attempt, setAttempt] = useState(0);
   // "Hướng dẫn chơi" ở thẻ bắt đầu: mở thẳng phần của game này
   const [guideOpen, setGuideOpen] = useState(false);
+  // Nút "?" (phím H) trong lúc chơi: hộp nhắc việc (chữ đã dựng lúc mở; null là đang đóng) và hướng dẫn đầy đủ mở từ hộp đó
+  const hintFn = useRef<(() => string) | null>(null);
+  const setHint = useCallback((fn: (() => string) | null) => {
+    hintFn.current = fn;
+  }, []);
+  const [hint, setHintText] = useState<string | null>(null);
+  const [playGuide, setPlayGuide] = useState(false);
+  const playGuideRef = useRef(false);
+  playGuideRef.current = playGuide;
   const hidden = useTabHidden();
   // Tab bị ẩn lúc đang chơi thì dừng và giữ dừng cho tới khi em bấm "Tiếp tục" (khỏi chạy tiếp lúc em chưa nhìn).
   const [held, setHeld] = useState(false);
   useEffect(() => {
     if (hidden && stage.kind === 'play') setHeld(true);
   }, [hidden, stage.kind]);
-  const paused = stage.kind === 'play' && (hidden || held);
+  const tabPaused = hidden || held;
+  // Game dừng thật (mọi đồng hồ đứng) khi tab ẩn, khi em chưa bấm "Tiếp tục", và suốt lúc hộp "?" mở
+  const paused = stage.kind === 'play' && (tabPaused || hint !== null);
+
+  const openHint = useCallback(() => {
+    setHintText(fmt(gameHints.viecCuaEm, { nd: fmt(hintFn.current?.() ?? gameHints.macDinh) }));
+  }, []);
+  const closeHint = useCallback(() => {
+    setHintText(null);
+    setPlayGuide(false);
+  }, []);
+  // Phím H mở/đóng hộp, Esc đóng (khi đang xem hướng dẫn đầy đủ thì Esc chỉ đóng hướng dẫn)
+  useEffect(() => {
+    if (stage.kind !== 'play') return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+      const t = e.target;
+      if (t instanceof Element && t.closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (e.key === 'h' || e.key === 'H') {
+        e.preventDefault();
+        if (playGuideRef.current) return;
+        setHintText((cur) => (cur === null ? fmt(gameHints.viecCuaEm, { nd: fmt(hintFn.current?.() ?? gameHints.macDinh) }) : null));
+      } else if (e.key === 'Escape' && !playGuideRef.current) {
+        setHintText(null);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [stage.kind]);
 
   const finished = useRef(false);
   const onFinish = useCallback(
@@ -113,6 +153,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
   const start = () => {
     finished.current = false;
     setHeld(false);
+    closeHint();
     setAttempt((a) => a + 1);
     setStage({ kind: 'play' });
   };
@@ -125,6 +166,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
       else window.location.assign(url);
     });
 
+  const next = nextReadyLevel(levelId);
   const title = fmt(text?.ten ?? def?.ten ?? '');
   const best = progress.levels[levelId]?.bestScore ?? 0;
   const moc = fmt(gameUi.cacMoc, { so: medals[0], so2: medals[1], so3: medals[2] });
@@ -132,8 +174,38 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
   if (stage.kind === 'play') {
     return (
       <div className="relative">
-        {renderGame({ paused, attempt, onFinish })}
-        {paused && (
+        {renderGame({ paused, attempt, onFinish, setHint })}
+        {!tabPaused && (
+          <button
+            type="button"
+            onClick={hint === null ? openHint : closeHint}
+            aria-label={gameHints.nut}
+            aria-haspopup="dialog"
+            data-testid="nut-goi-y"
+            className="fixed right-2 top-2 z-30 grid size-11 min-h-11 min-w-11 cursor-pointer place-items-center rounded-full border-[3px] border-nau-go bg-giay font-display text-xl font-extrabold text-chu focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim"
+          >
+            {gameHints.kyHieu}
+          </button>
+        )}
+        {hint !== null && !tabPaused && (
+          <div role="dialog" aria-modal="true" aria-label={gameHints.tieuDe} data-testid="hop-goi-y" className="fixed inset-0 z-40 grid place-items-center bg-black/50 p-4">
+            <Panel className="w-full max-w-md space-y-4 text-center [@media(max-height:500px)]:space-y-2 [@media(max-height:500px)]:p-3">
+              <p className="text-lg font-semibold leading-relaxed [@media(max-height:500px)]:text-base" data-testid="viec-cua-em">
+                {hint}
+              </p>
+              <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
+                <Button size="md" variant="secondary" className="min-h-11 whitespace-nowrap" onClick={() => setPlayGuide(true)}>
+                  {gameHints.xemDayDu}
+                </Button>
+                <Button size="md" autoFocus className="min-h-11 whitespace-nowrap" onClick={closeHint}>
+                  {gameHints.tiepTuc}
+                </Button>
+              </div>
+            </Panel>
+          </div>
+        )}
+        {playGuide && <GuideDialog section={guideSectionOfLevel(levelId) ?? undefined} onClose={() => setPlayGuide(false)} />}
+        {tabPaused && (
           <div role="dialog" aria-label={gameUi.tamDung} className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
             <Panel className="w-full max-w-sm space-y-4 text-center">
               <h2 className="text-2xl">{gameUi.tamDung}</h2>
@@ -187,9 +259,14 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
             <p className="text-sm">{moc}</p>
             {stage.coins > 0 && <p className="font-semibold">{fmt(gameUi.xuNhan, { so: stage.coins })}</p>}
             <div className="mg-result-buttons flex flex-col justify-center gap-3 sm:flex-row">
-              <Button size="lg" onClick={start}>
+              <Button size="lg" variant={next ? 'secondary' : 'primary'} onClick={start}>
                 {gameUi.choiLai}
               </Button>
+              {next && (
+                <Button size="lg" aria-label={fmt(gameUi.choiTiepNhan, { man: fmt(next.ten) })} data-testid="choi-tiep" onClick={() => navigate(`/lang/${next.lang}/man/${next.id}`)}>
+                  {gameUi.choiTiep}
+                </Button>
+              )}
               <Button size="lg" variant="secondary" onClick={leave}>
                 {gameUi.veLang}
               </Button>

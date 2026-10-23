@@ -139,6 +139,8 @@ export interface ClimbState {
   peakAt: number | null;
   /** Không bật được trước thời điểm này */
   lockUntil: number;
+  /** Giờ (đồng hồ của vòng) lúc lên tầng đang giữ: 0 ở gốc; dùng cho câu nhắc của nút "?" */
+  arrivedAt: number;
   /** Chưa trượt hay ngõ cụt lần nào ở tầng đang giữ: leo qua được thì nhặt tiền đồng của khoảng đó */
   cleanTry: boolean;
   hearts: number;
@@ -177,6 +179,7 @@ export function createClimbGame(seed: number): ClimbState {
     time: 0,
     peakAt: null,
     lockUntil: 0,
+    arrivedAt: 0,
     cleanTry: true,
     hearts: CLIMB_SPEC.hearts,
     coins: 0,
@@ -225,6 +228,7 @@ function resolvePeak(s: ClimbState, at: number, out: ClimbEvent[]): void {
   }
   s.level = level;
   s.index = index;
+  s.arrivedAt = at;
   const coins = s.cleanTry ? CLIMB_SPEC.coinsPerGap : 0;
   addCoins(s, coins);
   s.cleanTry = true;
@@ -250,6 +254,13 @@ export function stepClimb(s: ClimbState, dt: number): ClimbEvent[] {
   return out;
 }
 
+/**
+ * Bước thời gian khi có thể đang tạm dừng (nút "?", tab ẩn, bảng báo): `paused` thì KHÔNG có gì đổi (tay nắm đứng yên, đồng hồ của vòng đứng yên, cú bật đang bay giữ nguyên) và không có sự kiện.
+ */
+export function tickClimb(s: ClimbState, dt: number, paused: boolean): ClimbEvent[] {
+  return paused ? [] : stepClimb(s, dt);
+}
+
 /** Sang vòng kế tiếp sau khi xong vòng: cây mới, về gốc, đồng hồ về 0 (tim và tiền đồng giữ nguyên). */
 export function advanceRound(s: ClimbState): boolean {
   if (s.phase !== 'roundDone') return false;
@@ -259,6 +270,7 @@ export function advanceRound(s: ClimbState): boolean {
   s.level = 0;
   s.index = 0;
   s.time = 0;
+  s.arrivedAt = 0;
   s.peakAt = null;
   s.lockUntil = 0;
   s.cleanTry = true;

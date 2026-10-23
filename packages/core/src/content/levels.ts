@@ -46,3 +46,13 @@ export function levelById(id: number): LevelDef | undefined {
 export function levelsOfVillage(lang: VillageId): LevelDef[] {
   return LEVELS.filter((l) => l.lang === lang);
 }
+
+/**
+ * Màn kế tiếp đã ra mắt trong cùng làng sau màn `levelId` (bỏ qua màn 'coming-soon': Làng Bạc, xong màn 10 thì tới màn 12 vì màn 11 chưa có); không còn thì undefined.
+ * Dùng chung cho trang bài học ("Chơi tiếp: …") và màn kết quả của game (nút "Chơi tiếp").
+ */
+export function nextReadyLevel(levelId: number): LevelDef | undefined {
+  const here = levelById(levelId);
+  if (!here) return undefined;
+  return LEVELS.filter((l) => l.lang === here.lang && l.id > levelId).find((l) => l.status === 'ready');
+}

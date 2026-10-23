@@ -341,7 +341,9 @@ Trước vòng 2, {phanDien} lẻn tới nhét trang giả vào xấp giấy, c�
   - có câu hỏi sau mỗi vòng;
   - chạy lên nóc xe được;
   - không bao giờ gặp hàng chắn kín 3 làn.
+  - [x] **luật chung (bước HD, spec 03 mục 3.8 và 6):** hướng dẫn riêng, nút "?" (phím H) với `runnerHint.ts`, tạm dừng thật (`RunnerSession.update(dt, paused)`); màn kết quả có nút "Chơi tiếp" sang màn 3.
 - [ ] Màn 3: trang giả luôn phát hiện được bằng công thức; kéo thả dùng được trên điện thoại. (Bước X2: vòng 3 là vòng giữ sổ 90 giây, mốc 200 / 400 / 520; kiểm bằng Chrome, chuột và chạm giả lập đều chơi hết vòng 3 và ra "Vàng 545/555 điểm"; còn cần thử trên điện thoại thật.) (Bước 15a, **số điểm và mốc đã thay ở bước X2**: `rebuildLogic.test.ts` xanh; chơi hết màn trên bản build bằng chuột và bằng chạm giả lập đều ra "Vàng 360 điểm", 144 fps, không khung nào quá 33 ms. Còn cần thử trên điện thoại thật.)
+  - [x] **luật chung (bước HD, spec 03 mục 3.8 và 6):** hướng dẫn riêng, nút "?" (phím H) với `rebuildHint.ts`, tạm dừng thật; màn kết quả chỉ có "Chơi lại" và "Về làng" (không còn màn sau trong làng).
 - [x] Xong màn 3: nhận Trang Sổ Vàng, về chợ thấy cổng Làng Dệt mở. (Bước 15a, kiểm bằng Chrome: ghi kết quả 3 màn, vào làng thì bác An trao trang, "Về chợ" sang `/cho?mo=lang-giay`, then gỗ và dây đỏ rơi, Bi nói "Một trang rồi! Cổng Làng Dệt đã mở.", nhiệm vụ đổi sang Làng Dệt; tải lại thì không chiếu lại.)
 - [x] Lần đầu vào làng: sau cảnh mở đầu hiện thẻ "Em có biết?" (Thẻ n/4, "Vào làng"), chỉ một lần, xem lại ở menu làng; nút "Hướng dẫn chơi" có ở HUD, menu làng và thẻ bắt đầu màn 2, màn 3. (Bước 16, kiểm bằng Chrome.)
 - [x] Đống rơm ở màn 2 hiện đủ khối ở cả ba trạng thái (thấp, đang bay, đã rơi). (Bước 16.)

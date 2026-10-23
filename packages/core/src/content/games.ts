@@ -117,6 +117,9 @@ export const gameUi = {
   dongDiem: '{nhan}: {so} → {diem} điểm',
   cacPhanDiem: 'Điểm từng phần',
   choiLai: 'Chơi lại',
+  /** Sang màn kế tiếp đã ra mắt trong làng (nhãn đọc màn hình kèm tên màn); hết màn thì chỉ còn "Về làng" */
+  choiTiep: 'Chơi tiếp',
+  choiTiepNhan: 'Chơi tiếp: {man}',
   veLang: 'Về làng',
   /** Thanh trên màn chơi: quãng đường đã chạy */
   quangDuong: '{so} m',

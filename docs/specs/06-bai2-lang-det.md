@@ -258,5 +258,7 @@ Lớp đồi xa và tre gần phải có phần trời trong suốt (spec 01 m�
   - trùm xuất hiện 10 lần;
   - rê chuột lên đáp án thì nhân vật nhìn theo;
   - đúng thì đét trúng, sai thì {phanDien} chạy xuống sổ.
+  - **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
 - [ ] Màn 6: có câu hỏi ở 4 cổng làng; diều đen không chặn kín khe.
+  - **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
 - [ ] Xong màn 6: nhận Trang Sổ Vàng; cổng Làng Khắc Dấu mở.

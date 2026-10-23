@@ -167,6 +167,90 @@ function Page({ x, y, on = true }: { x: number; y: number; on?: boolean }) {
   );
 }
 
+/** Thẻ của màn 8 (hình minh họa): 'khuon' tím, 'mau' xanh lá; úp thì thấy mặt sau gỗ. Không có chữ. */
+function MemCard({ x, y, kind, down = false, ring }: { x: number; y: number; kind: 'khuon' | 'mau'; down?: boolean; ring?: string }) {
+  const w = 56;
+  const h = 72;
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      {ring && <rect x={-5} y={-5} width={w + 10} height={h + 10} rx={12} fill="none" stroke={ring} strokeWidth={4} strokeDasharray="8 6" />}
+      <rect x={0} y={4} width={w} height={h} rx={8} fill={C.wood} />
+      <rect x={0} y={0} width={w} height={h} rx={8} fill={down ? '#b98a54' : '#fffaf0'} stroke={C.wood} strokeWidth={3} />
+      {down ? (
+        <path d="M28 14 L46 36 L28 58 L10 36 Z" fill="none" stroke="#f1d9a9" strokeWidth={3} />
+      ) : kind === 'khuon' ? (
+        <g>
+          <rect x={10} y={10} width={36} height={18} rx={4} fill={C.purple} opacity={0.85} />
+          <rect x={22} y={28} width={12} height={22} fill={C.purple} />
+          <rect x={14} y={50} width={28} height={9} rx={3} fill={C.purple} />
+        </g>
+      ) : (
+        <g>
+          <circle cx={28} cy={34} r={19} fill="#cfe2a6" stroke={C.green} strokeWidth={3} />
+          <path d="M16 34 q6 -10 12 0 t12 0" fill="none" stroke={C.green} strokeWidth={3.5} strokeLinecap="round" />
+          <path d="M16 44 q6 -10 12 0 t12 0" fill="none" stroke={C.green} strokeWidth={3.5} strokeLinecap="round" />
+        </g>
+      )}
+    </g>
+  );
+}
+
+function Check({ x, y }: { x: number; y: number }) {
+  return (
+    <g>
+      <circle cx={x} cy={y} r={15} fill={C.green} />
+      <path d={`M${x - 7} ${y} l6 6 l11 -12`} fill="none" stroke="#fff" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
+    </g>
+  );
+}
+
+/** Đèn lồng của màn 12 (hình minh họa): thân đỏ, hai ô số xếp dọc (trên là Sổ, dưới là Nay) vẽ thành hai viên màu, không có chữ. */
+function Lantern({ x, y, top = C.gold, bottom = C.gold, ring }: { x: number; y: number; top?: string; bottom?: string; ring?: string }) {
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      {ring && <ellipse cx={0} cy={36} rx={46} ry={62} fill="none" stroke={ring} strokeWidth={4} strokeDasharray="8 6" />}
+      <line x1={0} y1={-26} x2={0} y2={-12} stroke={C.wood} strokeWidth={3} />
+      <rect x={-10} y={-14} width={20} height={8} rx={3} fill={C.wood} />
+      <ellipse cx={0} cy={22} rx={32} ry={34} fill="#d8452f" stroke={C.wood} strokeWidth={3} />
+      <rect x={-17} y={6} width={34} height={16} rx={6} fill={top} stroke={C.ink} strokeWidth={2} />
+      <rect x={-17} y={26} width={34} height={16} rx={6} fill={bottom} stroke={C.ink} strokeWidth={2} />
+      <rect x={-8} y={56} width={16} height={6} rx={3} fill={C.wood} />
+      <path d="M-6 62 v12 M0 62 v16 M6 62 v12" stroke={C.gold} strokeWidth={3} strokeLinecap="round" />
+    </g>
+  );
+}
+
+function Heart({ x, y, s = 1, color = C.red }: { x: number; y: number; s?: number; color?: string }) {
+  return <path transform={`translate(${x} ${y}) scale(${s})`} d="M0 18 C-30 -2 -22 -26 -8 -24 C-3 -24 0 -20 0 -16 C0 -20 3 -24 8 -24 C22 -26 30 -2 0 18 Z" fill={color} stroke={C.ink} strokeWidth={2.5} strokeLinejoin="round" />;
+}
+
+function Coin({ x, y, faded = false }: { x: number; y: number; faded?: boolean }) {
+  return (
+    <g opacity={faded ? 0.5 : 1}>
+      <circle cx={x} cy={y} r={17} fill={C.gold} stroke={C.goldDark} strokeWidth={3} strokeDasharray={faded ? '6 4' : undefined} />
+      <rect x={x - 5} y={y - 5} width={10} height={10} fill="none" stroke={C.goldDark} strokeWidth={2.5} />
+    </g>
+  );
+}
+
+function Cross({ x, y }: { x: number; y: number }) {
+  return (
+    <g>
+      <circle cx={x} cy={y} r={14} fill={C.red} />
+      <path d={`M${x - 6} ${y - 6} l12 12 M${x + 6} ${y - 6} l-12 12`} stroke="#fff" strokeWidth={4} strokeLinecap="round" />
+    </g>
+  );
+}
+
+function Leaf({ x, y, rot = 0, color = '#6fae4b' }: { x: number; y: number; rot?: number; color?: string }) {
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${rot})`}>
+      <path d="M0 -18 C16 -12 16 12 0 20 C-16 12 -16 -12 0 -18 Z" fill={color} stroke="#3d6b2a" strokeWidth={2} />
+      <path d="M0 -14 V18" stroke="#3d6b2a" strokeWidth={1.5} />
+    </g>
+  );
+}
+
 const K = huongDan.phim;
 
 const ARTS: Record<GuideArtId, () => ReactNode> = {
@@ -394,6 +478,112 @@ const ARTS: Record<GuideArtId, () => ReactNode> = {
       <path d="M248 40 V78 M228 59 H268" stroke="#c9915b" strokeWidth={3} />
       <Key x={226} y={118} w={44} h={44} label={K.m} />
       <Arrow x1={248} y1={114} x2={248} y2={104} width={3} />
+    </g>
+  ),
+  'lat-hai-the': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      <MemCard x={22} y={50} kind="khuon" down />
+      <MemCard x={92} y={50} kind="khuon" ring={C.purple} />
+      <MemCard x={168} y={50} kind="mau" ring={C.purple} />
+      <MemCard x={238} y={50} kind="mau" down />
+      <circle cx={136} cy={30} r={8} fill={C.purple} />
+      <circle cx={212} cy={30} r={8} fill={C.purple} />
+      <Finger x={196} y={150} />
+      <Arrow x1={196} y1={134} x2={196} y2={126} width={3} />
+    </g>
+  ),
+  'cap-the': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      <MemCard x={42} y={50} kind="khuon" />
+      <MemCard x={222} y={50} kind="mau" />
+      <rect x={128} y={72} width={36} height={22} rx={11} fill="none" stroke={C.wood} strokeWidth={5} />
+      <rect x={156} y={72} width={36} height={22} rx={11} fill="none" stroke={C.wood} strokeWidth={5} />
+      <Check x={160} y={130} />
+    </g>
+  ),
+  'may-tinh-mod': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      <rect x={34} y={26} width={104} height={132} rx={14} fill="#fffaf0" stroke={C.wood} strokeWidth={4} />
+      <rect x={46} y={38} width={80} height={28} rx={6} fill="#cfe8f7" stroke={C.ink} strokeWidth={2.5} />
+      <path d="M58 54 h18 M84 54 h10" stroke={C.ink} strokeWidth={4} strokeLinecap="round" />
+      {[0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => <rect key={`${r}${c}`} x={48 + c * 28} y={78 + r * 24} width={22} height={18} rx={5} fill={C.gold} stroke={C.goldDark} strokeWidth={2} />))}
+      <Arrow x1={152} y1={92} x2={206} y2={92} />
+      <MemCard x={226} y={56} kind="mau" ring={C.green} />
+      <Finger x={110} y={150} />
+    </g>
+  ),
+  'tran-the': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      <MemCard x={70} y={70} kind="khuon" down />
+      <MemCard x={194} y={70} kind="mau" down />
+      <path d="M104 62 Q160 14 216 62" fill="none" stroke={C.purple} strokeWidth={5} strokeLinecap="round" />
+      <polygon points="222,68 206,64 214,52" fill={C.purple} />
+      <path d="M216 152 Q160 198 104 152" fill="none" stroke={C.purple} strokeWidth={5} strokeLinecap="round" />
+      <polygon points="98,146 114,146 104,158" fill={C.purple} />
+      <circle cx={42} cy={34} r={20} fill="#fffaf0" stroke={C.ink} strokeWidth={3.5} />
+      <path d="M42 34 V20 M42 34 L52 40" stroke={C.ink} strokeWidth={3.5} strokeLinecap="round" />
+    </g>
+  ),
+  'den-long-so-nay': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.sky} />
+      <rect x={0} y={150} width={ART_W} height={30} fill={C.grass} />
+      <line x1={40} y1={6} x2={280} y2={6} stroke={C.wood} strokeWidth={6} strokeLinecap="round" />
+      <Lantern x={96} y={30} />
+      <Lantern x={224} y={30} top={C.gold} bottom={C.purple} ring={C.green} />
+      <path d="M80 126 h32 M80 136 h32" stroke={C.ink} strokeWidth={5} strokeLinecap="round" />
+      <path d="M208 126 h32 M208 136 h32 M214 146 l20 -26" stroke={C.ink} strokeWidth={5} strokeLinecap="round" />
+      <Check x={224} y={162} />
+    </g>
+  ),
+  'bat-len-phim': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.sky} />
+      <rect x={0} y={150} width={ART_W} height={30} fill={C.grass} />
+      <line x1={30} y1={6} x2={290} y2={6} stroke={C.wood} strokeWidth={6} strokeLinecap="round" />
+      <Lantern x={160} y={18} />
+      <Runner x={160} y={142} s={1.1} />
+      <Arrow x1={160} y1={104} x2={160} y2={92} width={4} />
+      <Key x={206} y={130} w={96} h={32} label={K.space} />
+    </g>
+  ),
+  'bat-len-cham': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.sky} />
+      <rect x={0} y={150} width={ART_W} height={30} fill={C.grass} />
+      <line x1={30} y1={6} x2={290} y2={6} stroke={C.wood} strokeWidth={6} strokeLinecap="round" />
+      <Lantern x={160} y={18} />
+      <Runner x={120} y={142} s={1.1} />
+      <Arrow x1={120} y1={104} x2={120} y2={92} width={4} />
+      <Finger x={236} y={128} />
+    </g>
+  ),
+  'tim-dong': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#fbf1d6" />
+      <Heart x={84} y={84} s={1.9} />
+      <Cross x={128} y={42} />
+      <Coin x={206} y={70} faded />
+      <Coin x={252} y={70} faded />
+      <Cross x={278} y={34} />
+    </g>
+  ),
+  'tang-la': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.sky} />
+      <rect x={140} y={110} width={40} height={70} fill="#8b5e34" stroke={C.wood} strokeWidth={3} />
+      {[[70, 70, -20], [110, 50, 10], [150, 38, -8], [190, 50, 14], [230, 70, 22], [96, 90, 30], [210, 94, -26], [130, 74, 0], [176, 76, 8]].map(([lx, ly, r]) => (
+        <Leaf key={`${lx}${ly}`} x={lx} y={ly} rot={r} />
+      ))}
+      <Leaf x={160} y={60} rot={-4} color="#e08a2e" />
+      <ellipse cx={160} cy={60} rx={30} ry={30} fill="none" stroke={C.green} strokeWidth={4} strokeDasharray="8 6" />
+      <circle cx={256} cy={118} r={11} fill="#8a5a36" />
+      <rect x={246} y={128} width={20} height={26} rx={7} fill="#6b4a2f" />
+      <Arrow x1={240} y1={110} x2={196} y2={76} width={4} />
     </g>
   ),
   'bon-trang': () => (

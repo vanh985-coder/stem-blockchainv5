@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CHARACTER_IDS, EXTRA_VARS } from './characters';
-import { LEVELS, VILLAGE_ORDER, levelById, levelsOfVillage } from './levels';
+import { LEVELS, VILLAGE_ORDER, levelById, levelsOfVillage, nextReadyLevel } from './levels';
 
 const ALLOWED = new Set<string>(['ten', 'Ten', ...CHARACTER_IDS.filter((id) => id !== 'hocSinh'), ...EXTRA_VARS]);
 
@@ -28,5 +28,27 @@ describe('levels', () => {
     }
     expect(levelById(2)!.bien).toBe('Đuổi theo {phanDien}');
     expect(levelById(10)!.bien).toBe('Học cùng thầy Linh');
+  });
+});
+
+describe('nextReadyLevel (nút "Chơi tiếp" ở màn kết quả và ở trang bài học)', () => {
+  it('màn 2 sang màn 3; màn 3, 8, 12 không còn màn nào trong làng nên chỉ còn "Về làng"', () => {
+    expect(nextReadyLevel(2)?.id).toBe(3);
+    expect(nextReadyLevel(3)).toBeUndefined();
+    expect(nextReadyLevel(8)).toBeUndefined();
+    expect(nextReadyLevel(12)).toBeUndefined();
+  });
+  it('bỏ qua màn "sắp ra mắt": sau bài học 10 là màn 12 (màn 11 chưa có), sau bài học 7 là màn 8, sau bài học 1 là màn 2; Làng Dệt chưa có game nào', () => {
+    expect(nextReadyLevel(10)?.id).toBe(12);
+    expect(nextReadyLevel(7)?.id).toBe(8);
+    expect(nextReadyLevel(1)?.id).toBe(2);
+    expect(nextReadyLevel(4)).toBeUndefined();
+  });
+  it('chỉ trong cùng làng; số màn lạ thì không có', () => {
+    for (const id of [1, 2, 3, 4, 7, 8, 10, 12]) {
+      const next = nextReadyLevel(id);
+      if (next) expect(next.lang).toBe(levelById(id)?.lang);
+    }
+    expect(nextReadyLevel(99)).toBeUndefined();
   });
 });

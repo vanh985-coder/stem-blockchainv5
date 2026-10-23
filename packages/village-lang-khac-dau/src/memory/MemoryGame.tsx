@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { CanvasTexture, LinearFilter, SRGBColorSpace, type Texture } from 'three';
-import { ASSETS_URL, Button, fmt, lookupAsset, memoryUi, sound, useManifest, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import { ASSETS_URL, Button, fmt, lookupAsset, memoryUi, sound, useGameHint, useManifest, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { Scene25D, isQualityChoice, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
@@ -9,7 +9,8 @@ import { MemoryBoard, MemoryVillain, type BoardCard } from './MemoryBoard';
 import { MEMORY_SPEC } from './memoryConfig';
 import { FACE_FONT, drawFaceAtlas } from './memoryFaces';
 import { GRID_AREA, HUD_AREA, MIN_LABEL_PX, WORLD, cardFonts, framePct, gridLayout, pxPerUnit, type MemoryFrame } from './memoryLayout';
-import { advanceRound, createMemoryGame, flipCard, memoryScore, roundScore, stepMemory, type MemoryEvent, type MemoryState } from './memoryLogic';
+import { advanceRound, createMemoryGame, flipCard, memoryScore, roundScore, tickMemory, type MemoryEvent, type MemoryState } from './memoryLogic';
+import { hintFor } from './memoryHint';
 
 const BACKGROUND = 'scenes/man-08-kho-dau';
 const CARD_ART = { back: 'ui/cards/the-mat-sau', khuon: 'ui/cards/the-khuon-rieng', mau: 'ui/cards/the-mau-cong-khai' } as const;
@@ -125,7 +126,7 @@ const ids = (s: MemoryState): string[] => s.cards.map((c) => c.id);
  * phủ lên: thanh trên, Máy tính mod, nút trong suốt đặt đúng chỗ từng thẻ (chuột, chạm, phím mũi tên và Enter/Space, nhãn cho trình đọc màn hình).
  * Luật nằm hết ở `memoryLogic`; ở đây chỉ nối thao tác, hoạt cảnh và âm thanh vào luật. Vòng lặp `requestAnimationFrame` gọi `stepMemory` (ms).
  */
-export function MemoryGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
+export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRenderProps) {
   const { settings } = useSettings();
   const reduced = settings.reducedMotion;
   const forced = useMemo(forcedQuality, []);
@@ -172,6 +173,10 @@ export function MemoryGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
   // ----- Vòng lặp thời gian: đồng hồ úp lại 800 ms và đồng hồ tráo bài (vòng 3). Mở Máy tính mod hay đang chiếu hoạt cảnh tráo thì đồng hồ tráo đứng yên.
   const swapRef = useRef<SwapShow>(null);
   swapRef.current = swapShow;
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
+  // Nút "?": câu nhắc theo trạng thái ván (không lộ đáp án)
+  useGameHint(setHint, () => hintFor(state));
   const calcRef = useRef(false);
   calcRef.current = calcOpen;
   const handleEvents = useCallback(
@@ -197,7 +202,7 @@ export function MemoryGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
       last = now;
       if (state.phase !== 'playing') return;
       const before = state.waitingFlipBack;
-      const events = stepMemory(state, dt, { swapClock: !calcRef.current && !swapRef.current });
+      const events = tickMemory(state, dt, pausedRef.current, { swapClock: !calcRef.current && !swapRef.current });
       if (events.length > 0 || before !== state.waitingFlipBack) handleEvents(events);
     };
     raf = requestAnimationFrame(tick);
@@ -315,7 +320,7 @@ export function MemoryGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
         onModeChange={onModeChange}
         overlay={
           <div ref={overlayRef} className="absolute inset-0" style={{ containerType: 'size', fontSize: textSize }} data-testid="man8-khung" data-phase={state.phase} data-round={state.round} data-swap={swapShow ? 'yes' : 'no'}>
-            <div className="absolute flex flex-col gap-2 p-2" style={{ left: `${hudTL.left}%`, top: `${hudTL.top}%`, width: `${hudBR.left - hudTL.left}%`, height: `${hudBR.top - hudTL.top}%` }}>
+            <div className={`absolute flex flex-col gap-2 p-2 ${portrait ? "pr-12" : ""}`} style={{ left: `${hudTL.left}%`, top: `${hudTL.top}%`, width: `${hudBR.left - hudTL.left}%`, height: `${hudBR.top - hudTL.top}%` }}>
               <div className={`flex ${portrait ? 'flex-row items-start justify-between' : 'flex-col'} gap-2`}>
                 <ModCalculator open={calcOpen} onOpenChange={setCalcOpen} className="relative z-30" />
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border-2 border-nau-go bg-giay px-3 py-1 font-display font-extrabold" data-testid="hud">

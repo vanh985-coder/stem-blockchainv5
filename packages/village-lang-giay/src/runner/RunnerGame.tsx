@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
-import { AssetImage, Button, Hearts, Panel, ProgressBar, QuizCard, fmt, gameUi, pickQuestions, runnerScoreLabels, runnerUi, type MiniGameRenderProps, type Question, type ScorePart } from '@so-chung/core';
+import { AssetImage, Button, Hearts, Panel, ProgressBar, QuizCard, fmt, gameUi, pickQuestions, runnerScoreLabels, runnerUi, useGameHint, type MiniGameRenderProps, type Question, type ScorePart } from '@so-chung/core';
 import { Scene3D, isQualityChoice, type QualityChoice } from '@so-chung/core/three/index';
 import { RUNNER_SPEC as SPEC } from './runnerConfig';
 import { SWIPE_MIN_PX, keyToCommand, swipeToCommand } from './runnerCommands';
+import { hintFor } from './runnerHint';
 import { makeCell, scoreParts } from './runnerLogic';
 import { RunnerSession } from './runnerSession';
 import { RunnerWorld, type QuizView, type RunnerHud } from './RunnerWorld';
@@ -53,7 +54,7 @@ function PowerChip({ icon, name, seconds }: { icon: ReactNode; name: string; sec
 /** Thanh trên: tim, trang sổ, tiền đồng, quãng đường, vòng; hàng dưới là các vật đặc biệt còn tác dụng (biểu tượng + giây còn lại). */
 function RunnerHudBar({ hud }: { hud: RunnerHud }) {
   return (
-    <div className="pointer-events-none absolute left-3 top-3 z-20 flex flex-col items-start gap-2">
+    <div className="pointer-events-none absolute left-3 top-3 z-20 flex max-w-[calc(100%-4.5rem)] flex-col items-start gap-2">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-nut border-2 border-nau-go bg-giay/90 px-3 py-1.5 shadow-md">
         <Hearts current={hud.hearts} max={SPEC.hearts} />
         <span role="img" aria-label={fmt(runnerUi.trang, { so: hud.pages })} className="flex items-center gap-1 font-display text-xl font-extrabold" data-testid="so-trang">
@@ -137,13 +138,17 @@ function QuizOverlay({ session, question, quiz, hearts }: { session: RunnerSessi
  * Phần chơi của màn 2: khung 3D, điều khiển (bàn phím, vuốt), thanh trên, câu hỏi giữa ván. Bọc trong `MiniGameLevel` (thẻ bắt đầu, màn kết quả). Ván đủ 4 vòng 25 giây, mỗi vòng
  * một câu hỏi Bài 1; kết thúc khi hết 4 vòng hoặc hết tim.
  */
-export function RunnerGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
+export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRenderProps) {
   const forced = useMemo(forcedQuality, []);
   // mỗi lần chơi (attempt) là một ván mới với hạt giống mới
   const session = useMemo(() => new RunnerSession({ seed: newSeed() }), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
   // 4 câu hỏi Bài 1 cho ván này (không lặp, đã trộn thứ tự đáp án)
   const questions = useMemo(() => pickQuestions({ bai: 1, soCau: SPEC.rounds, seed: session.seed }), [session]);
   if (import.meta.env.DEV) Object.assign(window, { __runner: session, __runnerQuestions: questions, __makeCell: makeCell });
+  const pausedRef = useRef(paused);
+  pausedRef.current = paused;
+  // Nút "?": câu nhắc theo trạng thái ván (không lộ đáp án)
+  useGameHint(setHint, () => hintFor(session.state));
   const [ready, setReady] = useState(false);
   const [hud, setHud] = useState<RunnerHud>(INITIAL_HUD);
   const [quiz, setQuiz] = useState<QuizView | null>(null);
@@ -164,7 +169,7 @@ export function RunnerGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
   // Bàn phím: ←/→ hoặc A/D đổi làn; ↑, W, Space nhảy; ↓, S trượt. Mỗi lần bấm là một lệnh (không lặp khi giữ phím). Lúc hỏi thì để phím cho câu hỏi.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (session.state.phase === 'quiz') return;
+      if (session.state.phase === 'quiz' || pausedRef.current) return;
       const c = keyToCommand(e.code);
       if (!c) return;
       e.preventDefault();
@@ -213,7 +218,7 @@ export function RunnerGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
   };
   const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     const t = touch.current;
-    if (t.id !== e.pointerId || t.fired || session.state.phase === 'quiz') return;
+    if (t.id !== e.pointerId || t.fired || session.state.phase === 'quiz' || pausedRef.current) return;
     const c = swipeToCommand(e.clientX - t.x, e.clientY - t.y, SWIPE_MIN_PX);
     if (c) {
       t.fired = true;

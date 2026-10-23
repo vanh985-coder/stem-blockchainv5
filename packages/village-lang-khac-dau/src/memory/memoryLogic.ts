@@ -321,6 +321,13 @@ export function advanceRound(state: MemoryState): boolean {
   return true;
 }
 
+/**
+ * Bước thời gian khi có thể đang tạm dừng (nút "?", tab ẩn): `paused` thì KHÔNG có gì đổi (đồng hồ úp lại và đồng hồ tráo đều đứng yên) và không có sự kiện.
+ */
+export function tickMemory(state: MemoryState, dt: number, paused: boolean, opts: StepOptions = {}): MemoryEvent[] {
+  return paused ? [] : stepMemory(state, dt, opts);
+}
+
 /** Tùy chọn của một bước thời gian. */
 export interface StepOptions {
   /** false: không đếm đồng hồ tráo ở bước này (mặc định đếm) */

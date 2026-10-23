@@ -254,8 +254,10 @@ Bot giỏi 100% Vàng (có assert). Bot trung bình chỉ in bảng tỉ lệ, K
   - đổi ô mượt, nổ dây chuyền đúng;
   - lá giả chỉ mất khi có hàng nổ sát bên;
   - cây lấp ô đúng loại lá.
+  - **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
 - [ ] Màn 12:
   - canh nhảy chọn nhánh được trên cả điện thoại lẫn máy tính;
   - con số khó dần qua 4 vòng;
   - hết tim vẫn xem được cao trào.
+  - [x] **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng"). (đã làm ở bước HD: phần `man-12`, `climbHint.ts`; màn kết quả chỉ có "Chơi lại", "Về làng" và "Xem lại cảnh cuối" vì màn 11 chưa ra mắt.)
 - [ ] Sau cao trào: có đủ 4 Trang Sổ Vàng, chuyển sang hội làng.

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { BiAvatar, Button, Hearts, fmt, rebuildUi, sound, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import { BiAvatar, Button, Hearts, fmt, rebuildUi, sound, useGameHint, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { Scene25D, isQualityChoice, type QualityChoice, type Sprite25D } from '@so-chung/core/three/index';
 import { REBUILD_KEEP as KEEP, REBUILD_SPEC as SPEC } from './rebuildConfig';
+import { hintFor } from './rebuildHint';
 import { BacAnActor, StudentActor, VillainActor, type Reaction } from './RebuildActors';
 import { Basket, CardFace, ChainRow, DragGhost, KeepChainRow, Tray, slotOfTarget, useCardDrag, type DropTarget } from './RebuildCards';
 import { AREAS, KEEP_VILLAIN_TIMING, REDUCED_MOTION_SCALE, VILLAIN_TIMING, cardHeight, cardWidth, center, villainStageAt, worldPoint, type VillainStage } from './rebuildLayout';
@@ -222,13 +223,15 @@ function rowLabel(r: ScorePartRow): string {
  * (chuột, ngón tay) hoặc chạm chọn rồi chạm đặt, soi công thức, thanh trên. Luật nằm hết ở `rebuildLogic`; ở đây chỉ nối thao tác, hoạt cảnh và âm thanh vào luật.
  * Vòng 3 (giữ sổ 90 giây) chạy bằng vòng lặp `requestAnimationFrame` gọi `stepKeep`; {phanDien} chạy vào trước giờ tráo `KEEP_VILLAIN_TIMING.dropAt` giây để lần tráo rơi đúng lúc nó cười.
  */
-export function RebuildGame({ paused, attempt, onFinish }: MiniGameRenderProps) {
+export function RebuildGame({ paused, attempt, onFinish, setHint }: MiniGameRenderProps) {
   const { settings } = useSettings();
   const reduced = settings.reducedMotion;
   const forced = useMemo(forcedQuality, []);
   const state = useMemo<RebuildState>(() => createRebuild(newSeed()), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
   const [version, bump] = useReducer((n: number) => n + 1, 0);
   const overlayRef = useRef<HTMLDivElement>(null);
+  // Nút "?": câu nhắc theo trạng thái ván (không lộ đáp án)
+  useGameHint(setHint, () => hintFor(state));
 
   const [selected, setSelected] = useState<string | null>(null);
   const [shake, setShake] = useState<{ id: string; n: number } | null>(null);
