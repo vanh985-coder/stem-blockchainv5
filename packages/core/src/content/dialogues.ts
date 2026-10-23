@@ -70,5 +70,9 @@ export const NHIEM_VU: readonly string[] = [
   'Cả làng đang mở hội. Hãy đến dự hội làng nhé!',
 ];
 
+/** Khi đủ 4 trang mà hội làng chưa ra mắt (cờ `FESTIVAL_LAUNCHED` = false, config/festival.ts): dòng nhiệm vụ và lời Bi thay cho `NHIEM_VU[4]` và `BI_NHAC_NHIEM[4]`. */
+export const NHIEM_VU_HOI_SAP_MO = 'Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở.';
+export const BI_NHAC_HOI_SAP_MO = 'Đủ 4 trang rồi! Hội làng sắp mở.';
+
 /** Câu thứ hai của Bi: nhắc lại nhiệm vụ. {nd} là dòng nhiệm vụ đã fmt. */
 export const BI_NHAC_LAI = 'Nhiệm vụ của {ten} bây giờ: {nd}';

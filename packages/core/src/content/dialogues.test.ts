@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CHARACTER_IDS, EXTRA_VARS, fmt } from './characters';
-import { BI_NHAC_LAI, BI_NHAC_NHIEM, MARKET_TALKERS, NHIEM_VU } from './dialogues';
+import { BI_NHAC_HOI_SAP_MO, BI_NHAC_LAI, BI_NHAC_NHIEM, MARKET_TALKERS, NHIEM_VU, NHIEM_VU_HOI_SAP_MO } from './dialogues';
 
 const ALLOWED = new Set<string>(['ten', 'Ten', ...CHARACTER_IDS.filter((id) => id !== 'hocSinh'), ...EXTRA_VARS]);
 const ALL: [string, string][] = [
@@ -8,6 +8,8 @@ const ALL: [string, string][] = [
   ...BI_NHAC_NHIEM.map((l, i): [string, string] => [`bi ${i}`, l]),
   ...NHIEM_VU.map((l, i): [string, string] => [`nhiemVu ${i}`, l]),
   ['biNhacLai', BI_NHAC_LAI],
+  ['nhiemVuHoiSapMo', NHIEM_VU_HOI_SAP_MO],
+  ['biHoiSapMo', BI_NHAC_HOI_SAP_MO],
 ];
 
 describe('dialogues.ts', () => {

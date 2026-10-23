@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { BI_NHAC_NHIEM, MARKET_TALKERS, NHIEM_VU } from '../../content/dialogues';
+import { FESTIVAL_LAUNCHED } from '../../config/festival';
+import { BI_NHAC_HOI_SAP_MO, BI_NHAC_NHIEM, MARKET_TALKERS, NHIEM_VU, NHIEM_VU_HOI_SAP_MO } from '../../content/dialogues';
 import { VILLAGE_ORDER } from '../../content/levels';
 import { computeUnlock } from '../../progress/unlock';
 import { GATES } from './marketLayout';
 import {
   GATE_ORDER,
   GATE_VILLAGE,
+  biQuestLine,
   clampPages,
   gateOpenedAfter,
   gateStates,
@@ -13,6 +15,7 @@ import {
   previousVillage,
   questGate,
   questIndex,
+  questLine,
 } from './marketQuest';
 
 describe('cổng theo tiến độ', () => {
@@ -109,5 +112,34 @@ describe('cổng nào mở sau Trang Sổ Vàng', () => {
     expect(gateOpenedAfter('lang-det')).toBe('khac-dau');
     expect(gateOpenedAfter('lang-khac-dau')).toBe('bac');
     expect(gateOpenedAfter('lang-bac')).toBeNull();
+  });
+});
+
+describe('dòng nhiệm vụ khi đủ 4 Trang Sổ Vàng (cờ hội làng đã ra mắt)', () => {
+  it('cờ FESTIVAL_LAUNCHED mặc định false', () => {
+    expect(FESTIVAL_LAUNCHED).toBe(false);
+  });
+
+  it('đủ 4 trang, hội làng chưa ra mắt: "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở." và không còn cổng làm đích', () => {
+    expect(questLine(4, false)).toBe('Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở.');
+    expect(questLine(4)).toBe('Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở.');
+    expect(questLine(7, false)).toBe(NHIEM_VU_HOI_SAP_MO);
+    expect(questGate(4)).toBeNull();
+    expect(biQuestLine(4, false)).toBe(BI_NHAC_HOI_SAP_MO);
+    expect(biQuestLine(4, false)).not.toContain('đang mở hội');
+  });
+
+  it('hội làng đã ra mắt: mời dự hội như cũ', () => {
+    expect(questLine(4, true)).toBe(NHIEM_VU[4]);
+    expect(biQuestLine(4, true)).toBe(BI_NHAC_NHIEM[4]);
+  });
+
+  it('dưới 4 trang thì cờ không đổi gì', () => {
+    for (const p of [0, 1, 2, 3]) {
+      for (const launched of [false, true]) {
+        expect(questLine(p, launched)).toBe(NHIEM_VU[p]);
+        expect(biQuestLine(p, launched)).toBe(BI_NHAC_NHIEM[p]);
+      }
+    }
   });
 });

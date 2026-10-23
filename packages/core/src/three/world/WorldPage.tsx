@@ -4,7 +4,7 @@ import { asset, useManifest } from '../../assets/store';
 import { useAuth } from '../../auth/AuthProvider';
 import { canSeeTeacherPage } from '../../auth/roles';
 import { CHARACTERS, fmt, speakerLabel } from '../../content/characters';
-import { BI_NHAC_LAI, BI_NHAC_NHIEM, MARKET_TALKERS, NHIEM_VU } from '../../content/dialogues';
+import { BI_NHAC_LAI, MARKET_TALKERS } from '../../content/dialogues';
 import { GUIDE_FIRST_SECTION } from '../../content/huongDan';
 import { VILLAGE_ORDER, levelById, levelsOfVillage } from '../../content/levels';
 import { STORY } from '../../content/story';
@@ -34,7 +34,7 @@ import { useWalkSession } from '../useWalkSession';
 import { createWalkApi } from '../walkApi';
 import { MarketHud } from '../cho/MarketHud';
 import { MarketMenu } from '../cho/MarketMenu';
-import { GATE_VILLAGE, gateOpenedAfter, gateStates, previousVillage, questGate, questIndex } from '../cho/marketQuest';
+import { GATE_VILLAGE, biQuestLine, gateOpenedAfter, gateStates, previousVillage, questGate, questLine } from '../cho/marketQuest';
 import { densityFor, type GateId } from '../cho/marketLayout';
 import { GoldenPagesRow } from '../village/GoldenPagesRow';
 import { guideTopic, lockedBy, nextLevel } from '../village/villageQuest';
@@ -209,7 +209,7 @@ export function WorldPage() {
     if (inside && insideGated) return fmt(knowScrollUi.nhiemVu, { n: knowGot(inside), tong: scrollTotals[inside] });
     if (inside && nextBoard !== null) return fmt(ui.langScene.nhiemVuMan, { bien: fmt(levelById(nextBoard)?.bien ?? '') });
     if (inside && ceremonyPending) return fmt(ui.langScene.nhiemVuXong, { lang: insideName });
-    return fmt(NHIEM_VU[questIndex(qPages)]);
+    return fmt(questLine(qPages));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inside, insideGated, knowMasks, scrollTotals, nextBoard, ceremonyPending, insideName, qPages]);
   // làng của nhiệm vụ: đang ở trong làng nào thì làng đó, không thì làng có cổng của nhiệm vụ theo số Trang Sổ Vàng
@@ -324,7 +324,6 @@ export function WorldPage() {
       const portrait = CHARACTERS[text?.guide ?? 'bacAn'].portrait;
       setDialog({ turns: [{ speaker: speakerLabel(text?.guide ?? 'bacAn'), portrait, text: fmt(line, { ten: l.ten }) }], villager: null, village: t.village, guideTalking: true });
     } else {
-      const k = questIndex(l.pages);
       if (l.inside && l.gated) {
         // Bi gợi ý khu có thẻ "Em có biết?" gần nhất chưa nhặt (không chỉ đúng chỗ)
         const sc = l.scrollsOf(l.inside).find((q) => q.index === l.scrollIdx);
@@ -334,7 +333,7 @@ export function WorldPage() {
         const n = l.nextBoard;
         const lang = ui.lang[l.inside];
         setDialog({ turns: [biTurn(n !== null ? fmt(ui.langScene.biNhacMan, { lang, bien: fmt(levelById(n)?.bien ?? ''), ten: l.ten }) : fmt(ui.langScene.biNhacXong, { lang, ten: l.ten }))], villager: null });
-      } else setDialog({ turns: [biTurn(fmt(BI_NHAC_NHIEM[k], { ten: l.ten })), biTurn(fmt(BI_NHAC_LAI, { ten: l.ten, nd: fmt(NHIEM_VU[k]) }))], villager: null });
+      } else setDialog({ turns: [biTurn(fmt(biQuestLine(l.pages), { ten: l.ten })), biTurn(fmt(BI_NHAC_LAI, { ten: l.ten, nd: fmt(questLine(l.pages)) }))], villager: null });
     }
     // chỗ người dẫn quay mặt về: vị trí người chơi lúc mở hộp thoại
     const p = (window as unknown as { __walkPlayer?: { x: number; z: number } }).__walkPlayer;
@@ -407,8 +406,7 @@ export function WorldPage() {
   const onGateFallen = useCallback(() => {
     if (seqRef.current !== 'fall') return;
     setSeq('talk');
-    const k = questIndex(live.current.pages);
-    setDialog({ turns: [biTurn(fmt(BI_NHAC_NHIEM[k], { ten: live.current.ten })), biTurn(fmt(BI_NHAC_LAI, { ten: live.current.ten, nd: fmt(NHIEM_VU[k]) }))], villager: null });
+    setDialog({ turns: [biTurn(fmt(biQuestLine(live.current.pages), { ten: live.current.ten })), biTurn(fmt(BI_NHAC_LAI, { ten: live.current.ten, nd: fmt(questLine(live.current.pages)) }))], villager: null });
     api.lock.exit();
   }, [biTurn, api]);
 

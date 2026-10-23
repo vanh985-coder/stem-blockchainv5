@@ -65,20 +65,24 @@ function isTyping(target: EventTarget | null): boolean {
 }
 
 const WIDE = '(min-width: 640px)';
-function useWide(): boolean {
-  const [wide, setWide] = useState(() => typeof window !== 'undefined' && window.matchMedia(WIDE).matches);
+/** Màn thấp (điện thoại nằm ngang, 844×390, 667×375): hộp thoại xếp ngang, chân dung hoặc ảnh bên trái chữ, vừa đúng một màn hình. Khớp với biến thể `[@media(max-height:500px)]` ở class bên dưới. */
+const LOW = '(max-height: 500px)';
+function useMedia(query: string): boolean {
+  const [match, setMatch] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
   useEffect(() => {
-    const mq = window.matchMedia(WIDE);
-    const on = () => setWide(mq.matches);
+    const mq = window.matchMedia(query);
+    const on = () => setMatch(mq.matches);
     mq.addEventListener('change', on);
     return () => mq.removeEventListener('change', on);
-  }, []);
-  return wide;
+  }, [query]);
+  return match;
 }
 
 /** Cỡ chân dung lớn: từ 160px trên máy tính, từ 112px trên điện thoại. */
 export const PORTRAIT_SIZE_WIDE = 176;
 export const PORTRAIT_SIZE_NARROW = 120;
+/** Cỡ chân dung ở màn thấp (đặt bên trái chữ). */
+export const PORTRAIT_SIZE_LOW = 88;
 
 const smallBtn =
   'inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-nut border-2 border-nau-go bg-giay/90 px-3 font-display text-base font-extrabold text-chu shadow-[0_2px_0_0_var(--color-nau-go)] focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim disabled:cursor-not-allowed disabled:opacity-40';
@@ -90,7 +94,8 @@ const smallBtn =
  */
 export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel, background, overlay, label, decor, backdrop, onTurnChange, className = '' }: VnDialogProps) {
   const [index, setIndex] = useState(0);
-  const wide = useWide();
+  const wide = useMedia(WIDE);
+  const low = useMedia(LOW);
   const manifest = useManifest();
   const nextRef = useRef<HTMLButtonElement>(null);
   const handlers = useRef({ next: () => {}, back: () => {}, skip: () => {} });
@@ -184,7 +189,7 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
   const portraitId = turn.portrait ? portraitForMood(turn.portrait, turn.mood, manifest) : undefined;
   const portraitMotion = reduced ? '' : typing ? 'animate-vn-talk' : 'animate-vn-breathe';
   const { shown, rest } = splitRevealed(turn.text, count);
-  const size = wide ? PORTRAIT_SIZE_WIDE : PORTRAIT_SIZE_NARROW;
+  const size = low ? PORTRAIT_SIZE_LOW : wide ? PORTRAIT_SIZE_WIDE : PORTRAIT_SIZE_NARROW;
   const heading = turn.speaker ?? label ?? '';
 
   const box = (
@@ -193,13 +198,16 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
       role={asOverlay ? 'dialog' : 'region'}
       aria-modal={asOverlay ? true : undefined}
       aria-label={heading}
-      className={['relative w-full max-w-[960px] overflow-hidden', className].join(' ')}
+      className={[
+        'relative w-full max-w-[960px] overflow-hidden [@media(max-height:500px)]:grid [@media(max-height:500px)]:max-h-[calc(100dvh-1rem)] [@media(max-height:500px)]:grid-cols-[auto_1fr] [@media(max-height:500px)]:grid-rows-[minmax(0,1fr)_auto]',
+        className,
+      ].join(' ')}
     >
       {/* Phần trên: ảnh minh họa hoặc chân dung lớn */}
-      <div key={`m${index}`} className="animate-vn-in relative">
+      <div key={`m${index}`} className="animate-vn-in relative [@media(max-height:500px)]:col-start-1 [@media(max-height:500px)]:row-span-2 [@media(max-height:500px)]:row-start-1">
         {turn.image ? (
           // Ảnh luôn hiện trọn (object-contain), không cắt; phần trống hai bên lấp bằng chính ảnh đó làm mờ.
-          <div className="relative aspect-video max-h-[56vh] w-full overflow-hidden border-b-4 border-nau-go bg-chu/20">
+          <div className="relative aspect-video max-h-[56vh] w-full overflow-hidden border-b-4 border-nau-go bg-chu/20 [@media(max-height:500px)]:h-full [@media(max-height:500px)]:max-h-none [@media(max-height:500px)]:w-[min(46vw,calc(50vh*16/9))] [@media(max-height:500px)]:border-b-0 [@media(max-height:500px)]:border-r-4">
             {imageUrl && (
               <div
                 aria-hidden="true"
@@ -210,32 +218,18 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
             <AssetImage path={turn.image} alt={ui.vn.anhNhan} className="relative size-full object-contain" />
           </div>
         ) : turn.portrait ? (
-          <div className="grid place-items-center border-b-4 border-nau-go bg-gradient-to-b from-muc-tim/15 to-giay/0 px-4 pb-4 pt-12 sm:pt-10">
+          <div className="grid place-items-center border-b-4 border-nau-go bg-gradient-to-b from-muc-tim/15 to-giay/0 px-4 pb-4 pt-12 sm:pt-10 [@media(max-height:500px)]:h-full [@media(max-height:500px)]:border-b-0 [@media(max-height:500px)]:border-r-4 [@media(max-height:500px)]:p-2">
             <div className={portraitMotion}>
               <PortraitFrame portrait={portraitId ?? turn.portrait} size={size} />
             </div>
           </div>
         ) : (
-          <div className="h-12" />
-        )}
-        <button
-          type="button"
-          onClick={() => handlers.current.back()}
-          disabled={index === 0}
-          aria-label={ui.vn.luiNhan}
-          className={`${smallBtn} absolute left-2 top-2`}
-        >
-          {ui.vn.lui}
-        </button>
-        {!noSkip && (
-          <button type="button" onClick={() => handlers.current.skip()} className={`${smallBtn} absolute right-2 top-2 text-sm`}>
-            {ui.vn.boQua}
-          </button>
+          <div className="h-12 [@media(max-height:500px)]:hidden" />
         )}
       </div>
 
       {/* Khung lời */}
-      <div key={`t${index}`} className="animate-vn-in px-4 pb-2 pt-4 sm:px-8">
+      <div key={`t${index}`} className="animate-vn-in px-4 pb-2 pt-4 sm:px-8 [@media(max-height:500px)]:col-start-2 [@media(max-height:500px)]:row-start-1 [@media(max-height:500px)]:min-h-0 [@media(max-height:500px)]:overflow-y-auto [@media(max-height:500px)]:px-3 [@media(max-height:500px)]:pb-1 [@media(max-height:500px)]:pt-2">
         {turn.speaker && <p className="font-display text-xl font-extrabold text-nau-go-dam">{turn.speaker}</p>}
         {/* Trình đọc màn hình đọc cả câu ngay; chữ hiện dần chỉ để nhìn (aria-hidden). Phần chưa hiện vẫn giữ chỗ nên khung không nhảy. */}
         <p aria-live="polite" className="sr-only">
@@ -258,14 +252,32 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
       </div>
 
       {/* Chân hộp: tiến trình bên trái, nút Tiếp bên phải */}
-      <div className="flex items-center justify-between gap-3 px-4 pb-4 pt-2 sm:px-8">
+      <div className="flex items-center justify-between gap-3 px-4 pb-4 pt-2 sm:px-8 [@media(max-height:500px)]:col-start-2 [@media(max-height:500px)]:row-start-2 [@media(max-height:500px)]:flex-wrap [@media(max-height:500px)]:justify-end [@media(max-height:500px)]:gap-x-2 [@media(max-height:500px)]:gap-y-1 [@media(max-height:500px)]:px-3 [@media(max-height:500px)]:pb-2 [@media(max-height:500px)]:pt-1">
+        <button
+          type="button"
+          onClick={() => handlers.current.back()}
+          disabled={index === 0}
+          aria-label={ui.vn.luiNhan}
+          className={`${smallBtn} absolute left-2 top-2 [@media(max-height:500px)]:static [@media(max-height:500px)]:order-1 [@media(max-height:500px)]:whitespace-nowrap`}
+        >
+          {ui.vn.lui}
+        </button>
+        {!noSkip && (
+          <button
+            type="button"
+            onClick={() => handlers.current.skip()}
+            className={`${smallBtn} absolute right-2 top-2 text-sm [@media(max-height:500px)]:static [@media(max-height:500px)]:order-3 [@media(max-height:500px)]:whitespace-nowrap`}
+          >
+            {ui.vn.boQua}
+          </button>
+        )}
         <span
-          className="font-display text-base font-extrabold text-nau-go-dam"
+          className="font-display text-base font-extrabold text-nau-go-dam [@media(max-height:500px)]:order-2 [@media(max-height:500px)]:mr-auto"
           aria-label={fmt(ui.vn.tienTrinhNhan, { x: index + 1, n: turns.length })}
         >
           {fmt(ui.vn.tienTrinh, { x: index + 1, n: turns.length })}
         </span>
-        <Button ref={nextRef} onClick={() => handlers.current.next()}>
+        <Button ref={nextRef} onClick={() => handlers.current.next()} className="[@media(max-height:500px)]:order-4 [@media(max-height:500px)]:whitespace-nowrap">
           {isLast && finishLabel ? finishLabel : ui.vn.tiep}
         </Button>
       </div>
@@ -275,7 +287,7 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
   if (!asOverlay) return box;
 
   return (
-    <div className="fixed inset-0 z-40 grid place-items-center overflow-y-auto p-3 sm:p-6">
+    <div className="fixed inset-0 z-40 grid place-items-center overflow-y-auto p-3 sm:p-6 [@media(max-height:500px)]:p-2">
       {/* Nền: ảnh làm mờ, tối nhẹ */}
       <div aria-hidden="true" className={`fixed inset-0 -z-10 overflow-hidden ${backdrop ? '' : 'bg-chu'}`}>
         {backdrop ?? (

@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import {
   NenTrangTri,
+  PORTRAIT_SIZE_LOW,
   PORTRAIT_SIZE_NARROW,
   PORTRAIT_SIZE_WIDE,
   STORY,
@@ -40,6 +41,19 @@ describe('VnDialog', () => {
     expect(PORTRAIT_SIZE_NARROW).toBeGreaterThanOrEqual(112);
     const html = renderToStaticMarkup(<VnDialog turns={turns} onFinish={noop} />);
     expect(html).toContain('max-w-[960px]');
+  });
+
+  it('màn thấp (cao ≤ 500px): chân dung 88px, hộp xếp ngang vừa một màn hình; nút ‹, Bỏ qua, Tiếp cùng nằm ở chân hộp, đủ sau lời', () => {
+    expect(PORTRAIT_SIZE_LOW).toBe(88);
+    const html = renderToStaticMarkup(<VnDialog turns={turns} onFinish={noop} />);
+    expect(html).toContain('[@media(max-height:500px)]:grid');
+    expect(html).toContain('[@media(max-height:500px)]:max-h-[calc(100dvh-1rem)]');
+    const text = html.indexOf('data-testid="vn-text"');
+    // ba nút nằm sau lời (ở chân hộp) để ở màn thấp thành một hàng nút; màn cao đặt tuyệt đối ở góc như cũ
+    for (const label of ['Bỏ qua', 'Tiếp ›']) expect(html.indexOf(label, text), label).toBeGreaterThan(text);
+    expect(html.indexOf('aria-label="Lùi lại một lượt"')).toBeGreaterThan(text);
+    expect(html).toContain('absolute left-2 top-2 [@media(max-height:500px)]:static');
+    expect(html).toContain('absolute right-2 top-2 text-sm [@media(max-height:500px)]:static');
   });
 
   it('chữ lời từ 18px trên máy tính (sm:text-lg) và 16px trên điện thoại (text-base)', () => {

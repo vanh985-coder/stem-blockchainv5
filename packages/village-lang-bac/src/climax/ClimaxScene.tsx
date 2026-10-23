@@ -116,15 +116,15 @@ export function ClimaxScene({ award, replay, onDone }: ClimaxSceneProps) {
   }
   return (
     <div className="fixed inset-0 z-40 overflow-y-auto bg-chu p-2 sm:p-4" data-testid="canh-cao-trao" data-step={step.id}>
-      {/* Cảnh nhỏ ở trên (cao tối đa 34% màn hình, tỉ lệ 16:9), hộp lời ở dưới; màn thấp (điện thoại ngang) thì đặt cạnh nhau */}
-      <div className="mx-auto flex min-h-full w-full max-w-6xl flex-col items-center justify-center gap-3 [@media(max-height:520px)]:flex-row">
+      {/* Cảnh nhỏ ở trên (cao tối đa 34% màn hình, tỉ lệ 16:9), hộp lời ở dưới; màn thấp (điện thoại ngang, cao ≤ 500px) thì đặt cạnh nhau: cảnh 40%, hộp lời 60% */}
+      <div className="mx-auto flex min-h-full w-full max-w-6xl flex-col items-center justify-center gap-3 [@media(max-height:500px)]:flex-row [@media(max-height:500px)]:gap-2">
         <div
-          className="relative aspect-video w-[var(--cw)] shrink-0 overflow-hidden rounded-2xl border-4 border-nau-go [@media(max-height:520px)]:w-1/2"
+          className="relative aspect-video w-[var(--cw)] shrink-0 overflow-hidden rounded-2xl border-4 border-nau-go [@media(max-height:500px)]:w-[40%]"
           style={{ '--cw': 'min(100%, calc(34vh * 16 / 9))' } as React.CSSProperties}
         >
           <ClimaxStage motion={climaxMotion(step, turn)} reduced={reduced} />
         </div>
-        <div className="w-full max-w-[960px] [@media(max-height:520px)]:w-1/2">
+        <div className="w-full max-w-[960px] [@media(max-height:500px)]:w-[60%]">
           <VnDialog key={step.id} turns={turns} onFinish={next} onSkip={finish} finishLabel={finishLabel} onTurnChange={setTurn} />
         </div>
       </div>

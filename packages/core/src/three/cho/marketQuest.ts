@@ -2,6 +2,8 @@
  * Nhiệm vụ, cổng mở/khóa và mũi tên chỉ đường ở chợ phiên 3D (spec 04 mục 3 "Cổng làng", "HUD" và mục 5). Hàm thuần, không import three.
  * Cổng mở theo tiến độ: cổng làng thứ k mở khi đã có k Trang Sổ Vàng (làng đầu luôn mở); tài khoản giáo viên mở hết (unlock.ts).
  */
+import { FESTIVAL_LAUNCHED } from '../../config/festival';
+import { BI_NHAC_HOI_SAP_MO, BI_NHAC_NHIEM, NHIEM_VU, NHIEM_VU_HOI_SAP_MO } from '../../content/dialogues';
 import { VILLAGE_ORDER } from '../../content/levels';
 import type { VillageId } from '../../village';
 import { type GateId } from './marketLayout';
@@ -55,6 +57,21 @@ export function previousVillage(id: GateId): VillageId | null {
 /** Chỉ số nhiệm vụ (0 đến 4) theo số Trang Sổ Vàng: 0 trang là "Đến Làng Giấy…", 4 trang là hội làng. */
 export function questIndex(goldenPages: number): number {
   return clampPages(goldenPages);
+}
+
+/**
+ * Dòng nhiệm vụ theo số Trang Sổ Vàng (chưa qua fmt). Đủ 4 trang: hội làng đã ra mắt (`launched`, mặc định `FESTIVAL_LAUNCHED`) thì mời dự hội, chưa thì "Hội làng sắp mở" (không mũi tên,
+ * không điểm đến: `questGate` đã trả null).
+ */
+export function questLine(goldenPages: number, launched: boolean = FESTIVAL_LAUNCHED): string {
+  const k = questIndex(goldenPages);
+  return k >= MAX_PAGES && !launched ? NHIEM_VU_HOI_SAP_MO : NHIEM_VU[k];
+}
+
+/** Câu Bi nói theo số Trang Sổ Vàng (chưa qua fmt); đủ 4 trang mà hội làng chưa ra mắt thì "Hội làng sắp mở". */
+export function biQuestLine(goldenPages: number, launched: boolean = FESTIVAL_LAUNCHED): string {
+  const k = questIndex(goldenPages);
+  return k >= MAX_PAGES && !launched ? BI_NHAC_HOI_SAP_MO : BI_NHAC_NHIEM[k];
 }
 
 /** Cổng cần tới theo nhiệm vụ (mũi tên chỉ về đó); đủ 4 trang thì không còn cổng nào để tới (hội làng). */

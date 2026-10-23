@@ -42,7 +42,7 @@ export { TapOrDragContainer, DraggableCard, DroppableSlot, useTapOrDrag } from '
 export { LevelFailed } from './ui/LevelFailed';
 export { DialogueBox, toVnTurns } from './ui/DialogueBox';
 export { withMoods } from './lesson2d/flow';
-export { VnDialog, PORTRAIT_SIZE_WIDE, PORTRAIT_SIZE_NARROW } from './ui/VnDialog';
+export { VnDialog, PORTRAIT_SIZE_WIDE, PORTRAIT_SIZE_NARROW, PORTRAIT_SIZE_LOW } from './ui/VnDialog';
 export { NenTrangTri } from './ui/NenTrangTri';
 export type { NenTrangTriProps } from './ui/NenTrangTri';
 export { PAGE_THEME, VILLAGE_THEME, THEME_GRADIENT, THEME_FADE_MS, STORY_IMAGE_OPACITY, storyTheme } from './content/nenTrangTri';
