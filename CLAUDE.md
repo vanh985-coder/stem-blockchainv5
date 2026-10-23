@@ -97,12 +97,12 @@ File này khớp với `GEMINI.md` (cùng nội dung, chỉ khác dòng tiêu đ
 - Docker Desktop có thể không chạy trên máy này; Vite nhớ cả import hỏng (khởi động lại dev server khi sửa lỗi import).
 
 ## 12. Quy tắc làm việc
-- KHÔNG tự `git commit`, `git push`. Khi xong chỉ đề xuất thông điệp commit (tiếng Việt, dạng "hub: …; lang-giay: …"); người dùng tự commit.
+- Commit: tự commit sau mỗi bước, CHỈ khi pnpm test, pnpm typecheck, pnpm check:text đều xanh. Mỗi bước một commit (sửa lỗi trong cùng bước thì commit thêm). Message tiếng Việt, dạng "<gói>: <việc đã làm>". Không commit .env*, assets/, file tạm. Không push, không sửa lịch sử (không amend, rebase, force).
 - HỎI TRƯỚC mọi thay đổi về server, Cloudflare, Supabase (migration, edge function, RLS, khóa, DNS, cache). KHÔNG deploy.
 - Không in ra hay ghi bí mật (khóa, token, mật khẩu, nội dung `.env.local`) vào chat, log, file, ảnh chụp.
 - Làm đúng spec. Chỗ spec chưa nói thì chọn phương án hợp lý nhất, nhưng PHẢI ghi rõ là "tự chọn" trong báo cáo. Không thêm tính năng ngoài spec.
 - Cập nhật spec liên quan (số liệu, đường dẫn, quyết định) trong cùng đợt làm.
-
+- docs: luật commit cho Claude Code, ước lượng mốc 3 (làng to)
 ## 13. Mẫu báo cáo khi xong một việc
 Trả lời bằng bản tóm tắt tiếng Việt gồm:
 1. **Đã làm gì** (ngắn, theo ý chứ không liệt kê từng file).
