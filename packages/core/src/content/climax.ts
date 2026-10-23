@@ -11,7 +11,10 @@ export const climaxUi = {
   loiPhanDienCoA: 'Có ạ!',
   /** Bước d: Thầy Linh trao Trang Sổ Vàng thứ tư */
   traoTrang: 'Thầy Linh trao Trang Sổ Vàng thứ tư.',
+  /** Lời Bi khi hội làng đã ra mắt (`FESTIVAL_LAUNCHED` = true) */
   biDuTrang: 'Đủ 4 trang rồi! Cả làng đang mở hội.',
+  /** Lời Bi khi hội làng chưa ra mắt (`FESTIVAL_LAUNCHED` = false), kèm dòng `hoiLangSapMo` */
+  biDuTrangChuanBi: 'Đủ 4 trang rồi! Cả làng đang chuẩn bị mở hội.',
   hoiLangSapMo: 'Hội làng sắp mở',
   /** Nút ở lượt cuối */
   xemKetQua: 'Xem kết quả',

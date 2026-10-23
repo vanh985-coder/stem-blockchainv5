@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { STORY, fmt, phanDien } from '@so-chung/core';
+import { FESTIVAL_LAUNCHED, STORY, fmt, phanDien } from '@so-chung/core';
 import { climaxMotion, climaxSteps, finishLabelOf } from './climaxFlow';
 
 const TEN = 'Minh';
@@ -31,12 +31,23 @@ describe('cảnh cao trào sau màn 12', () => {
     expect(b.turns.map((t) => t.speaker)).toEqual(['Tí', 'Cụ Bình', 'Tí']);
   });
 
-  it('bước d: thầy Linh trao trang với hàng 4 ô, rồi Bi "Đủ 4 trang rồi! Cả làng đang mở hội." kèm dòng "Hội làng sắp mở"', () => {
+  it('bước d: thầy Linh trao trang với hàng 4 ô, rồi Bi "Đủ 4 trang rồi! Cả làng đang chuẩn bị mở hội." kèm dòng "Hội làng sắp mở" (hội làng chưa ra mắt)', () => {
     const d = climaxSteps({ ten: TEN, award: true })[3];
     expect(d.scene).toBe(true);
     expect(d.turns[0]).toMatchObject({ portrait: 'thay-linh', text: 'Thầy Linh trao Trang Sổ Vàng thứ tư.', pagesRow: true });
-    expect(d.turns[1]).toMatchObject({ speaker: 'Bi', portrait: 'bi', text: 'Đủ 4 trang rồi! Cả làng đang mở hội.', note: 'Hội làng sắp mở' });
+    expect(d.turns[1]).toMatchObject({ speaker: 'Bi', portrait: 'bi', text: 'Đủ 4 trang rồi! Cả làng đang chuẩn bị mở hội.', note: 'Hội làng sắp mở' });
     expect(d.turns.filter((t) => t.pagesRow)).toHaveLength(1);
+  });
+
+  it('bước d theo cờ hội làng: mặc định theo FESTIVAL_LAUNCHED (false); đã ra mắt thì Bi "Cả làng đang mở hội." và không còn dòng "Hội làng sắp mở"', () => {
+    expect(FESTIVAL_LAUNCHED).toBe(false);
+    const off = climaxSteps({ ten: TEN, award: true, festivalLaunched: false })[3];
+    expect(off.turns[1]).toMatchObject({ text: 'Đủ 4 trang rồi! Cả làng đang chuẩn bị mở hội.', note: 'Hội làng sắp mở' });
+    expect(climaxSteps({ ten: TEN, award: true })[3]).toEqual(off);
+    const on = climaxSteps({ ten: TEN, award: true, festivalLaunched: true })[3];
+    expect(on.turns[1]).toMatchObject({ speaker: 'Bi', text: 'Đủ 4 trang rồi! Cả làng đang mở hội.' });
+    expect(on.turns[1].note).toBeUndefined();
+    expect(on.turns[0]).toEqual(off.turns[0]);
   });
 
   it('mọi lượt có chữ, không còn chỗ giữ tên chưa thay, không viết cứng tên phản diện trong chữ nguồn', () => {

@@ -6,7 +6,7 @@
  *  d. thầy Linh trao Trang Sổ Vàng thứ tư (hàng 4 ô), Bi nói, dòng "Hội làng sắp mở".
  * Bước d chỉ có khi trang thứ tư chưa có trước ván này (tài khoản đã có trang từ luật mốc 1 thì không trao lại) hoặc khi xem lại.
  */
-import { CHARACTERS, STORY, climaxUi, fmt, speakerLabel, type CharacterId } from '@so-chung/core';
+import { CHARACTERS, FESTIVAL_LAUNCHED, STORY, climaxUi, fmt, speakerLabel, type CharacterId } from '@so-chung/core';
 
 export type ClimaxStepId = 'a' | 'b' | 'c' | 'd';
 
@@ -34,6 +34,8 @@ export interface ClimaxOptions {
   ten: string;
   /** Có trao Trang Sổ Vàng thứ tư ở bước d không */
   award: boolean;
+  /** Hội làng đã ra mắt chưa (mặc định `FESTIVAL_LAUNCHED`): chưa thì Bi nói "đang chuẩn bị mở hội" kèm dòng "Hội làng sắp mở", rồi thì "đang mở hội" và không có dòng đó */
+  festivalLaunched?: boolean;
 }
 
 const storyTurn = (n: number, ten: string): ClimaxTurn => {
@@ -51,7 +53,7 @@ const say = (id: CharacterId, text: string, ten: string, extra: Partial<ClimaxTu
 });
 
 /** Các bước của cảnh, theo thứ tự a, b, c rồi d (nếu có trao trang). */
-export function climaxSteps({ ten, award }: ClimaxOptions): ClimaxStep[] {
+export function climaxSteps({ ten, award, festivalLaunched = FESTIVAL_LAUNCHED }: ClimaxOptions): ClimaxStep[] {
   const steps: ClimaxStep[] = [
     { id: 'a', scene: false, turns: [storyTurn(10, ten)] },
     {
@@ -68,7 +70,7 @@ export function climaxSteps({ ten, award }: ClimaxOptions): ClimaxStep[] {
       turns: [
         // lời chú thích của cảnh trao trang: chân dung thầy Linh, không ghi tên người nói (không phải lời thoại)
         { portrait: CHARACTERS.thayLinh.portrait, text: fmt(climaxUi.traoTrang, { ten }), speakerId: 'thayLinh', mood: 'vui', pagesRow: true },
-        say('bi', climaxUi.biDuTrang, ten, { note: climaxUi.hoiLangSapMo, mood: 'vui' }),
+        festivalLaunched ? say('bi', climaxUi.biDuTrang, ten, { mood: 'vui' }) : say('bi', climaxUi.biDuTrangChuanBi, ten, { note: climaxUi.hoiLangSapMo, mood: 'vui' }),
       ],
     });
   }

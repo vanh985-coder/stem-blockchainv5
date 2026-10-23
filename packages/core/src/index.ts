@@ -70,6 +70,7 @@ export { LEVELS, VILLAGE_ORDER, levelById, levelsOfVillage } from './content/lev
 export { medalOf, gameResultOf, summarizeGame } from './games/medals';
 export { GAMES, gameUi, runnerUi, runnerScoreLabels, rebuildUi, memoryUi, modCalcUi, climbUi } from './content/games';
 export { climaxUi } from './content/climax';
+export { FESTIVAL_LAUNCHED } from './config/festival';
 export { GoldenPagesRow } from './three/village/GoldenPagesRow';
 export type { GameText } from './content/games';
 export { MiniGameLevel } from './ui/MiniGameLevel';
