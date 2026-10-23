@@ -66,26 +66,26 @@ describe('bảng test của spec 06 (màn 5)', () => {
     expect(s.mice).toHaveLength(0);
   });
 
-  it('chuột ở trên vùng đập (vị trí < 7), đập làn đó: không trúng, không bị phạt (chỉ nghỉ làn)', () => {
+  it('chuột ở trên vùng đập (vị trí < 6,5), đập làn đó: không trúng, không bị phạt (chỉ nghỉ làn)', () => {
     const s = quiet();
-    spawnMouse(s, 'thuong', 2, 6.9);
+    spawnMouse(s, 'thuong', 2, 6.4);
     const e = hitLane(s, 2);
     expect(e).toEqual([{ type: 'miss', lane: 2 }]);
     expect(s.score).toBe(0);
     expect(s.ink).toBe(0);
     expect(s.mice).toHaveLength(1);
-    // chuột đã qua vùng đập (> 8,5) cũng không đập được
+    // chuột đã qua vùng đập (> 9) cũng không đập được
     const t = quiet();
-    spawnMouse(t, 'thuong', 1, 8.6);
+    spawnMouse(t, 'thuong', 1, 9.1);
     expect(hitLane(t, 1)[0].type).toBe('miss');
   });
 
-  it('vùng đập là [7; 8,5] (15% đến 30% chiều dài làn tính từ dưới lên)', () => {
-    expect(WHACK_SPEC.zoneStart).toBe(WHACK_SPEC.laneLength * (1 - 0.3));
-    expect(WHACK_SPEC.zoneEnd).toBe(WHACK_SPEC.laneLength * (1 - 0.15));
+  it('vùng đập là [6,5; 9] (10% đến 35% chiều dài làn tính từ dưới lên)', () => {
+    expect(WHACK_SPEC.zoneStart).toBe(WHACK_SPEC.laneLength * (1 - 0.35));
+    expect(WHACK_SPEC.zoneEnd).toBe(WHACK_SPEC.laneLength * (1 - 0.1));
     const s = quiet();
     const m = spawnMouse(s, 'thuong', 0);
-    for (const [pos, inside] of [[6.99, false], [7, true], [7.75, true], [8.5, true], [8.51, false]] as const) {
+    for (const [pos, inside] of [[6.49, false], [6.5, true], [7.75, true], [9, true], [9.01, false]] as const) {
       m.pos = pos;
       expect(inZone(m), String(pos)).toBe(inside);
     }
@@ -104,7 +104,7 @@ describe('bảng test của spec 06 (màn 5)', () => {
   it('chuột đổi làn: làn 0 sang làn 1, làn 3 sang làn 2, chỉ một lần; làn giữa sang trái hoặc phải theo rng', () => {
     for (const [from, to] of [[0, 1], [3, 2]] as const) {
       const s = quiet();
-      const m = spawnMouse(s, 'doiLan', from, 5.4);
+      const m = spawnMouse(s, 'doiLan', from, 4.9);
       const ev = stepWhack(s, 0.2);
       expect(ev.filter((x) => x.type === 'laneChange')).toHaveLength(1);
       expect(m.lane).toBe(to);
@@ -115,7 +115,7 @@ describe('bảng test của spec 06 (màn 5)', () => {
     const seen = new Set<number>();
     for (let seed = 1; seed <= 40; seed++) {
       const s = quiet(seed);
-      const m = spawnMouse(s, 'doiLan', 1, 5.4);
+      const m = spawnMouse(s, 'doiLan', 1, 4.9);
       stepWhack(s, 0.2);
       expect([0, 2]).toContain(m.lane);
       seen.add(m.lane);
@@ -123,18 +123,67 @@ describe('bảng test của spec 06 (màn 5)', () => {
     expect([...seen].sort()).toEqual([0, 2]);
     // làn 2 sang 1 hoặc 3
     const s = quiet(5);
-    const m = spawnMouse(s, 'doiLan', 2, 5.4);
+    const m = spawnMouse(s, 'doiLan', 2, 4.9);
     stepWhack(s, 0.2);
     expect([1, 3]).toContain(m.lane);
   });
 
-  it('chuột đổi làn nhảy khi tới vị trí 5,5 (cách vùng đập 1,5), chưa tới thì chưa nhảy', () => {
+  it('chuột đổi làn nhảy khi tới vị trí 5,0 (cách vùng đập 1,5), chưa tới thì chưa nhảy', () => {
     expect(WHACK_SPEC.zoneStart - WHACK_SPEC.laneChangeAt).toBe(1.5);
     const s = quiet();
-    const m = spawnMouse(s, 'doiLan', 0, 5);
+    const m = spawnMouse(s, 'doiLan', 0, 4.5);
     stepWhack(s, 0.1);
-    expect(m.pos).toBeLessThan(5.5);
+    expect(m.pos).toBeLessThan(5);
     expect(m.lane).toBe(0);
+  });
+
+  it('chuột đổi làn chỉ nhảy sang làn kề đang trống trong ±1,5 quanh vị trí của nó; làn kề bị chiếm thì không đổi (vẫn đổi làn, vẫn 15 điểm)', () => {
+    // làn 0: làn 1 có chuột ở vị trí 5,8 (cách 0,9 < 1,5) thì ở nguyên làn 0
+    const s = quiet();
+    const m = spawnMouse(s, 'doiLan', 0, 4.9);
+    spawnMouse(s, 'thuong', 1, 5.8);
+    const ev = stepWhack(s, 0.1);
+    expect(ev.filter((e) => e.type === 'laneChange')).toHaveLength(0);
+    expect(m.lane).toBe(0);
+    expect(m.changed).toBe(true);
+    expect(m.kind).toBe('doiLan');
+    stepWhack(s, 0.4);
+    expect(m.lane).toBe(0); // không thử lại
+    m.pos = 7.5;
+    expect(hitLane(s, 0)[0]).toMatchObject({ type: 'hit', killed: true, points: 15 });
+    // chuột ở làn kề cách xa (> 1,5) thì không chặn
+    const t = quiet();
+    const n = spawnMouse(t, 'doiLan', 0, 4.9);
+    spawnMouse(t, 'thuong', 1, 7.0);
+    stepWhack(t, 0.1);
+    expect(n.lane).toBe(1);
+    // làn 3 sang làn 2 cũng xét làn 2
+    const u = quiet();
+    const p = spawnMouse(u, 'doiLan', 3, 4.9);
+    spawnMouse(u, 'nhanh', 2, 4.0);
+    stepWhack(u, 0.1);
+    expect(p.lane).toBe(3);
+  });
+
+  it('chuột đổi làn ở làn giữa: bên rng chọn bị chiếm thì thử bên kia; cả hai bị chiếm thì không đổi', () => {
+    for (let seed = 1; seed <= 20; seed++) {
+      const a = quiet(seed);
+      const m = spawnMouse(a, 'doiLan', 1, 4.9);
+      spawnMouse(a, 'thuong', 0, 5.2); // làn 0 bị chiếm → phải sang làn 2
+      stepWhack(a, 0.1);
+      expect(m.lane, `seed ${seed}`).toBe(2);
+      const b = quiet(seed);
+      const n = spawnMouse(b, 'doiLan', 2, 4.9);
+      spawnMouse(b, 'thuong', 3, 4.5); // làn 3 bị chiếm → phải sang làn 1
+      stepWhack(b, 0.1);
+      expect(n.lane, `seed ${seed}`).toBe(1);
+      const c = quiet(seed);
+      const k = spawnMouse(c, 'doiLan', 1, 4.9);
+      spawnMouse(c, 'thuong', 0, 5.5);
+      spawnMouse(c, 'thuong', 2, 4.0);
+      stepWhack(c, 0.1);
+      expect(k.lane, `seed ${seed}`).toBe(1);
+    }
   });
 
   it('chuột to: đập lần 1 vẫn còn (khựng, chớp sáng); đập lần 2 thì mất, +30', () => {
@@ -356,7 +405,7 @@ describe('tốc độ, nhịp sinh, tỉ lệ loại', () => {
     expect(runSeconds(120)).toBeCloseTo(1.8, 12);
     expect(runSeconds(60)).toBeCloseTo(2.4, 12);
     expect(runSeconds(500)).toBeCloseTo(1.8, 12);
-    expect(mouseSpeed(0)).toBeCloseTo(7 / 3, 12);
+    expect(mouseSpeed(0)).toBeCloseTo(6.5 / 3, 12);
     for (const [clock, secs] of [[0, 3.0], [120, 1.8]] as const) {
       const s = quiet();
       s.clock = clock;
@@ -517,5 +566,62 @@ describe('tất định', () => {
       expect(got.bosses, `dt ${dt}`).toEqual(ref.bosses);
       expect(got.coins.slice(0, 10), `dt ${dt}`).toEqual(ref.coins.slice(0, 10));
     }
+  });
+});
+
+describe('sửa sau B6: trùm đúng xoá vết mực, thời gian trong vùng đập', () => {
+  it('trả lời đúng câu trùm xoá 1 vết mực nếu đang có: 3 vết → 2 vết; 0 vết → vẫn 0', () => {
+    const s = quiet();
+    s.ink = 3;
+    toQuiz(s);
+    const e = answerBoss(s, 'correct', 7);
+    expect(s.ink).toBe(2);
+    expect(e[0]).toMatchObject({ type: 'bossAnswer', result: 'correct', points: 135, ink: 2 });
+    expect(s.score).toBe(135);
+    const t = quiet();
+    expect(t.ink).toBe(0);
+    toQuiz(t);
+    answerBoss(t, 'correct', 7);
+    expect(t.ink).toBe(0);
+    expect(t.phase).toBe('play');
+  });
+
+  it('sai hoặc hết giờ vẫn +1 vết mực, không xoá vết nào', () => {
+    for (const result of ['wrong', 'timeout'] as const) {
+      const s = quiet();
+      s.ink = 2;
+      toQuiz(s);
+      answerBoss(s, result, 0);
+      expect(s.ink).toBe(3);
+    }
+  });
+
+  it('trùm đúng ở lượt cuối khi đang có 4 vết mực: xoá 1 vết rồi mới xét kết thúc (hết ván "complete")', () => {
+    const s = quiet();
+    s.bossesDone = 9;
+    s.ink = 4;
+    toQuiz(s);
+    answerBoss(s, 'correct', 3);
+    expect(s.ink).toBe(3);
+    expect(s.ended).toBe('complete');
+  });
+
+  it('thời gian chuột nằm trong vùng đập (dài 2,5 đơn vị): thường 1,154 giây và nhanh 0,721 giây ở giây 0; 0,692 và 0,433 giây ở giây 120', () => {
+    const len = WHACK_SPEC.zoneEnd - WHACK_SPEC.zoneStart;
+    expect(len).toBe(2.5);
+    expect(len / mouseSpeed(0)).toBeCloseTo(1.1538, 3);
+    expect(len / (mouseSpeed(0) * WHACK_SPEC.fastFactor)).toBeCloseTo(0.7212, 3);
+    expect(len / mouseSpeed(120)).toBeCloseTo(0.6923, 3);
+    expect(len / (mouseSpeed(120) * WHACK_SPEC.fastFactor)).toBeCloseTo(0.4327, 3);
+    // đo trong ván: chuột thường ở giây 0 ở trong vùng đập khoảng 1,15 giây
+    const s = quiet();
+    const m = spawnMouse(s, 'thuong', 0, WHACK_SPEC.zoneStart);
+    let t = 0;
+    while (inZone(m) && t < 5) {
+      stepWhack(s, 0.01);
+      t += 0.01;
+    }
+    expect(t).toBeGreaterThan(1.14);
+    expect(t).toBeLessThan(1.17);
   });
 });

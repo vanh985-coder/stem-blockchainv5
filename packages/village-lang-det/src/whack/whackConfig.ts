@@ -1,7 +1,7 @@
 /**
  * Số liệu của màn 5 "Đập {phanDien}" (spec 06, mục "Màn 5"). Đơn vị thời gian: GIÂY (mọi `dt`, đồng hồ, thời hạn đều là giây); khoảng cách: đơn vị dọc làn.
  *
- * Làn dài 10 đơn vị, vị trí tính từ đầu làn (0, nơi chuột xuất hiện) xuống cuốn sổ (10). Vùng đập là 15% đến 30% chiều dài tính từ dưới lên, tức vị trí [7; 8,5]; tới 10 là lọt vào sổ.
+ * Làn dài 10 đơn vị, vị trí tính từ đầu làn (0, nơi chuột xuất hiện) xuống cuốn sổ (10). Vùng đập là 10% đến 35% chiều dài tính từ dưới lên, tức vị trí [6,5; 9] (sửa sau B6: trước là 15% đến 30%, [7; 8,5], vì game quá khó: bot trung bình thua sau khoảng 20 chuột, không tới được câu hỏi); tới 10 là lọt vào sổ.
  * Những chỗ spec chưa nói (đã chốt trong lời giao bước B6, ghi cả trong spec 06): vị trí vùng đập, đồng hồ lịch dừng trong lượt trùm, lượt trùm làm chuột còn 20% tốc độ rồi đứng yên khi mở câu hỏi,
  * làm tròn xuống số giây còn lại. Số "tự chọn" của bước này được ghi chú riêng ngay tại chỗ.
  */
@@ -10,11 +10,11 @@ export const WHACK_SPEC = {
   lanes: 4,
   /** Chiều dài làn, và hai đầu vùng đập (vị trí tính từ đầu làn) */
   laneLength: 10,
-  zoneStart: 7,
-  zoneEnd: 8.5,
+  zoneStart: 6.5,
+  zoneEnd: 9,
   /** Đập hụt thì làn đó nghỉ chừng này giây (không đập được) */
   hitRest: 0.2,
-  /** Chuột cần `runSecondsStart` giây từ đầu làn tới đầu vùng đập (vị trí 7) lúc đồng hồ lịch = 0, giảm tuyến tính còn `runSecondsEnd` giây ở giây `rampSeconds` (rồi giữ nguyên) */
+  /** Chuột cần `runSecondsStart` giây từ đầu làn tới đầu vùng đập (vị trí 6,5) lúc đồng hồ lịch = 0, giảm tuyến tính còn `runSecondsEnd` giây ở giây `rampSeconds` (rồi giữ nguyên) */
   runSecondsStart: 3,
   runSecondsEnd: 1.8,
   rampSeconds: 120,
@@ -35,8 +35,12 @@ export const WHACK_SPEC = {
   ] as const,
   /** Điểm mỗi loại khi hạ xong */
   points: { thuong: 10, doiLan: 15, nhanh: 15, to: 30 },
-  /** Chuột đổi làn: tới vị trí này (cách đầu vùng đập 1,5) thì nhảy sang làn kề một lần */
-  laneChangeAt: 5.5,
+  /**
+   * Chuột đổi làn: tới vị trí này (cách đầu vùng đập 1,5) thì nhảy sang làn kề một lần, nhưng chỉ sang làn kề đang trống trong khoảng ±`laneChangeClear` quanh vị trí của nó (làn giữa: thử bên rng chọn, bị chiếm thì thử bên kia;
+   * không làn nào trống thì không đổi, vẫn là chuột đổi làn, vẫn 15 điểm). Sửa sau B6.
+   */
+  laneChangeAt: 5,
+  laneChangeClear: 1.5,
   /** Chuột nhanh: tốc độ nhân lên */
   fastFactor: 1.6,
   /** Chuột to: đập 2 lần, sau lần đầu khựng (đứng yên) chừng này giây và chớp sáng */
@@ -51,15 +55,17 @@ export const WHACK_SPEC = {
   coin: { every: 8, jitter: 1, life: 2.5, points: 5, xu: 1, posMin: 2, posMax: 6 },
   /**
    * Trùm: `count` lần, ở giây `every`, 2 × `every`, … của đồng hồ lịch (12, 24, …, 120). Lúc trùm ra chuột còn `slowFactor` tốc độ trong lúc {phanDien} chạy xuống (`runSeconds` giây, tự chọn, tới giữa vùng đập),
-   * rồi mở câu hỏi: chuột đứng yên. Thời gian trả lời: `answerSeconds[0]` cho lần 1–5, `answerSeconds[1]` cho lần 6–10. Đúng: `base` + `perSecond` × số giây còn lại (làm tròn xuống).
+   * rồi mở câu hỏi: chuột đứng yên. Thời gian trả lời: `answerSeconds[0]` cho lần 1–5, `answerSeconds[1]` cho lần 6–10. Đúng: `base` + `perSecond` × số giây còn lại (làm tròn xuống), và xoá 1 vết mực nếu đang có (`inkOnCorrect`, không xuống dưới 0; sửa sau B6). Sai hoặc hết giờ: +1 vết mực.
    */
-  boss: { count: 10, every: 12, slowFactor: 0.2, runSeconds: 1.2, answerSeconds: [15, 10] as const, firstHalf: 5, base: 100, perSecond: 5 },
+  boss: { count: 10, every: 12, slowFactor: 0.2, runSeconds: 1.2, answerSeconds: [15, 10] as const, firstHalf: 5, base: 100, perSecond: 5, inkOnCorrect: -1 },
   /** Bước mô phỏng cố định (giây): `stepWhack` chia `dt` thành các bước này để kết quả không phụ thuộc tốc độ khung hình (tự chọn: 1/120) */
   tick: 1 / 120,
   /**
-   * Mốc điểm cả ván: Đồng, Bạc, Vàng (spec 06; khai báo theo chuẩn màn 2, 3, 8, 12). Spec ghi "chỉnh lại sau khi chơi thử": số liệu bot ở `whackBalance.test.ts` và spec 06.
+   * Mốc điểm cả ván: Đồng, Bạc, Vàng (khai báo theo chuẩn màn 2, 3, 8, 12). TẠM, chỉnh khi học sinh chơi thật. Đặt theo số liệu 300 ván mỗi bot (sửa sau B6, thay 800 / 1600 / 2400 của spec cũ):
+   * Đồng = phân vị 25% điểm bot trung bình (575) làm tròn xuống bội số 50; Bạc = phân vị 75% điểm bot trung bình (1535) làm tròn xuống bội số 50; Vàng = phân vị 10% điểm bot giỏi (3120) làm tròn xuống bội số 100.
+   * Phân vị theo hạng gần nhất (`percentile` ở `whackBots.ts`). Xem `whackBalance.test.ts` và spec 06.
    */
-  medals: [800, 1600, 2400] as const,
+  medals: [550, 1500, 3100] as const,
 } as const;
 
 export type MouseKind = 'thuong' | 'doiLan' | 'nhanh' | 'to';

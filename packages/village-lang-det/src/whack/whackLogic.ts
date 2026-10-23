@@ -249,6 +249,22 @@ function spawnLaneChoices(s: WhackState): number[] {
   return ok;
 }
 
+/** Làn kề `lane` có trống quanh vị trí `pos` (không con nào trong ±`laneChangeClear`) không; `self` là con đang đổi làn (bỏ qua). */
+function laneClear(s: WhackState, lane: number, pos: number, self: Mouse): boolean {
+  for (const o of s.mice) if (o !== self && o.lane === lane && Math.abs(o.pos - pos) <= WHACK_SPEC.laneChangeClear + EPS) return false;
+  return true;
+}
+
+/**
+ * Làn mà chuột đổi làn `m` nhảy sang: làn ngoài cùng chỉ có một làn kề; làn giữa thì rng chọn bên trước, bị chiếm thì thử bên kia. Không làn nào trống thì null (không đổi). Rng chỉ rút ở làn giữa.
+ */
+function pickLaneChange(s: WhackState, m: Mouse): number | null {
+  const last = WHACK_SPEC.lanes - 1;
+  const options = m.lane === 0 ? [1] : m.lane === last ? [last - 1] : s.rng() < 0.5 ? [m.lane - 1, m.lane + 1] : [m.lane + 1, m.lane - 1];
+  for (const lane of options) if (laneClear(s, lane, m.pos, m)) return lane;
+  return null;
+}
+
 function stepOnce(s: WhackState, out: WhackEvent[]): void {
   const h = WHACK_SPEC.tick;
   const boss = s.phase === 'bossRun';
@@ -267,9 +283,12 @@ function stepOnce(s: WhackState, out: WhackEvent[]): void {
     m.pos += m.speed * mul * h;
     if (m.kind === 'doiLan' && !m.changed && m.pos >= WHACK_SPEC.laneChangeAt) {
       const from = m.lane;
-      m.lane = from === 0 ? 1 : from === WHACK_SPEC.lanes - 1 ? from - 1 : s.rng() < 0.5 ? from - 1 : from + 1;
+      const to = pickLaneChange(s, m);
       m.changed = true;
-      out.push({ type: 'laneChange', mouse: m, from });
+      if (to !== null) {
+        m.lane = to;
+        out.push({ type: 'laneChange', mouse: m, from });
+      }
     }
   }
   // lọt: xử lý theo thứ tự id để cùng seed cùng thứ tự sự kiện
@@ -388,7 +407,7 @@ export function collectCoin(s: WhackState): WhackEvent[] {
 }
 
 /**
- * Kết quả lượt trùm (chỉ nhận khi bảng câu hỏi đang mở). Đúng: +100 + 5 × số giây còn lại (làm tròn xuống). Sai hoặc hết giờ: +1 vết mực. Rồi {phanDien} rời đi và mọi thứ chạy lại;
+ * Kết quả lượt trùm (chỉ nhận khi bảng câu hỏi đang mở). Đúng: +100 + 5 × số giây còn lại (làm tròn xuống) và xoá 1 vết mực nếu đang có (không xuống dưới 0). Sai hoặc hết giờ: +1 vết mực. Rồi {phanDien} rời đi và mọi thứ chạy lại;
  * xong lượt thứ 10 hoặc đủ 5 vết mực thì hết ván (đủ 5 vết mực xét trước).
  */
 export function answerBoss(s: WhackState, result: BossResult, secondsLeft = 0): WhackEvent[] {
@@ -399,6 +418,8 @@ export function answerBoss(s: WhackState, result: BossResult, secondsLeft = 0): 
     points = bossPoints(Math.min(secondsLeft, s.boss.answerSeconds));
     s.score += points;
     s.stats.bossCorrect++;
+    // trả lời đúng thì xoá 1 vết mực nếu đang có
+    s.ink = Math.max(0, s.ink + WHACK_SPEC.boss.inkOnCorrect);
   } else {
     s.ink++;
   }

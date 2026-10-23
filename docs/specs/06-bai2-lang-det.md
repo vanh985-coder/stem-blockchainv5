@@ -44,7 +44,7 @@ Logic đặt trong `whackLogic.ts` (hàm thuần, có test).
 - **4 làn:** mỗi làn là một đoạn thẳng từ điểm trên tới điểm dưới, tính theo tọa độ chuẩn hóa của ảnh, lưu trong `man05Lanes.ts`.
   - Có trang `/dev/man-05-lanes` để bấm chọn điểm trực tiếp trên ảnh, khớp đúng 4 dải vải.
   - Chuột chạy dọc theo đoạn thẳng, càng lên trên càng nhỏ (theo phối cảnh của ảnh).
-- **Vùng đập:** đoạn cuối mỗi làn, ngay trên bàn sổ, từ 15% đến 30% chiều dài làn tính từ dưới lên. Có vệt sáng mờ để học sinh nhìn thấy.
+- **Vùng đập:** đoạn cuối mỗi làn, ngay trên bàn sổ, từ **10% đến 35%** chiều dài làn tính từ dưới lên (sửa sau B6, trước là 15% đến 30%, xem "Sửa sau B6" bên dưới). Có vệt sáng mờ để học sinh nhìn thấy.
 - **Hình rời:** `sprites/man-05-dap-ti/` gồm `chuot-giay-thuong`, `chuot-giay-doi-lan`, `chuot-giay-nhanh`, `chuot-giay-to`, `vet-muc`. Tiền đồng dùng `ui/icons/tien-dong`.
 - **Học sinh:** model 3D đứng dưới cùng, tay phải cầm quạt nan (code dựng, gắn vào xương `mixamorig:RightHand`). Khi đập thì lướt sang làn đó và dùng tư thế `swing`.
 - **{phanDien}:** model 3D, xuất hiện khi làm "trùm".
@@ -65,12 +65,12 @@ Logic đặt trong `whackLogic.ts` (hàm thuần, có test).
 | Loại | Đặc điểm | Điểm |
 |---|---|---|
 | Thường | Chạy thẳng | 10 |
-| Đổi làn | Khi còn cách vùng đập 1,5 đơn vị, nhảy sang làn bên cạnh **một lần** (ở làn ngoài cùng thì sang làn phía trong) | 15 |
+| Đổi làn | Khi còn cách vùng đập 1,5 đơn vị, nhảy sang làn bên cạnh **một lần** (ở làn ngoài cùng thì sang làn phía trong), nhưng chỉ khi làn đó đang trống trong khoảng ±1,5 quanh vị trí của nó; không thì ở nguyên làn (vẫn là chuột đổi làn, vẫn 15 điểm) | 15 |
 | Nhanh | Nhỏ hơn, nhanh gấp 1,6 lần | 15 |
 | To | Phải đập 2 lần; sau lần đầu khựng lại 0,3 giây và chớp sáng | 30 |
 
 **Tốc độ và nhịp sinh:**
-- Chuột cần 3 giây để chạy từ đầu làn tới vùng đập; giảm dần còn 1,8 giây ở giây thứ 120.
+- Chuột cần 3 giây để chạy từ đầu làn tới **đầu vùng đập**; giảm dần còn 1,8 giây ở giây thứ 120.
 - Nhịp sinh 1,2 giây một con, giảm dần còn 0,55 giây.
 - Không sinh chuột vào làn nếu con gần nhất ở làn đó còn quá gần điểm xuất phát (dưới 15% chiều dài làn).
 
@@ -95,7 +95,7 @@ Logic đặt trong `whackLogic.ts` (hàm thuần, có test).
   - {phanDien} chạy xuống một làn ngẫu nhiên (`run`), dừng giữa vùng đập, rồi `cheer` trêu.
 - **Câu hỏi:** hiện `QuizCard`, ôn Bài 1–2. Có 15 giây cho lần 1–5, 10 giây cho lần 6–10.
   - Rê chuột lên đáp án nào thì học sinh **quay đầu nhìn đáp án đó** (`ChoiceReaction`).
-- **Đúng:** học sinh lướt tới, đét quạt nan vào mông {phanDien} (`swing`). {phanDien} giật nảy (`hurt`), kêu "Ui da!" rồi chạy ngược lên, biến mất. Được **100 + 5 × số giây còn lại**.
+- **Đúng:** học sinh lướt tới, đét quạt nan vào mông {phanDien} (`swing`). {phanDien} giật nảy (`hurt`), kêu "Ui da!" rồi chạy ngược lên, biến mất. Được **100 + 5 × số giây còn lại**, và **xoá 1 vết mực** nếu đang có (sửa sau B6).
 - **Sai hoặc hết giờ:** học sinh đập trượt, {phanDien} cúi né, lè lưỡi rồi chạy thẳng xuống sổ: **+1 vết mực**. Hiện đáp án đúng và giải thích.
 - **Kết thúc:** xong lượt trùm thứ 10 (chơi trọn), hoặc đủ 5 vết mực.
 
@@ -103,36 +103,48 @@ Logic đặt trong `whackLogic.ts` (hàm thuần, có test).
 
 | Mốc | Điểm |
 |---|---|
-| Đồng | 800 |
-| Bạc | 1600 |
-| Vàng | 2400 |
+| Đồng | 550 |
+| Bạc | 1500 |
+| Vàng | 3100 |
 
-Các mốc này chỉnh lại sau khi chơi thử (số liệu bot và mốc đề xuất: mục "Chốt cho logic" bên dưới).
+Các mốc này **tạm, chỉnh khi học sinh chơi thật** (sửa sau B6: trước là 800 / 1600 / 2400). Đặt theo số liệu bot mới (300 ván mỗi bot): Đồng = phân vị 25% điểm bot trung bình (575) làm tròn xuống bội số 50; Bạc = phân vị 75% điểm bot trung bình (1535) làm tròn xuống bội số 50; Vàng = phân vị 10% điểm bot giỏi (3120) làm tròn xuống bội số 100. Số liệu: mục "Chốt cho logic" bên dưới.
 
-### Chốt cho logic (mốc 3, bước B6; code ở `packages/village-lang-det/src/whack/`)
+### Chốt cho logic (mốc 3, bước B6 và sửa sau B6; code ở `packages/village-lang-det/src/whack/`)
 
 Chỉ có logic (chưa có cảnh; màn 5 vẫn `coming-soon`). Đơn vị thời gian là **giây**. Cấu trúc theo mẫu màn 12: `whackConfig.ts` (số liệu, mốc `WHACK_SPEC.medals`), `whackLogic.ts` (hàm thuần, `createMulberry32`), `whackLogic.test.ts`, `whackBots.ts`, `whackBalance.test.ts`, `index.ts`.
 
-- **Làn dài 10 đơn vị**, vị trí tính từ đầu làn (0) xuống sổ (10). **Vùng đập** từ 15% đến 30% chiều dài tính từ dưới lên, tức vị trí **[7; 8,5]**. Tới 10 là lọt vào sổ.
+- **Làn dài 10 đơn vị**, vị trí tính từ đầu làn (0) xuống sổ (10). **Vùng đập** từ 10% đến 35% chiều dài tính từ dưới lên, tức vị trí **[6,5; 9]** (dài 2,5 đơn vị). Tới 10 là lọt vào sổ.
 - **Đồng hồ lịch** (dùng cho lịch trùm 12, 24, …, 120; tỉ lệ loại chuột; tốc độ; nhịp sinh) **dừng trong lượt trùm** (cả lúc {phanDien} chạy xuống lẫn lúc mở câu hỏi). Tiền đồng (hiện, biến mất) cũng đếm theo đồng hồ này nên dừng (tự chọn).
 - **Lượt trùm:** ngừng sinh chuột; chuột đang chạy còn 20% tốc độ trong lúc {phanDien} chạy xuống (1,2 giây, tự chọn); khi bảng câu hỏi mở thì chuột **đứng yên** và không nhận cú đập. Trả lời xong (hoặc hết giờ) thì {phanDien} rời đi, mọi thứ chạy lại. Trong lúc {phanDien} chạy xuống vẫn đập được chuột (tự chọn).
-- **Điểm trùm:** số giây còn lại **làm tròn xuống** (còn 7,0 đến 7,99 giây thì 7 → +135). Logic chỉ nhận kết quả `correct` / `wrong` / `timeout` kèm số giây còn lại; đếm giờ và chọn câu hỏi do `QuizCard` lo.
-- **Tốc độ:** chuột cần 3 giây từ 0 tới vị trí 7 (tốc độ 7/3 đơn vị/giây), giảm tuyến tính còn 1,8 giây ở giây 120 của đồng hồ lịch (rồi giữ). Tốc độ của mỗi con chốt lúc sinh. **Nhịp sinh** 1,2 giây giảm tuyến tính còn 0,55; con đầu tiên ở giây 1,2 (tự chọn). Không sinh vào làn có con gần nhất còn dưới 1,5; chọn làn đều trong các làn còn lại.
-- **Đổi làn:** tới vị trí 5,5 (cách vùng đập 1,5) thì nhảy sang làn kề một lần (làn 0 → 1, làn 3 → 2, làn giữa trái hoặc phải theo rng). **Nhanh:** tốc độ ×1,6. **To:** đập 2 lần; sau lần đầu khựng 0,3 giây (đứng yên) và có cờ chớp sáng; hạ xong +30.
+- **Điểm trùm:** số giây còn lại **làm tròn xuống** (còn 7,0 đến 7,99 giây thì 7 → +135). Logic chỉ nhận kết quả `correct` / `wrong` / `timeout` kèm số giây còn lại; đếm giờ và chọn câu hỏi do `QuizCard` lo. Đúng thì **xoá 1 vết mực** nếu đang có (không xuống dưới 0); sai hoặc hết giờ +1 vết mực.
+- **Tốc độ:** chuột cần 3 giây từ 0 tới đầu vùng đập (vị trí 6,5; tốc độ 6,5/3 đơn vị/giây), giảm tuyến tính còn 1,8 giây ở giây 120 của đồng hồ lịch (rồi giữ). Tốc độ của mỗi con chốt lúc sinh. **Nhịp sinh** 1,2 giây giảm tuyến tính còn 0,55; con đầu tiên ở giây 1,2 (tự chọn). Không sinh vào làn có con gần nhất còn dưới 1,5; chọn làn đều trong các làn còn lại.
+- **Thời gian chuột nằm trong vùng đập** (2,5 đơn vị ÷ tốc độ): chuột thường **1,154 giây** ở giây 0 và **0,692 giây** ở giây 120; chuột nhanh (×1,6) **0,721 giây** ở giây 0 và **0,433 giây** ở giây 120.
+- **Đổi làn:** tới vị trí **5,0** (cách vùng đập 1,5) thì nhảy sang làn kề một lần, nhưng chỉ sang làn kề đang **trống trong khoảng ±1,5 quanh vị trí của nó** (không có chuột nào của làn đó ở vị trí cách nó ≤ 1,5). Làn 0 → 1, làn 3 → 2; làn giữa thử bên rng chọn, bị chiếm thì thử bên kia; không làn nào trống thì **không đổi** (không thử lại; vẫn là chuột đổi làn, vẫn 15 điểm). **Nhanh:** tốc độ ×1,6. **To:** đập 2 lần; sau lần đầu khựng 0,3 giây (đứng yên) và có cờ chớp sáng; hạ xong +30.
 - **Đập hụt:** làn nghỉ 0,2 giây (không nhận cú đập); đập trúng không nghỉ. **Tiền đồng:** hiện ở làn ngẫu nhiên, vị trí ngẫu nhiên trong [2; 6] (tự chọn), cách nhau 8 ± 1 giây, tồn tại 2,5 giây, chạm +5 điểm +1 xu. **Thua:** đủ 5 vết mực (xét trước); **thắng trọn:** xong lượt trùm thứ 10.
 - **Bước mô phỏng cố định 1/120 giây:** `stepWhack(s, dt)` chia `dt` thành các bước này (rng chỉ rút trong bước cố định) nên cùng seed cùng ván và dt khác nhau (1/30, 1/60, 1/144) cho cùng chuỗi sinh chuột, đồng và trùm.
 
-**Số liệu bot** (`whackBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300; mốc hiện tại 800 / 1600 / 2400). Bot chỉ dùng thao tác của học sinh; phản xạ tính từ lúc chuột vào vùng đập, một tay (hai cú đập cách nhau ≥ 0,15 giây bot giỏi, 0,2 giây bot trung bình, tự chọn), chuột to đếm lại phản xạ sau cú đầu:
+**Sửa sau B6 (lý do: game quá khó, bot trung bình thua sau khoảng 20 chuột, không tới được câu hỏi):**
 
-| Bot | Chưa đạt | Đồng | Bạc | Vàng | Thua (5 vết mực) | Điểm trung bình (nhỏ nhất đến lớn nhất) |
-|---|---|---|---|---|---|---|
-| Lý tưởng (phản xạ 0, đúng hết, trả lời ngay) | 0% | 0% | 0% | 100% | 0% | 3579,9 (3445 đến 3765) |
-| Giỏi (phản xạ 0,25 giây, đúng 95%, trả lời sau 4 giây) | 0% | 0% | 1,7% | **98,3%** | 65,7% | 3080,0 (1985 đến 3485) |
-| Trung bình (phản xạ 0,45 giây, bỏ sót 25% chuột, đúng 70%, trả lời sau 7 giây) | 99,3% | 0,7% | 0% | 0% | 100% | 295,6 (0 đến 980) |
+| Luật | Trước | Sau |
+|---|---|---|
+| Vùng đập | 15% đến 30%, vị trí [7; 8,5] | 10% đến 35%, vị trí [6,5; 9]; "3 giây / 1,8 giây" tính tới đầu vùng mới (6,5) |
+| Đổi làn | còn cách vùng đập 1,5 → vị trí 5,5; luôn nhảy | vị trí 5,0; chỉ nhảy khi làn kề trống trong ±1,5 |
+| Trả lời đúng câu trùm | chỉ cộng điểm | cộng điểm và xoá 1 vết mực nếu đang có |
+| Mô hình bot | phản xạ từ lúc chuột vào vùng; bỏ sót 25% | canh trước: đập lúc chuột ở giữa vùng, lệch giờ chuẩn σ; bỏ sót 2% / 10% |
+| Mốc | 800 / 1600 / 2400 | 550 / 1500 / 3100 (tạm, theo phân vị bot) |
 
-- **Điểm tối đa lý thuyết ước tính khoảng 3580:** trùm 5 × (100 + 5 × 15) + 5 × (100 + 5 × 10) = 1625; khoảng 143 chuột (khoảng 1880 điểm); khoảng 14,5 đồng (khoảng 73 điểm). Chơi hoàn hảo không có phản xạ trễ là chuẩn trên.
-- **Bot giỏi đạt Vàng 98,3% (đạt yêu cầu ≥ 90%).** Nó vẫn lọt trung bình 4 chuột và hay sai một lượt trùm, nên 65,7% ván kết thúc vì đủ 5 vết mực, thường ở lượt trùm thứ 9, nhưng điểm đã qua 2400.
-- **Bot trung bình không rơi vào Đồng/Bạc** với mốc hiện tại: bỏ sót 25% chuột thì đủ 5 vết mực sau khoảng 20 con (vài chục giây đầu), chỉ làm được 1 đến 2 lượt trùm. **Không sửa mốc ở bước B6.** Đề xuất (chưa áp dụng, chờ chơi thử với học sinh thật): **150 / 500 / 2400** (bot trung bình: 18,3% chưa đạt, 72,3% Đồng, 9,3% Bạc, 0% Vàng; bot giỏi vẫn 98,3% Vàng). Phương án nhẹ hơn: 200 / 600 / 2400 (23,3% / 73,7% / 3,0% / 0%). Giữ Vàng 2400: bot giỏi thấp nhất 1985, phân vị 5% là 2665.
+**Số liệu bot** (`whackBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300; mốc 550 / 1500 / 3100). Bot "canh trước": với mỗi con chuột chọn giờ đập lúc con đó ở giữa vùng đập (vị trí 7,75), lệch giờ theo phân phối chuẩn; một tay (hai cú đập cách nhau ≥ 0,15 giây), xếp hàng theo thứ tự chuột tới vùng; chuột to đập lần hai sau lần đầu + 0,3 giây khựng; tiền đồng nhặt sau 0,3 giây (tự chọn); chỉ dùng thao tác của học sinh:
+
+| Bot | Chưa đạt | Đồng | Bạc | Vàng | Thua (5 vết mực) | Điểm trung bình (nhỏ nhất đến lớn nhất) | Lượt trùm gặp được (trung bình) | % ván hết 10 lượt trùm |
+|---|---|---|---|---|---|---|---|---|
+| Lý tưởng (σ 0, không sót, đúng hết, trả lời ngay) | 0% | 0% | 0% | 100% | 0% | 3576,4 (3395 đến 3745) | 10 | 100% |
+| Giỏi (σ 0,05 giây, bỏ sót 2%, đúng 95%, trả lời sau 4 giây) | 0% | 0% | 8,7% | **91,3%** | 0,3% | 3264,9 (2310 đến 3490) | 9,997 | 99,7% |
+| Trung bình (σ 0,12 giây, bỏ sót 10%, đúng 70%, trả lời sau 7 giây) | 23,0% | 49,0% | 28,0% | 0% | 98,7% | 1105,6 (55 đến 2940) | **4,74** | 1,3% |
+
+- **Mốc theo phân vị** (hạng gần nhất, 300 ván): Đồng = p25 bot trung bình 575 → 550; Bạc = p75 bot trung bình 1535 → 1500; Vàng = p10 bot giỏi 3120 → 3100. Đồng < Bạc < Vàng. Điểm bot trung bình p10 / p50 / p90 = 340 / 1020 / 1940; bot giỏi p25 / p50 / p90 = 3200 / 3275 / 3410.
+- **Điểm tối đa lý thuyết ước tính khoảng 3580:** trùm 5 × (100 + 5 × 15) + 5 × (100 + 5 × 10) = 1625; khoảng 143 chuột (khoảng 1880 điểm); khoảng 14,5 đồng (khoảng 73 điểm).
+- **Bot giỏi đạt Vàng 91,3% (đạt yêu cầu ≥ 90%)**, gần như luôn chơi hết 10 lượt trùm.
+- **Mục tiêu CHƯA đạt: bot trung bình gặp trung bình 4,74 lượt trùm, dưới mục tiêu 6.** Nó lọt trung bình 6,0 chuột mỗi ván và 98,7% ván thua vì đủ 5 vết mực, chỉ 1,3% chơi hết 10 lượt trùm (dù đã được xoá vết mực khi trả lời đúng). Theo lời giao KHÔNG đổi thêm luật; chờ học sinh chơi thật rồi chỉnh (cân nhắc: nới thêm vùng đập, tăng số vết mực, hoặc xoá nhiều vết hơn khi trả lời đúng).
 
 ### Test (`whackLogic.ts`; ngoài 10 dòng dưới còn test đồng hồ lịch dừng, chuột đứng yên khi mở câu hỏi, tỉ lệ loại, tốc độ, nhịp sinh, chuột to khựng, làn nghỉ, tất định theo seed và theo dt)
 
