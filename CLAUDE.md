@@ -86,7 +86,7 @@ File này khớp với `GEMINI.md` (cùng nội dung, chỉ khác dòng tiêu đ
 
 ## 10. Tham số dev và trang thử
 - Địa chỉ `/cho`: `?q=low|medium|high` (ép mức chất lượng), `?tu=<id làng>` (xuất hiện trong làng, cạnh biển), `?mo=<id làng>` (cách cổng 8,5 nhìn vào cổng, để thử hiệu ứng mở cổng), `?cam=top|oblique|free` (góc nhìn cố định để chụp; `free` đặt `window.__freeCam = {x,y,z,tx,ty,tz}` khi có PROBE), `?debug=colliders` (vẽ vật cản), `?loi3d=1` (ép lỗi 3D, chỉ khi chạy dev), `?warmup=off` (tắt `SceneWarmup`).
-- Trang thử chỉ có khi chạy dev: `/dev/assets`, `/dev/ui`, `/dev/nen`, `/dev/minigame`, `/dev/guide`, `/dev/3d`, `/dev/25d`, `/dev/walk`, `/dev/portraits`, `/dev/ban-do-hotspots`. Trang người chơi: `/ban-do` (bản đồ 2D đi nhanh).
+- Trang thử chỉ có khi chạy dev: `/dev/assets`, `/dev/ui`, `/dev/nen`, `/dev/minigame`, `/dev/guide`, `/dev/3d`, `/dev/25d`, `/dev/walk`, `/dev/portraits`, `/dev/ban-do-hotspots`. Trang người chơi: `/ban-do` (bản đồ 2D đi nhanh). Ở vỏ Làng Dệt (`pnpm dev:lang-det`, 5175) có thêm `/dev/man-05-lanes`: bấm chọn điểm 4 làn của màn 5 trên ảnh nền rồi chép khối mã xuất ra vào `packages/village-lang-det/src/whack/man05Lanes.ts`.
 - `pnpm guide:capture`: tự chụp ảnh thật cho Hướng dẫn chơi bằng Chrome (tự bật máy chủ dev còn thiếu); sau đó `pnpm assets:build`.
 - `pnpm assets:build` cần chạy lại khi đổi đồ họa gốc; commit `assets-build/`.
 

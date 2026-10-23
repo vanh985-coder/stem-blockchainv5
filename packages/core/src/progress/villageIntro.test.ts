@@ -97,7 +97,8 @@ describe('ghép danh sách nhiệm vụ của làng', () => {
     expect(tasks[0].state).toBe('open');
     expect(tasks[1].state).toBe('locked'); // màn 2 sẵn sàng nhưng phải xong màn 1 trước
     expect(tasks[2].state).toBe('locked'); // màn 3 sẵn sàng (bước 14) nhưng phải chơi màn 2 trước
-    expect(introTasks('lang-det', unlock)[1].state).toBe('coming-soon'); // game làng Dệt chưa ra mắt
+    expect(introTasks('lang-det', unlock)[1].state).toBe('locked'); // màn 5 đã ra mắt (bước B7) nhưng phải xong bài học trước
+    expect(introTasks('lang-det', unlock)[2].state).toBe('coming-soon'); // màn 6 làng Dệt chưa ra mắt
   });
 
   it('trạng thái đổi theo tiến độ: xong bài học thì màn 1 là "xong"', () => {

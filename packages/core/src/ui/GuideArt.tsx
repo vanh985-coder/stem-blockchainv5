@@ -251,6 +251,40 @@ function Leaf({ x, y, rot = 0, color = '#6fae4b' }: { x: number; y: number; rot?
   );
 }
 
+/** Chuột giấy của màn 5 (hình minh họa): thân gấp, hai tai, đuôi; đầu quay sang trái trước khi xoay `rot` độ. */
+function PaperMouse({ x, y, s = 1, rot = 0 }: { x: number; y: number; s?: number; rot?: number }) {
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${rot}) scale(${s})`}>
+      <path d="M24 2 q14 -10 22 0" fill="none" stroke="#d9c9a3" strokeWidth={3} strokeLinecap="round" />
+      <polygon points="-22,0 -10,-9 14,-10 24,-4 24,4 14,10 -10,9" fill="#f6ecd0" stroke="#a8946a" strokeWidth={2} strokeLinejoin="round" />
+      <polygon points="-6,-8 -2,-17 4,-9" fill="#efe1bb" stroke="#a8946a" strokeWidth={1.5} />
+      <polygon points="-6,8 -2,17 4,9" fill="#efe1bb" stroke="#a8946a" strokeWidth={1.5} />
+      <path d="M-22 0 L6 0" stroke="#c4b184" strokeWidth={1.5} />
+    </g>
+  );
+}
+
+const LANE_COLORS = ['#e23b3b', '#3c4aa8', '#e1a926', '#3f9a47'];
+
+/** Sân dệt nhìn từ trên: 4 dải vải (đỏ, xanh đen, vàng, xanh lá), vệt sáng ở cuối mỗi làn và cuốn sổ tím ở dưới. */
+function Courtyard({ mouseLane }: { mouseLane?: number }) {
+  const top = [112, 144, 176, 208];
+  const bottom = [70, 130, 190, 250];
+  return (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      {top.map((tx, i) => (
+        <g key={i}>
+          <polygon points={`${tx - 9},12 ${tx + 9},12 ${bottom[i] + 24},118 ${bottom[i] - 24},118`} fill={LANE_COLORS[i]} opacity={0.9} />
+          <polygon points={`${bottom[i] - 21},92 ${bottom[i] + 21},92 ${bottom[i] + 24},118 ${bottom[i] - 24},118`} fill="#fffbe0" opacity={0.7} />
+        </g>
+      ))}
+      <rect x={118} y={122} width={84} height={20} rx={3} fill="#7b5ad0" stroke={C.ink} strokeWidth={2} />
+      {mouseLane !== undefined && <PaperMouse x={bottom[mouseLane]} y={100} s={0.8} rot={-90} />}
+    </g>
+  );
+}
+
 const K = huongDan.phim;
 
 const ARTS: Record<GuideArtId, () => ReactNode> = {
@@ -584,6 +618,69 @@ const ARTS: Record<GuideArtId, () => ReactNode> = {
       <circle cx={256} cy={118} r={11} fill="#8a5a36" />
       <rect x={246} y={128} width={20} height={26} rx={7} fill="#6b4a2f" />
       <Arrow x1={240} y1={110} x2={196} y2={76} width={4} />
+    </g>
+  ),
+  'dap-lan-phim': () => (
+    <g>
+      <Courtyard mouseLane={2} />
+      <Key x={60} y={142} w={44} h={34} label="D" />
+      <Key x={112} y={142} w={44} h={34} label="F" />
+      <Key x={164} y={142} w={44} h={34} label="J" />
+      <Key x={216} y={142} w={44} h={34} label="K" />
+    </g>
+  ),
+  'dap-lan-cham': () => (
+    <g>
+      <Courtyard mouseLane={1} />
+      <Finger x={138} y={110} />
+      <path d="M124 150 q14 -20 28 0" fill="none" stroke={C.purple} strokeWidth={4} strokeLinecap="round" strokeDasharray="6 5" />
+    </g>
+  ),
+  'chuot-loai': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      <PaperMouse x={44} y={90} rot={-90} />
+      <PaperMouse x={124} y={90} rot={-90} />
+      <path d="M124 52 q22 -2 24 22" fill="none" stroke={C.purple} strokeWidth={4} strokeLinecap="round" />
+      <polygon points="150,76 142,64 156,64" fill={C.purple} />
+      <PaperMouse x={204} y={96} s={0.8} rot={-90} />
+      <path d="M190 40 v28 M204 34 v34 M218 40 v28" stroke={C.gold} strokeWidth={4} strokeLinecap="round" />
+      <PaperMouse x={282} y={90} s={1.35} rot={-90} />
+      <circle cx={264} cy={30} r={7} fill={C.red} />
+      <circle cx={282} cy={30} r={7} fill={C.red} />
+    </g>
+  ),
+  'so-muc': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      <rect x={70} y={56} width={120} height={84} rx={8} fill="#7b5ad0" stroke={C.ink} strokeWidth={3} />
+      <rect x={82} y={68} width={96} height={6} rx={3} fill="#c9baf0" />
+      <rect x={82} y={82} width={70} height={6} rx={3} fill="#c9baf0" />
+      <ellipse cx={120} cy={108} rx={22} ry={16} fill="#17141b" />
+      <ellipse cx={156} cy={98} rx={14} ry={11} fill="#17141b" />
+      <ellipse cx={104} cy={130} rx={10} ry={7} fill="#17141b" />
+      {Array.from({ length: 8 }, (_, i) => (
+        <circle key={i} cx={30 + i * 17} cy={26} r={6} fill={i < 3 ? C.red : '#fffaf0'} stroke={C.wood} strokeWidth={2} />
+      ))}
+      <g transform="translate(250 84)">
+        <circle r={26} fill="#fffaf0" stroke={C.wood} strokeWidth={3} />
+        <path d="M-10 4 l8 8 l16 -18" fill="none" stroke={C.green} strokeWidth={6} strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+    </g>
+  ),
+  'trum-hoi': () => (
+    <g>
+      <Courtyard />
+      <circle cx={160} cy={74} r={16} fill="#8a5a36" stroke={C.ink} strokeWidth={2.5} />
+      <rect x={150} y={88} width={20} height={30} rx={7} fill="#6b4a2f" />
+      <path d="M154 54 q6 -12 12 0" fill="none" stroke={C.ink} strokeWidth={3} strokeLinecap="round" />
+      <rect x={200} y={26} width={104} height={74} rx={10} fill="#fffaf0" stroke={C.wood} strokeWidth={3.5} />
+      <rect x={210} y={36} width={84} height={9} rx={4} fill={C.wood} opacity={0.55} />
+      <rect x={210} y={52} width={36} height={14} rx={5} fill="#cfe2a6" stroke={C.green} strokeWidth={2} />
+      <rect x={252} y={52} width={36} height={14} rx={5} fill="#f4e3b2" stroke={C.wood} strokeWidth={2} />
+      <rect x={210} y={72} width={36} height={14} rx={5} fill="#f4e3b2" stroke={C.wood} strokeWidth={2} />
+      <rect x={252} y={72} width={36} height={14} rx={5} fill="#f4e3b2" stroke={C.wood} strokeWidth={2} />
+      <path d="M215 59 l5 5 l10 -11" fill="none" stroke={C.green} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
     </g>
   ),
   'bon-trang': () => (

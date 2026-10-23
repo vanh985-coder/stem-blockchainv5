@@ -1,6 +1,6 @@
 import { useFrame, type ThreeElements } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
-import { Box3, type AnimationClip, type Group, type Object3D } from 'three';
+import { Box3, Vector3, type AnimationClip, type Group, type Object3D } from 'three';
 import { createMulberry32 } from '../lib/rng';
 import { BlobShadow } from './BlobShadow';
 import { useModel } from './Model';
@@ -78,6 +78,11 @@ export interface CharacterProps extends GroupProps {
   hang?: boolean;
   /** Đung đưa khi treo (tắt khi "Giảm chuyển động"); mặc định bật */
   hangSway?: boolean;
+  /**
+   * Vật cầm ở tay phải (gắn vào xương `RightHand`), dựng bằng code theo đơn vị của nhân vật (cao 1,7; tay ở gốc, trục Y dọc bàn tay), ví dụ quạt nan của màn 5. Chiều gắn tự bù tỉ lệ của xương nên vật có cỡ
+   * thật như đã dựng; gỡ ra khi đổi hay khi nhân vật bị dọn. Chỉ nhân vật có xương; người dùng tự giải phóng hình học và vật liệu của vật.
+   */
+  heldProp?: Object3D | null;
 
   // --- Nhân vật đứng yên ---
   /** "talking": nghiêng đầu và quay mặt về `lookAt` */
@@ -121,6 +126,8 @@ function hasSkinnedMesh(scene: Object3D): boolean {
 }
 
 const ALL_CLIPS: readonly ClipName[] = CLIP_NAMES;
+const HAND_SCALE = new Vector3();
+const ROOT_SCALE = new Vector3();
 
 /**
  * Nhân vật (spec 03 mục 3): cao 1,7, chân ở y = 0, mặt quay +Z (nhân bản bằng useModel).
@@ -143,6 +150,7 @@ export function Character({
   aim,
   hang = false,
   hangSway = true,
+  heldProp = null,
   mood = 'idle',
   happyTrigger,
   lookAt,
@@ -192,6 +200,7 @@ export function Character({
           aim={aim}
           hang={hang}
           hangSway={hangSway}
+          heldProp={heldProp}
           onReady={onReady}
         />
       ) : (
@@ -224,12 +233,13 @@ interface RigAnimatorProps {
   aim?: Aim | null;
   hang: boolean;
   hangSway: boolean;
+  heldProp: Object3D | null;
   onClipEnd?: (clip: ClipName) => void;
   onReady?: (info: CharacterInfo) => void;
 }
 
 /** Không vẽ gì; điều khiển AnimationMixer và lớp tư thế của nhân vật có xương. */
-function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing, animation, trigger, returnTo, clips, clipConfig, fade, timeScale, pose, aim, hang, hangSway, onClipEnd, onReady }: RigAnimatorProps) {
+function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing, animation, trigger, returnTo, clips, clipConfig, fade, timeScale, pose, aim, hang, hangSway, heldProp, onClipEnd, onReady }: RigAnimatorProps) {
   // Mượn clip của model khác nếu thiếu. Hỏi tên clip của model cho mượn một cách lười: chỉ tải khi thật sự cần.
   const ownNames = animations.map((a) => a.name);
   const sources = borrowClips(id, (mid) => (mid === id ? ownNames : readModel(mid).animations.map((a) => a.name)), clips);
@@ -304,6 +314,21 @@ function RigAnimator({ id, scene, animations, fit, height, outer, motion, facing
   useEffect(() => {
     host.layer?.setHang(hang, hangSway);
   }, [host, version, hang, hangSway]);
+
+  // Vật cầm ở tay phải: gắn vào xương RightHand, bù tỉ lệ của xương (xương Mixamo tính bằng cm, cả nhân vật còn phóng theo cỡ khung) để vật có cỡ như đã dựng
+  useEffect(() => {
+    const bone = heldProp ? (scene.getObjectByName('mixamorigRightHand') ?? scene.getObjectByName('mixamorig:RightHand')) : null;
+    const root = outer.current;
+    if (!heldProp || !bone || !root) return;
+    root.updateWorldMatrix(true, true);
+    bone.getWorldScale(HAND_SCALE);
+    root.getWorldScale(ROOT_SCALE);
+    heldProp.scale.setScalar(ROOT_SCALE.x / Math.max(1e-6, HAND_SCALE.x));
+    bone.add(heldProp);
+    return () => {
+      bone.remove(heldProp);
+    };
+  }, [scene, heldProp, outer, version]);
 
   useFrame((state, dt) => host.update(state.clock.elapsedTime, dt));
 

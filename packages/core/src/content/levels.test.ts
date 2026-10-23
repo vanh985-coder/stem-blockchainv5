@@ -13,9 +13,9 @@ describe('levels', () => {
     expect(VILLAGE_ORDER).toEqual(['lang-giay', 'lang-det', 'lang-khac-dau', 'lang-bac']);
   });
 
-  it('mốc 3 bước B5: màn 1, 2, 3 (làng Giấy trọn vẹn), 4, 7, 8, 10, 12 là ready; 4 màn còn lại là coming-soon', () => {
-    expect(LEVELS.filter((l) => l.status === 'ready').map((l) => l.id)).toEqual([1, 2, 3, 4, 7, 8, 10, 12]);
-    expect(LEVELS.filter((l) => l.status === 'coming-soon').map((l) => l.id)).toEqual([5, 6, 9, 11]);
+  it('mốc 3 bước B7: màn 1, 2, 3 (làng Giấy trọn vẹn), 4, 5, 7, 8, 10, 12 là ready; 3 màn còn lại (6, 9, 11) là coming-soon', () => {
+    expect(LEVELS.filter((l) => l.status === 'ready').map((l) => l.id)).toEqual([1, 2, 3, 4, 5, 7, 8, 10, 12]);
+    expect(LEVELS.filter((l) => l.status === 'coming-soon').map((l) => l.id)).toEqual([6, 9, 11]);
   });
 
   it('có tên màn và tên biển gỗ, chỗ giữ tên hợp lệ', () => {
@@ -35,17 +35,18 @@ describe('nextReadyLevel (nút "Chơi tiếp" ở màn kết quả và ở trang
   it('màn 2 sang màn 3; màn 3, 8, 12 không còn màn nào trong làng nên chỉ còn "Về làng"', () => {
     expect(nextReadyLevel(2)?.id).toBe(3);
     expect(nextReadyLevel(3)).toBeUndefined();
+    expect(nextReadyLevel(5)).toBeUndefined(); // màn 6 còn sắp ra mắt
     expect(nextReadyLevel(8)).toBeUndefined();
     expect(nextReadyLevel(12)).toBeUndefined();
   });
-  it('bỏ qua màn "sắp ra mắt": sau bài học 10 là màn 12 (màn 11 chưa có), sau bài học 7 là màn 8, sau bài học 1 là màn 2; Làng Dệt chưa có game nào', () => {
+  it('bỏ qua màn "sắp ra mắt": sau bài học 10 là màn 12 (màn 11 chưa có), sau bài học 7 là màn 8, sau bài học 4 là màn 5, sau bài học 1 là màn 2', () => {
     expect(nextReadyLevel(10)?.id).toBe(12);
     expect(nextReadyLevel(7)?.id).toBe(8);
     expect(nextReadyLevel(1)?.id).toBe(2);
-    expect(nextReadyLevel(4)).toBeUndefined();
+    expect(nextReadyLevel(4)?.id).toBe(5);
   });
   it('chỉ trong cùng làng; số màn lạ thì không có', () => {
-    for (const id of [1, 2, 3, 4, 7, 8, 10, 12]) {
+    for (const id of [1, 2, 3, 4, 5, 7, 8, 10, 12]) {
       const next = nextReadyLevel(id);
       if (next) expect(next.lang).toBe(levelById(id)?.lang);
     }

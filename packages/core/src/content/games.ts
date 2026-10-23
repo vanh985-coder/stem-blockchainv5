@@ -18,10 +18,11 @@ export interface GameText {
 /**
  * Chữ từng game phụ, theo số màn (1 đến 12): tên game ở đây; luật và cách điều khiển lấy từ `content/huongDanGame.ts` (chủ dự án sửa chữ ở đó). Chỉ có các màn đã ra mắt.
  */
-const textOf = (levelId: 2 | 3 | 8 | 12, ten: string): GameText => ({ ten, luat: HUONG_DAN_GAME[levelId].luat, dieuKhien: HUONG_DAN_GAME[levelId].dieuKhien });
+const textOf = (levelId: 2 | 3 | 5 | 8 | 12, ten: string): GameText => ({ ten, luat: HUONG_DAN_GAME[levelId].luat, dieuKhien: HUONG_DAN_GAME[levelId].dieuKhien });
 export const GAMES: Readonly<Partial<Record<number, GameText>>> = {
   2: textOf(2, 'Đuổi theo {phanDien}'),
   3: textOf(3, 'Ghép lại cuốn sổ'),
+  5: textOf(5, 'Đập {phanDien}'),
   8: textOf(8, 'Lật thẻ tìm cặp khóa'),
   12: textOf(12, 'Leo cây tìm lá giả'),
 };
@@ -220,4 +221,33 @@ export const climbUi = {
   phanVong: 'Vòng leo xong (× {diem})',
   phanDong: 'Tiền đồng',
   phanTim: 'Tim còn lại (× {diem})',
+} as const;
+
+/** Chữ trong màn 5 "Đập {phanDien}" (spec 06 mục Màn 5). Mọi câu đi qua fmt() ({phanDien}, {so}…). */
+export const whackUi = {
+  /** Nhãn đọc màn hình của khung chơi */
+  khung: 'Sân dệt. Phím D F J K hoặc chạm vào làn để đập chuột giấy.',
+  diem: 'Điểm: {so}',
+  xu: 'Xu: {so}',
+  trum: 'Trùm {so}/{max}',
+  /** Nhãn đọc màn hình của hàng chấm vết mực */
+  muc: 'Vết mực trên sổ: {so}/{max}',
+  /** Lượt trùm: tiêu đề, thời gian, kết quả */
+  cauHoi: '{phanDien} chạy xuống! Câu hỏi {so}/{max}',
+  conGio: 'Còn {giay} giây',
+  hetGio: 'Hết giờ rồi!',
+  dapAnDung: 'Đáp án đúng: {dapAn}',
+  uiDa: 'Ui da!',
+  quizDung: 'Trúng rồi! Em đét được {phanDien}: +{diem} điểm và xoá 2 vết mực.',
+  quizSai: '{phanDien} né được và chạy xuống sổ: thêm một vết mực.',
+  tiepTuc: 'Chơi tiếp',
+  /** Hết ván */
+  hetMuc: 'Sổ đầy mực rồi! Mình thử lại nhé.',
+  xongTrum: 'Em giữ được sổ qua cả 10 lượt của {phanDien}!',
+  xemKetQua: 'Xem kết quả',
+  /** Phần điểm ở màn kết quả: số lượng, điểm */
+  phanChuot: 'Chuột đập trúng',
+  phanDong: 'Tiền đồng nhặt được',
+  phanTrum: 'Lượt trùm trả lời đúng',
+  phanMuc: 'Vết mực trên sổ',
 } as const;

@@ -62,6 +62,10 @@ export interface WhackStats {
   leaked: number;
   coinsTaken: number;
   bossCorrect: number;
+  /** Điểm từ chuột (đập trúng), từ tiền đồng và từ trùm: chia điểm ở màn kết quả */
+  micePoints: number;
+  coinPoints: number;
+  bossPoints: number;
 }
 
 export interface WhackState {
@@ -202,7 +206,7 @@ export function createWhackGame(seed: number): WhackState {
     bossesDone: 0,
     boss: null,
     nextId: 1,
-    stats: { spawned: 0, hits: 0, misses: 0, leaked: 0, coinsTaken: 0, bossCorrect: 0 },
+    stats: { spawned: 0, hits: 0, misses: 0, leaked: 0, coinsTaken: 0, bossCorrect: 0, micePoints: 0, coinPoints: 0, bossPoints: 0 },
   };
   s.coinIn = nextCoinIn(rng);
   return s;
@@ -367,6 +371,13 @@ export function stepWhack(s: WhackState, dt: number): WhackEvent[] {
   return out;
 }
 
+/**
+ * Bước thời gian khi có thể đang tạm dừng (nút "?", tab ẩn, nhắc xoay ngang): `paused` thì KHÔNG có gì đổi (chuột, đồng, đồng hồ lịch, đồng hồ trùm đứng yên) và không có sự kiện.
+ */
+export function tickWhack(s: WhackState, dt: number, paused: boolean): WhackEvent[] {
+  return paused ? [] : stepWhack(s, dt);
+}
+
 // ---------------------------------------------------------------------------
 // Thao tác của học sinh
 
@@ -391,6 +402,7 @@ export function hitLane(s: WhackState, lane: number): WhackEvent[] {
   }
   const points = WHACK_SPEC.points[m.kind];
   s.score += points;
+  s.stats.micePoints += points;
   s.stats.hits++;
   s.mice.splice(s.mice.indexOf(m), 1);
   return [{ type: 'hit', lane, mouse: m, killed: true, points }];
@@ -401,6 +413,7 @@ export function collectCoin(s: WhackState): WhackEvent[] {
   if ((s.phase !== 'play' && s.phase !== 'bossRun') || !s.coin) return [];
   s.coin = null;
   s.score += WHACK_SPEC.coin.points;
+  s.stats.coinPoints += WHACK_SPEC.coin.points;
   s.coins += WHACK_SPEC.coin.xu;
   s.stats.coinsTaken++;
   return [{ type: 'coinTaken', points: WHACK_SPEC.coin.points, xu: WHACK_SPEC.coin.xu }];
@@ -417,6 +430,7 @@ export function answerBoss(s: WhackState, result: BossResult, secondsLeft = 0): 
   if (result === 'correct') {
     points = bossPoints(Math.min(secondsLeft, s.boss.answerSeconds));
     s.score += points;
+    s.stats.bossPoints += points;
     s.stats.bossCorrect++;
     // trả lời đúng thì xoá 2 vết mực nếu đang có
     s.ink = Math.max(0, s.ink + WHACK_SPEC.boss.inkOnCorrect);

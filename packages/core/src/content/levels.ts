@@ -29,7 +29,7 @@ export const LEVELS: readonly LevelDef[] = [
   { id: 2, lang: 'lang-giay', kind: 'game', ten: 'Đuổi theo {phanDien}', bien: 'Đuổi theo {phanDien}', status: 'ready' },
   { id: 3, lang: 'lang-giay', kind: 'game', ten: 'Ghép lại cuốn sổ', bien: 'Ghép lại cuốn sổ', status: 'ready' },
   { id: 4, lang: 'lang-det', kind: 'lesson', ten: 'Cả làng cùng giữ sổ', bien: 'Học cùng cụ Bình', status: 'ready' },
-  { id: 5, lang: 'lang-det', kind: 'game', ten: 'Đập {phanDien}', bien: 'Đập {phanDien}', status: 'coming-soon' },
+  { id: 5, lang: 'lang-det', kind: 'game', ten: 'Đập {phanDien}', bien: 'Đập {phanDien}', status: 'ready' },
   { id: 6, lang: 'lang-det', kind: 'game', ten: 'Diều đưa sổ', bien: 'Diều đưa sổ', status: 'coming-soon' },
   { id: 7, lang: 'lang-khac-dau', kind: 'lesson', ten: 'Khuôn riêng, mẫu chung', bien: 'Học cùng chú Dũng', status: 'ready' },
   { id: 8, lang: 'lang-khac-dau', kind: 'game', ten: 'Lật thẻ tìm cặp khóa', bien: 'Lật thẻ tìm cặp khóa', status: 'ready' },

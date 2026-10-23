@@ -106,13 +106,13 @@ describe('ba làng chưa dựng: đủ 3 biển (bài học và 2 game)', () => 
 
 describe('nhiệm vụ ở Làng Khắc Dấu khi màn 8 đã ra mắt (màn 9 còn sắp ra mắt)', () => {
   it('đã xong màn 7, chưa chơi màn 8: trong làng, mũi tên chỉ tới biển màn 8', () => {
-    const { unlock, next } = questIn('lang-khac-dau', [1, 2, 3, 4, 7]);
+    const { unlock, next } = questIn('lang-khac-dau', [1, 2, 3, 4, 5, 7]);
     expect(next).toBe(8);
     expect(targetNodeId({ inVillage: 'lang-khac-dau', nextBoard: next, pages: unlock.goldenPages })).toBe(boardNodeId(8));
   });
 
   it('đã chơi màn 8: có Trang Sổ Vàng 3, làng hết việc, nhiệm vụ chỉ sang cổng Bạc', () => {
-    const { unlock, next, stateOf } = questIn('lang-khac-dau', [1, 2, 3, 4, 7, 8]);
+    const { unlock, next, stateOf } = questIn('lang-khac-dau', [1, 2, 3, 4, 5, 7, 8]);
     expect(unlock.goldenPages).toBe(3);
     expect(stateOf(9)).toBe('coming-soon');
     expect(next).toBeNull();
@@ -121,9 +121,13 @@ describe('nhiệm vụ ở Làng Khắc Dấu khi màn 8 đã ra mắt (màn 9 c
   });
 
   it('biển sắp ra mắt không vào được (không phải open/done) nhưng không chặn màn sau', () => {
-    // Làng Dệt: màn 5, 6 sắp ra mắt; xong màn 4 là có trang 2 và cổng Khắc Dấu mở, màn 7 mở
-    const det = questIn('lang-det', [1, 2, 3, 4]);
-    expect(det.stateOf(5)).toBe('coming-soon');
+    // Làng Dệt: màn 5 đã ra mắt, màn 6 còn sắp ra mắt; xong màn 4 thì việc tiếp theo là biển màn 5, chơi màn 5 là có trang 2 và cổng Khắc Dấu mở, màn 7 mở
+    const lesson = questIn('lang-det', [1, 2, 3, 4]);
+    expect(lesson.stateOf(5)).toBe('open');
+    expect(lesson.next).toBe(5);
+    expect(lesson.unlock.goldenPages).toBe(1);
+    const det = questIn('lang-det', [1, 2, 3, 4, 5]);
+    expect(det.stateOf(5)).toBe('done');
     expect(det.stateOf(6)).toBe('coming-soon');
     expect(det.next).toBeNull();
     expect(det.unlock.goldenPages).toBe(2);

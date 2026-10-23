@@ -36,6 +36,8 @@ const ROWS: ClassProgressRow[] = [
   // Đào: bài 1 xong, bài 4 xong; game chưa chơi
   row({ student_id: 'd', display_name: 'Đào', level_id: 1, played: true, completed: true, stars: { de: 1, tb: 1, kho: 1 }, updated_at: '2026-03-03T08:00:00Z', golden_pages: 2 }),
   row({ student_id: 'd', display_name: 'Đào', level_id: 4, played: true, completed: true, stars: { de: 3, tb: 3, kho: 3 }, updated_at: '2026-03-04T08:00:00Z', golden_pages: 2 }),
+  // (bước B7: màn 5 đã ra mắt nên làng Dệt xong khi đã chơi cả màn 5)
+  row({ student_id: 'd', display_name: 'Đào', level_id: 5, played: true, completed: true, stars: { game: 2 }, best_score: 1700, updated_at: '2026-03-04T09:00:00Z', golden_pages: 2 }),
 ];
 
 describe('buildProgressTable', () => {
@@ -110,7 +112,7 @@ describe('isVillageDone và lọc "Chưa xong làng …"', () => {
     expect(isVillageDone(binh, 'lang-giay')).toBe(false); // Bình đã chơi màn 2 nhưng chưa chơi màn 3 (sẵn sàng từ mốc 2 bước 14)
     expect(isVillageDone(binh, 'lang-giay', [{ ...levelById(1)!, status: 'ready' as const }, { ...levelById(2)!, status: 'ready' as const }, { ...levelById(3)!, status: 'coming-soon' as const }])).toBe(true); // màn 3 sắp ra mắt thì không tính
     expect(isVillageDone(an, 'lang-giay')).toBe(false);
-    expect(isVillageDone(binh, 'lang-det')).toBe(false); // bài 4 chưa đủ 3 trạm
+    expect(isVillageDone(binh, 'lang-det')).toBe(false); // bài 4 chưa đủ 3 trạm, chưa chơi màn 5
     expect(isVillageDone(dao, 'lang-det')).toBe(true);
     expect(isVillageDone(dao, 'lang-khac-dau')).toBe(false);
   });

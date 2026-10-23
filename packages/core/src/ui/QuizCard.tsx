@@ -22,11 +22,13 @@ export interface QuizCardProps {
   levelId?: number;
   /** Ví dụ "Câu 2/4", hiện phía trên câu hỏi */
   caption?: string;
+  /** Gọn (cột hẹp cạnh một cảnh, ví dụ lượt trùm của màn 5): chữ, nút và khoảng cách nhỏ hơn */
+  compact?: boolean;
   className?: string;
 }
 
 /** Thẻ câu hỏi: đáp án là nút (bấm bằng chuột, chạm hoặc bàn phím). Đúng/sai có biểu tượng và chữ, không chỉ màu. */
-export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, caption, levelId, className = '' }: QuizCardProps) {
+export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, caption, levelId, compact = false, className = '' }: QuizCardProps) {
   const [chosen, setChosen] = useState<number | null>(null);
   const titleId = useId();
   const answered = chosen !== null;
@@ -70,13 +72,13 @@ export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, 
   };
 
   return (
-    <Panel className={['w-full max-w-2xl', className].join(' ')} role="group" aria-labelledby={titleId}>
+    <Panel className={['w-full max-w-2xl', compact ? '!p-2.5' : '', className].join(' ')} role="group" aria-labelledby={titleId}>
       {caption && <p className="mb-1 text-sm font-semibold text-nau-go-dam">{caption}</p>}
-      <h2 id={titleId} className="mb-4 text-xl leading-snug sm:text-2xl">
+      <h2 id={titleId} className={compact ? 'mb-2 text-base leading-snug' : 'mb-4 text-xl leading-snug sm:text-2xl'}>
         {fmt(question.text, vars)}
       </h2>
 
-      <ul className="space-y-3">
+      <ul className={compact ? 'space-y-1.5' : 'space-y-3'}>
         {question.options.map((option, i) => {
           const isRight = answered && i === question.correctIndex;
           const isWrongPick = answered && i === chosen && !isRight;
@@ -93,7 +95,7 @@ export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, 
                 {...reactions.bindChoice()}
                 onClick={(e) => choose(i, e.currentTarget)}
                 className={[
-                  'flex min-h-[52px] w-full items-center gap-3 rounded-nut border-2 px-4 py-3 text-left text-base font-semibold sm:text-lg',
+                  compact ? 'flex min-h-11 w-full items-center gap-2 rounded-nut border-2 px-2 py-1.5 text-left text-sm font-semibold' : 'flex min-h-[52px] w-full items-center gap-3 rounded-nut border-2 px-4 py-3 text-left text-base font-semibold sm:text-lg',
                   'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim',
                   answered ? 'cursor-default' : 'cursor-pointer',
                   tone,
@@ -101,7 +103,7 @@ export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, 
               >
                 <span
                   aria-hidden="true"
-                  className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-nau-go bg-white/70 font-display text-base font-extrabold"
+                  className={`grid shrink-0 place-items-center rounded-full border-2 border-nau-go bg-white/70 font-display font-extrabold ${compact ? 'size-6 text-sm' : 'size-8 text-base'}`}
                 >
                   {String.fromCharCode(65 + i)}
                 </span>
@@ -126,9 +128,9 @@ export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, 
         <div
           role="status"
           aria-live="polite"
-          className={`mt-4 rounded-2xl border-2 p-4 ${correct ? 'border-xanh-la-dam bg-xanh-la/15' : 'border-do-son-dam bg-do-son/10'}`}
+          className={`rounded-2xl border-2 ${compact ? 'mt-2 p-2 text-sm' : 'mt-4 p-4'} ${correct ? 'border-xanh-la-dam bg-xanh-la/15' : 'border-do-son-dam bg-do-son/10'}`}
         >
-          <p className={`flex items-center gap-2 font-display text-xl font-extrabold ${correct ? 'text-xanh-la-dam' : 'text-do-son-dam'}`}>
+          <p className={`flex items-center gap-2 font-display font-extrabold ${compact ? 'text-base' : 'text-xl'} ${correct ? 'text-xanh-la-dam' : 'text-do-son-dam'}`}>
             <span
               aria-hidden="true"
               className={`grid size-7 place-items-center rounded-full text-base text-white ${correct ? 'bg-xanh-la-dam' : 'bg-do-son'}`}
@@ -147,8 +149,8 @@ export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, 
             {fmt(question.explanation, vars)}
           </p>
           {onContinue && (
-            <div className="mt-3 flex justify-end">
-              <Button autoFocus onClick={onContinue}>
+            <div className="mt-2 flex justify-end">
+              <Button autoFocus size={compact ? 'sm' : undefined} className={compact ? 'min-h-11' : undefined} onClick={onContinue}>
                 {continueLabel ?? ui.quiz.cauTiep}
               </Button>
             </div>
