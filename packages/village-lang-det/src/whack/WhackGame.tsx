@@ -433,8 +433,8 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
             )}
 
             {quiz && question && (
-              <div data-whack-ui className={`absolute inset-y-1 z-20 w-[45%] min-w-[15rem] space-y-1 overflow-y-auto ${quiz.side === 'right' ? 'right-1' : 'left-1'}`} data-testid="trum-cau-hoi" onPointerDown={(e) => e.stopPropagation()}>
-                <div className={`rounded-nut bg-giay/95 px-2 py-0.5 ${quiz.side === 'right' ? 'pr-12' : ''}`}>
+              <div data-whack-ui className={`absolute inset-y-1 z-20 w-[45%] min-w-[15rem] flex flex-col gap-1 ${quiz.side === 'right' ? 'right-1' : 'left-1'}`} data-testid="trum-cau-hoi" onPointerDown={(e) => e.stopPropagation()}>
+                <div className={`shrink-0 rounded-nut bg-giay/95 px-2 py-0.5 ${quiz.side === 'right' ? 'pr-12' : ''}`}>
                   <p className="text-center font-display text-sm font-bold leading-snug">{fmt(whackUi.cauHoi, { so: quiz.index + 1, max: WHACK_SPEC.boss.count })}</p>
                   {quiz.answered === null && (
                     <div className="flex items-center gap-2">
@@ -446,7 +446,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
                   )}
                 </div>
                 {quiz.answered === 'timeout' ? (
-                  <Panel className="space-y-1.5 !p-2.5 text-sm" role="alert" data-testid="het-gio">
+                  <Panel className="shrink-0 space-y-1.5 !p-2.5 text-sm" role="alert" data-testid="het-gio">
                     <p className="font-bold text-do-son-dam">{whackUi.hetGio}</p>
                     <p>{fmt(whackUi.dapAnDung, { dapAn: question.options[question.correctIndex] })}</p>
                     <p className="text-xs">{fmt(question.explanation)}</p>
@@ -458,7 +458,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
                   <>
                     <QuizCard key={quiz.index} question={question} levelId={LEVEL_ID} compact onAnswer={onAnswer} onContinue={continueBoss} continueLabel={whackUi.tiepTuc} className="max-w-none" />
                     {quiz.answered !== null && (
-                      <p className="rounded-nut bg-giay/95 px-2 py-1 text-center text-xs font-semibold" data-testid="ket-qua-cau">
+                      <p className="shrink-0 rounded-nut bg-giay/95 px-2 py-1 text-center text-xs font-semibold" data-testid="ket-qua-cau">
                         {quiz.answered ? fmt(whackUi.quizDung, { diem: bossPoints(pending.current?.left ?? 0) }) : fmt(whackUi.quizSai)}
                       </p>
                     )}

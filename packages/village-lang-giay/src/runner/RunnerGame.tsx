@@ -99,11 +99,11 @@ function QuizOverlay({ session, question, quiz, hearts }: { session: RunnerSessi
   const resume = useCallback(() => session.resumeQuiz(), [session]);
   const label = last ? runnerUi.xemKetQua : runnerUi.chayTiep;
   return (
-    <div className="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:items-center" data-testid="cau-hoi">
-      <div className="w-full max-w-2xl space-y-3 py-2">
-        <p className="rounded-nut bg-giay/95 px-4 py-2 text-center font-display text-lg font-bold shadow-md">{fmt(runnerUi.cauHoi, { so: quiz.round + 1 })}</p>
+    <div className="fixed inset-0 z-30 flex items-start justify-center bg-black/40 p-3 [@media(max-height:520px)]:p-2 sm:items-center" data-testid="cau-hoi">
+      <div className="flex max-h-full w-full max-w-2xl flex-col gap-3 py-2 [@media(max-height:520px)]:gap-1.5 [@media(max-height:520px)]:py-0">
+        <p className="shrink-0 rounded-nut bg-giay/95 px-4 py-2 [@media(max-height:520px)]:py-1 text-center font-display text-lg [@media(max-height:520px)]:text-base font-bold shadow-md">{fmt(runnerUi.cauHoi, { so: quiz.round + 1 })}</p>
         {quiz.answered === null && (
-          <div className="rounded-nut bg-giay/95 px-4 py-2 shadow-md">
+          <div className="shrink-0 rounded-nut bg-giay/95 px-4 py-2 [@media(max-height:520px)]:py-1 shadow-md">
             <p className="mb-1 text-sm font-semibold" data-testid="con-gio">
               {fmt(runnerUi.conGio, { giay: Math.ceil(timeLeft) })}
             </p>
@@ -111,7 +111,7 @@ function QuizOverlay({ session, question, quiz, hearts }: { session: RunnerSessi
           </div>
         )}
         {quiz.timedOut ? (
-          <Panel className="space-y-3" role="alert" data-testid="het-gio">
+          <Panel className="shrink-0 space-y-3" role="alert" data-testid="het-gio">
             <p className="text-lg font-bold text-do-son-dam">{runnerUi.hetGio}</p>
             <p>{fmt(runnerUi.dapAnDung, { dapAn: question.options[question.correctIndex] })}</p>
             <p>{fmt(question.explanation)}</p>
@@ -123,7 +123,7 @@ function QuizOverlay({ session, question, quiz, hearts }: { session: RunnerSessi
           <>
             <QuizCard key={quiz.round} question={question} levelId={2} caption={fmt(runnerUi.cauSo, { so: quiz.round + 1, max: SPEC.rounds })} onAnswer={onAnswer} onContinue={resume} continueLabel={label} className="max-w-none" />
             {quiz.answered !== null && (
-              <p className="rounded-nut bg-giay/95 px-4 py-2 text-center font-semibold shadow-md" data-testid="ket-qua-cau">
+              <p className="shrink-0 rounded-nut bg-giay/95 px-4 py-2 [@media(max-height:520px)]:py-1 text-center font-semibold [@media(max-height:520px)]:text-sm shadow-md" data-testid="ket-qua-cau">
                 {quiz.answered ? fmt(runnerUi.quizDung, { so: SPEC.quizPages }) : runnerUi.quizSai}
               </p>
             )}
