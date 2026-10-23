@@ -407,8 +407,8 @@ export function collectCoin(s: WhackState): WhackEvent[] {
 }
 
 /**
- * Kết quả lượt trùm (chỉ nhận khi bảng câu hỏi đang mở). Đúng: +100 + 5 × số giây còn lại (làm tròn xuống) và xoá 1 vết mực nếu đang có (không xuống dưới 0). Sai hoặc hết giờ: +1 vết mực. Rồi {phanDien} rời đi và mọi thứ chạy lại;
- * xong lượt thứ 10 hoặc đủ 5 vết mực thì hết ván (đủ 5 vết mực xét trước).
+ * Kết quả lượt trùm (chỉ nhận khi bảng câu hỏi đang mở). Đúng: +100 + 5 × số giây còn lại (làm tròn xuống) và xoá 2 vết mực nếu đang có (không xuống dưới 0). Sai hoặc hết giờ: +1 vết mực. Rồi {phanDien} rời đi và mọi thứ chạy lại;
+ * xong lượt thứ 10 hoặc đủ `inkMax` (8) vết mực thì hết ván (đủ vết mực xét trước).
  */
 export function answerBoss(s: WhackState, result: BossResult, secondsLeft = 0): WhackEvent[] {
   if (s.phase !== 'quiz' || !s.boss) return [];
@@ -418,7 +418,7 @@ export function answerBoss(s: WhackState, result: BossResult, secondsLeft = 0): 
     points = bossPoints(Math.min(secondsLeft, s.boss.answerSeconds));
     s.score += points;
     s.stats.bossCorrect++;
-    // trả lời đúng thì xoá 1 vết mực nếu đang có
+    // trả lời đúng thì xoá 2 vết mực nếu đang có
     s.ink = Math.max(0, s.ink + WHACK_SPEC.boss.inkOnCorrect);
   } else {
     s.ink++;

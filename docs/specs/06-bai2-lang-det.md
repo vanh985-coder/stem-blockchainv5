@@ -83,7 +83,7 @@ Logic đặt trong `whackLogic.ts` (hàm thuần, có test).
 | 40–60 giây | 60% | 20% | 20% | |
 | Từ 60 giây | 45% | 20% | 20% | 15% |
 
-**Lọt chuột:** chuột chạy qua vùng đập tới cuốn sổ thì sổ bị loang **1 vết mực** (`vet-muc` hiện trên sổ). **5 vết mực là thua.** Thanh 5 chấm tròn ở góc màn hình chuyển đỏ dần, giống Talking Tom.
+**Lọt chuột:** chuột chạy qua vùng đập tới cuốn sổ thì sổ bị loang **1 vết mực** (`vet-muc` hiện trên sổ). **Sổ chịu tối đa 8 vết mực: đủ 8 vết là thua** (cân bằng sau B6, trước là 5). Thanh 8 chấm tròn ở góc màn hình chuyển đỏ dần, giống Talking Tom.
 
 **Tiền đồng:** khoảng 8 giây hiện một đồng, tồn tại 2,5 giây. Chạm vào được +5 điểm và +1 xu.
 
@@ -95,19 +95,19 @@ Logic đặt trong `whackLogic.ts` (hàm thuần, có test).
   - {phanDien} chạy xuống một làn ngẫu nhiên (`run`), dừng giữa vùng đập, rồi `cheer` trêu.
 - **Câu hỏi:** hiện `QuizCard`, ôn Bài 1–2. Có 15 giây cho lần 1–5, 10 giây cho lần 6–10.
   - Rê chuột lên đáp án nào thì học sinh **quay đầu nhìn đáp án đó** (`ChoiceReaction`).
-- **Đúng:** học sinh lướt tới, đét quạt nan vào mông {phanDien} (`swing`). {phanDien} giật nảy (`hurt`), kêu "Ui da!" rồi chạy ngược lên, biến mất. Được **100 + 5 × số giây còn lại**, và **xoá 1 vết mực** nếu đang có (sửa sau B6).
+- **Đúng:** học sinh lướt tới, đét quạt nan vào mông {phanDien} (`swing`). {phanDien} giật nảy (`hurt`), kêu "Ui da!" rồi chạy ngược lên, biến mất. Được **100 + 5 × số giây còn lại**, và **xoá 2 vết mực** nếu đang có (cân bằng sau B6, trước là 1).
 - **Sai hoặc hết giờ:** học sinh đập trượt, {phanDien} cúi né, lè lưỡi rồi chạy thẳng xuống sổ: **+1 vết mực**. Hiện đáp án đúng và giải thích.
-- **Kết thúc:** xong lượt trùm thứ 10 (chơi trọn), hoặc đủ 5 vết mực.
+- **Kết thúc:** xong lượt trùm thứ 10 (chơi trọn), hoặc đủ 8 vết mực.
 
 ### Điểm
 
 | Mốc | Điểm |
 |---|---|
-| Đồng | 550 |
-| Bạc | 1500 |
+| Đồng | 1650 |
+| Bạc | 2650 |
 | Vàng | 3100 |
 
-Các mốc này **tạm, chỉnh khi học sinh chơi thật** (sửa sau B6: trước là 800 / 1600 / 2400). Đặt theo số liệu bot mới (300 ván mỗi bot): Đồng = phân vị 25% điểm bot trung bình (575) làm tròn xuống bội số 50; Bạc = phân vị 75% điểm bot trung bình (1535) làm tròn xuống bội số 50; Vàng = phân vị 10% điểm bot giỏi (3120) làm tròn xuống bội số 100. Số liệu: mục "Chốt cho logic" bên dưới.
+Các mốc này **tạm, chỉnh khi học sinh chơi thật** (sửa sau B6: trước là 800 / 1600 / 2400). Đặt theo số liệu bot sau cân bằng phương án A (300 ván mỗi bot; 800 / 1600 / 2400 rồi 550 / 1500 / 3100 là các mốc trước): Đồng = phân vị 25% điểm bot trung bình (1675) làm tròn xuống bội số 50; Bạc = phân vị 75% điểm bot trung bình (2675) làm tròn xuống bội số 50; Vàng = phân vị 10% điểm bot giỏi (3120) làm tròn xuống bội số 100. Số liệu: mục "Chốt cho logic" bên dưới.
 
 ### Chốt cho logic (mốc 3, bước B6 và sửa sau B6; code ở `packages/village-lang-det/src/whack/`)
 
@@ -116,11 +116,11 @@ Chỉ có logic (chưa có cảnh; màn 5 vẫn `coming-soon`). Đơn vị thờ
 - **Làn dài 10 đơn vị**, vị trí tính từ đầu làn (0) xuống sổ (10). **Vùng đập** từ 10% đến 35% chiều dài tính từ dưới lên, tức vị trí **[6,5; 9]** (dài 2,5 đơn vị). Tới 10 là lọt vào sổ.
 - **Đồng hồ lịch** (dùng cho lịch trùm 12, 24, …, 120; tỉ lệ loại chuột; tốc độ; nhịp sinh) **dừng trong lượt trùm** (cả lúc {phanDien} chạy xuống lẫn lúc mở câu hỏi). Tiền đồng (hiện, biến mất) cũng đếm theo đồng hồ này nên dừng (tự chọn).
 - **Lượt trùm:** ngừng sinh chuột; chuột đang chạy còn 20% tốc độ trong lúc {phanDien} chạy xuống (1,2 giây, tự chọn); khi bảng câu hỏi mở thì chuột **đứng yên** và không nhận cú đập. Trả lời xong (hoặc hết giờ) thì {phanDien} rời đi, mọi thứ chạy lại. Trong lúc {phanDien} chạy xuống vẫn đập được chuột (tự chọn).
-- **Điểm trùm:** số giây còn lại **làm tròn xuống** (còn 7,0 đến 7,99 giây thì 7 → +135). Logic chỉ nhận kết quả `correct` / `wrong` / `timeout` kèm số giây còn lại; đếm giờ và chọn câu hỏi do `QuizCard` lo. Đúng thì **xoá 1 vết mực** nếu đang có (không xuống dưới 0); sai hoặc hết giờ +1 vết mực.
+- **Điểm trùm:** số giây còn lại **làm tròn xuống** (còn 7,0 đến 7,99 giây thì 7 → +135). Logic chỉ nhận kết quả `correct` / `wrong` / `timeout` kèm số giây còn lại; đếm giờ và chọn câu hỏi do `QuizCard` lo. Đúng thì **xoá 2 vết mực** nếu đang có (không xuống dưới 0); sai hoặc hết giờ +1 vết mực.
 - **Tốc độ:** chuột cần 3 giây từ 0 tới đầu vùng đập (vị trí 6,5; tốc độ 6,5/3 đơn vị/giây), giảm tuyến tính còn 1,8 giây ở giây 120 của đồng hồ lịch (rồi giữ). Tốc độ của mỗi con chốt lúc sinh. **Nhịp sinh** 1,2 giây giảm tuyến tính còn 0,55; con đầu tiên ở giây 1,2 (tự chọn). Không sinh vào làn có con gần nhất còn dưới 1,5; chọn làn đều trong các làn còn lại.
 - **Thời gian chuột nằm trong vùng đập** (2,5 đơn vị ÷ tốc độ): chuột thường **1,154 giây** ở giây 0 và **0,692 giây** ở giây 120; chuột nhanh (×1,6) **0,721 giây** ở giây 0 và **0,433 giây** ở giây 120.
 - **Đổi làn:** tới vị trí **5,0** (cách vùng đập 1,5) thì nhảy sang làn kề một lần, nhưng chỉ sang làn kề đang **trống trong khoảng ±1,5 quanh vị trí của nó** (không có chuột nào của làn đó ở vị trí cách nó ≤ 1,5). Làn 0 → 1, làn 3 → 2; làn giữa thử bên rng chọn, bị chiếm thì thử bên kia; không làn nào trống thì **không đổi** (không thử lại; vẫn là chuột đổi làn, vẫn 15 điểm). **Nhanh:** tốc độ ×1,6. **To:** đập 2 lần; sau lần đầu khựng 0,3 giây (đứng yên) và có cờ chớp sáng; hạ xong +30.
-- **Đập hụt:** làn nghỉ 0,2 giây (không nhận cú đập); đập trúng không nghỉ. **Tiền đồng:** hiện ở làn ngẫu nhiên, vị trí ngẫu nhiên trong [2; 6] (tự chọn), cách nhau 8 ± 1 giây, tồn tại 2,5 giây, chạm +5 điểm +1 xu. **Thua:** đủ 5 vết mực (xét trước); **thắng trọn:** xong lượt trùm thứ 10.
+- **Đập hụt:** làn nghỉ 0,2 giây (không nhận cú đập); đập trúng không nghỉ. **Tiền đồng:** hiện ở làn ngẫu nhiên, vị trí ngẫu nhiên trong [2; 6] (tự chọn), cách nhau 8 ± 1 giây, tồn tại 2,5 giây, chạm +5 điểm +1 xu. **Thua:** đủ 8 vết mực (xét trước); **thắng trọn:** xong lượt trùm thứ 10.
 - **Bước mô phỏng cố định 1/120 giây:** `stepWhack(s, dt)` chia `dt` thành các bước này (rng chỉ rút trong bước cố định) nên cùng seed cùng ván và dt khác nhau (1/30, 1/60, 1/144) cho cùng chuỗi sinh chuột, đồng và trùm.
 
 **Sửa sau B6 (lý do: game quá khó, bot trung bình thua sau khoảng 20 chuột, không tới được câu hỏi):**
@@ -129,22 +129,34 @@ Chỉ có logic (chưa có cảnh; màn 5 vẫn `coming-soon`). Đơn vị thờ
 |---|---|---|
 | Vùng đập | 15% đến 30%, vị trí [7; 8,5] | 10% đến 35%, vị trí [6,5; 9]; "3 giây / 1,8 giây" tính tới đầu vùng mới (6,5) |
 | Đổi làn | còn cách vùng đập 1,5 → vị trí 5,5; luôn nhảy | vị trí 5,0; chỉ nhảy khi làn kề trống trong ±1,5 |
-| Trả lời đúng câu trùm | chỉ cộng điểm | cộng điểm và xoá 1 vết mực nếu đang có |
+| Trả lời đúng câu trùm | chỉ cộng điểm | cộng điểm và xoá 1 vết mực nếu đang có (sau B6); xoá 2 vết (cân bằng sau B6) |
 | Mô hình bot | phản xạ từ lúc chuột vào vùng; bỏ sót 25% | canh trước: đập lúc chuột ở giữa vùng, lệch giờ chuẩn σ; bỏ sót 2% / 10% |
-| Mốc | 800 / 1600 / 2400 | 550 / 1500 / 3100 (tạm, theo phân vị bot) |
+| Mốc | 800 / 1600 / 2400 | 550 / 1500 / 3100 (sau B6); 1650 / 2650 / 3100 (cân bằng sau B6; tạm, theo phân vị bot) |
 
-**Số liệu bot** (`whackBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300; mốc 550 / 1500 / 3100). Bot "canh trước": với mỗi con chuột chọn giờ đập lúc con đó ở giữa vùng đập (vị trí 7,75), lệch giờ theo phân phối chuẩn; một tay (hai cú đập cách nhau ≥ 0,15 giây), xếp hàng theo thứ tự chuột tới vùng; chuột to đập lần hai sau lần đầu + 0,3 giây khựng; tiền đồng nhặt sau 0,3 giây (tự chọn); chỉ dùng thao tác của học sinh:
+**Cân bằng sau B6 (lý do: bot trung bình lọt khoảng 14 chuột mỗi ván, 5 vết mực quá ít: chỉ gặp 4,74 lượt trùm).** Chỉ chỉnh luật vết mực và nhịp sinh, thử lần lượt, dừng ở phương án đầu tiên đạt cả hai mục tiêu (bot trung bình gặp trung bình ≥ 6 lượt trùm; bot giỏi Vàng ≥ 90% với mốc đặt lại theo phân vị):
 
-| Bot | Chưa đạt | Đồng | Bạc | Vàng | Thua (5 vết mực) | Điểm trung bình (nhỏ nhất đến lớn nhất) | Lượt trùm gặp được (trung bình) | % ván hết 10 lượt trùm |
-|---|---|---|---|---|---|---|---|---|
-| Lý tưởng (σ 0, không sót, đúng hết, trả lời ngay) | 0% | 0% | 0% | 100% | 0% | 3576,4 (3395 đến 3745) | 10 | 100% |
-| Giỏi (σ 0,05 giây, bỏ sót 2%, đúng 95%, trả lời sau 4 giây) | 0% | 0% | 8,7% | **91,3%** | 0,3% | 3264,9 (2310 đến 3490) | 9,997 | 99,7% |
-| Trung bình (σ 0,12 giây, bỏ sót 10%, đúng 70%, trả lời sau 7 giây) | 23,0% | 49,0% | 28,0% | 0% | 98,7% | 1105,6 (55 đến 2940) | **4,74** | 1,3% |
+- **A (ĐÃ CHỌN, đạt cả hai mục tiêu):** sổ chịu tối đa **8** vết mực (thay 5); trả lời đúng câu trùm xoá **2** vết (thay 1).
+- B (không cần thử để chọn, ghi để tham khảo): A + nhịp sinh cuối ván 0,7 giây (thay 0,55).
+- C (như trên): B + tối đa 10 vết mực.
 
-- **Mốc theo phân vị** (hạng gần nhất, 300 ván): Đồng = p25 bot trung bình 575 → 550; Bạc = p75 bot trung bình 1535 → 1500; Vàng = p10 bot giỏi 3120 → 3100. Đồng < Bạc < Vàng. Điểm bot trung bình p10 / p50 / p90 = 340 / 1020 / 1940; bot giỏi p25 / p50 / p90 = 3200 / 3275 / 3410.
+**Số liệu bot** (`whackBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300). Bot "canh trước": với mỗi con chuột chọn giờ đập lúc con đó ở giữa vùng đập (vị trí 7,75), lệch giờ theo phân phối chuẩn; một tay (hai cú đập cách nhau ≥ 0,15 giây), xếp hàng theo thứ tự chuột tới vùng; chuột to đập lần hai sau lần đầu + 0,3 giây khựng; tiền đồng nhặt sau 0,3 giây (tự chọn); chỉ dùng thao tác của học sinh. Mốc của mỗi dòng đặt lại theo đúng quy tắc phân vị (Đồng = p25 và Bạc = p75 điểm bot trung bình, bội số 50; Vàng = p10 điểm bot giỏi, bội số 100):
+
+| Phương án (mốc) | Bot | Chưa đạt | Đồng | Bạc | Vàng | Thua (đầy sổ) | Điểm trung bình (nhỏ nhất đến lớn nhất) | Lượt trùm gặp được (trung bình) | % ván hết 10 lượt trùm |
+|---|---|---|---|---|---|---|---|---|---|
+| Trước (5 vết, xoá 1; mốc 550 / 1500 / 3100) | Giỏi | 0% | 0% | 8,7% | 91,3% | 0,3% | 3264,9 (2310 đến 3490) | 9,997 | 99,7% |
+| | Trung bình | 23,0% | 49,0% | 28,0% | 0% | 98,7% | 1105,5 (55 đến 2940) | 4,74 | 1,3% |
+| **A** (8 vết, xoá 2; mốc **1650 / 2650 / 3100**) | Giỏi | 0% | 0% | 8,7% | **91,3%** | 0% | 3266,1 (2670 đến 3490) | 10 | 100% |
+| | Trung bình | 23,3% | 48,0% | 28,7% | 0% | 57,3% | 2129,3 (165 đến 2990) | **8,31** | 44,3% |
+| B (A + nhịp sinh cuối 0,7 giây; mốc 1800 / 2500 / 2900) | Giỏi | 0% | 0% | 9,0% | 91,0% | 0% | 3062,8 (2695 đến 3275) | 10 | 100% |
+| | Trung bình | 24,7% | 42,3% | 32,7% | 0,3% | 42,3% | 2127,2 (435 đến 2935) | 8,76 | 57,7% |
+| C (B + 10 vết; mốc 2150 / 2550 / 2900) | Giỏi | 0% | 0% | 9,0% | 91,0% | 0% | 3062,8 (2695 đến 3275) | 10 | 100% |
+| | Trung bình | 23,3% | 50,7% | 25,7% | 0,3% | 27,3% | 2291,3 (565 đến 2935) | 9,38 | 73,7% |
+| Lý tưởng (σ 0, không sót, đúng hết, trả lời ngay; luật A) | | 0% | 0% | 0% | 100% | 0% | 3576,4 (3395 đến 3745) | 10 | 100% |
+
+- **Hai bot:** giỏi σ 0,05 giây, bỏ sót 2%, đúng câu hỏi 95%, trả lời sau 4 giây; trung bình σ 0,12 giây, bỏ sót 10%, đúng 70%, trả lời sau 7 giây.
+- **Chọn A vì là phương án đầu tiên đạt cả hai mục tiêu:** bot giỏi Vàng 91,3% (≥ 90%), bot trung bình gặp trung bình 8,31 lượt trùm (≥ 6). Lọt trung bình 12,4 chuột mỗi ván.
+- **Mốc mới 1650 / 2650 / 3100 (tạm, chỉnh khi học sinh chơi thật):** Đồng = p25 bot trung bình 1675 → 1650; Bạc = p75 bot trung bình 2675 → 2650; Vàng = p10 bot giỏi 3120 → 3100. Đồng < Bạc < Vàng. Với mốc này bot trung bình: 23,3% chưa đạt, 48,0% Đồng, 28,7% Bạc, không Vàng.
 - **Điểm tối đa lý thuyết ước tính khoảng 3580:** trùm 5 × (100 + 5 × 15) + 5 × (100 + 5 × 10) = 1625; khoảng 143 chuột (khoảng 1880 điểm); khoảng 14,5 đồng (khoảng 73 điểm).
-- **Bot giỏi đạt Vàng 91,3% (đạt yêu cầu ≥ 90%)**, gần như luôn chơi hết 10 lượt trùm.
-- **Mục tiêu CHƯA đạt: bot trung bình gặp trung bình 4,74 lượt trùm, dưới mục tiêu 6.** Nó lọt trung bình 6,0 chuột mỗi ván và 98,7% ván thua vì đủ 5 vết mực, chỉ 1,3% chơi hết 10 lượt trùm (dù đã được xoá vết mực khi trả lời đúng). Theo lời giao KHÔNG đổi thêm luật; chờ học sinh chơi thật rồi chỉnh (cân nhắc: nới thêm vùng đập, tăng số vết mực, hoặc xoá nhiều vết hơn khi trả lời đúng).
 
 ### Test (`whackLogic.ts`; ngoài 10 dòng dưới còn test đồng hồ lịch dừng, chuột đứng yên khi mở câu hỏi, tỉ lệ loại, tốc độ, nhịp sinh, chuột to khựng, làn nghỉ, tất định theo seed và theo dt)
 
@@ -155,7 +167,7 @@ Chỉ có logic (chưa có cảnh; màn 5 vẫn `coming-soon`). Đơn vị thờ
 | Hai chuột cùng làn đều trong vùng | Trúng con thấp hơn |
 | Chuột đổi làn ở làn 0 / làn 3 | Sang làn 1 / làn 2, chỉ một lần |
 | Chuột to | Đập lần 1 vẫn còn; đập lần 2 thì mất, +30 |
-| Chuột lọt tới sổ | +1 vết mực; vết thứ 5 thì kết thúc |
+| Chuột lọt tới sổ | +1 vết mực; vết thứ 8 (đầy sổ) thì kết thúc |
 | Lịch trùm | Đúng 10 lần, ở giây 12, 24, …, 120 |
 | Trùm: đúng khi còn 7 giây | +135 |
 | Trùm: sai, hoặc hết giờ | +1 vết mực |
@@ -242,7 +254,7 @@ Lớp đồi xa và tre gần phải có phần trời trong suốt (spec 01 m�
 - [ ] Màn 5:
   - 4 làn khớp đúng 4 dải vải trên ảnh nền;
   - 4 loại chuột chạy đúng luật;
-  - 5 vết mực thì thua;
+  - 8 vết mực thì thua;
   - trùm xuất hiện 10 lần;
   - rê chuột lên đáp án thì nhân vật nhìn theo;
   - đúng thì đét trúng, sai thì {phanDien} chạy xuống sổ.

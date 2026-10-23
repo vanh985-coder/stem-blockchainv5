@@ -46,8 +46,8 @@ export const WHACK_SPEC = {
   /** Chuột to: đập 2 lần, sau lần đầu khựng (đứng yên) chừng này giây và chớp sáng */
   bigHits: 2,
   bigFreeze: 0.3,
-  /** 5 vết mực là thua */
-  inkMax: 5,
+  /** Sổ chịu tối đa 8 vết mực: đủ 8 vết là thua (cân bằng sau B6, phương án A: trước là 5, bot trung bình lọt ~14 chuột mỗi ván nên 5 vết quá ít) */
+  inkMax: 8,
   /**
    * Tiền đồng: khoảng 8 giây hiện một đồng (±1 giây), tồn tại 2,5 giây, chạm được +5 điểm và +1 xu. Đồng hiện ở làn ngẫu nhiên, vị trí dọc làn ngẫu nhiên trong [`posMin`; `posMax`]
    * (tự chọn: giữa làn, ngoài vùng đập; cảnh có thể vẽ lại theo ảnh). Đếm theo đồng hồ lịch nên dừng trong lượt trùm.
@@ -55,17 +55,17 @@ export const WHACK_SPEC = {
   coin: { every: 8, jitter: 1, life: 2.5, points: 5, xu: 1, posMin: 2, posMax: 6 },
   /**
    * Trùm: `count` lần, ở giây `every`, 2 × `every`, … của đồng hồ lịch (12, 24, …, 120). Lúc trùm ra chuột còn `slowFactor` tốc độ trong lúc {phanDien} chạy xuống (`runSeconds` giây, tự chọn, tới giữa vùng đập),
-   * rồi mở câu hỏi: chuột đứng yên. Thời gian trả lời: `answerSeconds[0]` cho lần 1–5, `answerSeconds[1]` cho lần 6–10. Đúng: `base` + `perSecond` × số giây còn lại (làm tròn xuống), và xoá 1 vết mực nếu đang có (`inkOnCorrect`, không xuống dưới 0; sửa sau B6). Sai hoặc hết giờ: +1 vết mực.
+   * rồi mở câu hỏi: chuột đứng yên. Thời gian trả lời: `answerSeconds[0]` cho lần 1–5, `answerSeconds[1]` cho lần 6–10. Đúng: `base` + `perSecond` × số giây còn lại (làm tròn xuống), và xoá 2 vết mực nếu đang có (`inkOnCorrect`, không xuống dưới 0; cân bằng sau B6, phương án A: trước là 1 vết). Sai hoặc hết giờ: +1 vết mực.
    */
-  boss: { count: 10, every: 12, slowFactor: 0.2, runSeconds: 1.2, answerSeconds: [15, 10] as const, firstHalf: 5, base: 100, perSecond: 5, inkOnCorrect: -1 },
+  boss: { count: 10, every: 12, slowFactor: 0.2, runSeconds: 1.2, answerSeconds: [15, 10] as const, firstHalf: 5, base: 100, perSecond: 5, inkOnCorrect: -2 },
   /** Bước mô phỏng cố định (giây): `stepWhack` chia `dt` thành các bước này để kết quả không phụ thuộc tốc độ khung hình (tự chọn: 1/120) */
   tick: 1 / 120,
   /**
-   * Mốc điểm cả ván: Đồng, Bạc, Vàng (khai báo theo chuẩn màn 2, 3, 8, 12). TẠM, chỉnh khi học sinh chơi thật. Đặt theo số liệu 300 ván mỗi bot (sửa sau B6, thay 800 / 1600 / 2400 của spec cũ):
-   * Đồng = phân vị 25% điểm bot trung bình (575) làm tròn xuống bội số 50; Bạc = phân vị 75% điểm bot trung bình (1535) làm tròn xuống bội số 50; Vàng = phân vị 10% điểm bot giỏi (3120) làm tròn xuống bội số 100.
+   * Mốc điểm cả ván: Đồng, Bạc, Vàng (khai báo theo chuẩn màn 2, 3, 8, 12). TẠM, chỉnh khi học sinh chơi thật. Đặt theo số liệu 300 ván mỗi bot (cân bằng sau B6, phương án A):
+   * Đồng = phân vị 25% điểm bot trung bình (1675) làm tròn xuống bội số 50; Bạc = phân vị 75% điểm bot trung bình (2675) làm tròn xuống bội số 50; Vàng = phân vị 10% điểm bot giỏi (3120) làm tròn xuống bội số 100.
    * Phân vị theo hạng gần nhất (`percentile` ở `whackBots.ts`). Xem `whackBalance.test.ts` và spec 06.
    */
-  medals: [550, 1500, 3100] as const,
+  medals: [1650, 2650, 3100] as const,
 } as const;
 
 export type MouseKind = 'thuong' | 'doiLan' | 'nhanh' | 'to';

@@ -161,7 +161,7 @@ export interface WhackBalance {
   max: number;
   /** Số ván theo mốc: chưa đạt, Đồng, Bạc, Vàng */
   medals: { chua: number; dong: number; bac: number; vang: number };
-  /** Số ván thua vì đủ 5 vết mực */
+  /** Số ván thua vì đủ `inkMax` vết mực */
   lost: number;
   /** Số ván chơi hết cả 10 lượt trùm */
   fullBosses: number;

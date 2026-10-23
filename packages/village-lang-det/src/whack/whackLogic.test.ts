@@ -201,14 +201,15 @@ describe('bảng test của spec 06 (màn 5)', () => {
     expect(s.mice).toHaveLength(0);
   });
 
-  it('chuột lọt tới sổ: +1 vết mực; vết thứ 5 thì kết thúc', () => {
+  it('chuột lọt tới sổ: +1 vết mực; vết thứ 8 (đầy sổ) thì kết thúc', () => {
+    expect(WHACK_SPEC.inkMax).toBe(8);
     const s = quiet();
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= WHACK_SPEC.inkMax; i++) {
       spawnMouse(s, 'thuong', i % 4, 9.95);
       const ev = stepWhack(s, 0.05);
       expect(ev.find((e) => e.type === 'leak'), `vết ${i}`).toBeDefined();
       expect(s.ink).toBe(i);
-      if (i < 5) {
+      if (i < WHACK_SPEC.inkMax) {
         expect(s.phase).toBe('play');
         expect(s.ended).toBeNull();
       }
@@ -513,7 +514,7 @@ describe('tiền đồng', () => {
 });
 
 describe('kết thúc ván', () => {
-  it('xong lượt trùm thứ 10 thì kết thúc "complete"; đủ 5 vết mực thì "ink" (xét trước)', () => {
+  it('xong lượt trùm thứ 10 thì kết thúc "complete"; đủ 8 vết mực thì "ink" (xét trước)', () => {
     const s = quiet();
     s.bossesDone = 9;
     toQuiz(s);
@@ -526,15 +527,15 @@ describe('kết thúc ván', () => {
 
     const t = quiet();
     t.bossesDone = 9;
-    t.ink = 4;
+    t.ink = WHACK_SPEC.inkMax - 1;
     toQuiz(t);
     answerBoss(t, 'wrong', 0);
     expect(t.ended).toBe('ink');
   });
 
-  it('thua giữa chừng khi đủ 5 vết mực trong lượt trùm (chuột lọt lúc {phanDien} chạy xuống)', () => {
+  it('thua giữa chừng khi đủ 8 vết mực trong lượt trùm (chuột lọt lúc {phanDien} chạy xuống)', () => {
     const s = quiet();
-    s.ink = 4;
+    s.ink = WHACK_SPEC.inkMax - 1;
     callBoss(s);
     spawnMouse(s, 'thuong', 0, 9.99);
     stepWhack(s, 0.5);
@@ -570,13 +571,19 @@ describe('tất định', () => {
 });
 
 describe('sửa sau B6: trùm đúng xoá vết mực, thời gian trong vùng đập', () => {
-  it('trả lời đúng câu trùm xoá 1 vết mực nếu đang có: 3 vết → 2 vết; 0 vết → vẫn 0', () => {
+  it('trả lời đúng câu trùm xoá 2 vết mực nếu đang có: 3 vết → 1 vết; 1 vết → 0 (không âm); 0 vết → vẫn 0', () => {
+    expect(WHACK_SPEC.boss.inkOnCorrect).toBe(-2);
     const s = quiet();
     s.ink = 3;
     toQuiz(s);
     const e = answerBoss(s, 'correct', 7);
-    expect(s.ink).toBe(2);
-    expect(e[0]).toMatchObject({ type: 'bossAnswer', result: 'correct', points: 135, ink: 2 });
+    expect(s.ink).toBe(1);
+    expect(e[0]).toMatchObject({ type: 'bossAnswer', result: 'correct', points: 135, ink: 1 });
+    const u = quiet();
+    u.ink = 1;
+    toQuiz(u);
+    answerBoss(u, 'correct', 7);
+    expect(u.ink).toBe(0);
     expect(s.score).toBe(135);
     const t = quiet();
     expect(t.ink).toBe(0);
@@ -596,13 +603,13 @@ describe('sửa sau B6: trùm đúng xoá vết mực, thời gian trong vùng �
     }
   });
 
-  it('trùm đúng ở lượt cuối khi đang có 4 vết mực: xoá 1 vết rồi mới xét kết thúc (hết ván "complete")', () => {
+  it('trùm đúng ở lượt cuối khi đang có 7 vết mực: xoá 2 vết rồi mới xét kết thúc (hết ván "complete")', () => {
     const s = quiet();
     s.bossesDone = 9;
-    s.ink = 4;
+    s.ink = WHACK_SPEC.inkMax - 1;
     toQuiz(s);
     answerBoss(s, 'correct', 3);
-    expect(s.ink).toBe(3);
+    expect(s.ink).toBe(WHACK_SPEC.inkMax - 3);
     expect(s.ended).toBe('complete');
   });
 
