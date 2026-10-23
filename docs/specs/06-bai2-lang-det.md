@@ -107,9 +107,34 @@ Logic đặt trong `whackLogic.ts` (hàm thuần, có test).
 | Bạc | 1600 |
 | Vàng | 2400 |
 
-Các mốc này chỉnh lại sau khi chơi thử.
+Các mốc này chỉnh lại sau khi chơi thử (số liệu bot và mốc đề xuất: mục "Chốt cho logic" bên dưới).
 
-### Test (`whackLogic.ts`)
+### Chốt cho logic (mốc 3, bước B6; code ở `packages/village-lang-det/src/whack/`)
+
+Chỉ có logic (chưa có cảnh; màn 5 vẫn `coming-soon`). Đơn vị thời gian là **giây**. Cấu trúc theo mẫu màn 12: `whackConfig.ts` (số liệu, mốc `WHACK_SPEC.medals`), `whackLogic.ts` (hàm thuần, `createMulberry32`), `whackLogic.test.ts`, `whackBots.ts`, `whackBalance.test.ts`, `index.ts`.
+
+- **Làn dài 10 đơn vị**, vị trí tính từ đầu làn (0) xuống sổ (10). **Vùng đập** từ 15% đến 30% chiều dài tính từ dưới lên, tức vị trí **[7; 8,5]**. Tới 10 là lọt vào sổ.
+- **Đồng hồ lịch** (dùng cho lịch trùm 12, 24, …, 120; tỉ lệ loại chuột; tốc độ; nhịp sinh) **dừng trong lượt trùm** (cả lúc {phanDien} chạy xuống lẫn lúc mở câu hỏi). Tiền đồng (hiện, biến mất) cũng đếm theo đồng hồ này nên dừng (tự chọn).
+- **Lượt trùm:** ngừng sinh chuột; chuột đang chạy còn 20% tốc độ trong lúc {phanDien} chạy xuống (1,2 giây, tự chọn); khi bảng câu hỏi mở thì chuột **đứng yên** và không nhận cú đập. Trả lời xong (hoặc hết giờ) thì {phanDien} rời đi, mọi thứ chạy lại. Trong lúc {phanDien} chạy xuống vẫn đập được chuột (tự chọn).
+- **Điểm trùm:** số giây còn lại **làm tròn xuống** (còn 7,0 đến 7,99 giây thì 7 → +135). Logic chỉ nhận kết quả `correct` / `wrong` / `timeout` kèm số giây còn lại; đếm giờ và chọn câu hỏi do `QuizCard` lo.
+- **Tốc độ:** chuột cần 3 giây từ 0 tới vị trí 7 (tốc độ 7/3 đơn vị/giây), giảm tuyến tính còn 1,8 giây ở giây 120 của đồng hồ lịch (rồi giữ). Tốc độ của mỗi con chốt lúc sinh. **Nhịp sinh** 1,2 giây giảm tuyến tính còn 0,55; con đầu tiên ở giây 1,2 (tự chọn). Không sinh vào làn có con gần nhất còn dưới 1,5; chọn làn đều trong các làn còn lại.
+- **Đổi làn:** tới vị trí 5,5 (cách vùng đập 1,5) thì nhảy sang làn kề một lần (làn 0 → 1, làn 3 → 2, làn giữa trái hoặc phải theo rng). **Nhanh:** tốc độ ×1,6. **To:** đập 2 lần; sau lần đầu khựng 0,3 giây (đứng yên) và có cờ chớp sáng; hạ xong +30.
+- **Đập hụt:** làn nghỉ 0,2 giây (không nhận cú đập); đập trúng không nghỉ. **Tiền đồng:** hiện ở làn ngẫu nhiên, vị trí ngẫu nhiên trong [2; 6] (tự chọn), cách nhau 8 ± 1 giây, tồn tại 2,5 giây, chạm +5 điểm +1 xu. **Thua:** đủ 5 vết mực (xét trước); **thắng trọn:** xong lượt trùm thứ 10.
+- **Bước mô phỏng cố định 1/120 giây:** `stepWhack(s, dt)` chia `dt` thành các bước này (rng chỉ rút trong bước cố định) nên cùng seed cùng ván và dt khác nhau (1/30, 1/60, 1/144) cho cùng chuỗi sinh chuột, đồng và trùm.
+
+**Số liệu bot** (`whackBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300; mốc hiện tại 800 / 1600 / 2400). Bot chỉ dùng thao tác của học sinh; phản xạ tính từ lúc chuột vào vùng đập, một tay (hai cú đập cách nhau ≥ 0,15 giây bot giỏi, 0,2 giây bot trung bình, tự chọn), chuột to đếm lại phản xạ sau cú đầu:
+
+| Bot | Chưa đạt | Đồng | Bạc | Vàng | Thua (5 vết mực) | Điểm trung bình (nhỏ nhất đến lớn nhất) |
+|---|---|---|---|---|---|---|
+| Lý tưởng (phản xạ 0, đúng hết, trả lời ngay) | 0% | 0% | 0% | 100% | 0% | 3579,9 (3445 đến 3765) |
+| Giỏi (phản xạ 0,25 giây, đúng 95%, trả lời sau 4 giây) | 0% | 0% | 1,7% | **98,3%** | 65,7% | 3080,0 (1985 đến 3485) |
+| Trung bình (phản xạ 0,45 giây, bỏ sót 25% chuột, đúng 70%, trả lời sau 7 giây) | 99,3% | 0,7% | 0% | 0% | 100% | 295,6 (0 đến 980) |
+
+- **Điểm tối đa lý thuyết ước tính khoảng 3580:** trùm 5 × (100 + 5 × 15) + 5 × (100 + 5 × 10) = 1625; khoảng 143 chuột (khoảng 1880 điểm); khoảng 14,5 đồng (khoảng 73 điểm). Chơi hoàn hảo không có phản xạ trễ là chuẩn trên.
+- **Bot giỏi đạt Vàng 98,3% (đạt yêu cầu ≥ 90%).** Nó vẫn lọt trung bình 4 chuột và hay sai một lượt trùm, nên 65,7% ván kết thúc vì đủ 5 vết mực, thường ở lượt trùm thứ 9, nhưng điểm đã qua 2400.
+- **Bot trung bình không rơi vào Đồng/Bạc** với mốc hiện tại: bỏ sót 25% chuột thì đủ 5 vết mực sau khoảng 20 con (vài chục giây đầu), chỉ làm được 1 đến 2 lượt trùm. **Không sửa mốc ở bước B6.** Đề xuất (chưa áp dụng, chờ chơi thử với học sinh thật): **150 / 500 / 2400** (bot trung bình: 18,3% chưa đạt, 72,3% Đồng, 9,3% Bạc, 0% Vàng; bot giỏi vẫn 98,3% Vàng). Phương án nhẹ hơn: 200 / 600 / 2400 (23,3% / 73,7% / 3,0% / 0%). Giữ Vàng 2400: bot giỏi thấp nhất 1985, phân vị 5% là 2665.
+
+### Test (`whackLogic.ts`; ngoài 10 dòng dưới còn test đồng hồ lịch dừng, chuột đứng yên khi mở câu hỏi, tỉ lệ loại, tốc độ, nhịp sinh, chuột to khựng, làn nghỉ, tất định theo seed và theo dt)
 
 | Tình huống | Kết quả mong đợi |
 |---|---|
