@@ -27,6 +27,8 @@ export interface ChickenBotProfile {
 export const GOOD_BOT: ChickenBotProfile = { name: 'good', think: 0.4, accuracy: 0.98, cleanLoad: 0.9 };
 /** Bot trung bình (lời giao B10): 0,8 giây mỗi phát, đúng thuốc 85%, nạp sai ít nhất 1 lần ở 50% số đợt. */
 export const AVERAGE_BOT: ChickenBotProfile = { name: 'average', think: 0.8, accuracy: 0.85, cleanLoad: 0.5 };
+/** Bot chậm (sửa sau B10): 1,2 giây mỗi phát, đúng thuốc 80%, nạp sai ít nhất 1 lần ở 60% số đợt (nạp không sai ở 40%). */
+export const SLOW_BOT: ChickenBotProfile = { name: 'slow', think: 1.2, accuracy: 0.8, cleanLoad: 0.4 };
 /** Người chơi lý tưởng (chỉ để ước điểm tối đa, không phải bot cân bằng): không nghĩ, không bao giờ sai. */
 export const ORACLE_BOT: ChickenBotProfile = { name: 'oracle', think: 0, accuracy: 1, cleanLoad: 1 };
 

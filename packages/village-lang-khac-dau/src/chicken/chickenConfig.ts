@@ -70,11 +70,13 @@ export const CHICKEN_SPEC: ChickenSpec = {
   decoys: 2,
   tick: 1 / 120,
   /**
-   * Mốc TẠM (chỉnh khi học sinh chơi thật). Mốc của spec 300 / 500 / 700 cho bot giỏi Vàng 97,0% nhưng bot trung bình cũng Vàng 22,3% (trên 15%), nên đặt lại theo quy tắc màn 6 từ số liệu 300 ván mỗi bot
-   * (luật gốc, không cần phương án A, B, C): Đồng = phân vị 25% điểm bot trung bình (650), Bạc = phân vị 75% điểm bot trung bình (695), Vàng = phân vị 10% điểm bot giỏi (715), đều làm tròn xuống bội số 10 → 650 / 690 / 710.
-   * Điểm tối đa 750 nên các mốc dồn sát nhau: xem `chickenBalance.test.ts` và spec 07.
+   * Mốc điểm cả ván, theo nghĩa (sửa sau B10; trước đó đặt theo phân vị 650 / 690 / 710 nên ba mốc dồn sát, em chữa hết gà mà sai 12 phát thành "chưa đạt" là sai tinh thần):
+   *  - Vàng 700: chữa hết gà và gà trùm, sai rất ít (tối đa 750);
+   *  - Bạc 500: chơi hết 3 đợt (chữa hết 30 gà thường đã được 600 trừ phát sai);
+   *  - Đồng 300: qua 1 đến 2 đợt (một đợt chữa hết là 160 đến 190 điểm, hai đợt 360 đến 450).
+   * Xem `chickenBalance.test.ts` (điểm các kịch bản a đến d) và spec 07.
    */
-  medals: [650, 690, 710],
+  medals: [300, 500, 700],
 };
 
 /**
