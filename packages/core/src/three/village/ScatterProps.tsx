@@ -21,6 +21,8 @@ function clothMaterial(): MeshStandardMaterial {
   const m = new MeshStandardMaterial({ color: '#FFFFFF', roughness: 0.95, vertexColors: true, side: DoubleSide });
   m.onBeforeCompile = (shader) => {
     shader.uniforms.uClothTime = CLOTH_TIME;
+    // vải hai mặt bị tối ở mặt sau và khi nắng xiên: phát sáng nhẹ theo màu vải để đỏ, hồng, chàm, vàng rõ màu
+    shader.fragmentShader = shader.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n  totalEmissiveRadiance += diffuseColor.rgb * 0.45;');
     shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nattribute float aSway;\nuniform float uClothTime;').replace(
       '#include <begin_vertex>',
       `#include <begin_vertex>
@@ -34,7 +36,7 @@ function clothMaterial(): MeshStandardMaterial {
   transformed.x += sin(uClothTime * 1.7 + clothPhase) * aSway * 0.07;`,
     );
   };
-  m.customProgramCacheKey = () => 'cloth-sway-v1';
+  m.customProgramCacheKey = () => 'cloth-sway-v2';
   return m;
 }
 

@@ -2,7 +2,7 @@
  * Làm ấm texture cho GPU trước khi vùng làng dựng (mốc 2, bước W2): đẩy từng texture lên GPU bằng `renderer.initTexture`, MỖI KHUNG HÌNH TỐI ĐA MỘT CÁI, và chờ sau texture lớn.
  * Texture 2048 ngốn khoảng 20 ms ở luồng chính, rồi tiếp tục tạo mip và sao chép ở tiến trình GPU; đẩy dồn hay đẩy ngay lúc vẽ lần đầu thì luồng chính phải chờ ở lệnh GL kế tiếp (khựng 80 đến 100 ms).
  */
-import { Color, InstancedMesh, Scene, type BufferGeometry, type Camera, type Material, type Mesh, type Object3D, type Texture, type WebGLRenderer } from 'three';
+import { Color, InstancedMesh, Mesh as PlainMesh, Scene, type BufferGeometry, type Camera, type Material, type Mesh, type Object3D, type Texture, type WebGLRenderer } from 'three';
 import { sceneTextures, textureSize, textureUsable } from '../SceneWarmup';
 
 /** Chờ chừng này (ms) sau khi đẩy một texture từ 2048 điểm ảnh trở lên, để GPU làm xong trước khi đẩy cái tiếp theo hay dựng nhân vật. */
@@ -70,21 +70,27 @@ export function warmTextures(gl: WebGLRenderer, textures: readonly Texture[], is
  * Biên dịch trước shader cho các vật liệu `materials` (chạy ở tiến trình GPU, không chặn luồng chính: `compileAsync`), mỗi vật liệu gắn vào một InstancedMesh một bản có màu từng bản (đúng như lúc vẽ thật nên cùng
  * chương trình shader). Chương trình mới mà để tới lúc vẽ lần đầu mới biên dịch thì luồng chính phải chờ 40 đến 60 ms ở khung hình đó. `scene` là cảnh thật (để lấy ánh sáng và sương mù).
  */
-export async function compileAhead(gl: WebGLRenderer, camera: Camera, scene: Scene, items: readonly { geometry: BufferGeometry; material: Material }[], isCancelled: () => boolean): Promise<void> {
+export async function compileAhead(gl: WebGLRenderer, camera: Camera, scene: Scene, items: readonly { geometry: BufferGeometry; material: Material; /** vẽ bằng mesh thường (không nhân bản, không đổ bóng): thẻ Em có biết; khác chương trình shader với bản nhân bản */ plain?: boolean }[], isCancelled: () => boolean): Promise<void> {
   if (items.length === 0 || isCancelled()) return;
   // MỖI LẦN MỘT vật liệu, nghỉ một khung hình giữa hai lần (bước X3): gộp cả chục chương trình vào một lần compileAsync thì phần đồng bộ (dịch và liên kết shader qua ANGLE) dồn vào một khung hình tốn 80 mili giây trên máy yếu
-  for (const { geometry, material } of items) {
+  for (const { geometry, material, plain } of items) {
     if (isCancelled()) return;
     const tmp = new Scene();
-    const m = new InstancedMesh(geometry, material, 1);
-    m.setColorAt(0, new Color(1, 1, 1));
-    m.castShadow = true; // như lúc vẽ thật (đồ vật vừa đổ vừa nhận bóng): cùng chương trình shader
-    m.receiveShadow = true;
+    let m: InstancedMesh | PlainMesh;
+    if (plain) {
+      m = new PlainMesh(geometry, material); // như lúc vẽ thật: mesh thường, không đổ bóng, không nhận bóng (chương trình shader khác bản nhân bản)
+    } else {
+      const inst = new InstancedMesh(geometry, material, 1);
+      inst.setColorAt(0, new Color(1, 1, 1));
+      m = inst;
+      m.castShadow = true; // như lúc vẽ thật (đồ vật vừa đổ vừa nhận bóng): cùng chương trình shader
+      m.receiveShadow = true;
+    }
     tmp.add(m);
     try {
       await gl.compileAsync(tmp, camera, scene);
     } finally {
-      m.dispose(); // chỉ giải phóng bộ đệm bản nhân bản; hình học và vật liệu do nơi gọi giữ
+      if (m instanceof InstancedMesh) m.dispose(); // chỉ giải phóng bộ đệm bản nhân bản; hình học và vật liệu do nơi gọi giữ
     }
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
   }

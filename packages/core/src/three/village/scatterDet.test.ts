@@ -60,13 +60,15 @@ describe('sào phơi vải và luống dâu của Làng Dệt (mốc 3, bước 
     const m = scatterMaterial('sao-vai');
     expect(m.side).toBe(2); // DoubleSide
     expect(m.vertexColors).toBe(true);
-    const shader = { uniforms: {} as Record<string, unknown>, vertexShader: '#include <common>\nvoid main() {\n#include <begin_vertex>\n}' };
+    const shader = { uniforms: {} as Record<string, unknown>, vertexShader: '#include <common>\nvoid main() {\n#include <begin_vertex>\n}', fragmentShader: 'void main() {\n#include <emissivemap_fragment>\n}' };
     (m.onBeforeCompile as (s: unknown) => void)(shader);
     expect(shader.uniforms.uClothTime).toBe(CLOTH_TIME); // cùng MỘT uniform cho mọi vật liệu sào vải
     expect(shader.vertexShader).toContain('attribute float aSway;');
     expect(shader.vertexShader).toContain('uniform float uClothTime;');
     expect(shader.vertexShader).toContain('transformed.z +=');
     expect(shader.vertexShader).toContain('instanceMatrix'); // mỗi sào một pha
+    expect(shader.fragmentShader).toContain('totalEmissiveRadiance'); // vải phát sáng nhẹ theo màu, không tối ở mặt sau
+    expect(shader.fragmentShader).toContain('totalEmissiveRadiance'); // vải phát sáng nhẹ theo màu, không tối ở mặt sau
     for (const k of ['tre', 'cay-qua', 'phen', 'luong-dau'] as const) expect(scatterMaterial(k).onBeforeCompile.toString()).not.toContain('aSway');
     m.dispose();
   });

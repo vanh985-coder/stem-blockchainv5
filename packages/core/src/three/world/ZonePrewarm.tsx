@@ -68,7 +68,7 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
     const tasks: PartsPrewarm[] = [];
     const crafts: { kind: string; geometry: BufferGeometry; material: MeshStandardMaterial }[] = [];
     /** Đồ rải dựng bằng code và thẻ "Em có biết?" (bước X3): vật liệu mẫu để biên dịch trước shader, giữ tới khi bỏ chuẩn bị */
-    const extras: { geometry: BufferGeometry; material: Material }[] = [];
+    const extras: { geometry: BufferGeometry; material: Material; plain?: boolean }[] = [];
     let scrollRes: ReturnType<typeof createScrollResources> | null = null;
     let raf = 0;
 
@@ -118,7 +118,7 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
       for (const k of SCATTER_KINDS) if (scat.has(k)) extras.push({ geometry: createScatterGeometry(k), material: scatterMaterial(k) });
       if ((village.layout.scrolls ?? []).length > 0) {
         scrollRes = createScrollResources();
-        extras.push({ geometry: scrollRes.scroll, material: scrollRes.scrollMat }, { geometry: scrollRes.beam, material: scrollRes.beamMat }, { geometry: scrollRes.disc, material: scrollRes.discMat });
+        extras.push({ geometry: scrollRes.scroll, material: scrollRes.scrollMat, plain: true }, { geometry: scrollRes.beam, material: scrollRes.beamMat, plain: true }, { geometry: scrollRes.disc, material: scrollRes.discMat, plain: true });
       }
       await compileAhead(gl, camera, scene, [...crafts, ...extras, ...materialsOf([...loaded.values()].map((d) => d.scene))], isCancelled);
       if (cancelled) return;
