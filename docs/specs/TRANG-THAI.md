@@ -12,7 +12,7 @@ Cuối mỗi cửa sổ chat, Claude viết lại toàn bộ file này. Bạn th
 | Supabase | Project `zlqxwbgcyudybxaynluf` (Singapore), migrations 0001, 0002; Edge Function `teacher-reset-password` |
 | Email nội bộ | `<tên>@hs.blockchainptit.com`; **giữ mãi bản ghi MX `hs`** trên Cloudflare |
 | Tài khoản thử | Giáo viên `gva`, `gvb`; học sinh `thu01`, `thu02` |
-| Người code | Mốc 1–2: Claude Code (Sonnet 5.5). **Mốc 3: Gemini CLI, đọc `GEMINI.md` ở gốc repo.** AI không tự commit/push; chủ dự án tự commit |
+| Người code | Mốc 1–2: Claude Code (Sonnet 5.5). **Mốc 3: Claude Code, đọc `CLAUDE.md` ở gốc repo (`GEMINI.md` đã bỏ).** AI không tự commit/push; chủ dự án tự commit |
 
 ## Tiến độ
 

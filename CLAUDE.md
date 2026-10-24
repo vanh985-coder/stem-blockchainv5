@@ -1,7 +1,7 @@
 # Giấc mơ Sổ Chung — hướng dẫn cho AI code
 
 Game phiêu lưu 3D trên web dạy blockchain cho học sinh THPT: 12 màn ở 4 làng, có đăng nhập Supabase và trang giáo viên.
-File này khớp với `GEMINI.md` (cùng nội dung, chỉ khác dòng tiêu đề; Gemini CLI không đọc CLAUDE.md nên `GEMINI.md` cũng tự đủ). Sửa một file thì sửa cả hai.
+Dự án chỉ dùng Claude Code; `GEMINI.md` đã bỏ, file này là hướng dẫn duy nhất cho AI code.
 
 ## 1. Đọc trước khi làm
 - `docs/specs/00-HUONG-DAN-DU-AN.md`, rồi đúng file spec của việc được giao. Spec 03 là nền tảng cho mọi màn. Làm đúng spec; không tự thêm tính năng ngoài spec.
@@ -49,7 +49,7 @@ File này khớp với `GEMINI.md` (cùng nội dung, chỉ khác dòng tiêu đ
 - **Thẻ "Em có biết?"**: `content/knowScrolls.ts` (chữ), `content/villageCards.ts` (thẻ lấy từ bài học), `progress/knowCards.ts` (cờ theo bit), `three/village/KnowScrolls.tsx` + `scrollTargets.ts` (cuộn giấy, cột sáng), `ui/EmCoBietDialog.tsx`, `ui/KnowCollectionDialog.tsx`. Chặn biển bài, mũi tên, Bi gợi ý khu, `/ban-do` đọc thẻ: đã làm chung cho mọi làng có `scrolls`.
 - **Bản đồ nhỏ và lớn** `three/world/map/`: `mapProjection.ts`, `mapMarkers.ts`, `mapProgress.ts`, `mapGeometry.ts`, `miniMapFrame.ts` (hàm thuần có test), `MiniMap.tsx`, `BigMap.tsx`, chữ ở `content/minimap.ts`. Phím M ở `three/WalkControls.tsx`; vị trí người chơi đọc từ `WalkApi.player`.
 - **Cảnh 2.5D và trang bài học**: `three/scene25d/Scene25D.tsx` (camera trực giao, hình rời 2D, nhân vật 3D), `lesson2d/` (trang bài học 2D). **Khung màn chơi**: `ui/MiniGameLevel.tsx` (thẻ bắt đầu, câu hỏi, màn kết quả, huy chương `games/medals.ts`).
-- **Mẫu game**: `packages/village-lang-giay/src/runner/` (màn 2, chạy 3D: `runnerConfig`, `runnerLogic`, `runnerSession`, `testBots`, `runnerBalance.test`, `RunnerGame.tsx`) và `src/rebuild/` (màn 3, 2.5D: `rebuildConfig`, `rebuildLogic`, `rebuildBots`, `rebuildBalance.test`, `RebuildGame.tsx`).
+- **Mẫu game**: `packages/village-lang-giay/src/runner/` (màn 2, chạy 3D: `runnerConfig`, `runnerLogic`, `runnerSession`, `testBots`, `runnerBalance.test`, `RunnerGame.tsx`) và `src/rebuild/` (màn 3, 2.5D: `rebuildConfig`, `rebuildLogic`, `rebuildBots`, `rebuildBalance.test`, `RebuildGame.tsx`). Màn 6 Làng Dệt (cuộn ngang, 2.5D): `packages/village-lang-det/src/kite/` (`kiteConfig`, `kiteLogic`, `kiteBots`, `kiteBalance.test`; cảnh: `kiteLayout` hàm thuần, `kiteArt` texture, `KiteStage` chỉ vẽ bằng pool, `KiteGame` vòng lặp, cổng, HUD, điều khiển; `kiteHint` câu nhắc). Màn 5 cùng làng ở `src/whack/`.
 - **Đồ vật động**: `three/DynamicInstances.tsx` (`DynamicModel`, `DynamicBoxes`: InstancedMesh tạo sẵn sức chứa, bật/tắt bản theo lệnh, không cấp phát trong `useFrame`).
 - **Cỡ và va chạm**: `three/modelSizes.ts` (`MODEL_SIZES`: chiều cao thật, `dims`), `three/cho/footprints.ts` (chân tường thật của model làm vật cản; sinh lại: `GEN_FOOTPRINTS=<file.json> pnpm vitest run footprintGen`), `three/collision.ts`. Xem vật cản bằng `?debug=colliders`.
 - **Chữ** `content/`: `ui.ts` (chữ chung), `levels.ts` (12 màn, tên, chữ biển, `status`), `dialogues.ts`, `story.ts`, `characters.ts` (`{phanDien}`, `fmt`), `games.ts`, `villageScene.ts`, `villageIntro.ts`, `huongDan.ts` (Hướng dẫn chơi), `minimap.ts`, `lessons/`. Hướng dẫn chơi thêm phần mới ở CUỐI `GUIDE_SECTIONS` (cờ lưu theo bit).
