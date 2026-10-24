@@ -105,7 +105,7 @@ export interface Placement {
 }
 
 /** Đồ vật nhỏ do code dựng (chum vại, đống rơm, khóm hoa). */
-export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc' | 'coi-gia' | 'bep-do' | 'dinh' | 'chum-cham' | 'chum-do' | 'dong-soi' | 'gia-vai' | 'sao-soi';
+export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc' | 'coi-gia' | 'bep-do' | 'dinh' | 'chum-cham' | 'chum-do' | 'dong-soi' | 'gia-vai' | 'sao-soi' | 'sap-vai' | 'chau-canh';
 export interface PropPlacement {
   kind: PropKind;
   x: number;
@@ -210,11 +210,15 @@ export const PROP_SIZES: Readonly<Record<PropKind, PropSize>> = {
   'bep-do': { r: Math.hypot(1.0, 0.6), h: 1.9, box: { hx: 1.0, hz: 0.6 } },
   dinh: { r: Math.hypot(3.1, 2.5), h: 6, box: { hx: 3.1, hz: 2.5 } },
   // xưởng nhuộm và khung cửi của Làng Dệt (mốc 3, bước L1): chum nhuộm (nước chàm, nước đỏ), đống sợi, giá cuộn vải, sào phơi sợi
-  'chum-cham': { r: 0.85, h: 1.0 },
-  'chum-do': { r: 0.85, h: 1.0 },
+  // chum nhuộm: hình chum bầu của Làng Giấy (createJar) phóng 1,7 lần, mặt nước nhuộm trong miệng chum
+  'chum-cham': { r: 0.884, h: 1.785 },
+  'chum-do': { r: 0.884, h: 1.785 },
   'dong-soi': { r: 0.85, h: 0.65 },
   'gia-vai': { r: Math.hypot(1.1, 0.45), h: 1.55, box: { hx: 1.1, hz: 0.45 } },
   'sao-soi': { r: Math.hypot(1.3, 0.25), h: 2.0, box: { hx: 1.3, hz: 0.25 } },
+  // sạp vải nhỏ (bàn thấp, ba cuộn vải nằm ngang xếp chồng) và chậu cây cảnh (sân đình Làng Dệt)
+  'sap-vai': { r: Math.hypot(1.0, 0.5), h: 0.96 + 0.12 * Math.sqrt(3), box: { hx: 1.0, hz: 0.5 } },
+  'chau-canh': { r: 0.55, h: 1.12 },
 };
 
 /** Vật cản của đồ nhỏ do code dựng: hình tròn hoặc hộp xoay sát hình; vật thấp (khóm hoa) và chi tiết dưới vật khác (chân giá) thì không có. */
@@ -248,7 +252,6 @@ export interface DecorItem {
 }
 
 const PAPER: readonly [number, number, number] = [1, 1, 1];
-const roll = (u: number, w: number, tint: readonly [number, number, number]): DecorItem => ({ kind: 'vai', u, w, yaw: 0, tint });
 
 /**
  * Đồ gợi nghề quanh 4 cổng, nằm hai bên đường (|u| ≥ 5,6, ngoài dải đường rộng 4,4 mỗi bên) và phía sân chợ của tường cổng (w ≥ 2,6), để không chắn đường đất tới cổng:
@@ -266,13 +269,12 @@ export const GATE_DECOR: Readonly<Record<GateId, readonly DecorItem[]>> = {
   ],
   det: [
     { model: MODEL_LOOM, u: -6.6, w: 4.4, yaw: 0.3 },
-    roll(6.0, 3.3, [0.86, 0.27, 0.27]),
-    roll(6.6, 4.0, [0.24, 0.43, 0.82]),
-    roll(7.2, 3.2, [0.3, 0.65, 0.36]),
-    roll(6.2, 4.9, [0.9, 0.72, 0.23]),
-    roll(7.1, 4.7, [0.54, 0.33, 0.76]),
-    roll(-8.9, 3.4, [0.86, 0.27, 0.27]),
-    roll(-9.4, 4.2, [0.24, 0.43, 0.82]),
+    // cuộn vải nằm ngang trên sạp nhỏ và giá cạnh khung cửi (không còn cuộn đứng trơ ngoài đường)
+    { kind: 'sap-vai', u: -9.8, w: 3.2, yaw: 0.5 },
+    { kind: 'gia-vai', u: -8.8, w: 7.4, yaw: 0.2 },
+    { kind: 'sap-vai', u: 7.0, w: 4.6, yaw: -0.4 },
+    { kind: 'gia-vai', u: 8.4, w: 7.8, yaw: -0.15 },
+    { kind: 'dong-soi', u: 9.9, w: 3.6, yaw: 0.3 },
   ],
   'khac-dau': [
     { kind: 'khoi-da', u: -6.2, w: 3.2, yaw: 0.4, scale: 1 },
@@ -550,6 +552,18 @@ export function generateMarket(seed = 20260101, density: MarketDensity = FULL_DE
     placements.push(...kept);
   }
 
+  // Đá bờ sông (vật cản thật, không đi xuyên được)
+  const rockRng = createMulberry32(seed ^ 0x2545f491);
+  for (let i = 0; i < 24 && options.noBankRocks !== true; i++) {
+    const z = -60 + (i / 23) * 120;
+    if (Math.abs(z) < DOCK_HALF_WIDTH + 2.5) continue;
+    const scale = 0.6 + rockRng() * 0.9;
+    const grey = 0.8 + rockRng() * 0.2;
+    const rock: PropPlacement = { kind: 'da', x: RIVER_X + 0.9 + rockRng() * 0.8, z: z + (rockRng() - 0.5) * 3, yaw: rockRng() * 6, scale, tint: [grey, grey, grey] };
+    props.push(rock);
+    spots.push({ x: rock.x, z: rock.z, r: PROP_SIZES.da.r * scale });
+  }
+
   // Đồ vật nhỏ do code dựng: đống rơm cạnh nhà, chum vại cạnh lều và nhà, khóm hoa quanh nhà.
   const houses = placements.filter((p) => p.model === MODEL_HOUSE_TILE || p.model === MODEL_HOUSE_THATCH);
   const stallsPlaced = placements.filter((p) => p.model === MODEL_STALL);
@@ -584,16 +598,6 @@ export function generateMarket(seed = 20260101, density: MarketDensity = FULL_DE
     { x0: PLAZA_RADIUS - 1, z0: 0, x1: WORLD_RADIUS + 4, z1: 0, width: ROAD_WIDTH },
     { x0: -(PLAZA_RADIUS - 1), z0: 0, x1: RIVER_X + 0.5, z1: 0, width: ROAD_WIDTH },
   ];
-
-  // Đá bờ sông (vật cản thật, không đi xuyên được)
-  const rockRng = createMulberry32(seed ^ 0x2545f491);
-  for (let i = 0; i < 24 && options.noBankRocks !== true; i++) {
-    const z = -60 + (i / 23) * 120;
-    if (Math.abs(z) < DOCK_HALF_WIDTH + 2.5) continue;
-    const scale = 0.6 + rockRng() * 0.9;
-    const grey = 0.8 + rockRng() * 0.2;
-    props.push({ kind: 'da', x: RIVER_X + 0.9 + rockRng() * 0.8, z: z + (rockRng() - 0.5) * 3, yaw: rockRng() * 6, scale, tint: [grey, grey, grey] });
-  }
 
   // Vật cản và vật chắn camera
   const colliders: CameraBlocker[] = [];

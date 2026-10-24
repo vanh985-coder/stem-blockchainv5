@@ -288,7 +288,7 @@ export const toItem = (p: PropPlacement, extra: Partial<Item> = {}): Item => ({ 
  * Mỗi loại một InstancedMesh dùng chung geometry và material.
  */
 /** Đồ gợi nghề quanh cổng (bước 8d): hình dựng (`createCraftProp`) và màu vật liệu; màu từng món nhân thêm màu `tint` của bố cục (cuộn vải nhiều màu). */
-const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi'] as const;
+const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh'] as const;
 const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughness: number; vertexColors?: boolean }> = {
   giay: { color: '#EFE6CC', roughness: 1 },
   vai: { color: '#FFFFFF', roughness: 0.95 },
@@ -310,6 +310,8 @@ const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughne
   'dong-soi': { color: '#FFFFFF', roughness: 1, vertexColors: true },
   'gia-vai': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
   'sao-soi': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
+  'sap-vai': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
+  'chau-canh': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
 };
 
 /** Các loại đồ nhỏ do code dựng (kèm hình học và vật liệu) mà `MarketProps` vẽ: dùng cả để biên dịch trước shader (vật liệu màu theo đỉnh của đình, cối, bếp là chương trình shader mới). */
@@ -325,7 +327,9 @@ export interface PropsCull {
 }
 
 export function MarketProps({ layout, cull }: { layout: Pick<MarketLayout, 'props' | 'seed'>; cull?: PropsCull }) {
-  const crafts = useMemo(() => CRAFT_KINDS.map((kind) => ({ kind, geo: createCraftProp(kind)!, mat: craftMaterial(kind) })), []);
+  // chỉ dựng hình học của các loại có mặt trong bố cục (cả 21 loại trong một khung hình thì nặng, nhất là khi vùng làng gắn vào cảnh)
+  const kindsPresent = useMemo(() => new Set(layout.props.map((p) => p.kind)), [layout]);
+  const crafts = useMemo(() => CRAFT_KINDS.filter((kind) => kindsPresent.has(kind)).map((kind) => ({ kind, geo: createCraftProp(kind)!, mat: craftMaterial(kind) })), [kindsPresent]);
   useDispose(useMemo(() => crafts.flatMap((c) => [c.geo, c.mat]), [crafts]));
   const craftItems = useMemo(() => crafts.map((c) => layout.props.filter((p) => p.kind === c.kind).map((p) => toItem(p))), [crafts, layout]);
 

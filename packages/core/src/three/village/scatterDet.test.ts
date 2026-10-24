@@ -32,27 +32,28 @@ describe('sào phơi vải và luống dâu của Làng Dệt (mốc 3, bước 
     g.dispose();
   });
 
-  it('sào vải: thuộc tính aSway bằng 0 ở trụ và xà (không lay), tăng tới 1 ở mép dưới tấm vải; đủ 4 màu vải (đỏ, hồng, chàm, vàng)', () => {
+  it('sào vải: aSway bằng 0 ở trụ và xà (không lay), tăng tới 1 ở mép dưới tấm vải; aSlot là −1 ở trụ và xà, 0, 1, 2 ở ba chỗ treo vải; 96 tam giác', () => {
     const g = createClothPole();
+    expect(triangles(g)).toBe(96);
     const sway = g.getAttribute('aSway');
+    const slot = g.getAttribute('aSlot');
     const pos = g.getAttribute('position');
-    const color = g.getAttribute('color');
     expect(sway).toBeDefined();
     let max = 0;
     let min = 1;
+    const slots = new Set<number>();
     for (let i = 0; i < sway.count; i++) {
       max = Math.max(max, sway.getX(i));
       min = Math.min(min, sway.getX(i));
+      slots.add(slot.getX(i));
       expect(sway.getX(i)).toBeGreaterThanOrEqual(0);
       expect(sway.getX(i)).toBeLessThanOrEqual(1);
+      if (slot.getX(i) < 0) expect(sway.getX(i), 'trụ và xà không lay').toBe(0);
+      if (pos.getY(i) > 2.5) expect(sway.getX(i)).toBeLessThan(0.05);
     }
     expect(min).toBe(0);
     expect(max).toBeCloseTo(1, 6);
-    // đỉnh cao hơn 2,5 (trụ, xà, mép trên vải) không lay; đỉnh thấp hơn 1,0 lay gần hết
-    for (let i = 0; i < sway.count; i++) if (pos.getY(i) > 2.5) expect(sway.getX(i)).toBeLessThan(0.05);
-    const clothVerts = new Set<string>();
-    for (let i = 0; i < sway.count; i++) if (sway.getX(i) > 0.5) clothVerts.add(`${color.getX(i).toFixed(2)},${color.getY(i).toFixed(2)},${color.getZ(i).toFixed(2)}`);
-    expect(clothVerts.size).toBe(4);
+    expect([...slots].sort()).toEqual([-1, 0, 1, 2]);
     g.dispose();
   });
 
@@ -60,13 +61,17 @@ describe('sào phơi vải và luống dâu của Làng Dệt (mốc 3, bước 
     const m = scatterMaterial('sao-vai');
     expect(m.side).toBe(2); // DoubleSide
     expect(m.vertexColors).toBe(true);
-    const shader = { uniforms: {} as Record<string, unknown>, vertexShader: '#include <common>\nvoid main() {\n#include <begin_vertex>\n}', fragmentShader: 'void main() {\n#include <emissivemap_fragment>\n}' };
+    const shader = { uniforms: {} as Record<string, unknown>, vertexShader: '#include <common>\nvoid main() {\n#include <color_vertex>\n#include <begin_vertex>\n}', fragmentShader: 'void main() {\n#include <emissivemap_fragment>\n}' };
     (m.onBeforeCompile as (s: unknown) => void)(shader);
     expect(shader.uniforms.uClothTime).toBe(CLOTH_TIME); // cùng MỘT uniform cho mọi vật liệu sào vải
     expect(shader.vertexShader).toContain('attribute float aSway;');
     expect(shader.vertexShader).toContain('uniform float uClothTime;');
     expect(shader.vertexShader).toContain('transformed.z +=');
     expect(shader.vertexShader).toContain('instanceMatrix'); // mỗi sào một pha
+    expect(shader.vertexShader).toContain('attribute float aSlot;');
+    expect(shader.vertexShader).toContain('instanceColor'); // vải từng sào đọc từ màu bản (ba mã)
+    expect(shader.vertexShader).toContain('CLOTH_PAL[6]');
+    expect(shader.vertexShader).toContain('clothLen'); // co độ dài tấm, tấm trống co về một đường
     expect(shader.fragmentShader).toContain('totalEmissiveRadiance'); // vải phát sáng nhẹ theo màu, không tối ở mặt sau
     expect(shader.fragmentShader).toContain('totalEmissiveRadiance'); // vải phát sáng nhẹ theo màu, không tối ở mặt sau
     for (const k of ['tre', 'cay-qua', 'phen', 'luong-dau'] as const) expect(scatterMaterial(k).onBeforeCompile.toString()).not.toContain('aSway');

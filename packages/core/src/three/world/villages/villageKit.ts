@@ -135,6 +135,8 @@ export interface Filler {
   pondFlora(rng: Rng, ponds: readonly VillagePond[], count: number): void;
   /** Khóm hoa rải quanh một tâm (sân đình...). */
   circleFlora(rng: Rng, cx: number, cz: number, count: number, dMin: number, dSpan: number): void;
+  /** Đá ven bờ ao (khối đá nhỏ nằm ngay trên bờ cỏ, sát mép nước): khác khóm hoa ở chỗ được đặt sát ao (ao chỉ giữ chỗ trống quanh nó cho hoa và cây). Không đè đồ đã đặt, đường, lối đi, các vũng khác. */
+  pondStones(rng: Rng, ponds: readonly VillagePond[], count: number): void;
 }
 
 export function createFiller(env: FillerEnv): Filler {
@@ -258,6 +260,26 @@ export function createFiller(env: FillerEnv): Filler {
         const a = rng() * Math.PI * 2;
         const p = ponds[i % ponds.length];
         putProp(prop('hoa', p.x + Math.cos(a) * (p.r + 1.9), p.z + Math.sin(a) * (p.r + 1.9), 0, 1, [0.92, 0.94, 0.9]), 0.5);
+      }
+    },
+    pondStones(rng, ponds, count) {
+      const isPond = (s: Spot) => ponds.some((q) => q.x === s.x && q.z === s.z);
+      for (let i = 0; i < count; i++) {
+        const p = ponds[i % ponds.length];
+        const a = rng() * Math.PI * 2;
+        const s = 0.55 + rng() * 0.4;
+        const g = 0.9 + rng() * 0.1;
+        const x = p.x + Math.cos(a) * (p.r + 1.15);
+        const z = p.z + Math.sin(a) * (p.r + 1.15);
+        const yaw = rng() * 3;
+        const r = PROP_SIZES['khoi-da'].r * s;
+        if (Math.hypot(x, z) + r > env.keepInside) continue;
+        if (ponds.some((q) => Math.hypot(x - q.x, z - q.z) < q.r + r + 0.3)) continue;
+        if (taken.some((t) => !isPond(t) && Math.hypot(x - t.x, z - t.z) < t.r + r + 0.3)) continue;
+        if (env.roads.some((rd) => distToRoad(x, z, rd) < r + 0.5)) continue;
+        if (distToLanes(x, z, env.villagers, env.paths) < r + 1.0) continue;
+        props.push(prop('khoi-da', x, z, yaw, s, [g, g, g]));
+        taken.push({ x, z, r });
       }
     },
     circleFlora(rng, cx, cz, count, dMin, dSpan) {

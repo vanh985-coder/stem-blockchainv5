@@ -5,7 +5,7 @@ import { Fence, Hills, Instances, useDispose, useImageTexture, type Item } from 
 import { createBoatCanopy, createBoatHull } from '../cho/marketGeometry';
 import { createEdgeAlphaTexture, createGrassTexture, createPaddyTexture, createPlankTexture, createWaterTexture } from '../cho/marketTextures';
 import { DECK_START_X, DECK_TOP, PLAZA_RADIUS, RAMP_START_X, WORLD_RADIUS } from '../cho/marketLayout';
-import { POND_BANK, type VillageField, type VillageLayout } from '../village/villageLayout';
+import { POND_BANK, type VillageField, type VillageLayout, type VillageRoad, type VillageYard } from '../village/villageLayout';
 import { RIVER_TRUNK_HALF, ribbonOf, riverBranch, type RiverPoint } from './river';
 import { BRIDGE_DECK_END_X, BRIDGE_HALF_WIDTH, BRIDGE_RAMP_END_X, RIVER_EAST_X, RIVER_WEST_X, type WorldLayout, type WorldRoad } from './worldLayout';
 
@@ -41,6 +41,8 @@ function useRepeated(base: Texture | null, rx: number, ry: number): Texture | nu
 /** Đường gạch (đại lộ, lối lên đình; bước X3): ô gạch vuông cạnh 3 đơn vị, hơi đỏ hơn đất. */
 const BRICK_TILE = 3;
 const BRICK_TINT = '#E3CDBB';
+/** Màu đá viền sân lát gạch. */
+const KERB_COLOR: readonly [number, number, number] = [0.6, 0.58, 0.54];
 
 function RoadStrip({ road, dirt, lateral, brick = null }: { road: WorldRoad & { kind?: 'dat' | 'gach' }; dirt: Texture | null; lateral: Texture; brick?: Texture | null }) {
   const len = Math.hypot(road.x1 - road.x0, road.z1 - road.z0);
@@ -59,22 +61,64 @@ function RoadStrip({ road, dirt, lateral, brick = null }: { road: WorldRoad & { 
 
 /** Sân đất nện hay sân lát gạch (sân đình): hình tròn mép mờ; ô đất lặp theo cỡ sân (mỗi ô ${YARD_TILE} đơn vị, gạch mỗi ô ${BRICK_TILE}) để sân rộng không bị kéo giãn thành vằn lớn. */
 const YARD_TILE = 6;
-function YardDisc({ yard, y, dirt, brick, radial }: { yard: { x: number; z: number; r: number; kind?: 'dat' | 'gach' }; y: number; dirt: Texture | null; brick: Texture | null; radial: Texture }) {
+function YardDisc({ yard, y, dirt, brick, radial }: { yard: VillageYard; y: number; dirt: Texture | null; brick: Texture | null; radial: Texture }) {
   const isBrick = yard.kind === 'gach';
+  const isStain = yard.kind === 'vet';
   const rep = ((yard.r + 1.5) * 2) / (isBrick ? BRICK_TILE : YARD_TILE);
-  const map = useRepeated(isBrick ? brick : dirt, rep, rep);
+  const map = useRepeated(isStain ? null : isBrick ? brick : dirt, rep, rep);
+  if (isStain) {
+    return (
+      <mesh position={[yard.x, y, yard.z]} rotation-x={-Math.PI / 2}>
+        <circleGeometry args={[yard.r + 1.5, 32]} />
+        <meshStandardMaterial color={yard.tint ?? '#6E5040'} alphaMap={radial} transparent opacity={yard.opacity ?? 0.45} depthWrite={false} roughness={1} />
+      </mesh>
+    );
+  }
   return (
     <mesh position={[yard.x, y, yard.z]} rotation-x={-Math.PI / 2} receiveShadow>
       <circleGeometry args={[yard.r + 1.5, 40]} />
-      <meshStandardMaterial key={map ? 'a' : 'b'} map={map ?? undefined} color={map ? (isBrick ? BRICK_TINT : DIRT_TINT) : isBrick ? '#B98466' : '#C9A064'} alphaMap={radial} transparent depthWrite={false} roughness={1} />
+      <meshStandardMaterial key={map ? 'a' : 'b'} map={map ?? undefined} color={map ? (isBrick ? (yard.tint ?? BRICK_TINT) : DIRT_TINT) : isBrick ? '#B98466' : '#C9A064'} alphaMap={radial} transparent depthWrite={false} roughness={1} />
     </mesh>
   );
 }
 
+/**
+ * Viền đá của sân lát gạch: một vòng khối đá thấp (cao 0,16, rộng 0,55) xếp quanh mép sân, so le và lệch nhẹ, bỏ chỗ có đường đi qua (đại lộ vào sân). Không có vật cản (đi bước lên được). Một InstancedMesh.
+ */
+function YardKerb({ yard, roads }: { yard: VillageYard; roads: readonly VillageRoad[] }) {
+  const geo = useMemo(() => new BoxGeometry(1, 1, 1), []);
+  const mat = useMemo(() => new MeshStandardMaterial({ color: '#FFFFFF', roughness: 1 }), []);
+  useDispose(useMemo(() => [geo, mat], [geo, mat]));
+  const items = useMemo<Item[]>(() => {
+    const n = Math.round((Math.PI * 2 * (yard.r + 0.2)) / 1.45);
+    const out: Item[] = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      const x = yard.x + Math.cos(a) * (yard.r + 0.2 + (i % 2 ? 0.07 : -0.05));
+      const z = yard.z + Math.sin(a) * (yard.r + 0.2 + (i % 2 ? 0.07 : -0.05));
+      if (roads.some((r) => segmentDistance(x, z, r) < r.width / 2 + 0.9)) continue;
+      const shade = 0.88 + ((i * 7) % 5) * 0.045;
+      out.push({ x, z, y: 0.07, yaw: -a + Math.PI / 2 + (i % 3 ? 0.04 : -0.05), sx: 1.5 - (i % 3) * 0.08, sy: 0.16, sz: 0.55, color: [KERB_COLOR[0] * shade, KERB_COLOR[1] * shade, KERB_COLOR[2] * shade] });
+    }
+    return out;
+  }, [yard, roads]);
+  return <Instances geometry={geo} material={mat} items={items} receive />;
+}
+
+/** Khoảng cách từ (x, z) tới đoạn tim của một con đường. */
+function segmentDistance(x: number, z: number, r: VillageRoad): number {
+  const dx = r.x1 - r.x0;
+  const dz = r.z1 - r.z0;
+  const len2 = dx * dx + dz * dz;
+  const t = len2 === 0 ? 0 : Math.max(0, Math.min(1, ((x - r.x0) * dx + (z - r.z0) * dz) / len2));
+  return Math.hypot(x - (r.x0 + dx * t), z - (r.z0 + dz * t));
+}
+
 /** Mặt đất của một làng (luôn có, rẻ: vài draw call): cỏ làng, sân đất nện mép mờ, đường đất trong làng và hàng rào tre quanh khu. Đồ vật của làng nằm ở vùng (VillageZone). */
 function VillageGround({ layout, dirt, brick, grass: grassBase, paddy, radial, lateral }: { layout: VillageLayout; dirt: Texture | null; brick: Texture | null; grass: Texture; paddy: Texture; radial: Texture; lateral: Texture }) {
-  const cx = layout.fence?.center?.x ?? 0;
-  const cz = layout.fence?.center?.z ?? 0;
+  // tâm làng: hàng rào tròn của làng nhỏ, hoặc lũy tre của làng lớn (bản cũ chỉ đọc hàng rào nên cỏ của làng lớn nằm nhầm ở gốc tọa độ và mặt đất trong làng lộ ra ruộng lúa của cả thế giới)
+  const cx = layout.wall?.center?.x ?? layout.fence?.center?.x ?? 0;
+  const cz = layout.wall?.center?.z ?? layout.fence?.center?.z ?? 0;
   const rep = ((layout.radius + VILLAGE_GRASS_MARGIN) * 2) / GRASS_TILE;
   const grass = useRepeated(grassBase, rep, rep) ?? grassBase;
   return (
@@ -100,6 +144,9 @@ function VillageGround({ layout, dirt, brick, grass: grassBase, paddy, radial, l
       ))}
       {layout.yards.map((y, i) => (
         <YardDisc key={`y${i}`} yard={y} y={YARD_Y + i * 0.001} dirt={dirt} brick={brick} radial={radial} />
+      ))}
+      {layout.yards.filter((y) => y.kind === 'gach').map((y, i) => (
+        <YardKerb key={`k${i}`} yard={y} roads={layout.roads} />
       ))}
       {layout.roads.map((r, i) => (
         <RoadStrip key={`r${i}`} road={r} dirt={dirt} brick={brick} lateral={lateral} />

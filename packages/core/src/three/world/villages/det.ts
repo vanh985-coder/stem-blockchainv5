@@ -2,6 +2,7 @@ import { createMulberry32 } from '../../../lib/rng';
 import { MODEL_LOOM, MODEL_STALL, MODEL_TREE, MODEL_WELL, type Placement, type PropPlacement } from '../../cho/marketLayout';
 import { type ScatterPlacement } from '../../village/scatter';
 import type { VillageBoardDef, VillageField, VillageGuideDef, VillageLayoutInput, VillagePaths, VillagePond, VillageRoad, VillageScroll, VillagerLoop } from '../../village/villageLayout';
+import { clothPoleTint } from '../../village/clothPoles';
 import { createFiller, placementSpots, propSpots, prop, scatter, scatterSpots, thatch, tile, type Spot } from './villageKit';
 
 /**
@@ -43,13 +44,39 @@ const DESK = { x: -9, z: -82.5, yaw: 0.3 };
 const GUIDE: VillageGuideDef = { character: 'cuBinh', x: -9.2, z: -80.6, yaw: Math.PI };
 const COMPANIONS: VillageGuideDef[] = [{ character: 'coChi', x: 8.6, z: -83, yaw: Math.PI + 0.2 }];
 const PAVILION = prop('dinh', 0, -75.5, Math.PI);
+/** Chậu cây cảnh ở các góc sân đình (tám chậu, tránh biển, bàn, người đứng và lối đi). */
+const POTS: PropPlacement[] = [
+  prop('chau-canh', 12.6, -94.5, 0.3),
+  prop('chau-canh', 13.4, -88.5, 1.1),
+  prop('chau-canh', 12.8, -78.5, 2.0),
+  prop('chau-canh', 8.4, -72.4, 0.6),
+  prop('chau-canh', -8.6, -72.8, 1.6),
+  prop('chau-canh', -13.4, -78.8, 0.9),
+  prop('chau-canh', -14, -84.6, 2.4),
+  prop('chau-canh', -14.2, -90.8, 0.2),
+];
 
 // ---------------------------------------------------------------------------
 // Bãi phơi vải (đông nam): 6 cột × 5 hàng = 30 sào, chum nhuộm, đống sợi
 
 const POLE_X = [48, 54.4, 60.8, 67.2, 73.6, 80];
 const POLE_Z = [-58, -63, -68, -73, -78];
-const POLES: ScatterPlacement[] = POLE_Z.flatMap((z, j) => POLE_X.map((x, i) => scatter('sao-vai', x + ((i + j) % 3 === 0 ? 0.1 : -0.06), z, 1, (i + j) % 2 ? 0.03 : -0.03, [1, 1, 1])));
+/**
+ * Sào không thẳng hàng tuyệt đối: lệch vị trí (hai cột sát lối đi giữa bãi lệch ít để lối vẫn rộng) và xoay tối đa 0,17 rad (khoảng 10°); vải trên sào (bỏ trống hay 1 đến 3 tấm, màu nhuộm tự nhiên, độ dài) chọn bằng rng cố định,
+ * mã hóa trong màu bản (xem village/clothPoles.ts). Cùng seed cùng kết quả.
+ */
+const POLE_MAX_YAW = 0.17;
+const POLES: ScatterPlacement[] = (() => {
+  const rng = createMulberry32(20260212);
+  return POLE_Z.flatMap((z, j) =>
+    POLE_X.map((x, i) => {
+      const jx = (rng() - 0.5) * 2 * (i === 2 || i === 3 ? 0.15 : 0.4);
+      const jz = (rng() - 0.5) * 0.6;
+      const yaw = (rng() - 0.5) * 2 * POLE_MAX_YAW;
+      return scatter('sao-vai', x + jx, z + jz + (j % 2 ? 0.05 : 0), 1, yaw, clothPoleTint(rng));
+    }),
+  );
+})();
 /** Lối đứng thẳng giữa cột 3 và cột 4 của bãi phơi (rộng 2) để tới thẻ ở giữa bãi. */
 const AISLE_X = 64;
 
@@ -161,10 +188,8 @@ const m = (dx: number, dz: number): [number, number] => [MARKET.x + dx, MARKET.z
 const STALL_SPOTS: readonly (readonly [number, number])[] = [m(10.5, 0), m(5, 9), m(-5, 9), m(5, -9), m(-5, -9)];
 const STALLS: Placement[] = STALL_SPOTS.map(([x, z], i) => ({ model: MODEL_STALL, x, z, yaw: Math.atan2(MARKET.x - x, MARKET.z - z) + (i % 2 ? 0.1 : -0.1), scale: 1, tint: [1, 0.98 - (i % 3) * 0.03, 0.95] as const }));
 const MARKET_PROPS: PropPlacement[] = [
-  prop('vai', ...m(7.5, 5), 0, 1, [0.9, 0.35, 0.3]),
-  prop('vai', ...m(8.3, 5.4), 0, 1, [0.3, 0.55, 0.85]),
-  prop('vai', ...m(-7.2, 5.2), 0, 1, [0.95, 0.8, 0.3]),
-  prop('vai', ...m(-8, 5.8), 0, 1, [0.9, 0.5, 0.65]),
+  prop('sap-vai', ...m(8.2, 5.6), 0.3),
+  prop('sap-vai', ...m(-8.2, 5.8), -0.25),
   prop('gia-vai', ...m(0, 11.5), Math.PI),
   prop('gia-vai', ...m(-12, 6), Math.PI / 2),
   prop('gia-vai', ...m(8.5, -11.5), 0),
@@ -177,10 +202,10 @@ const MARKET_PROPS: PropPlacement[] = [
 ];
 
 const PONDS: VillagePond[] = [
-  { x: -60, z: 40, r: 13, water: '#35508E' }, // ao chàm
-  { x: -78, z: 50, r: 9, water: '#9A4B3C' }, // ao nước đỏ
+  { x: -60, z: 40, r: 13, water: '#4C7FBF' }, // vũng chàm (xanh chàm sáng, nhìn ra là nước)
+  { x: -78, z: 50, r: 11, water: '#B8644A' }, // vũng nhuộm đỏ nâu
   { x: -50, z: 56, r: 8 },
-  { x: -74, z: 28, r: 8, water: '#3E6A92' },
+  { x: -74, z: 28, r: 8, water: '#5A8CC4' },
 ];
 const JETTY = scatter('cau-ao', -46.2, 40, 1, 0);
 const POND_PROPS: PropPlacement[] = [
@@ -254,7 +279,14 @@ const ROADS: VillageRoad[] = [
 ];
 
 const YARDS = [
-  { x: PLAZA.x, z: PLAZA.z, r: 15, kind: 'gach' as const }, // sân đình lát gạch
+  { x: PLAZA.x, z: PLAZA.z, r: 15, kind: 'gach' as const, tint: '#A28C7D' }, // sân đình lát gạch đỏ nung trầm (viền đá vẽ ở WorldTerrain)
+  { x: PLAZA.x, z: PLAZA.z, r: 14, kind: 'vet' as const, tint: '#8A7A6D', opacity: 0.5 }, // lớp xám nâu phủ cả sân cho bớt đỏ (giảm bão hòa)
+  // vệt loang: mảng sẫm và mảng nhạt mờ phủ lên gạch cho khỏi đều một màu
+  { x: -6, z: -78, r: 6, kind: 'vet' as const, tint: '#5A4234', opacity: 0.4 },
+  { x: 7, z: -92, r: 5.5, kind: 'vet' as const, tint: '#74563F', opacity: 0.32 },
+  { x: 3, z: -84, r: 7, kind: 'vet' as const, tint: '#CDB29B', opacity: 0.3 },
+  { x: -10, z: -93, r: 4.5, kind: 'vet' as const, tint: '#4A382D', opacity: 0.3 },
+  { x: 11, z: -79, r: 4, kind: 'vet' as const, tint: '#6B4F3C', opacity: 0.28 },
   { x: 64, z: -68, r: 25 }, // bãi phơi vải
   { x: 65, z: -88, r: 18 }, // hàng chum nhuộm
   { x: MARKET.x, z: MARKET.z, r: 15 }, // sân chợ vải
@@ -366,7 +398,7 @@ const PATHS: VillagePaths = {
 function anchors(): Spot[] {
   const out: Spot[] = [
     ...placementSpots([...HOUSES, ...LANE.looms, ...TREES, ...WELLS, ...STALLS]),
-    ...propSpots([...DYE_PROPS, ...MARKET_PROPS, ...POND_PROPS, ...LANE.shelves, PAVILION]),
+    ...propSpots([...DYE_PROPS, ...MARKET_PROPS, ...POND_PROPS, ...LANE.shelves, ...POTS, PAVILION]),
     ...scatterSpots(POLES),
   ];
   for (const b of BOARDS) out.push({ x: b.x, z: b.z, r: 1.4 });
@@ -381,7 +413,7 @@ function anchors(): Spot[] {
 /** Rải đồ phụ: tre ở vườn và đồi, cây ăn quả, hoa, chum, rơm. Mỗi món chỉ đặt nếu còn chỗ trống (bán kính chân cộng khoảng hở). */
 function fillers(): { scatter: ScatterPlacement[]; props: PropPlacement[]; placements: Placement[] } {
   const rng = createMulberry32(20260210);
-  const f = createFiller({ wallRadius: DET_WALL_RADIUS, gateZ: DET_GATE_Z, keepInside: KEEP_INSIDE, taken: anchors(), roads: ROADS, fields: FIELDS, yards: YARDS, villagers: VILLAGERS, paths: PATHS });
+  const f = createFiller({ wallRadius: DET_WALL_RADIUS, gateZ: DET_GATE_Z, keepInside: KEEP_INSIDE, taken: anchors(), roads: ROADS, fields: FIELDS, yards: YARDS.filter((y) => y.kind !== 'vet'), villagers: VILLAGERS, paths: PATHS });
   const hills: ScatterPlacement[] = [
     scatter('doi', -105, -16, 7, 0, [0.14, 0.4, 0.09], { sy: 0.6 }),
     scatter('doi', 100, -22, 9, 1, [0.16, 0.42, 0.1], { sy: 0.55 }),
@@ -401,6 +433,7 @@ function fillers(): { scatter: ScatterPlacement[]; props: PropPlacement[]; place
   f.houseFlora(rng, [...LANE.houses, ...OTHER_HOUSES]);
   f.avenueFlora(rng, 24);
   f.pondFlora(rng, PONDS, 18);
+  f.pondStones(rng, PONDS, 26); // đá ven bờ ao (xen khóm hoa và cỏ)
   f.circleFlora(rng, 0, -85, 12, 9, 5);
   return { scatter: f.scatter, props: f.props, placements: f.placements };
 }
@@ -416,6 +449,7 @@ const PROPS: PropPlacement[] = [
   prop('ban-chep', DESK.x, DESK.z, DESK.yaw),
   prop('so-chung', DESK.x, DESK.z, DESK.yaw),
   PAVILION,
+  ...POTS,
   ...DYE_PROPS,
   ...MARKET_PROPS,
   ...POND_PROPS,

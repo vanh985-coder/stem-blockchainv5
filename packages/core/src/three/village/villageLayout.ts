@@ -108,6 +108,18 @@ export interface VillagePaths {
   scrollStands?: { x: number; z: number; join: string }[];
 }
 
+/**
+ * Một sân của làng: hình tròn mép mờ. `kind`: đất nện (mặc định), lát gạch (sân đình, vẽ thêm viền đá) hay vệt loang (`vet`: mảng màu mờ phủ lên sân để gạch không đều một màu). `tint`: nhân màu (mã #rrggbb); `opacity`: độ đậm của vệt loang.
+ */
+export interface VillageYard {
+  x: number;
+  z: number;
+  r: number;
+  kind?: 'dat' | 'gach' | 'vet';
+  tint?: string;
+  opacity?: number;
+}
+
 export interface VillageLayoutInput {
   id: VillageId;
   /** Bán kính khu đi lại (biên của WalkWorld) */
@@ -124,8 +136,8 @@ export interface VillageLayoutInput {
   guide?: VillageGuideDef;
   /** Người đứng yên thêm ở khu giữa làng (ví dụ cô Chi bên cạnh cụ Bình): có vật cản tròn, không nói chuyện được (chỉ `guide` mới nói chuyện) */
   companions?: VillageGuideDef[];
-  /** Sân: hình tròn, đất nện (mặc định) hay lát gạch (sân đình) */
-  yards: { x: number; z: number; r: number; kind?: 'dat' | 'gach' }[];
+  /** Sân: hình tròn, đất nện (mặc định), lát gạch (sân đình, có viền đá) hay vệt loang (`vet`) */
+  yards: VillageYard[];
   roads: VillageRoad[];
   /** Hàng rào tre tròn quanh khu: bán kính; chừa lối quanh cổng (bán kính `gap` tính từ tâm cổng). Bỏ trống thì không có hàng rào. */
   fence?: { radius: number; gap: number; /** tâm vòng rào (mặc định gốc tọa độ; thế giới mở: tâm làng) */ center?: { x: number; z: number } };

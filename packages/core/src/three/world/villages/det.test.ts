@@ -66,8 +66,9 @@ describe('Làng Dệt (mốc 3, bước L1): quy mô và bố cục', () => {
     expect(det.layout.placements.filter((p) => p.model === MODEL_LOOM).length).toBeLessThanOrEqual(8);
   });
 
-  it('chợ vải nhỏ và ruộng dâu: sạp có cuộn vải; 6 ruộng dâu, mỗi ruộng nhiều luống bụi thấp (đi qua được)', () => {
-    expect(props('vai').length).toBeGreaterThanOrEqual(3);
+  it('chợ vải nhỏ và ruộng dâu: sạp vải có cuộn nằm ngang, không còn cuộn đứng; 6 ruộng dâu, mỗi ruộng nhiều luống bụi thấp (đi qua được)', () => {
+    expect(props('sap-vai').length).toBeGreaterThanOrEqual(2);
+    expect(props('vai')).toHaveLength(0);
     expect(L.fields!.length).toBeGreaterThanOrEqual(5);
     for (const f of L.fields!) expect(f.kind).toBe('dau');
     const rows = scatterOf('luong-dau');

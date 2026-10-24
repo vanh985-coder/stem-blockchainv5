@@ -49,7 +49,7 @@ describe('hình học tự dựng của chợ', () => {
 });
 
 describe('đồ gợi nghề quanh cổng: hình dựng khớp PROP_SIZES (vật cản sát hình)', () => {
-  const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi'];
+  const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh'];
   for (const kind of crafts) {
     it(`${kind}: chân ở y = 0, cao đúng, vừa trong hình vật cản (hộp hoặc tròn)`, () => {
       const g = createCraftProp(kind)!;
@@ -67,8 +67,13 @@ describe('đồ gợi nghề quanh cổng: hình dựng khớp PROP_SIZES (vật
         expect(b.max.x - b.min.x).toBeCloseTo(k.box.hx * 2, 6);
         expect(b.max.z - b.min.z).toBeCloseTo(k.box.hz * 2, 6);
       } else {
-        expect((b.max.x - b.min.x) / 2).toBeCloseTo(k.r, 6);
+        // chum nhuộm dựng bằng hình chum của Làng Giấy (14 cạnh quanh trục): theo trục z đúng bán kính, theo trục x kém tối đa 3%
+        const lathe = kind === 'chum-cham' || kind === 'chum-do';
         expect((b.max.z - b.min.z) / 2).toBeCloseTo(k.r, 6);
+        if (lathe) {
+          expect((b.max.x - b.min.x) / 2).toBeGreaterThan(k.r * 0.97);
+          expect((b.max.x - b.min.x) / 2).toBeLessThanOrEqual(k.r + 1e-9);
+        } else expect((b.max.x - b.min.x) / 2).toBeCloseTo(k.r, 6);
       }
     });
   }
@@ -101,7 +106,7 @@ describe('mặt trước của hình đặc quay ra ngoài (vật liệu một m
   });
   it('chum vại và mọi đồ gợi nghề dựng bằng code: thể tích có dấu dương', () => {
     expect(signedVolume(createJar())).toBeGreaterThan(0);
-    const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi'];
+    const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh'];
     for (const kind of crafts) expect(signedVolume(createCraftProp(kind)!), kind).toBeGreaterThan(0);
   });
   it('thân thuyền: thể tích có dấu dương', () => {

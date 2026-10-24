@@ -430,13 +430,14 @@ describe('bước 8d: đồ gợi nghề quanh cổng', () => {
   const placed = (model: string) => layout.placements.filter((p) => p.model === model);
   const nearGate = (g: (typeof GATES)[number], r: number) => (x: number, z: number) => Math.hypot(x - g.x, z - g.z) < r;
 
-  it('Giấy: 2–3 phên phơi giấy và chồng giấy; Dệt: 1 khung cửi và cuộn vải; Khắc Dấu: khối đá và bàn đá; Bạc: hòm, thúng, chum', () => {
+  it('Giấy: 2–3 phên phơi giấy và chồng giấy; Dệt: 1 khung cửi, sạp và giá cuộn vải nằm ngang; Khắc Dấu: khối đá và bàn đá; Bạc: hòm, thúng, chum', () => {
     expect(placed(MODEL_PAPER_RACK).length).toBeGreaterThanOrEqual(2);
     expect(placed(MODEL_PAPER_RACK).length).toBeLessThanOrEqual(3);
     expect(placed(MODEL_LOOM)).toHaveLength(1);
     const kindsAt = (id: (typeof GATES)[number]['id']) => new Set(GATE_DECOR[id].flatMap((d) => (d.kind ? [d.kind] : [])));
     expect(kindsAt('giay').has('giay')).toBe(true);
-    expect(kindsAt('det').has('vai')).toBe(true);
+    expect(kindsAt('det').has('sap-vai')).toBe(true);
+    expect(kindsAt('det').has('vai')).toBe(false); // không còn cuộn vải dựng đứng ngoài cổng (bước L2)
     expect(kindsAt('khac-dau')).toEqual(new Set<PropKind>(['khoi-da', 'ban-da']));
     expect(kindsAt('bac')).toEqual(new Set<PropKind>(['hom', 'thung', 'chum']));
     // phên ở quanh cổng Giấy (Bắc), khung cửi quanh cổng Dệt (Nam)

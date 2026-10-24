@@ -103,39 +103,43 @@ export function createHill(): BufferGeometry {
   return bare(new SphereGeometry(1, 16, 4, 0, Math.PI * 2, 0, Math.PI / 2));
 }
 
-/** Màu bốn tấm vải của sào phơi: đỏ, hồng, chàm, vàng. */
-const CLOTH = [0xe0463b, 0xf29ab8, 0x3d68c4, 0xf2c53d];
 const BERRY_LEAF = [0x6fa33e, 0x5e9232, 0x7bb047];
 
-/** Thêm thuộc tính `aSway` (độ đung đưa 0 đến 1 của từng đỉnh; bộ đổ bóng đỉnh của vật liệu sào vải đọc nó) cho cả hình học. */
-function withSway(g: BufferGeometry, value: (y: number) => number): BufferGeometry {
+/** Thêm thuộc tính aSway (độ đung đưa 0 đến 1 của từng đỉnh) và aSlot (chỗ treo vải 0, 1, 2; −1 là trụ và xà) cho cả hình học: bộ đổ bóng đỉnh của vật liệu sào vải đọc cả hai. */
+function withCloth(g: BufferGeometry, slot: number, sway: (y: number) => number): BufferGeometry {
   const pos = g.getAttribute('position');
   const a = new Float32Array(pos.count);
-  for (let i = 0; i < pos.count; i++) a[i] = value(pos.getY(i));
+  const s = new Float32Array(pos.count).fill(slot);
+  for (let i = 0; i < pos.count; i++) a[i] = sway(pos.getY(i));
   g.setAttribute('aSway', new Float32BufferAttribute(a, 1));
+  g.setAttribute('aSlot', new Float32BufferAttribute(s, 1));
   return g;
 }
 
+/** Chiều dài thiết kế của tấm vải trên sào và độ cao mép trên (chỗ vải buộc vào xà); bộ đổ bóng đỉnh co tấm về mép trên theo từng sào. */
+export const CLOTH_DESIGN_LENGTH = 2.0;
+export const CLOTH_TOP = 2.46;
+/** Hoành độ ba chỗ treo vải và bề rộng một tấm. */
+export const CLOTH_SLOT_X = [-1.4, 0, 1.4] as const;
+export const CLOTH_PANEL_WIDTH = 1.15;
+
 /**
- * Sào phơi vải: hai trụ tre cao 2,6 ở x = ±2,0, xà ngang dài 4,4 ở y = 2,5 và bốn tấm vải (đỏ, hồng, chàm, vàng) rộng 0,95 treo từ xà xuống, mỗi tấm dài một khác (1,5 đến 2,0), chia lưới 2 × 5 để lay được.
- * `aSway` = 0 ở trụ và xà, tăng dần từ mép trên tới mép dưới của tấm vải (đầu dưới lay nhiều nhất). 116 tam giác. Vải hai mặt (vật liệu `DoubleSide`).
+ * Sào phơi vải: hai trụ tre cao 2,6 ở x = ±2,0, xà ngang dài 4,4 ở y = 2,5 và BA chỗ treo vải (rộng 1,15, dài thiết kế 2,0, chia lưới 2 × 5 để lay được). Màu, độ dài và có treo hay không của từng chỗ do từng sào quyết định
+ * (xem clothPoles.ts, bộ đổ bóng đỉnh giải mã từ màu bản); aSway = 0 ở trụ và xà, tăng dần từ mép trên tới mép dưới tấm vải. 96 tam giác. Vải hai mặt (vật liệu DoubleSide); màu gốc của tấm là trắng mộc.
  */
 export function createClothPole(): BufferGeometry {
   const parts: BufferGeometry[] = [];
   const stick = (w: number, h: number, d: number, x: number, y: number) => {
     const g = bare(new BoxGeometry(w, h, d));
     g.translate(x, y + h / 2, 0);
-    return withSway(g, () => 0);
+    return withCloth(g, -1, () => 0);
   };
   for (const x of [-2, 2]) parts.push(paint(stick(0.1, 2.6, 0.1, x, 0), WOOD_DARK));
   parts.push(paint(stick(4.4, 0.08, 0.08, 0, 2.46), WOOD));
-  const lengths = [1.9, 1.55, 2.0, 1.7];
-  const top = 2.46;
-  CLOTH.forEach((hex, i) => {
-    const len = lengths[i];
-    const g = bare(new PlaneGeometry(0.95, len, 2, 5));
-    g.translate(-1.5 + i, top - len / 2, 0);
-    parts.push(paint(withSway(g, (y) => Math.min(1, Math.max(0, (top - y) / len))), hex));
+  CLOTH_SLOT_X.forEach((x, slot) => {
+    const g = bare(new PlaneGeometry(CLOTH_PANEL_WIDTH, CLOTH_DESIGN_LENGTH, 2, 5));
+    g.translate(x, CLOTH_TOP - CLOTH_DESIGN_LENGTH / 2, 0);
+    parts.push(paint(withCloth(g, slot, (y) => Math.min(1, Math.max(0, (CLOTH_TOP - y) / CLOTH_DESIGN_LENGTH))), 0xe6ddc8));
   });
   return merge(parts);
 }

@@ -2,8 +2,9 @@
  * Hình học do code dựng cho chợ phiên (không có model trong file): thuyền gỗ, mui thuyền, chum vại, đống rơm. Hàm tạo hình học
  * thuần của three (không cần canvas hay GPU), dựng một lần rồi dùng chung cho mọi bản nhân bản.
  */
-import { BoxGeometry, CircleGeometry, Color, ConeGeometry, CylinderGeometry, Float32BufferAttribute, IcosahedronGeometry, LatheGeometry, Vector2, type BufferGeometry } from 'three';
+import { BoxGeometry, BufferGeometry as Geometry, CircleGeometry, Color, ConeGeometry, CylinderGeometry, Float32BufferAttribute, IcosahedronGeometry, LatheGeometry, Vector2, type BufferGeometry } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { CLOTH_PALETTE } from '../village/clothPoles';
 import { PROP_SIZES, type PropKind } from './marketLayout';
 
 /** Thân thuyền: dài 4,6 theo trục z, rộng 1,3, cao 0,55 (đáy ở y = 0), hai đầu thon và cong lên. */
@@ -190,16 +191,74 @@ function createPavilion(): BufferGeometry {
 const CLAY = 0xa8643c;
 const INDIGO = 0x2c52a8;
 const MADDER = 0xc2402f;
-const CLOTH_COLORS = [0xe0463b, 0xf29ab8, 0x3d68c4, 0xf2c53d, 0xf1e8d2];
+/** Sáu màu vải nhuộm tự nhiên (cùng bảng với vải trên sào, xem village/clothPoles.ts): đỏ son, hồng phai, chàm, vàng nghệ, nâu, trắng mộc. */
+const CLOTH_COLORS = CLOTH_PALETTE;
 
-/** Chum nhuộm: thùng sành loe miệng (rộng nhất ở miệng, 0,85), mặt nước nhuộm phẳng ngang miệng ở độ cao 1,0; `water` là màu nước (chàm hay đỏ). */
+/**
+ * Chum nhuộm: chính hình chum bầu tròn miệng loe của Làng Giấy (createJar) phóng 1,7 lần, mặt nước nhuộm (chàm hay đỏ) phẳng trong miệng chum ngay dưới vành. Cao 1,785; vòng bụng rộng nhất ở bán kính 0,884.
+ */
+const DYE_JAR_SCALE = 1.7;
 function createDyeVat(water: number): BufferGeometry {
-  const body = new CylinderGeometry(0.85, 0.62, 0.95, 16);
-  body.translate(0, 0.475, 0);
-  const surface = new CircleGeometry(0.76, 16);
+  const jar = createJar();
+  jar.scale(DYE_JAR_SCALE, DYE_JAR_SCALE, DYE_JAR_SCALE);
+  const surface = new CircleGeometry(0.28, 14);
   surface.rotateX(-Math.PI / 2);
-  surface.translate(0, 1.0, 0);
-  return mergeGeometries([paint(toPlain(body), CLAY), paint(toPlain(surface), water)])!;
+  surface.translate(0, 1.05 * DYE_JAR_SCALE - 0.012, 0); // ngay dưới vành miệng
+  return mergeGeometries([paint(toPlain(jar), CLAY), paint(toPlain(surface), water)])!;
+}
+
+/** Trộn hai màu (mã sRGB) theo tỉ lệ t. */
+const mixHex = (a: number, b: number, t: number): number => new Color(a).lerp(new Color(b), t).getHex();
+
+/**
+ * Mặt cắt đầu cuộn vải (quay ra +Z, ở z = 0): đĩa màu nhạt và một dải xoắn ốc sẫm 1,75 vòng nổi lên 0,004 (mỗi vòng 9 đoạn), tức vân xoắn của lớp vải cuộn. Khoảng 36 tam giác.
+ */
+function spiralCap(radius: number, hex: number): BufferGeometry {
+  const disc = toPlain(new CircleGeometry(radius, 8));
+  const turns = 1.75;
+  const steps = Math.round(turns * 9);
+  const w = radius * 0.2;
+  const pos: number[] = [];
+  const pt = (k: number, side: number) => {
+    const th = (k / steps) * turns * Math.PI * 2;
+    const r = radius * 0.14 + (radius * 0.8 - radius * 0.14) * (k / steps) + side * w * 0.5;
+    return [Math.cos(th) * r, Math.sin(th) * r, 0.004];
+  };
+  for (let k = 0; k < steps; k++) {
+    const a0 = pt(k, -1);
+    const b0 = pt(k, 1);
+    const a1 = pt(k + 1, -1);
+    const b1 = pt(k + 1, 1);
+    pos.push(...a0, ...b0, ...b1, ...a0, ...b1, ...a1);
+  }
+  const ribbon = new Geometry();
+  ribbon.setAttribute('position', new Float32BufferAttribute(pos, 3));
+  const n = pos.length / 3;
+  ribbon.setAttribute('normal', new Float32BufferAttribute(Array.from({ length: n }, () => [0, 0, 1]).flat(), 3));
+  ribbon.setAttribute('uv', new Float32BufferAttribute(new Array(n * 2).fill(0), 2));
+  return mergeGeometries([paint(disc, mixHex(hex, 0xf4ecd8, 0.5)), paint(ribbon, mixHex(hex, 0x2a1a10, 0.45))])!;
+}
+
+/**
+ * Cuộn vải nằm NGANG (trục x), tâm ở gốc: ống vải dài `length` bán kính `radius` màu `hex`, hai đầu là mặt cắt có vân xoắn (`spiralCap`). Ống hở hai đầu và hai mặt cắt đóng lại nên là khối kín.
+ */
+function createClothBolt(radius: number, length: number, hex: number): BufferGeometry {
+  const tube = toPlain(new CylinderGeometry(radius, radius, length, 10, 1, true));
+  tube.rotateZ(Math.PI / 2);
+  const capA = spiralCap(radius, hex);
+  capA.rotateY(Math.PI / 2);
+  capA.translate(length / 2, 0, 0);
+  const capB = spiralCap(radius, hex);
+  capB.rotateY(-Math.PI / 2);
+  capB.translate(-length / 2, 0, 0);
+  return mergeGeometries([paint(tube, hex), capA, capB])!;
+}
+
+/** Đặt một cuộn vải nằm ngang ở (x, y, z). */
+function boltAt(radius: number, length: number, hex: number, x: number, y: number, z: number): BufferGeometry {
+  const g = createClothBolt(radius, length, hex);
+  g.translate(x, y, z);
+  return g;
 }
 
 /** Đống sợi: nền gỗ tròn (bán kính 0,85), ba cuộn sợi màu và một cọc giữa cao 0,65. */
@@ -217,7 +276,7 @@ function createYarnPile(): BufferGeometry {
   return mergeGeometries([paint(toPlain(base), WOOD), skein(-0.32, -0.18, MADDER), skein(0.3, -0.2, INDIGO), skein(0, 0.34, CLOTH_COLORS[4]), paint(toPlain(stick), WOOD_DARK)])!;
 }
 
-/** Giá cuộn vải: hai trụ, ba tầng ván, mỗi tầng vài cuộn vải màu nằm ngang. Khung bao đúng hộp PROP_SIZES `gia-vai`. */
+/** Giá cuộn vải: hai trụ, ba tầng ván, mỗi tầng hai cuộn vải màu NẰM NGANG (đầu cuộn có vân xoắn). Khung bao đúng hộp PROP_SIZES `gia-vai`. */
 function createClothShelf(): BufferGeometry {
   const k = PROP_SIZES['gia-vai'];
   const hx = k.box!.hx;
@@ -227,15 +286,43 @@ function createClothShelf(): BufferGeometry {
   const tiers = [0.35, 0.8, 1.25];
   tiers.forEach((y, i) => {
     parts.push(paint(slabN(hx * 2 - 0.1, 0.06, hz * 2 - 0.1, 0, y - 0.06), WOOD));
-    [-0.16, 0.16].forEach((z, j) => {
-      const bolt = new CylinderGeometry(0.15, 0.15, hx * 2 - 0.45, 8);
-      bolt.rotateZ(Math.PI / 2);
-      bolt.translate(0, y + 0.15, z);
-      parts.push(paint(toPlain(bolt), CLOTH_COLORS[(i * 2 + j) % CLOTH_COLORS.length]));
-    });
+    [-0.16, 0.16].forEach((z, j) => parts.push(boltAt(0.15, hx * 2 - 0.45, CLOTH_COLORS[(i * 2 + j + 1) % CLOTH_COLORS.length], 0, y + 0.15, z)));
   });
   parts.push(paint(slabN(hx * 2, 0.08, hz * 2, 0, k.h - 0.08), WOOD)); // nóc giá (cao đúng khung bao)
   return mergeGeometries(parts)!;
+}
+
+/** Sạp vải nhỏ: bàn thấp bốn chân (mặt cao 0,72) và ba cuộn vải màu nằm ngang xếp chồng (hai dưới, một trên). Khung bao đúng hộp PROP_SIZES `sap-vai`. */
+function createClothStall(): BufferGeometry {
+  const k = PROP_SIZES['sap-vai'];
+  const hx = k.box!.hx;
+  const hz = k.box!.hz;
+  const parts: BufferGeometry[] = [];
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) parts.push(paint(slabN(0.1, 0.66, 0.1, sx * (hx - 0.08), 0, sz * (hz - 0.08)), WOOD_DARK));
+  parts.push(paint(slabN(hx * 2, 0.06, hz * 2, 0, 0.66), WOOD));
+  const r = 0.12;
+  const len = hx * 2 - 0.24;
+  parts.push(boltAt(r, len, CLOTH_COLORS[0], 0, 0.72 + r, -r));
+  parts.push(boltAt(r, len, CLOTH_COLORS[3], 0, 0.72 + r, r));
+  parts.push(boltAt(r, len, CLOTH_COLORS[2], 0, 0.72 + r + r * Math.sqrt(3), 0));
+  return mergeGeometries(parts)!;
+}
+
+/** Chậu cây cảnh: đĩa lót tròn (bán kính 0,55), chậu sành loe miệng, tán lá hai khối 20 mặt dẹt và một cọc giữ cao 1,12. */
+function createPotPlant(): BufferGeometry {
+  const saucer = new CylinderGeometry(0.55, 0.55, 0.05, 16);
+  saucer.translate(0, 0.025, 0);
+  const pot = new CylinderGeometry(0.34, 0.24, 0.5, 12);
+  pot.translate(0, 0.05 + 0.25, 0);
+  const leaf = (x: number, y: number, z: number, s: number, hex: number) => {
+    const g = new IcosahedronGeometry(1, 0);
+    g.scale(s, s * 0.9, s);
+    g.translate(x, y, z);
+    return paint(toPlain(g), hex);
+  };
+  const stake = new CylinderGeometry(0.02, 0.02, 1.12 - 0.5, 5);
+  stake.translate(0, 0.5 + (1.12 - 0.5) / 2, 0);
+  return mergeGeometries([paint(toPlain(saucer), STONE), paint(toPlain(pot), CLAY), leaf(0, 0.78, 0, 0.42, 0x4f9a3c), leaf(0.18, 0.7, 0.14, 0.3, 0x6fb14a), paint(toPlain(stake), WOOD_DARK)])!;
 }
 
 /** Sào phơi sợi: hai trụ có chân ngang, xà ngang và sáu mớ sợi treo (kem, nâu vàng, chàm, đỏ). Khung bao đúng hộp PROP_SIZES `sao-soi`. */
@@ -346,6 +433,10 @@ export function createCraftProp(kind: PropKind): BufferGeometry | null {
       return createClothShelf();
     case 'sao-soi':
       return createYarnRack();
+    case 'sap-vai':
+      return createClothStall();
+    case 'chau-canh':
+      return createPotPlant();
     default:
       return null;
   }
