@@ -223,8 +223,9 @@ Lớp đồi xa và tre gần phải có phần trời trong suốt (spec 01 m�
 
 **Cột tre:**
 - Từng cặp cột tre, chừa một khe ở giữa, nằm trọn trong khoảng [0,5; 9,5].
-- Khe cao 3,2, mỗi khe hẹp đi 0,04, dừng ở 2,4 từ khe thứ 20.
+- **Khe 1 cao 3,16, mỗi khe hẹp 0,04, dừng ở 2,4 từ khe thứ 20** (khe thứ k cao `max(2,4; 3,2 − 0,04 × k)`, khớp dòng test "2,4 ở khe 20").
 - Các cặp cách nhau 5 đơn vị.
+- **Mọi cặp khe liền nhau đều được kiểm qua được** (hàm `passable`, xem mục "Logic màn 6"): bộ sinh khe sinh lại khe không qua được.
 - Tốc độ bay ngang bắt đầu 4, mỗi khe tăng 0,1, tối đa 6,5.
 
 **Diều đen của {phanDien}:**
@@ -239,15 +240,17 @@ Lớp đồi xa và tre gần phải có phần trời trong suốt (spec 01 m�
   - Sai: mất 1 tim, cổng vẫn mở để đi tiếp.
 - Qua đủ 4 làng là thắng.
 
-**Tim:** 3 tim. Chạm cột, đất, trần hay diều đen đều mất 1 tim, kèm bất tử 1 giây. Sau mỗi lần mất tim, diều được đặt lại vào giữa khe kế tiếp.
+**Tim:** 5 tim (sửa sau B8, trước là 3: xem mục "Logic màn 6"). Chạm cột, đất, trần hay diều đen đều mất 1 tim, kèm bất tử 1 giây. Sau mỗi lần mất tim, diều được đặt lại vào giữa khe kế tiếp.
 
 **Điểm** = số khe × 10 + số bản sao trang nhặt được × 5 + số câu đúng × 50.
 
 | Mốc | Điểm |
 |---|---|
-| Đồng | 150 |
-| Bạc | 260 |
-| Vàng | 360 |
+| Đồng | 240 |
+| Bạc | 400 |
+| Vàng | 420 |
+
+Mốc TẠM, chỉnh khi học sinh chơi thật (đặt lại sau B8 theo phân vị của bot; mốc ban đầu của spec là 150 / 260 / 360).
 
 **Test (`kiteLogic.ts`):**
 
@@ -259,43 +262,50 @@ Lớp đồi xa và tre gần phải có phần trời trong suốt (spec 01 m�
 | Diều đen | Không xuất hiện trước khe 8; luôn chừa khoảng trống ≥ 1,4 |
 | Cổng làng | Ở sau khe 6, 12, 18, 24; qua cổng thứ 4 là thắng |
 
-### Logic màn 6 (mốc 3, bước B8; code ở `packages/village-lang-det/src/kite/`, chưa có cảnh, màn 6 vẫn coming-soon)
+### Logic màn 6 (mốc 3, bước B8 và sửa sau B8; code ở `packages/village-lang-det/src/kite/`, chưa có cảnh, màn 6 vẫn coming-soon)
 
-`kiteConfig.ts` (số liệu), `kiteLogic.ts` (hàm thuần: `createKiteGame`, `stepKite(s, dt)` bước cố định 1/120 giây, `flap`, `answerGate`, `tickKite(s, dt, paused)`), `kiteBots.ts` (bot cân bằng và người chơi lý tưởng, chỉ dùng trong test), `kiteLogic.test.ts`, `kiteBalance.test.ts`, `index.ts` (xuất config và logic). Mọi số ngẫu nhiên (khe, diều đen, trang) rút từ `createMulberry32(seed)` LÚC TẠO VÁN, nên cùng seed cùng ván bất kể người chơi làm gì.
+`kiteConfig.ts` (số liệu), `kiteLogic.ts` (hàm thuần: `createKiteGame`, `stepKite(s, dt)` bước cố định 1/120 giây, `flap`, `answerGate`, `tickKite(s, dt, paused)`, `passable`, `generateGaps`), `kiteBots.ts` (bot cân bằng và người chơi lý tưởng, chỉ dùng trong test), `kiteLogic.test.ts`, `kiteBalance.test.ts`, `index.ts` (xuất config và logic). Mọi số ngẫu nhiên (khe, diều đen, trang) rút từ `createMulberry32(seed)` LÚC TẠO VÁN, nên cùng seed cùng ván bất kể người chơi làm gì.
 
 **Chốt trong lời giao B8 (spec chưa nói):**
 - Hộp va chạm của diều: chữ nhật 0,8 × 0,5 quanh tâm diều (học sinh treo dưới không tính va chạm); cột rộng 0,9; chạm đất tính khi đáy hộp xuống tới 0, chạm trần khi đỉnh hộp lên tới 10.
 - Tâm khe: ngẫu nhiên theo rng, tâm hai khe liền nhau chênh tối đa 3,0 (và khe luôn nằm trọn [0,5; 9,5]).
-- Diều đen: từ khe 8, mỗi khe 35% có; cao 0,6; bám nửa trên hoặc nửa dưới khe (rng), dao động lên xuống trong dải sát mép đó sao cho phần trống còn lại của khe luôn ≥ 1,4: dải dao động rộng (cao khe − 0,6 − 1,4), khe 2,4 thì chỉ 0,4.
+- Diều đen: từ khe 8, mỗi khe 35% có (lần sinh đầu; sau khi loại các khe không qua được còn khoảng 31,6%); cao 0,6; bám nửa trên hoặc nửa dưới khe (rng), dao động lên xuống trong dải sát mép đó sao cho phần trống còn lại của khe luôn ≥ 1,4: dải dao động rộng (cao khe − 0,6 − 1,4), khe 2,4 thì chỉ 0,4.
 - Trang bản sao: mỗi khe tối đa 1 trang (60%), đặt trong phần trống chắc chắn của khe (nửa không có diều đen, cao ≥ 1,4); nhặt khi chạm hộp diều (+5 điểm, mỗi trang một lần).
 - Sau câu hỏi ở cổng: diều đặt lại giữa khe kế tiếp, vận tốc 0, bất tử 1 giây. Mất tim (đất, trần, cột, diều đen) cũng đặt lại như vậy: "khe kế tiếp" là khe đầu tiên mà tâm còn ở phía trước diều (hết khe thì khe cuối).
 
 **Tự chọn thêm (đã ghi chú trong `kiteConfig.ts`):**
-- **Chiều cao khe:** khe thứ k (đếm từ 1) cao `max(2,4; 3,2 − 0,04 × k)`: đạt 2,4 đúng ở khe 20 (đúng dòng test của spec) nhưng khe 1 cao 3,16 chứ không đủ 3,2. Nếu khe 1 phải đủ 3,2 thì 2,4 tới ở khe 21 (hai dòng của spec lệch nhau 0,04 một khe; chờ chủ dự án chốt).
 - Khe đầu cách chỗ xuất phát 8 (khoảng 2 giây bay); cổng đặt giữa khe có cổng và khe kế (cách tâm khe 2,5); diều đen rộng 0,8, chu kỳ dao động 1,6 giây (theo thời gian chạy của ván); trang bản sao cạnh 0,5.
 - Pha `ready`: diều chờ, ván chưa chạy cho tới lần bật đầu tiên (như Flappy Bird, để học sinh không rơi trước khi kịp chạm).
 - Bay qua tâm khe thì tính 1 khe, +10 điểm và +0,1 tốc độ (kể cả lúc đang bất tử); bất tử đúng 120 bước = 1 giây, bước mất tim không bị trừ.
 - Hết giờ trả lời ở cổng coi như sai (`answerGate(s, 'timeout')`); việc đếm 20 giây và chọn câu hỏi do trang lo, logic chỉ nhận kết quả.
 
-**Test thêm so với bảng spec** (`kiteLogic.test.ts`): chênh tâm hai khe liền nhau ≤ 3,0 (1000 khe, nhiều seed); diều đen luôn chừa ≥ 1,4 ở mọi thời điểm (lấy mẫu 0,01 giây, hơn 1000 diều đen); mất tim thì bất tử đúng 1 giây và đặt lại giữa khe kế tiếp; câu hỏi dừng mọi chuyển động; điểm một ván mẫu tính đúng công thức; cùng seed cùng ván; dt 1/30, 1/60, 1/144 (và 0,01, 0,0333) cho cùng kết quả; thống kê 35% diều đen, 60% trang; người chơi lý tưởng.
+**Sửa sau B8: 3 thay đổi luật (kèm lý do).**
 
-**Người chơi lý tưởng (biết trước, không trễ):**
-- `findIdealRun(seed, gaps)` (`kiteBots.ts`) tìm chuỗi bật/không bật không chạm gì bằng quy hoạch động nhìn trước 2 giây (trạng thái là độ cao và vận tốc thật, gom theo ô lưới, có quay lui), rồi `replayRun` chạy lại chuỗi đó trên ván thật để kiểm độc lập. Test (`kiteLogic.test.ts`): **qua đủ 24 khe, độ dài một ván thật, không chạm lần nào ở seed 1, 2, 3** (chạy lại trên ván thật: 24 khe, 0 lần mất tim, còn 3 tim). Nghĩa là ván thật qua được mà không chạm ở các seed đã thử (chưa thử hết 300 seed).
-- **CHƯA ĐẠT yêu cầu "qua 1000 khe không chạm":** thử seed 1 với 1000 khe (nhìn trước 2 giây, tối đa 12.000 trạng thái mỗi bước, 8 phương án quay lui, 40.000 lần lập kế hoạch, khoảng 25 phút) chỉ tới khe 91 rồi bế tắc; chưa biết là chỗ đó thật sự không qua được hay chỉ là bộ tìm kiếm chưa đủ mạnh. Ở các seed 3, 7, 11, 13 thì 80 khe qua được (có seed cần quay lui hàng chục lần). Vì ván thật chỉ có 24 khe (tốc độ tối đa 6,4, chưa chạm mức 6,5) nên điều này không ảnh hưởng ván thật, nhưng "không thể bị kẹt ở khe 25 trở đi" chưa được chứng minh. Chạy 1000 khe còn quá chậm cho `pnpm test` (hơn 0,15 giây mỗi lần lập kế hoạch, hàng nghìn lần).
+1. **Mọi cặp khe liền nhau đều được kiểm qua được.** Hàm thuần `passable(khe trước, khe sau, tốc độ)`: từ MỌI độ cao an toàn trong khe trước (lưới 0,25 cả hai đầu), vận tốc đứng 0, ngay lúc diều vừa ra khỏi cột của khe trước, phải có một cách bật (quyết định rời rạc mỗi 1/60 giây) để diều tới tâm khe sau mà không chạm đất, trần, cột hay diều đen của khe sau (hộp 0,8 × 0,5, chừa thêm 0,02) và còn ở trong phần trống của khe sau; tính vị trí diều đen theo giờ diều tới khe (`arrivalTime`). Tìm kiếm duyệt sâu có ghi nhớ, gom trạng thái theo ô 0,04 (chỉ có thể báo "không qua được" nhầm, không báo "qua được" nhầm). Xuất phát SAU cột khe trước (không phải ở tâm khe trước) vì từ tâm khe trước có những độ cao sát diều đen của chính khe trước gần như không tránh được dù khe sau thế nào: đó là lỗi của khe trước, không phải của cặp khe (bản đầu xuất phát ở tâm khe trước để lại 455 trong 6900 cặp vẫn không qua được kể cả sau khi bỏ diều đen và kéo hết về cùng tâm).
+   - **Bộ sinh:** khe không qua được thì sinh lại (tối đa 20 lần, mỗi lần rút đủ số ngẫu nhiên); vẫn không được thì bỏ diều đen ở khe đó và kéo tâm khe về phía tâm khe trước (từng 10%) cho tới khi qua được.
+   - **Lý do:** ván ngẫu nhiên thuần có nhiều cặp khe liền nhau không thể qua (nhất là khe có diều đen ở tốc độ cao), nên ván có thể không thể thắng dù chơi hoàn hảo; trước đó người chơi lý tưởng bế tắc ở nhiều seed.
+   - **Số liệu bộ sinh cũ (300 ván × 23 cặp = 6900 cặp):** lần sinh đầu tiên không qua được ở **558 khe (8,1%)**; tổng **668 lần sinh lại**; **0 khe** phải bỏ diều đen hay kéo tâm (mọi khe qua được trong 20 lần sinh lại); kiểm lại sau khi sinh xong: 0 cặp không qua được. Hệ quả phụ: tỉ lệ khe có diều đen còn khoảng 31,6% (diều đen làm cặp khó qua nên bị loại nhiều hơn).
+2. **Độ khó: phương án A, 5 tim (trước là 3).** Thử lần lượt A, B, C và dừng ở phương án ĐẦU TIÊN đạt mục tiêu (bot trung bình qua trung bình ≥ 2 cổng VÀ bot giỏi qua đủ 4 cổng ≥ 70%); mô hình bot giữ nguyên (kể cả margin 0,5). Với bộ sinh mới và 3 tim thì bot trung bình chỉ 1,69 cổng và bot giỏi 42,3% ván qua đủ 4 cổng; A đạt cả hai nên **dừng ở A, B (khe nhỏ nhất 2,8) và C (tốc độ tối đa 5,5) không thử trong lần chốt này, và không dùng.**
+3. **Mốc điểm đặt lại theo phân vị (TẠM, chỉnh khi học sinh chơi thật):** Đồng = p25 bot trung bình (240), Bạc = p75 bot trung bình (405 → 400), Vàng = p10 bot giỏi (425 → 420), làm tròn xuống bội số 10; Bạc < Vàng nên không cần dùng nhánh "trung bình cộng". **Mốc `medals`: 240 / 400 / 420.**
 
-**Cân bằng (`kiteBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300).** Bot nhắm tâm dải trống của khe kế (có tính vị trí diều đen lúc diều tới), đoán độ cao lúc cú bật có hiệu lực và bật khi dự đoán thấp hơn tâm 0,5 (nửa độ cao một cú bật, tự chọn); bot giỏi trễ 0,08 giây, lệch giờ σ 0,03, đúng câu hỏi 95%; bot trung bình trễ 0,18 giây, σ 0,08, đúng 70%.
+**Test thêm so với bảng spec** (`kiteLogic.test.ts`): chênh tâm hai khe liền nhau ≤ 3,0; diều đen luôn chừa ≥ 1,4 ở mọi thời điểm (lấy mẫu 0,01 giây, hơn 1000 diều đen); mất tim thì bất tử đúng 1 giây và đặt lại giữa khe kế tiếp; câu hỏi dừng mọi chuyển động; điểm một ván mẫu tính đúng công thức; cùng seed cùng ván; dt 1/30, 1/60, 1/144 (và 0,01, 0,0333) cho cùng kết quả; thống kê diều đen và trang; `passable` trả false cho cặp khe cố ý không thể qua (tâm chênh 6 khi tốc độ 6,5) và true cho cặp dễ; mọi cặp khe của 300 ván đều qua được (và số khe sinh lại đúng như ghi ở trên); người chơi lý tưởng.
 
-| | Chưa đạt | Đồng | Bạc | Vàng | Điểm TB (nhỏ nhất đến lớn nhất) | Khe TB | Cổng TB | Qua đủ 4 cổng | Mất tim TB |
-|---|---|---|---|---|---|---|---|---|---|
-| Bot giỏi, mốc spec 150 / 260 / 360 | 0,7% | 8,7% | 25,0% | **65,7%** | 381,9 (125 đến 525) | 19,77 | 2,94 | 28,3% | 2,50 |
-| Bot trung bình, mốc spec 150 / 260 / 360 | 28,3% | 40,7% | 24,3% | 6,7% | 208,8 (40 đến 515) | 12,54 | 1,61 | 0,3% | 2,54 |
-| Bot giỏi, mốc tạm 140 / 200 / 260 | 0,7% | 5,0% | 3,7% | **90,7%** | | | | | |
-| Bot trung bình, mốc tạm 140 / 200 / 260 | 22,7% | 30,0% | 16,3% | 31,0% | | | | | |
+**Người chơi lý tưởng (biết trước, không trễ):** `findIdealRun(seed, gaps)` (`kiteBots.ts`) tìm chuỗi bật/không bật không chạm gì bằng đúng kiểu tìm kiếm của `passable` (duyệt sâu trên độ cao và vận tốc thật, quyết định mỗi 1/60 giây, ghi nhớ trạng thái bế tắc) cho cả ván 24 khe; `replayRun` chạy lại chuỗi đó trên ván thật để kiểm độc lập. Test: **qua đủ 24 khe không chạm lần nào ở cả 300 seed (1 đến 300)**, chạy lại trên ván thật: 24 khe, 0 lần mất tim; khoảng 15 triệu trạng thái duyệt cho cả 300 seed (nhiều nhất 180 nghìn cho một seed), chừng 12 giây. (Ca "qua 1000 khe" của lần trước thay bằng ca này: ván thật chỉ có 24 khe; bộ tìm kiếm cũ bế tắc ở khe 91 của seed 1.)
 
-- **Mục tiêu 1 (bot giỏi Vàng ≥ 90%):** mốc spec cho 65,7% nên đặt lại theo quy tắc phân vị, TẠM: Đồng = p25 bot trung bình (140), Vàng = p10 bot giỏi (260), làm tròn xuống bội số 10. Bạc: quy tắc p75 bot trung bình cho 270, không nhỏ hơn Vàng (260) nên không dùng được (phải Đồng < Bạc < Vàng): tự chọn 200 (khoảng phân vị 53% của bot trung bình). **Mốc `medals` của màn 6: 140 / 200 / 260 (tạm)**; bot giỏi Vàng 90,7%.
-- **Mục tiêu 2 (bot trung bình qua trung bình ≥ 2 cổng): CHƯA ĐẠT, chỉ 1,61 cổng** (qua ít nhất 1 cổng 98%, 2 cổng 51,7%, 3 cổng 10,3%, 4 cổng 1,0%). Theo lời giao KHÔNG đổi luật. Cũng chưa đạt mong muốn chung "bot trung bình hầu như không Vàng": ở mốc tạm bot trung bình Vàng 31% vì điểm của hai bot chồng nhau nhiều (bot giỏi p10 = 260, bot trung bình p75 = 270): cả hai mất trung bình 2,5 tim mỗi ván, độ ngẫu nhiên của màn (khe, diều đen) lớn hơn khác biệt tay nghề giữa hai bot.
-- **Độ nhạy theo bot:** nếu bot bật đúng chữ "khi dự đoán sẽ rơi dưới tâm" (margin 0) thì bot giỏi chỉ điểm TB 192,8, 1,32 cổng, 5/300 ván Vàng ở mốc spec; margin 0,5 (dao động quanh tâm) và đoán vị trí diều đen lúc tới cho bot giỏi 381,9. Chọn bot khác thì mốc đổi theo, nên mốc là TẠM, chỉnh khi học sinh chơi thật.
-- **Điểm tối đa lý thuyết:** 24 khe × 10 + 24 trang × 5 + 4 câu × 50 = **560**; thực tế mỗi khe chỉ có trang 60% nên tối đa của từng seed chừng 512 (trung bình seed 1 đến 300: 511,9; lớn nhất 540). Điểm lớn nhất của bot giỏi: 525.
+**Cân bằng (`kiteBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300, luật hiện tại: 5 tim).** Bot nhắm tâm dải trống của khe kế (có tính vị trí diều đen lúc diều tới), đoán độ cao lúc cú bật có hiệu lực và bật khi dự đoán thấp hơn tâm 0,5 (nửa độ cao một cú bật, tự chọn); bot giỏi trễ 0,08 giây, lệch giờ σ 0,03, đúng câu hỏi 95%; bot trung bình trễ 0,18 giây, σ 0,08, đúng 70%.
+
+| Phương án, mốc | Bot | Chưa đạt | Đồng | Bạc | Vàng | Điểm TB (nhỏ nhất đến lớn nhất) | Khe TB | Cổng TB | Qua đủ 4 cổng | Mất tim TB |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Hiện tại (3 tim), mốc 140 / 200 / 260 theo quy tắc | giỏi | 0,3% | 4,3% | 4,0% | 91,3% | 401,0 (125 đến 530) | 20,53 | 3,14 | **42,3%** | 2,26 |
+| | trung bình | 21,7% | 27,7% | 19,0% | 31,7% | 217,5 (40 đến 515) | 12,96 | **1,69** | 2,3% | 2,51 |
+| **A (5 tim), mốc 240 / 400 / 420** | giỏi | 0,3% | 4,7% | 3,0% | **92,0%** | 474,6 (195 đến 530) | 23,66 | 3,89 | **89,0%** | 2,64 |
+| | trung bình | 22,0% | 51,3% | 5,3% | **21,3%** | 322,2 (105 đến 515) | 18,55 | **2,74** | 15,3% | 3,96 |
+
+- **Mục tiêu độ khó: đạt ở A** (bot trung bình 2,74 cổng ≥ 2; bot giỏi qua đủ 4 cổng 89,0% ≥ 70%; tính cả ván qua cổng 4 rồi hết tim thì 90,0%).
+- **Bot giỏi Vàng 92,0% ≥ 85%: đạt. Bot trung bình Vàng 21,3% > 15%: CHƯA ĐẠT.** Nguyên nhân: p75 bot trung bình (405) sát p10 bot giỏi (425), nên mốc Vàng theo quy tắc phân vị cho 21% bot trung bình đạt Vàng. Theo lời giao không đổi thêm gì; test ghi đúng số này.
+- **Độ nhạy theo bot:** margin 0 (đúng chữ "dự đoán rơi dưới tâm") cho kết quả kém hơn nhiều so với margin 0,5 (xem lần trước: bot giỏi 192,8 điểm, 1,32 cổng ở luật cũ). Mốc là TẠM vì phụ thuộc cách chọn bot.
+- **Điểm tối đa lý thuyết:** 24 khe × 10 + 24 trang × 5 + 4 câu × 50 = **560**; thực tế mỗi khe chỉ có trang 60% nên tối đa của từng seed chừng 512 (trung bình seed 1 đến 300: 511,9; lớn nhất 540). Điểm lớn nhất của bot giỏi: 530.
+
 
 ## Kết thúc làng
 

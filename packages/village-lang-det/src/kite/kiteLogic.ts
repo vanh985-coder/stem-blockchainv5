@@ -149,41 +149,228 @@ export function freeInterval(gap: Gap, time: number): [number, number] {
   return below >= above ? [gap.bottom, bb.y0] : [bb.y1, gap.top];
 }
 
+/** Thời điểm (giây của ván) diều bay qua tâm khe thứ `k` (đếm từ 1), khi không có gì làm dừng: tốc độ đổi theo số khe đã qua. Diều đen dao động theo thời điểm này. */
+export function arrivalTime(k: number): number {
+  let t = C.firstGapX / speedAt(0);
+  for (let i = 1; i < k; i++) t += C.gapSpacing / speedAt(i);
+  return t;
+}
+
+/** Số bước cố định giữa hai lần quyết định bật của `passable` (2 bước = 1/60 giây) và ô lưới gom trạng thái giống nhau */
+const PASS_STEP = 2;
+const PASS_SAFE = 0.02;
+const PASS_BIN = 0.04;
+let passSeen = new Int32Array(0);
+let passMark = 0;
+/** Khoảng cách giữa các độ cao xuất phát được thử */
+const PASS_START = 0.25;
+const PASS_TAU = Math.ceil((C.flapVelocity - C.maxFall) / (C.gravity * C.tick));
+
+/**
+ * Hai khe liền nhau có qua được không: từ MỌI độ cao an toàn trong khe trước (lưới 0,25, cả hai đầu), vận tốc đứng 0, ngay lúc diều vừa ra khỏi cột của khe trước, có một cách bật (quyết định rời rạc mỗi 1/60 giây) để diều
+ * bay tới tâm khe sau với tốc độ ngang `speed` mà không chạm đất, trần, cột hay diều đen của khe sau (hộp diều 0,8 × 0,5, chừa thêm 0,02) và còn ở trong phần trống của khe sau. Xuất phát sau cột của khe trước (diều đen của khe
+ * trước đã ra khỏi tầm) vì có những trạng thái chạm diều đen gần như không tránh được dù khe sau thế nào: đó là lỗi của khe trước, không phải của cặp khe. Tìm kiếm ngắn theo chiều sâu có ghi nhớ trên (độ cao, vận tốc), gom
+ * trạng thái theo ô lưới 0,04 (nên chỉ có thể báo "không qua được" nhầm, không báo "qua được" nhầm). `timePrev`: giây của ván lúc diều ở tâm khe trước (mặc định theo `arrivalTime`), để biết vị trí diều đen.
+ */
+export function passable(prev: Gap, next: Gap, speed: number, timePrev: number = arrivalTime(prev.k)): boolean {
+  const h = C.tick;
+  const dx = speed * h;
+  // xuất phát ngay sau khi diều ra khỏi cột của khe trước
+  const x0 = prev.x + (C.pillarWidth + C.kite.width) / 2 + PASS_SAFE + 0.01;
+  const N = Math.max(1, Math.round((next.x - x0) / dx));
+  const half = C.kite.height / 2;
+  // vùng không chạm của từng bước (tối đa hai khoảng: diều đen chia khe làm hai)
+  const lo0 = new Float64Array(N + 1);
+  const hi0 = new Float64Array(N + 1);
+  const lo1 = new Float64Array(N + 1);
+  const hi1 = new Float64Array(N + 1);
+  const cnt = new Uint8Array(N + 1);
+  for (let i = 0; i <= N; i++) {
+    const x = x0 + i * dx;
+    const time = timePrev + (x0 - prev.x) / speed + i * h;
+    let lo = C.floor + half + PASS_SAFE;
+    let hi = C.ceiling - half - PASS_SAFE;
+    let c0 = NaN;
+    let c1 = NaN;
+    for (const g of [prev, next]) {
+      const d = Math.abs(x - g.x);
+      if (d < (C.pillarWidth + C.kite.width) / 2 + PASS_SAFE) {
+        lo = Math.max(lo, g.bottom + half + PASS_SAFE);
+        hi = Math.min(hi, g.top - half - PASS_SAFE);
+      }
+      const bb = blackBox(g, time);
+      if (bb && d < (C.black.width + C.kite.width) / 2 + PASS_SAFE) {
+        c0 = bb.y0 - half - PASS_SAFE;
+        c1 = bb.y1 + half + PASS_SAFE;
+      }
+    }
+    let n = 0;
+    if (Number.isNaN(c0)) {
+      if (lo <= hi) {
+        lo0[i] = lo;
+        hi0[i] = hi;
+        n = 1;
+      }
+    } else {
+      if (lo <= Math.min(hi, c0)) {
+        lo0[i] = lo;
+        hi0[i] = Math.min(hi, c0);
+        n = 1;
+      }
+      if (Math.max(lo, c1) <= hi) {
+        if (n === 0) {
+          lo0[i] = Math.max(lo, c1);
+          hi0[i] = hi;
+        } else {
+          lo1[i] = Math.max(lo, c1);
+          hi1[i] = hi;
+        }
+        n++;
+      }
+    }
+    cnt[i] = n;
+    if (n === 0) return false;
+  }
+  const inBand = (i: number, y: number): boolean => (y >= lo0[i] && y <= hi0[i]) || (cnt[i] > 1 && y >= lo1[i] && y <= hi1[i]);
+  // từ MỖI độ cao xuất phát an toàn (lưới `PASS_START` = 0,25, cả hai đầu mỗi khoảng) phải tồn tại một cách bật tới được phần trống của khe sau; vận tốc đứng lúc xuất phát 0.
+  // Tìm theo chiều sâu, thử trước lựa chọn đưa diều về phía tâm phần trống của khe sau; mỗi (bước quyết định, ô lưới) chỉ xét một lần.
+  const goalLo = lo0[N];
+  const goalHi = cnt[N] > 1 ? hi1[N] : hi0[N];
+  const goal = (goalLo + goalHi) / 2;
+  const cellsY = Math.round(C.ceiling / PASS_BIN) + 2;
+  const width = cellsY * (PASS_TAU + 1);
+  const need = (Math.ceil(N / PASS_STEP) + 1) * width;
+  if (passSeen.length < need) passSeen = new Int32Array(need);
+  passMark++;
+  const visit = (i: number, y: number, v: number): boolean => {
+    if (i >= N) return true;
+    const steps = Math.min(PASS_STEP, N - i);
+    const first = y < goal ? 1 : 0;
+    for (let k = 0; k < 2; k++) {
+      const a = k === 0 ? first : 1 - first;
+      let yy = y;
+      let vv = a === 1 ? C.flapVelocity : v;
+      let ok = true;
+      for (let st = 1; st <= steps; st++) {
+        vv = Math.max(C.maxFall, vv - C.gravity * h);
+        yy += vv * h;
+        if (!inBand(i + st, yy)) {
+          ok = false;
+          break;
+        }
+      }
+      if (!ok) continue;
+      const tau = Math.min(PASS_TAU, Math.max(0, Math.round((C.flapVelocity - vv) / (C.gravity * h))));
+      const idx = (i / PASS_STEP) * width + Math.round(yy / PASS_BIN) * (PASS_TAU + 1) + tau;
+      if (passSeen[idx] === -passMark) return true;
+      if (passSeen[idx] === passMark) continue;
+      passSeen[idx] = passMark;
+      if (visit(i + steps, yy, vv)) {
+        passSeen[idx] = -passMark;
+        return true;
+      }
+    }
+    return false;
+  };
+  const reaches = (y0: number): boolean => visit(0, y0, 0);
+  // các độ cao xuất phát: cả khoảng an toàn bên trong khe trước
+  const startLo = prev.bottom + half + PASS_SAFE;
+  const startHi = prev.top - half - PASS_SAFE;
+  const n = Math.max(1, Math.ceil((startHi - startLo) / PASS_START));
+  for (let j = 0; j <= n; j++) if (!reaches(startLo + ((startHi - startLo) * j) / n)) return false;
+  return true;
+}
+
+/** Số liệu của bộ sinh khe (để biết bộ sinh "khe ngẫu nhiên thuần" hỏng bao nhiêu): ghi cộng dồn vào đối tượng truyền vào `generateGaps`. */
+export interface GenStats {
+  /** Số khe được kiểm (từ khe 2) */
+  checked: number;
+  /** Số khe mà lần sinh đầu tiên không qua được (phải sinh lại ít nhất một lần) */
+  failedFirst: number;
+  /** Tổng số lần sinh lại */
+  regenerated: number;
+  /** Số khe sinh lại 20 lần vẫn không qua được: bỏ diều đen và kéo tâm về phía khe trước */
+  fallback: number;
+  /** Trong số đó, số khe có diều đen phải bỏ */
+  blackDropped: number;
+  /** Số khe phải kéo tâm về phía khe trước (kể cả bỏ diều đen chưa đủ) */
+  pulled: number;
+}
+
+export const newGenStats = (): GenStats => ({ checked: 0, failedFirst: 0, regenerated: 0, fallback: 0, blackDropped: 0, pulled: 0 });
+
+/** Số lần sinh lại tối đa của một khe không qua được */
+const MAX_REGEN = 20;
+
 /**
  * Sinh `count` khe liên tiếp từ `rng`: tâm khe ngẫu nhiên trong phạm vi để khe nằm trọn [0,5; 9,5] và tâm hai khe liền nhau chênh tối đa `maxCenterShift`; từ khe `black.fromGap` mỗi khe có `black.chance` có diều đen;
- * mỗi khe có `page.chance` có một trang bản sao đặt trong phần trống chắc chắn của khe. Mỗi khe luôn rút đủ số ngẫu nhiên (kể cả khi không dùng) để số ngẫu nhiên của khe sau không phụ thuộc khe trước.
+ * mỗi khe có `page.chance` có một trang bản sao đặt trong phần trống chắc chắn của khe. MỌI CẶP KHE LIỀN NHAU ĐỀU ĐƯỢC KIỂM QUA ĐƯỢC (\`passable\`): khe không qua được thì sinh lại (tối đa 20 lần); vẫn không được thì bỏ diều đen
+ * ở khe đó và kéo tâm khe về phía tâm khe trước (từng 10%) cho tới khi qua được. Mỗi lần sinh luôn rút đủ số ngẫu nhiên (kể cả khi không dùng).
  */
-export function generateGaps(rng: () => number, count: number): Gap[] {
+export function generateGaps(rng: () => number, count: number, stats?: GenStats): Gap[] {
   const gaps: Gap[] = [];
-  let prev = NaN;
   for (let k = 1; k <= count; k++) {
+    const prev = gaps.length > 0 ? gaps[gaps.length - 1] : null;
     const height = gapHeight(k);
     const lo = C.gapMin + height / 2;
     const hi = C.gapMax - height / 2;
-    const lo2 = Number.isNaN(prev) ? lo : Math.max(lo, prev - C.maxCenterShift);
-    const hi2 = Number.isNaN(prev) ? hi : Math.min(hi, prev + C.maxCenterShift);
-    const center = lo2 + rng() * (hi2 - lo2);
-    prev = center;
-    const blackRoll = rng();
-    const sideRoll = rng();
-    const phase = rng() * 2 * Math.PI;
-    const pageRoll = rng();
-    const pageU = rng();
-    const bottom = center - height / 2;
-    const top = center + height / 2;
-    const black: BlackKite | null = k >= C.black.fromGap && blackRoll < C.black.chance ? { side: sideRoll < 0.5 ? 'top' : 'bottom', phase, range: blackRange(height) } : null;
-    let pageY: number | null = null;
-    if (pageRoll < C.page.chance) {
-      // phần trống chắc chắn: nửa không có diều đen đủ cao `minFree`
-      let a = bottom;
-      let b = top;
-      if (black) {
-        if (black.side === 'top') b = top - black.range - C.black.height;
-        else a = bottom + black.range + C.black.height;
+    const lo2 = prev ? Math.max(lo, prev.center - C.maxCenterShift) : lo;
+    const hi2 = prev ? Math.min(hi, prev.center + C.maxCenterShift) : hi;
+    const speed = speedAt(k - 1);
+    const build = (center: number, blackRoll: number, sideRoll: number, phase: number, pageRoll: number, pageU: number, noBlack: boolean): Gap => {
+      const bottom = center - height / 2;
+      const top = center + height / 2;
+      const black: BlackKite | null = !noBlack && k >= C.black.fromGap && blackRoll < C.black.chance ? { side: sideRoll < 0.5 ? 'top' : 'bottom', phase, range: blackRange(height) } : null;
+      let pageY: number | null = null;
+      if (pageRoll < C.page.chance) {
+        // phần trống chắc chắn: nửa không có diều đen đủ cao `minFree`
+        let a = bottom;
+        let b = top;
+        if (black) {
+          if (black.side === 'top') b = top - black.range - C.black.height;
+          else a = bottom + black.range + C.black.height;
+        }
+        pageY = a + C.page.size / 2 + pageU * Math.max(0, b - a - C.page.size);
       }
-      pageY = a + C.page.size / 2 + pageU * Math.max(0, b - a - C.page.size);
+      return { k, x: gapX(k), height, center, bottom, top, black, pageY };
+    };
+    let gap: Gap | null = null;
+    let last = [0, 0, 0, 0, 0, 0];
+    for (let attempt = 0; attempt <= MAX_REGEN; attempt++) {
+      last = [lo2 + rng() * (hi2 - lo2), rng(), rng(), rng() * 2 * Math.PI, rng(), rng()];
+      const cand = build(last[0], last[1], last[2], last[3], last[4], last[5], false);
+      if (!prev || passable(prev, cand, speed)) {
+        gap = cand;
+        if (stats && prev) {
+          stats.checked++;
+          if (attempt > 0) stats.failedFirst++;
+          stats.regenerated += attempt;
+        }
+        break;
+      }
     }
-    gaps.push({ k, x: gapX(k), height, center, bottom, top, black, pageY });
+    if (!gap) {
+      // 20 lần sinh lại vẫn không qua được: bỏ diều đen, rồi kéo tâm về phía tâm khe trước
+      const prevGap = prev!;
+      const hadBlack = k >= C.black.fromGap && last[1] < C.black.chance;
+      gap = build(last[0], last[1], last[2], last[3], last[4], last[5], true);
+      let pulled = false;
+      const base = last[0];
+      for (let f = 0; f <= 10; f++) {
+        gap = build(base + (prevGap.center - base) * 0.1 * f, last[1], last[2], last[3], last[4], last[5], true);
+        if (passable(prevGap, gap, speed)) break;
+        pulled = true;
+      }
+      if (stats) {
+        stats.checked++;
+        stats.failedFirst++;
+        stats.regenerated += MAX_REGEN;
+        stats.fallback++;
+        if (hadBlack) stats.blackDropped++;
+        if (pulled) stats.pulled++;
+      }
+    }
+    gaps.push(gap);
   }
   return gaps;
 }
@@ -196,13 +383,15 @@ export interface KiteOptions {
   gapCount?: number;
   /** Thay danh sách cổng (sau khe thứ bấy nhiêu); `[]` là không cổng (dùng để thử bay thật dài) */
   gateAfter?: readonly number[];
+  /** Nếu có: cộng dồn số liệu của bộ sinh khe vào đây */
+  stats?: GenStats;
 }
 
 export function createKiteGame(seed: number, opts: KiteOptions = {}): KiteState {
   const gateAfter = opts.gateAfter ?? C.gates.after;
   const gapCount = opts.gapCount ?? Math.max(...C.gates.after);
   const rng = createMulberry32(seed);
-  const gaps = generateGaps(rng, gapCount);
+  const gaps = generateGaps(rng, gapCount, opts.stats);
   return {
     seed,
     gaps,

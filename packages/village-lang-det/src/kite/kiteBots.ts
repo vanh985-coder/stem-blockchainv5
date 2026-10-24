@@ -10,7 +10,7 @@
  *  - bắt đầu ván bằng một cú bật ngay; ở cổng trả lời đúng với xác suất `correct`.
  * Số ngẫu nhiên của bot lấy từ rng riêng (không đụng rng của ván nên cùng seed vẫn cùng khe).
  *
- * Người chơi lý tưởng (`findIdealRun`, `replayRun`): biết trước toàn bộ khe và diều đen, không trễ; tìm một chuỗi bật/không bật không chạm gì bằng quy hoạch động nhìn trước có quay lui, rồi chạy lại chuỗi đó
+ * Người chơi lý tưởng (`findIdealRun`, `replayRun`): biết trước toàn bộ khe và diều đen, không trễ; tìm một chuỗi bật/không bật không chạm gì bằng đúng kiểu tìm kiếm của `passable` (duyệt sâu có ghi nhớ, quyết định mỗi 1/60 giây), rồi chạy lại chuỗi đó
  * trên ván thật để kiểm. Dùng để chứng tỏ luật chơi qua được mà không chạm.
  */
 import { medalOf, type MedalThresholds } from '@so-chung/core';
@@ -166,239 +166,137 @@ export function percentile(values: readonly number[], q: number): number {
 const SAFE = 0.002;
 /** Số bước kể từ lần bật cuối tới khi vận tốc chạm mức rơi nhanh nhất */
 const TAU_MAX = Math.ceil((C.flapVelocity - C.maxFall) / (C.gravity * C.tick));
-
-interface Band {
-  lo: number;
-  hi: number;
-}
-
-/**
- * Các khoảng độ cao tâm diều không chạm gì ở bước có `x`, `passed`, `time` (đúng các điều kiện của `collision` trong `kiteLogic`, thêm `SAFE`): tối đa hai khoảng (khi diều đen chia khe làm hai). Ghi vào `out`, trả về số khoảng.
- */
-function freeBands(s: KiteState, x: number, passed: number, time: number, out: Band[]): number {
-  let lo = C.floor + C.kite.height / 2 + SAFE;
-  let hi = C.ceiling - C.kite.height / 2 - SAFE;
-  let cut0 = NaN;
-  let cut1 = NaN;
-  for (let i = Math.max(0, passed - 1); i <= Math.min(s.gaps.length - 1, passed); i++) {
-    const g = s.gaps[i];
-    const dx = Math.abs(x - g.x);
-    if (dx < (C.pillarWidth + C.kite.width) / 2 + SAFE) {
-      lo = Math.max(lo, g.bottom + C.kite.height / 2 + SAFE);
-      hi = Math.min(hi, g.top - C.kite.height / 2 - SAFE);
-    }
-    const bb = blackBox(g, time);
-    if (bb && dx < (C.black.width + C.kite.width) / 2 + SAFE) {
-      cut0 = bb.y0 - C.kite.height / 2 - SAFE;
-      cut1 = bb.y1 + C.kite.height / 2 + SAFE;
-    }
-  }
-  let n = 0;
-  if (Number.isNaN(cut0)) {
-    if (lo <= hi) {
-      out[0].lo = lo;
-      out[0].hi = hi;
-      n = 1;
-    }
-    return n;
-  }
-  if (lo <= Math.min(hi, cut0)) {
-    out[n].lo = lo;
-    out[n].hi = Math.min(hi, cut0);
-    n++;
-  }
-  if (Math.max(lo, cut1) <= hi) {
-    out[n].lo = Math.max(lo, cut1);
-    out[n].hi = hi;
-    n++;
-  }
-  return n;
-}
-
-export interface OracleOptions {
-  /** Tầm nhìn trước (giây) */
-  horizon?: number;
-  /** Mỗi lần lập kế hoạch thực hiện chừng này giây đầu của đường đi (giây) */
-  commit?: number;
-  /** Ô lưới gom các trạng thái (độ cao) giống nhau khi quy hoạch */
-  yBin?: number;
-  /** Số trạng thái giữ lại tối đa mỗi bước */
-  perTick?: number;
-  /** Số phương án cuối đường đi được thử mỗi lần lập kế hoạch (khi gặp ngõ cụt thì quay lại thử phương án khác) */
-  branch?: number;
-  /** Số lần lập kế hoạch tối đa (quá thì bỏ cuộc) */
-  maxPlans?: number;
-}
+/** Số bước cố định giữa hai lần quyết định bật (2 bước = 1/60 giây, như `passable`) và ô lưới gom các trạng thái giống nhau */
+const STEP = 2;
+const Y_BIN = 0.04;
 
 export interface OracleRun {
   /** Hành động mỗi bước cố định kể từ sau lần bật đầu tiên: 1 là bật, 0 là không */
   actions: Uint8Array;
-  plans: number;
-  backtracks: number;
-}
-
-interface Plan {
-  /** Số bước sống sót được (≤ tầm nhìn) */
-  level: number;
-  /** Số khe đã bay qua ở cuối đường đi */
-  passedAtEnd: number;
-  /** Các đường đi (chuỗi 0/1) tới những trạng thái cuối khác nhau */
-  paths: Uint8Array[];
+  /** Số trạng thái đã duyệt */
+  expanded: number;
 }
 
 /**
- * Người chơi lý tưởng: biết trước toàn bộ khe và diều đen, không trễ. Tìm một chuỗi bật/không bật cho cả ván `seed` (không cổng, `gaps` khe) sao cho diều không chạm gì, bằng tìm kiếm có quay lui:
- * mỗi lần nhìn trước `horizon` giây bằng quy hoạch động (trạng thái = độ cao và vận tốc thật, mỗi bước chọn bật hay không, gom theo ô lưới `yBin`), chọn vài trạng thái cuối khác nhau, thử đi `commit` giây theo từng
- * đường rồi lập kế hoạch tiếp; gặp ngõ cụt thì quay lại thử đường khác. Trả về null nếu không tìm được trong `maxPlans` lần. Kết quả cần được CHẠY LẠI trên ván thật (`replayRun`) để kiểm.
+ * Người chơi lý tưởng: biết trước toàn bộ khe và diều đen, không trễ. Tìm một chuỗi bật/không bật (quyết định mỗi 1/60 giây) cho cả ván `seed` (không cổng, `gaps` khe) sao cho diều không chạm gì, bằng đúng kiểu tìm kiếm
+ * của `passable`: duyệt theo chiều sâu trên (độ cao, vận tốc) thật, thử trước lựa chọn đưa diều về phía tâm dải trống của khe kế, mỗi (bước quyết định, ô lưới) chỉ xét một lần; trạng thái đã duyệt mà bế tắc thì không xét lại.
+ * Trả về null nếu duyệt quá `maxExpanded` trạng thái. Kết quả cần được CHẠY LẠI trên ván thật (`replayRun`) để kiểm độc lập.
  */
-export function findIdealRun(seed: number, gaps: number, opts: OracleOptions = {}): OracleRun | null {
-  const horizon = opts.horizon ?? 2;
-  const commit = opts.commit ?? 0.6;
-  const yBin = opts.yBin ?? 0.02;
-  const perTick = opts.perTick ?? 12000;
-  const branch = opts.branch ?? 5;
-  const maxPlans = opts.maxPlans ?? 20000;
+export function findIdealRun(seed: number, gaps: number, maxExpanded = 3_000_000): OracleRun | null {
   const h = C.tick;
-  const H = Math.round(horizon / h);
-  const K = Math.round(commit / h);
-  const cap = perTick * (H + 1);
-  const Y = new Float64Array(cap);
-  const V = new Float64Array(cap);
-  const PAR = new Int32Array(cap);
-  const ACT = new Uint8Array(cap);
-  const start = new Int32Array(H + 2);
-  const yCells = Math.round(C.ceiling / yBin) + 1;
-  const stamp = new Int32Array(yCells * (TAU_MAX + 1)).fill(-1);
-  const xs = new Float64Array(H + 1);
-  const ps = new Int32Array(H + 1);
-  const bands: Band[] = [{ lo: 0, hi: 0 }, { lo: 0, hi: 0 }];
-  let planNo = 0;
-
-  const root = createKiteGame(seed, { gapCount: gaps + Math.ceil(horizon * C.speedMax / C.gapSpacing) + 3, gateAfter: [] });
-  flap(root);
-
-  const planFrom = (s: KiteState): Plan => {
-    planNo++;
-    let x = s.x;
-    let passed = s.passed;
-    for (let i = 1; i <= H; i++) {
+  const half = C.kite.height / 2;
+  const root = createKiteGame(seed, { gapCount: gaps + 2, gateAfter: [] });
+  // đích: diều ra khỏi cột của khe cuối cùng
+  const endX = root.gaps[gaps - 1].x + (C.pillarWidth + C.kite.width) / 2 + 0.05;
+  // quỹ đạo x theo bước (không phụ thuộc cách bật): x[i], khe đã qua passed[i]
+  const xs: number[] = [0];
+  const ps: number[] = [0];
+  {
+    let x = 0;
+    let passed = 0;
+    while (x < endX) {
       x += speedAt(passed) * h;
-      while (passed < s.gaps.length && x >= s.gaps[passed].x - 1e-9) passed++;
-      xs[i] = x;
-      ps[i] = passed;
+      while (passed < root.gaps.length && x >= root.gaps[passed].x - 1e-9) passed++;
+      xs.push(x);
+      ps.push(passed);
     }
-    Y[0] = s.y;
-    V[0] = s.vy;
-    PAR[0] = -1;
-    ACT[0] = 0;
-    start[0] = 0;
-    start[1] = 1;
-    let count = 1;
-    let level = 0;
-    // ô lưới thích nghi: số trạng thái mỗi bước vượt ngưỡng thì gom thô hơn (cho cả dải độ cao được phủ đều, thay vì cắt bỏ phần đuôi), ít đi thì mịn lại
-    let mul = 1;
-    for (let i = 1; i <= H; i++) {
-      const prevCount = start[i] - start[i - 1];
-      if (prevCount > perTick * 0.8 && mul < 8) mul++;
-      else if (prevCount < perTick * 0.3 && mul > 1) mul--;
-      const nb = freeBands(s, xs[i], ps[i], (s.ticks + i) * h, bands);
-      let added = 0;
-      for (let p = start[i - 1]; p < start[i]; p++) {
-        for (let a = 0; a < 2; a++) {
-          const v1 = Math.max(C.maxFall, (a === 1 ? C.flapVelocity : V[p]) - C.gravity * h);
-          const y1 = Y[p] + v1 * h;
-          let ok = false;
-          for (let b = 0; b < nb; b++) if (y1 >= bands[b].lo && y1 <= bands[b].hi) ok = true;
-          if (!ok) continue;
-          const tau = Math.min(TAU_MAX, Math.max(0, Math.round((C.flapVelocity - v1) / (C.gravity * h))));
-          const cell = Math.round(y1 / (yBin * mul)) * (TAU_MAX + 1) + tau;
-          const key = planNo * 1000 + i;
-          if (stamp[cell] === key || added >= perTick) continue;
-          stamp[cell] = key;
-          Y[count] = y1;
-          V[count] = v1;
-          PAR[count] = p;
-          ACT[count] = a;
-          count++;
-          added++;
+  }
+  const T = xs.length - 1;
+  // vùng không chạm của từng bước (≤ 2 khoảng) và độ cao nên nhắm (tâm dải trống của khe kế)
+  const lo0 = new Float64Array(T + 1);
+  const hi0 = new Float64Array(T + 1);
+  const lo1 = new Float64Array(T + 1);
+  const hi1 = new Float64Array(T + 1);
+  const cnt = new Uint8Array(T + 1);
+  const aim = new Float64Array(T + 1);
+  for (let i = 1; i <= T; i++) {
+    let lo = C.floor + half + SAFE;
+    let hi = C.ceiling - half - SAFE;
+    let cut0 = NaN;
+    let cut1 = NaN;
+    const time = (root.ticks + i) * h;
+    for (let j = Math.max(0, ps[i] - 1); j <= Math.min(root.gaps.length - 1, ps[i]); j++) {
+      const g = root.gaps[j];
+      const dx = Math.abs(xs[i] - g.x);
+      if (dx < (C.pillarWidth + C.kite.width) / 2 + SAFE) {
+        lo = Math.max(lo, g.bottom + half + SAFE);
+        hi = Math.min(hi, g.top - half - SAFE);
+      }
+      const bb = blackBox(g, time);
+      if (bb && dx < (C.black.width + C.kite.width) / 2 + SAFE) {
+        cut0 = bb.y0 - half - SAFE;
+        cut1 = bb.y1 + half + SAFE;
+      }
+    }
+    let n = 0;
+    if (Number.isNaN(cut0)) {
+      if (lo <= hi) {
+        lo0[i] = lo;
+        hi0[i] = hi;
+        n = 1;
+      }
+    } else {
+      if (lo <= Math.min(hi, cut0)) {
+        lo0[i] = lo;
+        hi0[i] = Math.min(hi, cut0);
+        n = 1;
+      }
+      if (Math.max(lo, cut1) <= hi) {
+        if (n === 0) {
+          lo0[i] = Math.max(lo, cut1);
+          hi0[i] = hi;
+        } else {
+          lo1[i] = Math.max(lo, cut1);
+          hi1[i] = hi;
+        }
+        n++;
+      }
+    }
+    cnt[i] = n;
+    const g = root.gaps[Math.min(ps[i], root.gaps.length - 1)];
+    const [a, b] = freeInterval(g, time);
+    aim[i] = (a + b) / 2;
+  }
+  const inBand = (i: number, y: number): boolean => (y >= lo0[i] && y <= hi0[i]) || (cnt[i] > 1 && y >= lo1[i] && y <= hi1[i]);
+
+  const seen = new Set<number>();
+  const record: number[] = [];
+  let expanded = 0;
+  // duyệt theo chiều sâu (đệ quy; độ sâu tối đa T / 2, vài nghìn)
+  const visit = (i: number, y: number, v: number): boolean => {
+    if (i >= T) return true;
+    if (++expanded > maxExpanded) return false;
+    const steps = Math.min(STEP, T - i);
+    const first = y < aim[Math.min(i + steps, T)] ? 1 : 0;
+    for (let k = 0; k < 2; k++) {
+      const a = k === 0 ? first : 1 - first;
+      let yy = y;
+      let vv = a === 1 ? C.flapVelocity : v;
+      let ok = true;
+      for (let st = 1; st <= steps; st++) {
+        vv = Math.max(C.maxFall, vv - C.gravity * h);
+        yy += vv * h;
+        if (!inBand(i + st, yy)) {
+          ok = false;
+          break;
         }
       }
-      start[i + 1] = count;
-      if (added === 0) break;
-      level = i;
+      if (!ok) continue;
+      const tau = Math.min(TAU_MAX, Math.max(0, Math.round((C.flapVelocity - vv) / (C.gravity * h))));
+      const key = ((i / STEP) * 1024 + Math.round(yy / Y_BIN)) * 128 + tau;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      record.push(a);
+      if (steps === 2) record.push(0);
+      if (visit(i + steps, yy, vv)) return true;
+      record.length -= steps === 2 ? 2 : 1;
+      if (expanded > maxExpanded) return false;
     }
-    // chọn tối đa `branch` trạng thái cuối khác nhau (cách nhau ≥ 0,25 về độ cao), ưu tiên gần giữa vùng trống và vận tốc nhỏ
-    const nbEnd = freeBands(s, xs[Math.max(level, 1)], ps[Math.max(level, 1)], (s.ticks + Math.max(level, 1)) * h, bands);
-    const scored: [number, number][] = [];
-    for (let p = start[level]; p < start[level + 1]; p++) {
-      let d = Infinity;
-      for (let b = 0; b < nbEnd; b++) d = Math.min(d, Math.abs(Y[p] - (bands[b].lo + bands[b].hi) / 2));
-      scored.push([d + 0.05 * Math.abs(V[p]), p]);
-    }
-    scored.sort((p, q) => p[0] - q[0]);
-    const chosen: number[] = [];
-    for (const [, p] of scored) {
-      if (chosen.length >= branch) break;
-      if (chosen.every((q) => Math.abs(Y[q] - Y[p]) >= 0.25)) chosen.push(p);
-    }
-    const paths: Uint8Array[] = chosen.map((end) => {
-      const acts: number[] = [];
-      for (let p = end; p > 0; p = PAR[p]) acts.push(ACT[p]);
-      return Uint8Array.from(acts.reverse());
-    });
-    return { level, passedAtEnd: ps[Math.max(level, 1)], paths };
+    return false;
   };
-
-  /** Bản sao của trạng thái, đi tiếp `steps` bước đầu của `path` trên ván thật. */
-  const advance = (s: KiteState, path: Uint8Array, steps: number): KiteState => {
-    const c: KiteState = { ...s, stats: { ...s.stats, hitsBy: { ...s.stats.hitsBy } } };
-    for (let i = 0; i < steps && i < path.length; i++) {
-      if (path[i] === 1) flap(c);
-      stepKite(c, h);
-    }
-    return c;
-  };
-
-  interface Frame {
-    state: KiteState;
-    plan: Plan;
-    next: number;
-    /** Số hành động đã ghi trước khi vào khung này */
-    mark: number;
-  }
-  const record: number[] = [];
-  const stack: Frame[] = [];
-  let backtracks = 0;
-  const first = planFrom(root);
-  stack.push({ state: root, plan: first, next: 0, mark: 0 });
-  while (stack.length > 0) {
-    const f = stack[stack.length - 1];
-    if (f.next >= f.plan.paths.length) {
-      stack.pop();
-      record.length = f.mark;
-      backtracks++;
-      continue;
-    }
-    if (planNo >= maxPlans) return null;
-    const path = f.plan.paths[f.next++];
-    const steps = Math.min(K, path.length);
-    const child = advance(f.state, path, steps);
-    if (child.hearts < C.hearts) continue;
-    record.length = f.mark;
-    for (let i = 0; i < steps; i++) record.push(path[i]);
-    if (child.passed >= gaps) return { actions: Uint8Array.from(record), plans: planNo, backtracks };
-    const plan = planFrom(child);
-    // ngõ cụt: không sống tới hết tầm nhìn mà cũng chưa tới đích
-    if (plan.level < H && plan.passedAtEnd < gaps) continue;
-    // đường tới đích nằm gọn trong tầm nhìn: dùng luôn
-    if (plan.passedAtEnd >= gaps && plan.level >= 1 && plan.paths.length > 0 && plan.level < H) {
-      const p0 = plan.paths[0];
-      for (let i = 0; i < p0.length; i++) record.push(p0[i]);
-      return { actions: Uint8Array.from(record), plans: planNo, backtracks };
-    }
-    stack.push({ state: child, plan, next: 0, mark: record.length });
-  }
-  return null;
+  // sau lần bật đầu tiên diều ở tâm khe 1 với vận tốc 5,5; mỗi quyết định dùng cho STEP bước: bật ở bước đầu rồi không bật ở bước sau
+  if (!visit(0, root.gaps[0].center, C.flapVelocity)) return null;
+  return { actions: Uint8Array.from(record), expanded };
 }
 
 export interface ReplayResult {
@@ -410,7 +308,7 @@ export interface ReplayResult {
 
 /** Chạy lại một chuỗi hành động trên ván thật (cùng `seed`, không cổng): bật một lần lúc đầu rồi mỗi bước theo `actions`; dừng khi bay qua `gaps` khe, hết hành động hay mất tim. */
 export function replayRun(seed: number, gaps: number, actions: Uint8Array): ReplayResult {
-  const s = createKiteGame(seed, { gapCount: gaps + 8, gateAfter: [] });
+  const s = createKiteGame(seed, { gapCount: gaps + 2, gateAfter: [] });
   flap(s);
   let ticks = 0;
   for (let i = 0; i < actions.length && s.passed < gaps && s.hearts === C.hearts; i++) {

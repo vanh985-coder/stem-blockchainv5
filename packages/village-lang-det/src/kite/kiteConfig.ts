@@ -20,8 +20,8 @@ export const KITE_SPEC = {
   gapMin: 0.5,
   gapMax: 9.5,
   /**
-   * Chiều cao khe: bắt đầu từ 3,2, mỗi khe hẹp đi 0,04, dừng ở 2,4. Khe thứ k (đếm từ 1) cao max(2,4; 3,2 − 0,04 × k): vậy đạt 2,4 đúng ở khe thứ 20 (đúng dòng test của spec), khe thứ nhất cao 3,16.
-   * (Nếu khe thứ nhất phải cao đủ 3,2 thì 2,4 tới ở khe thứ 21; chênh 0,04 một khe, tự chọn theo dòng test.)
+   * Chiều cao khe (chốt sau B8): khe 1 cao 3,16, mỗi khe hẹp 0,04, dừng ở `gapHeightMin`. Khe thứ k (đếm từ 1) cao max(gapHeightMin; 3,2 − 0,04 × k): với gapHeightMin = 2,4 thì đạt 2,4 đúng ở khe thứ 20 (khớp dòng test
+   * "2,4 ở khe 20" của spec), khe thứ nhất cao 3,16 chứ không đủ 3,2.
    */
   gapHeight0: 3.2,
   gapShrink: 0.04,
@@ -37,7 +37,11 @@ export const KITE_SPEC = {
   speedStep: 0.1,
   speedMax: 6.5,
 
-  hearts: 3,
+  /**
+   * Số tim. Spec: 3. ĐỔI sau B8 (phương án A của bước sửa độ khó): 5, vì với 3 tim bot trung bình chỉ qua trung bình 1,69 cổng và bot giỏi chỉ 42,3% ván qua đủ 4 cổng (đã tính cả bộ sinh khe bảo đảm qua được);
+   * với 5 tim: 2,74 cổng và 89,0% (xem `kiteBalance.test.ts` và spec 06).
+   */
+  hearts: 5,
   /** Bất tử sau khi mất tim và sau câu hỏi ở cổng */
   invSeconds: 1,
 
@@ -61,9 +65,8 @@ export const KITE_SPEC = {
   /** Bước mô phỏng cố định (giây): `stepKite` chia `dt` thành các bước này để kết quả không phụ thuộc tốc độ khung hình (tự chọn: 1/120) */
   tick: 1 / 120,
   /**
-   * Mốc điểm cả ván: Đồng, Bạc, Vàng (khai báo theo chuẩn màn 2, 3, 5, 8, 12). TẠM, chỉnh khi học sinh chơi thật. Mốc của spec (150 / 260 / 360) chỉ cho bot giỏi 65,7% Vàng (< 90%), nên đặt lại theo số liệu 300 ván
-   * mỗi bot (xem `kiteBalance.test.ts` và spec 06): Đồng = phân vị 25% điểm bot trung bình (140) làm tròn xuống bội số 10; Vàng = phân vị 10% điểm bot giỏi (260) làm tròn xuống bội số 10;
-   * Bạc: quy tắc phân vị 75% của bot trung bình cho 270, KHÔNG nhỏ hơn Vàng 260 nên không dùng được (phải Đồng < Bạc < Vàng): tự chọn 200 (giữa Đồng và Vàng, khoảng phân vị 53% của bot trung bình).
+   * Mốc điểm cả ván: Đồng, Bạc, Vàng (khai báo theo chuẩn màn 2, 3, 5, 8, 12). TẠM, chỉnh khi học sinh chơi thật. Đặt lại sau B8 theo phân vị của 300 ván mỗi bot ở luật hiện tại (5 tim): Đồng = p25 bot trung bình (240),
+   * Bạc = p75 bot trung bình (405), Vàng = p10 bot giỏi (425), làm tròn xuống bội số 10: 240 / 400 / 420. (Nếu Bạc ≥ Vàng thì Bạc = trung bình cộng của Đồng và Vàng, làm tròn xuống bội số 10; lần này không cần.)
    */
-  medals: [140, 200, 260] as const,
+  medals: [240, 400, 420] as const,
 } as const;
