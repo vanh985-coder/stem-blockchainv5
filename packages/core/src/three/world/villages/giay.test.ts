@@ -1,70 +1,27 @@
 import { describe, expect, it } from 'vitest';
-import { PLAYER_RADIUS, resolveCollisions, type Point2 } from '../../collision';
-import { footprintRadiusOf } from '../../cho/footprints';
-import { PROP_SIZES } from '../../cho/marketLayout';
-import { assembleVillage } from '../../village/villageLayout';
-import { scatterRadius } from '../../village/scatter';
 import { GIAY_GATE_Z, GIAY_HOUSE_COUNT, GIAY_RADIUS, GIAY_WALL_RADIUS, LANG_GIAY_LAYOUT as L } from './giay';
+import { fnv1a, layoutSpots, probeOf, reachGrid } from './villageChecks';
 
-const layout = assembleVillage(L);
-/** Có bị chặn không (không giới hạn biên: biên của cả thế giới là việc của WalkWorld). */
-const blocked = (x: number, z: number, r = PLAYER_RADIUS): boolean => resolveCollisions({ x, z } as Point2, r, layout.obstacles);
+const probe = probeOf(L);
+const blocked = probe.blocked;
 const props = (k: string) => L.props.filter((p) => p.kind === k);
 const scatterOf = (k: string) => (L.scatter ?? []).filter((p) => p.kind === k);
 const count = (m: string) => L.placements.filter((p) => p.model === m).length;
 
 /** Vòng tròn bao chân của một món (giữ khoảng cách khi xếp). */
-function spots() {
-  const out: { name: string; x: number; z: number; r: number }[] = [];
-  for (const p of L.placements) out.push({ name: p.model, x: p.x, z: p.z, r: footprintRadiusOf(p.model) * p.scale });
-  for (const p of L.props) {
-    const k = PROP_SIZES[p.kind];
-    if (p.kind === 'chan' || p.kind === 'nuoc' || p.kind === 'so-chung' || p.kind === 'hoa') continue; // nằm dưới/trên vật khác hoặc đi qua được
-    out.push({ name: p.kind, x: p.x, z: p.z, r: k.r * p.scale });
-  }
-  for (const p of L.scatter ?? []) if (p.collide !== false && p.kind !== 'cau-ao') out.push({ name: p.kind, x: p.x, z: p.z, r: p.kind === 'tre' ? scatterRadius(p) * 0.5 : scatterRadius(p) });
-  for (const b of L.boards) out.push({ name: `bien ${b.level}`, x: b.x, z: b.z, r: 1 });
-  out.push({ name: 'bac-an', x: L.guide.x, z: L.guide.z, r: 0.45 });
-  return out;
-}
+const spots = () => layoutSpots(L, [{ name: 'bac-an', x: L.guide.x, z: L.guide.z, r: 0.45 }]);
 
 /** Lưới ô 1,0 đi được từ chỗ xuất hiện (bước 4 hướng, người chơi bán kính 0,4); trả hàm hỏi một điểm có đứng tới được không. */
-function reachableCells(plugGate = false) {
-  const step = 1;
-  const R = 135;
-  const key = (i: number, j: number) => (j + R) * (2 * R + 1) + (i + R);
-  const free = (i: number, j: number) => Math.hypot(i * step, j * step) <= R - 1 && !(plugGate && Math.hypot(i * step, j * step - GIAY_GATE_Z) < 14) && !blocked(i * step, j * step);
-  const seen = new Set<number>();
-  const q: [number, number][] = [[Math.round(L.start.x / step), Math.round(L.start.z / step)]];
-  seen.add(key(q[0][0], q[0][1]));
-  for (let h = 0; h < q.length; h++) {
-    const [i, j] = q[h];
-    for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
-      const a = i + di;
-      const b = j + dj;
-      if (seen.has(key(a, b)) || !free(a, b)) continue;
-      seen.add(key(a, b));
-      q.push([a, b]);
-    }
-  }
-  const near = (x: number, z: number, radius = 2) => {
-    const n = Math.ceil(radius / step);
-    for (let a = -n; a <= n; a++) for (let b = -n; b <= n; b++) {
-      const i = Math.round(x / step) + a;
-      const j = Math.round(z / step) + b;
-      if (Math.hypot(i * step - x, j * step - z) <= radius && seen.has(key(i, j))) return true;
-    }
-    return false;
-  };
-  const inside = (i: number, j: number) => Math.hypot(i * step, j * step) < GIAY_WALL_RADIUS - 2;
-  let reachedInside = 0;
-  for (const k of seen) {
-    const i = (k % (2 * R + 1)) - R;
-    const j = Math.floor(k / (2 * R + 1)) - R;
-    if (inside(i, j)) reachedInside++;
-  }
-  return { seen, near, size: seen.size, key, reachedInside, R };
-}
+const reachableCells = (plugGate = false) => reachGrid(L, blocked, GIAY_WALL_RADIUS, GIAY_GATE_Z, plugGate);
+
+describe('Làng Giấy: bố cục không đổi sau khi tách bộ dụng cụ dùng chung (mốc 3, bước L1)', () => {
+  it('băm của cả bố cục khớp bản trước khi tách: không món nào đổi vị trí, cỡ, màu hay thứ tự (đổi Làng Giấy một cách chủ ý thì cập nhật số này)', () => {
+    expect(L.placements).toHaveLength(46);
+    expect(L.props).toHaveLength(151);
+    expect(L.scatter).toHaveLength(649);
+    expect(fnv1a(JSON.stringify(L))).toBe('e7bc8260');
+  });
+});
 
 describe('Làng Giấy (bước X3): quy mô và bố cục', () => {
   it('bán kính 125, cổng ở (0, −125) nên tâm làng cách chợ 197 (cổng ở 72); lũy tre bao quanh', () => {

@@ -1,8 +1,8 @@
 import { createMulberry32 } from '../../../lib/rng';
-import { MODEL_HOUSE_THATCH, MODEL_HOUSE_TILE, MODEL_STALL, MODEL_TREE, MODEL_WELL, PROP_SIZES, type Placement, type PropKind, type PropPlacement } from '../../cho/marketLayout';
-import { footprintRadiusOf } from '../../cho/footprints';
-import { scatterRadius, type ScatterPlacement } from '../../village/scatter';
+import { MODEL_STALL, MODEL_TREE, MODEL_WELL, type Placement, type PropPlacement } from '../../cho/marketLayout';
+import { type ScatterPlacement } from '../../village/scatter';
 import type { VillageBoardDef, VillageField, VillageGuideDef, VillageLayoutInput, VillagePaths, VillagePond, VillageRoad, VillageScroll, VillagerLoop } from '../../village/villageLayout';
+import { createFiller, placementSpots, propSpots, prop, scatter, scatterSpots, thatch, tile, type Spot } from './villageKit';
 
 /**
  * Bố cục Làng Giấy từ bước X3 (spec 05 mục "Cảnh làng", xếp theo ảnh concept-lang-giay): làng bán kính 125 mở ra phía sau cổng, bao quanh bằng lũy tre. Chỉ là dữ liệu (không import three), tọa độ như chợ:
@@ -29,17 +29,6 @@ export const GIAY_GATE_Z = -125;
 export const GIAY_WALL_RADIUS = 122;
 /** Đồ không được vượt qua bán kính này (tính cả cỡ chân): còn chừa chỗ cho lũy tre. */
 const KEEP_INSIDE = 118;
-
-const tile = (x: number, z: number, face: readonly [number, number], scale: number, tint: readonly [number, number, number], twist = 0): Placement => house(MODEL_HOUSE_TILE, x, z, face, scale, tint, twist);
-const thatch = (x: number, z: number, face: readonly [number, number], scale: number, tint: readonly [number, number, number], twist = 0): Placement => house(MODEL_HOUSE_THATCH, x, z, face, scale, tint, twist);
-
-/** Nhà đặt ở (x, z), mặt trước (+Z của model) quay về điểm `face`, xoay thêm `twist`. */
-function house(model: string, x: number, z: number, face: readonly [number, number], scale: number, tint: readonly [number, number, number], twist: number): Placement {
-  return { model, x, z, yaw: Math.atan2(face[0] - x, face[1] - z) + twist, scale, tint };
-}
-
-const prop = (kind: PropKind, x: number, z: number, yaw = 0, scale = 1, tint: readonly [number, number, number] = [1, 1, 1]): PropPlacement => ({ kind, x, z, yaw, scale, tint });
-const scatter = (kind: ScatterPlacement['kind'], x: number, z: number, scale = 1, yaw = 0, tint: readonly [number, number, number] = [1, 1, 1], extra: Partial<ScatterPlacement> = {}): ScatterPlacement => ({ kind, x, z, yaw, scale, tint, ...extra });
 
 // ---------------------------------------------------------------------------
 // Khu trung tâm: sân giữa làng, ba biển gỗ, bác An và bàn chép sổ
@@ -334,22 +323,10 @@ const PATHS: VillagePaths = {
 };
 
 // ---------------------------------------------------------------------------
-// Rải đồ có hạt giống, tránh mọi thứ đã đặt
-
-interface Spot {
-  x: number;
-  z: number;
-  r: number;
-}
+// Rải đồ có hạt giống, tránh mọi thứ đã đặt (bộ rải dùng chung ở villageKit.ts)
 
 function anchors(): Spot[] {
-  const out: Spot[] = [];
-  for (const p of [...HOUSES, ...TREES, ...WELLS, ...STALLS]) out.push({ x: p.x, z: p.z, r: footprintRadiusOf(p.model) * p.scale });
-  for (const p of [...WORKSHOP_PROPS, ...MARKET_PROPS, PAVILION]) {
-    if (p.kind === 'chan' || p.kind === 'nuoc') continue;
-    out.push({ x: p.x, z: p.z, r: PROP_SIZES[p.kind].r * p.scale });
-  }
-  for (const s of RACKS) out.push({ x: s.x, z: s.z, r: scatterRadius(s) });
+  const out: Spot[] = [...placementSpots([...HOUSES, ...TREES, ...WELLS, ...STALLS]), ...propSpots([...WORKSHOP_PROPS, ...MARKET_PROPS, PAVILION]), ...scatterSpots(RACKS)];
   for (const b of BOARDS) out.push({ x: b.x, z: b.z, r: 1.4 });
   out.push({ x: DESK.x, z: DESK.z, r: 1.4 }, { x: GUIDE.x, z: GUIDE.z, r: 1 });
   for (const p of PONDS) out.push({ x: p.x, z: p.z, r: p.r + 1.4 });
@@ -358,50 +335,10 @@ function anchors(): Spot[] {
   return out;
 }
 
-/** Khoảng cách từ (x, z) tới đoạn thẳng (ax, az)-(bx, bz). */
-function distToSegment(x: number, z: number, ax: number, az: number, bx: number, bz: number): number {
-  const dx = bx - ax;
-  const dz = bz - az;
-  const len2 = dx * dx + dz * dz;
-  const t = len2 === 0 ? 0 : Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / len2));
-  return Math.hypot(x - (ax + dx * t), z - (az + dz * t));
-}
-
-/** Khoảng cách từ (x, z) tới mép con đường (bằng 0 nếu nằm trên đường). */
-function distToRoad(x: number, z: number, r: VillageRoad): number {
-  return Math.max(0, distToSegment(x, z, r.x0, r.z0, r.x1, r.z1) - r.width / 2);
-}
-
-/** Khoảng cách tới lối đi của dân làng và tới các đoạn đường nhỏ của mũi tên: đồ rải không được chắn các lối này. */
-function distToLanes(x: number, z: number): number {
-  let best = Infinity;
-  for (const loop of VILLAGERS) for (let i = 0; i < loop.length; i++) {
-    const a = loop[i];
-    const b = loop[(i + 1) % loop.length];
-    best = Math.min(best, distToSegment(x, z, a[0], a[1], b[0], b[1]));
-  }
-  const byId = new Map(NODES.map((n) => [n.id, n]));
-  for (const [p, q] of PATHS.links) {
-    const a = byId.get(p)!;
-    const b = byId.get(q)!;
-    best = Math.min(best, distToSegment(x, z, a.x, a.z, b.x, b.z));
-  }
-  for (const s of PATHS.scrollStands ?? []) {
-    const j = byId.get(s.join)!;
-    best = Math.min(best, distToSegment(x, z, j.x, j.z, s.x, s.z));
-  }
-  const g = PATHS.guideStand!;
-  const j = byId.get(g.join)!;
-  return Math.min(best, distToSegment(x, z, j.x, j.z, g.x, g.z));
-}
-
 /** Rải đồ phụ: tre ở vườn và đồi, cây ăn quả, hoa, chum, rơm. Mỗi món chỉ đặt nếu còn chỗ trống (bán kính chân cộng khoảng hở). */
 function fillers(): { scatter: ScatterPlacement[]; props: PropPlacement[]; placements: Placement[] } {
   const rng = createMulberry32(20260110);
-  const taken = anchors();
-  const scat: ScatterPlacement[] = [];
-  const props: PropPlacement[] = [];
-  const placements: Placement[] = [];
+  const f = createFiller({ wallRadius: GIAY_WALL_RADIUS, gateZ: GIAY_GATE_Z, keepInside: KEEP_INSIDE, taken: anchors(), roads: ROADS, fields: FIELDS, yards: YARDS, villagers: VILLAGERS, paths: PATHS });
   const hills: ScatterPlacement[] = [
     scatter('doi', -34, 98, 14, 0, [0.14, 0.4, 0.09], { sy: 0.46 }),
     scatter('doi', 28, 100, 13, 1, [0.16, 0.42, 0.1], { sy: 0.46 }),
@@ -409,119 +346,21 @@ function fillers(): { scatter: ScatterPlacement[]; props: PropPlacement[]; place
     scatter('doi', -100, -10, 12, 3, [0.15, 0.41, 0.09], { sy: 0.46 }),
     scatter('doi', -10, 108, 8, 4, [0.17, 0.43, 0.11], { sy: 0.56 }),
   ];
-  for (const h of hills) {
-    scat.push(h);
-    taken.push({ x: h.x, z: h.z, r: h.scale + 0.3 });
-  }
-  const onGround = (x: number, z: number, r: number, limit: number = KEEP_INSIDE): boolean => {
-    if (Math.hypot(x, z) + r > limit) return false;
-    if (Math.hypot(x, z - GIAY_GATE_Z) < 10) return false; // lối quanh cổng
-    for (const t of taken) if (Math.hypot(x - t.x, z - t.z) < t.r + r + 0.4) return false;
-    for (const rd of ROADS) if (distToRoad(x, z, rd) < r + 0.5) return false;
-    if (distToLanes(x, z) < r + 1.0) return false;
-    for (const f of FIELDS) if (Math.abs(x - f.x) < f.hx + r && Math.abs(z - f.z) < f.hz + r) return false;
-    for (const y of YARDS) if (Math.hypot(x - y.x, z - y.z) < y.r - 1 && y.r < 12) return false; // sân nhỏ để trống
-    return true;
-  };
-  const putScatter = (p: ScatterPlacement, limit: number = KEEP_INSIDE): boolean => {
-    const r = scatterRadius(p) * (p.kind === 'tre' ? 0.7 : 1);
-    if (!onGround(p.x, p.z, r, limit)) return false;
-    scat.push(p);
-    taken.push({ x: p.x, z: p.z, r });
-    return true;
-  };
-  const putProp = (p: PropPlacement, r: number): boolean => {
-    if (!onGround(p.x, p.z, r)) return false;
-    props.push(p);
-    taken.push({ x: p.x, z: p.z, r });
-    return true;
-  };
-
-  // lũy tre quanh làng: hai hàng so le, chừa lối quanh cổng; vật cản của lũy là chuỗi hộp (ringColliders), nên từng bụi không có vật cản
-  const ringN = Math.round((2 * Math.PI * GIAY_WALL_RADIUS) / 3.3);
-  for (let i = 0; i < ringN; i++) {
-    for (const row of [0, 1]) {
-      const a = ((i + row * 0.5 + (rng() - 0.5) * 0.3) / ringN) * Math.PI * 2;
-      const rad = GIAY_WALL_RADIUS + (row ? 1.3 : -0.5) + (rng() - 0.5) * 0.8;
-      const x = Math.cos(a) * rad;
-      const z = Math.sin(a) * rad;
-      if (Math.hypot(x, z - GIAY_GATE_Z) < 9.5) continue;
-      const s = 1.15 + rng() * 0.35;
-      scat.push(scatter('tre', x, z, s, rng() * 6.28, [0.94 + rng() * 0.06, 1, 0.94 + rng() * 0.06], { collide: false }));
-    }
-  }
-  // bụi tre hai bên đại lộ gần cổng
-  for (let k = 0; k < 8; k++) {
-    for (const side of [-1, 1]) {
-      putScatter(scatter('tre', side * (7.5 + rng() * 1.5), -126 + k * 3.2 + (rng() - 0.5) * 1.2, 0.95 + rng() * 0.3, rng() * 6.28, [0.96, 1, 0.94]));
-    }
-  }
-  // đồi tre: hai vòng bụi quanh chân mỗi đồi
-  for (const h of hills) {
-    for (const [ring, n] of [
-      [h.scale + 2.6, 11],
-      [h.scale + 5.4, 15],
-    ] as const) {
-      for (let k = 0; k < n; k++) {
-        const a = ((k + rng() * 0.6) / n) * Math.PI * 2;
-        const s = 0.9 + rng() * 0.45;
-        putScatter(scatter('tre', h.x + Math.cos(a) * ring, h.z + Math.sin(a) * ring, s, rng() * 6.28, [0.95, 1, 0.94]));
-      }
-    }
-  }
+  f.addHills(hills);
+  f.wallRing(rng); // lũy tre quanh làng
+  f.gateBamboo(rng); // bụi tre hai bên đại lộ gần cổng
+  f.hillBamboo(rng, hills); // đồi tre: hai vòng bụi quanh chân mỗi đồi
   // vườn cây ăn quả: lưới có xô lệch, ở bốn chỗ
-  const orchard = (x0: number, x1: number, z0: number, z1: number, step: number) => {
-    for (let z = z0; z <= z1; z += step) {
-      for (let x = x0; x <= x1; x += step) {
-        const k = 0.85 + rng() * 0.4;
-        putScatter(scatter('cay-qua', x + (rng() - 0.5) * 1.6, z + (rng() - 0.5) * 1.6, k, rng() * 6.28, [0.9 + rng() * 0.1, 1, 0.9 + rng() * 0.1]), KEEP_INSIDE - 1);
-      }
-    }
-  };
-  orchard(-94, -52, -104, -86, 7);
-  orchard(-60, 60, 86, 96, 7);
-  orchard(-112, -96, 56, 76, 7);
-  orchard(40, 64, 40, 64, 8);
-  // tre rải trong làng (khóm nhỏ ở góc trống)
-  for (let k = 0; k < 90; k++) {
-    const a = rng() * Math.PI * 2;
-    const rad = 30 + rng() * 86;
-    putScatter(scatter('tre', Math.cos(a) * rad, Math.sin(a) * rad, 0.8 + rng() * 0.45, rng() * 6.28, [0.95, 1, 0.94]));
-  }
-  // quanh mỗi nhà ở: khóm hoa, chum vại, đôi khi đống rơm
-  for (const h of [...westHouses(), ...OTHER_HOUSES]) {
-    const hr = footprintRadiusOf(h.model) * h.scale;
-    for (let k = 0; k < 3; k++) {
-      for (let tries = 0; tries < 12; tries++) {
-        const a = rng() * Math.PI * 2;
-        const d = hr + 0.9 + rng() * 1.3;
-        const x = h.x + Math.cos(a) * d;
-        const z = h.z + Math.sin(a) * d;
-        const shade = 0.9 + rng() * 0.1;
-        if (k === 0 && putProp(prop('hoa', x, z, 0, 0.95 + rng() * 0.3, [shade, shade - 0.02, shade]), 0.5)) break;
-        if (k === 1 && putProp(prop('chum', x, z, 0, 0.9 + rng() * 0.2), PROP_SIZES.chum.r)) break;
-        if (k === 2 && rng() < 0.45 && putProp(prop('rom', x, z, rng() * 3, 0.85 + rng() * 0.2), PROP_SIZES.rom.r * 0.9)) break;
-        if (k === 2 && rng() >= 0.45) break;
-      }
-    }
-  }
-  // khóm hoa dọc đại lộ, sân giữa làng, quanh bờ ao và sân đình
-  for (let i = 0; i < 24; i++) {
-    const z = -126 + i * 3;
-    const side = i % 2 ? 1 : -1;
-    putProp(prop('hoa', side * (3.8 + rng() * 0.8), z, 0, 0.95 + rng() * 0.25, [0.93, 0.93, 0.9]), 0.5);
-  }
-  for (let i = 0; i < 18; i++) {
-    const a = rng() * Math.PI * 2;
-    const p = PONDS[i % PONDS.length];
-    putProp(prop('hoa', p.x + Math.cos(a) * (p.r + 1.9), p.z + Math.sin(a) * (p.r + 1.9), 0, 1, [0.92, 0.94, 0.9]), 0.5);
-  }
-  for (let i = 0; i < 12; i++) {
-    const a = rng() * Math.PI * 2;
-    const d = 8 + rng() * 11;
-    putProp(prop('hoa', Math.cos(a) * d, 58 + Math.sin(a) * d, 0, 1, [0.93, 0.94, 0.9]), 0.5);
-  }
-  return { scatter: scat, props, placements };
+  f.orchard(rng, -94, -52, -104, -86, 7);
+  f.orchard(rng, -60, 60, 86, 96, 7);
+  f.orchard(rng, -112, -96, 56, 76, 7);
+  f.orchard(rng, 40, 64, 40, 64, 8);
+  f.scatterBamboo(rng, 90, 30, 86); // tre rải trong làng (khóm nhỏ ở góc trống)
+  f.houseFlora(rng, [...westHouses(), ...OTHER_HOUSES]); // quanh mỗi nhà ở: khóm hoa, chum vại, đôi khi đống rơm
+  f.avenueFlora(rng, 24); // khóm hoa dọc đại lộ, sân giữa làng, quanh bờ ao và sân đình
+  f.pondFlora(rng, PONDS, 18);
+  f.circleFlora(rng, 0, 58, 12, 8, 11);
+  return { scatter: f.scatter, props: f.props, placements: f.placements };
 }
 
 const FILL = fillers();
