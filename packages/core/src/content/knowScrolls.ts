@@ -23,6 +23,11 @@ export const knowScrollUi = {
     dinh: 'đình làng',
     ao: 'cái ao làng',
     cho: 'chợ làng',
+    // Làng Dệt
+    phoi: 'bãi phơi vải',
+    khungcui: 'xóm khung cửi',
+    aonhuom: 'ao nhuộm',
+    chovai: 'chợ vải',
   },
   /** Menu "Em có biết?": bộ sưu tập thẻ */
   suuTamTieuDe: 'Em có biết? ({n}/{tong})',

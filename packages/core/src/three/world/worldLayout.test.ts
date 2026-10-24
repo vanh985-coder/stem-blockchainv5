@@ -45,7 +45,7 @@ describe('hệ tọa độ làng và thế giới', () => {
     expect(p.x).toBeCloseTo(1, 9);
     expect(p.z).toBeCloseTo(0, 9);
   });
-  it('cổng của bố cục làng rơi đúng chỗ cổng thế giới; Làng Giấy (bước X3) có tâm ở (0; 197) bán kính 125, ba làng nhỏ ở 89,5', () => {
+  it('cổng của bố cục làng rơi đúng chỗ cổng thế giới; Làng Giấy (bước X3) có tâm ở (0; 197) và Làng Dệt (bước L1) ở (0; −197), cùng bán kính 125, hai làng nhỏ ở 89,5', () => {
     for (const f of VILLAGE_FRAMES) {
       const local = LOCAL_VILLAGES[f.village];
       const g = localToWorld(local, f, local.gate.x, local.gate.z);
@@ -59,7 +59,12 @@ describe('hệ tọa độ làng và thế giới', () => {
     expect(giay.center.z).toBeCloseTo(197, 9); // cổng ở 72, cổng cách tâm làng 125
     expect(giay.radius).toBe(125);
     expect(giay.insideRadius).toBeCloseTo(124, 9);
-    for (const v of FULL.villages.slice(1)) expect(Math.hypot(v.center.x, v.center.z)).toBeCloseTo(89.5, 9);
+    const det = FULL.villages[1];
+    expect(det.center.x).toBeCloseTo(0, 9);
+    expect(det.center.z).toBeCloseTo(-197, 9);
+    expect(det.radius).toBe(125);
+    expect(det.insideRadius).toBeCloseTo(124, 9);
+    for (const v of FULL.villages.slice(2)) expect(Math.hypot(v.center.x, v.center.z)).toBeCloseTo(89.5, 9);
   });
   it('mọi biển gỗ quay mặt về phía chợ (mặt trước hướng về tâm chợ), ở cả 4 làng', () => {
     for (const v of FULL.villages) {
@@ -103,13 +108,13 @@ describe('bố cục thế giới', () => {
     // biên đi lại bao hết cả 4 chỗ dành riêng và lũy tre
     for (const r of reserved) expect(Math.hypot(r.x, r.z) + VILLAGE_RADIUS).toBeLessThan(WORLD_BOUNDS);
   });
-  it('đất hoang của ba làng chưa dựng: 5 đồi + 40 bụi tre mỗi làng, trong chỗ dành riêng, cách xa sông, không đè nhà/biển/cổng của làng; Làng Giấy không có', () => {
-    expect(FULL.wild.filter((p) => p.kind === 'doi')).toHaveLength(15);
-    expect(FULL.wild.filter((p) => p.kind === 'tre')).toHaveLength(120);
+  it('đất hoang của hai làng chưa dựng: 5 đồi + 40 bụi tre mỗi làng, trong chỗ dành riêng, cách xa sông, không đè nhà/biển/cổng của làng; Làng Giấy và Làng Dệt (đã dựng đủ) không có', () => {
+    expect(FULL.wild.filter((p) => p.kind === 'doi')).toHaveLength(10);
+    expect(FULL.wild.filter((p) => p.kind === 'tre')).toHaveLength(80);
     for (const f of VILLAGE_FRAMES) {
       const c = { x: f.dirX * (GATE_WORLD_DISTANCE + VILLAGE_RADIUS), z: f.dirZ * (GATE_WORLD_DISTANCE + VILLAGE_RADIUS) };
       const mine = FULL.wild.filter((p) => Math.hypot(p.x - c.x, p.z - c.z) < VILLAGE_RADIUS);
-      expect(mine.length, f.village).toBe(f.village === 'lang-giay' ? 0 : 45);
+      expect(mine.length, f.village).toBe(f.village === 'lang-giay' || f.village === 'lang-det' ? 0 : 45);
     }
     for (const p of FULL.wild) {
       expect(riverEdgeDistance(p.x, p.z)).toBeGreaterThan(6);

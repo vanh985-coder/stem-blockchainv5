@@ -133,6 +133,7 @@ export function placeVillage(local: VillageLayoutInput, f: VillageFrame): WorldV
     props: local.props.map(prop),
     boards: local.boards.map(board),
     guide: local.guide ? guide(local.guide) : undefined,
+    companions: local.companions?.map(guide),
     yards: local.yards.map((y) => ({ ...y, ...at(y.x, y.z) })),
     roads: local.roads.map(road),
     fence: local.fence ? { ...local.fence, center } : undefined,

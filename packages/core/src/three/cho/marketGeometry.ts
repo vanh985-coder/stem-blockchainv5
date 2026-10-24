@@ -2,7 +2,7 @@
  * Hình học do code dựng cho chợ phiên (không có model trong file): thuyền gỗ, mui thuyền, chum vại, đống rơm. Hàm tạo hình học
  * thuần của three (không cần canvas hay GPU), dựng một lần rồi dùng chung cho mọi bản nhân bản.
  */
-import { BoxGeometry, Color, ConeGeometry, CylinderGeometry, Float32BufferAttribute, IcosahedronGeometry, LatheGeometry, Vector2, type BufferGeometry } from 'three';
+import { BoxGeometry, CircleGeometry, Color, ConeGeometry, CylinderGeometry, Float32BufferAttribute, IcosahedronGeometry, LatheGeometry, Vector2, type BufferGeometry } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { PROP_SIZES, type PropKind } from './marketLayout';
 
@@ -187,6 +187,80 @@ function createPavilion(): BufferGeometry {
   return mergeGeometries(parts)!;
 }
 
+const CLAY = 0xa8643c;
+const INDIGO = 0x2c52a8;
+const MADDER = 0xc2402f;
+const CLOTH_COLORS = [0xe0463b, 0xf29ab8, 0x3d68c4, 0xf2c53d, 0xf1e8d2];
+
+/** Chum nhuộm: thùng sành loe miệng (rộng nhất ở miệng, 0,85), mặt nước nhuộm phẳng ngang miệng ở độ cao 1,0; `water` là màu nước (chàm hay đỏ). */
+function createDyeVat(water: number): BufferGeometry {
+  const body = new CylinderGeometry(0.85, 0.62, 0.95, 16);
+  body.translate(0, 0.475, 0);
+  const surface = new CircleGeometry(0.76, 16);
+  surface.rotateX(-Math.PI / 2);
+  surface.translate(0, 1.0, 0);
+  return mergeGeometries([paint(toPlain(body), CLAY), paint(toPlain(surface), water)])!;
+}
+
+/** Đống sợi: nền gỗ tròn (bán kính 0,85), ba cuộn sợi màu và một cọc giữa cao 0,65. */
+function createYarnPile(): BufferGeometry {
+  const base = new CylinderGeometry(0.85, 0.85, 0.12, 16);
+  base.translate(0, 0.06, 0);
+  const skein = (x: number, z: number, hex: number) => {
+    const g = new IcosahedronGeometry(1, 0);
+    g.scale(0.4, 0.27, 0.4);
+    g.translate(x, 0.385, z);
+    return paint(toPlain(g), hex);
+  };
+  const stick = new CylinderGeometry(0.04, 0.04, 0.53, 6);
+  stick.translate(0, 0.12 + 0.265, 0);
+  return mergeGeometries([paint(toPlain(base), WOOD), skein(-0.32, -0.18, MADDER), skein(0.3, -0.2, INDIGO), skein(0, 0.34, CLOTH_COLORS[4]), paint(toPlain(stick), WOOD_DARK)])!;
+}
+
+/** Giá cuộn vải: hai trụ, ba tầng ván, mỗi tầng vài cuộn vải màu nằm ngang. Khung bao đúng hộp PROP_SIZES `gia-vai`. */
+function createClothShelf(): BufferGeometry {
+  const k = PROP_SIZES['gia-vai'];
+  const hx = k.box!.hx;
+  const hz = k.box!.hz;
+  const parts: BufferGeometry[] = [];
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) parts.push(paint(slabN(0.12, k.h, 0.12, sx * (hx - 0.06), 0, sz * (hz - 0.06)), WOOD_DARK));
+  const tiers = [0.35, 0.8, 1.25];
+  tiers.forEach((y, i) => {
+    parts.push(paint(slabN(hx * 2 - 0.1, 0.06, hz * 2 - 0.1, 0, y - 0.06), WOOD));
+    [-0.16, 0.16].forEach((z, j) => {
+      const bolt = new CylinderGeometry(0.15, 0.15, hx * 2 - 0.45, 8);
+      bolt.rotateZ(Math.PI / 2);
+      bolt.translate(0, y + 0.15, z);
+      parts.push(paint(toPlain(bolt), CLOTH_COLORS[(i * 2 + j) % CLOTH_COLORS.length]));
+    });
+  });
+  parts.push(paint(slabN(hx * 2, 0.08, hz * 2, 0, k.h - 0.08), WOOD)); // nóc giá (cao đúng khung bao)
+  return mergeGeometries(parts)!;
+}
+
+/** Sào phơi sợi: hai trụ có chân ngang, xà ngang và sáu mớ sợi treo (kem, nâu vàng, chàm, đỏ). Khung bao đúng hộp PROP_SIZES `sao-soi`. */
+function createYarnRack(): BufferGeometry {
+  const k = PROP_SIZES['sao-soi'];
+  const hx = k.box!.hx;
+  const hz = k.box!.hz;
+  const parts: BufferGeometry[] = [];
+  for (const sx of [-1, 1]) {
+    parts.push(paint(slabN(0.1, k.h, 0.1, sx * (hx - 0.05), 0), WOOD_DARK));
+    parts.push(paint(slabN(0.1, 0.08, hz * 2, sx * (hx - 0.05), 0), WOOD_DARK)); // chân ngang
+  }
+  parts.push(paint(slabN(hx * 2, 0.08, 0.1, 0, k.h - 0.08), WOOD)); // xà ngang (đỉnh đúng chiều cao)
+  const hanks = [CLOTH_COLORS[4], 0xc9a15a, INDIGO, MADDER, CLOTH_COLORS[4], INDIGO];
+  hanks.forEach((hex, i) => parts.push(paint(slabN(0.16, 1.0, 0.06, -hx + 0.55 + i * ((hx * 2 - 1.1) / 5), k.h - 1.1), hex)));
+  return mergeGeometries(parts)!;
+}
+
+/** Bỏ chỉ mục để gộp được với khối 20 mặt (không có chỉ mục) của three: mergeGeometries cần cả hai cùng có hay cùng không có chỉ mục. */
+function toPlain(g: BufferGeometry): BufferGeometry {
+  return g.index ? g.toNonIndexed() : g;
+}
+
+const slabN = (w: number, h: number, d: number, dx = 0, dy = 0, dz = 0): BufferGeometry => toPlain(slab(w, h, d, dx, dy, dz));
+
 /**
  * Đồ nhỏ gợi nghề quanh cổng làng (bước 8d), dựng bằng code, chân ở y = 0, đúng cỡ trong PROP_SIZES (có test): chồng giấy (hộp), cuộn vải (trụ đứng), khối đá (hộp), bàn đá khắc (mặt phiến và hai chân),
  * hòm gỗ (thân và nắp), thúng (trụ thon), chân giá phên phơi giấy (trụ mảnh). Kind khác (chum, rơm, hoa, đá) dựng ở nơi khác thì trả về null.
@@ -262,6 +336,16 @@ export function createCraftProp(kind: PropKind): BufferGeometry | null {
       return createStove();
     case 'dinh':
       return createPavilion();
+    case 'chum-cham':
+      return createDyeVat(INDIGO);
+    case 'chum-do':
+      return createDyeVat(MADDER);
+    case 'dong-soi':
+      return createYarnPile();
+    case 'gia-vai':
+      return createClothShelf();
+    case 'sao-soi':
+      return createYarnRack();
     default:
       return null;
   }

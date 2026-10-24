@@ -18,6 +18,7 @@ import type { QualityLevel } from '../quality';
 import { preloadModel, releaseModel, retainModel } from '../modelLoader';
 import { VillageBoards } from '../village/VillageBoards';
 import { isModelWarm, markModelWarm, usableTextures, warmTextures } from './warm';
+import type { VillageGuideDef } from '../village/villageLayout';
 import type { WorldVillage } from './worldLayout';
 import { PROBE } from '../../lib/dev';
 
@@ -83,6 +84,18 @@ function useWarmModel(id: string | null): boolean {
   return id !== null && done === id;
 }
 
+/** Người đứng yên thêm ở khu giữa làng (cô Chi bên cạnh cụ Bình): dựng khi model đã làm ấm xong, không nói chuyện. */
+function Companion({ def }: { def: VillageGuideDef }) {
+  const model = `characters/${CHARACTERS[def.character].portrait}`;
+  const warm = useWarmModel(model);
+  if (!warm) return null;
+  return (
+    <Suspense fallback={null}>
+      <Character id={model} position={[def.x, 0, def.z]} rotation={[0, def.yaw, 0]} mood="idle" seed={9} />
+    </Suspense>
+  );
+}
+
 /**
  * Vùng làng đã tải (mốc 2, bước W1): đồ vật của làng (model nhân bản có đủ 3 bậc, đồ nhỏ, biển gỗ, người dẫn) dựng DẦN, mỗi vài khung hình một phần (đồ nhỏ, biển, từng model, người dẫn) thay vì cả cụm
  * trong một khung hình, để không khựng khi người chơi tới gần. Gỡ vùng (xa quá) thì mọi hình học, vật liệu riêng và texture biển được giải phóng bởi chính từng phần. Mặt đất, cổng và hình dáng nhìn từ xa
@@ -136,7 +149,7 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
       {stage >= 1 && <MarketProps layout={layout} cull={{ cell: SCATTER_CELL, maxDistance: PROPS_MAX_DISTANCE[level] }} />}
       {stage >= 2 && <VillageBoards boards={layout.boards} labels={labels} icons={icons} states={states} />}
       {stage >= 3 && layout.scrolls && layout.scrolls.length > 0 && <KnowScrolls scrolls={layout.scrolls} collected={collected} animate={animate} />}
-      {layout.scatter && scatterKinds.map((k, j) => (stage >= 4 + j ? <ScatterProps key={k} scatter={layout.scatter ?? []} level={level} only={k} /> : null))}
+      {layout.scatter && scatterKinds.map((k, j) => (stage >= 4 + j ? <ScatterProps key={k} scatter={layout.scatter ?? []} level={level} only={k} animate={animate} /> : null))}
       {byModel.map(({ id, items }, i) =>
         stage >= firstModel + i ? (
           <Suspense key={id} fallback={null}>
@@ -156,6 +169,7 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
           />
         </Suspense>
       )}
+      {stage >= guideStage && (layout.companions ?? []).map((c, i) => <Companion key={i} def={c} />)}
       {loops.map((path, i) =>
         stage >= total - loops.length + 1 + i ? (
           <Villager

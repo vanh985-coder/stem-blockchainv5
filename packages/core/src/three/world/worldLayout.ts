@@ -243,14 +243,14 @@ export function reservedCenter(f: Pick<VillageFrame, 'dirX' | 'dirZ'>): { x: num
 }
 
 /**
- * Ba làng chưa dựng (Dệt, Khắc Dấu, Bạc) giữ phần tạm như bước W1 ở sát cổng (cổng, vài nhà, biển "Học cùng…"); phần còn lại của chỗ dành riêng bán kính 125 là ruộng lúa (mặt đất phủ rộng), đồi và tre:
+ * Hai làng chưa dựng (Khắc Dấu, Bạc; Làng Dệt đã dựng đủ từ mốc 3, bước L1) giữ phần tạm như bước W1 ở sát cổng (cổng, vài nhà, biển "Học cùng…"); phần còn lại của chỗ dành riêng bán kính 125 là ruộng lúa (mặt đất phủ rộng), đồi và tre:
  * mỗi làng 5 đồi nhỏ và 40 bụi tre rải ở phía xa cổng (cách hướng ra cổng từ 60° trở lên, tránh sông), dựng bằng đồ rải nhẹ (xem `scatter.ts`). Cùng `seed` cùng kết quả. Làng Giấy không có phần này
  * (đã dựng đủ, có đồi tre riêng).
  */
 export function wildlands(seed: number): ScatterPlacement[] {
   const out: ScatterPlacement[] = [];
   for (const f of VILLAGE_FRAMES) {
-    if (f.village === 'lang-giay') continue;
+    if (f.village === 'lang-giay' || f.village === 'lang-det') continue; // đã dựng đủ (có đồi tre riêng)
     const rng = createMulberry32(seed ^ 0x3c6ef372 ^ Math.round(f.yaw * 1000));
     const c = reservedCenter(f);
     const toGate = Math.atan2(-f.dirZ, -f.dirX);

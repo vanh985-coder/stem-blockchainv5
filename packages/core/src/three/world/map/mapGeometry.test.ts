@@ -24,11 +24,14 @@ describe('hình học phần tĩnh của bản đồ', () => {
     expect(geo.roads.some((r) => r.kind === 'dat')).toBe(true);
   });
 
-  it('viền làng: Làng Giấy đã dựng (nét liền, tâm 197, bán kính lũy tre), ba làng kia chưa dựng (nét đứt, bán kính chỗ dành 125)', () => {
-    const [giay, ...others] = geo.outlines;
-    expect(giay.built).toBe(true);
-    expect(Math.hypot(giay.cx, giay.cz)).toBeCloseTo(197, 6);
-    expect(giay.r).toBeCloseTo(122, 6);
+  it('viền làng: Làng Giấy và Làng Dệt đã dựng (nét liền, tâm 197, bán kính lũy tre), hai làng kia chưa dựng (nét đứt, bán kính chỗ dành 125)', () => {
+    const [giay, det, ...others] = geo.outlines;
+    for (const o of [giay, det]) {
+      expect(o.built).toBe(true);
+      expect(Math.hypot(o.cx, o.cz)).toBeCloseTo(197, 6);
+      expect(o.r).toBeCloseTo(122, 6);
+    }
+    expect(det.cz).toBeLessThan(0);
     for (const o of others) {
       expect(o.built).toBe(false);
       expect(o.r).toBe(125);

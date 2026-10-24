@@ -36,6 +36,13 @@ export function guideModelOf(village: Pick<WorldVillage, 'layout'>): string | nu
   return g ? `characters/${CHARACTERS[g.character].portrait}` : null;
 }
 
+/** Id model nhân vật của những người đứng yên thêm ở khu giữa làng (cô Chi...), không trùng người dẫn. */
+export function companionModelsOf(village: Pick<WorldVillage, 'layout'>): string[] {
+  const guide = guideModelOf(village);
+  const ids = (village.layout.companions ?? []).map((c) => `characters/${CHARACTERS[c.character].portrait}`);
+  return [...new Set(ids)].filter((id) => id !== guide);
+}
+
 /**
  * Chuẩn bị sẵn một vùng làng khi người chơi còn ở xa (rìa làng dưới `ZONE_PREWARM_DISTANCE`), để lúc vùng thật sự tải không có việc nặng nào còn lại (mốc 2, bước W2):
  * 1. tải và giải mã mọi model của làng (bản chính, vừa, xa) cùng model người dẫn, ở luồng phụ (meshopt) và qua mạng, không chặn khung hình;
@@ -54,8 +61,9 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
     const isCancelled = () => cancelled;
     const models = village.layout.models; // gồm cả model cổng (cổng chỉ vẽ bản xa cho tới khi làng được chuẩn bị)
     const guide = guideModelOf(village);
+    const companions = companionModelsOf(village);
     const groups = models.map((id) => ({ id, ids: instanceModelIds(id, level) }));
-    const allIds = [...new Set([...groups.flatMap((g) => g.ids), ...(guide ? [guide] : [])])];
+    const allIds = [...new Set([...groups.flatMap((g) => g.ids), ...(guide ? [guide] : []), ...companions])];
     for (const id of allIds) retainModel(id);
     const tasks: PartsPrewarm[] = [];
     const crafts: { kind: string; geometry: BufferGeometry; material: MeshStandardMaterial }[] = [];
@@ -123,6 +131,7 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
       }
       const scenes = [...loaded.entries()].filter(([id]) => id !== guide).map(([, d]) => d.scene);
       await warmTextures(gl, usableTextures(scenes), isCancelled);
+      if (!cancelled) for (const id of companions) markModelWarm(id);
       mark('done');
       if (!cancelled) done.current?.(village.id, true);
     };
@@ -143,6 +152,7 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
       }
       void scrollRes;
       if (guide) unmarkModelWarm(guide);
+      for (const id of companions) unmarkModelWarm(id);
       for (const id of allIds) releaseModel(id);
     };
   }, [village, level, gl, scene, camera]);

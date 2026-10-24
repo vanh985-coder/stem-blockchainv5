@@ -2,7 +2,7 @@
  * Hình học dựng bằng code cho đồ rải của làng lớn (bước X3): bụi tre, cây ăn quả, phên phơi giấy, cầu ao, đồi. Mỗi loại là MỘT hình học gộp (màu theo đỉnh) nên một draw call cho cả loại; nhẹ
  * (dưới 200 tam giác mỗi món). Chân ở y = 0. Khớp cỡ ở `SCATTER_SIZES` (có test). Thuần của three: không cần canvas hay GPU.
  */
-import { BoxGeometry, Color, CylinderGeometry, Float32BufferAttribute, IcosahedronGeometry, SphereGeometry, type BufferGeometry } from 'three';
+import { BoxGeometry, Color, CylinderGeometry, Float32BufferAttribute, IcosahedronGeometry, PlaneGeometry, SphereGeometry, type BufferGeometry } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { ScatterKind } from './scatter';
 
@@ -103,6 +103,57 @@ export function createHill(): BufferGeometry {
   return bare(new SphereGeometry(1, 16, 4, 0, Math.PI * 2, 0, Math.PI / 2));
 }
 
+/** Màu bốn tấm vải của sào phơi: đỏ, hồng, chàm, vàng. */
+const CLOTH = [0xe0463b, 0xf29ab8, 0x3d68c4, 0xf2c53d];
+const BERRY_LEAF = [0x6fa33e, 0x5e9232, 0x7bb047];
+
+/** Thêm thuộc tính `aSway` (độ đung đưa 0 đến 1 của từng đỉnh; bộ đổ bóng đỉnh của vật liệu sào vải đọc nó) cho cả hình học. */
+function withSway(g: BufferGeometry, value: (y: number) => number): BufferGeometry {
+  const pos = g.getAttribute('position');
+  const a = new Float32Array(pos.count);
+  for (let i = 0; i < pos.count; i++) a[i] = value(pos.getY(i));
+  g.setAttribute('aSway', new Float32BufferAttribute(a, 1));
+  return g;
+}
+
+/**
+ * Sào phơi vải: hai trụ tre cao 2,6 ở x = ±2,0, xà ngang dài 4,4 ở y = 2,5 và bốn tấm vải (đỏ, hồng, chàm, vàng) rộng 0,95 treo từ xà xuống, mỗi tấm dài một khác (1,5 đến 2,0), chia lưới 2 × 5 để lay được.
+ * `aSway` = 0 ở trụ và xà, tăng dần từ mép trên tới mép dưới của tấm vải (đầu dưới lay nhiều nhất). 116 tam giác. Vải hai mặt (vật liệu `DoubleSide`).
+ */
+export function createClothPole(): BufferGeometry {
+  const parts: BufferGeometry[] = [];
+  const stick = (w: number, h: number, d: number, x: number, y: number) => {
+    const g = bare(new BoxGeometry(w, h, d));
+    g.translate(x, y + h / 2, 0);
+    return withSway(g, () => 0);
+  };
+  for (const x of [-2, 2]) parts.push(paint(stick(0.1, 2.6, 0.1, x, 0), WOOD_DARK));
+  parts.push(paint(stick(4.4, 0.08, 0.08, 0, 2.46), WOOD));
+  const lengths = [1.9, 1.55, 2.0, 1.7];
+  const top = 2.46;
+  CLOTH.forEach((hex, i) => {
+    const len = lengths[i];
+    const g = bare(new PlaneGeometry(0.95, len, 2, 5));
+    g.translate(-1.5 + i, top - len / 2, 0);
+    parts.push(paint(withSway(g, (y) => Math.min(1, Math.max(0, (top - y) / len))), hex));
+  });
+  return merge(parts);
+}
+
+/**
+ * Luống dâu: hàng năm bụi dâu thấp (khối 20 mặt dẹt, bán kính 0,8, cao 0,95) cách nhau 1,3 dọc trục x, ba sắc xanh xen kẽ. Dài 6,4. 100 tam giác.
+ */
+export function createMulberryRow(): BufferGeometry {
+  const parts: BufferGeometry[] = [];
+  for (let k = 0; k < 5; k++) {
+    const g = bare(new IcosahedronGeometry(1, 0));
+    g.scale(0.8, 0.5, 0.8);
+    g.translate(-2.6 + k * 1.3, 0.45, 0);
+    parts.push(paint(g, BERRY_LEAF[k % BERRY_LEAF.length]));
+  }
+  return merge(parts);
+}
+
 export function createScatterGeometry(kind: ScatterKind): BufferGeometry {
   switch (kind) {
     case 'tre':
@@ -115,8 +166,12 @@ export function createScatterGeometry(kind: ScatterKind): BufferGeometry {
       return createPondJetty();
     case 'doi':
       return createHill();
+    case 'sao-vai':
+      return createClothPole();
+    case 'luong-dau':
+      return createMulberryRow();
   }
 }
 
 /** Loại có màu theo đỉnh (vật liệu `vertexColors`); đồi dùng nhân màu theo từng bản. */
-export const SCATTER_VERTEX_COLORS: Readonly<Record<ScatterKind, boolean>> = { tre: true, 'cay-qua': true, phen: true, 'cau-ao': true, doi: false };
+export const SCATTER_VERTEX_COLORS: Readonly<Record<ScatterKind, boolean>> = { tre: true, 'cay-qua': true, phen: true, 'cau-ao': true, doi: false, 'sao-vai': true, 'luong-dau': true };

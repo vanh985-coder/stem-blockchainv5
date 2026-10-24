@@ -3,6 +3,7 @@ import { decodeProgress, encodeProgress } from './compact';
 import {
   countKnowCards,
   effectiveKnowMask,
+  firstLevelIdOf,
   fullKnowMask,
   hasKnowCard,
   knowCardMaskOf,
@@ -14,6 +15,7 @@ import {
   withKnowCard,
 } from './knowCards';
 import { mergeProgress } from './merge';
+import { computeUnlock } from './unlock';
 import { emptyProgress } from './types';
 
 describe('thẻ Em có biết nhặt trong làng: cờ', () => {
@@ -117,5 +119,36 @@ describe('thẻ hiệu lực: người chơi từ trước coi như đủ', () =
   it('làng không có thẻ để nhặt thì coi là đủ; bit thừa ngoài total bị bỏ', () => {
     expect(knowCardsComplete({ ...base, total: 0 })).toBe(true);
     expect(effectiveKnowMask({ ...base, data: { knowCards: { 'lang-giay': 0b111111 } } })).toBe(15);
+  });
+});
+
+describe('Làng Dệt (mốc 3, bước L1): 4 thẻ rải, người chơi cũ không bị chặn', () => {
+  const base = { data: {} as Record<string, unknown>, village: 'lang-det' as const, total: 4, lessonDone: false, seenOld: false };
+  it('màn đầu của Làng Dệt là màn 4; tài khoản cũ đã xong màn 4 coi như đủ 4 thẻ, người mới thì phải nhặt', () => {
+    expect(firstLevelIdOf('lang-det')).toBe(4);
+    const done = computeUnlock({ doneLevels: [1, 2, 3, 4] });
+    const lessonDone = done.levels.find((l) => l.id === firstLevelIdOf('lang-det'))?.state === 'done';
+    expect(lessonDone).toBe(true);
+    expect(effectiveKnowMask({ ...base, lessonDone })).toBe(15);
+    expect(knowCardsComplete({ ...base, lessonDone })).toBe(true);
+    const fresh = computeUnlock({ doneLevels: [1, 2, 3] });
+    expect(fresh.levels.find((l) => l.id === 4)?.state).toBe('open');
+    expect(knowCardsComplete({ ...base, lessonDone: false })).toBe(false);
+  });
+  it('đã xem hộp cũ (knowSeen) của Làng Dệt cũng coi là đủ', () => {
+    expect(knowCardsComplete({ ...base, seenOld: true })).toBe(true);
+  });
+  it('thẻ nhặt ở Làng Dệt lưu riêng với Làng Giấy, gộp tài khoản không làm mất, cookie khách giữ đúng', () => {
+    let d: Record<string, unknown> = withKnowCard({}, 'lang-giay', 1);
+    d = withKnowCard(d, 'lang-det', 0);
+    d = withKnowCard(d, 'lang-det', 3);
+    expect(knowCardMaskOf(d, 'lang-det')).toBe(0b1001);
+    expect(knowCardMaskOf(d, 'lang-giay')).toBe(0b0010);
+    expect(knowCardsComplete({ ...base, data: d })).toBe(false);
+    const other = withKnowCard({}, 'lang-det', 1);
+    expect(knowCardMaskOf(mergeKnowCards(d, other), 'lang-det')).toBe(0b1011);
+    const p = emptyProgress();
+    p.game = { ...p.game, data: d, updatedAt: 3 };
+    expect(knowCardMaskOf(decodeProgress(encodeProgress(p)).game.data, 'lang-det')).toBe(0b1001);
   });
 });

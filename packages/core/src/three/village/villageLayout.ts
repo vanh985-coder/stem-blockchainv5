@@ -63,22 +63,24 @@ export interface VillageWall {
   center?: { x: number; z: number };
 }
 
-/** Ao làng: hợp của các vũng tròn (mỗi vũng một hình tròn mặt nước, đi vào là bị chặn), bờ cỏ rộng thêm `POND_BANK` quanh vũng. */
+/** Ao làng: hợp của các vũng tròn (mỗi vũng một hình tròn mặt nước, đi vào là bị chặn), bờ cỏ rộng thêm `POND_BANK` quanh vũng. `water`: màu nước (mã #rrggbb) của ao nhuộm; bỏ trống là nước ao thường. */
 export interface VillagePond {
   x: number;
   z: number;
   r: number;
+  water?: string;
 }
 /** Bề rộng bờ ao (đơn vị) quanh mặt nước. */
 export const POND_BANK = 1.3;
 
-/** Ruộng lúa ở rìa làng: hình chữ nhật nửa rộng hx (theo trục x của ruộng) và hz, xoay `yaw`; đi qua được (không có vật cản), chỉ là mặt đất. */
+/** Ruộng ở rìa làng: hình chữ nhật nửa rộng hx (theo trục x của ruộng) và hz, xoay `yaw`; đi qua được (không có vật cản), chỉ là mặt đất. `kind`: ruộng lúa (mặc định) hay ruộng dâu (đất nâu; luống dâu là đồ rải `luong-dau`). */
 export interface VillageField {
   x: number;
   z: number;
   hx: number;
   hz: number;
   yaw: number;
+  kind?: 'lua' | 'dau';
 }
 
 /** Hàng rào tre thẳng ngắn (rào sân nhà, ranh ruộng): có vật cản như hàng rào quanh làng. */
@@ -120,8 +122,10 @@ export interface VillageLayoutInput {
   boards: VillageBoardDef[];
   /** Người dẫn đứng yên; làng chưa dựng đủ (mốc 3) thì không có */
   guide?: VillageGuideDef;
-  /** Sân đất nện: hình tròn */
-  yards: { x: number; z: number; r: number }[];
+  /** Người đứng yên thêm ở khu giữa làng (ví dụ cô Chi bên cạnh cụ Bình): có vật cản tròn, không nói chuyện được (chỉ `guide` mới nói chuyện) */
+  companions?: VillageGuideDef[];
+  /** Sân: hình tròn, đất nện (mặc định) hay lát gạch (sân đình) */
+  yards: { x: number; z: number; r: number; kind?: 'dat' | 'gach' }[];
   roads: VillageRoad[];
   /** Hàng rào tre tròn quanh khu: bán kính; chừa lối quanh cổng (bán kính `gap` tính từ tâm cổng). Bỏ trống thì không có hàng rào. */
   fence?: { radius: number; gap: number; /** tâm vòng rào (mặc định gốc tọa độ; thế giới mở: tâm làng) */ center?: { x: number; z: number } };
@@ -183,6 +187,7 @@ export function assembleVillage(input: VillageLayoutInput): VillageLayout {
   }
   for (const b of input.boards) colliders.push(boardCollider(b));
   if (input.guide) colliders.push({ shape: circle(input.guide.x, input.guide.z, GUIDE_RADIUS), height: 1.7 });
+  for (const c of input.companions ?? []) colliders.push({ shape: circle(c.x, c.z, GUIDE_RADIUS), height: 1.7 });
   for (const p of input.ponds ?? []) colliders.push({ shape: circle(p.x, p.z, p.r), height: POND_COLLIDER_HEIGHT });
   for (const p of input.scatter ?? []) {
     const c = scatterCollider(p);

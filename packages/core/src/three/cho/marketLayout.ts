@@ -105,7 +105,7 @@ export interface Placement {
 }
 
 /** Đồ vật nhỏ do code dựng (chum vại, đống rơm, khóm hoa). */
-export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc' | 'coi-gia' | 'bep-do' | 'dinh';
+export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc' | 'coi-gia' | 'bep-do' | 'dinh' | 'chum-cham' | 'chum-do' | 'dong-soi' | 'gia-vai' | 'sao-soi';
 export interface PropPlacement {
   kind: PropKind;
   x: number;
@@ -209,6 +209,12 @@ export const PROP_SIZES: Readonly<Record<PropKind, PropSize>> = {
   'coi-gia': { r: Math.hypot(1.1, 0.45), h: 1.15, box: { hx: 1.1, hz: 0.45 } },
   'bep-do': { r: Math.hypot(1.0, 0.6), h: 1.9, box: { hx: 1.0, hz: 0.6 } },
   dinh: { r: Math.hypot(3.1, 2.5), h: 6, box: { hx: 3.1, hz: 2.5 } },
+  // xưởng nhuộm và khung cửi của Làng Dệt (mốc 3, bước L1): chum nhuộm (nước chàm, nước đỏ), đống sợi, giá cuộn vải, sào phơi sợi
+  'chum-cham': { r: 0.85, h: 1.0 },
+  'chum-do': { r: 0.85, h: 1.0 },
+  'dong-soi': { r: 0.85, h: 0.65 },
+  'gia-vai': { r: Math.hypot(1.1, 0.45), h: 1.55, box: { hx: 1.1, hz: 0.45 } },
+  'sao-soi': { r: Math.hypot(1.3, 0.25), h: 2.0, box: { hx: 1.3, hz: 0.25 } },
 };
 
 /** Vật cản của đồ nhỏ do code dựng: hình tròn hoặc hộp xoay sát hình; vật thấp (khóm hoa) và chi tiết dưới vật khác (chân giá) thì không có. */

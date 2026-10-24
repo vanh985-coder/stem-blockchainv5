@@ -221,7 +221,8 @@ describe('thẻ Em có biết trong đồ thị đường và đích mũi tên (
 
   it('mỗi thẻ có một nút chỗ đứng trong đồ thị, nối liền với đường làng', () => {
     for (let i = 0; i < 4; i++) expect(ids.has(`scroll:lang-giay:${i}`), `thẻ ${i}`).toBe(true);
-    expect(ids.has('scroll:lang-det:0')).toBe(false); // làng chưa dựng chưa có thẻ
+    for (let i = 0; i < 4; i++) expect(ids.has(`scroll:lang-det:${i}`), `thẻ Làng Dệt ${i}`).toBe(true);
+    expect(ids.has('scroll:lang-khac-dau:0')).toBe(false); // làng chưa dựng chưa có thẻ
   });
 
   it('mũi tên: trong làng còn thẻ thì dẫn tới thẻ; hết thẻ thì như cũ (biển màn tiếp, hoặc cổng); ngoài làng thì không dẫn tới thẻ', () => {

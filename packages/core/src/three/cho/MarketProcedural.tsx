@@ -288,7 +288,7 @@ export const toItem = (p: PropPlacement, extra: Partial<Item> = {}): Item => ({ 
  * Mỗi loại một InstancedMesh dùng chung geometry và material.
  */
 /** Đồ gợi nghề quanh cổng (bước 8d): hình dựng (`createCraftProp`) và màu vật liệu; màu từng món nhân thêm màu `tint` của bố cục (cuộn vải nhiều màu). */
-const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh'] as const;
+const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi'] as const;
 const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughness: number; vertexColors?: boolean }> = {
   giay: { color: '#EFE6CC', roughness: 1 },
   vai: { color: '#FFFFFF', roughness: 0.95 },
@@ -305,6 +305,11 @@ const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughne
   'coi-gia': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
   'bep-do': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
   dinh: { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'chum-cham': { color: '#FFFFFF', roughness: 0.8, vertexColors: true },
+  'chum-do': { color: '#FFFFFF', roughness: 0.8, vertexColors: true },
+  'dong-soi': { color: '#FFFFFF', roughness: 1, vertexColors: true },
+  'gia-vai': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
+  'sao-soi': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
 };
 
 /** Các loại đồ nhỏ do code dựng (kèm hình học và vật liệu) mà `MarketProps` vẽ: dùng cả để biên dịch trước shader (vật liệu màu theo đỉnh của đình, cối, bếp là chương trình shader mới). */

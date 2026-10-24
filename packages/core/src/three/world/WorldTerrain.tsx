@@ -57,15 +57,16 @@ function RoadStrip({ road, dirt, lateral, brick = null }: { road: WorldRoad & { 
   );
 }
 
-/** Sân đất nện: hình tròn mép mờ; ô đất lặp theo cỡ sân (mỗi ô ${YARD_TILE} đơn vị) để sân rộng không bị kéo giãn thành vằn lớn. */
+/** Sân đất nện hay sân lát gạch (sân đình): hình tròn mép mờ; ô đất lặp theo cỡ sân (mỗi ô ${YARD_TILE} đơn vị, gạch mỗi ô ${BRICK_TILE}) để sân rộng không bị kéo giãn thành vằn lớn. */
 const YARD_TILE = 6;
-function YardDisc({ yard, y, dirt, radial }: { yard: { x: number; z: number; r: number }; y: number; dirt: Texture | null; radial: Texture }) {
-  const rep = ((yard.r + 1.5) * 2) / YARD_TILE;
-  const map = useRepeated(dirt, rep, rep);
+function YardDisc({ yard, y, dirt, brick, radial }: { yard: { x: number; z: number; r: number; kind?: 'dat' | 'gach' }; y: number; dirt: Texture | null; brick: Texture | null; radial: Texture }) {
+  const isBrick = yard.kind === 'gach';
+  const rep = ((yard.r + 1.5) * 2) / (isBrick ? BRICK_TILE : YARD_TILE);
+  const map = useRepeated(isBrick ? brick : dirt, rep, rep);
   return (
     <mesh position={[yard.x, y, yard.z]} rotation-x={-Math.PI / 2} receiveShadow>
       <circleGeometry args={[yard.r + 1.5, 40]} />
-      <meshStandardMaterial key={map ? 'a' : 'b'} map={map ?? undefined} color={map ? DIRT_TINT : '#C9A064'} alphaMap={radial} transparent depthWrite={false} roughness={1} />
+      <meshStandardMaterial key={map ? 'a' : 'b'} map={map ?? undefined} color={map ? (isBrick ? BRICK_TINT : DIRT_TINT) : isBrick ? '#B98466' : '#C9A064'} alphaMap={radial} transparent depthWrite={false} roughness={1} />
     </mesh>
   );
 }
@@ -83,7 +84,7 @@ function VillageGround({ layout, dirt, brick, grass: grassBase, paddy, radial, l
         <meshStandardMaterial map={grass} roughness={1} />
       </mesh>
       {layout.fields?.map((q, i) => (
-        <Field key={`f${i}`} field={q} paddy={paddy} />
+        <Field key={`f${i}`} field={q} paddy={paddy} dirt={dirt} />
       ))}
       {layout.ponds?.map((p, i) => (
         <group key={`p${i}`} position={[p.x, 0, p.z]}>
@@ -93,12 +94,12 @@ function VillageGround({ layout, dirt, brick, grass: grassBase, paddy, radial, l
           </mesh>
           <mesh position-y={POND_Y + 0.008} rotation-x={-Math.PI / 2}>
             <circleGeometry args={[p.r, 40]} />
-            <meshStandardMaterial color={POND_WATER_COLOR} roughness={0.15} metalness={0.05} />
+            <meshStandardMaterial color={p.water ?? POND_WATER_COLOR} roughness={0.15} metalness={0.05} />
           </mesh>
         </group>
       ))}
       {layout.yards.map((y, i) => (
-        <YardDisc key={`y${i}`} yard={y} y={YARD_Y + i * 0.001} dirt={dirt} radial={radial} />
+        <YardDisc key={`y${i}`} yard={y} y={YARD_Y + i * 0.001} dirt={dirt} brick={brick} radial={radial} />
       ))}
       {layout.roads.map((r, i) => (
         <RoadStrip key={`r${i}`} road={r} dirt={dirt} brick={brick} lateral={lateral} />
@@ -108,9 +109,13 @@ function VillageGround({ layout, dirt, brick, grass: grassBase, paddy, radial, l
   );
 }
 
-/** Ruộng lúa: bờ ruộng đất nâu viền quanh, mặt ruộng xanh có hàng lúa (cùng hoa văn ruộng lúa phủ ngoài biên, lặp theo cỡ). Đi qua được. */
-function Field({ field: q, paddy }: { field: VillageField; paddy: Texture }) {
-  const map = useRepeated(paddy, (q.hx * 2) / 8, (q.hz * 2) / 8);
+/** Ruộng lúa: bờ ruộng đất nâu viền quanh, mặt ruộng xanh có hàng lúa (cùng hoa văn ruộng lúa phủ ngoài biên, lặp theo cỡ). Ruộng dâu (`kind: 'dau'`): mặt đất nâu, luống dâu là đồ rải. Đi qua được. */
+const MULBERRY_SOIL = '#A58E63';
+function Field({ field: q, paddy, dirt }: { field: VillageField; paddy: Texture; dirt: Texture | null }) {
+  const isMulberry = q.kind === 'dau';
+  const lua = useRepeated(paddy, (q.hx * 2) / 8, (q.hz * 2) / 8);
+  const soil = useRepeated(dirt, (q.hx * 2) / 6, (q.hz * 2) / 6);
+  const map = isMulberry ? soil : lua;
   return (
     <group position={[q.x, 0, q.z]} rotation-y={q.yaw}>
       <mesh position-y={FIELD_Y - 0.003} rotation-x={-Math.PI / 2} receiveShadow>
@@ -119,7 +124,7 @@ function Field({ field: q, paddy }: { field: VillageField; paddy: Texture }) {
       </mesh>
       <mesh position-y={FIELD_Y} rotation-x={-Math.PI / 2} receiveShadow>
         <planeGeometry args={[q.hx * 2, q.hz * 2]} />
-        <meshStandardMaterial map={map ?? undefined} color={map ? '#FFFFFF' : '#A9C95F'} roughness={1} />
+        <meshStandardMaterial map={map ?? undefined} color={isMulberry ? MULBERRY_SOIL : map ? '#FFFFFF' : '#A9C95F'} roughness={1} />
       </mesh>
     </group>
   );
