@@ -65,8 +65,9 @@ export const KITE_SPEC = {
   /** Bước mô phỏng cố định (giây): `stepKite` chia `dt` thành các bước này để kết quả không phụ thuộc tốc độ khung hình (tự chọn: 1/120) */
   tick: 1 / 120,
   /**
-   * Mốc điểm cả ván: Đồng, Bạc, Vàng (khai báo theo chuẩn màn 2, 3, 5, 8, 12). TẠM, chỉnh khi học sinh chơi thật. Đặt lại sau B8 theo phân vị của 300 ván mỗi bot ở luật hiện tại (5 tim): Đồng = p25 bot trung bình (240),
-   * Bạc = p75 bot trung bình (405), Vàng = p10 bot giỏi (425), làm tròn xuống bội số 10: 240 / 400 / 420. (Nếu Bạc ≥ Vàng thì Bạc = trung bình cộng của Đồng và Vàng, làm tròn xuống bội số 10; lần này không cần.)
+   * Mốc điểm cả ván: Đồng, Bạc, Vàng (khai báo theo chuẩn màn 2, 3, 5, 8, 12). TẠM, chỉnh khi học sinh chơi thật. Chọn ở bước B9 từ mô phỏng 300 ván mỗi bot của luật hiện tại (5 tim), Đồng giữ 240, xét Bạc ∈ {340, 360, 380, 400} và
+   * Vàng ∈ {440, 460, 480}: KHÔNG cặp nào thỏa cả "bot giỏi Vàng ≥ 85%" lẫn "bot trung bình Vàng ≤ 15%" (Vàng 440 cho bot giỏi 84,3% và bot trung bình 14,7%; Vàng 460 trở lên bot giỏi dưới 77%), cũng không cặp nào có bot giỏi Vàng ≥ 85%.
+   * Chọn Vàng 440 (gần đạt cả hai nhất) và Bạc 340 (Vàng − Bạc lớn nhất trong các cặp Vàng 440). Bảng đủ 12 cặp ở spec 06.
    */
-  medals: [240, 400, 420] as const,
+  medals: [240, 340, 440] as const,
 } as const;

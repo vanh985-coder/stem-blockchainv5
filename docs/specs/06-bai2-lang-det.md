@@ -247,10 +247,10 @@ Lớp đồi xa và tre gần phải có phần trời trong suốt (spec 01 m�
 | Mốc | Điểm |
 |---|---|
 | Đồng | 240 |
-| Bạc | 400 |
-| Vàng | 420 |
+| Bạc | 340 |
+| Vàng | 440 |
 
-Mốc TẠM, chỉnh khi học sinh chơi thật (đặt lại sau B8 theo phân vị của bot; mốc ban đầu của spec là 150 / 260 / 360).
+Mốc TẠM, chỉnh khi học sinh chơi thật (chọn ở bước B9 từ mô phỏng bot, xem bảng các cặp ở mục "Logic màn 6"; mốc ban đầu của spec là 150 / 260 / 360).
 
 **Test (`kiteLogic.ts`):**
 
@@ -286,7 +286,7 @@ Mốc TẠM, chỉnh khi học sinh chơi thật (đặt lại sau B8 theo phân
    - **Lý do:** ván ngẫu nhiên thuần có nhiều cặp khe liền nhau không thể qua (nhất là khe có diều đen ở tốc độ cao), nên ván có thể không thể thắng dù chơi hoàn hảo; trước đó người chơi lý tưởng bế tắc ở nhiều seed.
    - **Số liệu bộ sinh cũ (300 ván × 23 cặp = 6900 cặp):** lần sinh đầu tiên không qua được ở **558 khe (8,1%)**; tổng **668 lần sinh lại**; **0 khe** phải bỏ diều đen hay kéo tâm (mọi khe qua được trong 20 lần sinh lại); kiểm lại sau khi sinh xong: 0 cặp không qua được. Hệ quả phụ: tỉ lệ khe có diều đen còn khoảng 31,6% (diều đen làm cặp khó qua nên bị loại nhiều hơn).
 2. **Độ khó: phương án A, 5 tim (trước là 3).** Thử lần lượt A, B, C và dừng ở phương án ĐẦU TIÊN đạt mục tiêu (bot trung bình qua trung bình ≥ 2 cổng VÀ bot giỏi qua đủ 4 cổng ≥ 70%); mô hình bot giữ nguyên (kể cả margin 0,5). Với bộ sinh mới và 3 tim thì bot trung bình chỉ 1,69 cổng và bot giỏi 42,3% ván qua đủ 4 cổng; A đạt cả hai nên **dừng ở A, B (khe nhỏ nhất 2,8) và C (tốc độ tối đa 5,5) không thử trong lần chốt này, và không dùng.**
-3. **Mốc điểm đặt lại theo phân vị (TẠM, chỉnh khi học sinh chơi thật):** Đồng = p25 bot trung bình (240), Bạc = p75 bot trung bình (405 → 400), Vàng = p10 bot giỏi (425 → 420), làm tròn xuống bội số 10; Bạc < Vàng nên không cần dùng nhánh "trung bình cộng". **Mốc `medals`: 240 / 400 / 420.**
+3. **Mốc điểm (TẠM, chỉnh khi học sinh chơi thật), chọn lại ở B9:** sau B8 đặt theo phân vị là 240 / 400 / 420 (bot trung bình Vàng 21,3%); ở B9 chọn lại bằng mô phỏng 300 ván mỗi bot, không đổi luật: Đồng giữ 240, xét 12 cặp Bạc × Vàng (bảng bên dưới). **Mốc `medals`: 240 / 340 / 440.**
 
 **Test thêm so với bảng spec** (`kiteLogic.test.ts`): chênh tâm hai khe liền nhau ≤ 3,0; diều đen luôn chừa ≥ 1,4 ở mọi thời điểm (lấy mẫu 0,01 giây, hơn 1000 diều đen); mất tim thì bất tử đúng 1 giây và đặt lại giữa khe kế tiếp; câu hỏi dừng mọi chuyển động; điểm một ván mẫu tính đúng công thức; cùng seed cùng ván; dt 1/30, 1/60, 1/144 (và 0,01, 0,0333) cho cùng kết quả; thống kê diều đen và trang; `passable` trả false cho cặp khe cố ý không thể qua (tâm chênh 6 khi tốc độ 6,5) và true cho cặp dễ; mọi cặp khe của 300 ván đều qua được (và số khe sinh lại đúng như ghi ở trên); người chơi lý tưởng.
 
@@ -298,11 +298,30 @@ Mốc TẠM, chỉnh khi học sinh chơi thật (đặt lại sau B8 theo phân
 |---|---|---|---|---|---|---|---|---|---|---|
 | Hiện tại (3 tim), mốc 140 / 200 / 260 theo quy tắc | giỏi | 0,3% | 4,3% | 4,0% | 91,3% | 401,0 (125 đến 530) | 20,53 | 3,14 | **42,3%** | 2,26 |
 | | trung bình | 21,7% | 27,7% | 19,0% | 31,7% | 217,5 (40 đến 515) | 12,96 | **1,69** | 2,3% | 2,51 |
-| **A (5 tim), mốc 240 / 400 / 420** | giỏi | 0,3% | 4,7% | 3,0% | **92,0%** | 474,6 (195 đến 530) | 23,66 | 3,89 | **89,0%** | 2,64 |
-| | trung bình | 22,0% | 51,3% | 5,3% | **21,3%** | 322,2 (105 đến 515) | 18,55 | **2,74** | 15,3% | 3,96 |
+| **A (5 tim), mốc 240 / 340 / 440** | giỏi | 0,3% | 1,0% | 14,3% | **84,3%** | 474,6 (195 đến 530) | 23,66 | 3,89 | **89,0%** | 2,64 |
+| | trung bình | 22,0% | 35,0% | 28,3% | **14,7%** | 322,2 (105 đến 515) | 18,55 | **2,74** | 15,3% | 3,96 |
 
 - **Mục tiêu độ khó: đạt ở A** (bot trung bình 2,74 cổng ≥ 2; bot giỏi qua đủ 4 cổng 89,0% ≥ 70%; tính cả ván qua cổng 4 rồi hết tim thì 90,0%).
-- **Bot giỏi Vàng 92,0% ≥ 85%: đạt. Bot trung bình Vàng 21,3% > 15%: CHƯA ĐẠT.** Nguyên nhân: p75 bot trung bình (405) sát p10 bot giỏi (425), nên mốc Vàng theo quy tắc phân vị cho 21% bot trung bình đạt Vàng. Theo lời giao không đổi thêm gì; test ghi đúng số này.
+- **Mốc (B9):** bot giỏi Vàng 84,3% (< 85%: CHƯA ĐẠT, thiếu 0,7 điểm phần trăm), bot trung bình Vàng 14,7% (≤ 15%: đạt). Không cặp nào trong bảng thỏa cả hai điều kiện; xem bảng các cặp bên dưới. Test ghi đúng các số này.
+
+**Chọn lại mốc ở B9 (luật A, 300 ván mỗi bot, Đồng 240).** Điều kiện: bot giỏi Vàng ≥ 85%, bot trung bình Vàng ≤ 15%, Vàng − Bạc ≥ 60; nhiều cặp thỏa thì chọn Vàng − Bạc lớn nhất; không cặp nào thỏa thì chọn cặp có bot trung bình Vàng nhỏ nhất trong các cặp có bot giỏi Vàng ≥ 85%. **Không cặp nào có bot giỏi Vàng ≥ 85%** (cao nhất 84,3% ở Vàng 440), nên cả hai nhánh đều rỗng; chọn cặp gần đạt nhất: Vàng 440 (bot giỏi 84,3%, bot trung bình 14,7%) và Bạc 340 (Vàng − Bạc lớn nhất trong các cặp Vàng 440).
+
+| Bạc | Vàng | Vàng − Bạc | Bot giỏi Vàng | Bot trung bình Vàng | Thỏa |
+|---|---|---|---|---|---|
+| **340** | **440** | **100** | **84,3%** | **14,7%** | chọn (gần đạt nhất) |
+| 340 | 460 | 120 | 76,3% | 10,3% | không |
+| 340 | 480 | 140 | 68,0% | 8,7% | không |
+| 360 | 440 | 80 | 84,3% | 14,7% | không |
+| 360 | 460 | 100 | 76,3% | 10,3% | không |
+| 360 | 480 | 120 | 68,0% | 8,7% | không |
+| 380 | 440 | 60 | 84,3% | 14,7% | không |
+| 380 | 460 | 80 | 76,3% | 10,3% | không |
+| 380 | 480 | 100 | 68,0% | 8,7% | không |
+| 400 | 440 | 40 | 84,3% | 14,7% | không (Vàng − Bạc < 60) |
+| 400 | 460 | 60 | 76,3% | 10,3% | không |
+| 400 | 480 | 80 | 68,0% | 8,7% | không |
+
+Tỉ lệ Vàng chỉ phụ thuộc Vàng (không phụ thuộc Bạc), nên mọi cặp cùng Vàng có cùng hai số Vàng; Bạc chỉ chia lại Đồng và Bạc.
 - **Độ nhạy theo bot:** margin 0 (đúng chữ "dự đoán rơi dưới tâm") cho kết quả kém hơn nhiều so với margin 0,5 (xem lần trước: bot giỏi 192,8 điểm, 1,32 cổng ở luật cũ). Mốc là TẠM vì phụ thuộc cách chọn bot.
 - **Điểm tối đa lý thuyết:** 24 khe × 10 + 24 trang × 5 + 4 câu × 50 = **560**; thực tế mỗi khe chỉ có trang 60% nên tối đa của từng seed chừng 512 (trung bình seed 1 đến 300: 511,9; lớn nhất 540). Điểm lớn nhất của bot giỏi: 530.
 

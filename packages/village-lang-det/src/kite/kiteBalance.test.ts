@@ -11,12 +11,12 @@ import { createKiteGame, scoreOf } from './kiteLogic';
  *   (hiện tại, 3 tim)  bot giỏi 3,14 cổng, 42,3% qua đủ 4 cổng; bot trung bình 1,69 cổng → chưa đạt;
  *   A. 5 tim           bot giỏi 3,89 cổng, 89,0% qua đủ 4 cổng; bot trung bình 2,74 cổng → ĐẠT (dừng ở A; B và C không thử).
  *
- * Mốc theo phân vị (TẠM, chỉnh khi học sinh chơi thật): Đồng = p25 bot trung bình (240), Bạc = p75 bot trung bình (405 → 400), Vàng = p10 bot giỏi (425 → 420), làm tròn xuống bội số 10: 240 / 400 / 420.
- * Bot giỏi Vàng 92,0% (đạt ≥ 85%). Bot trung bình Vàng 21,3% (CHƯA đạt ≤ 15%: p75 bot trung bình = 405 sát p10 bot giỏi = 425, nên không mốc nào theo quy tắc này tách được; báo số liệu, không đổi thêm).
+ * Mốc (TẠM, chỉnh khi học sinh chơi thật): chọn ở B9 trong các cặp Bạc ∈ {340, 360, 380, 400}, Vàng ∈ {440, 460, 480} (Đồng giữ 240) theo điều kiện bot giỏi Vàng ≥ 85%, bot trung bình Vàng ≤ 15%, Vàng − Bạc ≥ 60.
+ * KHÔNG cặp nào thỏa (bot giỏi chỉ tới 84,3% ở Vàng 440), nên chọn cặp gần đạt nhất: Vàng 440 (bot giỏi 84,3% CHƯA đạt 85%, bot trung bình 14,7% đạt ≤ 15%) và Bạc 340: mốc 240 / 340 / 440.
  *
- * Kết quả đã chạy (mốc 240 / 400 / 420, 5 tim):
- *  - bot giỏi (trễ 0,08 giây, σ 0,03, đúng 95%): điểm trung bình 474,6 (195 đến 530); chưa đạt 0,3%, Đồng 4,7%, Bạc 3,0%, Vàng 92,0%; qua trung bình 23,66 khe, 3,89 cổng; thắng (đủ 4 cổng) 89,0% ván; mất 2,64 tim;
- *  - bot trung bình (trễ 0,18 giây, σ 0,08, đúng 70%): điểm trung bình 322,2 (105 đến 515); chưa đạt 22,0%, Đồng 51,3%, Bạc 5,3%, Vàng 21,3%; qua trung bình 18,55 khe, 2,74 cổng; thắng 15,3% ván; mất 3,96 tim.
+ * Kết quả đã chạy (mốc 240 / 340 / 440, 5 tim):
+ *  - bot giỏi (trễ 0,08 giây, σ 0,03, đúng 95%): điểm trung bình 474,6 (195 đến 530); chưa đạt 0,3%, Đồng 1,0%, Bạc 14,3%, Vàng 84,3%; qua trung bình 23,66 khe, 3,89 cổng; thắng (đủ 4 cổng) 89,0% ván; mất 2,64 tim;
+ *  - bot trung bình (trễ 0,18 giây, σ 0,08, đúng 70%): điểm trung bình 322,2 (105 đến 515); chưa đạt 22,0%, Đồng 35,0%, Bạc 28,3%, Vàng 14,7%; qua trung bình 18,55 khe, 2,74 cổng; thắng 15,3% ván; mất 3,96 tim.
  * Đổi cấu hình hay bot thì chạy lại và cập nhật các con số này.
  */
 describe('cân bằng màn 6', () => {
@@ -52,25 +52,36 @@ describe('cân bằng màn 6', () => {
     expect(good.complete / good.games).toBeCloseTo(0.89, 2);
   });
 
-  it('bot giỏi Vàng ≥ 85%', () => {
-    expect(good.medals.vang / good.games).toBeGreaterThanOrEqual(0.85);
+  it('bot giỏi Vàng ≥ 85%: CHƯA ĐẠT (84,3%, thiếu 0,7 điểm phần trăm), báo số liệu', () => {
+    const vang = good.medals.vang / good.games;
+    expect(vang).toBeCloseTo(0.8433, 3);
+    expect(vang).toBeLessThan(0.85);
   });
 
-  it('bot trung bình Vàng ≤ 15%: CHƯA ĐẠT (21,3%), báo số liệu, không đổi thêm gì', () => {
+  it('bot trung bình Vàng ≤ 15%', () => {
     const vang = avg.medals.vang / avg.games;
-    expect(vang).toBeCloseTo(0.2133, 3);
-    expect(vang).toBeGreaterThan(0.15);
+    expect(vang).toBeLessThanOrEqual(0.15);
+    expect(vang).toBeCloseTo(0.1467, 3);
   });
 
-  it('mốc đặt theo phân vị: Đồng = p25 và Bạc = p75 của bot trung bình, Vàng = p10 của bot giỏi (bội số 10); Đồng < Bạc < Vàng', () => {
-    const floorTo = (x: number, unit: number) => Math.floor(x / unit) * unit;
-    expect(percentile(avg.scores, 0.25)).toBe(240);
-    expect(percentile(avg.scores, 0.75)).toBe(405);
-    expect(percentile(good.scores, 0.1)).toBe(425);
-    expect([...medals]).toEqual([floorTo(percentile(avg.scores, 0.25), 10), floorTo(percentile(avg.scores, 0.75), 10), floorTo(percentile(good.scores, 0.1), 10)]);
-    expect([...medals]).toEqual([240, 400, 420]);
+  it('chọn mốc: 12 cặp (Bạc 340 đến 400, Vàng 440 đến 480, Đồng 240) không cặp nào thỏa cả bot giỏi Vàng ≥ 85%, bot trung bình Vàng ≤ 15% và Vàng − Bạc ≥ 60; chọn cặp gần đạt nhất (Vàng 440, Bạc 340)', () => {
+    const share = (b: typeof good, x: number) => b.scores.filter((v) => v >= x).length / b.games;
+    const ok: number[][] = [];
+    let bestGood = 0;
+    for (const bac of [340, 360, 380, 400]) {
+      for (const vang of [440, 460, 480]) {
+        bestGood = Math.max(bestGood, share(good, vang));
+        if (share(good, vang) >= 0.85 && share(avg, vang) <= 0.15 && vang - bac >= 60) ok.push([bac, vang]);
+      }
+    }
+    expect(ok).toEqual([]);
+    expect(bestGood).toBeCloseTo(0.8433, 3);
+    expect(share(good, 460)).toBeLessThan(0.77);
+    expect([...medals]).toEqual([240, 340, 440]);
     expect(medals[0]).toBeLessThan(medals[1]);
     expect(medals[1]).toBeLessThan(medals[2]);
+    expect(medals[2] - medals[1]).toBeGreaterThanOrEqual(60);
+    expect(percentile(avg.scores, 0.25)).toBe(240);
   });
 
   it('mô phỏng tất định: cùng seed, cùng hồ sơ bot thì cùng kết quả', () => {
@@ -100,7 +111,7 @@ describe('cân bằng màn 6', () => {
     expect(good.mean).toBeCloseTo(474.55, 1);
     expect(good.min).toBe(195);
     expect(good.max).toBe(530);
-    expect(good.medals).toEqual({ chua: 1, dong: 14, bac: 9, vang: 276 });
+    expect(good.medals).toEqual({ chua: 1, dong: 3, bac: 43, vang: 253 });
     expect(good.meanGates).toBeCloseTo(3.89, 2);
     expect(good.meanGaps).toBeCloseTo(23.66, 2);
     expect(good.complete).toBe(267);
@@ -108,7 +119,7 @@ describe('cân bằng màn 6', () => {
     expect(avg.mean).toBeCloseTo(322.2, 1);
     expect(avg.min).toBe(105);
     expect(avg.max).toBe(515);
-    expect(avg.medals).toEqual({ chua: 66, dong: 154, bac: 16, vang: 64 });
+    expect(avg.medals).toEqual({ chua: 66, dong: 105, bac: 85, vang: 44 });
     expect(avg.meanGaps).toBeCloseTo(18.55, 2);
     expect(avg.complete).toBe(46);
     expect(avg.meanHits).toBeCloseTo(3.96, 2);
