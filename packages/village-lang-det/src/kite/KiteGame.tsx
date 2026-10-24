@@ -6,7 +6,7 @@ import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
 import { KITE_SPEC as C } from './kiteConfig';
 import { useKiteTextures } from './kiteArt';
 import { hintFor } from './kiteHint';
-import { SHAKE_SECONDS } from './kiteLayout';
+import { SHAKE_SECONDS, gateCounter } from './kiteLayout';
 import { answerGate, createKiteGame, flap, tickKite, type GateResult, type KiteEvent } from './kiteLogic';
 import { KiteStage, createView, type KiteView } from './KiteStage';
 
@@ -59,7 +59,7 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
   const forced = useMemo(forcedQuality, []);
   const state = useMemo(() => createKiteGame(newSeed()), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
   // 4 câu hỏi ôn Bài 1 và 2 cho 4 cổng (không lặp, đã trộn thứ tự đáp án; cách chọn như màn 5)
-  const questions = useMemo(() => pickQuestions({ bai: [1, 2], soCau: state.gateAfter.length, seed: state.seed }), [state]);
+  const questions = useMemo(() => pickQuestions({ bai: [1, 2], soCau: gateCounter(0).max, seed: state.seed }), [state]);
   const view = useRef<KiteView>(createView(state, reduced));
   const viewKey = useRef(state);
   if (viewKey.current !== state) {
@@ -269,7 +269,7 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
                   <PageIcon />
                   {state.pages}
                 </span>
-                <span data-testid="cong">{fmt(kiteUi.cong, { so: state.gatesDone, max: state.gateAfter.length })}</span>
+                <span data-testid="cong">{fmt(kiteUi.cong, gateCounter(state.gatesDone))}</span>
                 <span data-testid="diem">{fmt(kiteUi.diem, { so: state.score })}</span>
               </div>
             </div>
@@ -289,7 +289,7 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
             {quiz && question && (
               <div data-kite-ui className="absolute inset-y-1 right-1 z-20 flex w-[45%] min-w-[15rem] flex-col gap-1" data-testid="cong-cau-hoi" onPointerDown={(e) => e.stopPropagation()}>
                 <div className="shrink-0 rounded-nut bg-giay/95 px-2 py-0.5 pr-12">
-                  <p className="text-center font-display text-sm font-bold leading-snug">{fmt(kiteUi.cauHoi, { so: quiz.index + 1, max: state.gateAfter.length })}</p>
+                  <p className="text-center font-display text-sm font-bold leading-snug">{fmt(kiteUi.cauHoi, { so: quiz.index + 1, max: gateCounter(0).max })}</p>
                   {quiz.answered === null && (
                     <div className="flex items-center gap-2">
                       <p className="shrink-0 text-sm font-semibold" data-testid="con-gio">

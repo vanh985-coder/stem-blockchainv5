@@ -142,6 +142,12 @@ export function bookProgress(t: number): number {
 /** Độ mở cửa (0 đến 1) lúc `t` giây */
 export const doorOpen = (t: number): number => Math.min(1, Math.max(0, t / DOOR_OPEN));
 
+/** Số cổng và số cổng đã qua cho HUD ("Cổng n/4"): tổng lấy từ cấu hình, không từ trạng thái ván (trạng thái có thể bị đổi khi thử nghiệm), n không vượt tổng */
+export function gateCounter(gatesDone: number): { so: number; max: number } {
+  const max = C.gates.after.length;
+  return { so: Math.min(Math.max(0, gatesDone), max), max };
+}
+
 /** Số ô pool của cảnh (cột theo cặp, trang, diều đen): đủ cho mọi khe có thể nằm trong khung cộng một khe mỗi phía */
 export const POOL = { gaps: 6 } as const;
 /** Khoảng x (đơn vị bay) mà các khe được dựng: trong khung cộng nửa khe mỗi phía (để cột không hiện đột ngột ở mép) */

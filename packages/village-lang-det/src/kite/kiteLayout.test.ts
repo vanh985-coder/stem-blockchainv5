@@ -18,6 +18,7 @@ import {
   blackSprite,
   bookProgress,
   doorOpen,
+  gateCounter,
   gateSprite,
   invOpacity,
   kiteSprite,
@@ -34,6 +35,13 @@ import {
 } from './kiteLayout';
 
 describe('bố cục cảnh màn 6 (kiteLayout.ts)', () => {
+  it('HUD cổng luôn là n/4: tổng không phụ thuộc trạng thái ván, n nằm trong [0, 4]', () => {
+    expect(gateCounter(0)).toEqual({ so: 0, max: 4 });
+    expect(gateCounter(3)).toEqual({ so: 3, max: 4 });
+    expect(gateCounter(9)).toEqual({ so: 4, max: 4 });
+    expect(gateCounter(-1)).toEqual({ so: 0, max: 4 });
+  });
+
   it('đổi đơn vị bay sang thế giới: vùng bay 0 tới 10 phủ đúng chiều cao khung, diều đứng ở KITE_SCREEN_X', () => {
     expect(UNIT).toBeCloseTo(0.9, 9);
     expect(worldY(C.floor)).toBeCloseTo(-FRAME.height / 2, 9);
