@@ -192,6 +192,31 @@ Logic đặt trong `chickenLogic.ts` (hàm thuần, có test).
 | Gà chạy tới cổng | Mất 1 tim |
 | Nạp đạn | Chỉ cho bắt đầu khi mọi nhãn đều đúng |
 
+### Chốt cho logic (mốc 3, bước B10; code ở `packages/village-lang-khac-dau/src/chicken/`; chưa có cảnh, màn 9 vẫn coming-soon)
+
+`chickenConfig.ts` (số liệu, `chickenVariant` cho các phương án độ khó), `chickenLogic.ts` (hàm thuần: `createChickenGame`, `dropLabel`, `startWave`, `selectMedicine`, `shoot`, `stepChicken(s, dt)` bước cố định 1/120 giây, `tickChicken`, `chickenScore`), `chickenBots.ts` (bot cân bằng, chỉ dùng trong test), `chickenLogic.test.ts` (26 ca), `chickenBalance.test.ts` (11 ca), `index.ts`. Mẫu công khai luôn tính bằng `publicKey` của bài 3 (`lessons/bai-3/logic`), không viết lại công thức. Mọi số ngẫu nhiên từ `createMulberry32(seed)`: ba lần nạp đạn và dãy thẻ của gà trùm rút SẴN khi tạo ván; số ngẫu nhiên khi sinh gà (làn rồi thẻ, hai số mỗi con) chỉ rút lúc sinh, nên chuỗi gà không phụ thuộc người chơi bắn thế nào.
+
+**Chốt trong lời giao B10 (spec chưa nói):**
+- Làn dài 10 đơn vị (0 là cuối đường, 10 là cổng làng), 3 làn.
+- Gà chạy từ 0 tới cổng: đợt 1 là 9 giây, đợt 2 là 7 giây, đợt 3 là 6 giây; gà trùm 14 giây. Nhịp sinh 1,6 / 1,3 / 1,1 giây (con đầu sau đúng một nhịp: tự chọn); không sinh vào làn có con gần cuối đường nhất còn dưới 1,5 (làn nào cũng vướng thì thử lại bước sau, không rút số ngẫu nhiên). Hết đợt khi đã sinh đủ và không còn gà thường trên đường; rồi sang nạp đạn đợt sau, hoặc gà trùm sau đợt 3.
+- Bắn: chọn thuốc (mặc định thuốc 1) rồi chọn một con gà; viên thuốc LUÔN trúng con đã chọn, bay 0,4 giây, xét kết quả lúc tới (so `publicKey(khuôn của thuốc lúc bắn)` với thẻ lúc viên thuốc tới); gà đã tới cổng (hay đã được chữa) trước đó thì phát đó không tính (không trừ, không cộng; tính vào `voidShots`). Giữa hai phát tối thiểu 0,35 giây. Gà tới cổng cùng bước với viên thuốc thì cổng xét trước (phát không tính).
+- Gà trùm ở làn giữa, cần chữa đúng 3 lần; mỗi lần chữa đúng không có điểm riêng (điểm tối đa 750 chỉ tính 30 gà thường) và thẻ đổi sang số KHÁC thẻ liền trước, trong bộ mẫu công khai của đợt 3 (10, 8, 17, 11); chữa đủ 3 lần thì +60 và hết ván (`complete`). Phát sai vào trùm vẫn −5 và không mất lần chữa. Trùm tới cổng mà chưa chữa xong: mất 1 tim và hết ván (`boss`, không +60). Hết tim cũng hết ván (`hearts`).
+- Nạp đạn (trước mỗi đợt, không tính giờ): mỗi thuốc 1 nhãn đúng (= `publicKey` của khuôn) cùng 2 nhãn nhiễu CHO CẢ ĐỢT (không phải mỗi thuốc 2 nhãn): một nhãn BẪY bằng chính số khuôn của một thuốc trong đợt (chọn trong các khuôn không trùng mẫu công khai nào của đợt) và một nhãn là mẫu công khai của một khuôn ngoài đợt; nhãn nhiễu không trùng mẫu công khai nào của đợt và các nhãn khác nhau. Kéo nhãn vào thuốc sai (kể cả nhãn nhiễu, và nhãn đúng vào thuốc khác) thì nhãn bật ra và đợt đó mất thưởng 30; xong khi mọi nhãn đúng đã nằm đúng thuốc (nhãn nhiễu để lại khay), rồi `startWave`. Thưởng 30 cộng lúc đợt bắt đầu.
+- Điểm = gà chữa được × 20 − 5 × phát sai + 30 × số đợt nạp không sai + 60 nếu chữa xong trùm; hiển thị không âm (`chickenScore`). Tối đa 30 × 20 + 3 × 30 + 60 = **750**. 3 tim.
+
+**Test thêm so với bảng spec** (`chickenLogic.test.ts`): nhãn nạp đạn mỗi đợt (đủ nhãn đúng, đúng 1 nhãn bẫy bằng số khuôn, 1 nhãn khuôn ngoài đợt, nhãn nhiễu không trùng mẫu công khai của đợt; 500 seed); đợt chỉ bắt đầu khi mọi nhãn đúng đã nạp, nạp sai một lần thì mất thưởng 30; gà trùm đổi thẻ sau mỗi lần chữa đúng (thẻ mới khác thẻ cũ, thuộc bộ đợt 3), tới cổng thì hết ván; viên thuốc bay 0,4 giây, gà tới cổng trước thì phát đó không tính; khoảng cách tối thiểu 0,35 giây; tốc độ và nhịp sinh từng đợt đúng số chốt; cùng seed cùng ván; dt 1/30, 1/60, 1/144 cho cùng kết quả; tạm dừng không đổi gì; người chơi hoàn hảo đúng 750 điểm.
+
+**Cân bằng (`chickenBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300).** Bot bắn con gà gần cổng nhất trước (không nhắm con đã có viên thuốc đang bay tới), chỉ dùng thao tác của học sinh. Bot giỏi: nghĩ 0,4 giây mỗi phát, đúng thuốc 98%, nạp không sai ở 90% số đợt. Bot trung bình: 0,8 giây mỗi phát, đúng thuốc 85%, nạp sai một lần ở 50% số đợt.
+
+| Bot | Chưa đạt | Đồng | Bạc | Vàng | Điểm TB (nhỏ nhất đến lớn nhất) | Tới trùm | Chữa xong trùm | Tim mất TB | Phát sai TB | Đợt nạp không sai TB |
+|---|---|---|---|---|---|---|---|---|---|---|
+| lý tưởng | 0% | 0% | 0% | 100% | 750 (750 đến 750) | 100% | 100% | 0 | 0 | 3,00 |
+| giỏi | 0% | 1,3% | 2,3% | **96,3%** | 737,4 (675 đến 750) | 100% | 100% | 0 | 0,8 | 2,71 |
+| trung bình | 23,7% | 43,3% | 21,7% | 11,3% | 671,3 (590 đến 750) | **100%** | 100% | 0 | 6,4 | 1,45 |
+
+- **Độ khó:** mục tiêu là bot giỏi Vàng ≥ 85% và bot trung bình tới được gà trùm ≥ 60%. Luật gốc đạt cả hai (bot trung bình tới trùm 100%), nên **không dùng phương án A, B, C** (A: gà chậm hơn 20% mọi đợt; B: A + 4 tim; C: B + nhịp sinh giãn 20%; `chickenVariant`, đã có test cấu hình). Cả hai bot không mất tim nào trong 300 ván: ván dễ về mặt sống sót, độ khó nằm ở điểm (phát sai, nạp sai).
+- **Mốc (TẠM, chỉnh khi học sinh chơi thật):** mốc spec 300 / 500 / 700 cho bot giỏi Vàng 97,0% (291 ván) nhưng bot trung bình cũng Vàng 22,3% (67 ván, quá 15%), nên đặt lại theo quy tắc màn 6: Đồng = phân vị 25% điểm bot trung bình (650), Bạc = phân vị 75% (695), Vàng = phân vị 10% điểm bot giỏi (715), làm tròn xuống bội số 10: **650 / 690 / 710** (`CHICKEN_SPEC.medals`). Với mốc này bot giỏi Vàng 96,3%, bot trung bình Vàng 11,3%. Vì điểm tối đa 750 và gần như mọi ván chữa hết 30 gà (600 điểm), ba mốc dồn trong khoảng 650 tới 710.
+
 ## Kết thúc làng
 
 - Chú Dũng trao **Trang Sổ Vàng thứ ba**.
