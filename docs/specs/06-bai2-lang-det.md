@@ -262,7 +262,7 @@ Mốc TẠM, chỉnh khi học sinh chơi thật (chọn ở bước B9 từ mô
 | Diều đen | Không xuất hiện trước khe 8; luôn chừa khoảng trống ≥ 1,4 |
 | Cổng làng | Ở sau khe 6, 12, 18, 24; qua cổng thứ 4 là thắng |
 
-### Logic màn 6 (mốc 3, bước B8 và sửa sau B8; code ở `packages/village-lang-det/src/kite/`, chưa có cảnh, màn 6 vẫn coming-soon)
+### Logic màn 6 (mốc 3, bước B8 và sửa sau B8; code ở `packages/village-lang-det/src/kite/`; cảnh và giao diện ở bước B9, xem mục "Cảnh màn 6")
 
 `kiteConfig.ts` (số liệu), `kiteLogic.ts` (hàm thuần: `createKiteGame`, `stepKite(s, dt)` bước cố định 1/120 giây, `flap`, `answerGate`, `tickKite(s, dt, paused)`, `passable`, `generateGaps`), `kiteBots.ts` (bot cân bằng và người chơi lý tưởng, chỉ dùng trong test), `kiteLogic.test.ts`, `kiteBalance.test.ts`, `index.ts` (xuất config và logic). Mọi số ngẫu nhiên (khe, diều đen, trang) rút từ `createMulberry32(seed)` LÚC TẠO VÁN, nên cùng seed cùng ván bất kể người chơi làm gì.
 
@@ -326,6 +326,36 @@ Tỉ lệ Vàng chỉ phụ thuộc Vàng (không phụ thuộc Bạc), nên m�
 - **Điểm tối đa lý thuyết:** 24 khe × 10 + 24 trang × 5 + 4 câu × 50 = **560**; thực tế mỗi khe chỉ có trang 60% nên tối đa của từng seed chừng 512 (trung bình seed 1 đến 300: 511,9; lớn nhất 540). Điểm lớn nhất của bot giỏi: 530.
 
 
+### Cảnh màn 6 (mốc 3, bước B9; `KiteGame.tsx`, `KiteStage.tsx`, `kiteLayout.ts`, `kiteArt.ts`, `kiteHint.ts` trong `src/kite/`, trang `pages/Man6.tsx`)
+
+Logic KHÔNG đổi ở B9 (chỉ đổi mốc `medals`, xem trên). `KiteGame` giữ một ván (`createKiteGame(seed)`), chạy `tickKite` mỗi khung hình (bước cố định 1/120 giây nằm trong logic), đọc sự kiện (nhặt trang, mất tim, tới cổng, kết thúc) để phát âm và dựng hiệu ứng. `KiteStage` chỉ VẼ: đọc trạng thái ván và ghi vị trí vào các đối tượng đã tạo sẵn, không tạo object mới trong `useFrame`.
+
+**Bố cục:** camera trực giao, khung thế giới 16 × 9; 1 đơn vị logic = 0,9 đơn vị khung (`UNIT`), diều cố định cách mép trái 3,8 (`KITE_SCREEN_X` = −4,2), nền và cột trôi qua. Vùng thấy được tính từ vị trí diều (`visibleRange`); chỉ dựng cột, trang, diều đen trong vùng thấy cộng 3 đơn vị lề.
+
+**Nền 3 lớp** (`BACK_LAYERS`): trời 0,05, đồi xa 0,25, tre gần 0,6 (nhân quãng đường bay). Mỗi lớp là một mặt phẳng với texture `MirroredRepeatWrapping`, cuộn bằng cách đổi `offset` (không dịch hình). **Giảm chuyển động:** riêng 3 lớp nền cuộn bằng một nửa tốc độ; cột, trang, diều đen vẫn đúng tốc độ luật.
+
+**Cột tre:** hình `sprites/man-06-dieu/cot-tre` được cắt phần thân (`POLE_CROP`) thành texture lặp dọc; mỗi cột là một mặt phẳng có hình học riêng, thuộc tính uv viết lại mỗi khung để lặp đủ chiều cao mà KHÔNG kéo giãn méo (`poleRepeat`). Cột phía trên lật ngược. Dùng pool 12 cột (đủ cho các khe trong tầm nhìn). Diều đen (`dieu-den`) pool 6, vị trí dao động tính bằng đúng hàm của logic; cổng làng `cong-lang-xa` pool 2.
+
+**Trang bản sao:** `docs/danh-sach-assets3.txt` không có icon trang giấy hợp (và màn 6 chỉ cần một hình nhỏ) nên **vẽ bằng code** trên canvas (`kiteArt.ts`, tự chọn), pool 6 trang, mỗi trang quay nhẹ; cuốn sổ bay vào cổng ở cảnh giao sổ cũng vẽ bằng code. Thiếu file đồ họa thì hiện hình thay thế (ô màu), không lỗi trang.
+
+**Học sinh:** model `characters/hoc-sinh-nam` với tư thế `hang` do code dựng (`Character` nhận `hang`; hai tay ở điểm tay cầm của diều, `HANG.handsRatio`), đung đưa nhẹ (tắt khi giảm chuyển động). Diều nghiêng theo vận tốc đứng từ −20° đến +20° (`kiteTilt`), xoay quanh nút buộc dây (`KITE_ART.knotU/knotV`) nên học sinh treo đúng chỗ. Mất tim: chớp nhẹ (độ mờ diều theo `invOpacity`) trong 1 giây bất tử và rung màn ngắn (`shakeOffset`; **không rung khi giảm chuyển động**).
+
+**Các pha:**
+- `ready`: diều chờ, dòng "Chạm để bắt đầu"; ván chạy từ lần bật đầu tiên. Điều khiển: pointerdown trên lớp phủ (chạm và chuột), phím Space (keydown, `preventDefault` nên không cuộn trang; bỏ qua khi tiêu điểm đang ở nút hay bảng câu hỏi).
+- `play`: bay, nhặt trang, né cột, đất, trần, diều đen.
+- `quiz` (tới cổng): game dừng hẳn (logic không chạy), hiện `QuizCard` bên PHẢI (45% chiều rộng, cỡ gọn) với câu Bài 1–2 chọn bằng `pickQuestions({ bai: [1, 2], soCau: 4, seed })` (như màn 5; 4 cổng 4 câu khác nhau), 20 giây. Đúng: cảnh giao sổ 1,5 giây (`DELIVER_SECONDS`): cổng mở (`doorOpen`), cuốn sổ bay vào (`bookProgress`), dòng "Làng thứ {n} đã có sổ giống làng em!". Sai hoặc hết giờ: mất 1 tim, hiện đáp án và giải thích, cổng vẫn mở. Bấm "Chơi tiếp" thì diều đặt lại giữa khe kế, bất tử 1 giây.
+- `ended`: nút "Xem kết quả" rồi màn kết quả của `MiniGameLevel`.
+
+**HUD** (góc trên phải, dời sang trái khi bảng câu hỏi mở): 5 tim, số trang, cổng n/4, điểm. Khung dọc (cao hơn rộng) hiện nhắc xoay ngang như màn 5, ván giữ nguyên. HUD là lớp HTML nên không dùng bóng hay bộ lọc.
+
+**Hướng dẫn chơi (luật chung, spec 03 mục 3.8 và 6):** `content/huongDanGame.ts` có phần màn 6 (luật, điều khiển, 4 trang có hình vẽ code trong `GuideArt.tsx`, 7 câu nhắc). `hintFor(state)` (`kiteHint.ts`, hàm thuần, có test) trả KHÓA, không bao giờ lộ đáp án câu hỏi; thứ tự ưu tiên: hết ván, đang hỏi, còn 1 tim, diều đen ở khe kế (trong 9 đơn vị), cổng phía trước (trong 9 đơn vị), đầu ván hoặc 10 giây đầu, bay đều. Nút "?" (phím H) tạm dừng thật: không cuộn nền, không vật lý, đồng hồ câu hỏi cũng dừng.
+
+**Kết quả:** `MiniGameLevel levelId={6} medals={KITE_SPEC.medals}`; phần chi tiết hiện số khe, số trang, số câu đúng, số cổng. Làng Dệt không còn màn sau màn 6 nên nút là "Về làng".
+
+**Mở khóa:** `levels.ts` màn 6 là `ready`; Trang Sổ Vàng thứ hai trao khi xong màn 4 VÀ đã chơi màn 6 (màn cuối đã ra mắt của làng, quy tắc chung của `unlock.ts`); tài khoản đã có trang 2 từ trước giữ nguyên (cờ chỉ thêm, không bỏ). Làng tối giản Dệt: biển màn 6 mở được.
+
+**Đã kiểm trên trình duyệt thật (Chrome, bản dev, mức Thấp) ở 640 × 360, 844 × 390, 1366 × 768:** sẵn sàng, bay, mất tim vì cột, diều đen, cổng 1 (đúng) và cổng 2 (sai), "?" giữa ván, khung dọc 360 × 640, chạm, chuột, Space, đi từ chợ vào Làng Dệt bấm E ở biển màn 6. Bộ nhớ GPU giữa khe 3 và khe 20 đứng yên (geometries và textures không đổi), dựng lại ván 6 lần không tăng. Số đo cụ thể ở báo cáo bước B9.
+
 ## Kết thúc làng
 
 - Cụ Bình trao **Trang Sổ Vàng thứ hai**.
@@ -343,6 +373,6 @@ Tỉ lệ Vàng chỉ phụ thuộc Vàng (không phụ thuộc Bạc), nên m�
   - rê chuột lên đáp án thì nhân vật nhìn theo;
   - đúng thì đét trúng, sai thì {phanDien} chạy xuống sổ.
   - **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
-- [ ] Màn 6: có câu hỏi ở 4 cổng làng; diều đen không chặn kín khe.
+- [x] Màn 6 (bước B9, đã kiểm trên trình duyệt): có câu hỏi ở 4 cổng làng; diều đen không chặn kín khe.
   - **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
 - [ ] Xong màn 6: nhận Trang Sổ Vàng; cổng Làng Khắc Dấu mở.

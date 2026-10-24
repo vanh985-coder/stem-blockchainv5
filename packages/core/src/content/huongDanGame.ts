@@ -174,8 +174,49 @@ export const HUONG_DAN_GAME = {
       hetVan: 'Ván này đã kết thúc.',
     },
   },
-  // ---------------------------------------------------------------- Màn 6: Diều đưa sổ (Làng Dệt): chưa làm
-  6: EMPTY,
+  // ---------------------------------------------------------------- Màn 6: Diều đưa sổ (Làng Dệt)
+  6: {
+    nhan: 'Màn 6',
+    tieuDe: 'Màn 6: Diều đưa sổ',
+    luat: [
+      'Cụ Bình nhờ em thả diều mang bản sao Sổ Chung tới 4 làng xa, để làng nào cũng có sổ giống nhau. {phanDien} thả diều đen ra cản đường.',
+      'Chạm để diều bật lên, thả ra để diều hạ xuống. Bay qua khe giữa hai cột tre; chạm cột, đất, trần hay diều đen thì mất 1 tim. Em có 5 tim.',
+      'Tới cổng mỗi làng có một câu hỏi: trả lời đúng thì giao được sổ, sai thì mất 1 tim. Qua đủ 4 làng là thắng.',
+    ],
+    dieuKhien: {
+      mayTinh: 'Bấm Space hoặc bấm chuột để diều bật lên',
+      dienThoai: 'Chạm vào màn hình để diều bật lên',
+    },
+    trang: [
+      {
+        hinh: { art: 'dieu-bat-phim' },
+        hinhDt: { art: 'dieu-bat-cham' },
+        may: 'Bấm Space (hoặc bấm chuột) để diều bật lên. Thả ra thì diều hạ xuống.',
+        dt: 'Chạm vào màn hình để diều bật lên. Thả ra thì diều hạ xuống.',
+      },
+      {
+        hinh: { art: 'dieu-khe' },
+        may: 'Bay qua khe giữa hai cột tre. Đụng cột, đất hay trần thì mất 1 tim, rồi diều được đặt lại giữa khe kế và bất tử 1 giây.',
+      },
+      {
+        hinh: { art: 'dieu-den' },
+        may: 'Từ khe thứ 8 có diều đen của {phanDien} bay lên xuống trong khe. Luôn còn một phần trống: bay qua phần trống lớn hơn.',
+      },
+      {
+        hinh: { art: 'cong-lang' },
+        may: 'Sau khe 6, 12, 18 và 24 là cổng một làng. Trả lời đúng câu hỏi thì giao được sổ; sai thì mất 1 tim nhưng cổng vẫn mở.',
+      },
+    ],
+    nhac: {
+      dauVan: 'Chạm để diều bật lên, thả ra để diều hạ xuống. Bay qua khe giữa hai cột tre.',
+      chay: 'Giữ nhịp bật đều để diều bay giữa khe, đừng chạm cột, đất hay trần.',
+      dieuDen: 'Diều đen của {phanDien} phía trước: bay qua phần trống lớn hơn.',
+      cong: 'Cổng làng phía trước: trả lời đúng để giao sổ.',
+      motTim: 'Em chỉ còn một tim: bật nhẹ, nhịp đều.',
+      cauHoi: 'Đọc câu hỏi rồi chọn đáp án — đúng thì cổng mở đón sổ.',
+      hetVan: 'Ván này đã kết thúc.',
+    },
+  },
 
   // ---------------------------------------------------------------- Màn 8: Lật thẻ tìm cặp khóa (Làng Khắc Dấu)
   8: {

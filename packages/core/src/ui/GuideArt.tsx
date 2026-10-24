@@ -287,6 +287,57 @@ function Courtyard({ mouseLane }: { mouseLane?: number }) {
 
 const K = huongDan.phim;
 
+/** Diều của màn 6 (hình minh họa): thân hình thoi, đuôi dây; `dark` là diều đen của {phanDien} (có mặt cười nhếch). Tâm ở thân diều. */
+function KiteArt({ x, y, s = 1, rot = 0, dark = false }: { x: number; y: number; s?: number; rot?: number; dark?: boolean }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${s}) rotate(${rot})`}>
+      <polygon points="0,-26 20,-4 0,26 -20,-4" fill={dark ? '#3a3a44' : C.gold} stroke={C.ink} strokeWidth={2.5} strokeLinejoin="round" />
+      {dark ? (
+        <path d="M-10 -2 q10 9 20 -2 M-11 -9 l7 3 M11 -9 l-7 3" fill="none" stroke="#c9c9d4" strokeWidth={2.2} strokeLinecap="round" />
+      ) : (
+        <>
+          <polygon points="0,-26 20,-4 0,-4" fill={C.red} />
+          <polygon points="0,26 20,-4 0,-4" fill={C.green} />
+          <polygon points="0,-26 -20,-4 0,-4" fill={C.purple} opacity={0.85} />
+          <line x1={0} y1={-26} x2={0} y2={26} stroke={C.ink} strokeWidth={1.8} />
+          <line x1={-20} y1={-4} x2={20} y2={-4} stroke={C.ink} strokeWidth={1.8} />
+        </>
+      )}
+      <path d="M0 26 q-9 10 3 18 q9 8 -3 18" fill="none" stroke={dark ? '#666' : C.purple} strokeWidth={3.5} strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** Một cặp cột tre với khe ở giữa (hình minh họa): khe từ `gapTop` xuống `gapBottom` (toạ độ hình, y xuống dưới). */
+function BambooPair({ x, gapTop, gapBottom, w = 16 }: { x: number; gapTop: number; gapBottom: number; w?: number }) {
+  const pole = (y0: number, y1: number) => (
+    <g>
+      <rect x={x - w / 2} y={y0} width={w} height={y1 - y0} rx={4} fill="#9ccf6a" stroke={C.ink} strokeWidth={2.2} />
+      {Array.from({ length: Math.max(0, Math.floor((y1 - y0) / 34)) }, (_, i) => (
+        <line key={i} x1={x - w / 2} y1={y0 + 17 + i * 34} x2={x + w / 2} y2={y0 + 17 + i * 34} stroke={C.ink} strokeWidth={2} />
+      ))}
+    </g>
+  );
+  return (
+    <g>
+      {pole(0, gapTop)}
+      {pole(gapBottom, ART_H)}
+    </g>
+  );
+}
+
+/** Nền trời cho hình minh họa màn 6 */
+function KiteSky() {
+  return (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.sky} />
+      <rect x={0} y={150} width={ART_W} height={30} fill={C.grass} />
+      <ellipse cx={250} cy={34} rx={34} ry={13} fill="#ffffff" opacity={0.85} />
+      <ellipse cx={60} cy={26} rx={26} ry={10} fill="#ffffff" opacity={0.85} />
+    </g>
+  );
+}
+
 const ARTS: Record<GuideArtId, () => ReactNode> = {
   'phim-di-chuyen': () => (
     <g>
@@ -691,6 +742,56 @@ const ARTS: Record<GuideArtId, () => ReactNode> = {
       <Page x={162} y={52} />
       <Page x={232} y={52} />
       <path d="M48 30 l4 8 l8 4 l-8 4 l-4 8 l-4 -8 l-8 -4 l8 -4 Z M258 150 l3 6 l6 3 l-6 3 l-3 6 l-3 -6 l-6 -3 l6 -3 Z" fill={C.gold} />
+    </g>
+  ),
+  'dieu-bat-phim': () => (
+    <g>
+      <KiteSky />
+      <KiteArt x={96} y={66} rot={-16} />
+      <Arrow x1={96} y1={118} x2={96} y2={92} width={5} />
+      <Key x={150} y={112} w={110} h={38} label={huongDan.phim.space} />
+    </g>
+  ),
+  'dieu-bat-cham': () => (
+    <g>
+      <KiteSky />
+      <KiteArt x={96} y={66} rot={-16} />
+      <Arrow x1={96} y1={118} x2={96} y2={92} width={5} />
+      <Finger x={226} y={112} />
+      <path d="M208 140 q18 -24 36 0" fill="none" stroke={C.purple} strokeWidth={4} strokeLinecap="round" strokeDasharray="6 5" />
+    </g>
+  ),
+  'dieu-khe': () => (
+    <g>
+      <KiteSky />
+      <BambooPair x={170} gapTop={52} gapBottom={118} />
+      <BambooPair x={270} gapTop={30} gapBottom={96} />
+      <KiteArt x={70} y={86} s={0.8} rot={10} />
+      <Arrow x1={96} y1={86} x2={146} y2={86} width={5} />
+      <Cross x={170} y={36} />
+      <Cross x={170} y={134} />
+    </g>
+  ),
+  'dieu-den': () => (
+    <g>
+      <KiteSky />
+      <BambooPair x={190} gapTop={40} gapBottom={132} />
+      <KiteArt x={190} y={62} s={0.5} dark />
+      <KiteArt x={72} y={100} s={0.8} rot={8} />
+      <Arrow x1={98} y1={102} x2={166} y2={108} width={5} />
+      <rect x={176} y={86} width={28} height={40} rx={8} fill="none" stroke={C.green} strokeWidth={3.5} strokeDasharray="7 5" />
+    </g>
+  ),
+  'cong-lang': () => (
+    <g>
+      <KiteSky />
+      <rect x={200} y={78} width={86} height={72} fill="#c97b4a" stroke={C.ink} strokeWidth={2.5} />
+      <polygon points="190,80 243,46 296,80" fill="#d9573b" stroke={C.ink} strokeWidth={2.5} strokeLinejoin="round" />
+      <path d="M229 150 v-34 a14 14 0 0 1 28 0 v34 Z" fill="#7a4a2a" stroke={C.ink} strokeWidth={2.5} />
+      <KiteArt x={96} y={60} s={0.8} rot={-12} />
+      <Page x={146} y={70} />
+      <Arrow x1={176} y1={100} x2={226} y2={118} width={4} />
+      <Check x={30} y={140} />
     </g>
   ),
 };

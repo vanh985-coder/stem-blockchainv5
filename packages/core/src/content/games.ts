@@ -18,11 +18,12 @@ export interface GameText {
 /**
  * Chữ từng game phụ, theo số màn (1 đến 12): tên game ở đây; luật và cách điều khiển lấy từ `content/huongDanGame.ts` (chủ dự án sửa chữ ở đó). Chỉ có các màn đã ra mắt.
  */
-const textOf = (levelId: 2 | 3 | 5 | 8 | 12, ten: string): GameText => ({ ten, luat: HUONG_DAN_GAME[levelId].luat, dieuKhien: HUONG_DAN_GAME[levelId].dieuKhien });
+const textOf = (levelId: 2 | 3 | 5 | 6 | 8 | 12, ten: string): GameText => ({ ten, luat: HUONG_DAN_GAME[levelId].luat, dieuKhien: HUONG_DAN_GAME[levelId].dieuKhien });
 export const GAMES: Readonly<Partial<Record<number, GameText>>> = {
   2: textOf(2, 'Đuổi theo {phanDien}'),
   3: textOf(3, 'Ghép lại cuốn sổ'),
   5: textOf(5, 'Đập {phanDien}'),
+  6: textOf(6, 'Diều đưa sổ'),
   8: textOf(8, 'Lật thẻ tìm cặp khóa'),
   12: textOf(12, 'Leo cây tìm lá giả'),
 };
@@ -250,4 +251,34 @@ export const whackUi = {
   phanDong: 'Tiền đồng nhặt được',
   phanTrum: 'Lượt trùm trả lời đúng',
   phanMuc: 'Vết mực trên sổ',
+} as const;
+
+/** Chữ trong màn 6 "Diều đưa sổ" (spec 06 mục Màn 6). Mọi câu đi qua fmt() ({phanDien}, {so}…). */
+export const kiteUi = {
+  /** Nhãn đọc màn hình của khung chơi */
+  khung: 'Bầu trời làng Dệt. Chạm hoặc bấm Space để diều bật lên.',
+  chamBatDau: 'Chạm để bắt đầu',
+  diem: 'Điểm: {so}',
+  trang: 'Trang bản sao: {so}',
+  cong: 'Cổng {so}/{max}',
+  /** Nhãn đọc màn hình của hàng tim */
+  tim: 'Tim: {so}/{max}',
+  /** Cổng làng: tiêu đề, thời gian, kết quả */
+  cauHoi: 'Cổng làng thứ {so}/{max}! Trả lời để giao sổ.',
+  conGio: 'Còn {giay} giây',
+  hetGio: 'Hết giờ rồi, em mất 1 tim.',
+  dapAnDung: 'Đáp án đúng: {dapAn}',
+  quizDung: 'Đúng rồi! Cổng mở đón sổ: +{diem} điểm.',
+  quizSai: 'Chưa đúng, em mất 1 tim. Cổng vẫn mở để diều đi tiếp.',
+  tiepTuc: 'Chơi tiếp',
+  giaoSo: 'Làng thứ {so} đã có sổ giống làng em!',
+  /** Hết ván */
+  hetTim: 'Diều hết sức rồi! Mình thử lại nhé.',
+  xongCong: 'Cả 4 làng đã có sổ giống nhau!',
+  xemKetQua: 'Xem kết quả',
+  /** Phần điểm ở màn kết quả: số lượng, điểm */
+  phanKhe: 'Khe đã bay qua',
+  phanTrang: 'Trang bản sao nhặt được',
+  phanCau: 'Câu hỏi trả lời đúng',
+  phanCong: 'Cổng làng đã qua',
 } as const;

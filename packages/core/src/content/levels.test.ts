@@ -13,9 +13,9 @@ describe('levels', () => {
     expect(VILLAGE_ORDER).toEqual(['lang-giay', 'lang-det', 'lang-khac-dau', 'lang-bac']);
   });
 
-  it('mốc 3 bước B7: màn 1, 2, 3 (làng Giấy trọn vẹn), 4, 5, 7, 8, 10, 12 là ready; 3 màn còn lại (6, 9, 11) là coming-soon', () => {
-    expect(LEVELS.filter((l) => l.status === 'ready').map((l) => l.id)).toEqual([1, 2, 3, 4, 5, 7, 8, 10, 12]);
-    expect(LEVELS.filter((l) => l.status === 'coming-soon').map((l) => l.id)).toEqual([6, 9, 11]);
+  it('mốc 3 bước B9: màn 1, 2, 3 (làng Giấy trọn vẹn), 4, 5, 6 (làng Dệt trọn vẹn), 7, 8, 10, 12 là ready; 2 màn còn lại (9, 11) là coming-soon', () => {
+    expect(LEVELS.filter((l) => l.status === 'ready').map((l) => l.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 10, 12]);
+    expect(LEVELS.filter((l) => l.status === 'coming-soon').map((l) => l.id)).toEqual([9, 11]);
   });
 
   it('có tên màn và tên biển gỗ, chỗ giữ tên hợp lệ', () => {
@@ -32,10 +32,11 @@ describe('levels', () => {
 });
 
 describe('nextReadyLevel (nút "Chơi tiếp" ở màn kết quả và ở trang bài học)', () => {
-  it('màn 2 sang màn 3; màn 3, 8, 12 không còn màn nào trong làng nên chỉ còn "Về làng"', () => {
+  it('màn 2 sang màn 3, màn 5 sang màn 6; màn 3, 6, 8, 12 không còn màn nào trong làng nên chỉ còn "Về làng"', () => {
     expect(nextReadyLevel(2)?.id).toBe(3);
     expect(nextReadyLevel(3)).toBeUndefined();
-    expect(nextReadyLevel(5)).toBeUndefined(); // màn 6 còn sắp ra mắt
+    expect(nextReadyLevel(5)?.id).toBe(6);
+    expect(nextReadyLevel(6)).toBeUndefined(); // màn cuối của làng Dệt (bước B9)
     expect(nextReadyLevel(8)).toBeUndefined();
     expect(nextReadyLevel(12)).toBeUndefined();
   });
@@ -46,7 +47,7 @@ describe('nextReadyLevel (nút "Chơi tiếp" ở màn kết quả và ở trang
     expect(nextReadyLevel(4)?.id).toBe(5);
   });
   it('chỉ trong cùng làng; số màn lạ thì không có', () => {
-    for (const id of [1, 2, 3, 4, 5, 7, 8, 10, 12]) {
+    for (const id of [1, 2, 3, 4, 5, 6, 7, 8, 10, 12]) {
       const next = nextReadyLevel(id);
       if (next) expect(next.lang).toBe(levelById(id)?.lang);
     }

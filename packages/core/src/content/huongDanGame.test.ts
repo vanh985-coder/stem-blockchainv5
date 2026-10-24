@@ -24,9 +24,9 @@ function allTexts(id: number): [string, string][] {
 }
 
 describe('huongDanGame.ts: mọi chữ hướng dẫn của game nằm trong một file', () => {
-  it('có đủ các màn 2, 3, 5, 6, 8, 9, 11, 12; màn chưa ra mắt (6, 9, 11) để trống', () => {
+  it('có đủ các màn 2, 3, 5, 6, 8, 9, 11, 12; màn chưa ra mắt (9, 11) để trống', () => {
     expect(Object.keys(HUONG_DAN_GAME).map(Number).sort((a, b) => a - b)).toEqual([2, 3, 5, 6, 8, 9, 11, 12]);
-    for (const id of [6, 9, 11]) {
+    for (const id of [9, 11]) {
       const g = guide(id);
       expect(g.luat, String(id)).toEqual([]);
       expect(g.trang, String(id)).toEqual([]);
@@ -36,7 +36,7 @@ describe('huongDanGame.ts: mọi chữ hướng dẫn của game nằm trong m�
   });
 
   it('mọi màn đã ra mắt (game status ready) có đủ luat, dieuKhien, trang và nhac', () => {
-    expect(READY_GAMES.map((l) => l.id)).toEqual([2, 3, 5, 8, 12]);
+    expect(READY_GAMES.map((l) => l.id)).toEqual([2, 3, 5, 6, 8, 12]);
     for (const l of READY_GAMES) {
       const g = guide(l.id);
       expect(g, `màn ${l.id}`).toBeDefined();
