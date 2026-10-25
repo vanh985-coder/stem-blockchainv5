@@ -22,7 +22,7 @@ export interface LevelDef {
 
 /**
  * 12 màn (tên lấy từ spec 05 đến 08).
- * 4 bài học (màn 1, 4, 7, 10) là 'ready' từ mốc 1; màn 2 (game chạy) 'ready' từ mốc 2 bước 12, màn 3 (ghép sổ) 'ready' từ mốc 2 bước 14. Đổi một game sang 'ready' khi làm xong game đó.
+ * 4 bài học (màn 1, 4, 7, 10) là 'ready' từ mốc 1; màn 2 (game chạy) 'ready' từ mốc 2 bước 12, màn 3 (ghép sổ) 'ready' từ mốc 2 bước 14, màn 9 (chữa đàn gà) 'ready' từ mốc 3 bước B11. Đổi một game sang 'ready' khi làm xong game đó.
  */
 export const LEVELS: readonly LevelDef[] = [
   { id: 1, lang: 'lang-giay', kind: 'lesson', ten: 'Trang nối trang', bien: 'Học cùng bác An', status: 'ready' },
@@ -33,7 +33,7 @@ export const LEVELS: readonly LevelDef[] = [
   { id: 6, lang: 'lang-det', kind: 'game', ten: 'Diều đưa sổ', bien: 'Diều đưa sổ', status: 'ready' },
   { id: 7, lang: 'lang-khac-dau', kind: 'lesson', ten: 'Khuôn riêng, mẫu chung', bien: 'Học cùng chú Dũng', status: 'ready' },
   { id: 8, lang: 'lang-khac-dau', kind: 'game', ten: 'Lật thẻ tìm cặp khóa', bien: 'Lật thẻ tìm cặp khóa', status: 'ready' },
-  { id: 9, lang: 'lang-khac-dau', kind: 'game', ten: 'Chữa đàn gà', bien: 'Chữa đàn gà', status: 'coming-soon' },
+  { id: 9, lang: 'lang-khac-dau', kind: 'game', ten: 'Chữa đàn gà', bien: 'Chữa đàn gà', status: 'ready' },
   { id: 10, lang: 'lang-bac', kind: 'lesson', ten: 'Cây gộp sổ', bien: 'Học cùng thầy Linh', status: 'ready' },
   { id: 11, lang: 'lang-bac', kind: 'game', ten: 'Ghép lá cây sổ', bien: 'Ghép lá cây sổ', status: 'coming-soon' },
   { id: 12, lang: 'lang-bac', kind: 'game', ten: 'Leo cây tìm lá giả', bien: 'Leo cây tìm lá giả', status: 'ready' },

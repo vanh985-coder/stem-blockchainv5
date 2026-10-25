@@ -263,8 +263,51 @@ export const HUONG_DAN_GAME = {
     },
   },
 
-  // ---------------------------------------------------------------- Màn 9: Chữa đàn gà (Làng Khắc Dấu): chưa làm
-  9: EMPTY,
+  // ---------------------------------------------------------------- Màn 9: Chữa đàn gà (Làng Khắc Dấu)
+  9: {
+    nhan: 'Màn 9',
+    tieuDe: 'Màn 9: Chữa đàn gà',
+    luat: [
+      '{phanDien} lùa một đàn gà bệnh vào làng để phá phiên chợ. Mỗi con gà đeo một thẻ số, là mẫu công khai. Em dùng ná cao su bắn viên thuốc đúng loại để chữa cho gà.',
+      'Trước mỗi đợt em nạp đạn: kéo nhãn vào đúng lọ thuốc. Lọ Thuốc x cần nhãn bằng {congThuc}. Có Máy tính mod để tính, và có nhãn nhiễu không dùng tới.',
+      'Bắn đúng thuốc thì gà khỏi bệnh và chạy về chuồng (+20 điểm), bắn sai bị trừ 5 điểm. Gà chạy tới cổng làng thì em mất 1 tim; em có 3 tim.',
+      'Có 3 đợt gà, rồi tới gà trùm có {phanDien} cưỡi: gà trùm cần chữa 3 lần, thẻ trên gà đổi sau mỗi lần.',
+    ],
+    dieuKhien: {
+      mayTinh: 'Nạp đạn: Tab chọn nhãn, phím 1 đến 4 đưa vào lọ, hoặc kéo thả · Bắn: phím 1 đến 4 chọn thuốc, bấm chuột vào con gà (hoặc mũi tên trái phải chọn gà, Enter hay Space để bắn)',
+      dienThoai: 'Nạp đạn: kéo nhãn vào lọ, hoặc chạm nhãn rồi chạm lọ · Bắn: chạm nút thuốc để chọn, rồi chạm vào con gà',
+    },
+    trang: [
+      {
+        hinh: { art: 'nap-nhan' },
+        may: 'Trước mỗi đợt em nạp đạn: kéo nhãn vào đúng lọ thuốc, hoặc Tab chọn nhãn rồi nhấn phím 1 đến 4. Lọ Thuốc x cần nhãn bằng {congThuc}.',
+        dt: 'Trước mỗi đợt em nạp đạn: kéo nhãn bằng ngón tay vào đúng lọ thuốc, hoặc chạm nhãn rồi chạm lọ. Lọ Thuốc x cần nhãn bằng {congThuc}.',
+      },
+      {
+        hinh: { art: 'nhan-bay' },
+        may: 'Bấm Máy tính mod để tính {congThuc}. Có nhãn bẫy: số khuôn của lọ không phải mẫu công khai. Nạp sai thì nhãn bật về khay và đợt đó mất điểm thưởng.',
+      },
+      {
+        hinh: { art: 'ban-ga-phim' },
+        hinhDt: { art: 'ban-ga-cham' },
+        may: 'Đọc thẻ số trên gà, chọn thuốc có nhãn bằng số đó (phím 1 đến 4) rồi bấm chuột vào con gà để bắn. Hoặc mũi tên trái phải chọn gà, Enter hay Space để bắn.',
+        dt: 'Đọc thẻ số trên gà, chạm nút thuốc có nhãn bằng số đó, rồi chạm vào con gà để bắn.',
+      },
+      {
+        hinh: { art: 'ga-trum' },
+        may: 'Gà trùm có {phanDien} cưỡi cần chữa 3 lần, thẻ đổi sau mỗi lần. Gà nào chạy tới cổng làng em mất 1 tim; hết 3 tim là thua.',
+      },
+    ],
+    nhac: {
+      napDan: 'Mỗi lọ Thuốc x cần nhãn bằng {congThuc}. Dùng Máy tính mod để tính nếu cần. Cẩn thận nhãn bẫy: số khuôn KHÔNG phải mẫu công khai.',
+      napXong: 'Lọ nào cũng có nhãn rồi. Bấm nút "Bắt đầu đợt" khi em sẵn sàng.',
+      dotGa: 'Đọc thẻ trên gà, chọn thuốc có mẫu công khai bằng thẻ đó rồi bắn.',
+      choGa: 'Chưa có gà trên đường. Em xem lại các lọ thuốc, gà sắp tới rồi.',
+      trum: 'Gà trùm cần chữa 3 lần, thẻ đổi sau mỗi lần.',
+      motTim: 'Em chỉ còn một tim: chữa con gần cổng nhất trước.',
+      hetVan: 'Ván này đã kết thúc.',
+    },
+  },
   // ---------------------------------------------------------------- Màn 11: Ghép lá cây sổ (Làng Bạc): chưa làm
   11: EMPTY,
 

@@ -104,17 +104,26 @@ describe('hai làng chưa dựng (Làng Dệt đã dựng đủ ở det.ts): đ�
   });
 });
 
-describe('nhiệm vụ ở Làng Khắc Dấu khi màn 8 đã ra mắt (màn 9 còn sắp ra mắt) và Làng Dệt khi cả hai game đã ra mắt', () => {
+describe('nhiệm vụ ở Làng Khắc Dấu và Làng Dệt khi cả hai game của làng đã ra mắt (màn 8 và 9, màn 5 và 6)', () => {
   it('đã xong màn 7, chưa chơi màn 8: trong làng, mũi tên chỉ tới biển màn 8', () => {
     const { unlock, next } = questIn('lang-khac-dau', [1, 2, 3, 4, 5, 6, 7]);
     expect(next).toBe(8);
     expect(targetNodeId({ inVillage: 'lang-khac-dau', nextBoard: next, pages: unlock.goldenPages })).toBe(boardNodeId(8));
   });
 
-  it('đã chơi màn 8: có Trang Sổ Vàng 3, làng hết việc, nhiệm vụ chỉ sang cổng Bạc', () => {
+  it('đã chơi màn 8: chưa có Trang Sổ Vàng 3, biển màn 9 của làng tối giản mở được và là việc tiếp theo', () => {
     const { unlock, next, stateOf } = questIn('lang-khac-dau', [1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(unlock.goldenPages).toBe(2);
+    expect(stateOf(8)).toBe('done');
+    expect(stateOf(9)).toBe('open');
+    expect(next).toBe(9);
+    expect(targetNodeId({ inVillage: 'lang-khac-dau', nextBoard: next, pages: unlock.goldenPages })).toBe(boardNodeId(9));
+  });
+
+  it('đã chơi màn 9 (màn cuối của làng): có Trang Sổ Vàng 3, làng hết việc, nhiệm vụ chỉ sang cổng Bạc', () => {
+    const { unlock, next, stateOf } = questIn('lang-khac-dau', [1, 2, 3, 4, 5, 6, 7, 8, 9]);
     expect(unlock.goldenPages).toBe(3);
-    expect(stateOf(9)).toBe('coming-soon');
+    expect(stateOf(9)).toBe('done');
     expect(next).toBeNull();
     expect(targetNodeId({ inVillage: 'lang-khac-dau', nextBoard: next, pages: unlock.goldenPages })).toBe(gateNodeId('bac'));
     expect(targetNodeId({ inVillage: null, nextBoard: null, pages: unlock.goldenPages })).toBe(gateNodeId('bac'));

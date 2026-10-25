@@ -18,13 +18,14 @@ export interface GameText {
 /**
  * Chữ từng game phụ, theo số màn (1 đến 12): tên game ở đây; luật và cách điều khiển lấy từ `content/huongDanGame.ts` (chủ dự án sửa chữ ở đó). Chỉ có các màn đã ra mắt.
  */
-const textOf = (levelId: 2 | 3 | 5 | 6 | 8 | 12, ten: string): GameText => ({ ten, luat: HUONG_DAN_GAME[levelId].luat, dieuKhien: HUONG_DAN_GAME[levelId].dieuKhien });
+const textOf = (levelId: 2 | 3 | 5 | 6 | 8 | 9 | 12, ten: string): GameText => ({ ten, luat: HUONG_DAN_GAME[levelId].luat, dieuKhien: HUONG_DAN_GAME[levelId].dieuKhien });
 export const GAMES: Readonly<Partial<Record<number, GameText>>> = {
   2: textOf(2, 'Đuổi theo {phanDien}'),
   3: textOf(3, 'Ghép lại cuốn sổ'),
   5: textOf(5, 'Đập {phanDien}'),
   6: textOf(6, 'Diều đưa sổ'),
   8: textOf(8, 'Lật thẻ tìm cặp khóa'),
+  9: textOf(9, 'Chữa đàn gà'),
   12: textOf(12, 'Leo cây tìm lá giả'),
 };
 
@@ -281,4 +282,53 @@ export const kiteUi = {
   phanTrang: 'Trang bản sao nhặt được',
   phanCau: 'Câu hỏi trả lời đúng',
   phanCong: 'Cổng làng đã qua',
+} as const;
+
+/** Chữ trong màn 9 "Chữa đàn gà" (spec 07 mục Màn 9). Mọi câu đi qua fmt() ({phanDien}, {so}…); ^^x^^ là số mũ nhỏ (qua rich()). Thẻ số trên gà do code vẽ, chỉ có con số. */
+export const chickenUi = {
+  /** Nhãn đọc màn hình của khung chơi */
+  khung: 'Đường vào làng. Phím 1 đến 4 chọn thuốc, phím mũi tên trái phải chọn con gà, Enter hoặc Space để bắn; hoặc chạm vào con gà để bắn.',
+  /** Bước nạp đạn */
+  napTieuDe: 'Nạp đạn: đợt {so}/{max}',
+  napHuongDan: 'Kéo mỗi nhãn vào đúng lọ thuốc: lọ Thuốc x cần nhãn bằng {congThuc}. Nhãn nào dùng không tới thì để lại khay.',
+  thuoc: 'Thuốc {x}',
+  loTrong: 'Kéo nhãn vào đây',
+  loTrongDoc: 'Lọ Thuốc {x}, chưa có nhãn. Bấm vào đây để nạp nhãn đang chọn, hoặc nhấn phím {so}.',
+  loCoNhan: 'Lọ Thuốc {x}, đã nạp nhãn {y}',
+  khay: 'Khay nhãn',
+  khayDoc: 'Khay nhãn. Tab để chọn nhãn, rồi nhấn phím 1 đến 4 để đưa vào lọ thuốc.',
+  nhanDoc: 'Nhãn {y}',
+  nhanChon: 'Nhãn {y}, đang chọn',
+  napDung: 'Đúng rồi! Lọ Thuốc {x} đã có nhãn {y}.',
+  napSai: 'Chưa đúng: 5^^x^^ mod 23 của thuốc này không ra số đó',
+  napChonTruoc: 'Em chọn một nhãn ở khay trước nhé.',
+  napXong: 'Đủ nhãn rồi! Bấm "Bắt đầu đợt {so}" khi em sẵn sàng.',
+  batDau: 'Bắt đầu đợt {so}',
+  /** Đợt gà */
+  dot: 'Đợt {so}/{max}',
+  dotTrum: 'Gà trùm',
+  diem: 'Điểm: {so}',
+  chua: 'Gà đã chữa: {so}',
+  tim: 'Tim: {so}/{max}',
+  trumChua: 'Chữa gà trùm: {so}/{max}',
+  thuocNut: 'Thuốc {x}, nhãn {y}. Phím {so}.',
+  thuocNutChon: 'Thuốc {x}, nhãn {y}, đang chọn. Phím {so}.',
+  nhomThuoc: 'Bảng thuốc',
+  gaThe: 'Gà có thẻ số {so}',
+  gaDangChon: 'Đang chọn con gà có thẻ số {so}. Nhấn Enter để bắn.',
+  khongDung: 'Không đúng thuốc!',
+  khoi: 'Gà khỏi bệnh rồi! Cộng {so} điểm.',
+  mat: 'Một con gà lọt vào làng, em mất 1 tim.',
+  oi: 'Ối!',
+  trumDoiThe: 'Gà trùm đã được chữa một lần, thẻ trên gà đổi số.',
+  /** Hết ván */
+  xongTrum: '{phanDien} ngã nhào khỏi lưng gà trùm! Cả đàn gà đã khỏi bệnh.',
+  hetTim: 'Em hết tim rồi, đàn gà lọt vào làng. Mình thử lại nhé.',
+  trumToiCong: 'Gà trùm đã chạy tới cổng làng! Mình thử lại nhé.',
+  xemKetQua: 'Xem kết quả',
+  /** Phần điểm ở màn kết quả: số lượng, điểm */
+  phanGa: 'Gà đã chữa khỏi',
+  phanSai: 'Phát bắn sai',
+  phanNap: 'Đợt nạp đạn không sai',
+  phanTrum: 'Chữa xong gà trùm (1 là đã chữa)',
 } as const;

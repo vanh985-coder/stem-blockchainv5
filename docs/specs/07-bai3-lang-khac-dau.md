@@ -192,7 +192,7 @@ Logic đặt trong `chickenLogic.ts` (hàm thuần, có test).
 | Gà chạy tới cổng | Mất 1 tim |
 | Nạp đạn | Chỉ cho bắt đầu khi mọi nhãn đều đúng |
 
-### Chốt cho logic (mốc 3, bước B10; code ở `packages/village-lang-khac-dau/src/chicken/`; chưa có cảnh, màn 9 vẫn coming-soon)
+### Chốt cho logic (mốc 3, bước B10; code ở `packages/village-lang-khac-dau/src/chicken/`; cảnh ở bước B11 bên dưới, màn 9 đã `ready`)
 
 `chickenConfig.ts` (số liệu, `chickenVariant` cho các phương án độ khó), `chickenLogic.ts` (hàm thuần: `createChickenGame`, `dropLabel`, `startWave`, `selectMedicine`, `shoot`, `stepChicken(s, dt)` bước cố định 1/120 giây, `tickChicken`, `chickenScore`), `chickenBots.ts` (bot cân bằng, chỉ dùng trong test), `chickenLogic.test.ts` (26 ca), `chickenBalance.test.ts` (15 ca), `index.ts`. Mẫu công khai luôn tính bằng `publicKey` của bài 3 (`lessons/bai-3/logic`), không viết lại công thức. Mọi số ngẫu nhiên từ `createMulberry32(seed)`: ba lần nạp đạn và dãy thẻ của gà trùm rút SẴN khi tạo ván; số ngẫu nhiên khi sinh gà (làn rồi thẻ, hai số mỗi con) chỉ rút lúc sinh, nên chuỗi gà không phụ thuộc người chơi bắn thế nào.
 
@@ -234,6 +234,21 @@ Logic đặt trong `chickenLogic.ts` (hàm thuần, có test).
 
 Hết tim giữa đợt 3 thì **Bạc hoặc Đồng tùy điểm**: từ 500 trở lên khi hai đợt đầu chữa hết, nạp đúng và chữa thêm vài gà ở đợt 3 (kịch bản c: 510); dưới 500 khi nạp sai và sai nhiều phát (kịch bản c2: 320). Hai đợt đầu chữa hết mà sai dưới 12 phát thì không dưới Đồng (360 − 5 × 11 = 305).
 
+### Cảnh màn 9 (mốc 3, bước B11; code ở `packages/village-lang-khac-dau/src/chicken/`)
+
+Dùng lại logic B10 nguyên vẹn (không sửa luật). File: `man09Lanes.ts` (+ test), `DevMan09Lanes.tsx` (trang `/dev/man-09-lanes`, chỉ khi chạy dev, vỏ Làng Khắc Dấu cổng 5176), `chickenLayout.ts` (+ test, hàm thuần), `chickenArt.ts` (nạp hình rời, tia lấp lánh và viên thuốc vẽ bằng canvas), `ChickenStage.tsx` (cảnh Scene25D, pool, không cấp phát trong `useFrame`), `ChickenLoad.tsx` (bước nạp đạn), `ChickenGame.tsx` (vòng lặp, thẻ số, bảng thuốc, HUD, điều khiển), `chickenHint.ts` (+ test), `pages/Man9.tsx`, route `man/9`. Máy tính mod dùng lại `ui/ModCalculator.tsx`.
+
+- **Ba làn** (`MAN09_LANES`, tọa độ chuẩn hóa của ảnh `scenes/man-09-duong-lang`, đo trên ảnh): làn 1 từ (0,55; 0,30) xuống (0,25; 0,69), làn 2 từ (0,654; 0,30) xuống (0,41; 0,70), làn 3 từ (0,748; 0,30) xuống (0,60; 0,69); mỗi làn có thêm nửa bề rộng ở hai đầu để vẽ hình thang. Ba dải đường tỏa ra phía người xem nên gà chạy chếch xuống bên trái; hình gà gốc quay sang phải nên cảnh lật lại. Gà nhỏ 0,38 ở cuối đường, cỡ đầy đủ ở cuối làn. Chuồng gà là cái chòi tre ở mép trái đường (`COOP_POINT`).
+- **Bố cục** (test `chickenLayout.test.ts` ở 640×360, 844×390, 1366×768, 1024×768): ná cao su ở giữa đáy khung (xoay tối đa ±0,6 rad về con gà được chọn, di chuột lên gà cũng xoay), học sinh đứng bên phải ná (cách 2,3 đơn vị), bảng thuốc 3 hoặc 4 nút ở góc dưới trái (mỗi nút 60 × 58 điểm ảnh), HUD ở góc trên trái (250 × 64). Không đồ nào chồng lên nửa dưới ba làn (từ giữa làn tới cổng, kể cả thân gà và thẻ số trên đầu) và không chồng lên nhau. Chữ thẻ số trên gà cỡ theo gà trên màn hình, kẹp 14 đến 30 điểm ảnh (không dưới 14 ở mọi chỗ gà đứng, "Chữ to" nhân 1,15). Khung dọc: nhắc "Xoay ngang để chơi" như màn 5 (không `allowPortrait`).
+- **Nạp đạn** (`ChickenLoad.tsx`): lọ "Thuốc x" kèm màu và số phím 1 đến 4; khay nhãn gồm nhãn đúng và 2 nhãn nhiễu của logic. Kéo thả bằng con trỏ (chuột và cảm ứng), hoặc chạm nhãn rồi chạm lọ, hoặc Tab chọn nhãn rồi nhấn phím 1 đến 4. Nạp sai: nhãn bay về khay (không bay khi "Giảm chuyển động", chỉ rung) và hiện "Chưa đúng: 5^^x^^ mod 23 của thuốc này không ra số đó". Nút "Bắt đầu đợt n" chỉ mở khi mọi lọ đã đủ nhãn. Nút Máy tính mod ở góc trên (lệch trái nút "?").
+- **Đợt gà**: gà chạy nảy và nghiêng (không nảy, không nghiêng khi "Giảm chuyển động"; gà vẫn chạy vì đó là luật chơi), thẻ số HTML treo trên đầu gà. Chọn thuốc: phím 1 đến 4 hoặc chạm nút thuốc (thuốc đang chọn viền vàng dày). Bắn: bấm hay chạm vào con gà (nhận ngay ở `pointerdown`), hoặc mũi tên trái phải chọn gà (thẻ viền vàng và vòng sáng dưới chân) rồi Enter hay Space. Viên thuốc bay vòng cung 0,4 giây (bay thẳng khi "Giảm chuyển động"), học sinh quay người và chỉ về phía gà. Đúng thuốc: lấp lánh, đổi sang `ga-khoe` (to bằng gà thường, thu nhỏ 0,8), chạy về chuồng rồi mờ dần; sai: "Không đúng thuốc!" trên đầu gà. Gà lọt qua cổng: gà chạy tiếp rồi mờ dần, mất 1 tim.
+- **Gà trùm**: `ga-trum` ở làn giữa với {phanDien} (model `ti`, `idle`, thu nhỏ còn 0,42 chiều cao gà) đứng trên yên, đi theo gà trùm (cùng độ nảy); thẻ đổi số sau mỗi lần chữa đúng kèm lấp lánh. Chữa xong lần thứ ba: gà trùm hóa `ga-khoe` chạy về chuồng, {phanDien} rơi từ yên xuống đất (0,35 giây), `hurt`, hiện "Ối!" (1,1 giây), rồi `run` chạy lên cuối đường (1,5 giây); bảng kết thúc hiện sau 3 giây. Gà trùm tới cổng hay hết tim: bảng kết thúc sau 0,9 giây.
+- **Hướng dẫn và nút "?"** (luật chung, spec 03 mục 3.8 và 6): phần `man-9` ở `content/huongDanGame.ts` (4 luật, cách điều khiển, 4 trang với 5 hình vẽ trong `GuideArt.tsx`: `nap-nhan`, `nhan-bay`, `ban-ga-phim`, `ban-ga-cham`, `ga-trum`; 7 câu nhắc), thêm vào CUỐI `GUIDE_SECTIONS`. `hintFor` trả khóa, KHÔNG lộ thuốc nào chữa thẻ nào, không nói số cụ thể nào ngoài công thức. Hộp "?" tạm dừng thật (gà, viên thuốc, nhịp sinh, hoạt cảnh đứng yên). Màn kết quả: màn cuối của làng nên chỉ có "Chơi lại" và "Về làng"; hiện số gà chữa, số phát sai, số đợt nạp đúng, đã chữa gà trùm chưa.
+- **Mở khóa**: màn 9 `ready`; Trang Sổ Vàng 3 trao sau khi chơi màn 9 (màn cuối đã ra mắt của làng), không còn sau màn 8. Tài khoản đã có trang 3 từ trước giữ nguyên (test `unlock.test.ts`). Biển màn 9 của làng tối giản mở được sau khi chơi màn 8 (test `minimal.test.ts`).
+- **Chữ**: `chickenUi` ở `content/games.ts`. Câu nhắc "nạp đạn" viết "Dùng Máy tính mod để tính nếu cần" thay vì "Tính bằng Máy tính mod nếu cần" của lời giao (tự chọn: test `huongDanGame.test.ts` cấm chuỗi "Tí" trong chữ hướng dẫn và "Tính" bắt đầu bằng "Tí").
+
+**Tự chọn của bước B11 (spec chưa nói):** hình gà lật cho quay sang trái theo hướng chạy; gà khỏe chạy về cái chòi tre ở mép trái đường; cỡ gà thường cao 2,3 đơn vị ở cuối làn và gà trùm 3,3; nhịp lạch bạch 11 rad/giây, nảy 6% chiều cao gà, nghiêng 0,1 rad; viên thuốc có màu theo loại thuốc (đỏ, xanh dương, xanh lá, vàng; luôn kèm chữ "Thuốc x"); di chuột lên gà cũng xoay ná và đặt vòng sáng; bảng thuốc hiện nhãn đã nạp trong mỗi nút; ván tua (`window.__chickenSim`) chỉ có khi chạy dev hay build có `VITE_PROBE`.
+
 ## Kết thúc làng
 
 - Chú Dũng trao **Trang Sổ Vàng thứ ba**.
@@ -245,9 +260,9 @@ Hết tim giữa đợt 3 thì **Bạc hoặc Đồng tùy điểm**: từ 500 t
 - [ ] Màn 7: máy soi dấu chỉ đúng người đã đóng dấu; dò số với p = 1.000.003 không làm đơ giao diện.
 - [ ] Màn 8: {phanDien} tráo bài có hoạt cảnh rõ ràng, không bao giờ đụng thẻ đã khớp.
   - [x] **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng"). (đã làm ở bước HD: phần `man-8`, `memoryHint.ts`, "Chơi tiếp" không có vì làng chưa có màn sau.)
-- [ ] Màn 9:
-  - nạp đạn chỉ tính xuôi;
-  - bắn đúng thuốc thì gà khỏi bệnh chạy về chuồng;
-  - gà trùm có {phanDien} cưỡi.
-  - **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
-- [ ] Xong màn 9: nhận Trang Sổ Vàng; cổng Làng Bạc mở.
+- [x] Màn 9 (bước B11):
+  - [x] nạp đạn chỉ tính xuôi;
+  - [x] bắn đúng thuốc thì gà khỏi bệnh chạy về chuồng;
+  - [x] gà trùm có {phanDien} cưỡi.
+  - [x] **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
+- [x] Xong màn 9: nhận Trang Sổ Vàng; cổng Làng Bạc mở (test `unlock.test.ts`).
