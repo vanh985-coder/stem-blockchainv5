@@ -3,6 +3,7 @@ import { useEffect, useMemo } from 'react';
 import { BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, ExtrudeGeometry, IcosahedronGeometry, MeshStandardMaterial, Shape, type Texture } from 'three';
 import { Fence, Hills, Instances, useDispose, useImageTexture, type Item } from '../cho/MarketProcedural';
 import { createBoatCanopy, createBoatHull } from '../cho/marketGeometry';
+import type { HillAvoid } from '../cho/hillLayout';
 import { createEdgeAlphaTexture, createGrassTexture, createPaddyTexture, createPlankTexture, createWaterTexture } from '../cho/marketTextures';
 import { DECK_START_X, DECK_TOP, PLAZA_RADIUS, RAMP_START_X, WORLD_RADIUS } from '../cho/marketLayout';
 import { POND_BANK, type VillageField, type VillageLayout, type VillageRoad, type VillageYard } from '../village/villageLayout';
@@ -17,6 +18,8 @@ const YARD_Y = 0.03;
 const WATER_Y = 0.02;
 /** Cỏ làng phủ quanh khu: bán kính làng + bấy nhiêu. */
 const VILLAGE_GRASS_MARGIN = 3;
+/** Đồi xa cách mép chỗ dành riêng của làng ít nhất bấy nhiêu (đồi lấn vào làng thì bị đẩy ra, xem `layoutHills`). */
+const HILL_MARGIN = 8;
 /** Mỗi ô cỏ lặp lại trên chừng này đơn vị (làng càng rộng thì lặp càng nhiều để hoa văn không bị kéo giãn). */
 const GRASS_TILE = 8.3;
 const FIELD_Y = 0.012;
@@ -319,6 +322,7 @@ export function WorldTerrain({ world, dirtUrl, brickUrl = null, animate }: World
     [],
   );
   useDispose(useMemo(() => Object.values(tex), [tex]));
+  const hillAvoid = useMemo<HillAvoid[]>(() => world.villages.map((v) => ({ x: v.center.x, z: v.center.z, r: v.radius + HILL_MARGIN })), [world]);
   useFrame((_, dt) => {
     if (animate) tex.water.offset.y -= dt * 0.03;
   });
@@ -343,7 +347,7 @@ export function WorldTerrain({ world, dirtUrl, brickUrl = null, animate }: World
       ))}
       <River world={world} water={tex.water} plank={tex.plank} />
       <Fence />
-      <Hills minDistance={400} spread={60} size={80} sizeVar={60} height={28} heightVar={20} />
+      <Hills minDistance={400} spread={60} size={80} sizeVar={60} height={28} heightVar={20} avoid={hillAvoid} />
       {world.villages.map((v) => (
         <VillageGround key={v.id} layout={v.layout} dirt={yardDirt} brick={brick} grass={tex.villageGrass} paddy={tex.fieldPaddy} radial={tex.radial} lateral={tex.lateral} />
       ))}

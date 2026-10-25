@@ -19,6 +19,7 @@ import { createMulberry32 } from '../../lib/rng';
 import { FENCE_POST_HEIGHT, FENCE_RAIL_LENGTH, fenceLayout, type FenceLayout, DECK_START_X, DECK_TOP, DOCK_END_X, DOCK_HALF_WIDTH, PLAZA_RADIUS, RAMP_START_X, RIVER_X, ROAD_WIDTH, WORLD_RADIUS, type MarketLayout, type PropPlacement } from './marketLayout';
 import { createBoatCanopy, createBoatHull, createCraftProp, createHayStack, createJar } from './marketGeometry';
 import { buildInstanced, type Item } from './instancing';
+import { layoutHills, type HillAvoid } from './hillLayout';
 import { ChunkedInstances } from '../village/ChunkedInstances';
 import { createEdgeAlphaTexture, createGrassTexture, createPaddyTexture, createPlankTexture, createWaterTexture } from './marketTextures';
 
@@ -261,23 +262,13 @@ export function Fence({ fence }: { fence?: FenceLayout } = {}) {
 
 /**
  * Dãy đồi xa quanh chân trời (khối cầu dẹt, sương làm nhạt dần): 9 đồi cách tâm chợ từ `minDistance` thêm tới `spread`. Chợ riêng lẻ dùng mặc định (210 đến 250); thế giới mở từ bước X3 đẩy ra ngoài biên đi lại
- * (làng bán kính 125 chiếm tới 322 quanh chợ) và làm to hơn cho còn thấy qua sương.
+ * (làng bán kính 125 chiếm tới 322 quanh chợ) và làm to hơn cho còn thấy qua sương; `avoid` (các làng) đẩy đồi lấn vào làng ra xa (`layoutHills`).
  */
-export function Hills({ minDistance = 210, spread = 40, size = 40, sizeVar = 40, height = 12, heightVar = 10 }: { minDistance?: number; spread?: number; size?: number; sizeVar?: number; height?: number; heightVar?: number } = {}) {
+export function Hills({ minDistance = 210, spread = 40, size = 40, sizeVar = 40, height = 12, heightVar = 10, avoid }: { minDistance?: number; spread?: number; size?: number; sizeVar?: number; height?: number; heightVar?: number; avoid?: readonly HillAvoid[] } = {}) {
   const geo = useMemo(() => new SphereGeometry(1, 20, 10), []);
   const mat = useMemo(() => new MeshStandardMaterial({ color: '#6FA66A', roughness: 1 }), []);
   useDispose(useMemo(() => [geo, mat], [geo, mat]));
-  const items = useMemo<Item[]>(() => {
-    const rng = createMulberry32(77);
-    const out: Item[] = [];
-    for (let i = 0; i < 9; i++) {
-      const a = (i / 9) * Math.PI * 2 + rng() * 0.3;
-      const d = minDistance + rng() * spread;
-      const s = size + rng() * sizeVar;
-      out.push({ x: Math.cos(a) * d, z: Math.sin(a) * d, y: -4, sx: s * 1.4, sy: height + rng() * heightVar, sz: s, yaw: rng() * 3 });
-    }
-    return out;
-  }, [minDistance, spread, size, sizeVar, height, heightVar]);
+  const items = useMemo<Item[]>(() => layoutHills({ minDistance, spread, size, sizeVar, height, heightVar }, avoid), [minDistance, spread, size, sizeVar, height, heightVar, avoid]);
   return <Instances geometry={geo} material={mat} items={items} />;
 }
 

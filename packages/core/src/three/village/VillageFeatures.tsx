@@ -1,12 +1,13 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { BoxGeometry, CanvasTexture, Color, CylinderGeometry, Float32BufferAttribute, LinearFilter, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, SphereGeometry, SRGBColorSpace, type BufferGeometry, type Mesh } from 'three';
+import { BoxGeometry, CanvasTexture, Color, CylinderGeometry, Float32BufferAttribute, LinearFilter, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, SphereGeometry, SRGBColorSpace, type BufferGeometry, type Group, type Mesh } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { fmt } from '../../content/characters';
 import { stampBoardText } from '../../content/villageFeatures';
 import { PEOPLE } from '../../lessons/bai-3/logic';
 import { STAMP_BOARD } from '../cho/marketGeometry';
 import { PROP_SIZES, type PropPlacement } from '../cho/marketLayout';
+import { usePlayerState } from '../WalkWorld';
 
 /**
  * Phần chuyển động và chữ của đồ dựng bằng code ở Làng Khắc Dấu (mốc 3, bước L3), vẽ riêng vì không nhân bản chung được:
@@ -14,7 +15,11 @@ import { PROP_SIZES, type PropPlacement } from '../cho/marketLayout';
  *    "Giảm chuyển động" (`animate` = false) thì bánh răng đứng yên và đèn sáng đều;
  *  - **bảng mẫu dấu** (`bang-mau`): chữ trên 6 tấm gỗ, mỗi tấm là tên một người và mẫu dấu công khai của người đó, lấy từ `PEOPLE` của Bài 3 (`lessons/bai-3/logic`, không đặt số riêng).
  * Không tạo object mới trong useFrame; rời cảnh thì giải phóng hình học, vật liệu và texture.
+ * Thân máy và khung bảng là đồ nhỏ nhân bản bị ẩn khi xa người chơi hơn tầm vẽ đồ nhỏ (`maxDistance`); phần vẽ riêng ở đây ẩn theo cùng tầm, để không còn bánh răng, đèn hay chữ lơ lửng giữa trời.
  */
+
+/** Bán kính chừa thêm quanh một món khi so với tầm vẽ (máy và bảng đều nhỏ hơn bấy nhiêu). */
+const FEATURE_RADIUS = 4;
 
 const BRASS = 0xc9a24a;
 
@@ -114,10 +119,26 @@ function useDispose(list: readonly { dispose(): void }[]): void {
   );
 }
 
-function Machine({ p, animate, gearGeos, gearMat, lampGeo, lampMat }: { p: PropPlacement; animate: boolean; gearGeos: BufferGeometry[]; gearMat: MeshStandardMaterial; lampGeo: SphereGeometry; lampMat: MeshStandardMaterial }) {
+/** Ẩn nhóm khi người chơi xa hơn `maxDistance` (cùng tầm với đồ nhỏ nhân bản); trả về true nếu còn hiện. */
+function useRangeCull(group: { current: Group | null }, p: PropPlacement, maxDistance: number): (() => boolean) {
+  const player = usePlayerState();
+  return () => {
+    const g = group.current;
+    if (!g || !player) return true;
+    const dx = player.x - p.x;
+    const dz = player.z - p.z;
+    const r = maxDistance + FEATURE_RADIUS;
+    g.visible = dx * dx + dz * dz <= r * r;
+    return g.visible;
+  };
+}
+
+function Machine({ p, animate, maxDistance, gearGeos, gearMat, lampGeo, lampMat }: { p: PropPlacement; animate: boolean; maxDistance: number; gearGeos: BufferGeometry[]; gearMat: MeshStandardMaterial; lampGeo: SphereGeometry; lampMat: MeshStandardMaterial }) {
   const gears = useRef<(Mesh | null)[]>([]);
+  const group = useRef<Group>(null);
+  const inRange = useRangeCull(group, p, maxDistance);
   useFrame((state) => {
-    if (!animate) return;
+    if (!inRange() || !animate) return;
     const t = state.clock.elapsedTime;
     for (let i = 0; i < MACHINE_GEARS.length; i++) {
       const m = gears.current[i];
@@ -128,7 +149,7 @@ function Machine({ p, animate, gearGeos, gearMat, lampGeo, lampMat }: { p: PropP
     lampMat.emissiveIntensity = phase < 0.55 ? 1.6 : 0.25;
   });
   return (
-    <group position={[p.x, 0, p.z]} rotation={[0, p.yaw, 0]} scale={p.scale}>
+    <group ref={group} position={[p.x, 0, p.z]} rotation={[0, p.yaw, 0]} scale={p.scale}>
       {MACHINE_GEARS.map((g, i) => (
         <group key={i} position={[g.x, g.y, g.z]} rotation={[0, g.axis === 'x' ? Math.PI / 2 : 0, 0]}>
           <mesh
@@ -146,9 +167,14 @@ function Machine({ p, animate, gearGeos, gearMat, lampGeo, lampMat }: { p: PropP
   );
 }
 
-function StampBoard({ p, plane, material }: { p: PropPlacement; plane: PlaneGeometry; material: MeshBasicMaterial }) {
+function StampBoard({ p, maxDistance, plane, material }: { p: PropPlacement; maxDistance: number; plane: PlaneGeometry; material: MeshBasicMaterial }) {
+  const group = useRef<Group>(null);
+  const inRange = useRangeCull(group, p, maxDistance);
+  useFrame(() => {
+    inRange();
+  });
   return (
-    <group position={[p.x, 0, p.z]} rotation={[0, p.yaw, 0]} scale={p.scale}>
+    <group ref={group} position={[p.x, 0, p.z]} rotation={[0, p.yaw, 0]} scale={p.scale}>
       <mesh geometry={plane} material={material} position={[0, PROP_SIZES['bang-mau'].h / 2, STAMP_BOARD.front + 0.008]} renderOrder={2} />
     </group>
   );
@@ -159,10 +185,12 @@ export interface VillageFeaturesProps {
   props: readonly PropPlacement[];
   /** false ("Giảm chuyển động"): bánh răng đứng yên, đèn sáng đều */
   animate: boolean;
+  /** Tầm vẽ đồ nhỏ của mức chất lượng (`PROPS_MAX_DISTANCE`): xa hơn thì ẩn */
+  maxDistance: number;
 }
 
 /** Bánh răng quay chậm và đèn nhấp nháy của máy soi dấu, chữ trên bảng mẫu dấu (xem chú thích đầu file). */
-export function VillageFeatures({ props, animate }: VillageFeaturesProps) {
+export function VillageFeatures({ props, animate, maxDistance }: VillageFeaturesProps) {
   const machines = useMemo(() => props.filter((p) => p.kind === KINDS[0]), [props]);
   const boards = useMemo(() => props.filter((p) => p.kind === KINDS[1]), [props]);
   const res = useMemo(() => {
@@ -201,10 +229,10 @@ export function VillageFeatures({ props, animate }: VillageFeaturesProps) {
   return (
     <>
       {machines.map((p, i) => (
-        <Machine key={`m${i}`} p={p} animate={animate} gearGeos={res.gearGeos} gearMat={res.gearMat} lampGeo={res.lampGeo} lampMat={res.lampMat} />
+        <Machine key={`m${i}`} p={p} animate={animate} maxDistance={maxDistance} gearGeos={res.gearGeos} gearMat={res.gearMat} lampGeo={res.lampGeo} lampMat={res.lampMat} />
       ))}
       {boards.map((p, i) => (
-        <StampBoard key={`b${i}`} p={p} plane={res.plane} material={res.boardMat} />
+        <StampBoard key={`b${i}`} p={p} maxDistance={maxDistance} plane={res.plane} material={res.boardMat} />
       ))}
     </>
   );

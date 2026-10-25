@@ -17,7 +17,7 @@ import { createFiller, placementSpots, propSpots, prop, scatter, thatch, tile, t
  * - Bãi đá (tây bắc, gần rìa): khối đá lớn nhỏ, hai phiến đá đang xẻ, hai đồi đá thấp; thẻ số 4;
  * - Chuồng gà (gần cổng, bên trong lũy tre): chuồng tre nhỏ, đàn gà, ổ rơm, chum nước (đàn gà của màn 9);
  * - Khu nhà ở: 30 nhà ngói và nhà tranh dọc ngõ phía tây, đại lộ, trục bắc nam, quanh đình, trạm và xưởng; hai giếng; vườn cây;
- * - Rìa làng: năm ruộng lúa, đồi tre, lũy tre bao quanh;
+ * - Rìa làng: bốn ruộng lúa, đồi tre, đồi đá, lũy tre bao quanh;
  * - 6 dân làng đi lại giữa các khu.
  */
 
