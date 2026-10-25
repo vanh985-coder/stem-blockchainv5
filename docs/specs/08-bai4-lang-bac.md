@@ -211,7 +211,7 @@ Logic thuần, chưa có cảnh (màn 11 vẫn `coming-soon`): `match3Config.ts`
 | **12 / 15 / 15 (chọn)** | 245 (81,7%) | 223 (74,3%) | 154 (51,3%) | **91** |
 | 12 / 16 / 16 | 260 (86,7%) | 240 (80,0%) | 177 (59,0%) | 83 |
 
-Ô gần nhất ở phía còn lại: 11 / 15 / 15 giỏi 236 (78,7%, hụt mục tiêu bot giỏi) / ngẫu nhiên 148 (49,3%). Bot ngẫu nhiên ở ô chọn xong cả 3 cây ở 51,3%, vượt 50% khoảng 1,3 điểm phần trăm: ghi bằng `it.fails`. Các ô còn lại (giỏi < 80%) có trong lần quét nhưng không đưa vào bảng.
+Ô gần nhất ở phía còn lại: 11 / 15 / 15 giỏi 236 (78,7%, hụt mục tiêu bot giỏi) / ngẫu nhiên 148 (49,3%). Bot ngẫu nhiên ở ô chọn xong cả 3 cây ở 51,3%, vượt 50% khoảng 1,3 điểm phần trăm (chủ dự án chấp nhận mức ≤ 55%, xem bên dưới). Các ô còn lại (giỏi < 80%) có trong lần quét nhưng không đưa vào bảng.
 
 **Bảng 3 bot ở 12 / 15 / 15** (mốc 1150 / 1550 / 1850):
 
@@ -232,7 +232,7 @@ Logic thuần, chưa có cảnh (màn 11 vẫn `coming-soon`): `match3Config.ts`
 
 **Mốc theo nghĩa**: điều kiện ≥ 85% ván xong k cây đạt mốc k và ≤ 15% ván xong ít hơn k cây đạt mốc k (bội số 50, gộp 900 ván). Với điểm mới các bậc tách nhau: thỏa Đồng 1050 đến 1250, Bạc 1450 đến 1600, Vàng 1800 đến 1900. Chọn giữa khoảng thỏa (tự chọn): **Đồng 1150, Bạc 1550, Vàng 1850**. Tỉ lệ thật: Đồng 1150: 44 / 44 ván xong 1 cây đạt (100%), 0 / 2 ván xong 0 cây đạt (0%); Bạc 1550: 223 / 232 ván xong 2 cây đạt (96,1%), 0 / 46 ván xong ≤ 1 cây đạt (0%); Vàng 1850: 615 / 622 ván xong 3 cây đạt (98,9%), 2 / 278 ván xong ≤ 2 cây đạt (0,7%).
 
-**Điều cần biết**: vì bot ngẫu nhiên xong cả 3 cây ở 51,3% ván, nó cũng đạt Vàng ở 50,3% ván (bot trung bình 73,7%); đây là hệ quả của việc bot ngẫu nhiên vốn ăn may nhờ nổ dây chuyền (xem lý do) và mục tiêu ≤ 50% chưa đạt. Mục tiêu chung trong CLAUDE.md mục 7 ("bot trung bình chủ yếu Đồng/Bạc, hầu như không Vàng") KHÔNG đạt ở màn này: bot trung bình Vàng 73,7%. Muốn đạt cần bớt lượt thêm (nhưng bot giỏi sẽ xuống dưới 80%) hoặc đổi luật, ngoài phạm vi lượt này.
+**Mức chấp nhận thật (lượt B13)**: match-3 bấm bừa vẫn ăn may nhờ nổ dây chuyền; mốc đặt theo nghĩa số cây xong, không theo tỉ lệ bot. Test chấp nhận: bot giỏi xong cả 3 cây ≥ 80% (81,7%), bot ngẫu nhiên ≤ 55% (51,3%), và ba tỉ lệ nghĩa của mốc (≥ 85% ván xong k cây đạt mốc k, ≤ 15% ván xong ít hơn k cây đạt mốc k). Bot trung bình Vàng 73,7% và bot ngẫu nhiên Vàng 50,3%: màn 11 thuộc ngoại lệ "mốc theo nghĩa" của CLAUDE.md mục 7 (màn 9, 11, 12), không áp quy tắc "bot trung bình hầu như không Vàng".
 
 ## Màn 12 — Game phụ 2: "Leo cây tìm lá giả" (kiểu leo dây của Talking Tom) và cao trào
 
