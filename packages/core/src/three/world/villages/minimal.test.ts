@@ -12,7 +12,7 @@ import { assembleWorld, boardNodeId, gateNodeId } from '../worldLayout';
 import { targetNodeId } from '../worldQuest';
 import { LOCAL_VILLAGES } from './index';
 
-const SMALL: VillageId[] = ['lang-khac-dau', 'lang-bac'];
+const SMALL: VillageId[] = ['lang-bac'];
 /** Đứng trước biển bấy nhiêu (như `BOARD_STAND_DISTANCE` của worldLayout). */
 const STAND = 1.2;
 /** Ngã ở sân trước của làng chưa khai báo đường nhỏ (như `JUNCTION_LOCAL` của worldLayout). */
@@ -26,7 +26,7 @@ function questIn(village: VillageId, doneLevels: number[]) {
   return { unlock, stateOf, next: nextLevel(ids, stateOf) };
 }
 
-describe('hai làng chưa dựng (Làng Dệt đã dựng đủ ở det.ts): đủ 3 biển (bài học và 2 game)', () => {
+describe('làng chưa dựng (Làng Dệt ở det.ts, Làng Khắc Dấu ở khac-dau.ts đã dựng đủ): đủ 3 biển (bài học và 2 game)', () => {
   for (const id of SMALL) {
     const L = LOCAL_VILLAGES[id];
     const layout = assembleVillage(L);

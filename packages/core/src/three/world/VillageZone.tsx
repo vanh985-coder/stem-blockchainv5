@@ -9,6 +9,7 @@ import { VILLAGER_CULL } from '../cullDistance';
 import type { CircleObstacle } from '../collision';
 import { MarketProps } from '../cho/MarketProcedural';
 import { KnowScrolls } from '../village/KnowScrolls';
+import { VillageFeatures } from '../village/VillageFeatures';
 import { ScatterProps } from '../village/ScatterProps';
 import { SCATTER_CELL } from '../village/ScatterProps';
 import { PROPS_MAX_DISTANCE, SCATTER_KINDS, VILLAGE_MODEL_MAX_DISTANCE } from '../village/scatter';
@@ -114,7 +115,10 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
   const loops = layout.villagers ?? [];
   // các phần theo thứ tự: 1 đồ nhỏ, 2 biển, 3 thẻ "Em có biết?", rồi từng loại đồ rải dựng bằng code (mỗi loại một phần: dựng hình học và các mảnh của cả loại trong một khung hình tốn chừng 15 đến 40 ms), rồi từng model, rồi người dẫn (chỉ khi model đã làm ấm xong), cuối cùng dân làng đi lại
   const scatterKinds = useMemo(() => SCATTER_KINDS.filter((k) => layout.scatter?.some((p) => p.kind === k)), [layout]);
-  const firstModel = 4 + scatterKinds.length;
+  // đồ có chuyển động hay chữ riêng (máy soi dấu, bảng mẫu dấu của Làng Khắc Dấu) là một phần dựng riêng sau thẻ; làng không có thì không thêm phần nào (số phần các làng cũ không đổi)
+  const featureProps = useMemo(() => layout.props.filter((p) => p.kind === 'may-soi-dau' || p.kind === 'bang-mau'), [layout]);
+  const featureStage = featureProps.length > 0 ? 1 : 0;
+  const firstModel = 4 + featureStage + scatterKinds.length;
   const guideStage = firstModel + byModel.length;
   const total = firstModel - 1 + byModel.length + (guide ? 1 : 0) + loops.length; // mỗi dân làng một phần riêng (dựng một nhân vật có xương mất chừng 15 ms)
   const [stage, setStage] = useState(0);
@@ -149,7 +153,8 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
       {stage >= 1 && <MarketProps layout={layout} cull={{ cell: SCATTER_CELL, maxDistance: PROPS_MAX_DISTANCE[level] }} />}
       {stage >= 2 && <VillageBoards boards={layout.boards} labels={labels} icons={icons} states={states} />}
       {stage >= 3 && layout.scrolls && layout.scrolls.length > 0 && <KnowScrolls scrolls={layout.scrolls} collected={collected} animate={animate} />}
-      {layout.scatter && scatterKinds.map((k, j) => (stage >= 4 + j ? <ScatterProps key={k} scatter={layout.scatter ?? []} level={level} only={k} animate={animate} /> : null))}
+      {featureStage > 0 && stage >= 4 && <VillageFeatures props={featureProps} animate={animate} />}
+      {layout.scatter && scatterKinds.map((k, j) => (stage >= 4 + featureStage + j ? <ScatterProps key={k} scatter={layout.scatter ?? []} level={level} only={k} animate={animate} /> : null))}
       {byModel.map(({ id, items }, i) =>
         stage >= firstModel + i ? (
           <Suspense key={id} fallback={null}>

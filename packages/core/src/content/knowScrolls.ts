@@ -28,6 +28,11 @@ export const knowScrollUi = {
     khungcui: 'xóm khung cửi',
     aonhuom: 'ao nhuộm',
     chovai: 'chợ vải',
+    // Làng Khắc Dấu
+    xuongdau: 'xưởng khắc dấu',
+    dinhlang: 'đình làng',
+    tramthu: 'trạm đưa thư',
+    baida: 'bãi đá',
   },
   /** Menu "Em có biết?": bộ sưu tập thẻ */
   suuTamTieuDe: 'Em có biết? ({n}/{tong})',

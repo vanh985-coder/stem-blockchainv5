@@ -105,7 +105,7 @@ export interface Placement {
 }
 
 /** Đồ vật nhỏ do code dựng (chum vại, đống rơm, khóm hoa). */
-export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc' | 'coi-gia' | 'bep-do' | 'dinh' | 'chum-cham' | 'chum-do' | 'dong-soi' | 'gia-vai' | 'sao-soi' | 'sap-vai' | 'chau-canh';
+export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc' | 'coi-gia' | 'bep-do' | 'dinh' | 'chum-cham' | 'chum-do' | 'dong-soi' | 'gia-vai' | 'sao-soi' | 'sap-vai' | 'chau-canh' | 'may-soi-dau' | 'bang-mau' | 'phien-da' | 'mai-che' | 'phoi-go' | 'hom-thu' | 'gia-thu' | 'chuong-bo-cau' | 'chuong-ga' | 'ga';
 export interface PropPlacement {
   kind: PropKind;
   x: number;
@@ -219,6 +219,17 @@ export const PROP_SIZES: Readonly<Record<PropKind, PropSize>> = {
   // sạp vải nhỏ (bàn thấp, ba cuộn vải nằm ngang xếp chồng) và chậu cây cảnh (sân đình Làng Dệt)
   'sap-vai': { r: Math.hypot(1.0, 0.5), h: 0.96 + 0.12 * Math.sqrt(3), box: { hx: 1.0, hz: 0.5 } },
   'chau-canh': { r: 0.55, h: 1.12 },
+  // Làng Khắc Dấu (mốc 3, bước L3): thân máy soi dấu (bệ tròn; bánh răng và đèn do VillageFeatures vẽ), bảng 6 tấm mẫu dấu, phiến đá đang xẻ, mái che xưởng (đi dưới mái được), chồng phôi gỗ, hòm thư, giá xếp thư, chuồng bồ câu, chuồng gà tre, gà (đi qua được)
+  'may-soi-dau': { r: 1.75, h: 3.9 },
+  'bang-mau': { r: Math.hypot(3.3, 0.4), h: 3.2, box: { hx: 3.3, hz: 0.4 } },
+  'phien-da': { r: Math.hypot(1.7, 0.9), h: 1.3, box: { hx: 1.7, hz: 0.9 } },
+  'mai-che': { r: Math.hypot(3.2, 2.4), h: 3.6, box: { hx: 3.2, hz: 2.4 }, collide: false },
+  'phoi-go': { r: Math.hypot(0.7, 0.45), h: 0.6, box: { hx: 0.7, hz: 0.45 } },
+  'hom-thu': { r: Math.hypot(0.4, 0.35), h: 1.6, box: { hx: 0.4, hz: 0.35 } },
+  'gia-thu': { r: Math.hypot(1.2, 0.45), h: 1.6, box: { hx: 1.2, hz: 0.45 } },
+  'chuong-bo-cau': { r: Math.hypot(1.0, 1.0), h: 3.8, box: { hx: 1.0, hz: 1.0 } },
+  'chuong-ga': { r: Math.hypot(1.7, 1.3), h: 1.9, box: { hx: 1.7, hz: 1.3 } },
+  ga: { r: 0.38, h: 0.75, collide: false },
 };
 
 /** Vật cản của đồ nhỏ do code dựng: hình tròn hoặc hộp xoay sát hình; vật thấp (khóm hoa) và chi tiết dưới vật khác (chân giá) thì không có. */

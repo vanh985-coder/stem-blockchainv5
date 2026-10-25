@@ -250,7 +250,7 @@ export function reservedCenter(f: Pick<VillageFrame, 'dirX' | 'dirZ'>): { x: num
 export function wildlands(seed: number): ScatterPlacement[] {
   const out: ScatterPlacement[] = [];
   for (const f of VILLAGE_FRAMES) {
-    if (f.village === 'lang-giay' || f.village === 'lang-det') continue; // đã dựng đủ (có đồi tre riêng)
+    if (f.village === 'lang-giay' || f.village === 'lang-det' || f.village === 'lang-khac-dau') continue; // đã dựng đủ (có đồi tre riêng)
     const rng = createMulberry32(seed ^ 0x3c6ef372 ^ Math.round(f.yaw * 1000));
     const c = reservedCenter(f);
     const toGate = Math.atan2(-f.dirZ, -f.dirX);

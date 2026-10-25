@@ -3,7 +3,7 @@ import { footprintRadiusOf } from '../../cho/footprints';
 import { MODEL_LOOM } from '../../cho/marketLayout';
 import { assembleWorld } from '../worldLayout';
 import { DET_GATE_Z, DET_HOUSE_COUNT, DET_RADIUS, DET_WALL_RADIUS, LANG_DET_LAYOUT as L } from './det';
-import { layoutSpots, pathLength, probeOf, reachGrid } from './villageChecks';
+import { fnv1a, layoutSpots, pathLength, probeOf, reachGrid } from './villageChecks';
 
 const probe = probeOf(L);
 const blocked = probe.blocked;
@@ -17,6 +17,15 @@ const reachableCells = (plugGate = false) => reachGrid(L, blocked, DET_WALL_RADI
 
 /** Tốc độ đi bộ và chạy của người chơi (đơn vị mỗi giây) để đổi quãng đường ra giây (khớp con số ở spec 05: 32,7 đơn vị = 8 giây). */
 const WALK = 4.1;
+
+describe('Làng Dệt: bố cục không đổi khi thêm Làng Khắc Dấu (mốc 3, bước L3)', () => {
+  it('băm của cả bố cục khớp bản trước bước L3: không món nào đổi vị trí, cỡ, màu hay thứ tự (đổi Làng Dệt một cách chủ ý thì cập nhật số này)', () => {
+    expect(L.placements.length).toBe(46);
+    expect(L.props.length).toBe(150);
+    expect((L.scatter ?? []).length).toBe(720);
+    expect(fnv1a(JSON.stringify(L))).toBe('49f59a10');
+  });
+});
 
 describe('Làng Dệt (mốc 3, bước L1): quy mô và bố cục', () => {
   it('bán kính 125, cổng ở (0, −125) nên tâm làng cách chợ 197 (cổng ở 72); lũy tre bao quanh', () => {

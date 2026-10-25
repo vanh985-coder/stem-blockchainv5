@@ -3,8 +3,8 @@ import { fmt } from './characters';
 import { VILLAGE_SCENE } from './villageScene';
 
 describe('chữ của cảnh làng 3D', () => {
-  it('Làng Giấy (mốc 2) và Làng Dệt (mốc 3, bước L1) có chữ cảnh mở đầu và trao trang; Khắc Dấu và Bạc điền sau', () => {
-    expect(Object.keys(VILLAGE_SCENE)).toEqual(['lang-giay', 'lang-det']);
+  it('Làng Giấy (mốc 2), Làng Dệt (mốc 3, bước L1) và Làng Khắc Dấu (bước L3) có chữ cảnh mở đầu và trao trang; Bạc điền sau', () => {
+    expect(Object.keys(VILLAGE_SCENE)).toEqual(['lang-giay', 'lang-det', 'lang-khac-dau']);
   });
   it('Làng Bạc không có cảnh trao trang riêng ở thế giới mở (bước B5): Trang Sổ Vàng thứ tư đã trao trong cảnh cao trào sau màn 12 (WorldPage chỉ chiếu cảnh trao trang cho làng có chữ ở đây)', () => {
     expect(VILLAGE_SCENE['lang-bac']).toBeUndefined();
@@ -27,6 +27,21 @@ describe('chữ của cảnh làng 3D', () => {
     expect(t.award.loi[0]).toContain('Trang Sổ Vàng thứ hai');
     expect(t.award.loi[1]).toContain('Làng Khắc Dấu');
     expect(t.guideNext.game1).toContain('{phanDien}');
+    for (const s of [t.opening, ...Object.values(t.guideNext), ...t.award.loi]) {
+      expect(s).not.toMatch(/(^|[^\p{L}])Tí(?![\p{L}])/u);
+      expect(fmt(s, { ten: 'Lan' })).not.toMatch(/[{}]/);
+    }
+  });
+  it('Làng Khắc Dấu: ảnh truyện 8, người dẫn là chú Dũng, lời mở đầu theo spec 07, hai lượt trao Trang Sổ Vàng thứ ba, không viết cứng tên phản diện', () => {
+    const t = VILLAGE_SCENE['lang-khac-dau']!;
+    expect(t.storyFrame).toBe(8);
+    expect(t.guide).toBe('chuDung');
+    expect(t.opening).toBe('Mỗi người có một khuôn dấu riêng cất kín, và một mẫu dấu công khai treo ở đình. Từ khuôn tạo ra mẫu thì dễ, nhìn mẫu mà đoán ngược ra khuôn thì chịu.');
+    expect(t.award.loi).toHaveLength(2);
+    expect(t.award.loi[0]).toContain('Trang Sổ Vàng thứ ba');
+    expect(t.award.loi[1]).toContain('Làng Bạc');
+    expect(t.guideNext.game1).toContain('{phanDien}');
+    expect(t.guideNext.game2).toContain('{phanDien}');
     for (const s of [t.opening, ...Object.values(t.guideNext), ...t.award.loi]) {
       expect(s).not.toMatch(/(^|[^\p{L}])Tí(?![\p{L}])/u);
       expect(fmt(s, { ten: 'Lan' })).not.toMatch(/[{}]/);

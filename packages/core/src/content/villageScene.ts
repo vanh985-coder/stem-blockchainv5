@@ -17,7 +17,7 @@ export interface VillageSceneText {
   award: { loi: readonly string[] };
 }
 
-/** Làng Giấy (mốc 2) và Làng Dệt (mốc 3, bước L1); 2 làng còn lại điền ở mốc 3. */
+/** Làng Giấy (mốc 2), Làng Dệt (mốc 3, bước L1) và Làng Khắc Dấu (bước L3); Làng Bạc điền ở mốc 3. */
 export const VILLAGE_SCENE: Partial<Record<VillageId, VillageSceneText>> = {
   'lang-giay': {
     guide: 'bacAn',
@@ -50,6 +50,23 @@ export const VILLAGE_SCENE: Partial<Record<VillageId, VillageSceneText>> = {
       loi: [
         'Cả làng đã cùng kiểm sổ, và nhờ diều của em, bản sao sổ mới đã tới các làng xa! Cụ trao em Trang Sổ Vàng thứ hai.',
         'Sổ thì ai cũng kiểm được. Nhưng làm sao biết giấy nợ đúng là người đó viết? Sang Làng Khắc Dấu hỏi chú Dũng.',
+      ],
+    },
+  },
+  'lang-khac-dau': {
+    guide: 'chuDung',
+    storyFrame: 8,
+    opening: 'Mỗi người có một khuôn dấu riêng cất kín, và một mẫu dấu công khai treo ở đình. Từ khuôn tạo ra mẫu thì dễ, nhìn mẫu mà đoán ngược ra khuôn thì chịu.',
+    guideNext: {
+      lesson: 'Em ra biển gỗ "Học cùng chú Dũng" nhé. Chú sẽ chỉ em cách đóng dấu bằng khuôn riêng và kiểm dấu bằng mẫu chung.',
+      game1: 'Giờ tới biển "Lật thẻ tìm cặp khóa" nhé. {phanDien} trộn lung tung bộ khuôn tập của chú đấy!',
+      game2: 'Còn biển "Chữa đàn gà": {phanDien} lùa một đàn gà bệnh vào làng, em dùng ná bắn viên thuốc đúng loại để chữa cho gà nhé.',
+      done: 'Làng Khắc Dấu cảm ơn em nhiều! Em quay về chợ để sang làng kế tiếp nhé.',
+    },
+    award: {
+      loi: [
+        'Em đã ghép lại bộ khuôn và chữa cả đàn gà rồi đấy! Chú trao em Trang Sổ Vàng thứ ba.',
+        'Không giả dấu được nữa, {phanDien} chuyển sang trò trộn giao dịch ở Làng Bạc rồi.',
       ],
     },
   },

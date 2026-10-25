@@ -67,7 +67,8 @@ describe('ký hiệu trên bản đồ', () => {
   it('thẻ chưa nhặt: chỉ hiện khi đang ở trong làng đó; thẻ đã nhặt biến mất', () => {
     expect(of(mapMarkers(base(), 'mini'), 'scroll')).toHaveLength(0);
     expect(of(mapMarkers(base(), 'big'), 'scroll')).toHaveLength(0);
-    expect(of(mapMarkers(base({ inside: 'lang-khac-dau' }), 'mini'), 'scroll')).toHaveLength(0); // làng chưa có thẻ rải
+    expect(of(mapMarkers(base({ inside: 'lang-bac' }), 'mini'), 'scroll')).toHaveLength(0); // làng chưa có thẻ rải
+    expect(of(mapMarkers(base({ inside: 'lang-khac-dau' }), 'mini'), 'scroll')).toHaveLength(4); // Làng Khắc Dấu có 4 thẻ rải (bước L3)
     expect(of(mapMarkers(base({ inside: 'lang-det' }), 'mini'), 'scroll')).toHaveLength(4); // Làng Dệt có 4 thẻ rải
     for (const scope of ['mini', 'big'] as const) {
       const all = of(mapMarkers(base({ inside: 'lang-giay' }), scope), 'scroll');

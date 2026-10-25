@@ -49,7 +49,7 @@ describe('hình học tự dựng của chợ', () => {
 });
 
 describe('đồ gợi nghề quanh cổng: hình dựng khớp PROP_SIZES (vật cản sát hình)', () => {
-  const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh'];
+  const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh', 'may-soi-dau', 'bang-mau', 'phien-da', 'mai-che', 'phoi-go', 'hom-thu', 'gia-thu', 'chuong-bo-cau', 'chuong-ga', 'ga'];
   for (const kind of crafts) {
     it(`${kind}: chân ở y = 0, cao đúng, vừa trong hình vật cản (hộp hoặc tròn)`, () => {
       const g = createCraftProp(kind)!;
@@ -106,7 +106,7 @@ describe('mặt trước của hình đặc quay ra ngoài (vật liệu một m
   });
   it('chum vại và mọi đồ gợi nghề dựng bằng code: thể tích có dấu dương', () => {
     expect(signedVolume(createJar())).toBeGreaterThan(0);
-    const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh'];
+    const crafts: PropKind[] = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh', 'may-soi-dau', 'bang-mau', 'phien-da', 'mai-che', 'phoi-go', 'hom-thu', 'gia-thu', 'chuong-bo-cau', 'chuong-ga', 'ga'];
     for (const kind of crafts) expect(signedVolume(createCraftProp(kind)!), kind).toBeGreaterThan(0);
   });
   it('thân thuyền: thể tích có dấu dương', () => {

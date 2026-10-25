@@ -288,7 +288,7 @@ export const toItem = (p: PropPlacement, extra: Partial<Item> = {}): Item => ({ 
  * Mỗi loại một InstancedMesh dùng chung geometry và material.
  */
 /** Đồ gợi nghề quanh cổng (bước 8d): hình dựng (`createCraftProp`) và màu vật liệu; màu từng món nhân thêm màu `tint` của bố cục (cuộn vải nhiều màu). */
-const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh'] as const;
+const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh', 'may-soi-dau', 'bang-mau', 'phien-da', 'mai-che', 'phoi-go', 'hom-thu', 'gia-thu', 'chuong-bo-cau', 'chuong-ga', 'ga'] as const;
 const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughness: number; vertexColors?: boolean }> = {
   giay: { color: '#EFE6CC', roughness: 1 },
   vai: { color: '#FFFFFF', roughness: 0.95 },
@@ -312,6 +312,16 @@ const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughne
   'sao-soi': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
   'sap-vai': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
   'chau-canh': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'may-soi-dau': { color: '#FFFFFF', roughness: 0.45, vertexColors: true },
+  'bang-mau': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'phien-da': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'mai-che': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'phoi-go': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'hom-thu': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'gia-thu': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'chuong-bo-cau': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'chuong-ga': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'ga': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
 };
 
 /** Các loại đồ nhỏ do code dựng (kèm hình học và vật liệu) mà `MarketProps` vẽ: dùng cả để biên dịch trước shader (vật liệu màu theo đỉnh của đình, cối, bếp là chương trình shader mới). */
@@ -377,7 +387,7 @@ export function MarketProps({ layout, cull }: { layout: Pick<MarketLayout, 'prop
       {draw('jar', res.geos.jar, res.mats.jar, items.jar, 0.7, true, true)}
       {draw('bush', res.geos.bush, res.mats.bush, items.bush, 1, true, true)}
       {draw('bloom', res.geos.bloom, res.mats.bloom, items.bloom, 1, false, false)}
-      {crafts.map((c, i) => (craftItems[i].length > 0 ? draw(c.kind, c.geo, c.mat, craftItems[i], c.kind === 'dinh' ? 5 : 2.2, c.kind !== 'chan', true) : null))}
+      {crafts.map((c, i) => (craftItems[i].length > 0 ? draw(c.kind, c.geo, c.mat, craftItems[i], c.kind === 'dinh' || c.kind === 'bang-mau' ? 5 : c.kind === 'mai-che' ? 4.2 : 2.2, c.kind !== 'chan', true) : null))}
     </>
   );
 }
