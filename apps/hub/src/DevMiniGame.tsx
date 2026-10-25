@@ -1,8 +1,8 @@
-import { MiniGameLevel, Panel, type ScorePart } from '@so-chung/core';
+import { GAMES, MiniGameLevel, Panel, type ScorePart } from '@so-chung/core';
 
 /**
  * Trang thu /dev/minigame (chi co khi chay dev): thu khung MiniGameLevel voi mot "game" gia (cac nut ket thuc voi diem co san).
- * Vi du: /dev/minigame?level=2 (mac dinh man 2, moc 200/380/520).
+ * Vi du: /dev/minigame?level=9 (the bat dau cua man 9; mac dinh man 2; moc 200/380/520).
  */
 /** Dong diem mau (chu ASCII, do dai nhu that) de thu man ket qua o dien thoai ngang. */
 const PARTS_5: ScorePart[] = [
@@ -19,11 +19,17 @@ const PARTS_4: ScorePart[] = [
   { label: 'Cau hoi tra loi dung', count: 4, points: 120 },
 ];
 
+/** Game duoc chon bang ?level=N (N co trong GAMES: 2, 3, 5, 6, 8, 9, 12); khong hop le thi man 2. */
+function levelFromUrl(): number {
+  const n = Number(new URLSearchParams(window.location.search).get('level'));
+  return GAMES[n] ? n : 2;
+}
+
 export default function DevMiniGame() {
   return (
     <main className="mx-auto min-h-screen max-w-[900px] p-4">
       <MiniGameLevel
-        levelId={2}
+        levelId={levelFromUrl()}
         medals={[200, 380, 520]}
         renderGame={({ paused, attempt, onFinish }) => (
           <Panel className="space-y-3">

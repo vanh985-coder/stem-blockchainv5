@@ -284,9 +284,11 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
   }
 
   return (
-    <div className="mx-auto w-full max-w-xl px-4 py-8">
-      <Panel className="space-y-5 p-6 sm:p-8">
-        <h2 className="text-2xl sm:text-3xl">{title}</h2>
+    <div className="mx-auto w-full max-w-xl px-4 py-3 sm:py-8 [@media(max-height:500px)]:py-1.5">
+      {/* Thẻ bắt đầu: tiêu đề và hai nút luôn thấy (nút cố định ở đáy thẻ), chỉ phần luật cuộn khi dài (màn thấp như điện thoại ngang) */}
+      <Panel padded={false} className="flex max-h-[calc(100dvh-1.5rem)] flex-col gap-3 p-4 sm:max-h-[calc(100dvh-4rem)] sm:p-8 [@media(max-height:500px)]:max-h-[calc(100dvh-0.75rem)] [@media(max-height:500px)]:gap-2 [@media(max-height:500px)]:p-3" data-testid="the-bat-dau">
+        <h2 className="shrink-0 text-2xl sm:text-3xl [@media(max-height:500px)]:text-xl">{title}</h2>
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1" data-testid="the-luat">
         {text && (
           <>
             <section aria-label={gameUi.luat}>
@@ -314,7 +316,8 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
           {best > 0 ? fmt(gameUi.diemCao, { diem: formatNumber(best) }) : gameUi.chuaChoi}
         </p>
         <p className="text-sm">{moc}</p>
-        <div className="flex flex-col justify-center gap-3 sm:flex-row sm:justify-end">
+        </div>
+        <div className="flex shrink-0 flex-col justify-center gap-2 sm:flex-row sm:justify-end sm:gap-3" data-testid="nut-the-bat-dau">
           <Button size="lg" variant="secondary" fullWidth className="sm:w-auto" onClick={() => setGuideOpen(true)}>
             {huongDan.nut}
           </Button>
