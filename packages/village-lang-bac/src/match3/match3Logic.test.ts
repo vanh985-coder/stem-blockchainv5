@@ -37,7 +37,7 @@ describe('bảng test của spec 08 (màn 11)', () => {
     expect(findGroups(s.board).map((g) => g.cells.map(keyOf))).toEqual([['0,0', '0,1', '0,2']]);
     const events = settleBoard(s);
     expect(cellsOfFirstClear(events)).toEqual(['0,0', '0,1', '0,2']);
-    expect(ev(events, 'clear')[0].points).toBe(15);
+    expect(ev(events, 'clear')[0].points).toBe(3);
   });
 
   it('ABC / ADE / AFG: nổ đúng 3 ô cột 0', () => {
@@ -102,7 +102,7 @@ describe('bảng test của spec 08 (màn 11)', () => {
     const lotus = ev(r.events, 'spawnLotus');
     expect(lotus).toEqual([{ type: 'spawnLotus', pos: [0, 2], leaf: 0 }]);
     expect(cellsOfFirstClear(r.events)).toEqual(['0,0', '0,1', '0,3']); // 3 lá nổ, hoa sen ở lại
-    expect(ev(r.events, 'clear')[0].points).toBe(15);
+    expect(ev(r.events, 'clear')[0].points).toBe(3);
   });
 });
 
@@ -175,7 +175,7 @@ describe('hoa sen và gió xoáy', () => {
     const clear = ev(events, 'clear')[0];
     expect(clear.lotusRows).toEqual([1]);
     expect(clear.cells.map((c) => keyOf(c.pos)).sort()).toEqual(['1,0', '1,1', '1,2', '1,4']);
-    expect(clear.points).toBe(20);
+    expect(clear.points).toBe(4);
     expect(ev(events, 'fakeGone').map((x) => keyOf(x.pos))).toEqual(['1,3']);
     expect(ev(events, 'slotFilled')).toEqual([]); // loại A không có ô cần; D ở hàng bị xóa thêm không lấp
   });
@@ -194,7 +194,7 @@ describe('hoa sen và gió xoáy', () => {
     const clear = ev(r.events, 'clear')[0];
     expect(clear.windOf).toBe(0);
     expect(clear.cells.map((c) => keyOf(c.pos)).sort()).toEqual(['0,0', '0,1', '1,1', '2,0']);
-    expect(clear.points).toBe(15); // 3 lá A, ô gió không tính điểm
+    expect(clear.points).toBe(3); // 3 lá A, ô gió không tính điểm
     expect(ev(r.events, 'slotFilled')).toHaveLength(1);
     expect(r.events[0]).toEqual({ type: 'swap', a: [0, 0], b: [0, 1] });
   });
@@ -409,7 +409,7 @@ describe('vòng, điểm, tất định', () => {
     const r = swapCells(s, [0, 2], [1, 2]);
     expect(r.ok).toBe(true);
     const end = ev(r.events, 'roundEnd')[0];
-    expect(end).toEqual({ type: 'roundEnd', round: 0, done: true, turnsLeft: 4, bonus: 80 });
+    expect(end).toEqual({ type: 'roundEnd', round: 0, done: true, turnsLeft: 4, bonus: 280 });
     expect(s.phase).toBe('roundEnd');
     expect(s.results[0]).toMatchObject({ done: true, turnsLeft: 4 });
     expect(ev(r.events, 'treeDone')).toHaveLength(1);
@@ -516,7 +516,7 @@ describe('vòng, điểm, tất định', () => {
     }
   });
 
-  it('phương án số lượt: A (12, 16, 16), B (10, 14, 14), C (8, 12, 12); chỉ đổi lượt, lá giả và ô cây giữ nguyên; số liệu đang dùng là C', () => {
+  it('phương án số lượt: A (12, 16, 16), B (10, 14, 14), C (8, 12, 12); chỉ đổi lượt, lá giả và ô cây giữ nguyên; số liệu đang dùng là 12 / 15 / 15', () => {
     const expected = { A: [12, 16, 16], B: [10, 14, 14], C: [8, 12, 12] } as const;
     for (const v of ['A', 'B', 'C'] as const) {
       const spec = match3Variant(v);
@@ -526,7 +526,8 @@ describe('vòng, điểm, tất định', () => {
       expect({ ...spec, rounds: BASE_MATCH3_SPEC.rounds }).toEqual(BASE_MATCH3_SPEC);
     }
     expect(match3Variant('base')).toBe(BASE_MATCH3_SPEC);
-    expect(MATCH3_SPEC.rounds.map((r) => r.turns)).toEqual([8, 12, 12]);
+    expect(MATCH3_SPEC.rounds.map((r) => r.turns)).toEqual([12, 15, 15]);
+    expect(MATCH3_SPEC.medals).toEqual([1150, 1550, 1850]);
   });
 
   it('số liệu gốc đúng bảng spec 08: lưới 7 × 7, 6 loại, ba vòng, điểm 5 / 50 / 20, mốc 600 / 1000 / 1400 (hay mốc đã đặt lại, ghi trong spec)', () => {
@@ -538,7 +539,7 @@ describe('vòng, điểm, tất định', () => {
       { slots: 8, turns: 25, fakes: 8 },
     ]);
     expect(BASE_MATCH3_SPEC.throwEvery).toBe(5);
-    expect(BASE_MATCH3_SPEC.points).toEqual({ leaf: 5, slot: 50, spare: 20 });
+    expect(BASE_MATCH3_SPEC.points).toEqual({ leaf: 1, slot: 50, tree: 200, spare: 20 });
     expect(BASE_MATCH3_SPEC.medals).toEqual([600, 1000, 1400]);
   });
 });

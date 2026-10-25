@@ -696,7 +696,7 @@ export type SwapResult = { ok: true; events: Match3Event[] } | { ok: false; why:
 
 function endRound(s: Match3State, events: Match3Event[]): void {
   const done = slotsDone(s);
-  const bonus = done ? s.spec.points.spare * s.turnsLeft : 0;
+  const bonus = done ? s.spec.points.tree + s.spec.points.spare * s.turnsLeft : 0;
   s.score += bonus;
   s.roundScore += bonus;
   s.results.push({ done, turnsLeft: s.turnsLeft, score: s.roundScore, slotsFilled: s.slots.filter((x) => x.filled).length });
@@ -763,9 +763,9 @@ export function advanceRound(s: Match3State): Match3Event[] {
 
 export const match3Score = (s: Match3State): number => s.score;
 
-/** Điểm tính lại từ thống kê và kết quả các vòng (để kiểm công thức): lá nổ × 5 + ô cây × 50 + thưởng lượt dư. */
+/** Điểm tính lại từ thống kê và kết quả các vòng (để kiểm công thức): lá nổ × 1 + ô cây × 50 + mỗi cây xong (200 + 20 × lượt dư). */
 export function scoreFromStats(spec: Match3Spec, stats: Pick<Match3Stats, 'leavesCleared' | 'slotsFilled'>, results: readonly RoundResult[]): number {
-  const spare = results.reduce((sum, r) => sum + (r.done ? r.turnsLeft * spec.points.spare : 0), 0);
+  const spare = results.reduce((sum, r) => sum + (r.done ? spec.points.tree + r.turnsLeft * spec.points.spare : 0), 0);
   return stats.leavesCleared * spec.points.leaf + stats.slotsFilled * spec.points.slot + spare;
 }
 

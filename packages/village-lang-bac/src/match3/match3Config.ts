@@ -1,8 +1,8 @@
 /**
  * Số liệu của màn 11 "Ghép lá cây sổ" (spec 08, mục "Màn 11"). Đơn vị: ô, lượt, điểm (không có thời gian).
  *
- * Luật gốc của spec: lưới 7 × 7, 6 loại lá; ba vòng (4 ô cây, 20 lượt, 3 lá giả) / (8, 25, 5) / (8, 25, 8); mỗi lá nổ +5, mỗi ô cây lấp +50, xong cây +20 mỗi lượt dư; mốc 600 / 1000 / 1400;
- * cứ 5 lượt {phanDien} ném một lá giả.
+ * Luật gốc của spec: lưới 7 × 7, 6 loại lá; ba vòng (4 ô cây, 20 lượt, 3 lá giả) / (8, 25, 5) / (8, 25, 8); mỗi lá nổ +5, mỗi ô cây lấp +50, xong cây +20 mỗi lượt dư; mốc 600 / 1000 / 1400
+ * (`BASE_MATCH3_SPEC` dùng điểm đã sửa ở lượt cân bằng 2: lá +1, ô cây +50, xong cây +200 + 20 × lượt dư; số lượt và mốc đang dùng ở `MATCH3_SPEC`); cứ 5 lượt {phanDien} ném một lá giả.
  *
  * Những chỗ spec chưa nói (đã chốt trong lời giao bước B12, ghi cả trong spec 08):
  *  - "một hàng" là một nhóm liền nhau từ 3 lá cùng loại thẳng hàng trở lên (hình L, T tính theo đường dài nhất); mỗi hàng loại X lấp TỐI ĐA một ô cây loại X còn trống;
@@ -30,8 +30,8 @@ export interface Match3Spec {
   throwEvery: number;
   /** Mỗi ô cây có nhiều nhất bấy nhiêu ô cùng loại, tính trên 8 ô (4 ô thì chia theo tỉ lệ, làm tròn lên) */
   maxSameOf8: number;
-  /** Điểm: mỗi lá nổ, mỗi ô cây lấp, mỗi lượt dư khi xong cây */
-  points: { leaf: number; slot: number; spare: number };
+  /** Điểm: mỗi lá nổ, mỗi ô cây lấp, mỗi cây xong, và mỗi lượt dư khi xong cây */
+  points: { leaf: number; slot: number; tree: number; spare: number };
   /** Mốc điểm cả ván: Đồng, Bạc, Vàng */
   medals: readonly [number, number, number];
 }
@@ -49,7 +49,7 @@ export const BASE_MATCH3_SPEC: Match3Spec = {
   rounds: BASE_ROUNDS,
   throwEvery: 5,
   maxSameOf8: 3,
-  points: { leaf: 5, slot: 50, spare: 20 },
+  points: { leaf: 1, slot: 50, tree: 200, spare: 20 },
   medals: [600, 1000, 1400],
 };
 
@@ -66,6 +66,12 @@ export const MATCH3_TURNS: Readonly<Record<Match3Variant, readonly [number, numb
   C: [8, 12, 12],
 };
 
+/** Luật gốc với số lượt tùy ý: vòng 1 `round1`, vòng 2 và vòng 3 cùng `round23` (dùng quét lưới số lượt). */
+export function match3WithTurns(round1: number, round23: number, base: Match3Spec = BASE_MATCH3_SPEC): Match3Spec {
+  const turns = [round1, round23, round23];
+  return { ...base, rounds: base.rounds.map((r, i) => ({ ...r, turns: turns[i] })) };
+}
+
 export function match3Variant(variant: Match3Variant, base: Match3Spec = BASE_MATCH3_SPEC): Match3Spec {
   if (variant === 'base') return base;
   const turns = MATCH3_TURNS[variant];
@@ -73,12 +79,13 @@ export function match3Variant(variant: Match3Variant, base: Match3Spec = BASE_MA
 }
 
 /**
- * Số liệu đang dùng: phương án C (8, 12, 12 lượt), luật khác như spec. Mục tiêu (300 ván mỗi bot, seed 1 đến 300): bot giỏi xong cả 3 cây ≥ 85% và bot ngẫu nhiên xong cả 3 cây ≤ 40%.
- * Xong cả 3 cây: A giỏi 86,7% / ngẫu nhiên 59,0%; B giỏi 71,7% / ngẫu nhiên 35,7%; C giỏi 45,7% / ngẫu nhiên 15,0%. Không phương án nào đạt cả hai (A đạt bot giỏi mà bot ngẫu nhiên còn quá cao; B và C đạt bot
- * ngẫu nhiên mà bot giỏi quá thấp), nên theo lời giao dừng ở C và báo số thật.
+ * Số liệu đang dùng (cân bằng màn 11, lượt 2): điểm mới (lá nổ +1, ô cây +50, xong cây +200 + 20 × lượt dư) và số lượt 12 / 15 / 15, mốc 1150 / 1550 / 1850. Lý do: điểm lá nổ (~1.200) lấn át điểm dựng cây nên
+ * điểm không phản ánh số cây xong; bot ngẫu nhiên vốn ăn may nhờ nổ dây chuyền nên mục tiêu ≤ 40% quá chặt.
  *
- * MỐC ĐIỂM 600 / 1000 / 1400 (của spec) vẫn CHƯA CHỌN ĐƯỢC mốc theo nghĩa (Vàng ≈ xong 3 cây, Bạc ≈ xong 2 cây, Đồng ≈ xong 1 cây): điểm hầu như không phụ thuộc số cây xong (lá nổ khoảng 1.200 điểm,
- * ô cây và lượt dư chỉ thêm vài trăm) nên điểm các ván xong 0, 1, 2, 3 cây chồng lên nhau (p10 đến p90: 1.370 đến 1.605, 1.460 đến 1.745, 1.565 đến 1.810, 1.670 đến 1.915); không bội số 50 nào thỏa
- * hai điều kiện ≥ 90% và ≤ 10% của lời giao. Báo số liệu, giữ mốc của spec (298 / 300 ván của bot giỏi và bot trung bình, 294 / 300 của bot ngẫu nhiên vẫn Vàng).
+ * Số lượt: quét lưới vòng 1 ∈ {8 … 12} × vòng 2 = vòng 3 ∈ {12 … 16}, 300 ván mỗi bot mỗi ô; mục tiêu bot giỏi xong cả 3 cây ≥ 80% và bot ngẫu nhiên ≤ 50%. KHÔNG ô nào đạt cả hai; theo lời giao chọn ô có
+ * (giỏi − ngẫu nhiên) lớn nhất trong các ô có giỏi ≥ 80%: 12 / 15 / 15 (giỏi 245 / 300 = 81,7%, ngẫu nhiên 154 / 300 = 51,3%, hiệu 91). Xem bảng ở `match3Balance.test.ts` và spec 08.
+ *
+ * Mốc theo nghĩa (Vàng ≈ xong 3 cây, Bạc ≈ xong 2 cây, Đồng ≈ xong 1 cây): ≥ 85% ván xong k cây đạt mốc k và ≤ 15% ván xong ít hơn k cây đạt mốc k (gộp 900 ván của cả 3 bot). Thỏa: Đồng 1050 đến 1250,
+ * Bạc 1450 đến 1600, Vàng 1800 đến 1900; chọn giữa khoảng thỏa (tự chọn): 1150 / 1550 / 1850.
  */
-export const MATCH3_SPEC: Match3Spec = match3Variant('C');
+export const MATCH3_SPEC: Match3Spec = { ...match3WithTurns(12, 15), medals: [1150, 1550, 1850] };
