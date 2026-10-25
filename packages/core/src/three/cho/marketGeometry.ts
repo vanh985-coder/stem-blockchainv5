@@ -6,6 +6,7 @@ import { BoxGeometry, BufferGeometry as Geometry, CatmullRomCurve3, CircleGeomet
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createMulberry32 } from '../../lib/rng';
 import { CLOTH_PALETTE } from '../village/clothPoles';
+import { bakeCopperSheen } from './copperBake';
 import { CRAFT_TEXTURE_OF, CRAFT_TEXTURE_TILE, applyBoxUV } from './craftTextures';
 import { PROP_SIZES, type PropKind } from './marketLayout';
 
@@ -496,7 +497,7 @@ function createInspector(): BufferGeometry {
   parts.push(cylAt(0.25, 0.12, 0, 3.0, 0, BRASS, 12));
   for (const sx of [-1, 1]) for (const sz of [-1, 1]) parts.push(cylAt(0.025, 0.5, sx * 0.17, 3.12, sz * 0.17, BRASS, 6));
   parts.push(solid(translated(new ConeGeometry(0.26, 0.25, 12), 0, 3.62 + 0.125, 0), BRASS), cylAt(0.04, 0.03, 0, 3.87, 0, BRASS, 8));
-  return mergeGeometries(parts)!;
+  return bakeCopperSheen(mergeGeometries(parts)!); // ánh kim nướng vào màu đỉnh (không đổi chương trình shader)
 }
 
 /**
@@ -912,6 +913,8 @@ export function createCraftProp(kind: PropKind): BufferGeometry | null {
   const g = buildCraftProp(kind);
   const tex = CRAFT_TEXTURE_OF[kind];
   if (g && tex) applyBoxUV(g, CRAFT_TEXTURE_TILE[tex]);
+  // bàn đá thường có vân đá như các đồ đá khác: thêm màu theo đỉnh trắng để dùng chung chương trình shader (màu theo đỉnh + texture) với chúng, thay vì thêm một chương trình riêng
+  if (g && kind === 'ban-da' && !g.getAttribute('color')) paint(g, 0xffffff);
   return g;
 }
 

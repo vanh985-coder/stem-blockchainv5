@@ -172,22 +172,41 @@ function drawThatch(g: Ctx, s: number): void {
   const rng = createMulberry32(4103);
   g.fillStyle = '#E6E2D6';
   g.fillRect(0, 0, s, s);
-  // sợi rơm: hàng nghìn nét ngắn, phần lớn theo một hướng (xuôi dốc), lệch nhẹ
+  // sợi rơm: hàng nghìn nét ngắn, phần lớn theo một hướng (xuôi dốc), lệch nhẹ. Gom các nét cùng màu và độ đậm thành MỘT đường rồi vẽ một lần (vẽ từng nét một mất 120 đến 180 ms trên luồng chính, gom lại còn vài mili giây);
+  // nét tràn qua mép thì thêm một bản lệch đúng một chu kỳ để texture lát liền.
+  const styles = [
+    { color: 'rgba(92,66,24,0.14)', width: 1.2 },
+    { color: 'rgba(92,66,24,0.24)', width: 1.6 },
+    { color: 'rgba(92,66,24,0.34)', width: 2 },
+    { color: 'rgba(255,248,214,0.2)', width: 1.2 },
+    { color: 'rgba(255,248,214,0.32)', width: 1.6 },
+    { color: 'rgba(255,248,214,0.42)', width: 2 },
+  ];
+  const segs: number[][][] = styles.map(() => []);
   for (let i = 0; i < 2600; i++) {
     const x = rng() * s;
     const y = rng() * s;
     const a = Math.PI / 2 + (rng() - 0.5) * 0.9;
     const len = 9 + rng() * 26;
-    const dark = rng() < 0.55;
-    tiled(s, (dx, dy) => {
-      g.strokeStyle = dark ? `rgba(92,66,24,${0.12 + rng() * 0.26})` : `rgba(255,248,214,${0.16 + rng() * 0.26})`;
-      g.lineWidth = 1 + rng() * 1.5;
-      g.beginPath();
-      g.moveTo(x + dx, y + dy);
-      g.lineTo(x + dx + Math.cos(a) * len, y + dy + Math.sin(a) * len);
-      g.stroke();
-    });
+    const k = (rng() < 0.55 ? 0 : 3) + Math.floor(rng() * 3);
+    const x1 = x + Math.cos(a) * len;
+    const y1 = y + Math.sin(a) * len;
+    segs[k].push([x, y, x1, y1]);
+    const ox = x1 >= s ? -s : x1 < 0 ? s : 0;
+    const oy = y1 >= s ? -s : y1 < 0 ? s : 0;
+    if (ox !== 0) segs[k].push([x + ox, y, x1 + ox, y1]);
+    if (oy !== 0) segs[k].push([x, y + oy, x1, y1 + oy]);
   }
+  styles.forEach((st, k) => {
+    g.strokeStyle = st.color;
+    g.lineWidth = st.width;
+    g.beginPath();
+    for (const [x0, y0, x1, y1] of segs[k]) {
+      g.moveTo(x0, y0);
+      g.lineTo(x1, y1);
+    }
+    g.stroke();
+  });
   // vài đường buộc ngang sẫm
   for (let y = s / 6; y < s; y += s / 3) {
     g.fillStyle = 'rgba(70,48,18,0.3)';

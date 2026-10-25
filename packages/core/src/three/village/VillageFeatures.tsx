@@ -5,10 +5,10 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { fmt } from '../../content/characters';
 import { stampBoardText } from '../../content/villageFeatures';
 import { PEOPLE } from '../../lessons/bai-3/logic';
-import { acquireCraftTexture, applyBoxUV, releaseCraftTexture, CRAFT_TEXTURE_TILE } from '../cho/craftTextures';
-import { attachCopperSheen } from '../cho/copperSheen';
+import { applyBoxUV, attachCraftTexture, CRAFT_TEXTURE_TILE } from '../cho/craftTextures';
+import { bakeCopperSheen } from '../cho/copperBake';
 import { DOVECOTE_PIGEONS, PIGEON_NECK, STAMP_BOARD, createPigeonHead } from '../cho/marketGeometry';
-import { COPPER_SHEEN_INTENSITY, LOW_COPPER } from '../cho/MarketProcedural';
+import { LOW_COPPER } from '../cho/MarketProcedural';
 import { PROP_SIZES, type PropPlacement } from '../cho/marketLayout';
 import type { QualityLevel } from '../quality';
 import { usePlayerState } from '../WalkWorld';
@@ -58,7 +58,21 @@ export function createGear(radius: number, teeth: number, thickness: number): Bu
     false,
   ) as BufferGeometry;
   for (const p of parts) p.dispose();
-  return applyBoxUV(merged, CRAFT_TEXTURE_TILE.copper);
+  return bakeCopperSheen(applyBoxUV(merged, CRAFT_TEXTURE_TILE.copper), 0.5); // bánh răng quay: ánh kim nướng nhẹ hơn thân máy
+}
+
+/**
+ * Vật liệu bánh răng: đồng có vân (texture `copper` dùng chung, trả tham chiếu khi vật liệu bị giải phóng); mức Thấp chỉ màu đồng và ánh kim thấp. Bánh răng vẽ bằng mesh thường (có màu theo đỉnh, có texture) nên là một chương trình shader
+ * riêng: `ZonePrewarm` biên dịch trước bằng đúng vật liệu này (cờ `plain`), nếu không thì biên dịch ở khung đầu tiên bánh răng vào cảnh (một khung 130 đến 145 ms).
+ */
+export function gearMaterial(level?: QualityLevel): MeshStandardMaterial {
+  const m = new MeshStandardMaterial(
+    level === 'low'
+      ? { color: '#FFFFFF', vertexColors: true, metalness: LOW_COPPER.metalness, roughness: LOW_COPPER.roughness, emissive: LOW_COPPER.emissive }
+      : { color: '#FFFFFF', vertexColors: true, metalness: 0.55, roughness: 0.3, emissive: '#2a1308' },
+  );
+  attachCraftTexture(m, 'copper');
+  return m;
 }
 
 /** Bánh răng của máy: vị trí (hệ máy, mặt trước là +Z), bán kính, số răng, trục (z: mặt trước; x: hai bên), chiều quay và tốc độ (rad/giây) */
@@ -259,14 +273,7 @@ export function VillageFeatures({ props, animate, maxDistance, level }: VillageF
   const dovecotes = useMemo(() => props.filter((p) => p.kind === KINDS[2]), [props]);
   const res = useMemo(() => {
     const gearGeos = MACHINE_GEARS.map((g) => createGear(g.r, g.teeth, 0.14));
-    const copperMap = acquireCraftTexture('copper');
-    // mức Thấp: bánh răng cũng chỉ có màu đồng và ánh kim thấp, không ánh kim giả (như thân máy)
-    const gearMat = new MeshStandardMaterial(
-      level === 'low'
-        ? { color: '#FFFFFF', vertexColors: true, metalness: LOW_COPPER.metalness, roughness: LOW_COPPER.roughness, emissive: LOW_COPPER.emissive, ...(copperMap ? { map: copperMap } : {}) }
-        : { color: '#FFFFFF', vertexColors: true, metalness: 0.7, roughness: 0.34, emissive: '#2a1308', ...(copperMap ? { map: copperMap } : {}) },
-    );
-    if (level !== 'low') attachCopperSheen(gearMat, COPPER_SHEEN_INTENSITY);
+    const gearMat = gearMaterial(level);
     const lampGeo = new SphereGeometry(0.2, 12, 8);
     lampGeo.scale(1, 1.3, 1);
     const lampMat = new MeshStandardMaterial({ color: '#FFE9A8', emissive: '#FFB52E', emissiveIntensity: 1.2, roughness: 0.25 });
@@ -278,15 +285,9 @@ export function VillageFeatures({ props, animate, maxDistance, level }: VillageF
     texture.anisotropy = 4;
     const plane = new PlaneGeometry(PROP_SIZES['bang-mau'].box!.hx * 2, PROP_SIZES['bang-mau'].h);
     const boardMat = new MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
-    return { gearGeos, gearMat, lampGeo, lampMat, canvas, texture, plane, boardMat, copperMap };
+    return { gearGeos, gearMat, lampGeo, lampMat, canvas, texture, plane, boardMat };
   }, [level]);
   useDispose(useMemo(() => [...res.gearGeos, res.gearMat, res.lampGeo, res.lampMat, res.texture, res.plane, res.boardMat], [res]));
-  useEffect(
-    () => () => {
-      if (res.copperMap) releaseCraftTexture('copper');
-    },
-    [res],
-  );
   // vẽ lại chữ khi phông chữ tải xong (lần đầu có thể còn dùng phông dự phòng)
   useEffect(() => {
     let alive = true;

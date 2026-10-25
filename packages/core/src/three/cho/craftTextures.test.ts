@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createStoneHill } from '../village/scatterGeometry';
 import { CRAFT_TEXTURE_OF, CRAFT_TEXTURE_TILE, acquireCraftTexture, applyBoxUV, craftTextureCount, releaseCraftTexture } from './craftTextures';
 import { DOVECOTE_PIGEONS, PIGEON_NECK, createCraftProp, createPigeonHead } from './marketGeometry';
+import { bakeCopperSheen, copperSheenFactor } from './copperBake';
 import { CRAFT_KINDS, LOW_COPPER, craftMaterial } from './MarketProcedural';
 import { PROP_SIZES, type PropKind } from './marketLayout';
 
@@ -122,7 +123,7 @@ describe('đồ làm đẹp bước L4', () => {
 });
 
 describe('ánh kim chỉ của máy soi dấu (bước L4)', () => {
-  it('mọi đồ nhỏ khác (kể cả bệ đá của máy) không kim loại, không bản đồ môi trường, không ánh kim giả: trông như trước L4', () => {
+  it('mọi đồ nhỏ khác (kể cả bệ đá của máy) không kim loại, không bản đồ môi trường: trông như trước L4', () => {
     for (const kind of CRAFT_KINDS) {
       if (kind === 'may-soi-dau') continue;
       const m = craftMaterial(kind);
@@ -132,16 +133,17 @@ describe('ánh kim chỉ của máy soi dấu (bước L4)', () => {
     }
   });
 
-  it('mức Thấp: máy soi dấu chỉ có màu đồng và ánh kim thấp, không ánh kim giả; các mức khác có ánh kim giả và kim loại cao hơn rõ rệt (không dùng envMap)', () => {
+  it('mức Thấp: máy soi dấu chỉ có màu đồng và ánh kim thấp; các mức khác kim loại cao hơn rõ rệt; không dùng envMap và không đổi chương trình shader (dùng chung với đồ nhỏ khác, không có gì để biên dịch thêm)', () => {
     const low = craftMaterial('may-soi-dau', 'low');
     expect(low.envMap).toBeNull();
-    expect(low.onBeforeCompile.toString()).not.toContain('uSheen');
+    expect(low.onBeforeCompile).toBe(craftMaterial('da-xe').onBeforeCompile);
     expect(low.metalness).toBeCloseTo(LOW_COPPER.metalness, 6);
     for (const level of ['medium', 'high'] as const) {
       const m = craftMaterial('may-soi-dau', level);
-      expect(m.metalness).toBeGreaterThan(low.metalness + 0.4);
+      expect(m.metalness).toBeGreaterThan(low.metalness + 0.3);
       expect(m.envMap).toBeNull(); // envMap buộc three đổi sang PMREM ở khung đầu tiên (400 ms)
-      expect(m.onBeforeCompile.toString()).toContain('uSheen');
+      expect(m.onBeforeCompile).toBe(craftMaterial('da-xe').onBeforeCompile); // không có shader tùy biến
+      expect(m.customProgramCacheKey()).toBe(craftMaterial('da-xe').customProgramCacheKey());
     }
   });
 
@@ -149,5 +151,35 @@ describe('ánh kim chỉ của máy soi dấu (bước L4)', () => {
     expect(PROP_SIZES['de-may'].r).toBe(PROP_SIZES['may-soi-dau'].r);
     expect(PROP_SIZES['de-may'].collide).toBe(false);
     expect(CRAFT_TEXTURE_OF['de-may']).toBeUndefined(); // vật liệu đá phẳng như trước, không vân mới
+  });
+});
+
+describe('ánh kim nướng vào màu đỉnh của đồng (copperBake)', () => {
+  it('mặt hướng lên sáng hơn mặt hướng xuống; có vệt nắng; không đổi gì khi strength = 0', () => {
+    const up = copperSheenFactor(0, 1, 0);
+    const down = copperSheenFactor(0, -1, 0);
+    const side = copperSheenFactor(1, 0, 0);
+    expect(up).toBeGreaterThan(side);
+    expect(side).toBeGreaterThan(down);
+    expect(down).toBeGreaterThan(0.4);
+    const sun = Math.hypot(0.45, 0.8, 0.35);
+    expect(copperSheenFactor(0.45 / sun, 0.8 / sun, 0.35 / sun)).toBeGreaterThan(up + 0.5);
+    expect(copperSheenFactor(0.3, 0.9, 0.1, 0)).toBe(1);
+  });
+
+  it('máy soi dấu đã nướng: có mặt sáng hơn màu gốc và mặt tối hơn màu gốc (độ tương phản), pháp tuyến không đổi', () => {
+    const baked = createCraftProp('may-soi-dau')!;
+    const color = baked.getAttribute('color');
+    let min = Infinity;
+    let max = -Infinity;
+    for (let i = 0; i < color.count; i++) {
+      const l = color.getX(i) + color.getY(i) + color.getZ(i);
+      min = Math.min(min, l);
+      max = Math.max(max, l);
+    }
+    expect(max / min).toBeGreaterThan(3);
+    const g = createCraftProp('may-soi-dau')!;
+    const again = bakeCopperSheen(g, 0);
+    expect(again).toBe(g);
   });
 });

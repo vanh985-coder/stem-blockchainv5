@@ -91,7 +91,8 @@ function YardDisc({ yard, y, dirt, brick, radial }: { yard: VillageYard; y: numb
  */
 function YardKerb({ yard, roads }: { yard: VillageYard; roads: readonly VillageRoad[] }) {
   const geo = useMemo(() => applyBoxUV(new BoxGeometry(1, 1, 1), 1.0), []);
-  const mat = useMemo(() => new MeshStandardMaterial({ color: '#FFFFFF', roughness: 1 }), []);
+  // flatShading (các mặt hộp vốn phẳng) để dùng chung chương trình shader với đá rời (texture, không màu theo đỉnh, flatShading)
+  const mat = useMemo(() => new MeshStandardMaterial({ color: '#FFFFFF', roughness: 1, flatShading: true }), []);
   const stoneTex = useCraftTexture('stone');
   useEffect(() => {
     mat.map = stoneTex;

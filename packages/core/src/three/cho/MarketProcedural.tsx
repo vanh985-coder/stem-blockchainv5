@@ -20,7 +20,6 @@ import { FENCE_POST_HEIGHT, FENCE_RAIL_LENGTH, fenceLayout, type FenceLayout, DE
 import { createBoatCanopy, createBoatHull, createCraftProp, createHayStack, createJar } from './marketGeometry';
 import { buildInstanced, type Item } from './instancing';
 import { CRAFT_TEXTURE_OF, attachCraftTexture } from './craftTextures';
-import { attachCopperSheen } from './copperSheen';
 import type { QualityLevel } from '../quality';
 import { layoutHills, type HillAvoid } from './hillLayout';
 import { ChunkedInstances } from '../village/ChunkedInstances';
@@ -288,7 +287,7 @@ const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughne
   vai: { color: '#FFFFFF', roughness: 0.95 },
   // đá: có texture thì nhân với màu trắng (xem `craftMaterial`), không có thì màu xám phẳng
   'khoi-da': { color: '#A8A69E', roughness: 1 },
-  'ban-da': { color: '#B2B2A8', roughness: 1 },
+  'ban-da': { color: '#B2B2A8', roughness: 1, vertexColors: true },
   hom: { color: '#8A5A2B', roughness: 0.9 },
   thung: { color: '#D2A85A', roughness: 1 },
   chan: { color: '#6B4526', roughness: 1 },
@@ -308,7 +307,7 @@ const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughne
   'sap-vai': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
   'chau-canh': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
   // thân máy: đồng ánh kim (kim loại vừa, bóng, vân mài)
-  'may-soi-dau': { color: '#FFFFFF', roughness: 0.34, metalness: 0.7, emissive: '#2a1308', vertexColors: true },
+  'may-soi-dau': { color: '#FFFFFF', roughness: 0.3, metalness: 0.55, emissive: '#2a1308', vertexColors: true },
   'bang-mau': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
   'phien-da': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
   'mai-che': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
@@ -329,18 +328,16 @@ const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughne
   'de-may': { color: '#FFFFFF', roughness: 0.45, vertexColors: true },
 };
 
-/** Đồng ở mức Thấp: ánh kim thấp, nền phát sáng nhẹ để vẫn ra màu đồng khi không có ánh kim giả. Cường độ ánh kim giả ở các mức khác. */
+/** Đồng ở mức Thấp: ánh kim thấp (kim loại 0,18), nền phát sáng nhẹ để vẫn ra màu đồng. Các mức khác kim loại cao hơn (`CRAFT_COLOR`). Cả hai dùng chung chương trình shader chuẩn của đồ nhỏ. */
 export const LOW_COPPER = { metalness: 0.18, roughness: 0.42, emissive: '#6a3416' } as const;
-export const COPPER_SHEEN_INTENSITY = 2.4;
 
 /** Các loại đồ nhỏ do code dựng (kèm hình học và vật liệu) mà `MarketProps` vẽ: dùng cả để biên dịch trước shader (vật liệu màu theo đỉnh của đình, cối, bếp là chương trình shader mới). */
 export function craftMaterial(kind: (typeof CRAFT_KINDS)[number], level?: QualityLevel): MeshStandardMaterial {
-  // mức Thấp: máy soi dấu chỉ có màu đồng và ánh kim thấp, không có ánh kim giả
+  // mức Thấp: máy soi dấu chỉ có màu đồng và ánh kim thấp (ánh kim nướng vào màu đỉnh có ở mọi mức, xem copperBake.ts)
   const low = kind === 'may-soi-dau' && level === 'low';
-  const m = new MeshStandardMaterial({ ...CRAFT_COLOR[kind], ...(low ? { metalness: LOW_COPPER.metalness, roughness: LOW_COPPER.roughness, emissive: LOW_COPPER.emissive } : {}), flatShading: kind === 'khoi-da' || kind === 'da-vun' });
+  const m = new MeshStandardMaterial({ ...CRAFT_COLOR[kind], ...(low ? { metalness: LOW_COPPER.metalness, roughness: LOW_COPPER.roughness, emissive: LOW_COPPER.emissive } : {}), flatShading: kind === 'khoi-da' }); // đá vụn không cần flatShading: mặt khối 20 mặt vốn phẳng (pháp tuyến theo mặt); bỏ để dùng chung chương trình shader với các đồ có màu theo đỉnh
   const tex = CRAFT_TEXTURE_OF[kind];
   if (tex) attachCraftTexture(m, tex); // texture dùng chung đếm tham chiếu; không có canvas thì giữ màu phẳng
-  if (kind === 'may-soi-dau' && !low) attachCopperSheen(m, COPPER_SHEEN_INTENSITY); // đồng ánh kim: phản chiếu bầu trời giả trong shader, CHỈ vật liệu này (xem copperSheen.ts: dùng envMap thì three đổi sang PMREM, một khung 400 ms)
   return m;
 }
 export { CRAFT_KINDS };
@@ -351,12 +348,55 @@ export interface PropsCull {
   maxDistance: number;
 }
 
+/** Số loại đồ nhỏ dựng ở khung hình đầu và thêm mỗi khung hình tiếp theo khi vùng làng chia mảnh. */
+const CRAFTS_FIRST_FRAME = 6;
+const CRAFTS_PER_FRAME = 6;
+
+const craftGeoCache = new Map<string, { geo: BufferGeometry; refs: number }>();
+
+/**
+ * Hình học của một loại đồ nhỏ dùng chung, đếm tham chiếu: `ZonePrewarm` dựng sẵn lúc chuẩn bị làng (để biên dịch shader) và vùng làng dùng lại khi dựng, không dựng lần hai ở khung hình dựng vùng (dựng hơn 30 loại, có khối
+ * đùn, ống, đinh tán, là chừng 50 ms). Hết tham chiếu thì giải phóng.
+ */
+export function acquireCraftGeometry(kind: (typeof CRAFT_KINDS)[number]): BufferGeometry {
+  const had = craftGeoCache.get(kind);
+  if (had) {
+    had.refs++;
+    return had.geo;
+  }
+  const geo = createCraftProp(kind)!;
+  craftGeoCache.set(kind, { geo, refs: 1 });
+  return geo;
+}
+
+export function releaseCraftGeometry(kind: string): void {
+  const had = craftGeoCache.get(kind);
+  if (!had) return;
+  if (--had.refs <= 0) {
+    had.geo.dispose();
+    craftGeoCache.delete(kind);
+  }
+}
+
 export function MarketProps({ layout, cull, level }: { layout: Pick<MarketLayout, 'props' | 'seed'>; cull?: PropsCull; /** Mức chất lượng (máy soi dấu ở mức Thấp không dùng bản đồ môi trường) */ level?: QualityLevel }) {
   // chỉ dựng hình học của các loại có mặt trong bố cục (cả 21 loại trong một khung hình thì nặng, nhất là khi vùng làng gắn vào cảnh)
   const kindsPresent = useMemo(() => new Set(layout.props.map((p) => p.kind)), [layout]);
-  const crafts = useMemo(() => CRAFT_KINDS.filter((kind) => kindsPresent.has(kind)).map((kind) => ({ kind, geo: createCraftProp(kind)!, mat: craftMaterial(kind, level) })), [kindsPresent, level]);
-  useDispose(useMemo(() => crafts.flatMap((c) => [c.geo, c.mat]), [crafts]));
+  const crafts = useMemo(() => CRAFT_KINDS.filter((kind) => kindsPresent.has(kind)).map((kind) => ({ kind, geo: acquireCraftGeometry(kind), mat: craftMaterial(kind, level) })), [kindsPresent, level]);
+  useEffect(
+    () => () => {
+      for (const c of crafts) {
+        releaseCraftGeometry(c.kind);
+        c.mat.dispose();
+      }
+    },
+    [crafts],
+  );
   const craftItems = useMemo(() => crafts.map((c) => layout.props.filter((p) => p.kind === c.kind).map((p) => toItem(p))), [crafts, layout]);
+  // vùng làng lớn có hơn 30 loại đồ nhỏ: dựng mọi mảnh của mọi loại trong một khung hình tốn chừng 50 ms, nên mỗi khung hình thêm vài loại (chợ không chia mảnh thì dựng hết ngay)
+  const [shownCrafts, setShownCrafts] = useState(cull ? CRAFTS_FIRST_FRAME : Number.MAX_SAFE_INTEGER);
+  useFrame(() => {
+    if (cull && shownCrafts < crafts.length) setShownCrafts((n) => n + CRAFTS_PER_FRAME);
+  });
 
   const res = useMemo(() => {
     const hay = createHayStack();
@@ -402,7 +442,7 @@ export function MarketProps({ layout, cull, level }: { layout: Pick<MarketLayout
       {draw('jar', res.geos.jar, res.mats.jar, items.jar, 0.7, true, true)}
       {draw('bush', res.geos.bush, res.mats.bush, items.bush, 1, true, true)}
       {draw('bloom', res.geos.bloom, res.mats.bloom, items.bloom, 1, false, false)}
-      {crafts.map((c, i) => (craftItems[i].length > 0 ? draw(c.kind, c.geo, c.mat, craftItems[i], c.kind === 'dinh' || c.kind === 'bang-mau' ? 5 : c.kind === 'mai-che' ? 4.2 : 2.2, c.kind !== 'chan', true) : null))}
+      {crafts.map((c, i) => (i < shownCrafts && craftItems[i].length > 0 ? draw(c.kind, c.geo, c.mat, craftItems[i], c.kind === 'dinh' || c.kind === 'bang-mau' ? 5 : c.kind === 'mai-che' ? 4.2 : 2.2, c.kind !== 'chan', true) : null))}
     </>
   );
 }
