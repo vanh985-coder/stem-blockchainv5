@@ -146,7 +146,7 @@ Logic thuần, chưa có cảnh (màn 11 vẫn `coming-soon`): `match3Config.ts`
 - **Sự kiện** (để cảnh diễn hoạt đúng thứ tự, theo từng đợt): `swap`, `swapBack`, `wave` (đầu mỗi đợt nổ), `spawnLotus`, `spawnWind`, `clear` (các lá nổ, điểm, hàng bị hoa sen xóa, loại bị gió xóa), `fakeGone`, `slotFilled`, `branchMerged` (mức, chỉ số, có phải gốc), `treeDone`, `fall`, `fill`, `throwFake`, `shuffle`, `roundEnd`, `roundStart`, `gameEnd`. Thứ tự trong một đợt: `wave`, tạo hoa sen hay gió, `clear`, `fakeGone`, lấp ô cây và gộp cành, `fall`, `fill`.
 - **Bot** (`match3Bots.ts`): chỉ dùng `swapCells` và `advanceRound`, nhìn MỘT nước đi (`previewMove`: đợt nổ đầu, không đoán lá rơi xuống). Bot giỏi chọn nước lấp được nhiều ô cây nhất, rồi nổ nhiều lá nhất (hòa thì ngẫu nhiên bằng rng riêng của bot); bot trung bình 50% chọn như bot giỏi, 50% chọn ngẫu nhiên một nước hợp lệ; thêm bot ngẫu nhiên (chỉ để báo mức sàn).
 
-**Kết quả cân bằng** (300 ván mỗi bot, seed 1 đến 300, luật gốc, mốc 600 / 1000 / 1400):
+**Kết quả cân bằng bước B12** (300 ván mỗi bot, seed 1 đến 300, luật gốc 20 / 25 / 25 lượt, mốc 600 / 1000 / 1400; đã được thay bằng phương án C ở mục "Cân bằng màn 11" ngay dưới, giữ lại để so sánh):
 
 | Bot | Điểm TB (nhỏ nhất đến lớn nhất) | p10 / p25 / p75 | Xong cây vòng 1 / 2 / 3 | Lượt dư vòng 1 / 2 / 3 | Lượt, lá nổ, xáo mỗi ván | Chưa đạt / Đồng / Bạc / Vàng |
 |---|---|---|---|---|---|---|
@@ -157,6 +157,40 @@ Logic thuần, chưa có cảnh (màn 11 vẫn `coming-soon`): `match3Config.ts`
 - **Độ khó**: mục tiêu "bot trung bình xong cây vòng 1 ≥ 70%" đạt dư (99,7%) nên KHÔNG dùng phương án A (mỗi vòng +5 lượt) hay B (A và lá giả ban đầu 2 / 4 / 6); cả hai chỉ làm dễ hơn (điểm trung bình của bot trung bình 2.850). Với luật gốc ngay cả bot chỉ chọn ngẫu nhiên cũng xong cây ở 99% ván: cây chỉ cần chừng 9 lượt mỗi vòng so với 20 đến 25 lượt cho phép.
 - **Mốc điểm CHƯA ĐẠT, chờ chủ dự án chọn**: với mốc 600 / 1000 / 1400 mọi bot đều Vàng 100% (bot trung bình Vàng 100% > 15%), vì điểm dồn vào 2.170 đến 2.950 (ô cây 1.000 điểm cố định, lá nổ khoảng 700, thưởng lượt dư khoảng 800). Quy tắc phân vị của lời giao (Đồng = p25 bot trung bình = 2.470 → 2.450, Bạc = p75 bot trung bình = 2.595 → 2.550, Vàng = p10 bot giỏi = 2.425 → 2.400; Bạc ≥ Vàng nên Bạc = trung bình cộng Đồng và Vàng = 2.425) cho ba mốc không tăng dần và cách nhau dưới 150 điểm, nên KHÔNG áp dụng; giữ 600 / 1000 / 1400 của spec trong `MATCH3_SPEC` cho tới khi chọn mốc theo nghĩa (ví dụ theo số vòng xong cây trong số lượt cho phép, hoặc giảm số lượt cho khó hơn).
 - **Điểm tối đa ước tính**: khoảng 3.300 (ô cây 1.000; thưởng lượt dư tối đa 20 × (16 + 17 + 17) = 1.000 nếu mỗi ô cây một lượt; lá nổ khoảng 1.300 cho 260 lá). Bot giỏi cao nhất thấy 2.950 (300 ván).
+
+### Cân bằng màn 11 (số lượt và mốc; code ở `match3Config.ts`, `match3Balance.test.ts`)
+
+**Lý do**: với luật gốc bot chọn ngẫu nhiên cũng xong cây khoảng 99% ván và mọi bot đều Vàng, nên học sinh bấm bừa vẫn thắng. Chỉ đổi số lượt (vòng 1, 2, 3) và xét mốc; mọi luật khác (lưới, lá, lá giả, điểm, cây) giữ nguyên.
+
+**Phương án số lượt đã thử** (300 ván mỗi bot, seed 1 đến 300; thử lần lượt, dừng ở phương án đầu tiên đạt cả hai mục tiêu: bot giỏi xong cả 3 cây ≥ 85% và bot ngẫu nhiên xong cả 3 cây ≤ 40%; bot trung bình chỉ in ra):
+
+| Phương án | Lượt (vòng 1 / 2 / 3) | Bot giỏi xong cả 3 cây | Bot trung bình xong cả 3 cây | Bot ngẫu nhiên xong cả 3 cây | Điểm TB giỏi / trung bình / ngẫu nhiên | Đạt? |
+|---|---|---|---|---|---|---|
+| Gốc | 20 / 25 / 25 | 100% | 99,7% (vòng 1) | 98,7% (vòng 1) | 2.553,3 / 2.537,7 / 2.508,2 | Không (ngẫu nhiên quá cao) |
+| A | 12 / 16 / 16 | 260 / 300 = 86,7% (đạt) | 240 / 300 = 80,0% | 177 / 300 = 59,0% (> 40%) | 2.021,2 / 2.000,5 / 1.958,8 | Không |
+| B | 10 / 14 / 14 | 215 / 300 = 71,7% (< 85%) | 179 / 300 = 59,7% | 107 / 300 = 35,7% (đạt) | 1.891,5 / 1.863,1 / 1.807,2 | Không |
+| C | 8 / 12 / 12 | 137 / 300 = 45,7% (< 85%) | 101 / 300 = 33,7% | 45 / 300 = 15,0% (đạt) | 1.737,9 / 1.699,7 / 1.643,1 | Không |
+
+**Kết luận**: không phương án nào đạt cả hai mục tiêu. A đạt mục tiêu bot giỏi nhưng bot ngẫu nhiên còn xong cả 3 cây ở 59%; B và C làm bot ngẫu nhiên đủ khó nhưng bot giỏi (chỉ nhìn một nước đi) xong cả 3 cây ở 71,7% và 45,7%. Theo lời giao dừng ở C và báo số thật; `MATCH3_SPEC` đang là C (8 / 12 / 12), mục tiêu bot giỏi ≥ 85% ở C ghi bằng `it.fails` trong test. Khoảng giữa các phương án (ví dụ lượt 11 / 15 / 15) chưa thử vì ngoài lời giao; nếu chủ dự án muốn cả hai mục tiêu, nên thử một phương án nằm giữa A và B.
+
+**Bảng 3 bot ở phương án C** (mốc spec 600 / 1000 / 1400):
+
+| Bot | Xong 0 / 1 / 2 / 3 cây (ván) | Điểm TB (nhỏ nhất đến lớn nhất) | Chưa đạt / Đồng / Bạc / Vàng (ván) |
+|---|---|---|---|
+| Giỏi | 5 / 34 / 124 / 137 | 1.737,9 (1.360 đến 2.095) | 0 / 0 / 2 / 298 |
+| Trung bình | 7 / 60 / 132 / 101 | 1.699,7 (1.335 đến 2.060) | 0 / 0 / 2 / 298 |
+| Ngẫu nhiên | 32 / 86 / 137 / 45 | 1.643,1 (1.280 đến 1.950) | 0 / 0 / 6 / 294 |
+
+**Điểm theo số cây xong** (gộp cả 3 bot, 900 ván, phương án C):
+
+| Xong | Số ván | p10 | Trung vị | p90 | Nhỏ nhất đến lớn nhất |
+|---|---|---|---|---|---|
+| 0 cây | 44 | 1.370 | 1.495 | 1.605 | 1.280 đến 1.660 |
+| 1 cây | 180 | 1.460 | 1.570 | 1.745 | 1.325 đến 1.850 |
+| 2 cây | 393 | 1.565 | 1.685 | 1.810 | 1.335 đến 2.055 |
+| 3 cây | 283 | 1.670 | 1.795 | 1.915 | 1.595 đến 2.095 |
+
+**Mốc theo nghĩa CHƯA CHỌN ĐƯỢC**: yêu cầu là Vàng ≈ xong 3 cây, Bạc ≈ xong 2 cây, Đồng ≈ xong 1 cây, với ≥ 90% ván xong đúng số cây đạt mốc và ≤ 10% ván xong ít cây hơn đạt mốc (bội số 50). Quét mọi bội số 50 từ 0 đến 3.600: không giá trị nào thỏa cho Vàng, Bạc hay Đồng. Nguyên nhân: điểm gần như không phụ thuộc số cây xong (lá nổ cho khoảng 1.200 điểm; ô cây lấp được và thưởng lượt dư chỉ thêm vài trăm), nên điểm các ván xong 0, 1, 2, 3 cây chồng lên nhau (ví dụ Vàng ở 1.800: 46% ván xong 3 cây đạt, 9% ván xong ≤ 2 cây đạt; ở 1.700: 84% và 35%). Không tự chế mốc: giữ 600 / 1000 / 1400 của spec trong `MATCH3_SPEC` (298 / 300 ván của bot giỏi và bot trung bình, 294 / 300 của bot ngẫu nhiên vẫn Vàng, nên mốc này chưa phân biệt được ai). Hướng cho chủ dự án chọn: cho điểm phụ thuộc cây nhiều hơn (tăng điểm ô cây và thưởng lượt dư, hoặc giảm điểm lá nổ) rồi quét lại, hoặc đặt mốc theo số cây xong thay vì theo điểm.
 
 ## Màn 12 — Game phụ 2: "Leo cây tìm lá giả" (kiểu leo dây của Talking Tom) và cao trào
 

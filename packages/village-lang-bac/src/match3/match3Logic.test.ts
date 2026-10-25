@@ -516,14 +516,17 @@ describe('vòng, điểm, tất định', () => {
     }
   });
 
-  it('phương án độ khó: A cộng 5 lượt mỗi vòng; B cộng thêm lá giả 2 / 4 / 6', () => {
-    const a = match3Variant('A');
-    expect(a.rounds.map((r) => r.turns)).toEqual([25, 30, 30]);
-    expect(a.rounds.map((r) => r.fakes)).toEqual([3, 5, 8]);
-    const b = match3Variant('B');
-    expect(b.rounds.map((r) => r.turns)).toEqual([25, 30, 30]);
-    expect(b.rounds.map((r) => r.fakes)).toEqual([2, 4, 6]);
+  it('phương án số lượt: A (12, 16, 16), B (10, 14, 14), C (8, 12, 12); chỉ đổi lượt, lá giả và ô cây giữ nguyên; số liệu đang dùng là C', () => {
+    const expected = { A: [12, 16, 16], B: [10, 14, 14], C: [8, 12, 12] } as const;
+    for (const v of ['A', 'B', 'C'] as const) {
+      const spec = match3Variant(v);
+      expect(spec.rounds.map((r) => r.turns)).toEqual(expected[v]);
+      expect(spec.rounds.map((r) => r.fakes)).toEqual(BASE_MATCH3_SPEC.rounds.map((r) => r.fakes));
+      expect(spec.rounds.map((r) => r.slots)).toEqual(BASE_MATCH3_SPEC.rounds.map((r) => r.slots));
+      expect({ ...spec, rounds: BASE_MATCH3_SPEC.rounds }).toEqual(BASE_MATCH3_SPEC);
+    }
     expect(match3Variant('base')).toBe(BASE_MATCH3_SPEC);
+    expect(MATCH3_SPEC.rounds.map((r) => r.turns)).toEqual([8, 12, 12]);
   });
 
   it('số liệu gốc đúng bảng spec 08: lưới 7 × 7, 6 loại, ba vòng, điểm 5 / 50 / 20, mốc 600 / 1000 / 1400 (hay mốc đã đặt lại, ghi trong spec)', () => {

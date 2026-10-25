@@ -54,22 +54,31 @@ export const BASE_MATCH3_SPEC: Match3Spec = {
 };
 
 /**
- * Phương án độ khó khi bot trung bình xong cây vòng 1 chưa tới 70% (lời giao B12): A là mỗi vòng thêm 5 lượt; B là A và lá giả lúc đầu 2 / 4 / 6.
- * `'base'` là luật gốc.
+ * Phương án số lượt (lời giao cân bằng màn 11: với luật gốc bot chọn ngẫu nhiên cũng xong cây ~99% và mọi bot đều Vàng, học sinh bấm bừa vẫn thắng). CHỈ đổi số lượt ba vòng, mọi luật khác giữ nguyên.
+ * `'base'` là luật gốc của spec (20, 25, 25); A (12, 16, 16); B (10, 14, 14); C (8, 12, 12). Thử lần lượt, dừng ở phương án đầu tiên đạt mục tiêu; không phương án nào đạt cả hai mục tiêu (xem `MATCH3_SPEC`).
  */
-export type Match3Variant = 'base' | 'A' | 'B';
+export type Match3Variant = 'base' | 'A' | 'B' | 'C';
+
+export const MATCH3_TURNS: Readonly<Record<Match3Variant, readonly [number, number, number]>> = {
+  base: [20, 25, 25],
+  A: [12, 16, 16],
+  B: [10, 14, 14],
+  C: [8, 12, 12],
+};
 
 export function match3Variant(variant: Match3Variant, base: Match3Spec = BASE_MATCH3_SPEC): Match3Spec {
   if (variant === 'base') return base;
-  const fakes = [2, 4, 6];
-  return { ...base, rounds: base.rounds.map((r, i) => ({ ...r, turns: r.turns + 5, ...(variant === 'B' ? { fakes: fakes[i] } : {}) })) };
+  const turns = MATCH3_TURNS[variant];
+  return { ...base, rounds: base.rounds.map((r, i) => ({ ...r, turns: turns[i] })) };
 }
 
 /**
- * Số liệu đang dùng (chọn ở bước B12; xem `match3Balance.test.ts` và spec 08): luật gốc, KHÔNG dùng phương án A hay B (bot trung bình xong cây vòng 1 ở 99,7% ván, đã vượt mục tiêu 70%).
+ * Số liệu đang dùng: phương án C (8, 12, 12 lượt), luật khác như spec. Mục tiêu (300 ván mỗi bot, seed 1 đến 300): bot giỏi xong cả 3 cây ≥ 85% và bot ngẫu nhiên xong cả 3 cây ≤ 40%.
+ * Xong cả 3 cây: A giỏi 86,7% / ngẫu nhiên 59,0%; B giỏi 71,7% / ngẫu nhiên 35,7%; C giỏi 45,7% / ngẫu nhiên 15,0%. Không phương án nào đạt cả hai (A đạt bot giỏi mà bot ngẫu nhiên còn quá cao; B và C đạt bot
+ * ngẫu nhiên mà bot giỏi quá thấp), nên theo lời giao dừng ở C và báo số thật.
  *
- * MỐC ĐIỂM 600 / 1000 / 1400 CHƯA ĐẠT mục tiêu cân bằng và đang chờ chủ dự án chọn: với luật gốc mọi bot, kể cả bot chỉ chọn ngẫu nhiên, đều được 2.170 đến 2.950 điểm (xem bảng ở `match3Balance.test.ts`), nên
- * cả bot giỏi, bot trung bình và bot ngẫu nhiên đều Vàng 100%. Quy tắc phân vị (Đồng = p25 bot trung bình, Bạc = p75 bot trung bình, Vàng = p10 bot giỏi, làm tròn xuống bội số 50) cho 2.450 / 2.550 / 2.400, ba mốc
- * cách nhau dưới 150 điểm và không tăng dần, nên KHÔNG áp dụng; giữ 600 / 1000 / 1400 của spec cho tới khi chọn mốc theo nghĩa.
+ * MỐC ĐIỂM 600 / 1000 / 1400 (của spec) vẫn CHƯA CHỌN ĐƯỢC mốc theo nghĩa (Vàng ≈ xong 3 cây, Bạc ≈ xong 2 cây, Đồng ≈ xong 1 cây): điểm hầu như không phụ thuộc số cây xong (lá nổ khoảng 1.200 điểm,
+ * ô cây và lượt dư chỉ thêm vài trăm) nên điểm các ván xong 0, 1, 2, 3 cây chồng lên nhau (p10 đến p90: 1.370 đến 1.605, 1.460 đến 1.745, 1.565 đến 1.810, 1.670 đến 1.915); không bội số 50 nào thỏa
+ * hai điều kiện ≥ 90% và ≤ 10% của lời giao. Báo số liệu, giữ mốc của spec (298 / 300 ván của bot giỏi và bot trung bình, 294 / 300 của bot ngẫu nhiên vẫn Vàng).
  */
-export const MATCH3_SPEC: Match3Spec = BASE_MATCH3_SPEC;
+export const MATCH3_SPEC: Match3Spec = match3Variant('C');
