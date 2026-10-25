@@ -105,7 +105,7 @@ export interface Placement {
 }
 
 /** Đồ vật nhỏ do code dựng (chum vại, đống rơm, khóm hoa). */
-export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc' | 'coi-gia' | 'bep-do' | 'dinh' | 'chum-cham' | 'chum-do' | 'dong-soi' | 'gia-vai' | 'sao-soi' | 'sap-vai' | 'chau-canh' | 'may-soi-dau' | 'bang-mau' | 'phien-da' | 'mai-che' | 'phoi-go' | 'hom-thu' | 'gia-thu' | 'chuong-bo-cau' | 'chuong-ga' | 'ga';
+export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc' | 'coi-gia' | 'bep-do' | 'dinh' | 'chum-cham' | 'chum-do' | 'dong-soi' | 'gia-vai' | 'sao-soi' | 'sap-vai' | 'chau-canh' | 'may-soi-dau' | 'bang-mau' | 'phien-da' | 'mai-che' | 'phoi-go' | 'hom-thu' | 'gia-thu' | 'chuong-bo-cau' | 'chuong-ga' | 'ga' | 'ban-khac' | 'ban-khac2' | 'ban-khac3' | 'gia-dau' | 'da-xe' | 'da-vun' | 'khung-cua-da' | 'ban-thu' | 'de-may';
 export interface PropPlacement {
   kind: PropKind;
   x: number;
@@ -230,6 +230,17 @@ export const PROP_SIZES: Readonly<Record<PropKind, PropSize>> = {
   'chuong-bo-cau': { r: Math.hypot(1.0, 1.0), h: 3.8, box: { hx: 1.0, hz: 1.0 } },
   'chuong-ga': { r: Math.hypot(1.7, 1.3), h: 1.9, box: { hx: 1.7, hz: 1.3 } },
   ga: { r: 0.38, h: 0.75, collide: false },
+  // Làng Khắc Dấu (bước L4): bàn đá khắc có dụng cụ (ba biến thể xếp khác nhau, cùng cỡ), giá bày con dấu, khối đá xẻ xếp chồng, đá vụn (đi qua được), khung cưa đá, bàn viết thư của trạm
+  'ban-khac': { r: Math.hypot(0.85, 0.5), h: 1.05, box: { hx: 0.85, hz: 0.5 } },
+  'ban-khac2': { r: Math.hypot(0.85, 0.5), h: 1.05, box: { hx: 0.85, hz: 0.5 } },
+  'ban-khac3': { r: Math.hypot(0.85, 0.5), h: 1.05, box: { hx: 0.85, hz: 0.5 } },
+  'gia-dau': { r: Math.hypot(0.9, 0.35), h: 1.35, box: { hx: 0.9, hz: 0.35 } },
+  'da-xe': { r: Math.hypot(0.9, 0.7), h: 1.2, box: { hx: 0.9, hz: 0.7 } },
+  'da-vun': { r: Math.hypot(0.8, 0.6), h: 0.32, box: { hx: 0.8, hz: 0.6 }, collide: false },
+  'khung-cua-da': { r: Math.hypot(1.3, 0.65), h: 1.75, box: { hx: 1.3, hz: 0.65 } },
+  'ban-thu': { r: Math.hypot(1.1, 0.55), h: 1.1, box: { hx: 1.1, hz: 0.55 } },
+  // bệ đá hai bậc của máy soi dấu: vật riêng (vật liệu đá như trước, không kim loại); vật cản là hình tròn của chính máy nên bệ không có
+  'de-may': { r: 1.75, h: 0.5, collide: false },
 };
 
 /** Vật cản của đồ nhỏ do code dựng: hình tròn hoặc hộp xoay sát hình; vật thấp (khóm hoa) và chi tiết dưới vật khác (chân giá) thì không có. */

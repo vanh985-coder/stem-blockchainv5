@@ -19,6 +19,9 @@ import { createMulberry32 } from '../../lib/rng';
 import { FENCE_POST_HEIGHT, FENCE_RAIL_LENGTH, fenceLayout, type FenceLayout, DECK_START_X, DECK_TOP, DOCK_END_X, DOCK_HALF_WIDTH, PLAZA_RADIUS, RAMP_START_X, RIVER_X, ROAD_WIDTH, WORLD_RADIUS, type MarketLayout, type PropPlacement } from './marketLayout';
 import { createBoatCanopy, createBoatHull, createCraftProp, createHayStack, createJar } from './marketGeometry';
 import { buildInstanced, type Item } from './instancing';
+import { CRAFT_TEXTURE_OF, attachCraftTexture } from './craftTextures';
+import { attachCopperSheen } from './copperSheen';
+import type { QualityLevel } from '../quality';
 import { layoutHills, type HillAvoid } from './hillLayout';
 import { ChunkedInstances } from '../village/ChunkedInstances';
 import { createEdgeAlphaTexture, createGrassTexture, createPaddyTexture, createPlankTexture, createWaterTexture } from './marketTextures';
@@ -279,12 +282,13 @@ export const toItem = (p: PropPlacement, extra: Partial<Item> = {}): Item => ({ 
  * Mỗi loại một InstancedMesh dùng chung geometry và material.
  */
 /** Đồ gợi nghề quanh cổng (bước 8d): hình dựng (`createCraftProp`) và màu vật liệu; màu từng món nhân thêm màu `tint` của bố cục (cuộn vải nhiều màu). */
-const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh', 'may-soi-dau', 'bang-mau', 'phien-da', 'mai-che', 'phoi-go', 'hom-thu', 'gia-thu', 'chuong-bo-cau', 'chuong-ga', 'ga'] as const;
-const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughness: number; vertexColors?: boolean }> = {
+const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh', 'may-soi-dau', 'bang-mau', 'phien-da', 'mai-che', 'phoi-go', 'hom-thu', 'gia-thu', 'chuong-bo-cau', 'chuong-ga', 'ga', 'ban-khac', 'ban-khac2', 'ban-khac3', 'gia-dau', 'da-xe', 'da-vun', 'khung-cua-da', 'ban-thu', 'de-may'] as const;
+const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughness: number; metalness?: number; emissive?: string; vertexColors?: boolean }> = {
   giay: { color: '#EFE6CC', roughness: 1 },
   vai: { color: '#FFFFFF', roughness: 0.95 },
-  'khoi-da': { color: '#8E8E86', roughness: 1 },
-  'ban-da': { color: '#9C9C92', roughness: 1 },
+  // đá: có texture thì nhân với màu trắng (xem `craftMaterial`), không có thì màu xám phẳng
+  'khoi-da': { color: '#A8A69E', roughness: 1 },
+  'ban-da': { color: '#B2B2A8', roughness: 1 },
   hom: { color: '#8A5A2B', roughness: 0.9 },
   thung: { color: '#D2A85A', roughness: 1 },
   chan: { color: '#6B4526', roughness: 1 },
@@ -303,7 +307,8 @@ const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughne
   'sao-soi': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
   'sap-vai': { color: '#FFFFFF', roughness: 0.95, vertexColors: true },
   'chau-canh': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
-  'may-soi-dau': { color: '#FFFFFF', roughness: 0.45, vertexColors: true },
+  // thân máy: đồng ánh kim (kim loại vừa, bóng, vân mài)
+  'may-soi-dau': { color: '#FFFFFF', roughness: 0.34, metalness: 0.7, emissive: '#2a1308', vertexColors: true },
   'bang-mau': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
   'phien-da': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
   'mai-che': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
@@ -313,11 +318,30 @@ const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughne
   'chuong-bo-cau': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
   'chuong-ga': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
   'ga': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'ban-khac': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'ban-khac2': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'ban-khac3': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'gia-dau': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'da-xe': { color: '#FFFFFF', roughness: 1, vertexColors: true },
+  'da-vun': { color: '#FFFFFF', roughness: 1, vertexColors: true },
+  'khung-cua-da': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'ban-thu': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'de-may': { color: '#FFFFFF', roughness: 0.45, vertexColors: true },
 };
 
+/** Đồng ở mức Thấp: ánh kim thấp, nền phát sáng nhẹ để vẫn ra màu đồng khi không có ánh kim giả. Cường độ ánh kim giả ở các mức khác. */
+export const LOW_COPPER = { metalness: 0.18, roughness: 0.42, emissive: '#6a3416' } as const;
+export const COPPER_SHEEN_INTENSITY = 2.4;
+
 /** Các loại đồ nhỏ do code dựng (kèm hình học và vật liệu) mà `MarketProps` vẽ: dùng cả để biên dịch trước shader (vật liệu màu theo đỉnh của đình, cối, bếp là chương trình shader mới). */
-export function craftMaterial(kind: (typeof CRAFT_KINDS)[number]): MeshStandardMaterial {
-  return new MeshStandardMaterial({ ...CRAFT_COLOR[kind], flatShading: kind === 'khoi-da' });
+export function craftMaterial(kind: (typeof CRAFT_KINDS)[number], level?: QualityLevel): MeshStandardMaterial {
+  // mức Thấp: máy soi dấu chỉ có màu đồng và ánh kim thấp, không có ánh kim giả
+  const low = kind === 'may-soi-dau' && level === 'low';
+  const m = new MeshStandardMaterial({ ...CRAFT_COLOR[kind], ...(low ? { metalness: LOW_COPPER.metalness, roughness: LOW_COPPER.roughness, emissive: LOW_COPPER.emissive } : {}), flatShading: kind === 'khoi-da' || kind === 'da-vun' });
+  const tex = CRAFT_TEXTURE_OF[kind];
+  if (tex) attachCraftTexture(m, tex); // texture dùng chung đếm tham chiếu; không có canvas thì giữ màu phẳng
+  if (kind === 'may-soi-dau' && !low) attachCopperSheen(m, COPPER_SHEEN_INTENSITY); // đồng ánh kim: phản chiếu bầu trời giả trong shader, CHỈ vật liệu này (xem copperSheen.ts: dùng envMap thì three đổi sang PMREM, một khung 400 ms)
+  return m;
 }
 export { CRAFT_KINDS };
 
@@ -327,10 +351,10 @@ export interface PropsCull {
   maxDistance: number;
 }
 
-export function MarketProps({ layout, cull }: { layout: Pick<MarketLayout, 'props' | 'seed'>; cull?: PropsCull }) {
+export function MarketProps({ layout, cull, level }: { layout: Pick<MarketLayout, 'props' | 'seed'>; cull?: PropsCull; /** Mức chất lượng (máy soi dấu ở mức Thấp không dùng bản đồ môi trường) */ level?: QualityLevel }) {
   // chỉ dựng hình học của các loại có mặt trong bố cục (cả 21 loại trong một khung hình thì nặng, nhất là khi vùng làng gắn vào cảnh)
   const kindsPresent = useMemo(() => new Set(layout.props.map((p) => p.kind)), [layout]);
-  const crafts = useMemo(() => CRAFT_KINDS.filter((kind) => kindsPresent.has(kind)).map((kind) => ({ kind, geo: createCraftProp(kind)!, mat: craftMaterial(kind) })), [kindsPresent]);
+  const crafts = useMemo(() => CRAFT_KINDS.filter((kind) => kindsPresent.has(kind)).map((kind) => ({ kind, geo: createCraftProp(kind)!, mat: craftMaterial(kind, level) })), [kindsPresent, level]);
   useDispose(useMemo(() => crafts.flatMap((c) => [c.geo, c.mat]), [crafts]));
   const craftItems = useMemo(() => crafts.map((c) => layout.props.filter((p) => p.kind === c.kind).map((p) => toItem(p))), [crafts, layout]);
 

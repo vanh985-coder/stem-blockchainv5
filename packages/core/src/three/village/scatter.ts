@@ -22,6 +22,8 @@ export interface ScatterPlacement {
   tint: readonly [number, number, number];
   /** Có vật cản không (mặc định theo loại: xem `SCATTER_SIZES`); lũy tre quanh làng có vật cản riêng (`ringColliders`) nên đặt false từng bụi */
   collide?: boolean;
+  /** Chỉ đồi: đồi đá (khối lởm chởm có vân đá, xem `createStoneHill`) thay cho đồi cỏ */
+  stone?: boolean;
 }
 
 export interface ScatterSize {

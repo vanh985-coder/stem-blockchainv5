@@ -7,7 +7,6 @@ import { CHARACTERS, fmt, speakerLabel } from '../../content/characters';
 import { BI_NHAC_LAI, MARKET_TALKERS } from '../../content/dialogues';
 import { GUIDE_FIRST_SECTION } from '../../content/huongDan';
 import { VILLAGE_ORDER, levelById, levelsOfVillage } from '../../content/levels';
-import { STORY } from '../../content/story';
 import { ui } from '../../content/ui';
 import { VILLAGE_SCENE } from '../../content/villageScene';
 import { villageKnowCards } from '../../content/villageCards';
@@ -45,7 +44,9 @@ import { mapMarkers } from './map/mapMarkers';
 import { miniMapSize } from './map/mapProjection';
 import { villageProgress } from './map/mapProgress';
 import { WorldScene } from './WorldScene';
-import type { LoadedZones } from './WorldTracker';
+import { openingSceneTurns } from './sceneTurns';
+import { preloadSceneImages, releaseSceneImages } from './scenePreload';
+import type { LoadedZones, PrewarmZones } from './WorldTracker';
 import { assembleWorld, gateApproachSpawn, villageSpawn } from './worldLayout';
 import { effectivePages, lastGiver, targetNodeId } from './worldQuest';
 import { composeTargets, createWorldBase, createZoneTargets, parseWorldTarget, withoutCollectedScrolls, type WorldTarget } from './worldTargets';
@@ -56,6 +57,8 @@ const BRICK_TEXTURE = 'ui/textures/san-gach';
 /** Sương: trong vùng đi lại gần như không có, ngoài ruộng thì nhạt dần vào chân trời (làng ở xa 70 đến 130 vẫn thấy rõ). */
 const FOG: [number, number] = [90, 300];
 const NONE_LOADED: LoadedZones = { 'lang-giay': false, 'lang-det': false, 'lang-khac-dau': false, 'lang-bac': false };
+/** Hộp thoại cảnh mở đầu dựng ẩn bấy nhiêu mili giây để ảnh được vẽ sẵn, rồi gỡ. */
+const SCENE_WARM_MS = 700;
 
 /** Mức chất lượng ép bằng ?q=low|medium|high (để kiểm tra hiệu năng); không có thì theo Cài đặt. */
 function forcedQuality(): QualityChoice | undefined {
@@ -103,6 +106,8 @@ interface DialogState {
   golden?: boolean;
 }
 
+const noop = () => {};
+
 type Seq = 'idle' | 'wait' | 'fall' | 'talk' | 'done';
 
 /**
@@ -137,6 +142,10 @@ export function WorldPage() {
   const [guide, setGuide] = useState<{ section?: string } | null>(null);
   const [ready, setReady] = useState(false);
   const [loaded, setLoaded] = useState<LoadedZones>(NONE_LOADED);
+  const [prewarmZones, setPrewarmZones] = useState<PrewarmZones>(NONE_LOADED);
+  /** Làng có cảnh mở đầu chưa xem đã nạp xong ảnh, đang chờ dựng hộp thoại làm ấm (cái đầu hàng đang dựng) */
+  const [warmQueue, setWarmQueue] = useState<VillageId[]>([]);
+  const warmedScenes = useRef(new Set<VillageId>());
   const [zoneReady, setZoneReady] = useState<ReadonlySet<VillageId>>(new Set());
   const [inside, setInside] = useState<VillageId | null>(null);
   const [nearGate, setNearGate] = useState<GateId | null>(null);
@@ -344,7 +353,10 @@ export function WorldPage() {
   const closeDialog = useCallback(() => {
     const d = dialogRef.current;
     setDialog(null);
-    if (d?.cutscene && d.village) progress.markVillageSceneSeen(d.village);
+    if (d?.cutscene && d.village) {
+      progress.markVillageSceneSeen(d.village);
+      releaseSceneImages(d.village);
+    }
     if (d?.golden && d.village) progress.markGoldenSeen(d.village);
     if (seqRef.current === 'talk') {
       // Bi nói xong: ghi cờ "đã chiếu" và hiện nhiệm vụ mới
@@ -361,10 +373,7 @@ export function WorldPage() {
     if (!text) return;
     const cards = villageKnowCards(inside);
     if (shouldShowScene(data, inside)) {
-      const frame = STORY.find((s) => s.n === text.storyFrame);
-      const turns: VnTurn[] = [];
-      if (frame) turns.push({ image: frame.image, background: frame.image, text: fmt(frame.text, { ten }) });
-      turns.push({ speaker: speakerLabel(text.guide), portrait: CHARACTERS[text.guide].portrait, text: fmt(text.opening, { ten }) });
+      const turns = openingSceneTurns(inside, ten) ?? [];
       setDialog({ turns, villager: null, village: inside, guideTalking: false, cutscene: true });
       api.lock.exit();
       return;
@@ -476,6 +485,27 @@ export function WorldPage() {
       return changed ? out : prev;
     });
   }, []);
+  // cảnh mở đầu chưa xem của làng đang được chuẩn bị sẵn: nạp và giải mã trước ảnh, rồi dựng hộp thoại ẩn một lúc (xem scenePreload.ts)
+  useEffect(() => {
+    if (!ready || !flagKnown) return;
+    if (PROBE && (window as unknown as { __noSceneWarm?: boolean }).__noSceneWarm) return; // chỉ bản đo: tắt để so trước và sau
+    for (const id of VILLAGE_ORDER) {
+      if (!prewarmZones[id] || warmedScenes.current.has(id) || !VILLAGE_SCENE[id] || !shouldShowScene(data, id)) continue;
+      warmedScenes.current.add(id);
+      void preloadSceneImages(id).then(() => {
+        if (PROBE && (window as unknown as { __noSceneMount?: boolean }).__noSceneMount) return; // chỉ bản đo: chỉ nạp ảnh, không dựng hộp thoại ẩn
+        setWarmQueue((q) => [...q, id]);
+      });
+    }
+  }, [ready, flagKnown, prewarmZones, data]);
+  const warmVillage = warmQueue[0] ?? null;
+  useEffect(() => {
+    if (warmVillage === null) return;
+    const timer = setTimeout(() => setWarmQueue((q) => q.slice(1)), SCENE_WARM_MS);
+    return () => clearTimeout(timer);
+  }, [warmVillage]);
+  useEffect(() => () => releaseSceneImages(), []);
+  const warmTurns = useMemo(() => (warmVillage ? openingSceneTurns(warmVillage, ten) : null), [warmVillage, ten]);
   const onZoneReady = useCallback((id: VillageId) => setZoneReady((prev) => (prev.has(id) ? prev : new Set(prev).add(id))), []);
   const onNearest = useCallback((i: number) => setNear(i), []);
 
@@ -538,6 +568,7 @@ export function WorldPage() {
             loaded={loaded}
             levelStates={levelStates}
             onZones={onZones}
+            onPrewarm={setPrewarmZones}
             onInside={setInside}
             onNearGate={setNearGate}
             onZoneReady={onZoneReady}
@@ -577,10 +608,17 @@ export function WorldPage() {
         {session.lockMode && session.locked && <div data-hud aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-10 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80 ring-1 ring-black/40" />}
       </WalkControls>
 
+      {warmTurns && dialog === null && (
+        <div aria-hidden="true" inert data-testid="canh-lam-am" className="pointer-events-none fixed inset-0 z-[1] grid place-items-center overflow-hidden p-3 opacity-[0.01]">
+          <div className="flex w-full max-w-[960px] justify-center">
+            <VnDialog warm flat turns={warmTurns} onFinish={noop} />
+          </div>
+        </div>
+      )}
       {dialog && (
         <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/30 p-3">
           <div className="flex w-full max-w-[960px] justify-center">
-            <VnDialog turns={dialog.turns} onFinish={closeDialog} onSkip={dialog.cutscene || dialog.golden ? closeDialog : undefined} label={dialog.village ? ui.lang[dialog.village] : undefined} />
+            <VnDialog flat turns={dialog.turns} onFinish={closeDialog} onSkip={dialog.cutscene || dialog.golden ? closeDialog : undefined} label={dialog.village ? ui.lang[dialog.village] : undefined} />
           </div>
         </div>
       )}

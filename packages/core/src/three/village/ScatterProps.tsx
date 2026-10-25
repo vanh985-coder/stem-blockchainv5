@@ -1,12 +1,13 @@
 import { useFrame } from '@react-three/fiber';
 import { useMemo } from 'react';
 import { Color, DoubleSide, MeshStandardMaterial, type BufferGeometry } from 'three';
+import { attachCraftTexture } from '../cho/craftTextures';
 import { useDispose, type Item } from '../cho/MarketProcedural';
 import type { QualityLevel } from '../quality';
 import { ChunkedInstances } from './ChunkedInstances';
 import { SCATTER_KINDS, SCATTER_MAX_DISTANCE, SCATTER_SIZES, scatterRadius, type ScatterKind, type ScatterPlacement } from './scatter';
 import { CLOTH_PALETTE, CLOTH_MIN_LENGTH } from './clothPoles';
-import { CLOTH_TOP, SCATTER_VERTEX_COLORS, createScatterGeometry } from './scatterGeometry';
+import { CLOTH_TOP, SCATTER_VERTEX_COLORS, createScatterGeometry, createStoneHill } from './scatterGeometry';
 
 /** Ô lưới chia mảnh cho đồ rải: 48 đơn vị (làng bán kính 125 chia chừng 25 mảnh). */
 export const SCATTER_CELL = 48;
@@ -83,6 +84,13 @@ export function scatterMaterial(kind: ScatterKind): MeshStandardMaterial {
   return new MeshStandardMaterial({ color: '#FFFFFF', roughness: 1, vertexColors: SCATTER_VERTEX_COLORS[kind], flatShading: kind === 'tre' || kind === 'cay-qua' });
 }
 
+/** Vật liệu đồi đá: khối phẳng có vân đá (texture dùng chung, xem `craftTextures`), màu từng đồi qua nhân màu. Dùng cả khi biên dịch trước shader (xem `ZonePrewarm`). */
+export function stoneHillMaterial(): MeshStandardMaterial {
+  const m = new MeshStandardMaterial({ color: '#97958D', roughness: 1, flatShading: true });
+  attachCraftTexture(m, 'stone');
+  return m;
+}
+
 /** Đồng hồ gió của sào vải: mỗi khung hình ghi giây của cảnh vào `CLOTH_TIME` (không cộng dồn nên nhiều vùng cùng gắn vẫn đúng một nhịp); `animate` false thì ghi 0. Không cấp phát. */
 function ClothClock({ animate }: { animate: boolean }) {
   useFrame((state) => {
@@ -103,15 +111,27 @@ function itemOf(p: ScatterPlacement): Item {
  */
 export function ScatterProps({ scatter, level, only, animate = true }: { scatter: readonly ScatterPlacement[]; level: QualityLevel; only?: ScatterKind; /** false ("Giảm chuyển động"): sào vải đứng yên */ animate?: boolean }) {
   const kinds = useMemo(() => SCATTER_KINDS.filter((k) => (only === undefined || only === k) && scatter.some((p) => p.kind === k)), [scatter, only]);
-  const res = useMemo(() => kinds.map((kind) => ({ kind, geometry: createScatterGeometry(kind) as BufferGeometry, material: scatterMaterial(kind) })), [kinds]);
+  // đồi đá (cờ `stone`) là một nhóm vẽ riêng với hình học lởm chởm và vật liệu có vân đá
+  const res = useMemo(
+    () =>
+      kinds.flatMap((kind) => {
+        const own = scatter.filter((p) => p.kind === kind);
+        if (kind !== 'doi') return [{ kind, stone: false, geometry: createScatterGeometry(kind) as BufferGeometry, material: scatterMaterial(kind) }];
+        const out: { kind: ScatterKind; stone: boolean; geometry: BufferGeometry; material: MeshStandardMaterial }[] = [];
+        if (own.some((p) => !p.stone)) out.push({ kind, stone: false, geometry: createScatterGeometry(kind), material: scatterMaterial(kind) });
+        if (own.some((p) => p.stone)) out.push({ kind, stone: true, geometry: createStoneHill(), material: stoneHillMaterial() });
+        return out;
+      }),
+    [kinds, scatter],
+  );
   useDispose(useMemo(() => res.flatMap((r) => [r.geometry, r.material]), [res]));
-  const items = useMemo(() => res.map((r) => scatter.filter((p) => p.kind === r.kind).map(itemOf)), [res, scatter]);
+  const items = useMemo(() => res.map((r) => scatter.filter((p) => p.kind === r.kind && (r.kind !== 'doi' || !!p.stone === r.stone)).map(itemOf)), [res, scatter]);
   return (
     <>
       {res.some((r) => r.kind === 'sao-vai') && <ClothClock animate={animate} />}
       {res.map((r, i) => (
         <ChunkedInstances
-          key={r.kind}
+          key={r.stone ? `${r.kind}-da` : r.kind}
           geometry={r.geometry}
           material={r.material}
           items={items[i]}

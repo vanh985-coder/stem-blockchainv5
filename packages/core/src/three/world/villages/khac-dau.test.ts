@@ -10,10 +10,13 @@ const probe = probeOf(L);
 const blocked = probe.blocked;
 const props = (k: string) => L.props.filter((p) => p.kind === k);
 const scatterOf = (k: string) => (L.scatter ?? []).filter((p) => p.kind === k);
+/** Mọi loại bàn đá: bàn đá thường và ba kiểu bàn khắc dấu có dụng cụ (bước L4). */
+const BENCHES = ['ban-da', 'ban-khac', 'ban-khac2', 'ban-khac3'] as const;
+const benches = () => BENCHES.flatMap((k) => props(k));
 const count = (m: string) => L.placements.filter((p) => p.model === m).length;
 
 /** Vòng tròn bao chân của mọi món (kể cả chú Dũng). Mái che, gà và đồ không vật cản (chân, mặt nước, cuốn sổ, hoa) không tính chỗ chiếm: mái che phủ lên cả dãy bàn bên dưới. */
-const spots = () => layoutSpots(L, [{ name: 'chu-dung', x: L.guide.x, z: L.guide.z, r: 0.45 }], ['chan', 'nuoc', 'so-chung', 'hoa', 'mai-che']);
+const spots = () => layoutSpots(L, [{ name: 'chu-dung', x: L.guide.x, z: L.guide.z, r: 0.45 }], ['chan', 'nuoc', 'so-chung', 'hoa', 'mai-che', 'de-may']);
 const reachableCells = (plugGate = false) => reachGrid(L, blocked, KHAC_DAU_WALL_RADIUS, KHAC_DAU_GATE_Z, plugGate);
 
 /** Tốc độ đi bộ của người chơi (đơn vị mỗi giây) để đổi quãng đường ra giây (khớp con số ở spec 05: 32,7 đơn vị = 8 giây). */
@@ -60,7 +63,7 @@ describe('Làng Khắc Dấu (mốc 3, bước L3): quy mô và bố cục', () 
     expect(Math.hypot(L.guide.x - yard.x, L.guide.z - yard.z)).toBeLessThan(yard.r);
     expect(L.start.z).toBeLessThan(Math.min(...L.boards.map((b) => b.z)));
     expect(Math.hypot(L.start.x - L.boards[1].x, L.start.z - L.boards[1].z)).toBeLessThan(8);
-    expect(props('ban-da').length).toBeGreaterThanOrEqual(8);
+    expect(benches().length).toBeGreaterThanOrEqual(8);
   });
 
   it('xưởng khắc dấu (đông nam): hai mái che với dãy bàn đá khắc, khối đá, phôi gỗ, hòm; ba nhà xưởng', () => {
@@ -72,8 +75,11 @@ describe('Làng Khắc Dấu (mốc 3, bước L3): quy mô và bố cục', () 
       // mỗi mái che phủ ít nhất ba bàn đá khắc
       const hx = PROP_SIZES['mai-che'].box!.hx;
       const hz = PROP_SIZES['mai-che'].box!.hz;
-      expect(props('ban-da').filter((t) => Math.abs(t.x - s.x) < hx && Math.abs(t.z - s.z) < hz).length, `bàn dưới mái che (${s.x}, ${s.z})`).toBeGreaterThanOrEqual(3);
+      expect(BENCHES.slice(1).flatMap((k) => props(k)).filter((t) => Math.abs(t.x - s.x) < hx && Math.abs(t.z - s.z) < hz).length, `bàn khắc dấu dưới mái che (${s.x}, ${s.z})`).toBeGreaterThanOrEqual(3);
     }
+    // ba kiểu bàn khắc đều có mặt (xếp dụng cụ khác nhau); hai giá bày con dấu đã khắc xong
+    for (const k of BENCHES.slice(1)) expect(props(k).length, k).toBeGreaterThanOrEqual(2);
+    expect(props('gia-dau')).toHaveLength(2);
     expect(props('khoi-da').length).toBeGreaterThanOrEqual(6);
     expect(props('phoi-go').length).toBeGreaterThanOrEqual(3);
     expect(props('hom').length).toBeGreaterThanOrEqual(3);
@@ -106,7 +112,8 @@ describe('Làng Khắc Dấu (mốc 3, bước L3): quy mô và bố cục', () 
     expect(props('hom-thu').filter(near).length).toBeGreaterThanOrEqual(2);
     expect(props('gia-thu').filter(near).length).toBeGreaterThanOrEqual(2);
     expect(props('chuong-bo-cau').filter(near).length).toBeGreaterThanOrEqual(2);
-    expect(props('ban-chep').filter(near).length).toBeGreaterThanOrEqual(1);
+    expect(props('ban-thu').filter(near).length).toBeGreaterThanOrEqual(1); // bàn viết thư có bao thư buộc dây
+    expect(props('ban-chep').length).toBe(0);
     expect(L.placements.some((p) => p.model.startsWith('env/nha-mai') && Math.hypot(p.x + 62, p.z - 24) < 3 && p.scale > 1.1)).toBe(true); // nhà trạm to hơn nhà thường
   });
 
@@ -117,9 +124,25 @@ describe('Làng Khắc Dấu (mốc 3, bước L3): quy mô và bố cục', () 
     expect(rocks.length).toBeGreaterThanOrEqual(8);
     expect(Math.max(...rocks.map((r) => r.scale))).toBeGreaterThanOrEqual(2);
     expect(Math.min(...rocks.map((r) => r.scale))).toBeLessThanOrEqual(1);
-    const grey = scatterOf('doi').filter((h) => Math.abs(h.tint[0] - h.tint[1]) < 0.05 && h.tint[0] > 0.4);
-    expect(grey.length).toBeGreaterThanOrEqual(2);
+    const grey = scatterOf('doi').filter((h) => h.stone);
+    expect(grey.length).toBeGreaterThanOrEqual(2); // đồi đá có vân (cờ stone), không còn khối xám trơn
     for (const h of grey) expect(Math.hypot(h.x, h.z)).toBeGreaterThan(95); // gần rìa
+    expect(scatterOf('doi').filter((h) => !h.stone).length).toBeGreaterThanOrEqual(4); // đồi tre vẫn là đồi cỏ
+  });
+
+  it('bãi đá (bước L4): đá xếp thành cụm nhiều cỡ nhiều sắc, khối đá xẻ xếp chồng, khung cưa gỗ, đá vụn', () => {
+    const near = (p: { x: number; z: number }) => Math.hypot(p.x + 82, p.z - 58) < 26;
+    const rocks = props('khoi-da').filter(near);
+    expect(new Set(rocks.map((r) => r.tint.join())).size).toBeGreaterThanOrEqual(4); // sắc đá khác nhau
+    expect(new Set(rocks.map((r) => r.scale)).size).toBeGreaterThanOrEqual(8); // nhiều cỡ
+    // cụm: mỗi khối nhỏ nằm sát một khối lớn hơn (khoảng cách giữa hai tâm nhỏ hơn tổng bán kính cộng 1,5)
+    const big = rocks.filter((r) => r.scale >= 1.3);
+    const small = rocks.filter((r) => r.scale < 1.3);
+    const clustered = small.filter((s) => big.some((b) => Math.hypot(s.x - b.x, s.z - b.z) < (PROP_SIZES['khoi-da'].r * (s.scale + b.scale)) + 1.5));
+    expect(clustered.length).toBeGreaterThanOrEqual(Math.floor(small.length * 0.6));
+    expect(props('da-xe').filter(near).length).toBeGreaterThanOrEqual(2);
+    expect(props('khung-cua-da').filter(near).length).toBe(1);
+    expect(props('da-vun').filter(near).length).toBeGreaterThanOrEqual(3);
   });
 
   it('chuồng gà gần cổng, bên trong lũy tre: chuồng tre và đàn gà (đàn gà của màn 9)', () => {
@@ -179,12 +202,12 @@ describe('Làng Khắc Dấu: không đè nhau, đi lại được', () => {
     for (const s of L.scrolls!) expect(standNear(s.x, s.z, 1.8), `thẻ ${s.index}`).toBe(true);
     const board = props('bang-mau')[0];
     expect(standNear(board.x + Math.sin(board.yaw) * 2.2, board.z + Math.cos(board.yaw) * 2.2, 2), 'trước bảng mẫu dấu').toBe(true);
-    for (const t of [props('dinh')[0], ...L.placements.filter((p) => p.model === 'env/gieng-lang'), ...props('chuong-ga'), ...props('chuong-bo-cau'), ...props('hom-thu'), ...props('gia-thu'), ...props('phien-da'), ...props('ban-chep')]) {
+    for (const t of [props('dinh')[0], ...L.placements.filter((p) => p.model === 'env/gieng-lang'), ...props('chuong-ga'), ...props('chuong-bo-cau'), ...props('hom-thu'), ...props('gia-thu'), ...props('phien-da'), ...props('ban-thu'), ...props('gia-dau'), ...props('khung-cua-da'), ...props('da-xe')]) {
       const x = (t as { x: number }).x;
       const z = (t as { z: number }).z;
       expect(standNear(x, z, 6), `${(t as { model?: string; kind?: string }).model ?? (t as { kind?: string }).kind} ở (${x.toFixed(1)}, ${z.toFixed(1)})`).toBe(true);
     }
-    for (const t of props('ban-da')) expect(standNear(t.x, t.z, 4), `bàn đá ở (${t.x.toFixed(1)}, ${t.z.toFixed(1)})`).toBe(true);
+    for (const t of benches()) expect(standNear(t.x, t.z, 4), `bàn đá ở (${t.x.toFixed(1)}, ${t.z.toFixed(1)})`).toBe(true);
     for (const t of props('mai-che')) expect(standNear(t.x, t.z, 6), `mái che ở (${t.x.toFixed(1)}, ${t.z.toFixed(1)})`).toBe(true);
     expect(standNear(0, KHAC_DAU_GATE_Z - 3, 1.5), 'ngoài cổng').toBe(true);
     // phần lớn mặt đất trong lũy tre (không tính nhà, đồi) đi được và liên thông
@@ -284,7 +307,7 @@ describe('Làng Khắc Dấu ở thế giới mở: đổi sang tọa độ th�
   });
 
   it('mọi món nhỏ mới có cỡ trong PROP_SIZES; chân nhà (nhà ngói, nhà tranh) có footprint', () => {
-    for (const k of ['may-soi-dau', 'bang-mau', 'phien-da', 'mai-che', 'phoi-go', 'hom-thu', 'gia-thu', 'chuong-bo-cau', 'chuong-ga', 'ga'] as const) expect(PROP_SIZES[k].h, k).toBeGreaterThan(0.5);
+    for (const k of ['may-soi-dau', 'bang-mau', 'phien-da', 'mai-che', 'phoi-go', 'hom-thu', 'gia-thu', 'chuong-bo-cau', 'chuong-ga', 'ga', 'ban-khac', 'ban-khac2', 'ban-khac3', 'gia-dau', 'da-xe', 'khung-cua-da', 'ban-thu'] as const) expect(PROP_SIZES[k].h, k).toBeGreaterThan(0.5);
     expect(footprintRadiusOf('env/nha-mai-ngoi')).toBeGreaterThan(1);
   });
 });

@@ -32,6 +32,16 @@ export const KHAC_DAU_WALL_RADIUS = 122;
 /** Đồ không được vượt qua bán kính này (tính cả cỡ chân): còn chừa chỗ cho lũy tre. */
 const KEEP_INSIDE = 118;
 
+/** Năm sắc đá (nhân với vân đá): trắng, ấm, lạnh, cát, sẫm; các cụm đá lấy xen kẽ cho không đồng màu. */
+const ROCK_TINTS = [
+  [1, 1, 1],
+  [0.95, 0.92, 0.86],
+  [0.9, 0.95, 1],
+  [1.03, 0.98, 0.9],
+  [0.86, 0.86, 0.84],
+] as const;
+const rock = (x: number, z: number, yaw: number, scale: number, i: number): PropPlacement => prop('khoi-da', x, z, yaw, scale, ROCK_TINTS[i % ROCK_TINTS.length]);
+
 /** Hướng (yaw) để mặt trước (+Z) của một vật ở (x, z) quay về (tx, tz). */
 const faceTo = (x: number, z: number, tx: number, tz: number): number => Math.atan2(tx - x, tz - z);
 
@@ -47,11 +57,12 @@ const BOARDS: VillageBoardDef[] = [
 const MACHINE = prop('may-soi-dau', 0, -78.5, Math.PI);
 const GUIDE: VillageGuideDef = { character: 'chuDung', x: -3.9, z: -80.6, yaw: faceTo(-3.9, -80.6, 0, -96) };
 const PLAZA_PROPS: PropPlacement[] = [
+  prop('de-may', MACHINE.x, MACHINE.z, MACHINE.yaw), // bệ đá của máy (vật riêng, vật liệu đá không ánh kim)
   MACHINE,
   // bàn đá khắc và khối đá ở phía đông sân (thợ khắc thử dấu bên máy)
-  prop('ban-da', 8.8, -81.2, -0.35),
-  prop('khoi-da', 11.4, -78.6, 0.5, 1),
-  prop('khoi-da', 7.8, -77.4, 1.2, 0.8, [0.95, 0.95, 0.93]),
+  prop('ban-khac', 8.8, -81.2, -0.35),
+  rock(11.4, -78.6, 0.5, 1, 1),
+  rock(7.8, -77.4, 1.2, 0.8, 2),
   prop('hom', -9.2, -78.6, 0.3, 1),
   prop('thung', -10.6, -81.6, 0, 1),
 ];
@@ -74,11 +85,16 @@ const SHELTERS = [
   { x: 58, z: -69 },
   { x: 78, z: -69 },
 ];
+/** Ba kiểu bàn đá khắc (xếp dụng cụ khác nhau) luân phiên cho các bàn dưới hai mái che. */
+const BENCH_KINDS = ['ban-khac', 'ban-khac2', 'ban-khac3'] as const;
 const WORKSHOP: PropPlacement[] = [
   ...SHELTERS.map((s) => prop('mai-che', s.x, s.z, 0)),
   // ba bàn đá khắc dưới mỗi mái che, quay mặt ra phía đường (nam)
-  ...SHELTERS.flatMap((s) => [-2.1, 0, 2.1].map((dx, i) => prop('ban-da', s.x + dx, s.z + 0.4, (i - 1) * 0.06))),
-  ...SHELTERS.flatMap((s) => [prop('khoi-da', s.x - 2.6, s.z - 1.5, 0.4, 0.9), prop('khoi-da', s.x + 2.4, s.z - 1.6, 1.4, 0.85, [0.94, 0.94, 0.92])]),
+  ...SHELTERS.flatMap((s, si) => [-2.1, 0, 2.1].map((dx, i) => prop(BENCH_KINDS[(si * 2 + i) % 3], s.x + dx, s.z + 0.4, (i - 1) * 0.06 + (si ? Math.PI : 0)))),
+  ...SHELTERS.flatMap((s, si) => [rock(s.x - 2.6, s.z - 1.5, 0.4, 0.9, si), rock(s.x + 2.4, s.z - 1.6, 1.4, 0.85, si + 2)]),
+  // hai giá gỗ bày con dấu đã khắc xong, ở khoảng giữa hai mái che và bên phải mái che thứ hai
+  prop('gia-dau', 68, -69.6, Math.PI / 2 + 0.06),
+  prop('gia-dau', 85, -67.6, 0.12),
   prop('phoi-go', 52.4, -66, 0.2),
   prop('phoi-go', 68.3, -73.4, -0.3),
   prop('phoi-go', 68.1, -65.8, 0.15),
@@ -116,7 +132,7 @@ const STATION_PROPS: PropPlacement[] = [
   prop('hom-thu', -73.4, -0.4, faceTo(-73.4, -0.4, -62, 4)),
   prop('gia-thu', -57.6, 13.4, Math.PI + 0.1),
   prop('gia-thu', -66.8, 13.6, Math.PI - 0.1),
-  prop('ban-chep', -62, 9.2, 0.05),
+  prop('ban-thu', -62, 9.2, 0.05),
   prop('chuong-bo-cau', -46.6, 15.6, 0.4),
   prop('chuong-bo-cau', -78.6, 14.4, -0.5),
   prop('thung', -53.4, 8.6, 0, 1),
@@ -130,16 +146,35 @@ const STATION_PROPS: PropPlacement[] = [
 const QUARRY_PROPS: PropPlacement[] = [
   prop('phien-da', -72.2, 57.2, 0.35),
   prop('phien-da', -92.4, 56.6, -0.2),
-  prop('khoi-da', -86.4, 49, 0.6, 2.2, [0.92, 0.92, 0.9]),
-  prop('khoi-da', -78.2, 66.2, 1.1, 2.6, [0.96, 0.96, 0.93]),
-  prop('khoi-da', -90.6, 68.4, 2.0, 1.7, [0.9, 0.9, 0.88]),
-  prop('khoi-da', -69.4, 63.6, 0.2, 1.3),
-  prop('khoi-da', -84.4, 61, 0.9, 0.9),
-  prop('khoi-da', -95, 46.4, 1.6, 1.5, [0.93, 0.93, 0.9]),
-  prop('khoi-da', -67.4, 52.4, 2.4, 1.0),
-  prop('khoi-da', -80, 78, 0.3, 1.9, [0.94, 0.94, 0.92]),
+  // cụm đá lớn nhỏ chạm sát nhau (mỗi cụm một khối to và vài khối nhỏ, xen sắc đá)
+  rock(-90.4, 49.6, 0.6, 2.2, 0),
+  rock(-88.1, 47.4, 1.3, 1.3, 1),
+  rock(-92.6, 47.6, 0.2, 0.8, 2),
+  rock(-88.4, 51.9, 2.1, 0.6, 3),
+  rock(-78.2, 66.2, 1.1, 2.6, 1),
+  rock(-80.7, 68.7, 0.4, 1.4, 4),
+  rock(-75.9, 68.8, 2.0, 0.9, 2),
+  rock(-90.6, 68.4, 2.0, 1.7, 3),
+  rock(-93.4, 66.6, 0.7, 0.8, 0),
+  rock(-69.4, 63.6, 0.2, 1.3, 2),
+  rock(-67.3, 62.0, 1.2, 0.7, 4),
+  rock(-95, 46.4, 1.6, 1.5, 1),
+  rock(-93, 44.6, 0.5, 0.8, 3),
+  rock(-67.4, 52.4, 2.4, 1.0, 0),
+  rock(-66.1, 54.1, 0.9, 0.6, 2),
+  rock(-80, 78, 0.3, 1.9, 4),
+  rock(-77.7, 79.3, 1.6, 1.1, 1),
+  rock(-82.2, 79.5, 0.8, 0.7, 3),
   prop('ban-da', -87.4, 59.4, 0.3, 1),
   prop('thung', -75.2, 58.2, 0, 1),
+  // khối đá vuông đã xẻ xếp chồng, khung cưa đá bằng gỗ và đá vụn quanh chỗ đục
+  prop('da-xe', -96.2, 57.8, 0.1),
+  prop('da-xe', -70.2, 70.6, -0.2),
+  prop('khung-cua-da', -86.2, 52.4, 0.3),
+  prop('da-vun', -83.6, 50.2, 0.4),
+  prop('da-vun', -93.4, 61.4, 1.1),
+  prop('da-vun', -74, 55.2, 2.0),
+  prop('da-vun', -84.4, 63.6, 0.7),
 ];
 
 // ---------------------------------------------------------------------------
@@ -376,7 +411,7 @@ const PATHS: VillagePaths = {
 const ALL_PROPS: PropPlacement[] = [...PLAZA_PROPS, ...POTS, ...WORKSHOP, ...DINH_PROPS, ...STATION_PROPS, ...QUARRY_PROPS, ...COOP_PROPS];
 
 function anchors(): Spot[] {
-  const out: Spot[] = [...placementSpots([...HOUSES, ...TREES, ...WELLS]), ...propSpots(ALL_PROPS, ['chan', 'nuoc', 'mai-che'])];
+  const out: Spot[] = [...placementSpots([...HOUSES, ...TREES, ...WELLS]), ...propSpots(ALL_PROPS, ['chan', 'nuoc', 'mai-che', 'da-vun', 'de-may'])];
   for (const s of SHELTERS) out.push({ x: s.x, z: s.z, r: 2.4 });
   for (const b of BOARDS) out.push({ x: b.x, z: b.z, r: 1.4 });
   out.push({ x: GUIDE.x, z: GUIDE.z, r: 1 });
@@ -392,8 +427,8 @@ const HILLS: ScatterPlacement[] = [
   scatter('doi', 64, 88, 7, 3, [0.15, 0.41, 0.09], { sy: 0.6 }),
 ];
 const STONE_HILLS: ScatterPlacement[] = [
-  scatter('doi', -102, 38, 6, 4, [0.5, 0.5, 0.47], { sy: 0.5 }),
-  scatter('doi', -62, 92, 6, 5, [0.54, 0.53, 0.5], { sy: 0.45 }),
+  scatter('doi', -102, 38, 6, 4, [1.04, 1.02, 0.96], { sy: 0.5, stone: true }),
+  scatter('doi', -62, 92, 6, 5, [0.94, 0.97, 1], { sy: 0.45, stone: true }),
 ];
 
 function fillers(): { scatter: ScatterPlacement[]; props: PropPlacement[]; placements: Placement[] } {

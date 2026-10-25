@@ -54,6 +54,10 @@ export interface VnDialogProps {
   /** Báo lượt hiện tại (đếm từ 0). */
   onTurnChange?: (index: number) => void;
   className?: string;
+  /** Làm ấm: dựng hộp thoại ẩn để ảnh được giải mã và vẽ sẵn (xem `three/world/scenePreload.ts`); không lấy focus, không nghe phím, không báo lượt. */
+  warm?: boolean;
+  /** Hộp thoại nằm trên cảnh 3D: không bóng đổ và không ảnh nền làm mờ (`filter`, `box-shadow` buộc GPU vẽ lại trên nền WebGL; lần vẽ đầu mất 30 đến 100 ms, spec 03 mục 9, bước L4). */
+  flat?: boolean;
 }
 
 /** Phím tắt Enter/Space chỉ xử lý khi focus không nằm trên một điều khiển khác (nút tự xử lý). */
@@ -92,7 +96,7 @@ const smallBtn =
  * phần dưới là khung lời có tên người nói. Góc dưới trái "x/n", góc dưới phải "Tiếp ›"; góc trên có "‹" và "Bỏ qua".
  * Phím: → / Enter / Space tiếp, ← lùi, Esc bỏ qua.
  */
-export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel, background, overlay, label, decor, backdrop, onTurnChange, className = '' }: VnDialogProps) {
+export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel, background, overlay, label, decor, backdrop, onTurnChange, className = '', warm = false, flat = false }: VnDialogProps) {
   const [index, setIndex] = useState(0);
   const wide = useMedia(WIDE);
   const low = useMedia(LOW);
@@ -146,6 +150,7 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
 
   // Mỗi lượt mới: đưa focus vào nút "Tiếp" để Enter/Space dùng được ngay; báo cho nơi gọi.
   useEffect(() => {
+    if (warm) return;
     nextRef.current?.focus({ preventScroll: true });
     onTurnChange?.(index);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -161,6 +166,7 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
   }, [index, turns, manifest]);
 
   useEffect(() => {
+    if (warm) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.repeat || e.ctrlKey || e.metaKey || e.altKey || isTyping(e.target)) return;
       if (e.key === 'ArrowRight') {
@@ -179,7 +185,7 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [warm]);
 
   if (!turn) return null;
 
@@ -199,6 +205,7 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
       aria-modal={asOverlay ? true : undefined}
       aria-label={heading}
       className={[
+        flat ? '[&_*]:!shadow-none !shadow-none outline outline-[3px] outline-nau-go-dam' : '',
         'relative w-full max-w-[960px] overflow-hidden [@media(max-height:500px)]:grid [@media(max-height:500px)]:max-h-[calc(100dvh-1rem)] [@media(max-height:500px)]:grid-cols-[auto_1fr] [@media(max-height:500px)]:grid-rows-[minmax(0,1fr)_auto]',
         className,
       ].join(' ')}
@@ -208,7 +215,7 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
         {turn.image ? (
           // Ảnh luôn hiện trọn (object-contain), không cắt; phần trống hai bên lấp bằng chính ảnh đó làm mờ.
           <div className="relative aspect-video max-h-[56vh] w-full overflow-hidden border-b-4 border-nau-go bg-chu/20 [@media(max-height:500px)]:h-full [@media(max-height:500px)]:max-h-none [@media(max-height:500px)]:w-[min(46vw,calc(50vh*16/9))] [@media(max-height:500px)]:border-b-0 [@media(max-height:500px)]:border-r-4">
-            {imageUrl && (
+            {imageUrl && !flat && (
               <div
                 aria-hidden="true"
                 className="absolute inset-[-24px] scale-110 bg-cover bg-center opacity-80 blur-xl"

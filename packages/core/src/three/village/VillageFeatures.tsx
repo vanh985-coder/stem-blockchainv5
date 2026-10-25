@@ -1,12 +1,16 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { BoxGeometry, CanvasTexture, Color, CylinderGeometry, Float32BufferAttribute, LinearFilter, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, SphereGeometry, SRGBColorSpace, type BufferGeometry, type Group, type Mesh } from 'three';
+import { BoxGeometry, CanvasTexture, Color, CylinderGeometry, DynamicDrawUsage, Float32BufferAttribute, InstancedMesh, LinearFilter, Matrix4, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry, Quaternion, SphereGeometry, SRGBColorSpace, Vector3, type BufferGeometry, type Group, type Mesh } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { fmt } from '../../content/characters';
 import { stampBoardText } from '../../content/villageFeatures';
 import { PEOPLE } from '../../lessons/bai-3/logic';
-import { STAMP_BOARD } from '../cho/marketGeometry';
+import { acquireCraftTexture, applyBoxUV, releaseCraftTexture, CRAFT_TEXTURE_TILE } from '../cho/craftTextures';
+import { attachCopperSheen } from '../cho/copperSheen';
+import { DOVECOTE_PIGEONS, PIGEON_NECK, STAMP_BOARD, createPigeonHead } from '../cho/marketGeometry';
+import { COPPER_SHEEN_INTENSITY, LOW_COPPER } from '../cho/MarketProcedural';
 import { PROP_SIZES, type PropPlacement } from '../cho/marketLayout';
+import type { QualityLevel } from '../quality';
 import { usePlayerState } from '../WalkWorld';
 
 /**
@@ -21,7 +25,8 @@ import { usePlayerState } from '../WalkWorld';
 /** Bán kính chừa thêm quanh một món khi so với tầm vẽ (máy và bảng đều nhỏ hơn bấy nhiêu). */
 const FEATURE_RADIUS = 4;
 
-const BRASS = 0xc9a24a;
+const BRASS = 0xe89a58; // bánh răng đồng (như thân máy), không phải đồng thau vàng
+const HUB = 0xa96030;
 
 function paintAll(g: BufferGeometry, hex: number): BufferGeometry {
   const { r, g: gr, b } = new Color(hex);
@@ -47,13 +52,13 @@ export function createGear(radius: number, teeth: number, thickness: number): Bu
   }
   const hub = new CylinderGeometry(radius * 0.26, radius * 0.26, thickness * 2, 10);
   hub.rotateX(Math.PI / 2);
-  parts.push(paintAll(hub, 0x9a6a2c));
+  parts.push(paintAll(hub, HUB));
   const merged = mergeGeometries(
     parts.map((p) => (p.index ? p.toNonIndexed() : p)),
     false,
   ) as BufferGeometry;
   for (const p of parts) p.dispose();
-  return merged;
+  return applyBoxUV(merged, CRAFT_TEXTURE_TILE.copper);
 }
 
 /** Bánh răng của máy: vị trí (hệ máy, mặt trước là +Z), bán kính, số răng, trục (z: mặt trước; x: hai bên), chiều quay và tốc độ (rad/giây) */
@@ -104,11 +109,11 @@ export function drawStampBoard(canvas: HTMLCanvasElement, entries: readonly { na
 }
 
 /** Sáu tên và mẫu dấu công khai của bảng: đúng 6 người của bảng khóa Bài 3 (`PEOPLE`), tên theo `content/villageFeatures.ts` (tên phản diện qua {phanDien}). */
-export function stampBoardEntries(): { name: string; key: number }[] {
-  return PEOPLE.map((p) => ({ name: fmt(stampBoardText.ten[p.id as keyof typeof stampBoardText.ten]), key: p.publicKey }));
+export function stampBoardEntries(format: (text: string) => string = fmt): { name: string; key: number }[] {
+  return PEOPLE.map((p) => ({ name: format(stampBoardText.ten[p.id as keyof typeof stampBoardText.ten]), key: p.publicKey }));
 }
 
-const KINDS = ['may-soi-dau', 'bang-mau'] as const;
+const KINDS = ['may-soi-dau', 'bang-mau', 'chuong-bo-cau'] as const;
 
 function useDispose(list: readonly { dispose(): void }[]): void {
   useEffect(
@@ -180,6 +185,62 @@ function StampBoard({ p, maxDistance, plane, material }: { p: PropPlacement; max
   );
 }
 
+/** Nhịp gật đầu của bồ câu (rad/giây) và biên độ cúi (rad); mỗi con lệch pha riêng. */
+const PIGEON_NOD = { speed: 2.3, amp: 0.42 } as const;
+
+/**
+ * Đầu bồ câu của các chuồng bồ câu: MỘT InstancedMesh cho mọi con (đầu và mỏ, tâm xoay ở cổ). Mỗi con gật đầu nhẹ theo nhịp riêng (cúi xuống rồi ngẩng lại, nghỉ một lúc); "Giảm chuyển động" thì đứng yên.
+ * Ma trận mỗi bản ghi vào mảng dựng sẵn (không tạo object mới trong useFrame); ẩn cả nhóm khi xa mọi chuồng quá tầm vẽ đồ nhỏ.
+ */
+function Pigeons({ props, animate, maxDistance }: { props: readonly PropPlacement[]; animate: boolean; maxDistance: number }) {
+  const player = usePlayerState();
+  const res = useMemo(() => {
+    const geometry = createPigeonHead();
+    const material = new MeshStandardMaterial({ color: '#FFFFFF', roughness: 0.85, vertexColors: true });
+    const count = props.length * DOVECOTE_PIGEONS.length;
+    const mesh = new InstancedMesh(geometry, material, count);
+    mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+    const white = new Color(1, 1, 1);
+    for (let i = 0; i < count; i++) mesh.setColorAt(i, white); // có màu theo bản để cùng chương trình shader với các đồ nhỏ nhân bản (đã biên dịch trước)
+    mesh.frustumCulled = false;
+    // ma trận cố định của từng chuồng (vị trí, hướng, tỉ lệ) và hai ma trận tạm dùng lại mỗi khung hình
+    const bases = props.map((p) => new Matrix4().compose(new Vector3(p.x, 0, p.z), new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), p.yaw), new Vector3(p.scale, p.scale, p.scale)));
+    return { geometry, material, mesh, bases, local: new Matrix4(), out: new Matrix4() };
+  }, [props]);
+  useDispose(useMemo(() => [res.geometry, res.material, res.mesh], [res]));
+  const pose = (time: number, moving: boolean) => {
+    let i = 0;
+    for (let b = 0; b < res.bases.length; b++) {
+      for (let k = 0; k < DOVECOTE_PIGEONS.length; k++, i++) {
+        const p = DOVECOTE_PIGEONS[k];
+        const s = moving ? Math.sin(time * PIGEON_NOD.speed + (b * 3 + k) * 1.9) : 0;
+        const angle = s > 0.45 ? ((s - 0.45) / 0.55) * PIGEON_NOD.amp : 0;
+        res.local.makeRotationX(angle).setPosition(p.x, p.y + PIGEON_NECK.y, p.z + PIGEON_NECK.z);
+        res.out.multiplyMatrices(res.bases[b], res.local);
+        res.mesh.setMatrixAt(i, res.out);
+      }
+    }
+    res.mesh.instanceMatrix.needsUpdate = true;
+  };
+  // đứng yên (hoặc vừa dựng): ghi tư thế nghỉ một lần
+  useEffect(() => {
+    if (!animate) pose(0, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [res, animate]);
+  useFrame((state) => {
+    let near = false;
+    const r = maxDistance + FEATURE_RADIUS;
+    for (let b = 0; b < props.length; b++) {
+      const dx = (player?.x ?? 0) - props[b].x;
+      const dz = (player?.z ?? 0) - props[b].z;
+      if (!player || dx * dx + dz * dz <= r * r) near = true;
+    }
+    res.mesh.visible = near;
+    if (near && animate) pose(state.clock.elapsedTime, true);
+  });
+  return <primitive object={res.mesh} />;
+}
+
 export interface VillageFeaturesProps {
   /** Đồ nhỏ của làng (đã ở tọa độ thế giới); chỉ lấy máy soi dấu và bảng mẫu dấu */
   props: readonly PropPlacement[];
@@ -187,15 +248,25 @@ export interface VillageFeaturesProps {
   animate: boolean;
   /** Tầm vẽ đồ nhỏ của mức chất lượng (`PROPS_MAX_DISTANCE`): xa hơn thì ẩn */
   maxDistance: number;
+  /** Mức chất lượng: Thấp thì bánh răng không dùng bản đồ môi trường */
+  level?: QualityLevel;
 }
 
 /** Bánh răng quay chậm và đèn nhấp nháy của máy soi dấu, chữ trên bảng mẫu dấu (xem chú thích đầu file). */
-export function VillageFeatures({ props, animate, maxDistance }: VillageFeaturesProps) {
+export function VillageFeatures({ props, animate, maxDistance, level }: VillageFeaturesProps) {
   const machines = useMemo(() => props.filter((p) => p.kind === KINDS[0]), [props]);
   const boards = useMemo(() => props.filter((p) => p.kind === KINDS[1]), [props]);
+  const dovecotes = useMemo(() => props.filter((p) => p.kind === KINDS[2]), [props]);
   const res = useMemo(() => {
     const gearGeos = MACHINE_GEARS.map((g) => createGear(g.r, g.teeth, 0.14));
-    const gearMat = new MeshStandardMaterial({ color: '#FFFFFF', vertexColors: true, metalness: 0.55, roughness: 0.4 });
+    const copperMap = acquireCraftTexture('copper');
+    // mức Thấp: bánh răng cũng chỉ có màu đồng và ánh kim thấp, không ánh kim giả (như thân máy)
+    const gearMat = new MeshStandardMaterial(
+      level === 'low'
+        ? { color: '#FFFFFF', vertexColors: true, metalness: LOW_COPPER.metalness, roughness: LOW_COPPER.roughness, emissive: LOW_COPPER.emissive, ...(copperMap ? { map: copperMap } : {}) }
+        : { color: '#FFFFFF', vertexColors: true, metalness: 0.7, roughness: 0.34, emissive: '#2a1308', ...(copperMap ? { map: copperMap } : {}) },
+    );
+    if (level !== 'low') attachCopperSheen(gearMat, COPPER_SHEEN_INTENSITY);
     const lampGeo = new SphereGeometry(0.2, 12, 8);
     lampGeo.scale(1, 1.3, 1);
     const lampMat = new MeshStandardMaterial({ color: '#FFE9A8', emissive: '#FFB52E', emissiveIntensity: 1.2, roughness: 0.25 });
@@ -207,9 +278,15 @@ export function VillageFeatures({ props, animate, maxDistance }: VillageFeatures
     texture.anisotropy = 4;
     const plane = new PlaneGeometry(PROP_SIZES['bang-mau'].box!.hx * 2, PROP_SIZES['bang-mau'].h);
     const boardMat = new MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
-    return { gearGeos, gearMat, lampGeo, lampMat, canvas, texture, plane, boardMat };
-  }, []);
+    return { gearGeos, gearMat, lampGeo, lampMat, canvas, texture, plane, boardMat, copperMap };
+  }, [level]);
   useDispose(useMemo(() => [...res.gearGeos, res.gearMat, res.lampGeo, res.lampMat, res.texture, res.plane, res.boardMat], [res]));
+  useEffect(
+    () => () => {
+      if (res.copperMap) releaseCraftTexture('copper');
+    },
+    [res],
+  );
   // vẽ lại chữ khi phông chữ tải xong (lần đầu có thể còn dùng phông dự phòng)
   useEffect(() => {
     let alive = true;
@@ -234,6 +311,7 @@ export function VillageFeatures({ props, animate, maxDistance }: VillageFeatures
       {boards.map((p, i) => (
         <StampBoard key={`b${i}`} p={p} maxDistance={maxDistance} plane={res.plane} material={res.boardMat} />
       ))}
+      {dovecotes.length > 0 && <Pigeons props={dovecotes} animate={animate} maxDistance={maxDistance} />}
     </>
   );
 }

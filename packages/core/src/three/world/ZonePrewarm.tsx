@@ -5,9 +5,9 @@ import { CHARACTERS } from '../../content/characters';
 import { CRAFT_KINDS, craftMaterial } from '../cho/MarketProcedural';
 import { createCraftProp } from '../cho/marketGeometry';
 import { createScrollResources } from '../village/KnowScrolls';
-import { scatterMaterial } from '../village/ScatterProps';
+import { scatterMaterial, stoneHillMaterial } from '../village/ScatterProps';
 import { SCATTER_KINDS } from '../village/scatter';
-import { createScatterGeometry } from '../village/scatterGeometry';
+import { createScatterGeometry, createStoneHill } from '../village/scatterGeometry';
 import { createPartsPrewarm, instanceModelIds, type PartsPrewarm } from '../cho/ModelInstances';
 import { lodId } from '../modelIds';
 import { preloadModel, releaseModel, retainModel, type ModelData } from '../modelLoader';
@@ -112,10 +112,11 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
       // biên dịch trước shader: vật liệu các model của làng (kể cả người dẫn) và các đồ nhỏ do code dựng có trong làng (vật liệu màu theo đỉnh là chương trình mới)
       const kinds = new Set(village.layout.props.map((p) => p.kind));
       // giữ vật liệu mẫu tới khi bỏ chuẩn bị: vật liệu bị giải phóng thì three bỏ luôn chương trình shader vừa biên dịch (hết nơi dùng), và vùng dựng sau phải biên dịch lại
-      for (const k of CRAFT_KINDS) if (kinds.has(k)) crafts.push({ kind: k, geometry: createCraftProp(k)!, material: craftMaterial(k) as MeshStandardMaterial });
+      for (const k of CRAFT_KINDS) if (kinds.has(k)) crafts.push({ kind: k, geometry: createCraftProp(k)!, material: craftMaterial(k, level) as MeshStandardMaterial });
       // đồ rải của làng lớn: mỗi loại có mặt trong làng một vật liệu (màu theo đỉnh) là một chương trình shader mới; thẻ Em có biết: cuộn phát sáng, cột sáng và vầng sáng (vật liệu cộng sáng)
       const scat = new Set((village.layout.scatter ?? []).map((p) => p.kind));
       for (const k of SCATTER_KINDS) if (scat.has(k)) extras.push({ geometry: createScatterGeometry(k), material: scatterMaterial(k) });
+      if ((village.layout.scatter ?? []).some((p) => p.kind === 'doi' && p.stone)) extras.push({ geometry: createStoneHill(), material: stoneHillMaterial() });
       if ((village.layout.scrolls ?? []).length > 0) {
         scrollRes = createScrollResources();
         extras.push({ geometry: scrollRes.scroll, material: scrollRes.scrollMat, plain: true }, { geometry: scrollRes.beam, material: scrollRes.beamMat, plain: true }, { geometry: scrollRes.disc, material: scrollRes.discMat, plain: true });

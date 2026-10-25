@@ -78,6 +78,8 @@ export interface WorldSceneProps {
   /** Trạng thái các màn (để vẽ biển gỗ) */
   levelStates: Readonly<Record<number, LevelState | undefined>>;
   onZones: (loaded: LoadedZones) => void;
+  /** Báo khi một làng bắt đầu hay thôi được chuẩn bị sẵn (kèm trạng thái của cả 4 làng) */
+  onPrewarm?: (prewarm: PrewarmZones) => void;
   onInside: (village: VillageId | null) => void;
   onNearGate: (gate: GateId | null) => void;
   /** Vùng làng đã dựng xong (từng phần dựng dần) */
@@ -119,6 +121,7 @@ export function WorldScene({
   loaded,
   levelStates,
   onZones,
+  onPrewarm,
   onInside,
   onNearGate,
   onZoneReady,
@@ -133,6 +136,13 @@ export function WorldScene({
   const [prewarm, setPrewarm] = useState<PrewarmZones>({ 'lang-giay': false, 'lang-det': false, 'lang-khac-dau': false, 'lang-bac': false });
   // làng nào đã chuẩn bị xong: vùng làng chỉ dựng khi chuẩn bị xong (hoặc chờ quá ZONE_PREWARM_WAIT giây)
   const [prewarmed, setPrewarmed] = useState<ReadonlySet<VillageId>>(new Set());
+  const handlePrewarm = useCallback(
+    (next: PrewarmZones) => {
+      setPrewarm(next);
+      onPrewarm?.(next);
+    },
+    [onPrewarm],
+  );
   const onPrewarmDone = useCallback((id: VillageId, done: boolean) => setPrewarmed((prev) => (prev.has(id) === done ? prev : done ? new Set(prev).add(id) : new Set([...prev].filter((x) => x !== id)))), []);
   const byModel = useMemo(() => MARKET_MODELS.map((id) => ({ id, items: market.placements.filter((p) => p.model === id) })), [market]);
   const gateItems = useMemo(() => world.gates.map((g) => ({ id: g.model, village: world.villages.find((v) => v.gate.id === g.id)!.id, items: [{ model: g.model, x: g.x, z: g.z, yaw: g.yaw, scale: 1, tint: [1, 1, 1] as const } satisfies Placement] })), [world]);
@@ -210,7 +220,7 @@ export function WorldScene({
       <GateBarriers gates={closedGates} falling={fallingGate} onFallen={onGateFallen} animate={animate} />
       <Signposts signposts={world.signposts} />
       <GroundArrow graph={world.graph} target={arrowTarget} animate={animate} />
-      <WorldTracker villages={world.villages} mission={mission} onZones={onZones} onPrewarm={setPrewarm} onInside={onInside} onNearGate={onNearGate} />
+      <WorldTracker villages={world.villages} mission={mission} onZones={onZones} onPrewarm={handlePrewarm} onInside={onInside} onNearGate={onNearGate} />
       <ScrollTargetPicker scrolls={inside ? world.villages.find((v) => v.id === inside)?.layout.scrolls : undefined} collected={inside ? (knowMasks[inside] ?? 0) : 0} onChange={onNearestScroll} />
       {debugColliders && <ColliderDebug colliders={colliders} dynamic={dynamicColliders} />}
       <StatsProbe />

@@ -103,6 +103,30 @@ export function createHill(): BufferGeometry {
   return bare(new SphereGeometry(1, 16, 4, 0, Math.PI * 2, 0, Math.PI / 2));
 }
 
+/**
+ * Đồi đá: nửa khối cầu dẹt có mặt lởm chởm (đỉnh lệch theo bán kính, ô nhỏ phẳng), chân ở y = 0, bán kính 1 như đồi cỏ nên đặt chung bằng `scale` và `sy`. Có toạ độ ảnh lặp 4 × 2 lần để phủ texture đá (vân đá, xem
+ * `craftTextures`). Độ lệch tính từ vị trí đỉnh nên các đỉnh trùng nhau cùng lệch như nhau (không hở mặt).
+ */
+export function createStoneHill(): BufferGeometry {
+  const g = new SphereGeometry(1, 10, 3, 0, Math.PI * 2, 0, Math.PI / 2);
+  const pos = g.getAttribute('position');
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    const z = pos.getZ(i);
+    if (y < 1e-6) continue; // viền chân giữ nguyên
+    const n = Math.sin(x * 12.9898 + z * 78.233 + y * 37.719) * 43758.5453;
+    const f = 1 + ((n - Math.floor(n)) - 0.5) * 0.26;
+    pos.setXYZ(i, x * f, y * (1 + ((n * 7.13 - Math.floor(n * 7.13)) - 0.5) * 0.3), z * f);
+  }
+  const flat = g.toNonIndexed();
+  g.dispose();
+  const uv = flat.getAttribute('uv');
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 4, uv.getY(i) * 2);
+  flat.computeVertexNormals();
+  return flat;
+}
+
 const BERRY_LEAF = [0x6fa33e, 0x5e9232, 0x7bb047];
 
 /** Thêm thuộc tính aSway (độ đung đưa 0 đến 1 của từng đỉnh) và aSlot (chỗ treo vải 0, 1, 2; −1 là trụ và xà) cho cả hình học: bộ đổ bóng đỉnh của vật liệu sào vải đọc cả hai. */

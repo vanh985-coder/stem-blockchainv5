@@ -4,6 +4,7 @@ import { BoxGeometry, BufferAttribute, BufferGeometry, CylinderGeometry, Extrude
 import { Fence, Hills, Instances, useDispose, useImageTexture, type Item } from '../cho/MarketProcedural';
 import { createBoatCanopy, createBoatHull } from '../cho/marketGeometry';
 import type { HillAvoid } from '../cho/hillLayout';
+import { applyBoxUV, useCraftTexture } from '../cho/craftTextures';
 import { createEdgeAlphaTexture, createGrassTexture, createPaddyTexture, createPlankTexture, createWaterTexture } from '../cho/marketTextures';
 import { DECK_START_X, DECK_TOP, PLAZA_RADIUS, RAMP_START_X, WORLD_RADIUS } from '../cho/marketLayout';
 import { POND_BANK, type VillageField, type VillageLayout, type VillageRoad, type VillageYard } from '../village/villageLayout';
@@ -89,8 +90,13 @@ function YardDisc({ yard, y, dirt, brick, radial }: { yard: VillageYard; y: numb
  * Viền đá của sân lát gạch: một vòng khối đá thấp (cao 0,16, rộng 0,55) xếp quanh mép sân, so le và lệch nhẹ, bỏ chỗ có đường đi qua (đại lộ vào sân). Không có vật cản (đi bước lên được). Một InstancedMesh.
  */
 function YardKerb({ yard, roads }: { yard: VillageYard; roads: readonly VillageRoad[] }) {
-  const geo = useMemo(() => new BoxGeometry(1, 1, 1), []);
+  const geo = useMemo(() => applyBoxUV(new BoxGeometry(1, 1, 1), 1.0), []);
   const mat = useMemo(() => new MeshStandardMaterial({ color: '#FFFFFF', roughness: 1 }), []);
+  const stoneTex = useCraftTexture('stone');
+  useEffect(() => {
+    mat.map = stoneTex;
+    mat.needsUpdate = true;
+  }, [mat, stoneTex]);
   useDispose(useMemo(() => [geo, mat], [geo, mat]));
   const items = useMemo<Item[]>(() => {
     const n = Math.round((Math.PI * 2 * (yard.r + 0.2)) / 1.45);
@@ -201,8 +207,14 @@ function River({ world, water, plank }: { world: WorldLayout; water: Texture; pl
   const canopyMat = useMemo(() => new MeshStandardMaterial({ color: '#C9A857', roughness: 1, side: 2 }), []);
   const postGeo = useMemo(() => new CylinderGeometry(0.11, 0.13, 1.1, 8), []);
   const postMat = useMemo(() => new MeshStandardMaterial({ color: '#6B4526', roughness: 1 }), []);
-  const rockGeo = useMemo(() => new IcosahedronGeometry(0.55, 0), []);
+  const rockGeo = useMemo(() => applyBoxUV(new IcosahedronGeometry(0.55, 0), 1.0), []);
   const rockMat = useMemo(() => new MeshStandardMaterial({ color: '#9A9A90', roughness: 1, flatShading: true }), []);
+  // đá hai bờ sông: vân đá dùng chung với đá của làng (bước L4); chưa có texture thì giữ màu xám phẳng
+  const stoneTex = useCraftTexture('stone');
+  useEffect(() => {
+    rockMat.map = stoneTex;
+    rockMat.needsUpdate = true;
+  }, [rockMat, stoneTex]);
   const bridgeLen = DECK_START_X - BRIDGE_DECK_END_X;
   const deckGeo = useMemo(() => new BoxGeometry(bridgeLen, DECK_TOP, BRIDGE_HALF_WIDTH * 2), [bridgeLen]);
   const rampGeo = useMemo(() => {
