@@ -23,9 +23,8 @@ describe('content/games.ts', () => {
   });
 
   it('không viết cứng tên phản diện (dùng {phanDien}) và không còn chỗ giữ tên sau fmt()', () => {
-    const phanDien = fmt('{phanDien}');
     for (const [path, s] of strings) {
-      expect(s, path).not.toContain(phanDien);
+      expect(s, path).not.toMatch(/(^|[^\p{L}])Tí(?![\p{L}])/u);
       expect(fmt(s, { diem: 1, so: 1, so2: 2, so3: 3, muc: 'Đồng', nhan: 'x', man: 'x' }), path).not.toMatch(/[{}]/);
     }
   });

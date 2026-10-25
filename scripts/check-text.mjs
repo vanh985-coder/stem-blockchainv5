@@ -1,8 +1,9 @@
-// Kiểm tra: không có chữ tiếng Việt có dấu viết thẳng trong .ts/.tsx (chuỗi hoặc JSX). Chạy: pnpm check:text
+// Kiểm tra: (1) không có chữ tiếng Việt có dấu viết thẳng trong .ts/.tsx (chuỗi hoặc JSX); (2) không viết cứng tên phản diện (cả từ, kể cả trong content/; xem scripts/lib/villainName.mjs). Chạy: pnpm check:text
 // Chữ hiển thị phải nằm trong packages/core/src/content/ (spec 03 mục 7).
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { findVillainName, readVillainName } from './lib/villainName.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SCAN_DIRS = ['apps', 'packages'];
@@ -84,17 +85,33 @@ async function* walk(dir) {
 }
 
 const problems = [];
+const nameProblems = [];
 let scanned = 0;
+const VILLAIN_FILE = 'packages/core/src/content/characters.ts';
+const villainName = readVillainName(await readFile(path.join(ROOT, VILLAIN_FILE), 'utf8'));
+// Luật tên phản diện bỏ qua test (so sánh nguyên văn) và nơi khai báo tên.
+const NAME_IGNORE = [/\.test\.tsx?$/, /^packages\/core\/src\/content\/characters\.ts$/, /^packages\/core\/src\/lessons\/[^/]+\/tests\.ts$/ /* dữ liệu test giai đoạn 1, chuỗi so sánh nguyên văn */];
 for (const top of SCAN_DIRS) {
   for await (const file of walk(path.join(ROOT, top))) {
     const rel = path.relative(ROOT, file).split(path.sep).join('/');
+    const lines = stripComments(await readFile(file, 'utf8')).split('\n');
+    if (villainName && !NAME_IGNORE.some((re) => re.test(rel))) {
+      lines.forEach((line, idx) => {
+        if (findVillainName(line, villainName).length > 0) nameProblems.push(`${rel}:${idx + 1}: ${line.trim().slice(0, 100)}`);
+      });
+    }
     if (IGNORE.some((re) => re.test(rel))) continue;
     scanned++;
-    const lines = stripComments(await readFile(file, 'utf8')).split('\n');
     lines.forEach((line, idx) => {
       if (VIET.test(line)) problems.push(`${rel}:${idx + 1}: ${line.trim().slice(0, 100)}`);
     });
   }
+}
+
+if (nameProblems.length) {
+  console.error(`check:text: ${nameProblems.length} dòng viết cứng tên phản diện ("${villainName}"), hãy dùng {phanDien}:\n`);
+  for (const p of nameProblems) console.error('  ' + p);
+  process.exit(1);
 }
 
 if (problems.length) {

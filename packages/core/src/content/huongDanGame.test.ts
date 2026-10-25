@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseRich } from '../ui/rich';
-import { CHARACTER_IDS, EXTRA_VARS, fmt, phanDien } from './characters';
+import { CHARACTER_IDS, EXTRA_VARS, fmt } from './characters';
 import { GAMES } from './games';
 import { GUIDE_ART_IDS, GUIDE_SECTIONS, GUIDE_SHOT_IDS, guideSectionsFor } from './huongDan';
 import { HUONG_DAN_GAME, gameGuide, hintText, type GameGuide } from './huongDanGame';
@@ -95,7 +95,7 @@ describe('huongDanGame.ts: mọi chữ hướng dẫn của game nằm trong m�
     for (const l of READY_GAMES) {
       for (const [name, t] of allTexts(l.id)) {
         for (const m of t.matchAll(/\{([^}]*)\}/g)) expect(ALLOWED.has(m[1]), `${name}: {${m[1]}}`).toBe(true);
-        expect(t, name).not.toContain(phanDien);
+        expect(t, name).not.toMatch(/(^|[^\p{L}])Tí(?![\p{L}])/u);
         expect(fmt(t), name).not.toMatch(/[{}]/);
       }
     }

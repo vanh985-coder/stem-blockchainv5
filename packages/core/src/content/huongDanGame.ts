@@ -299,7 +299,7 @@ export const HUONG_DAN_GAME = {
       },
     ],
     nhac: {
-      napDan: 'Mỗi lọ Thuốc x cần nhãn bằng {congThuc}. Dùng Máy tính mod để tính nếu cần. Cẩn thận nhãn bẫy: số khuôn KHÔNG phải mẫu công khai.',
+      napDan: 'Mỗi lọ Thuốc x cần nhãn bằng {congThuc}. Tính bằng Máy tính mod nếu cần. Cẩn thận nhãn bẫy: số khuôn KHÔNG phải mẫu công khai.',
       napXong: 'Lọ nào cũng có nhãn rồi. Bấm nút "Bắt đầu đợt" khi em sẵn sàng.',
       dotGa: 'Đọc thẻ trên gà, chọn thuốc có mẫu công khai bằng thẻ đó rồi bắn.',
       choGa: 'Chưa có gà trên đường. Em xem lại các lọ thuốc, gà sắp tới rồi.',

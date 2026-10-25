@@ -13,9 +13,8 @@ describe('chữ của cảnh làng 3D', () => {
     const t = VILLAGE_SCENE['lang-giay']!;
     const all = [t.opening, ...Object.values(t.guideNext)];
     expect(t.guideNext.game1).toContain('{phanDien}');
-    const phanDien = fmt('{phanDien}');
     for (const s of all) {
-      expect(s).not.toContain(phanDien);
+      expect(s).not.toMatch(/(^|[^\p{L}])Tí(?![\p{L}])/u);
       expect(fmt(s, { ten: 'Lan' })).not.toMatch(/[{}]/);
     }
   });
@@ -28,9 +27,8 @@ describe('chữ của cảnh làng 3D', () => {
     expect(t.award.loi[0]).toContain('Trang Sổ Vàng thứ hai');
     expect(t.award.loi[1]).toContain('Làng Khắc Dấu');
     expect(t.guideNext.game1).toContain('{phanDien}');
-    const phanDien = fmt('{phanDien}');
     for (const s of [t.opening, ...Object.values(t.guideNext), ...t.award.loi]) {
-      expect(s).not.toContain(phanDien);
+      expect(s).not.toMatch(/(^|[^\p{L}])Tí(?![\p{L}])/u);
       expect(fmt(s, { ten: 'Lan' })).not.toMatch(/[{}]/);
     }
   });

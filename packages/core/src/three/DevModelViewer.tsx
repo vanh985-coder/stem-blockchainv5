@@ -102,7 +102,7 @@ function FakeAnswers() {
         ))}
       </ul>
       <p className="text-sm font-bold" role="status">
-        {result === null ? ui.dev3d.phanUngChon : result ? ui.dev3d.phanUngDung : ui.dev3d.phanUngSai}
+        {result === null ? ui.dev3d.phanUngChon : fmt(result ? ui.dev3d.phanUngDung : ui.dev3d.phanUngSai)}
       </p>
     </div>
   );
@@ -268,7 +268,7 @@ export function DevModelViewer() {
                       {ui.dev3d.tuTheHang}
                     </button>
                   </div>
-                  <p className="mt-1 text-sm">{ui.dev3d.tuTheGhiChu}</p>
+                  <p className="mt-1 text-sm">{fmt(ui.dev3d.tuTheGhiChu)}</p>
                 </fieldset>
 
                 <fieldset className="space-y-2">
