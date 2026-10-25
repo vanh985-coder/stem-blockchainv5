@@ -131,6 +131,33 @@ Ký hiệu: A–G là các loại lá, X là lá giả. Bàn ghi theo hàng, ng�
 | Hai ô cạnh nhau cùng đầy | Gộp thành 1 cành |
 | 4 lá thẳng hàng | Tạo ô hoa sen ở vị trí vừa đổi |
 
+### Logic đã làm và các chỗ đã chốt (mốc 3, bước B12; code ở `packages/village-lang-bac/src/match3/`)
+
+Logic thuần, chưa có cảnh (màn 11 vẫn `coming-soon`): `match3Config.ts` (số liệu, phương án độ khó), `match3Logic.ts`, `match3Logic.test.ts` (36 ca), `match3Bots.ts`, `match3Balance.test.ts` (7 ca), `index.ts`. Ngẫu nhiên chỉ qua `createMulberry32`: bàn đầu vòng và ô cây rút từ rng RIÊNG của vòng (theo seed và số vòng, không phụ thuộc cách chơi); lá mới, lá giả ném và xáo bàn rút từ rng của ván. Cùng seed và cùng chuỗi nước đi thì cùng ván.
+
+**Chốt các chỗ spec chưa rõ:**
+- **Một hàng** là một nhóm liền nhau từ 3 lá cùng loại thẳng hàng (ngang hoặc dọc) trở lên; hai đường cùng loại giao nhau (hình L, T, +) là MỘT nhóm, độ dài tính theo đường dài nhất. Mỗi hàng loại X lấp TỐI ĐA 1 ô cây loại X còn trống, dù hàng dài 3, 4 hay 5 (ô trống nhỏ nhất cần đúng loại X, tự chọn). Nổ dây chuyền: mỗi đợt xét mọi hàng cùng lúc, rồi xóa, rồi lá rơi (lá giả cũng rơi theo trọng lực, tự chọn), rồi thêm lá từ trên, lặp lại tới khi hết hàng. Hai hàng loại A trong cùng một đợt lấp 2 ô A nếu còn.
+- **Ô cây**: mỗi ô yêu cầu một loại lá, chọn theo rng sao cho không loại nào chiếm quá 3 ô trong 8 (tự chọn: 4 ô thì tối đa 2 ô mỗi loại, cùng tỉ lệ). Cây là cây nhị phân: 8 ô → 4 cành → 2 cành → gốc (vòng 1: 4 ô → 2 cành → gốc). Hai ô anh em (chỉ số 2k và 2k + 1) cùng đầy thì gộp thành cành (chỉ là sự kiện để vẽ); gộp tiếp lên mức trên khi cành anh em cũng đã gộp; mọi ô đầy là gốc hình thành, xong vòng (thưởng +20 mỗi lượt dư).
+- **Hoa sen** (`o-hoa`): tạo khi đúng 4 thẳng hàng, đặt ở ô vừa đổi nếu ô đó nằm trong nhóm (ô đầu tiên trong hai ô đổi thỏa), không thì ô giữa của đường dài nhất (ô thứ ⌊(n − 1) / 2⌋, tự chọn). Hoa sen GIỮ loại lá của nhóm (vẫn ghép hàng được). Khi nổ (bằng bất cứ cách nào): xóa cả hàng ngang của nó, kể cả lá giả và ô gió trong hàng; hoa sen khác trong hàng đó nổ theo. Các lá bị xóa thêm vẫn +5, không lấp ô cây; lá giả và ô gió bị xóa thêm không cộng điểm (tự chọn).
+- **Gió xoáy** (`o-gio`): tạo khi từ 5 thẳng hàng trở lên (cùng quy tắc vị trí). Không có loại lá. Đổi chỗ với một lá thường loại X (hoặc hoa sen loại X) thì xóa mọi lá loại X trên bàn và chính nó, tính là 1 hàng loại X (lấp tối đa 1 ô); gió + gió xóa mọi lá thường (không lấp ô cây). Không đổi với lá giả. Đổi chỗ có ô gió luôn hợp lệ và mất một lượt.
+- **Lá giả**: không đổi chỗ được, không tính vào hàng, biến mất khi có ô nổ ngay sát bên (trên, dưới, trái, phải; tính cả ô nổ do hoa sen xóa thêm), không cộng điểm khi biến mất. {phanDien} ném lá giả (cứ đủ 5 lượt, tức sau lượt thứ 5, 10, …; không ném ở lượt kết thúc vòng) vào một ô lá thường ngẫu nhiên (không vào hoa sen, ô gió hay lá giả).
+- **Bàn đầu vòng và bàn sau khi xáo**: không có hàng sẵn, có ít nhất 1 nước đi; lá giả ban đầu đặt ngẫu nhiên. Hết nước đi (sau lượt, sau lần ném lá giả): xáo lại các lá thường (không phải hoa sen), lá giả và ô đặc biệt giữ chỗ.
+- **Lượt**: một lượt là một lần đổi chỗ hợp lệ. Đổi mà không tạo được hàng thì trả về chỗ cũ, KHÔNG mất lượt (`ok: false`, `why: 'noMatch'`). Hết lượt chưa xong cây thì vẫn sang vòng sau (`advanceRound`), không thưởng. Điểm: mỗi lá nổ +5 (kể cả lá bị hoa sen và gió xoáy xóa thêm, hoa sen, lá thường; không tính lá giả và ô gió), mỗi ô cây lấp +50, xong cây +20 × lượt dư.
+- **Sự kiện** (để cảnh diễn hoạt đúng thứ tự, theo từng đợt): `swap`, `swapBack`, `wave` (đầu mỗi đợt nổ), `spawnLotus`, `spawnWind`, `clear` (các lá nổ, điểm, hàng bị hoa sen xóa, loại bị gió xóa), `fakeGone`, `slotFilled`, `branchMerged` (mức, chỉ số, có phải gốc), `treeDone`, `fall`, `fill`, `throwFake`, `shuffle`, `roundEnd`, `roundStart`, `gameEnd`. Thứ tự trong một đợt: `wave`, tạo hoa sen hay gió, `clear`, `fakeGone`, lấp ô cây và gộp cành, `fall`, `fill`.
+- **Bot** (`match3Bots.ts`): chỉ dùng `swapCells` và `advanceRound`, nhìn MỘT nước đi (`previewMove`: đợt nổ đầu, không đoán lá rơi xuống). Bot giỏi chọn nước lấp được nhiều ô cây nhất, rồi nổ nhiều lá nhất (hòa thì ngẫu nhiên bằng rng riêng của bot); bot trung bình 50% chọn như bot giỏi, 50% chọn ngẫu nhiên một nước hợp lệ; thêm bot ngẫu nhiên (chỉ để báo mức sàn).
+
+**Kết quả cân bằng** (300 ván mỗi bot, seed 1 đến 300, luật gốc, mốc 600 / 1000 / 1400):
+
+| Bot | Điểm TB (nhỏ nhất đến lớn nhất) | p10 / p25 / p75 | Xong cây vòng 1 / 2 / 3 | Lượt dư vòng 1 / 2 / 3 | Lượt, lá nổ, xáo mỗi ván | Chưa đạt / Đồng / Bạc / Vàng |
+|---|---|---|---|---|---|---|
+| Giỏi | 2.553,3 (2.300 đến 2.950) | 2.425 / 2.480 / 2.615 | 100% / 100% / 100% | 13,9 / 15,1 / 14,7 | 26,3; 136,1; 0,26 | 0 / 0 / 0 / 300 |
+| Trung bình | 2.537,7 (2.350 đến 2.820) | 2.420 / 2.470 / 2.595 | 99,7% / 99,7% / 100% | 13,2 / 13,7 / 13,7 | 29,4; 145,1; 0,30 | 0 / 0 / 0 / 300 |
+| Ngẫu nhiên | 2.508,2 (2.170 đến 2.825) | 2.400 / 2.450 / 2.565 | 98,7% / 99,7% / 99,0% | 11,8 / 11,9 / 12,2 | 34,1; 158,2; 0,35 | 0 / 0 / 0 / 300 |
+
+- **Độ khó**: mục tiêu "bot trung bình xong cây vòng 1 ≥ 70%" đạt dư (99,7%) nên KHÔNG dùng phương án A (mỗi vòng +5 lượt) hay B (A và lá giả ban đầu 2 / 4 / 6); cả hai chỉ làm dễ hơn (điểm trung bình của bot trung bình 2.850). Với luật gốc ngay cả bot chỉ chọn ngẫu nhiên cũng xong cây ở 99% ván: cây chỉ cần chừng 9 lượt mỗi vòng so với 20 đến 25 lượt cho phép.
+- **Mốc điểm CHƯA ĐẠT, chờ chủ dự án chọn**: với mốc 600 / 1000 / 1400 mọi bot đều Vàng 100% (bot trung bình Vàng 100% > 15%), vì điểm dồn vào 2.170 đến 2.950 (ô cây 1.000 điểm cố định, lá nổ khoảng 700, thưởng lượt dư khoảng 800). Quy tắc phân vị của lời giao (Đồng = p25 bot trung bình = 2.470 → 2.450, Bạc = p75 bot trung bình = 2.595 → 2.550, Vàng = p10 bot giỏi = 2.425 → 2.400; Bạc ≥ Vàng nên Bạc = trung bình cộng Đồng và Vàng = 2.425) cho ba mốc không tăng dần và cách nhau dưới 150 điểm, nên KHÔNG áp dụng; giữ 600 / 1000 / 1400 của spec trong `MATCH3_SPEC` cho tới khi chọn mốc theo nghĩa (ví dụ theo số vòng xong cây trong số lượt cho phép, hoặc giảm số lượt cho khó hơn).
+- **Điểm tối đa ước tính**: khoảng 3.300 (ô cây 1.000; thưởng lượt dư tối đa 20 × (16 + 17 + 17) = 1.000 nếu mỗi ô cây một lượt; lá nổ khoảng 1.300 cho 260 lá). Bot giỏi cao nhất thấy 2.950 (300 ván).
+
 ## Màn 12 — Game phụ 2: "Leo cây tìm lá giả" (kiểu leo dây của Talking Tom) và cao trào
 
 Logic đặt trong `climbLogic.ts` (hàm thuần, có test).
