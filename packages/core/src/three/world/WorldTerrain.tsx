@@ -8,7 +8,7 @@ import { applyBoxUV, useCraftTexture } from '../cho/craftTextures';
 import { createEdgeAlphaTexture, createGrassTexture, createPaddyTexture, createPlankTexture, createWaterTexture } from '../cho/marketTextures';
 import { DECK_START_X, DECK_TOP, PLAZA_RADIUS, RAMP_START_X, WORLD_RADIUS } from '../cho/marketLayout';
 import { POND_BANK, type VillageField, type VillageLayout, type VillageRoad, type VillageYard } from '../village/villageLayout';
-import { RIVER_TRUNK_HALF, ribbonOf, riverBranch, type RiverPoint } from './river';
+import { RIVER_TRUNK_HALF, ribbonOf, riverBranch, smoothPath, type RiverPoint } from './river';
 import { BRIDGE_DECK_END_X, BRIDGE_HALF_WIDTH, BRIDGE_RAMP_END_X, RIVER_EAST_X, RIVER_WEST_X, type WorldLayout, type WorldRoad } from './worldLayout';
 
 /** Nhân màu cho ảnh đất (ảnh gốc rất vàng): dịu bớt cho hợp cỏ và nhà. */
@@ -125,7 +125,7 @@ function segmentDistance(x: number, z: number, r: VillageRoad): number {
 }
 
 /** Mặt đất của một làng (luôn có, rẻ: vài draw call): cỏ làng, sân đất nện mép mờ, đường đất trong làng và hàng rào tre quanh khu. Đồ vật của làng nằm ở vùng (VillageZone). */
-function VillageGround({ layout, dirt, brick, grass: grassBase, paddy, radial, lateral }: { layout: VillageLayout; dirt: Texture | null; brick: Texture | null; grass: Texture; paddy: Texture; radial: Texture; lateral: Texture }) {
+function VillageGround({ layout, dirt, brick, grass: grassBase, paddy, radial, lateral, water }: { layout: VillageLayout; dirt: Texture | null; brick: Texture | null; grass: Texture; paddy: Texture; radial: Texture; lateral: Texture; water: Texture }) {
   // tâm làng: hàng rào tròn của làng nhỏ, hoặc lũy tre của làng lớn (bản cũ chỉ đọc hàng rào nên cỏ của làng lớn nằm nhầm ở gốc tọa độ và mặt đất trong làng lộ ra ruộng lúa của cả thế giới)
   const cx = layout.wall?.center?.x ?? layout.fence?.center?.x ?? 0;
   const cz = layout.wall?.center?.z ?? layout.fence?.center?.z ?? 0;
@@ -152,6 +152,9 @@ function VillageGround({ layout, dirt, brick, grass: grassBase, paddy, radial, l
           </mesh>
         </group>
       ))}
+      {layout.streams?.map((s, i) => (
+        <VillageStreamMesh key={`s${i}`} points={s.points} water={water} />
+      ))}
       {layout.yards.map((y, i) => (
         <YardDisc key={`y${i}`} yard={y} y={YARD_Y + i * 0.001} dirt={dirt} brick={brick} radial={radial} />
       ))}
@@ -162,6 +165,26 @@ function VillageGround({ layout, dirt, brick, grass: grassBase, paddy, radial, l
         <RoadStrip key={`r${i}`} road={r} dirt={dirt} brick={brick} lateral={lateral} />
       ))}
       {layout.fenceLayout && <Fence fence={layout.fenceLayout} />}
+    </group>
+  );
+}
+
+/** Nhánh sông nhỏ trong làng (Làng Bạc): dải nước theo đường tim đã làm mượt (cùng nước của sông thế giới) và dải bờ cỏ rộng thêm `STREAM_BANK` mỗi bên. Hai draw call. */
+const STREAM_BANK = 1.6;
+function VillageStreamMesh({ points, water }: { points: readonly RiverPoint[]; water: Texture }) {
+  const geo = useMemo(() => {
+    const pts = smoothPath(points);
+    return { water: ribbonGeometry(pts, 13.3), bank: ribbonGeometry(pts, 13.3, STREAM_BANK * 2) };
+  }, [points]);
+  useDispose(useMemo(() => [geo.water, geo.bank], [geo]));
+  return (
+    <group>
+      <mesh geometry={geo.bank} position-y={FIELD_Y - 0.002}>
+        <meshStandardMaterial color={POND_BANK_COLOR} roughness={1} />
+      </mesh>
+      <mesh geometry={geo.water} position-y={WATER_Y}>
+        <meshStandardMaterial map={water} roughness={0.2} metalness={0.05} />
+      </mesh>
     </group>
   );
 }
@@ -362,7 +385,7 @@ export function WorldTerrain({ world, dirtUrl, brickUrl = null, animate }: World
       <Fence />
       <Hills minDistance={400} spread={60} size={80} sizeVar={60} height={28} heightVar={20} avoid={hillAvoid} />
       {world.villages.map((v) => (
-        <VillageGround key={v.id} layout={v.layout} dirt={yardDirt} brick={brick} grass={tex.villageGrass} paddy={tex.fieldPaddy} radial={tex.radial} lateral={tex.lateral} />
+        <VillageGround key={v.id} layout={v.layout} dirt={yardDirt} brick={brick} grass={tex.villageGrass} paddy={tex.fieldPaddy} radial={tex.radial} lateral={tex.lateral} water={tex.water} />
       ))}
     </group>
   );

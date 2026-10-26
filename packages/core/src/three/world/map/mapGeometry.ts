@@ -4,7 +4,7 @@
  */
 import { PLAZA_RADIUS, WORLD_RADIUS } from '../../cho/marketLayout';
 import type { VillageId } from '../../../village';
-import { RIVER_CENTER_X, RIVER_TRUNK_HALF, RIVER_TRUNK_WIDTH, riverBranch, type RiverPoint } from '../river';
+import { RIVER_CENTER_X, RIVER_TRUNK_HALF, RIVER_TRUNK_WIDTH, riverBranch, smoothPath, type RiverPoint } from '../river';
 import { BRIDGE_HALF_WIDTH } from '../worldLayout';
 import type { WorldLayout } from '../worldLayout';
 import { reservedCenter } from '../worldLayout';
@@ -30,7 +30,7 @@ export interface VillageOutline {
 export interface MapGeometry {
   market: { r: number; plaza: number };
   roads: RoadStroke[];
-  /** Mỗi vùng nước một đường vẽ đóng kín (đoạn thân và hai nhánh) */
+  /** Mỗi vùng nước một đường vẽ đóng kín (đoạn thân và hai nhánh của sông, rồi nhánh sông nhỏ trong làng nếu có) */
   river: string[];
   /** Cầu gỗ qua sông: hình chữ nhật (x từ-đến, z từ-đến) */
   bridge: { x0: number; x1: number; z0: number; z1: number };
@@ -83,6 +83,8 @@ export function buildMapGeometry(world: Pick<WorldLayout, 'roads' | 'villages'>)
 
   const trunk = `M${n1(RIVER_CENTER_X - RIVER_TRUNK_WIDTH / 2)} ${-RIVER_TRUNK_HALF} L${n1(RIVER_CENTER_X + RIVER_TRUNK_WIDTH / 2)} ${-RIVER_TRUNK_HALF} L${n1(RIVER_CENTER_X + RIVER_TRUNK_WIDTH / 2)} ${RIVER_TRUNK_HALF} L${n1(RIVER_CENTER_X - RIVER_TRUNK_WIDTH / 2)} ${RIVER_TRUNK_HALF} Z`;
   const river = [trunk, ribbonPolygon(riverBranch('ne')), ribbonPolygon(riverBranch('se'))];
+  // nhánh sông nhỏ trong làng (Làng Bạc, bước L5)
+  for (const v of world.villages) for (const s of v.layout.streams ?? []) river.push(ribbonPolygon(smoothPath(s.points)));
 
   const bridge = { x0: RIVER_CENTER_X - RIVER_TRUNK_WIDTH / 2 - 2, x1: RIVER_CENTER_X + RIVER_TRUNK_WIDTH / 2 + 2, z0: -BRIDGE_HALF_WIDTH, z1: BRIDGE_HALF_WIDTH };
 

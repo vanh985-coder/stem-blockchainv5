@@ -80,7 +80,7 @@ function clothMaterial(): MeshStandardMaterial {
 
 /** Vật liệu của một loại đồ rải (màu theo đỉnh cho loại nhiều màu, đồi thì một màu nhân theo từng bản). Dùng cả khi biên dịch trước shader (xem `ZonePrewarm`). */
 export function scatterMaterial(kind: ScatterKind): MeshStandardMaterial {
-  if (kind === 'sao-vai') return clothMaterial();
+  if (kind === 'sao-vai' || kind === 'the-so') return clothMaterial(); // thẻ số của cây đa lay bằng đúng vật liệu của sào vải (cùng chương trình shader)
   return new MeshStandardMaterial({ color: '#FFFFFF', roughness: 1, vertexColors: SCATTER_VERTEX_COLORS[kind], flatShading: kind === 'tre' || kind === 'cay-qua' });
 }
 
@@ -128,7 +128,7 @@ export function ScatterProps({ scatter, level, only, animate = true }: { scatter
   const items = useMemo(() => res.map((r) => scatter.filter((p) => p.kind === r.kind && (r.kind !== 'doi' || !!p.stone === r.stone)).map(itemOf)), [res, scatter]);
   return (
     <>
-      {res.some((r) => r.kind === 'sao-vai') && <ClothClock animate={animate} />}
+      {res.some((r) => r.kind === 'sao-vai' || r.kind === 'the-so') && <ClothClock animate={animate} />}
       {res.map((r, i) => (
         <ChunkedInstances
           key={r.stone ? `${r.kind}-da` : r.kind}

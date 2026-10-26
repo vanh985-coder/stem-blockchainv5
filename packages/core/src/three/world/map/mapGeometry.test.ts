@@ -7,11 +7,11 @@ const world = assembleWorld();
 const geo = buildMapGeometry(world);
 
 describe('hình học phần tĩnh của bản đồ', () => {
-  it('có chợ, đường, sông (thân và hai nhánh), cầu, ao, nhà và 4 viền làng', () => {
+  it('có chợ, đường, sông (thân và hai nhánh) và nhánh sông nhỏ của Làng Bạc, cầu, ao, nhà và 4 viền làng', () => {
     expect(geo.market.r).toBe(42);
     expect(geo.market.plaza).toBe(14);
     expect(geo.roads.length).toBeGreaterThanOrEqual(2);
-    expect(geo.river).toHaveLength(3);
+    expect(geo.river).toHaveLength(4); // thân, hai nhánh, và nhánh sông nhỏ trong Làng Bạc
     expect(geo.ponds.length).toBeGreaterThanOrEqual(3);
     expect(geo.houses.length).toBeGreaterThan(100);
     expect(geo.outlines.map((o) => o.village)).toEqual(['lang-giay', 'lang-det', 'lang-khac-dau', 'lang-bac']);
@@ -24,19 +24,15 @@ describe('hình học phần tĩnh của bản đồ', () => {
     expect(geo.roads.some((r) => r.kind === 'dat')).toBe(true);
   });
 
-  it('viền làng: Làng Giấy, Dệt và Khắc Dấu đã dựng (nét liền, tâm 197, bán kính lũy tre), Làng Bạc chưa dựng (nét đứt, bán kính chỗ dành 125)', () => {
-    const [giay, det, khacDau, ...others] = geo.outlines;
-    for (const o of [giay, det, khacDau]) {
+  it('viền làng: cả bốn làng đã dựng (nét liền, tâm 197, bán kính lũy tre; Làng Bạc từ bước L5)', () => {
+    const [giay, det, khacDau, bac, ...others] = geo.outlines;
+    expect(others).toHaveLength(0);
+    for (const o of [giay, det, khacDau, bac]) {
       expect(o.built).toBe(true);
       expect(Math.hypot(o.cx, o.cz)).toBeCloseTo(197, 6);
       expect(o.r).toBeCloseTo(122, 6);
     }
     expect(det.cz).toBeLessThan(0);
-    for (const o of others) {
-      expect(o.built).toBe(false);
-      expect(o.r).toBe(125);
-      expect(Math.hypot(o.cx, o.cz)).toBeCloseTo(197, 6);
-    }
   });
 
   it('mọi thứ nằm trong biên thế giới', () => {

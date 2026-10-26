@@ -172,7 +172,7 @@ export function WorldPage() {
   const giverVillage = lastGiver(pages);
   // Cảnh trao trang của làng vừa trao trang cuối chưa chiếu: nhiệm vụ và mũi tên chưa tính trang mới (đổi ngay sau cảnh trao trang)
   // (chỉ làng đã có cảnh trao trang, xem VILLAGE_SCENE: làng chưa dựng thì trang đã được trao ở bài học nên không có gì để chờ)
-  const ceremonyPending = !isTeacher && giverVillage !== null && VILLAGE_SCENE[giverVillage] !== undefined && shouldShowGolden(data, giverVillage, pages);
+  const ceremonyPending = !isTeacher && giverVillage !== null && VILLAGE_SCENE[giverVillage]?.award !== undefined && shouldShowGolden(data, giverVillage, pages);
   const effPages = effectivePages(pages, ceremonyPending);
   // Hiệu ứng mở cổng còn chờ (cổng của làng kế tiếp vẫn đóng cho tới khi chiếu xong)
   const openingGiver = isTeacher ? null : pendingGateOpening(data, pages);
@@ -384,10 +384,11 @@ export function WorldPage() {
       api.lock.exit();
       return;
     }
-    if (!isTeacher && shouldShowGolden(data, inside, pages)) {
+    if (!isTeacher && text.award && shouldShowGolden(data, inside, pages)) {
+      const award = text.award;
       const index = VILLAGE_ORDER.indexOf(inside);
       const portrait = CHARACTERS[text.guide].portrait;
-      const turns: VnTurn[] = text.award.loi.map((line, i) => ({
+      const turns: VnTurn[] = award.loi.map((line, i) => ({
         speaker: speakerLabel(text.guide),
         portrait,
         mood: 'vui' as const,

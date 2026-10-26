@@ -45,7 +45,7 @@ describe('hệ tọa độ làng và thế giới', () => {
     expect(p.x).toBeCloseTo(1, 9);
     expect(p.z).toBeCloseTo(0, 9);
   });
-  it('cổng của bố cục làng rơi đúng chỗ cổng thế giới; Làng Giấy (bước X3) có tâm ở (0; 197), Làng Dệt (bước L1) ở (0; −197) và Làng Khắc Dấu (bước L3) cách chợ 197, cùng bán kính 125; làng nhỏ còn lại ở 89,5', () => {
+  it('cổng của bố cục làng rơi đúng chỗ cổng thế giới; Làng Giấy (bước X3) có tâm ở (0; 197), Làng Dệt (bước L1) ở (0; −197) Làng Khắc Dấu (bước L3) và Làng Bạc (bước L5) cách chợ 197, cùng bán kính 125', () => {
     for (const f of VILLAGE_FRAMES) {
       const local = LOCAL_VILLAGES[f.village];
       const g = localToWorld(local, f, local.gate.x, local.gate.z);
@@ -68,7 +68,10 @@ describe('hệ tọa độ làng và thế giới', () => {
     expect(Math.hypot(khacDau.center.x, khacDau.center.z)).toBeCloseTo(197, 9);
     expect(khacDau.radius).toBe(125);
     expect(khacDau.insideRadius).toBeCloseTo(124, 9);
-    for (const v of FULL.villages.slice(3)) expect(Math.hypot(v.center.x, v.center.z)).toBeCloseTo(89.5, 9);
+    const bac = FULL.villages[3];
+    expect(Math.hypot(bac.center.x, bac.center.z)).toBeCloseTo(197, 9);
+    expect(bac.radius).toBe(125);
+    expect(bac.insideRadius).toBeCloseTo(124, 9);
   });
   it('mọi biển gỗ quay mặt về phía chợ (mặt trước hướng về tâm chợ), ở cả 4 làng', () => {
     for (const v of FULL.villages) {
@@ -112,13 +115,12 @@ describe('bố cục thế giới', () => {
     // biên đi lại bao hết cả 4 chỗ dành riêng và lũy tre
     for (const r of reserved) expect(Math.hypot(r.x, r.z) + VILLAGE_RADIUS).toBeLessThan(WORLD_BOUNDS);
   });
-  it('đất hoang của làng chưa dựng: 5 đồi + 40 bụi tre, trong chỗ dành riêng, cách xa sông, không đè nhà/biển/cổng của làng; Làng Giấy, Dệt và Khắc Dấu (đã dựng đủ) không có', () => {
-    expect(FULL.wild.filter((p) => p.kind === 'doi')).toHaveLength(5);
-    expect(FULL.wild.filter((p) => p.kind === 'tre')).toHaveLength(40);
+  it('không còn đất hoang: cả bốn làng đã dựng đủ (Làng Bạc từ bước L5) nên không làng nào có đồi và bụi tre của đất hoang', () => {
+    expect(FULL.wild).toHaveLength(0);
     for (const f of VILLAGE_FRAMES) {
       const c = { x: f.dirX * (GATE_WORLD_DISTANCE + VILLAGE_RADIUS), z: f.dirZ * (GATE_WORLD_DISTANCE + VILLAGE_RADIUS) };
       const mine = FULL.wild.filter((p) => Math.hypot(p.x - c.x, p.z - c.z) < VILLAGE_RADIUS);
-      expect(mine.length, f.village).toBe(f.village === 'lang-giay' || f.village === 'lang-det' || f.village === 'lang-khac-dau' ? 0 : 45);
+      expect(mine.length, f.village).toBe(0);
     }
     for (const p of FULL.wild) {
       expect(riverEdgeDistance(p.x, p.z)).toBeGreaterThan(6);

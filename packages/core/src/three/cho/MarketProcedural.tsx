@@ -281,7 +281,7 @@ export const toItem = (p: PropPlacement, extra: Partial<Item> = {}): Item => ({ 
  * Mỗi loại một InstancedMesh dùng chung geometry và material.
  */
 /** Đồ gợi nghề quanh cổng (bước 8d): hình dựng (`createCraftProp`) và màu vật liệu; màu từng món nhân thêm màu `tint` của bố cục (cuộn vải nhiều màu). */
-const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh', 'may-soi-dau', 'bang-mau', 'phien-da', 'mai-che', 'phoi-go', 'hom-thu', 'gia-thu', 'chuong-bo-cau', 'chuong-ga', 'ga', 'ban-khac', 'ban-khac2', 'ban-khac3', 'gia-dau', 'da-xe', 'da-vun', 'khung-cua-da', 'ban-thu', 'de-may'] as const;
+const CRAFT_KINDS = ['giay', 'vai', 'khoi-da', 'ban-da', 'hom', 'thung', 'chan', 'ban-chep', 'so-chung', 'be-ngam', 'nuoc', 'coi-gia', 'bep-do', 'dinh', 'chum-cham', 'chum-do', 'dong-soi', 'gia-vai', 'sao-soi', 'sap-vai', 'chau-canh', 'may-soi-dau', 'bang-mau', 'phien-da', 'mai-che', 'phoi-go', 'hom-thu', 'gia-thu', 'chuong-bo-cau', 'chuong-ga', 'ga', 'ban-khac', 'ban-khac2', 'ban-khac3', 'gia-dau', 'da-xe', 'da-vun', 'khung-cua-da', 'ban-thu', 'de-may', 'day-xu', 'thoi-bac', 'can-bac', 'ruong-go', 'kien-hang', 'ke-so', 'thuyen', 'la-sen', 'hoa-sen', 'ben-go'] as const;
 const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughness: number; metalness?: number; emissive?: string; vertexColors?: boolean }> = {
   giay: { color: '#EFE6CC', roughness: 1 },
   vai: { color: '#FFFFFF', roughness: 0.95 },
@@ -326,6 +326,16 @@ const CRAFT_COLOR: Record<(typeof CRAFT_KINDS)[number], { color: string; roughne
   'khung-cua-da': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
   'ban-thu': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
   'de-may': { color: '#FFFFFF', roughness: 0.45, vertexColors: true },
+  'day-xu': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'thoi-bac': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'can-bac': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'ruong-go': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'kien-hang': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'ke-so': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'thuyen': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'la-sen': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'hoa-sen': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
+  'ben-go': { color: '#FFFFFF', roughness: 0.9, vertexColors: true },
 };
 
 /** Đồng ở mức Thấp: ánh kim thấp (kim loại 0,18), nền phát sáng nhẹ để vẫn ra màu đồng. Các mức khác kim loại cao hơn (`CRAFT_COLOR`). Cả hai dùng chung chương trình shader chuẩn của đồ nhỏ. */

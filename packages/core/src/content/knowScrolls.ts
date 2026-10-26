@@ -33,6 +33,11 @@ export const knowScrollUi = {
     dinhlang: 'đình làng',
     tramthu: 'trạm đưa thư',
     baida: 'bãi đá',
+    // Làng Bạc
+    quaybac: 'quầy đổi bạc',
+    bensong: 'bến sông',
+    nhaso: 'nhà giữ sổ',
+    aosen: 'ao sen',
   },
   /** Menu "Em có biết?": bộ sưu tập thẻ */
   suuTamTieuDe: 'Em có biết? ({n}/{tong})',

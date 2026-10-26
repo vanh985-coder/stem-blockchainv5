@@ -19,6 +19,7 @@ import { GATE_WORLD_DISTANCE, VILLAGE_FRAMES, VILLAGE_RADIUS, insideRadiusOf, lo
 import { scrollNodeId } from '../village/scrollTargets';
 import { RIVER_EAST_X, RIVER_WEST_X, riverEdgeDistance, riverRocks, riverWaterColliders } from './river';
 import { scatterCollider, scatterRadius, type ScatterPlacement } from '../village/scatter';
+import { decksHeight, decksOf } from '../village/deck';
 
 export { RIVER_EAST_X, RIVER_WEST_X };
 
@@ -247,10 +248,12 @@ export function reservedCenter(f: Pick<VillageFrame, 'dirX' | 'dirZ'>): { x: num
  * mỗi làng 5 đồi nhỏ và 40 bụi tre rải ở phía xa cổng (cách hướng ra cổng từ 60° trở lên, tránh sông), dựng bằng đồ rải nhẹ (xem `scatter.ts`). Cùng `seed` cùng kết quả. Làng Giấy không có phần này
  * (đã dựng đủ, có đồi tre riêng).
  */
+/** Làng đã dựng đủ (không còn đất hoang): từ bước L5 là cả bốn làng, nên `wildlands` trả về rỗng; giữ hàm để dựng lại đất hoang khi có làng chưa dựng. */
+const BUILT_VILLAGES: ReadonlySet<VillageId> = new Set<VillageId>(['lang-giay', 'lang-det', 'lang-khac-dau', 'lang-bac']);
 export function wildlands(seed: number): ScatterPlacement[] {
   const out: ScatterPlacement[] = [];
   for (const f of VILLAGE_FRAMES) {
-    if (f.village === 'lang-giay' || f.village === 'lang-det' || f.village === 'lang-khac-dau') continue; // đã dựng đủ (có đồi tre riêng)
+    if (BUILT_VILLAGES.has(f.village)) continue; // đã dựng đủ (có đồi tre riêng)
     const rng = createMulberry32(seed ^ 0x3c6ef372 ^ Math.round(f.yaw * 1000));
     const c = reservedCenter(f);
     const toGate = Math.atan2(-f.dirZ, -f.dirX);
@@ -359,6 +362,8 @@ export interface WorldLayout {
   graph: RoadGraph;
   /** Đồ rải ở đất hoang của ba làng chưa dựng (đồi, tre; bước X3), luôn có, có vật cản */
   wild: ScatterPlacement[];
+  /** Độ cao mặt đi được tại (x, z): mặt cầu và dốc cầu của chợ, và bến gỗ của các làng (xem `three/village/deck.ts`); ngoài ra 0 */
+  groundHeight: (x: number, z: number) => number;
   /** Đá hai bờ sông, dọc theo đường tim (đồ nhỏ do code dựng, có vật cản) */
   riverRocks: PropPlacement[];
   /** Vật cản luôn có (chợ, sông và cầu, biển chỉ đường); vật cản của làng thuộc về làng (chỉ tính khi vùng đó đã tải) */
@@ -395,6 +400,8 @@ export function assembleWorld(density: MarketDensity = FULL_DENSITY, seed: numbe
     baseColliders.push(...cs);
     baseBlockers.push(...cs);
   }
+  const deckHeight = decksHeight(villages.flatMap((v) => decksOf(v.layout.props)));
+  const groundHeight = (x: number, z: number) => Math.max(worldGroundHeight(x, z), deckHeight(x, z));
   return {
     market,
     villages,
@@ -403,6 +410,7 @@ export function assembleWorld(density: MarketDensity = FULL_DENSITY, seed: numbe
     signposts: sp,
     graph: buildWorldGraph(villages),
     riverRocks: rocks,
+    groundHeight,
     wild,
     baseColliders,
     baseObstacles: baseColliders.map((c) => c.shape),

@@ -30,7 +30,7 @@ import { WorldTerrain } from './WorldTerrain';
 import { WorldTracker, type LoadedZones, type PrewarmZones } from './WorldTracker';
 import { ZonePrewarm } from './ZonePrewarm';
 import { WORLD_BOUNDS } from './worldFrames';
-import { worldGroundHeight, type WorldLayout } from './worldLayout';
+import type { WorldLayout } from './worldLayout';
 import { PROBE } from '../../lib/dev';
 import { VILLAGER_CULL, withinCullDistance } from '../cullDistance';
 
@@ -172,7 +172,7 @@ export function WorldScene({
       interactables={interactables}
       biTrack={biTrack}
       cameraBlockers={blockers}
-      groundHeight={worldGroundHeight}
+      groundHeight={world.groundHeight}
       onNearestChange={onNearestChange}
       groundUrl={null}
       showGround={false}

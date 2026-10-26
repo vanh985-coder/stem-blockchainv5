@@ -2,21 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { levelsOfVillage } from '../../../content/levels';
 import { computeUnlock } from '../../../progress/unlock';
 import type { VillageId } from '../../../village';
-import { PLAYER_RADIUS, resolveCollisions, type Point2 } from '../../collision';
-import { footprintRadiusOf } from '../../cho/footprints';
-import { PROP_SIZES } from '../../cho/marketLayout';
 import { nextLevel } from '../../village/villageQuest';
-import { assembleVillage } from '../../village/villageLayout';
 import { createRouter, type RouteStep } from '../roadGraph';
 import { assembleWorld, boardNodeId, gateNodeId } from '../worldLayout';
 import { targetNodeId } from '../worldQuest';
-import { LOCAL_VILLAGES } from './index';
 
-const SMALL: VillageId[] = ['lang-bac'];
-/** Đứng trước biển bấy nhiêu (như `BOARD_STAND_DISTANCE` của worldLayout). */
-const STAND = 1.2;
-/** Ngã ở sân trước của làng chưa khai báo đường nhỏ (như `JUNCTION_LOCAL` của worldLayout). */
-const JUNCTION = { x: 0, z: -12 };
+
+/** Đứng trước biển bấy nhiêu: mũi tên từ chỗ xuất hiện `?tu=` phải tới được từng biển trong chừng này đơn vị đường đi. */
+const NEAR = 20;
 
 /** Trạng thái màn và việc tiếp theo trong một làng, từ danh sách màn đã xong (bảng status mặc định của levels.ts). */
 function questIn(village: VillageId, doneLevels: number[]) {
@@ -26,75 +19,19 @@ function questIn(village: VillageId, doneLevels: number[]) {
   return { unlock, stateOf, next: nextLevel(ids, stateOf) };
 }
 
-describe('làng chưa dựng (Làng Dệt ở det.ts, Làng Khắc Dấu ở khac-dau.ts đã dựng đủ): đủ 3 biển (bài học và 2 game)', () => {
-  for (const id of SMALL) {
-    const L = LOCAL_VILLAGES[id];
-    const layout = assembleVillage(L);
-    const blocked = (x: number, z: number) => resolveCollisions({ x, z } as Point2, PLAYER_RADIUS, layout.obstacles);
-    const stands = L.boards.map((b) => ({ level: b.level, x: b.x + Math.sin(b.yaw) * STAND, z: b.z + Math.cos(b.yaw) * STAND }));
 
-    it(`${id}: 3 biển đúng các màn của làng trong levels.ts, đứng cạnh nhau ở sân trước, quay mặt về cổng`, () => {
-      expect(L.boards.map((b) => b.level)).toEqual(levelsOfVillage(id).map((l) => l.id));
-      for (const b of L.boards) {
-        const toGate = Math.atan2(L.gate.x - b.x, L.gate.z - b.z);
-        expect(Math.abs(Math.atan2(Math.sin(b.yaw - toGate), Math.cos(b.yaw - toGate)))).toBeLessThan(1e-9);
-        expect(Math.hypot(b.x - 0, b.z - -8.2)).toBeLessThan(4); // chỗ biển cũ
-      }
-      // ?tu= vẫn đứng ngay trước các biển
-      for (const b of L.boards) expect(Math.hypot(L.start.x - b.x, L.start.z - b.z)).toBeLessThan(8);
-    });
-
-    it(`${id}: biển nằm trong làng, không chồng nhau và không chồng nhà, bụi tre, đồ vật`, () => {
-      for (const b of L.boards) expect(Math.hypot(b.x, b.z) + 1).toBeLessThan(L.fence!.radius - 1);
-      for (let i = 0; i < L.boards.length; i++) {
-        for (let j = i + 1; j < L.boards.length; j++) expect(Math.hypot(L.boards[i].x - L.boards[j].x, L.boards[i].z - L.boards[j].z)).toBeGreaterThan(2.2);
-      }
-      const others = [
-        { name: L.gate.model, x: L.gate.x, z: L.gate.z, r: footprintRadiusOf(L.gate.model) },
-        ...L.placements.map((p) => ({ name: p.model, x: p.x, z: p.z, r: footprintRadiusOf(p.model) * p.scale })),
-        ...L.props.filter((p) => p.kind !== 'hoa').map((p) => ({ name: p.kind, x: p.x, z: p.z, r: PROP_SIZES[p.kind].r * p.scale })),
-      ];
-      for (const b of L.boards) for (const o of others) expect(Math.hypot(b.x - o.x, b.z - o.z), `biển ${b.level} và ${o.name}`).toBeGreaterThan(1 + o.r);
-    });
-
-    it(`${id}: tới được chỗ đứng trước từng biển từ chỗ xuất hiện (dò lưới bước 0,5), và đoạn đường từ ngã sân trước tới đó không xuyên vật cản`, () => {
-      const step = 0.5;
-      const R = Math.ceil(L.radius / step);
-      const key = (i: number, j: number) => `${i},${j}`;
-      const seen = new Set<string>();
-      const start: [number, number] = [Math.round(L.start.x / step), Math.round(L.start.z / step)];
-      expect(blocked(L.start.x, L.start.z)).toBe(false);
-      const q = [start];
-      seen.add(key(...start));
-      for (let h = 0; h < q.length; h++) {
-        const [i, j] = q[h];
-        for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
-          const a = i + di;
-          const c = j + dj;
-          if (Math.hypot(a, c) > R || seen.has(key(a, c)) || blocked(a * step, c * step)) continue;
-          seen.add(key(a, c));
-          q.push([a, c]);
-        }
-      }
-      for (const s of stands) {
-        expect(blocked(s.x, s.z), `chỗ đứng biển ${s.level}`).toBe(false);
-        expect(seen.has(key(Math.round(s.x / step), Math.round(s.z / step))), `tới biển ${s.level}`).toBe(true);
-        for (let t = 0; t <= 1; t += 0.05) expect(blocked(JUNCTION.x + (s.x - JUNCTION.x) * t, JUNCTION.z + (s.z - JUNCTION.z) * t), `đường tới biển ${s.level}`).toBe(false);
-      }
-    });
-  }
-
-  it('đồ thị đường thế giới có nút cho cả 12 biển; mũi tên từ chỗ xuất hiện ?tu= tới từng biển của làng đó đều có đường', () => {
+describe('đồ thị đường thế giới và nhiệm vụ theo biển', () => {
+  it('đồ thị đường thế giới có nút cho cả 12 biển; mũi tên từ chỗ xuất hiện ?tu= tới từng biển của mỗi làng đều có đường', () => {
     const w = assembleWorld();
     const router = createRouter(w.graph);
     const out: RouteStep = { x: 0, z: 0, remaining: 0, found: false };
     for (let level = 1; level <= 12; level++) expect(w.graph.nodes.some((n) => n.id === boardNodeId(level)), `board:${level}`).toBe(true);
-    for (const v of w.villages.filter((q) => SMALL.includes(q.id))) {
+    for (const v of w.villages) {
       for (const b of v.layout.boards) {
         router.setTarget(boardNodeId(b.level));
         router.next(v.start.x, v.start.z, out);
         expect(out.found, `${v.id} màn ${b.level}`).toBe(true);
-        expect(out.remaining).toBeLessThan(15);
+        expect(out.remaining, `${v.id} màn ${b.level}`).toBeLessThan(NEAR);
       }
     }
     // từ chợ đi vào Làng Khắc Dấu tới biển màn 8
@@ -103,6 +40,7 @@ describe('làng chưa dựng (Làng Dệt ở det.ts, Làng Khắc Dấu ở kha
     expect(out.found).toBe(true);
   });
 });
+
 
 describe('nhiệm vụ ở Làng Khắc Dấu và Làng Dệt khi cả hai game của làng đã ra mắt (màn 8 và 9, màn 5 và 6)', () => {
   it('đã xong màn 7, chưa chơi màn 8: trong làng, mũi tên chỉ tới biển màn 8', () => {

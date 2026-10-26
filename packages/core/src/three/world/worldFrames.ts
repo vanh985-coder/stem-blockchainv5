@@ -10,7 +10,7 @@
 import { VILLAGE_ORDER } from '../../content/levels';
 import type { VillageId } from '../../village';
 import { GATES, type Direction, type GateDef, type GateId, type Placement, type PropPlacement } from '../cho/marketLayout';
-import type { VillageBoardDef, VillageFenceRun, VillageField, VillageGateDef, VillageGuideDef, VillageLayoutInput, VillagePaths, VillagePond, VillageRoad, VillageScroll, VillagerLoop } from '../village/villageLayout';
+import type { VillageBlock, VillageBoardDef, VillageFenceRun, VillageField, VillageGateDef, VillageGuideDef, VillageLayoutInput, VillagePaths, VillagePond, VillageRoad, VillageScroll, VillageStream, VillagerLoop } from '../village/villageLayout';
 import type { ScatterPlacement } from '../village/scatter';
 
 /** Cổng làng cách tâm chợ bấy nhiêu: từ rìa chợ (bán kính 42) tới cổng dài 30. */
@@ -124,6 +124,8 @@ export function placeVillage(local: VillageLayoutInput, f: VillageFrame): WorldV
   });
   const scatter = (p: ScatterPlacement): ScatterPlacement => ({ ...p, ...at(p.x, p.z), yaw: p.yaw + f.yaw });
   const scroll = (q: VillageScroll): VillageScroll => ({ ...q, ...at(q.x, q.z) });
+  const stream = (q: VillageStream): VillageStream => ({ points: q.points.map((p) => ({ ...p, ...at(p.x, p.z) })) });
+  const block = (b: VillageBlock): VillageBlock => ({ ...b, ...at(b.x, b.z), yaw: b.yaw + f.yaw });
   return {
     ...local,
     center,
@@ -138,6 +140,8 @@ export function placeVillage(local: VillageLayoutInput, f: VillageFrame): WorldV
     roads: local.roads.map(road),
     fence: local.fence ? { ...local.fence, center } : undefined,
     ponds: local.ponds?.map(pond),
+    streams: local.streams?.map(stream),
+    blocks: local.blocks?.map(block),
     fields: local.fields?.map(field),
     fenceRuns: local.fenceRuns?.map(run),
     villagers: local.villagers?.map(loop),

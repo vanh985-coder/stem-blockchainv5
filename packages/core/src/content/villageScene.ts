@@ -13,11 +13,11 @@ export interface VillageSceneText {
   opening: string;
   /** Người dẫn nhắc việc tiếp theo khi nói chuyện (E), theo việc đang chờ: bài học, game 1, game 2, hoặc đã xong cả làng */
   guideNext: { lesson: string; game1: string; game2: string; done: string };
-  /** Cảnh trao Trang Sổ Vàng khi vào làng sau khi xong màn ready cuối (spec 05 "Kết thúc làng"): các lượt người dẫn nói */
-  award: { loi: readonly string[] };
+  /** Cảnh trao Trang Sổ Vàng khi vào làng sau khi xong màn ready cuối (spec 05 "Kết thúc làng"): các lượt người dẫn nói. Làng Bạc không có: Trang Sổ Vàng thứ tư trao trong cảnh cao trào sau màn 12. */
+  award?: { loi: readonly string[] };
 }
 
-/** Làng Giấy (mốc 2), Làng Dệt (mốc 3, bước L1) và Làng Khắc Dấu (bước L3); Làng Bạc điền ở mốc 3. */
+/** Cả bốn làng: Làng Giấy (mốc 2), Làng Dệt (mốc 3, bước L1), Làng Khắc Dấu (bước L3) và Làng Bạc (bước L5, không có cảnh trao trang). */
 export const VILLAGE_SCENE: Partial<Record<VillageId, VillageSceneText>> = {
   'lang-giay': {
     guide: 'bacAn',
@@ -69,5 +69,17 @@ export const VILLAGE_SCENE: Partial<Record<VillageId, VillageSceneText>> = {
         'Không giả dấu được nữa, {phanDien} chuyển sang trò trộn giao dịch ở Làng Bạc rồi.',
       ],
     },
+  },
+  'lang-bac': {
+    guide: 'thayLinh',
+    storyFrame: 9,
+    opening: 'Hàng trăm khoản bạc đổi tay mỗi ngày, ghi cả vào sổ thì dài lắm. Thầy gộp từng cặp giao dịch lên cây đa này, để chỉ cần nhìn một con số ở gốc là biết cả sổ có bị sửa hay không.',
+    guideNext: {
+      lesson: 'Em ra biển gỗ "Học cùng thầy Linh" nhé. Thầy sẽ chỉ em cách gộp cả cuốn sổ thành một con số ở gốc cây.',
+      game1: 'Giờ tới biển "Ghép lá cây sổ" nhé. {phanDien} ném lá giả lẫn vào cây, em ghép các lá cho đúng để gộp cây cho xong!',
+      game2: 'Còn biển "Leo cây tìm lá giả": {phanDien} đã tráo một chiếc lá trên cây đa, em leo từ gốc theo nhánh lệch để bắt nó nhé.',
+      done: 'Làng Bạc cảm ơn em nhiều! Nhờ em, cả bốn làng đã giữ sổ cùng nhau.',
+    },
+    // không có `award`: Trang Sổ Vàng thứ tư trao trong cảnh cao trào sau màn 12
   },
 };

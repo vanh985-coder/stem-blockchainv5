@@ -69,6 +69,26 @@ export interface VillagePond {
   z: number;
   r: number;
   water?: string;
+  /** false: mặt nước chỉ để vẽ, không có vật cản (vật cản do `blocks` đảm nhận, ví dụ nước quanh bến gỗ); mặc định có */
+  collide?: boolean;
+}
+
+/**
+ * Nhánh sông nhỏ chảy trong làng (Làng Bạc, bước L5): đường tim qua các điểm điều khiển (x, z, bề rộng đầy đủ của nước); mặt nước là dải lưới theo đường tim đã làm mượt (`smoothPath` ở world/river.ts, giống nhánh sông của thế giới).
+ * Vật cản của nước do làng khai báo ở `blocks` (để chừa lối cho bến gỗ).
+ */
+export interface VillageStream {
+  points: readonly { x: number; z: number; w: number }[];
+}
+
+/** Vật cản hộp xoay do làng khai báo (nước của nhánh sông, tường): nửa rộng hx theo trục x của hộp, nửa sâu hz theo trục z, quay `yaw` (như rotation.y của three), cao `height`. */
+export interface VillageBlock {
+  x: number;
+  z: number;
+  hx: number;
+  hz: number;
+  yaw: number;
+  height: number;
 }
 /** Bề rộng bờ ao (đơn vị) quanh mặt nước. */
 export const POND_BANK = 1.3;
@@ -143,6 +163,9 @@ export interface VillageLayoutInput {
   fence?: { radius: number; gap: number; /** tâm vòng rào (mặc định gốc tọa độ; thế giới mở: tâm làng) */ center?: { x: number; z: number } };
   /** Ao làng (hợp của các vũng tròn), ruộng lúa ở rìa, hàng rào tre ngắn, dân làng đi lại và đường đất nhỏ: Làng Giấy từ bước W2 */
   ponds?: VillagePond[];
+  /** Nhánh sông nhỏ trong làng và các vật cản hộp riêng của làng (nước quanh bến gỗ...): Làng Bạc từ bước L5 */
+  streams?: VillageStream[];
+  blocks?: VillageBlock[];
   fields?: VillageField[];
   fenceRuns?: VillageFenceRun[];
   villagers?: VillagerLoop[];
@@ -200,7 +223,8 @@ export function assembleVillage(input: VillageLayoutInput): VillageLayout {
   for (const b of input.boards) colliders.push(boardCollider(b));
   if (input.guide) colliders.push({ shape: circle(input.guide.x, input.guide.z, GUIDE_RADIUS), height: 1.7 });
   for (const c of input.companions ?? []) colliders.push({ shape: circle(c.x, c.z, GUIDE_RADIUS), height: 1.7 });
-  for (const p of input.ponds ?? []) colliders.push({ shape: circle(p.x, p.z, p.r), height: POND_COLLIDER_HEIGHT });
+  for (const p of input.ponds ?? []) if (p.collide !== false) colliders.push({ shape: circle(p.x, p.z, p.r), height: POND_COLLIDER_HEIGHT });
+  for (const b of input.blocks ?? []) colliders.push({ shape: obox(b.x, b.z, b.hx, b.hz, b.yaw), height: b.height });
   for (const p of input.scatter ?? []) {
     const c = scatterCollider(p);
     if (!c) continue;
