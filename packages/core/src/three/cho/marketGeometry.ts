@@ -2,7 +2,7 @@
  * Hình học do code dựng cho chợ phiên (không có model trong file): thuyền gỗ, mui thuyền, chum vại, đống rơm. Hàm tạo hình học
  * thuần của three (không cần canvas hay GPU), dựng một lần rồi dùng chung cho mọi bản nhân bản.
  */
-import { BoxGeometry, BufferGeometry as Geometry, CatmullRomCurve3, CircleGeometry, Color, ConeGeometry, CylinderGeometry, ExtrudeGeometry, Float32BufferAttribute, IcosahedronGeometry, LatheGeometry, Path, Shape, SphereGeometry, TubeGeometry, Vector2, Vector3, type BufferGeometry } from 'three';
+import { BoxGeometry, BufferGeometry as Geometry, CatmullRomCurve3, CircleGeometry, Color, ConeGeometry, CylinderGeometry, ExtrudeGeometry, Float32BufferAttribute, IcosahedronGeometry, LatheGeometry, Path, Shape, SphereGeometry, TubeGeometry, Quaternion, Vector2, Vector3, type BufferGeometry } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createMulberry32 } from '../../lib/rng';
 import { CLOTH_PALETTE } from '../village/clothPoles';
@@ -907,15 +907,21 @@ export function createPigeonHead(): BufferGeometry {
 }
 
 // ---------------------------------------------------------------------------
-// Đồ nhỏ của Làng Bạc (mốc 3, bước L5): dây xu, bàn thỏi bạc, cân đĩa, rương gỗ, kiện hàng, giá sổ cái, thuyền mui lá, lá sen, hoa sen, bến gỗ
+// Đồ nhỏ của Làng Bạc (mốc 3, bước L5 và làm đẹp L6): hòm, thúng, kiện hàng, dây xu, cuộn xu, bàn thỏi bạc, cân đòn, giá sổ, bàn viết, hiên nhà, thuyền, lá sen, hoa sen, bến gỗ
 
-const SILVER = 0xcfd2d6;
-const SILVER_DARK = 0xaeb3ba;
-const COPPER_COIN = 0xc0773a;
+const SILVER = 0xe6e9ee;
+const SILVER_DARK = 0xc9ced6;
+const COIN_COPPER = [0xa0693a, 0x8e5c33, 0x9a7440] as const;
 const WALNUT = 0x7a4a24;
+const WALNUT_LID = 0x6b4526;
+const COPPER_BAND = 0xa8683a;
 const IRON = 0x45464a;
-const BURLAP = [0xb9a06a, 0xc2ab74, 0xa89363] as const;
+const BURLAP = [0xb9a06a, 0xcdb98e, 0x4a5f8a, 0xa89363, 0xc4ad78] as const;
+const BASKET = [0xc9a24a, 0xb48a38, 0xd2b062] as const;
+const BOOK_COVER = [0x6b3e22, 0x2c4a7a, 0xb98a3c, 0x7a4a24] as const;
 const LEAF_GREEN = [0x4f8f3a, 0x5fa043, 0x6aa84a, 0x447f33] as const;
+const ROPE = 0x5a3a20;
+const TILE_RED = 0xb85a32;
 
 /** Chân bàn bốn chân, mặt dày `top`, cao `h`, rộng hx × hz (tâm ở gốc). */
 function tableParts(hx: number, hz: number, h: number, top: number, wood: number, legWood: number): BufferGeometry[] {
@@ -924,119 +930,237 @@ function tableParts(hx: number, hz: number, h: number, top: number, wood: number
   return parts;
 }
 
-/** Dây xu đồng treo trên giá: hai cột, xà ngang trên, năm dây xu (xâu đồng xu đồng và vàng xen kẽ) dài ngắn khác nhau. Khung bao đúng hộp PROP_SIZES `day-xu` (1,0 × 0,7, cao 1,6). */
+/** Que tròn (trụ mảnh) nối hai điểm. */
+function rodBetween(ax: number, ay: number, az: number, bx: number, by: number, bz: number, r: number, hex: number): BufferGeometry {
+  const dir = new Vector3(bx - ax, by - ay, bz - az);
+  const len = dir.length();
+  const g = new CylinderGeometry(r, r, len, 5);
+  g.applyQuaternion(new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), dir.normalize()));
+  g.translate((ax + bx) / 2, (ay + by) / 2, (az + bz) / 2);
+  return solid(g, hex);
+}
+
+/** Đồng tiền tròn lỗ vuông, mặt quay về +z: đĩa đồng xỉn và lỗ vuông sẫm hơi nhô ra hai mặt. */
+function coin(x: number, y: number, z: number, roll: number, hex: number): BufferGeometry[] {
+  const disc = new CylinderGeometry(0.055, 0.055, 0.014, 9);
+  disc.rotateX(Math.PI / 2);
+  const hole = new BoxGeometry(0.028, 0.028, 0.018);
+  const out = [solid(disc, hex), solid(hole, 0x2a1c10)];
+  for (const g of out) {
+    g.rotateZ(roll);
+    g.translate(x, y, z);
+  }
+  return out;
+}
+
+/** Một thỏi bạc hình thuyền (đầu và đuôi vểnh, bụng thon, nằm dọc theo trục x), màu bạc sáng, tâm đáy ở (x, y, z). */
+function ingot(x: number, y: number, z: number, yaw: number, hex: number): BufferGeometry {
+  const g = createBoatHull();
+  g.rotateY(Math.PI / 2);
+  g.scale(0.42 / BOAT_LENGTH, 0.13 / (BOAT_HEIGHT + 0.32), 0.18 / BOAT_WIDTH);
+  g.rotateY(yaw);
+  g.translate(x, y, z);
+  return solid(g, hex);
+}
+
+/**
+ * Hòm gỗ có nắp cong: thân óc chó, bốn chân nhỏ, nắp nửa trụ, ba đai đồng xỉn ôm cả thân và nắp, góc bọc đồng và khóa đồng thau ở mặt trước (+z). Dùng chung cho `hom` và `ruong-go`
+ * (cả đồ quanh cổng làng); khung bao vừa hộp hx × hz và cao h.
+ */
+function chestGeometry(hx: number, hz: number, h: number): BufferGeometry {
+  const bodyH = h * 0.62;
+  const foot = 0.04;
+  const parts: BufferGeometry[] = [boxAt(hx * 2, bodyH, hz * 2, 0, foot, 0, WALNUT)];
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) parts.push(boxAt(0.09, foot, 0.09, sx * (hx - 0.07), 0, sz * (hz - 0.07), WOOD_DARK));
+  const lidH = h - foot - bodyH;
+  const lid = (len: number, grow: number, hex: number, x: number): BufferGeometry => {
+    const g = new CylinderGeometry(hz + grow, hz + grow, len, 14);
+    g.rotateZ(Math.PI / 2);
+    g.scale(1, (lidH + grow) / (hz + grow), 1);
+    g.translate(x, foot + bodyH, 0);
+    return solid(g, hex);
+  };
+  parts.push(lid(hx * 2, 0, WALNUT_LID, 0));
+  for (const x of [-hx * 0.62, 0, hx * 0.62]) {
+    parts.push(boxAt(0.08, bodyH + 0.015, hz * 2 + 0.03, x, foot - 0.005, 0, COPPER_BAND), lid(0.08, 0.012, COPPER_BAND, x));
+  }
+  for (const sx of [-1, 1]) parts.push(boxAt(0.07, bodyH * 0.3, hz * 2 + 0.035, sx * (hx - 0.035), foot + bodyH * 0.7, 0, COPPER_BAND));
+  parts.push(boxAt(0.16, 0.2, 0.045, 0, foot + bodyH * 0.55, hz + 0.012, BRASS), boxAt(0.03, 0.06, 0.05, 0, foot + bodyH * 0.6, hz + 0.014, SOOT));
+  return fitBox(mergeGeometries(parts)!, hx, hz, h);
+}
+
+/** Thúng đan tre: miệng loe, mười sáu cạnh, bảy vòng nan xen hai ba sắc tre (so le nửa cạnh cho ra vân đan), viền miệng sẫm hơn và đáy. Khung bao tròn bán kính r, cao h. */
+function createBasket(r: number, h: number): BufferGeometry {
+  const rings = 7;
+  const rh = h / rings;
+  const parts: BufferGeometry[] = [];
+  for (let i = 0; i < rings; i++) {
+    const t0 = i / rings;
+    const t1 = (i + 1) / rings;
+    const g = new CylinderGeometry(r * (0.78 + 0.22 * t1), r * (0.78 + 0.22 * t0), rh * 1.03, 16);
+    if (i % 2) g.rotateY(Math.PI / 16);
+    g.translate(0, i * rh + rh / 2, 0);
+    parts.push(solid(g, BASKET[(i + (i > 3 ? 1 : 0)) % BASKET.length]));
+  }
+  parts.push(cylAt(r * 1.03, 0.045, 0, h - 0.045, 0, 0x8a6a2a, 16));
+  // nan dọc: tám que tre mảnh nhô ra ngoài thân
+  for (let k = 0; k < 8; k++) {
+    const a = (k / 8) * Math.PI * 2 + 0.2;
+    const x = Math.sin(a) * r * 0.9;
+    const z = Math.cos(a) * r * 0.9;
+    parts.push(rodBetween(x * 0.88, 0.04, z * 0.88, x * 1.02, h - 0.04, z * 1.02, 0.012, 0x9a7a30));
+  }
+  return fitBox(mergeGeometries(parts)!, r, r, h);
+}
+
+/** Một kiện bọc vải: hộp phình nhẹ như gối (đỉnh lưới đẩy ra theo mặt), nghiêng và xoay nhẹ, hai đai dây buộc và nút buộc trên đỉnh. */
+function bale(parts: BufferGeometry[], w: number, h: number, d: number, x: number, y: number, z: number, yaw: number, tilt: number, hex: number): void {
+  const g = new BoxGeometry(w, h, d, 4, 3, 4);
+  const pos = g.getAttribute('position');
+  for (let i = 0; i < pos.count; i++) {
+    const nx = pos.getX(i) / (w / 2);
+    const ny = pos.getY(i) / (h / 2);
+    const nz = pos.getZ(i) / (d / 2);
+    const bulge = 0.1;
+    pos.setXYZ(i, pos.getX(i) * (1 + bulge * (1 - ny * ny) * (1 - nz * nz)), pos.getY(i) * (1 + bulge * (1 - nx * nx) * (1 - nz * nz)), pos.getZ(i) * (1 + bulge * (1 - nx * nx) * (1 - ny * ny)));
+  }
+  g.computeVertexNormals();
+  const place = (m: BufferGeometry, dy: number): BufferGeometry => {
+    m.translate(0, dy, 0);
+    m.rotateZ(tilt);
+    m.rotateY(yaw);
+    m.translate(x, y, z);
+    return m;
+  };
+  parts.push(place(solid(g, hex), h / 2));
+  for (const dx of [-w * 0.25, w * 0.25]) {
+    const band = new BoxGeometry(0.04, h * 1.1 + 0.03, d * 1.1 + 0.03);
+    band.translate(dx, 0, 0);
+    parts.push(place(solid(band, ROPE), h / 2));
+  }
+  const knot = new BoxGeometry(0.1, 0.05, 0.07);
+  knot.translate(w * 0.25, h * 0.55 + 0.03, 0);
+  parts.push(place(solid(knot, ROPE), h / 2));
+}
+
+/** Kiện hàng bọc vải bố hay vải chàm buộc dây: ba kiện xếp lệch nhau (một kiện đặt trên, một kiện đổ nghiêng), mỗi kiện một màu vải. Khung bao đúng hộp PROP_SIZES `kien-hang` (1,7 × 1,2, cao 1,0). */
+function createBales(): BufferGeometry {
+  const k = PROP_SIZES['kien-hang'];
+  const parts: BufferGeometry[] = [];
+  bale(parts, 0.78, 0.46, 0.56, -0.42, 0, -0.14, 0.12, 0, BURLAP[0]);
+  bale(parts, 0.74, 0.44, 0.54, 0.44, 0, -0.06, -0.2, 0, BURLAP[2]);
+  bale(parts, 0.7, 0.4, 0.5, -0.02, 0.44, -0.1, 0.34, 0.03, BURLAP[1]);
+  bale(parts, 0.5, 0.36, 0.4, 0.34, 0, 0.4, -0.5, -0.05, BURLAP[3]);
+  return fitBox(mergeGeometries(parts)!, k.box!.hx, k.box!.hz, k.h);
+}
+
+/** Rương gỗ nắp cong, đai và khóa đồng: cùng hình với `hom`. Khung bao đúng hộp PROP_SIZES `ruong-go` (1,2 × 0,76, cao 0,78). */
+function createChest(): BufferGeometry {
+  const k = PROP_SIZES['ruong-go'];
+  return chestGeometry(k.box!.hx, k.box!.hz, k.h);
+}
+
+/**
+ * Dây xu đồng treo trên giá: hai cột, xà ngang có năm móc đồng, mỗi móc một xâu xu (đồng tiền tròn lỗ vuông màu đồng xỉn, mặt quay về +z, xâu so le một chút, dài ngắn khác nhau). Không còn hình xếp ngang như bàn tính.
+ * Khung bao đúng hộp PROP_SIZES `day-xu` (1,0 × 0,7, cao 1,6).
+ */
 function createCoinStand(): BufferGeometry {
   const k = PROP_SIZES['day-xu'];
   const hx = k.box!.hx;
   const hz = k.box!.hz;
+  const rng = createMulberry32(8101);
   const parts: BufferGeometry[] = [];
-  for (const sx of [-1, 1]) {
-    parts.push(boxAt(0.08, k.h, 0.08, sx * (hx - 0.05), 0, 0, WOOD_DARK), boxAt(0.1, 0.06, hz * 2, sx * (hx - 0.05), 0, 0, WOOD_DARK));
-  }
-  parts.push(boxAt(hx * 2, 0.07, 0.1, 0, k.h - 0.1, 0, WOOD));
-  const lens = [0.9, 1.1, 0.8, 1.0, 0.7];
-  lens.forEach((len, i) => {
-    const x = -0.3 + i * 0.15;
-    const top = k.h - 0.1;
-    parts.push(cylAt(0.008, len, x, top - len, 0, 0x5a3a20, 5));
-    const n = Math.floor((len - 0.05) / 0.075);
-    for (let j = 0; j < n; j++) parts.push(cylAt(0.052, 0.018, x, top - 0.06 - j * 0.075, 0, (i + j) % 2 ? BRASS : COPPER_COIN, 8));
+  for (const sx of [-1, 1]) parts.push(boxAt(0.08, k.h, 0.08, sx * (hx - 0.05), 0, 0, WOOD_DARK), boxAt(0.1, 0.06, hz * 2, sx * (hx - 0.05), 0, 0, WOOD_DARK));
+  const beamY = k.h - 0.1;
+  parts.push(boxAt(hx * 2, 0.07, 0.1, 0, beamY, 0, WOOD));
+  const lens = [9, 12, 8, 11, 7];
+  lens.forEach((n, i) => {
+    const x = -0.32 + i * 0.16;
+    parts.push(cylAt(0.012, 0.09, x, beamY - 0.06, 0, COPPER_BAND, 5)); // móc đồng
+    const top = beamY - 0.08;
+    for (let j = 0; j < n; j++) parts.push(...coin(x + (rng() - 0.5) * 0.012 + (j % 2 ? 0.006 : -0.006), top - 0.05 - j * 0.072, (rng() - 0.5) * 0.02, (rng() - 0.5) * 0.5, COIN_COPPER[(i + j) % COIN_COPPER.length]));
+    parts.push(boxAt(0.025, 0.07, 0.025, x, top - 0.1 - n * 0.072, 0, ROPE)); // nút buộc cuối xâu
   });
   return fitBox(mergeGeometries(parts)!, hx, hz, k.h);
 }
 
-/** Một thỏi bạc: đế bản rộng và lưng nhỏ hơn đặt lên trên (hình thuyền xếp bậc), nằm dọc theo trục x. */
-function ingot(x: number, y: number, z: number, yaw: number, hex: number): BufferGeometry[] {
-  return [boxYaw(0.34, 0.07, 0.17, x, y, z, yaw, hex), boxYaw(0.24, 0.045, 0.11, x, y + 0.07, z, yaw, mixHex(hex, 0xffffff, 0.25))];
+/** Bàn nhỏ bày các cuộn xu: ba cuộn xu (chồng đĩa đồng xoay lệch nhau, buộc dây đỏ ở giữa) và vài đồng xu rời trên mặt. Khung bao đúng hộp PROP_SIZES `cuon-xu` (1,6 × 1,0, cao 1,0). */
+function createCoinCoils(): BufferGeometry {
+  const k = PROP_SIZES['cuon-xu'];
+  const hx = k.box!.hx;
+  const hz = k.box!.hz;
+  const rng = createMulberry32(8102);
+  const parts: BufferGeometry[] = [...tableParts(hx, hz, 0.82, 0.08, WOOD, WOOD_DARK)];
+  const y0 = 0.82;
+  [
+    [-0.45, -0.1, 7],
+    [0.05, 0.12, 9],
+    [0.5, -0.12, 6],
+  ].forEach(([x, z, n], c) => {
+    for (let j = 0; j < n; j++) parts.push(cylAt(0.15, 0.016, x + (rng() - 0.5) * 0.012, y0 + j * 0.016, z + (rng() - 0.5) * 0.012, COIN_COPPER[(c + j) % COIN_COPPER.length], 10));
+    parts.push(boxAt(0.34, 0.012, 0.035, x, y0 + n * 0.016, z, RED), boxAt(0.035, 0.012, 0.34, x, y0 + n * 0.016 + 0.012, z, RED));
+  });
+  for (let i = 0; i < 6; i++) parts.push(cylAt(0.052, 0.012, -0.7 + rng() * 1.4, y0, 0.2 + rng() * 0.2, COIN_COPPER[i % 3], 9), boxAt(0.026, 0.004, 0.026, 0, y0, 0, SOOT));
+  return fitBox(mergeGeometries(parts)!, hx, hz, k.h);
 }
 
-/** Bàn bày thỏi bạc: bàn gỗ, trên mặt một chồng thỏi bạc ba tầng (3, 2, 1 thỏi) và vài thỏi nằm rời. Khung bao đúng hộp PROP_SIZES `thoi-bac` (1,5 × 0,9, cao 1,12). */
+/** Bàn bày thỏi bạc: bàn gỗ, khay gỗ có thành, trên khay chồng thỏi bạc hình thuyền màu bạc sáng (3, 2, 1 thỏi) và vài thỏi nằm rời. Khung bao đúng hộp PROP_SIZES `thoi-bac` (1,5 × 0,9, cao 1,12). */
 function createIngotTable(): BufferGeometry {
   const k = PROP_SIZES['thoi-bac'];
   const hx = k.box!.hx;
   const hz = k.box!.hz;
   const parts: BufferGeometry[] = [...tableParts(hx, hz, 0.78, 0.09, WOOD, WOOD_DARK)];
   const y0 = 0.78;
-  const rowH = 0.115;
-  [3, 2, 1].forEach((n, row) => {
-    for (let i = 0; i < n; i++) parts.push(...ingot((i - (n - 1) / 2) * 0.37, y0 + row * rowH, -0.08, 0, (i + row) % 2 ? SILVER : SILVER_DARK));
+  // khay gỗ: đáy và bốn thành thấp
+  parts.push(boxAt(1.0, 0.04, 0.62, 0, y0, -0.02, MID_WOOD));
+  for (const sz of [-1, 1]) parts.push(boxAt(1.0, 0.07, 0.04, 0, y0, -0.02 + sz * 0.29, PALE_WOOD));
+  for (const sx of [-1, 1]) parts.push(boxAt(0.04, 0.07, 0.62, sx * 0.48, y0, -0.02, PALE_WOOD));
+  const base = y0 + 0.04;
+  const row = 0.115;
+  [3, 2, 1].forEach((n, r) => {
+    for (let i = 0; i < n; i++) parts.push(ingot((i - (n - 1) / 2) * 0.38 + (r % 2 ? 0.01 : -0.01), base + r * row, -0.02 + (i % 2 ? 0.015 : -0.015), (i - 1) * 0.04, (i + r) % 2 ? SILVER : SILVER_DARK));
   });
-  parts.push(...ingot(-0.55, y0, 0.24, 0.35, SILVER), ...ingot(0.5, y0, 0.2, -0.4, SILVER_DARK), ...ingot(0.1, y0, 0.3, 0.1, SILVER));
+  parts.push(ingot(-0.58, y0, 0.26, 0.5, SILVER), ingot(0.56, y0, 0.24, -0.45, SILVER_DARK), ingot(0.18, y0, 0.34, 0.12, SILVER));
   return fitBox(mergeGeometries(parts)!, hx, hz, k.h);
 }
 
-/** Cân đĩa trên bàn nhỏ: cột giữa, đòn cân hơi nghiêng, hai đĩa treo dây (đĩa trái có hai thỏi bạc, đĩa phải có quả cân). Khung bao đúng hộp PROP_SIZES `can-bac` (1,1 × 0,8, cao 1,55). */
+/**
+ * Cân đòn rõ hình: bàn nhỏ, cột gỗ cao với núm đồng thau, đòn gỗ dài hơi nghiêng có đầu đồng, hai đĩa đồng thau treo mỗi đĩa ba sợi dây, đĩa trái có thỏi bạc, đĩa phải có ba quả cân đồng. Khung bao đúng hộp PROP_SIZES `can-bac` (1,9 × 1,0, cao 1,75).
+ */
 function createBalanceScale(): BufferGeometry {
   const k = PROP_SIZES['can-bac'];
   const hx = k.box!.hx;
   const hz = k.box!.hz;
-  const parts: BufferGeometry[] = [...tableParts(hx, hz, 0.72, 0.08, WOOD, WOOD_DARK)];
-  const y0 = 0.72;
-  parts.push(cylAt(0.035, 0.62, 0, y0, 0, BRASS, 8), blob(0.06, 0.06, 0.06, 0, y0 + 0.66, 0, BRASS));
+  const tabHx = 0.78;
+  const parts: BufferGeometry[] = [...tableParts(tabHx, hz, 0.74, 0.08, WOOD, WOOD_DARK)];
+  const y0 = 0.74;
+  parts.push(boxAt(0.22, 0.05, 0.22, 0, y0, 0, WOOD_DARK), boxAt(0.07, 0.7, 0.07, 0, y0 + 0.05, 0, WOOD_DARK));
+  const pivotY = y0 + 0.78;
+  parts.push(cylAt(0.05, 0.1, 0, pivotY - 0.05, 0, BRASS, 8));
   const tilt = 0.07;
-  const beam = boxYaw(0.84, 0.035, 0.035, 0, 0, 0, 0, BRASS);
+  const arm = 0.7;
+  const beam = new BoxGeometry(arm * 2, 0.05, 0.06);
   beam.rotateZ(tilt);
-  beam.translate(0, y0 + 0.64, 0);
-  parts.push(beam);
-  const arm = 0.42;
+  beam.translate(0, pivotY, 0);
+  parts.push(solid(beam, WOOD));
   for (const s of [-1, 1]) {
-    const bx = s * arm * Math.cos(tilt);
-    const by = y0 + 0.64 + s * arm * Math.sin(tilt);
-    const panY = by - 0.36;
-    // dây treo đĩa (một sợi giữa, thẳng đứng)
-    parts.push(cylAt(0.007, by - panY, bx, panY, 0, 0x5a3a20, 4));
-    parts.push(cylAt(0.17, 0.02, bx, panY, 0, BRASS, 12), cylAt(0.18, 0.012, bx, panY + 0.02, 0, mixHex(BRASS, 0xffffff, 0.2), 12));
-    if (s < 0) parts.push(...ingot(bx, panY + 0.032, 0, 0.3, SILVER), ...ingot(bx + 0.03, panY + 0.1, 0.02, -0.2, SILVER_DARK));
-    else parts.push(cylAt(0.05, 0.07, bx - 0.05, panY + 0.032, 0, IRON, 8), cylAt(0.04, 0.05, bx + 0.07, panY + 0.032, 0.03, IRON, 8));
+    const ex = s * arm * Math.cos(tilt);
+    const ey = pivotY + s * arm * Math.sin(tilt);
+    parts.push(...[cylAt(0.035, 0.1, ex, ey - 0.05, 0, BRASS, 8)]);
+    const panY = ey - 0.55;
+    for (const a of [0, 2.094, 4.189]) {
+      const px = ex + Math.cos(a) * 0.23;
+      const pz = Math.sin(a) * 0.23;
+      parts.push(rodBetween(ex, ey - 0.03, 0, px, panY + 0.02, pz, 0.008, ROPE));
+    }
+    parts.push(cylAt(0.25, 0.025, ex, panY, 0, BRASS, 14), cylAt(0.26, 0.03, ex, panY + 0.025, 0, mixHex(BRASS, 0xffffff, 0.25), 14, 0.2));
+    if (s < 0) parts.push(ingot(ex - 0.03, panY + 0.055, 0.0, 0.3, SILVER), ingot(ex + 0.04, panY + 0.17, 0.02, -0.25, SILVER_DARK));
+    else for (const [dx, dz, r] of [[-0.09, 0.03, 0.06], [0.07, -0.05, 0.05], [0.09, 0.08, 0.04]] as const) parts.push(cylAt(r, r * 1.3, ex + dx, panY + 0.055, dz, IRON, 8, r * 1.1));
   }
   return fitBox(mergeGeometries(parts)!, hx, hz, k.h);
 }
 
-/** Rương gỗ có nắp tròn, đai sắt và khóa đồng. Khung bao đúng hộp PROP_SIZES `ruong-go` (1,2 × 0,76, cao 0,78). */
-function createChest(): BufferGeometry {
-  const k = PROP_SIZES['ruong-go'];
-  const hx = k.box!.hx;
-  const hz = k.box!.hz;
-  const bodyH = 0.5;
-  const parts: BufferGeometry[] = [boxAt(hx * 2, bodyH, hz * 2, 0, 0.04, 0, WALNUT)];
-  for (const sx of [-1, 1]) for (const sz of [-1, 1]) parts.push(boxAt(0.1, 0.06, 0.1, sx * (hx - 0.06), 0, sz * (hz - 0.06), WOOD_DARK));
-  const lid = new CylinderGeometry(hz, hz, hx * 2, 14);
-  lid.rotateZ(Math.PI / 2);
-  lid.scale(1, (k.h - bodyH - 0.04) / hz, 1);
-  lid.translate(0, 0.04 + bodyH, 0);
-  parts.push(solid(lid, 0x6b4526));
-  for (const x of [-0.42, 0, 0.42]) parts.push(boxAt(0.08, bodyH + 0.02, hz * 2 + 0.03, x, 0.03, 0, IRON));
-  parts.push(boxAt(0.14, 0.17, 0.04, 0, 0.04 + bodyH - 0.15, hz + 0.02, BRASS));
-  return fitBox(mergeGeometries(parts)!, hx, hz, k.h);
-}
-
-/** Kiện hàng bằng vải bố buộc dây: hai kiện dưới, một kiện trên và một kiện nhỏ đặt cạnh. Khung bao đúng hộp PROP_SIZES `kien-hang` (1,7 × 1,2, cao 1,0). */
-function createBales(): BufferGeometry {
-  const k = PROP_SIZES['kien-hang'];
-  const hx = k.box!.hx;
-  const hz = k.box!.hz;
-  const parts: BufferGeometry[] = [];
-  const bale = (w: number, h: number, d: number, x: number, y: number, z: number, yaw: number, i: number) => {
-    parts.push(boxYaw(w, h, d, x, y, z, yaw, BURLAP[i % BURLAP.length]));
-    const band = (dx: number) => {
-      const g = new BoxGeometry(0.05, h + 0.025, d + 0.025);
-      g.rotateY(yaw);
-      const c = Math.cos(yaw);
-      const s = Math.sin(yaw);
-      g.translate(x + dx * c, y + h / 2, z - dx * s);
-      parts.push(solid(g, 0x4a3524));
-    };
-    band(-w * 0.22);
-    band(w * 0.22);
-  };
-  bale(0.78, 0.46, 0.56, -0.42, 0, -0.1, 0.05, 0);
-  bale(0.78, 0.46, 0.56, 0.44, 0, -0.06, -0.06, 1);
-  bale(0.72, 0.42, 0.52, 0, 0.46, -0.08, 0.1, 2);
-  bale(0.5, 0.34, 0.4, 0.3, 0, 0.42, -0.3, 0);
-  return fitBox(mergeGeometries(parts)!, hx, hz, k.h);
-}
-
-/** Giá sổ cái: hai thành, nóc, đáy, ba tầng ván, mỗi tầng một hàng sổ cái dày mỏng khác nhau, gáy da nâu, đỏ, chàm và xanh. Khung bao đúng hộp PROP_SIZES `ke-so` (1,8 × 0,52, cao 2,0). */
+/** Giá gỗ xếp sổ đóng chỉ: hai thành, nóc, đáy, ba tầng ván; mỗi tầng vài chồng sổ nằm (bìa nâu, chàm, vàng đất, xếp lệch nhẹ, gáy khâu chỉ sẫm, dây buộc nhạt), tầng trên cùng là cuộn giấy buộc dây đỏ. Khung bao đúng hộp PROP_SIZES `ke-so` (1,8 × 0,52, cao 2,0). */
 function createLedgerShelf(): BufferGeometry {
   const k = PROP_SIZES['ke-so'];
   const hx = k.box!.hx;
@@ -1046,20 +1170,83 @@ function createLedgerShelf(): BufferGeometry {
   const shelves = [0.05, 0.55, 1.05, 1.55];
   for (const y of shelves) parts.push(boxAt(hx * 2 - 0.1, 0.05, hz * 2 - 0.04, 0, y, 0.01, WOOD));
   parts.push(boxAt(hx * 2, 0.05, hz * 2, 0, k.h - 0.05, 0, WOOD_DARK));
-  const spines = [0x6b3e22, 0x8f3a2a, 0x2c4a7a, 0x3c5a38, 0x5a3a20, 0xa87a3a];
-  for (const y of shelves) {
-    let x = -hx + 0.14;
-    while (x < hx - 0.2) {
-      const w = 0.07 + rng() * 0.07;
-      const h = 0.3 + rng() * 0.1;
-      if (rng() < 0.1) {
-        x += 0.16; // chỗ trống
-        continue;
+  shelves.forEach((y, row) => {
+    const top = y + 0.05;
+    if (row === shelves.length - 1) {
+      // tầng trên: cuộn giấy nằm ngang, mỗi cuộn buộc hai dây đỏ
+      for (let i = 0; i < 6; i++) {
+        const cx = -hx + 0.3 + i * 0.27;
+        const cz = (i % 2 ? 0.07 : -0.05) + (rng() - 0.5) * 0.04;
+        parts.push(cylAlongX(0.075, 0.38, cx, top + 0.075, cz, 0xf0e6cc, 10));
+        for (const dx of [-0.12, 0.12]) parts.push(cylAlongX(0.081, 0.03, cx + dx, top + 0.075, cz, RED, 10));
       }
-      parts.push(boxYaw(w, h, hz * 2 - 0.12, x + w / 2, y + 0.05, 0.02, (rng() - 0.5) * 0.03, spines[Math.floor(rng() * spines.length)]));
-      x += w + 0.012;
+      return;
     }
+    for (let s = 0; s < 3; s++) {
+      const cx = -hx * 0.6 + s * hx * 0.6;
+      const n = 3 + Math.floor(rng() * 3);
+      for (let b = 0; b < n; b++) {
+        const yaw = (rng() - 0.5) * 0.09;
+        const ox = (rng() - 0.5) * 0.05;
+        const by = top + b * 0.078;
+        parts.push(boxYaw(0.5, 0.072, 0.36, cx + ox, by, 0.02, yaw, BOOK_COVER[Math.floor(rng() * BOOK_COVER.length)]));
+        parts.push(boxYaw(0.04, 0.078, 0.37, cx + ox - 0.23, by, 0.02, yaw, 0x2b2420)); // gáy khâu chỉ
+        parts.push(boxYaw(0.018, 0.074, 0.05, cx + ox - 0.16, by + 0.001, 0.19, yaw, 0xe9dcc0)); // dây buộc nhạt
+      }
+    }
+  });
+  return fitBox(mergeGeometries(parts)!, hx, hz, k.h);
+}
+
+/** Bàn chép sổ có nghiên mực và bút lông: mặt bàn trên bốn chân, cuốn sổ mở (bìa nâu, hai trang giấy), nghiên đá có mực, bút lông gác trên giá bút, tờ giấy rời và thỏi mực. Khung bao đúng hộp PROP_SIZES `ban-viet` (2,2 × 1,1, cao 1,0). */
+function createWritingDesk(): BufferGeometry {
+  const k = PROP_SIZES['ban-viet'];
+  const hx = k.box!.hx;
+  const hz = k.box!.hz;
+  const parts: BufferGeometry[] = [...tableParts(hx, hz, 0.85, 0.1, WOOD, WOOD_DARK)];
+  const y0 = 0.85;
+  parts.push(boxYaw(0.66, 0.03, 0.46, -0.45, y0, 0.02, 0.05, 0x6b3e22), boxYaw(0.3, 0.02, 0.42, -0.6, y0 + 0.03, 0.02, 0.05, 0xf3ead2), boxYaw(0.3, 0.02, 0.42, -0.3, y0 + 0.03, 0.01, 0.03, 0xf0e6cc));
+  parts.push(boxYaw(0.4, 0.008, 0.3, 0.2, y0, 0.2, -0.3, 0xf6efd8)); // tờ giấy rời
+  // nghiên đá và thỏi mực
+  parts.push(boxAt(0.22, 0.06, 0.16, 0.62, y0, -0.15, 0x6a6c70), boxAt(0.14, 0.012, 0.09, 0.62, y0 + 0.06, -0.15, SOOT), boxAt(0.1, 0.04, 0.03, 0.82, y0, -0.02, SOOT));
+  // giá bút và bút lông gác nghiêng
+  parts.push(boxAt(0.05, 0.1, 0.05, 0.35, y0, -0.3, WOOD_DARK), boxAt(0.05, 0.1, 0.05, 0.58, y0, -0.3, WOOD_DARK));
+  parts.push(rodBetween(0.28, y0 + 0.16, -0.3, 0.7, y0 + 0.1, -0.3, 0.012, PALE_WOOD), rodBetween(0.7, y0 + 0.1, -0.3, 0.82, y0 + 0.14, -0.3, 0.017, SOOT));
+  return fitBox(mergeGeometries(parts)!, hx, hz, k.h);
+}
+
+/**
+ * Hiên nhà giữ sổ dựng bằng code: sáu cột tròn ở mép trước, sáu cột sau gần vách nhà, xà trước, mái ngói đỏ dốc về phía trước (các hàng ngói là gờ sẫm) và bậc gỗ trước hiên. Đi dưới mái được. Khung bao đúng hộp PROP_SIZES `hien-nha` (8,6 × 5,0, cao 3,4): +z là phía trước (xa nhà), −z sát vách nhà.
+ */
+function createVeranda(): BufferGeometry {
+  const k = PROP_SIZES['hien-nha'];
+  const hx = k.box!.hx;
+  const hz = k.box!.hz;
+  const parts: BufferGeometry[] = [];
+  const frontY = 2.75;
+  const backY = 3.3;
+  const colXs = [-3.7, -2.22, -0.74, 0.74, 2.22, 3.7];
+  for (const x of colXs) {
+    parts.push(cylAt(0.11, frontY, x, 0, hz - 0.5, WOOD, 10), boxAt(0.34, 0.1, 0.34, x, 0, hz - 0.5, STONE)); // cột trước và chân cột đá
+    parts.push(cylAt(0.1, backY, x, 0, -hz + 0.35, WOOD_DARK, 8));
   }
+  parts.push(boxAt(hx * 2 - 0.4, 0.14, 0.18, 0, frontY - 0.08, hz - 0.5, WOOD_DARK), boxAt(hx * 2 - 0.4, 0.14, 0.18, 0, backY - 0.08, -hz + 0.35, WOOD_DARK));
+  const run = hz * 2 - 0.3;
+  const slope = Math.atan2(backY - frontY, run);
+  const rLen = Math.hypot(run, backY - frontY) + 0.5;
+  const roof = new BoxGeometry(hx * 2, 0.12, rLen);
+  roof.rotateX(slope);
+  roof.translate(0, (frontY + backY) / 2 + 0.1, 0.05);
+  parts.push(solid(roof, TILE_RED));
+  for (let i = 0; i < 16; i++) {
+    const u = -rLen / 2 + 0.2 + (i * (rLen - 0.4)) / 15;
+    const line = new BoxGeometry(hx * 2 + 0.02, 0.05, 0.07);
+    line.translate(0, 0.085, u);
+    line.rotateX(slope);
+    line.translate(0, (frontY + backY) / 2 + 0.1, 0.05);
+    parts.push(solid(line, 0x8f3f20));
+  }
+  parts.push(boxAt(hx * 2 - 1.0, 0.1, 0.5, 0, 0, hz - 0.05, WOOD)); // bậc gỗ trước hiên
   return fitBox(mergeGeometries(parts)!, hx, hz, k.h);
 }
 
@@ -1124,12 +1311,10 @@ function createDeck(): BufferGeometry {
   const ramp = 2.2;
   const flatStart = -hz + ramp;
   const parts: BufferGeometry[] = [];
-  // sàn đặc phía dưới (tối) và ván ngang phía trên, xen hai sắc gỗ
   parts.push(boxAt(hx * 2 - 0.1, top - 0.06, hz - flatStart, 0, 0, (hz + flatStart) / 2, WOOD_DARK));
   const n = 15;
   const plankDepth = (hz - flatStart) / n;
   for (let i = 0; i < n; i++) parts.push(boxAt(hx * 2, 0.06, plankDepth - 0.03, 0, top - 0.06, flatStart + plankDepth * (i + 0.5), i % 2 ? WOOD : MID_WOOD));
-  // dốc: lăng trụ tam giác (z từ −hz tới flatStart, y từ 0 tới top), rộng 2·hx
   const tri = new Shape();
   tri.moveTo(-flatStart, 0);
   tri.lineTo(hz, 0);
@@ -1139,7 +1324,6 @@ function createDeck(): BufferGeometry {
   wedge.rotateY(Math.PI / 2);
   wedge.translate(-hx, 0, 0);
   parts.push(solid(wedge, PALE_WOOD));
-  // vạch ván trên dốc
   const slope = Math.atan2(top, ramp);
   for (let i = 1; i <= 4; i++) {
     const u = (ramp / 5) * i;
@@ -1148,7 +1332,6 @@ function createDeck(): BufferGeometry {
     g.translate(0, (top * u) / ramp + 0.005, -hz + u);
     parts.push(solid(g, WOOD));
   }
-  // cột và thanh vịn hai bên (phần sàn phẳng)
   for (const sx of [-1, 1]) {
     for (let i = 0; i < 6; i++) parts.push(boxAt(0.12, k.h - top, 0.12, sx * (hx - 0.1), top, flatStart + 0.3 + i * ((hz - flatStart - 0.6) / 5), WOOD_DARK));
     parts.push(boxAt(0.07, 0.07, hz - flatStart - 0.3, sx * (hx - 0.1), 1.12, (hz + flatStart) / 2, BAMBOO));
@@ -1196,13 +1379,9 @@ function buildCraftProp(kind: PropKind): BufferGeometry | null {
       return mergeGeometries([slab(k.box!.hx * 2, top, k.box!.hz * 2, 0, legH), slab(0.22, legH, k.box!.hz * 1.6, -k.box!.hx * 0.7), slab(0.22, legH, k.box!.hz * 1.6, k.box!.hx * 0.7)]);
     }
     case 'hom':
-      // thân cao 0,56 và nắp 0,14 rộng hơn một chút (nắp nằm trong khung bao của hòm)
-      return mergeGeometries([slab(k.box!.hx * 2, k.h - 0.14, k.box!.hz * 2), slab(k.box!.hx * 2, 0.14, k.box!.hz * 2, 0, k.h - 0.14)]);
-    case 'thung': {
-      const g = new CylinderGeometry(k.r, k.r * 0.78, k.h, 16, 1, false);
-      g.translate(0, k.h / 2, 0);
-      return g;
-    }
+      return chestGeometry(k.box!.hx, k.box!.hz, k.h); // hòm nắp cong, đai và khóa đồng (cũng là đồ quanh cổng mọi làng)
+    case 'thung':
+      return createBasket(k.r, k.h); // thúng đan tre có vân đan
     case 'ban-chep': {
       // bàn chép sổ: mặt bàn dày 0,1 trên bốn chân gỗ
       const top = 0.1;
@@ -1295,6 +1474,12 @@ function buildCraftProp(kind: PropKind): BufferGeometry | null {
       return createLetterTable();
     case 'day-xu':
       return createCoinStand();
+    case 'cuon-xu':
+      return createCoinCoils();
+    case 'ban-viet':
+      return createWritingDesk();
+    case 'hien-nha':
+      return createVeranda();
     case 'thoi-bac':
       return createIngotTable();
     case 'can-bac':

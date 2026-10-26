@@ -1,11 +1,11 @@
 import { useThree } from '@react-three/fiber';
-import type { BufferGeometry, Material, MeshStandardMaterial } from 'three';
+import { PlaneGeometry, type BufferGeometry, type Material, type MeshStandardMaterial, type Texture } from 'three';
 import { useEffect, useRef } from 'react';
 import { CHARACTERS } from '../../content/characters';
 import { CRAFT_KINDS, acquireCraftGeometry, craftMaterial, releaseCraftGeometry } from '../cho/MarketProcedural';
 import { createScrollResources } from '../village/KnowScrolls';
 import { scatterMaterial, stoneHillMaterial } from '../village/ScatterProps';
-import { createGear, gearMaterial } from '../village/VillageFeatures';
+import { acquireTagAtlas, createGear, gearMaterial, readyTagAtlas, releaseTagAtlas, tagDigitMaterial } from '../village/VillageFeatures';
 import { SCATTER_KINDS } from '../village/scatter';
 import { createScatterGeometry, createStoneHill } from '../village/scatterGeometry';
 import { createPartsPrewarm, instanceModelIds, type PartsPrewarm } from '../cho/ModelInstances';
@@ -69,6 +69,8 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
     const crafts: { kind: string; geometry: BufferGeometry; material: MeshStandardMaterial }[] = [];
     /** Đồ rải dựng bằng code và thẻ "Em có biết?" (bước X3): vật liệu mẫu để biên dịch trước shader, giữ tới khi bỏ chuẩn bị */
     const extras: { geometry: BufferGeometry; material: Material; plain?: boolean }[] = [];
+    let tagAtlasHeld = false;
+    let tagTexture: Texture | null = null;
     let scrollRes: ReturnType<typeof createScrollResources> | null = null;
     let raf = 0;
 
@@ -118,6 +120,15 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
       for (const k of SCATTER_KINDS) if (scat.has(k)) extras.push({ geometry: createScatterGeometry(k), material: scatterMaterial(k) });
       if (kinds.has('may-soi-dau')) extras.push({ geometry: createGear(0.5, 12, 0.14), material: gearMaterial(level), plain: true }); // bánh răng của máy: mesh thường có texture, chương trình shader riêng
       if ((village.layout.scatter ?? []).some((p) => p.kind === 'doi' && p.stone)) extras.push({ geometry: createStoneHill(), material: stoneHillMaterial() });
+      if (kinds.has('cay-the')) {
+        // chữ trên thẻ gỗ của cây đa: ảnh chữ chung (chờ phông chữ của game, vẽ một lần) và mặt phẳng vật liệu cơ bản có ảnh (chương trình shader riêng, như chữ bảng mẫu dấu); ảnh được đẩy lên GPU ở bước texture bên dưới
+        const atlas = acquireTagAtlas();
+        tagAtlasHeld = true;
+        tagTexture = atlas.texture;
+        await readyTagAtlas();
+        if (cancelled) return;
+        extras.push({ geometry: new PlaneGeometry(1, 1), material: tagDigitMaterial(atlas.texture), plain: true });
+      }
       if ((village.layout.scrolls ?? []).length > 0) {
         scrollRes = createScrollResources();
         extras.push({ geometry: scrollRes.scroll, material: scrollRes.scrollMat, plain: true }, { geometry: scrollRes.beam, material: scrollRes.beamMat, plain: true }, { geometry: scrollRes.disc, material: scrollRes.discMat, plain: true });
@@ -132,7 +143,7 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
         if (!cancelled) markModelWarm(guide);
       }
       const scenes = [...loaded.entries()].filter(([id]) => id !== guide).map(([, d]) => d.scene);
-      await warmTextures(gl, usableTextures(scenes), isCancelled);
+      await warmTextures(gl, [...(tagTexture ? [tagTexture] : []), ...usableTextures(scenes)], isCancelled);
       if (!cancelled) for (const id of companions) markModelWarm(id);
       mark('done');
       if (!cancelled) done.current?.(village.id, true);
@@ -152,6 +163,7 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
         e.geometry.dispose();
         e.material.dispose();
       }
+      if (tagAtlasHeld) releaseTagAtlas();
       void scrollRes;
       if (guide) unmarkModelWarm(guide);
       for (const id of companions) unmarkModelWarm(id);

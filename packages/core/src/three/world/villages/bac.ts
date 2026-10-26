@@ -41,8 +41,8 @@ const SOUTH = Math.PI;
 
 export const BANYAN = { x: 0, z: -80, scale: 1 } as const;
 const BANYAN_TREE: Placement = { model: MODEL_TREE, x: BANYAN.x, z: BANYAN.z, yaw: 0, scale: BANYAN.scale, tint: [1, 1, 1] };
-/** Mười lăm thẻ gỗ ghi số: MỘT món rải (xem `scatterGeometry.createNumberTags`), +z của hình quay về cổng làng. */
-const TAGS = scatter('the-so', BANYAN.x, BANYAN.z, BANYAN.scale, Math.PI, [1, 1, 1], { collide: false });
+/** Mười lăm thẻ gỗ ghi số: MỘT chỗ đặt (`cay-the`, vẽ ở `VillageFeatures`), +z của hệ cây quay về cổng làng. */
+const TAGS = prop('cay-the', BANYAN.x, BANYAN.z, Math.PI, BANYAN.scale);
 
 const BOARDS: VillageBoardDef[] = [
   { level: 10, icon: 'ui/icons/trang-vang', x: 4.6, z: -91, yaw: Math.PI },
@@ -70,15 +70,18 @@ const STALL_Z = -40;
 const STALL_X = [47, 55, 63, 71, 79];
 const STALLS: Placement[] = STALL_X.map((x, i) => ({ model: MODEL_STALL, x, z: STALL_Z + (i % 2) * 0.3, yaw: SOUTH + (i - 2) * 0.03, scale: 1, tint: [1 - (i % 3) * 0.02, 1, 1 - (i % 2) * 0.03] as const }));
 const COUNTER_Z = -43.7;
+/** Mỗi quầy bày khác nhau: lệch vị trí và hướng nhẹ theo hạt giống cố định (không xếp thẳng tắp). */
+const stallRng = createMulberry32(20260422);
+const shown = (kind: PropPlacement['kind'], x: number, z: number, yaw: number, scale = 1): PropPlacement => prop(kind, x + (stallRng() - 0.5) * 0.5, z + (stallRng() - 0.5) * 0.3, yaw + (stallRng() - 0.5) * 0.24, scale);
 const STALL_PROPS: PropPlacement[] = [
-  prop('day-xu', 47, COUNTER_Z, SOUTH),
-  prop('thoi-bac', 55, COUNTER_Z - 0.1, SOUTH),
-  prop('can-bac', 63, COUNTER_Z, SOUTH),
-  prop('ban-chep', 71, COUNTER_Z - 0.1, SOUTH),
-  prop('so-chung', 71, COUNTER_Z - 0.1, SOUTH + 0.1),
-  prop('ruong-go', 77.6, COUNTER_Z, SOUTH),
-  prop('ruong-go', 80.8, COUNTER_Z, SOUTH - 0.2),
-  prop('day-xu', 84.2, COUNTER_Z + 0.3, SOUTH - 0.1),
+  shown('day-xu', 45.4, COUNTER_Z, SOUTH),
+  shown('cuon-xu', 49.2, COUNTER_Z - 0.1, SOUTH),
+  shown('thoi-bac', 55, COUNTER_Z - 0.1, SOUTH),
+  shown('can-bac', 63, COUNTER_Z - 0.2, SOUTH, 1.15),
+  shown('ban-viet', 71, COUNTER_Z - 0.1, SOUTH),
+  shown('ruong-go', 77.6, COUNTER_Z, SOUTH),
+  shown('ruong-go', 80.8, COUNTER_Z, SOUTH),
+  shown('day-xu', 84.4, COUNTER_Z + 0.3, SOUTH),
   // sau lều: kiện hàng, thúng, chum, rương
   prop('kien-hang', 47, -36.2, 0.1),
   prop('thung', 51.2, -36.4, 0, 1),
@@ -169,18 +172,16 @@ const STREAM_POOLS: VillagePond[] = [
 // ---------------------------------------------------------------------------
 // Nhà giữ sổ (tây): nhà ngói lớn, hiên, bàn chép sổ, giá sổ cái, rương
 
-const LEDGER_HOUSE = tile(-79, -10, [0, -10], 1.7, [1, 0.97, 0.93], 0);
+const LEDGER_HOUSE = tile(-80, -10, [0, -10], 1.9, [1, 0.97, 0.93], 0);
 const LEDGER_PROPS: PropPlacement[] = [
-  prop('mai-che', -70.9, -10, Math.PI / 2),
-  prop('ban-chep', -70.7, -12.1, Math.PI / 2),
-  prop('so-chung', -70.7, -12.1, Math.PI / 2 + 0.15),
-  prop('ban-chep', -70.7, -7.9, Math.PI / 2),
-  prop('so-chung', -70.7, -7.9, Math.PI / 2 - 0.12),
-  prop('ke-so', -70.8, -15.4, Math.PI / 2),
-  prop('ke-so', -70.8, -4.6, Math.PI / 2),
-  prop('ruong-go', -74.4, -17.8, 0.2),
-  prop('ruong-go', -74.4, -2.2, -0.2),
-  prop('ke-so', -78.4, -16.8, Math.PI),
+  prop('hien-nha', -73.6, -10, Math.PI / 2),
+  prop('ban-viet', -72.6, -12.2, Math.PI / 2 + 0.04),
+  prop('ban-viet', -72.4, -7.8, Math.PI / 2 - 0.05),
+  prop('ke-so', -72.8, -15.8, Math.PI / 2),
+  prop('ke-so', -72.8, -4.2, Math.PI / 2),
+  prop('ruong-go', -75.4, -18.2, 0.2),
+  prop('ruong-go', -75.4, -1.8, -0.2),
+  prop('ke-so', -80.4, -17.8, Math.PI),
   prop('thung', -67.2, -17.4, 0, 1),
   prop('chau-canh', -66.2, -3.6, 0.7),
 ];
@@ -371,8 +372,8 @@ const WELLS: Placement[] = [
 // ---------------------------------------------------------------------------
 // Chỗ đã chiếm, rồi xếp nhà ở dọc các ngõ, rải đồ phụ có hạt giống (bộ rải dùng chung ở villageKit.ts)
 
-const ALL_PROPS: PropPlacement[] = [...PLAZA_PROPS, ...STALL_PROPS, ...DOCK_PROPS, ...LEDGER_PROPS, ...LOTUS];
-const STREAM_REST_PROPS = ['chan', 'nuoc', 'mai-che', 'da-vun', 'de-may', 'thuyen', 'la-sen', 'hoa-sen', 'ben-go', 'so-chung'] as const;
+const ALL_PROPS: PropPlacement[] = [TAGS, ...PLAZA_PROPS, ...STALL_PROPS, ...DOCK_PROPS, ...LEDGER_PROPS, ...LOTUS];
+const STREAM_REST_PROPS = ['chan', 'nuoc', 'mai-che', 'da-vun', 'de-may', 'thuyen', 'la-sen', 'hoa-sen', 'ben-go', 'so-chung', 'cay-the'] as const;
 
 /** Chỗ chiếm của nước nhánh sông: vòng tròn dọc đường tim (kể cả bờ) để đồ rải không rơi xuống nước. */
 function streamSpots(): Spot[] {
@@ -387,7 +388,7 @@ function anchors(): Spot[] {
   out.push({ x: DOCK.x + 1.6, z: DOCK.z, r: 5.6 }); // bến gỗ và dốc
   out.push({ x: LOTUS_POND.x, z: LOTUS_POND.z, r: LOTUS_POND.r + 1.4 });
   out.push({ x: BANYAN.x, z: BANYAN.z, r: 7.5 }); // nền rễ cây đa và tán thấp
-  out.push({ x: -70.9, z: -10, r: 4 }); // hiên nhà giữ sổ
+  out.push({ x: -73.6, z: -10, r: 4 }); // hiên nhà giữ sổ
   for (const b of BOARDS) out.push({ x: b.x, z: b.z, r: 1.4 });
   out.push({ x: GUIDE.x, z: GUIDE.z, r: 1 }, { x: MERCHANT.x, z: MERCHANT.z, r: 1 });
   for (const s of SCROLLS) out.push({ x: s.x, z: s.z, r: 1.6 });
@@ -471,7 +472,7 @@ function fillers(): { scatter: ScatterPlacement[]; props: PropPlacement[]; place
 const FILL = fillers();
 const HOUSES: Placement[] = FILL.houses;
 const PLACEMENTS: Placement[] = [BANYAN_TREE, ...STALLS, LEDGER_HOUSE, ...HOUSES, ...WELLS, ...FILL.placements];
-const SCATTER: ScatterPlacement[] = [TAGS, POND_JETTY, ...FILL.scatter];
+const SCATTER: ScatterPlacement[] = [POND_JETTY, ...FILL.scatter];
 const PROPS: PropPlacement[] = [...ALL_PROPS, ...FILL.props];
 const PONDS: VillagePond[] = [LOTUS_POND, ...STREAM_POOLS];
 

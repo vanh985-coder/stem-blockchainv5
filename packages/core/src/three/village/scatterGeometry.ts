@@ -4,7 +4,6 @@
  */
 import { BoxGeometry, Color, CylinderGeometry, Float32BufferAttribute, IcosahedronGeometry, PlaneGeometry, SphereGeometry, type BufferGeometry } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { SEGMENTS_OF, banyanTags, segmentBox } from './banyanTags';
 import type { ScatterKind } from './scatter';
 
 /** Tô cả hình học một màu theo đỉnh (để gộp nhiều bộ phận khác màu thành một hình học). */
@@ -183,56 +182,6 @@ export function createMulberryRow(): BufferGeometry {
   return merge(parts);
 }
 
-/** Gỗ của thẻ số, khung viền, mực chữ và dây treo. */
-const TAG_PLATE = [0xd6b67c, 0xc9a46a] as const;
-const TAG_FRAME = 0x6b4526;
-const TAG_INK = 0x2b2420;
-const TAG_ROPE = 0x4a3524;
-/** Chữ số rộng bấy nhiêu lần bước chữ; nét dày bấy nhiêu lần chiều cao chữ. */
-const GLYPH_FILL = 0.62;
-const STROKE = 0.16;
-
-/**
- * Mười lăm thẻ gỗ ghi số của cây đa Làng Bạc (xem banyanTags.ts: số lấy từ `buildTree` của Bài 4). Mỗi thẻ: tấm gỗ, khung viền sẫm sau lưng, các chữ số bằng đoạn thẳng (hộp mỏng nổi lên mặt thẻ, màu mực), hai sợi dây
- * buộc lên cành. Một hình học gộp, màu theo đỉnh, và có aSway (đung đưa nhẹ: 0 ở chỗ buộc dây, tăng dần xuống đáy thẻ) với aSlot = −1 (không phải vải) để dùng đúng vật liệu sào vải (cùng chương trình shader, không thêm shader mới).
- * Khoảng 2.700 tam giác.
- */
-export function createNumberTags(): BufferGeometry {
-  const parts: BufferGeometry[] = [];
-  for (const t of banyanTags()) {
-    const plateTop = t.y + t.h / 2;
-    const plateH = t.h;
-    // Bộ đổ bóng đỉnh đẩy từng đỉnh theo sóng phụ thuộc vị trí đỉnh, còn mặt tấm gỗ chỉ có 4 đỉnh nên nội suy thẳng: tấm càng rộng thì chữ nổi càng lệch khỏi mặt gỗ (độ lệch tỉ lệ bình phương bề rộng nhân aSway),
-    // nên thẻ to đung đưa ít hơn (độ lệch tối đa khoảng 3 cm, chữ nổi cao 5 cm)
-    const swayMax = Math.min(0.45, 0.4 / (t.w * t.w));
-    const sway = (y: number) => swayMax * (0.4 + 0.6 * Math.min(1, Math.max(0, (plateTop - y) / plateH)));
-    const ropeSway = (y: number) => swayMax * 0.4 * Math.min(1, Math.max(0, (t.top - y) / (t.top - plateTop)));
-    const put = (w: number, h: number, d: number, cx: number, cy: number, cz: number, hex: number, ropeLike = false) => {
-      const g = bare(new BoxGeometry(w, h, d));
-      g.translate(cx, cy, cz);
-      g.rotateY(t.yaw);
-      g.translate(t.x, t.y, t.z);
-      parts.push(paint(withCloth(g, -1, ropeLike ? ropeSway : sway), hex));
-    };
-    put(t.w + 0.05, t.h + 0.05, 0.05, 0, 0, -0.045, TAG_FRAME);
-    put(t.w, t.h, 0.07, 0, 0, 0, TAG_PLATE[(t.level + t.index) % 2]);
-    const glyphW = t.digitW * GLYPH_FILL;
-    const thick = t.digitH * STROKE;
-    const x0 = -((t.digits.length - 1) * t.digitW) / 2;
-    [...t.digits].forEach((ch, i) => {
-      for (const s of SEGMENTS_OF[ch]) {
-        const b = segmentBox(s, glyphW, t.digitH, thick);
-        put(b.w, b.h, 0.05, x0 + i * t.digitW + b.x, b.y, 0.06, TAG_INK);
-      }
-    });
-    // hai sợi dây từ mép trên của thẻ lên chỗ buộc (thẻ hẹp một sợi giữa)
-    const ropeLen = t.top - plateTop;
-    const xs = t.w > 0.6 ? [-t.w * 0.32, t.w * 0.32] : [0];
-    for (const x of xs) put(0.028, ropeLen + 0.02, 0.028, x, t.h / 2 + ropeLen / 2, 0, TAG_ROPE, true);
-  }
-  return merge(parts);
-}
-
 export function createScatterGeometry(kind: ScatterKind): BufferGeometry {
   switch (kind) {
     case 'tre':
@@ -249,10 +198,8 @@ export function createScatterGeometry(kind: ScatterKind): BufferGeometry {
       return createClothPole();
     case 'luong-dau':
       return createMulberryRow();
-    case 'the-so':
-      return createNumberTags();
   }
 }
 
 /** Loại có màu theo đỉnh (vật liệu `vertexColors`); đồi dùng nhân màu theo từng bản. */
-export const SCATTER_VERTEX_COLORS: Readonly<Record<ScatterKind, boolean>> = { tre: true, 'cay-qua': true, phen: true, 'cau-ao': true, doi: false, 'sao-vai': true, 'luong-dau': true, 'the-so': true };
+export const SCATTER_VERTEX_COLORS: Readonly<Record<ScatterKind, boolean>> = { tre: true, 'cay-qua': true, phen: true, 'cau-ao': true, doi: false, 'sao-vai': true, 'luong-dau': true };

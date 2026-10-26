@@ -6,9 +6,9 @@
 import type { CameraBlocker } from '../cameraCollision';
 import { circle, obox } from '../collision';
 
-export type ScatterKind = 'tre' | 'cay-qua' | 'phen' | 'cau-ao' | 'doi' | 'sao-vai' | 'luong-dau' | 'the-so';
+export type ScatterKind = 'tre' | 'cay-qua' | 'phen' | 'cau-ao' | 'doi' | 'sao-vai' | 'luong-dau';
 
-export const SCATTER_KINDS: readonly ScatterKind[] = ['tre', 'cay-qua', 'phen', 'cau-ao', 'doi', 'sao-vai', 'luong-dau', 'the-so'];
+export const SCATTER_KINDS: readonly ScatterKind[] = ['tre', 'cay-qua', 'phen', 'cau-ao', 'doi', 'sao-vai', 'luong-dau'];
 
 export interface ScatterPlacement {
   kind: ScatterKind;
@@ -52,8 +52,6 @@ export const SCATTER_SIZES: Readonly<Record<ScatterKind, ScatterSize>> = {
   // Làng Dệt (mốc 3, bước L1): sào phơi vải (hai trụ cao 2,6, xà dài 4,4, bốn tấm vải phấp phới; vật cản hộp mỏng) và luống dâu (ruộng dâu: hàng bụi thấp dài 6,4 cao 0,95, đi qua được)
   'sao-vai': { r: Math.hypot(2.2, 0.3), h: 2.6, box: { hx: 2.2, hz: 0.3 }, collide: true },
   'luong-dau': { r: Math.hypot(3.2, 0.8), h: 0.95, collide: false },
-  // Làng Bạc (mốc 3, bước L5): mười lăm thẻ gỗ ghi số treo trên cây đa (xem banyanTags.ts); một món duy nhất đặt ở thân cây, đi qua được (dưới tán, trên nền rễ có vật cản của cây)
-  'the-so': { r: 7, h: 7, collide: false },
 };
 
 /** Vật cản của một món rải, hoặc null nếu không có. Đồi: hình tròn bằng chân đồi, cao bằng đồi; cây và bụi tre: hình tròn ở thân. */
@@ -140,9 +138,9 @@ export function chunkScatter<T extends { x: number; z: number }>(items: readonly
 
 /** Tầm vẽ xa nhất (tính tới mặt mảnh) của từng loại ở từng mức chất lượng; Thấp ngắn nhất để giữ dưới 270.000 tam giác. */
 export const SCATTER_MAX_DISTANCE: Readonly<Record<'low' | 'medium' | 'high', Readonly<Record<ScatterKind, number>>>> = {
-  low: { tre: 60, 'cay-qua': 55, phen: 42, 'cau-ao': 70, doi: 120, 'sao-vai': 48, 'luong-dau': 40, 'the-so': 90 },
-  medium: { tre: 100, 'cay-qua': 85, phen: 70, 'cau-ao': 120, doi: 240, 'sao-vai': 80, 'luong-dau': 75, 'the-so': 130 },
-  high: { tre: 160, 'cay-qua': 140, phen: 115, 'cau-ao': 180, doi: 300, 'sao-vai': 120, 'luong-dau': 110, 'the-so': 190 },
+  low: { tre: 60, 'cay-qua': 55, phen: 42, 'cau-ao': 70, doi: 120, 'sao-vai': 48, 'luong-dau': 40 },
+  medium: { tre: 100, 'cay-qua': 85, phen: 70, 'cau-ao': 120, doi: 240, 'sao-vai': 80, 'luong-dau': 75 },
+  high: { tre: 160, 'cay-qua': 140, phen: 115, 'cau-ao': 180, doi: 300, 'sao-vai': 120, 'luong-dau': 110 },
 };
 
 /** Tầm vẽ xa nhất (tính tới mặt mảnh) của đồ nhỏ do `MarketProps` vẽ trong làng lớn (hoa, chum, rơm, bể ngâm, đình...): Thấp 55, Vừa 90, Cao 130. */

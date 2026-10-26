@@ -116,7 +116,7 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
   // các phần theo thứ tự: 1 đồ nhỏ, 2 biển, 3 thẻ "Em có biết?", rồi từng loại đồ rải dựng bằng code (mỗi loại một phần: dựng hình học và các mảnh của cả loại trong một khung hình tốn chừng 15 đến 40 ms), rồi từng model, rồi người dẫn (chỉ khi model đã làm ấm xong), cuối cùng dân làng đi lại
   const scatterKinds = useMemo(() => SCATTER_KINDS.filter((k) => layout.scatter?.some((p) => p.kind === k)), [layout]);
   // đồ có chuyển động hay chữ riêng (máy soi dấu, bảng mẫu dấu của Làng Khắc Dấu) là một phần dựng riêng sau thẻ; làng không có thì không thêm phần nào (số phần các làng cũ không đổi)
-  const featureProps = useMemo(() => layout.props.filter((p) => p.kind === 'may-soi-dau' || p.kind === 'bang-mau' || p.kind === 'chuong-bo-cau'), [layout]);
+  const featureProps = useMemo(() => layout.props.filter((p) => p.kind === 'may-soi-dau' || p.kind === 'bang-mau' || p.kind === 'chuong-bo-cau' || p.kind === 'cay-the'), [layout]);
   const featureStage = featureProps.length > 0 ? 1 : 0;
   const firstModel = 4 + featureStage + scatterKinds.length;
   const guideStage = firstModel + byModel.length;

@@ -105,7 +105,7 @@ export interface Placement {
 }
 
 /** Đồ vật nhỏ do code dựng (chum vại, đống rơm, khóm hoa). */
-export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc' | 'coi-gia' | 'bep-do' | 'dinh' | 'chum-cham' | 'chum-do' | 'dong-soi' | 'gia-vai' | 'sao-soi' | 'sap-vai' | 'chau-canh' | 'may-soi-dau' | 'bang-mau' | 'phien-da' | 'mai-che' | 'phoi-go' | 'hom-thu' | 'gia-thu' | 'chuong-bo-cau' | 'chuong-ga' | 'ga' | 'ban-khac' | 'ban-khac2' | 'ban-khac3' | 'gia-dau' | 'da-xe' | 'da-vun' | 'khung-cua-da' | 'ban-thu' | 'de-may' | 'day-xu' | 'thoi-bac' | 'can-bac' | 'ruong-go' | 'kien-hang' | 'ke-so' | 'thuyen' | 'la-sen' | 'hoa-sen' | 'ben-go';
+export type PropKind = 'chum' | 'rom' | 'hoa' | 'da' | 'giay' | 'vai' | 'khoi-da' | 'ban-da' | 'hom' | 'thung' | 'chan' | 'ban-chep' | 'so-chung' | 'be-ngam' | 'nuoc' | 'coi-gia' | 'bep-do' | 'dinh' | 'chum-cham' | 'chum-do' | 'dong-soi' | 'gia-vai' | 'sao-soi' | 'sap-vai' | 'chau-canh' | 'may-soi-dau' | 'bang-mau' | 'phien-da' | 'mai-che' | 'phoi-go' | 'hom-thu' | 'gia-thu' | 'chuong-bo-cau' | 'chuong-ga' | 'ga' | 'ban-khac' | 'ban-khac2' | 'ban-khac3' | 'gia-dau' | 'da-xe' | 'da-vun' | 'khung-cua-da' | 'ban-thu' | 'de-may' | 'day-xu' | 'thoi-bac' | 'can-bac' | 'ruong-go' | 'kien-hang' | 'ke-so' | 'thuyen' | 'la-sen' | 'hoa-sen' | 'ben-go' | 'cuon-xu' | 'ban-viet' | 'hien-nha' | 'cay-the';
 export interface PropPlacement {
   kind: PropKind;
   x: number;
@@ -244,7 +244,7 @@ export const PROP_SIZES: Readonly<Record<PropKind, PropSize>> = {
   // Làng Bạc (mốc 3, bước L5): dây xu đồng treo trên giá, bàn thỏi bạc, cân đĩa trên bàn, rương gỗ, kiện hàng, giá sổ cái, thuyền mui lá (nằm trên nước, đi qua được vì nước đã là vật cản), lá sen và hoa sen nổi trên ao (đi qua được), bến gỗ (sàn đặc có dốc: xem three/village/deck.ts)
   'day-xu': { r: Math.hypot(0.5, 0.35), h: 1.6, box: { hx: 0.5, hz: 0.35 } },
   'thoi-bac': { r: Math.hypot(0.75, 0.45), h: 1.12, box: { hx: 0.75, hz: 0.45 } },
-  'can-bac': { r: Math.hypot(0.55, 0.4), h: 1.55, box: { hx: 0.55, hz: 0.4 } },
+  'can-bac': { r: Math.hypot(0.95, 0.5), h: 1.75, box: { hx: 0.95, hz: 0.5 } },
   'ruong-go': { r: Math.hypot(0.6, 0.38), h: 0.78, box: { hx: 0.6, hz: 0.38 } },
   'kien-hang': { r: Math.hypot(0.85, 0.6), h: 1.0, box: { hx: 0.85, hz: 0.6 } },
   'ke-so': { r: Math.hypot(0.9, 0.26), h: 2.0, box: { hx: 0.9, hz: 0.26 } },
@@ -252,6 +252,11 @@ export const PROP_SIZES: Readonly<Record<PropKind, PropSize>> = {
   'la-sen': { r: Math.hypot(0.95, 0.85), h: 0.05, box: { hx: 0.95, hz: 0.85 }, collide: false, lift: 0.03 },
   'hoa-sen': { r: 0.78, h: 0.62, box: { hx: 0.55, hz: 0.55 }, collide: false, lift: 0.03 },
   'ben-go': { r: Math.hypot(1.7, 4.5), h: 1.45, box: { hx: 1.7, hz: 4.5 }, collide: false },
+  // làm đẹp L6: bàn bày cuộn xu, bàn chép sổ có nghiên bút, hiên nhà giữ sổ (đi dưới mái được) và 'cay-the' (15 thẻ số của cây đa: chỉ là chỗ đặt, `VillageFeatures` vẽ; không có hình trong đồ nhỏ nhân bản)
+  'cuon-xu': { r: Math.hypot(0.8, 0.5), h: 1.0, box: { hx: 0.8, hz: 0.5 } },
+  'ban-viet': { r: Math.hypot(1.1, 0.55), h: 1.0, box: { hx: 1.1, hz: 0.55 } },
+  'hien-nha': { r: Math.hypot(4.3, 2.5), h: 3.4, box: { hx: 4.3, hz: 2.5 }, collide: false },
+  'cay-the': { r: 7, h: 7, collide: false },
 };
 
 /** Vật cản của đồ nhỏ do code dựng: hình tròn hoặc hộp xoay sát hình; vật thấp (khóm hoa) và chi tiết dưới vật khác (chân giá) thì không có. */

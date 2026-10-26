@@ -15,7 +15,7 @@ describe('hình học đồ rải của làng lớn', () => {
   it('mỗi loại là một hình học gộp, nhẹ (dưới 200 tam giác), chân ở y = 0, có pháp tuyến; loại màu theo đỉnh có thuộc tính màu', () => {
     for (const k of SCATTER_KINDS) {
       const g = createScatterGeometry(k);
-      expect(triangles(g), k).toBeLessThan(k === 'the-so' ? 3500 : 200); // thẻ số: một món duy nhất cho cả cây đa (mười lăm thẻ, chữ số bằng đoạn thẳng)
+      expect(triangles(g), k).toBeLessThan(200);
       expect(triangles(g), k).toBeGreaterThan(30);
       expect(g.getAttribute('normal'), k).toBeDefined();
       expect(!!g.getAttribute('color'), k).toBe(SCATTER_VERTEX_COLORS[k]);

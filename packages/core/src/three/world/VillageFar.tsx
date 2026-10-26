@@ -8,6 +8,15 @@ import type { WorldVillage } from './worldLayout';
 
 /** Xa nhất còn vẽ hình dáng làng từ xa ở mức Thấp (các mức khác vẽ hết trong khung nhìn). Tâm làng cách chợ 89,5: từ chợ thấy cả 4 làng, từ trong một làng thì không thấy làng đối diện. */
 export const FAR_VIEW_LOW = 130;
+/**
+ * Xa nhất còn vẽ nhà, lều và bụi tre ở xa (hình dáng các làng và chợ) ở mức Vừa (bước L6): sương ở mức Vừa gần kín ở 260 (kín hẳn từ 300) nên xa hơn thế hầu như không thấy; đứng sâu trong Làng Bạc nhìn về phía chợ thì cả chợ và hình dáng ba làng kia
+ * lọt khung nhìn (mỗi bản xa 8.000 tam giác): đo trước khi giới hạn là 1.046.415 tam giác ở (0; 52) nhìn bắc, vượt 1.000.000. Mức Cao không giới hạn (dưới 1.500.000).
+ */
+export const FAR_VIEW_MEDIUM = 260;
+/** Tầm vẽ xa nhất của các model ở xa (hình dáng làng, chợ) theo mức chất lượng; undefined là vẽ hết trong khung nhìn. */
+export function farViewDistance(level: QualityLevel): number | undefined {
+  return level === 'low' ? FAR_VIEW_LOW : level === 'medium' ? FAR_VIEW_MEDIUM : undefined;
+}
 
 /** Tối đa bấy nhiêu nhà và bụi tre của MỖI làng được vẽ từ xa (bản xa 8.000 tam giác mỗi cái): Làng Giấy có 12 nhà nhưng từ xa chỉ cần thấy vài nhà; mức Thấp bớt thêm. */
 export const FAR_HOUSES: Readonly<Record<QualityLevel, number>> = { low: 4, medium: 6, high: 6 };
@@ -52,7 +61,7 @@ export function VillageFar({ villages, level, loaded }: { villages: readonly Wor
     <>
       {groups.map((g) => (
         <Suspense key={g.id} fallback={null}>
-          <ModelInstances id={g.id} items={g.items} level={level} farOnly maxDistance={level === 'low' ? FAR_VIEW_LOW : undefined} skip={g.skip} />
+          <ModelInstances id={g.id} items={g.items} level={level} farOnly maxDistance={farViewDistance(level)} skip={g.skip} />
         </Suspense>
       ))}
     </>

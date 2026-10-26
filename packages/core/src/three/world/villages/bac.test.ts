@@ -4,8 +4,7 @@ import { footprintRadiusOf } from '../../cho/footprints';
 import { PROP_SIZES, collidersFor } from '../../cho/marketLayout';
 import { resolveCollisions, type Point2 } from '../../collision';
 import { DECK, deckHeight, decksOf } from '../../village/deck';
-import { SEGMENTS_OF, banyanTags, banyanTree } from '../../village/banyanTags';
-import { createNumberTags } from '../../village/scatterGeometry';
+import { TAG_ATLAS, banyanTags, banyanTree, tagCell, tagPlane, tagSwing, tagTextScale } from '../../village/banyanTags';
 import { assembleWorld, worldGroundHeight } from '../worldLayout';
 import { BAC_GATE_Z, BAC_HOUSE_COUNT, BAC_RADIUS, BAC_STREAM, BAC_WALL_RADIUS, BANYAN, LANG_BAC_LAYOUT as L } from './bac';
 import { layoutSpots, pathLength, probeOf, reachGrid } from './villageChecks';
@@ -18,7 +17,7 @@ const count = (m: string) => L.placements.filter((p) => p.model === m).length;
 const MERCHANT = L.companions![0];
 
 /** Món chiếm chỗ: bỏ đồ nằm trên nước hay dưới đồ khác (mặt nước, thuyền, lá sen, bến gỗ, mái che, cuốn sổ, chân giá). */
-const SKIP = ['chan', 'nuoc', 'so-chung', 'hoa', 'mai-che', 'de-may', 'thuyen', 'la-sen', 'hoa-sen', 'ben-go'];
+const SKIP = ['chan', 'nuoc', 'so-chung', 'hoa', 'mai-che', 'hien-nha', 'cay-the', 'de-may', 'thuyen', 'la-sen', 'hoa-sen', 'ben-go'];
 const spots = () =>
   layoutSpots(
     L,
@@ -83,8 +82,8 @@ describe('Làng Bạc (mốc 3, bước L5): quy mô và bố cục', () => {
     expect(props('thoi-bac').filter(near).length).toBeGreaterThanOrEqual(1);
     expect(props('can-bac').filter(near).length).toBeGreaterThanOrEqual(1);
     expect(props('ruong-go').filter(near).length).toBeGreaterThanOrEqual(2);
-    expect(props('ban-chep').filter(near).length).toBeGreaterThanOrEqual(1);
-    expect(props('so-chung').filter(near).length).toBeGreaterThanOrEqual(1);
+    expect(props('ban-viet').filter(near).length).toBeGreaterThanOrEqual(1);
+    expect(props('cuon-xu').filter(near).length).toBeGreaterThanOrEqual(1);
     expect(props('kien-hang').filter(near).length).toBeGreaterThanOrEqual(2);
     const yard = L.yards.find((y) => y.kind === undefined && Math.hypot(y.x - 63, y.z + 43) < 3)!;
     expect(yard.r).toBeGreaterThanOrEqual(20); // sân đất nện rộng trùm cả dãy lều
@@ -94,9 +93,10 @@ describe('Làng Bạc (mốc 3, bước L5): quy mô và bố cục', () => {
     const house = L.placements.find((p) => p.model === 'env/nha-mai-ngoi' && p.scale > 1.3)!;
     expect(house.x).toBeLessThan(-55);
     const near = (p: { x: number; z: number }) => Math.hypot(p.x - house.x, p.z - house.z) < 16;
-    expect(props('mai-che').filter(near)).toHaveLength(1);
-    expect(props('ban-chep').filter(near).length).toBeGreaterThanOrEqual(2);
-    expect(props('so-chung').filter(near).length).toBeGreaterThanOrEqual(2);
+    expect(props('hien-nha').filter(near)).toHaveLength(1); // hiên dựng bằng code (bước L6)
+    expect(props('ban-viet').filter(near).length).toBeGreaterThanOrEqual(2); // bàn chép sổ có nghiên mực và bút lông
+    expect(props('mai-che')).toHaveLength(0);
+    expect(props('so-chung')).toHaveLength(0);
     expect(props('ke-so').filter(near).length).toBeGreaterThanOrEqual(2);
     expect(props('ruong-go').filter(near).length).toBeGreaterThanOrEqual(2);
   });
@@ -123,7 +123,7 @@ describe('Làng Bạc (mốc 3, bước L5): quy mô và bố cục', () => {
 
   it('mọi món nằm trong lũy tre (kể cả cỡ chân), cổng ở đầu đường', () => {
     for (const s of spots()) expect(Math.hypot(s.x, s.z) + s.r, `${s.name} (${s.x.toFixed(1)}, ${s.z.toFixed(1)})`).toBeLessThanOrEqual(BAC_WALL_RADIUS - 0.8);
-    for (const p of props('mai-che')) expect(Math.hypot(p.x, p.z) + PROP_SIZES['mai-che'].r).toBeLessThanOrEqual(BAC_WALL_RADIUS - 0.8);
+    for (const p of props('hien-nha')) expect(Math.hypot(p.x, p.z) + PROP_SIZES['hien-nha'].r).toBeLessThanOrEqual(BAC_WALL_RADIUS - 0.8);
     for (const f of L.fields!) expect(Math.hypot(Math.abs(f.x) + f.hx, Math.abs(f.z) + f.hz)).toBeLessThan(BAC_WALL_RADIUS - 2);
     for (const p of L.ponds!) expect(Math.hypot(p.x, p.z) + p.r + 1.3).toBeLessThan(BAC_WALL_RADIUS - 1);
     for (const p of BAC_STREAM.samples) expect(Math.hypot(p.x, p.z) + p.w / 2 + 1.6).toBeLessThan(BAC_WALL_RADIUS - 1);
@@ -141,7 +141,6 @@ describe('Làng Bạc: thẻ gỗ ghi số trên cây đa (cây ví dụ của B
     for (const t of tags) {
       expect(t.value, `tầng ${t.level} số ${t.index}`).toBe(tree[t.level][t.index]);
       expect(t.digits).toBe(String(t.value));
-      for (const ch of t.digits) expect(SEGMENTS_OF[ch], ch).toBeTruthy();
     }
     expect(tree.map((r) => r.join(' '))).toEqual(['3 7 5 2 6 1 4 8', '37 52 61 48', '422 658', '4878']); // combine(a, b) = a × 10 + b
   });
@@ -162,31 +161,50 @@ describe('Làng Bạc: thẻ gỗ ghi số trên cây đa (cây ví dụ của B
     }
   });
 
-  it('một món rải duy nhất đặt ở thân cây, quay mặt về cổng; hình học có aSway, aSlot = −1 (dùng vật liệu của sào vải) và vừa phải', () => {
-    const t = scatterOf('the-so');
+  it('một chỗ đặt duy nhất (cay-the) ở thân cây, quay mặt về cổng; không còn đồ rải thẻ số', () => {
+    const t = props('cay-the');
     expect(t).toHaveLength(1);
     expect([t[0].x, t[0].z]).toEqual([BANYAN.x, BANYAN.z]);
     expect(Math.cos(t[0].yaw)).toBeCloseTo(-1, 6);
-    expect(t[0].collide).toBe(false);
-    const g = createNumberTags();
-    const slot = g.getAttribute('aSlot');
-    const sway = g.getAttribute('aSway');
-    expect(slot.count).toBe(g.getAttribute('position').count);
-    for (let i = 0; i < slot.count; i++) expect(slot.getX(i)).toBe(-1);
-    let max = 0;
-    let min = 1;
-    for (let i = 0; i < sway.count; i++) {
-      max = Math.max(max, sway.getX(i));
-      min = Math.min(min, sway.getX(i));
+    expect(scatterOf('the-so')).toHaveLength(0);
+    expect(PROP_SIZES['cay-the'].collide).toBe(false);
+  });
+
+  it('ảnh chữ chung: mỗi thẻ một ô riêng trong lưới 4 × 4 (không trùng, uv nằm trong ảnh); chữ co vừa mặt phẳng chữ và cao tối đa bằng chiều cao chữ mong muốn', () => {
+    const seen = new Set<string>();
+    for (const t of tags) {
+      const c = tagCell(t.id);
+      expect(c.px).toBeLessThan(TAG_ATLAS.cell * TAG_ATLAS.cols);
+      expect(c.u0).toBeGreaterThanOrEqual(0);
+      expect(c.u1).toBeLessThanOrEqual(1);
+      expect(c.v0).toBeGreaterThanOrEqual(0);
+      expect(c.v1).toBeLessThanOrEqual(1);
+      expect(c.u1 - c.u0).toBeCloseTo(1 / TAG_ATLAS.cols, 9);
+      seen.add(`${c.px},${c.py}`);
+      const plane = tagPlane(t);
+      expect(plane.w).toBeLessThan(t.w);
+      expect(plane.h).toBeLessThan(t.h);
+      // chữ rộng 0,62 cỡ phông mỗi chữ số: bề rộng chuỗi ở cỡ phông 100 xấp xỉ 62 × số chữ số
+      const k = tagTextScale(t, 100, 62 * t.digits.length);
+      expect(k * 62 * t.digits.length, `thẻ ${t.digits} lọt mặt phẳng chữ`).toBeLessThanOrEqual(plane.w + 1e-9);
+      expect(k * 100 * 0.72, `thẻ ${t.digits} không cao quá mong muốn`).toBeLessThanOrEqual(t.digitH + 1e-9);
     }
-    expect(min).toBeGreaterThanOrEqual(0);
-    expect(max).toBeLessThanOrEqual(0.5); // lay nhẹ (z lệch tối đa vài chục phân)
-    expect(max).toBeGreaterThan(0.2);
-    expect(g.getAttribute('color')).toBeDefined();
-    expect(g.getAttribute('position').count / 3).toBeLessThan(4000);
-    g.computeBoundingBox();
-    expect(g.boundingBox!.max.y).toBeGreaterThan(6);
-    expect(g.boundingBox!.min.y).toBeGreaterThan(2);
+    expect(seen.size).toBe(15);
+  });
+
+  it('thẻ gốc chữ cao nhất; ở khoảng 6 đến 8 đơn vị chữ lá cao ≥ 0,3 và chữ gốc ≥ 0,5; thẻ to lay ít hơn thẻ nhỏ', () => {
+    const root = tags.find((t) => t.level === 3)!;
+    const leaf = tags.find((t) => t.level === 0)!;
+    for (const t of tags) expect(root.digitH).toBeGreaterThanOrEqual(t.digitH);
+    expect(leaf.digitH).toBeGreaterThanOrEqual(0.3);
+    expect(root.digitH).toBeGreaterThanOrEqual(0.5);
+    expect(tagSwing(root).amp).toBeLessThan(tagSwing(leaf).amp);
+    for (const t of tags) {
+      const s = tagSwing(t);
+      expect(s.amp).toBeGreaterThan(0);
+      expect(s.amp).toBeLessThan(0.08); // lay nhẹ (tối đa khoảng 4,5 độ)
+      expect(s.speed).toBeGreaterThan(1);
+    }
   });
 });
 
@@ -433,7 +451,7 @@ describe('Làng Bạc ở thế giới mở: đổi sang tọa độ thế giớ
   });
 
   it('mọi món nhỏ mới có cỡ trong PROP_SIZES; chân nhà ngói có footprint', () => {
-    for (const k of ['day-xu', 'thoi-bac', 'can-bac', 'ruong-go', 'kien-hang', 'ke-so', 'thuyen', 'la-sen', 'hoa-sen', 'ben-go'] as const) expect(PROP_SIZES[k].h, k).toBeGreaterThan(0.04);
+    for (const k of ['day-xu', 'thoi-bac', 'can-bac', 'ruong-go', 'kien-hang', 'ke-so', 'thuyen', 'la-sen', 'hoa-sen', 'ben-go', 'cuon-xu', 'ban-viet', 'hien-nha'] as const) expect(PROP_SIZES[k].h, k).toBeGreaterThan(0.04);
     expect(footprintRadiusOf('env/nha-mai-ngoi')).toBeGreaterThan(1);
   });
 });

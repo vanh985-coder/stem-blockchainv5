@@ -24,7 +24,7 @@ import { GroundArrow } from './GroundArrow';
 import { ScatterProps } from '../village/ScatterProps';
 import { ScrollTargetPicker } from './ScrollTargetPicker';
 import { Signposts } from './Signposts';
-import { VillageFar } from './VillageFar';
+import { FAR_VIEW_MEDIUM, VillageFar } from './VillageFar';
 import { VillageZone } from './VillageZone';
 import { WorldTerrain } from './WorldTerrain';
 import { WorldTracker, type LoadedZones, type PrewarmZones } from './WorldTracker';
@@ -182,11 +182,11 @@ export function WorldScene({
     >
       {overview && <OverviewCamera kind={overview} />}
       <WorldTerrain world={world} dirtUrl={dirtUrl} brickUrl={brickUrl} animate={animate} />
-      {byModel.map(({ id, items }) => (items.length > 0 ? <ModelInstances key={id} id={id} items={items} level={level} /> : null))}
+      {byModel.map(({ id, items }) => (items.length > 0 ? <ModelInstances key={id} id={id} items={items} level={level} maxDistance={level === 'medium' ? FAR_VIEW_MEDIUM : undefined} /> : null))}
       {gateItems.map(({ id, village, items }) => {
         // cổng của làng chưa chuẩn bị xong chỉ vẽ bản xa: không tải bản chính và bản vừa (5 MB cho 3 cổng) cho tới khi người chơi tới gần
         const full = prewarmed.has(village) || loaded[village]; // chỉ khi đã chuẩn bị xong (hình học bản chính và bản vừa đã nướng sẵn): dựng lúc đó mới không khựng
-        return <ModelInstances key={`${id}|${full ? 'f' : 'n'}`} id={id} items={items} level={level} farOnly={!full} />;
+        return <ModelInstances key={`${id}|${full ? 'f' : 'n'}`} id={id} items={items} level={level} farOnly={!full} maxDistance={level === 'medium' ? FAR_VIEW_MEDIUM : undefined} />;
       })}
       <MarketProps layout={market} />
       <VillageFar villages={world.villages} level={level} loaded={loaded} />
