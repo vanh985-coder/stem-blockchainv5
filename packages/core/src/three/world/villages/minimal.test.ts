@@ -129,6 +129,28 @@ describe('nhiệm vụ ở Làng Khắc Dấu và Làng Dệt khi cả hai game 
     expect(targetNodeId({ inVillage: null, nextBoard: null, pages: unlock.goldenPages })).toBe(gateNodeId('bac'));
   });
 
+  it('làng tối giản Bạc (bước B13): màn 10, 11, 12 đều ra mắt; xong bài học thì biển màn 11 mở được (biển 12 còn khóa), xong màn 11 thì biển 12 mở; Trang Sổ Vàng 4 chỉ có sau màn 12', () => {
+    const lesson = questIn('lang-bac', [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    expect(lesson.stateOf(10)).toBe('open');
+    expect(lesson.stateOf(11)).toBe('locked');
+    expect(lesson.next).toBe(10);
+    expect(lesson.unlock.goldenPages).toBe(3);
+    const afterLesson = questIn('lang-bac', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    expect(afterLesson.stateOf(11)).toBe('open'); // biển màn 11 mở được, vào chơi được (không còn "sắp ra mắt")
+    expect(afterLesson.stateOf(12)).toBe('locked');
+    expect(afterLesson.next).toBe(11);
+    expect(afterLesson.unlock.goldenPages).toBe(3);
+    expect(targetNodeId({ inVillage: 'lang-bac', nextBoard: afterLesson.next, pages: afterLesson.unlock.goldenPages })).toBe(boardNodeId(11));
+    const afterMatch = questIn('lang-bac', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    expect(afterMatch.stateOf(11)).toBe('done');
+    expect(afterMatch.stateOf(12)).toBe('open');
+    expect(afterMatch.next).toBe(12);
+    expect(afterMatch.unlock.goldenPages).toBe(3); // Trang Sổ Vàng 4 chỉ trao sau màn 12 và cao trào
+    const all = questIn('lang-bac', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(all.next).toBeNull();
+    expect(all.unlock.goldenPages).toBe(4);
+  });
+
   it('biển sắp ra mắt không vào được (không phải open/done) nhưng không chặn màn sau; biển màn 5 và 6 của làng Dệt mở được khi tới lượt', () => {
     // Làng Dệt (bước B9): màn 5 và 6 đều đã ra mắt; xong màn 4 thì việc tiếp theo là biển màn 5, xong màn 5 thì biển màn 6 mở, chơi màn 6 (màn cuối của làng) là có trang 2 và cổng Khắc Dấu mở, màn 7 mở
     const lesson = questIn('lang-det', [1, 2, 3, 4]);

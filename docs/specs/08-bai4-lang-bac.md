@@ -56,7 +56,7 @@ Thay cho nút "Sửa giao dịch & xem gốc đổi" ở bản cũ. Công thức
 
 ### Sau màn 10 (đã thay ở mốc 3, bước B5)
 
-Cảnh trao trang tạm của mốc 1 (`LessonPage2D`: "Thầy Linh trao Trang Sổ Vàng thứ tư…", nút "Về bản đồ") đã bỏ (`bai4Lesson.award` không còn). Xong màn 10 chỉ mở màn 12 (màn 11 còn `coming-soon`; nút "Chơi tiếp" của bài trỏ tới game đã ra mắt kế tiếp, tức màn 12). Trang Sổ Vàng thứ tư chỉ trao sau cảnh cao trào của màn 12 (mục "Cảnh cao trào"); xong màn 10 mà chưa chơi màn 12 thì mới có 3 trang.
+Cảnh trao trang tạm của mốc 1 (`LessonPage2D`: "Thầy Linh trao Trang Sổ Vàng thứ tư…", nút "Về bản đồ") đã bỏ (`bai4Lesson.award` không còn). Xong màn 10 mở màn 11 (từ bước B13 màn 11 đã ra mắt; trước đó còn `coming-soon` nên mở thẳng màn 12); nút "Chơi tiếp" của bài trỏ tới game đã ra mắt kế tiếp, tức màn 11. Xong màn 11 thì mở màn 12. Trang Sổ Vàng thứ tư vẫn chỉ trao sau cảnh cao trào của màn 12 (mục "Cảnh cao trào"); xong màn 10 và 11 mà chưa chơi màn 12 thì mới có 3 trang.
 
 ## Màn 11 — Game phụ 1: "Ghép lá cây sổ" (kiểu Candy Crush)
 
@@ -135,7 +135,7 @@ Ký hiệu: A–G là các loại lá, X là lá giả. Bàn ghi theo hàng, ng�
 
 ### Logic đã làm và các chỗ đã chốt (mốc 3, bước B12; code ở `packages/village-lang-bac/src/match3/`)
 
-Logic thuần, chưa có cảnh (màn 11 vẫn `coming-soon`): `match3Config.ts` (số liệu, phương án độ khó), `match3Logic.ts`, `match3Logic.test.ts` (36 ca), `match3Bots.ts`, `match3Balance.test.ts` (7 ca), `index.ts`. Ngẫu nhiên chỉ qua `createMulberry32`: bàn đầu vòng và ô cây rút từ rng RIÊNG của vòng (theo seed và số vòng, không phụ thuộc cách chơi); lá mới, lá giả ném và xáo bàn rút từ rng của ván. Cùng seed và cùng chuỗi nước đi thì cùng ván.
+Logic thuần (cảnh làm ở bước B13, mục "Cảnh màn 11" ngay dưới): `match3Config.ts` (số liệu, phương án độ khó), `match3Logic.ts`, `match3Logic.test.ts` (36 ca), `match3Bots.ts`, `match3Balance.test.ts` (7 ca), `index.ts`. Ngẫu nhiên chỉ qua `createMulberry32`: bàn đầu vòng và ô cây rút từ rng RIÊNG của vòng (theo seed và số vòng, không phụ thuộc cách chơi); lá mới, lá giả ném và xáo bàn rút từ rng của ván. Cùng seed và cùng chuỗi nước đi thì cùng ván.
 
 **Chốt các chỗ spec chưa rõ:**
 - **Một hàng** là một nhóm liền nhau từ 3 lá cùng loại thẳng hàng (ngang hoặc dọc) trở lên; hai đường cùng loại giao nhau (hình L, T, +) là MỘT nhóm, độ dài tính theo đường dài nhất. Mỗi hàng loại X lấp TỐI ĐA 1 ô cây loại X còn trống, dù hàng dài 3, 4 hay 5 (ô trống nhỏ nhất cần đúng loại X, tự chọn). Nổ dây chuyền: mỗi đợt xét mọi hàng cùng lúc, rồi xóa, rồi lá rơi (lá giả cũng rơi theo trọng lực, tự chọn), rồi thêm lá từ trên, lặp lại tới khi hết hàng. Hai hàng loại A trong cùng một đợt lấp 2 ô A nếu còn.
@@ -233,6 +233,70 @@ Logic thuần, chưa có cảnh (màn 11 vẫn `coming-soon`): `match3Config.ts`
 **Mốc theo nghĩa**: điều kiện ≥ 85% ván xong k cây đạt mốc k và ≤ 15% ván xong ít hơn k cây đạt mốc k (bội số 50, gộp 900 ván). Với điểm mới các bậc tách nhau: thỏa Đồng 1050 đến 1250, Bạc 1450 đến 1600, Vàng 1800 đến 1900. Chọn giữa khoảng thỏa (tự chọn): **Đồng 1150, Bạc 1550, Vàng 1850**. Tỉ lệ thật: Đồng 1150: 44 / 44 ván xong 1 cây đạt (100%), 0 / 2 ván xong 0 cây đạt (0%); Bạc 1550: 223 / 232 ván xong 2 cây đạt (96,1%), 0 / 46 ván xong ≤ 1 cây đạt (0%); Vàng 1850: 615 / 622 ván xong 3 cây đạt (98,9%), 2 / 278 ván xong ≤ 2 cây đạt (0,7%).
 
 **Mức chấp nhận thật (lượt B13)**: match-3 bấm bừa vẫn ăn may nhờ nổ dây chuyền; mốc đặt theo nghĩa số cây xong, không theo tỉ lệ bot. Test chấp nhận: bot giỏi xong cả 3 cây ≥ 80% (81,7%), bot ngẫu nhiên ≤ 55% (51,3%), và ba tỉ lệ nghĩa của mốc (≥ 85% ván xong k cây đạt mốc k, ≤ 15% ván xong ít hơn k cây đạt mốc k). Bot trung bình Vàng 73,7% và bot ngẫu nhiên Vàng 50,3%: màn 11 thuộc ngoại lệ "mốc theo nghĩa" của CLAUDE.md mục 7 (màn 9, 11, 12), không áp quy tắc "bot trung bình hầu như không Vàng".
+
+### Cảnh màn 11 (mốc 3, bước B13; code ở `packages/village-lang-bac/src/match3/`, trang `pages/Man11.tsx`)
+
+Màn 11 đã ra mắt (`status: 'ready'`, route `man/11`, bọc trong `MiniGameLevel` với `medals = MATCH3_SPEC.medals` = 1150 / 1550 / 1850). Logic giữ nguyên; cảnh chỉ nối thao tác vào `swapCells` rồi diễn hoạt theo DANH SÁCH SỰ KIỆN logic trả về, không tính lại luật.
+
+**Các tệp:** `man11Slots.ts` (chỗ 8 ô lá trên ảnh cây) + `DevMan11Slots.tsx` (trang `/dev/man-11-slots`, chỉ khi chạy dev, ở `pnpm dev:lang-bac`); `man11Layout.ts` (bố cục thuần) + test; `man11Anim.ts` (đổi sự kiện thành dòng thời gian) + test; `man11Engine.ts` (phát dòng thời gian, tạm dừng, cây đã hiện) + test; `man11Art.ts` (nạp hình, texture vẽ bằng canvas); `Man11Stage.tsx` (cảnh, chỉ vẽ bằng pool); `Match3Game.tsx` (vòng chơi, điều khiển, HUD, hết vòng); `match3Hint.ts` + test (câu nhắc).
+
+**Bố cục (`Scene25D`, nền `scenes/man-11-goc-da`, `allowPortrait`: chơi được cả hai khung, không nhắc xoay):**
+- Khung ngang 16 × 9: bàn 7 × 7 bên trái (cạnh ô 1,05 đơn vị: 42 điểm ảnh ở 640 × 360), cây bên phải (rộng 6,8; ảnh cây cắt theo phần có hình: u từ 0,225 đến 0,765, v từ 0,125 đến 0,9). HUD một hàng bốn ô ở mép trên: "Vòng", "Lượt còn", "Cây xong", "Điểm".
+- Khung dọc 9 × 16: cây ở trên (rộng 6,4), bàn ở dưới (cạnh ô 1,12: 44,8 điểm ảnh ở 360 × 640, đạt yêu cầu ô lá ≥ 40 điểm ảnh). HUD hai hàng hai ô (cao 64 điểm ảnh) vì khung hẹp.
+- Nút "?" của khung chơi (44 điểm ảnh cộng lề 8, góc trên bên phải) là vùng cấm. {phanDien} ló ra từ mép dưới khung, cạnh mép bàn (khung ngang: bên phải khay; khung dọc: góc dưới bên phải), rồi rụt lại.
+- Test bố cục (`man11Layout.test.ts`) ở 360 × 640, 640 × 360, 844 × 390, 1366 × 768: khay bàn, cây, HUD, nút "?" nằm trong khung và không chồng nhau; 8 ô lá trên cây không chồng nhau và không chồng khay, HUD, nút "?"; {phanDien} lúc ló ra (nửa thân trên) không che ô lá, HUD, nút "?".
+
+**Ô lá trên cây (`man11Slots.ts`):** tọa độ theo ẢNH cây (u, v), không phụ thuộc cỡ khung. Giá trị đầu tự đặt bằng cách xem ảnh: cây có 5 đầu mút mỗi bên, chọn 4 (bỏ cành nhỏ gần ngọn nhất, **tự chọn**) sao cho hai ô cạnh nhau cách ≥ 1 đơn vị. Chỉ số theo logic: ô (2k, 2k + 1) là anh em (gộp thành cành): (0, 1) hai đầu chạc dưới bên trái, (2, 3) đầu nhánh trên và cành nhỏ gần thân bên trái, (4, 5) và (6, 7) đối xứng bên phải. Vòng 1 (4 ô) dùng hai cặp thấp nhất, tức ô 0, 1, 6, 7 (**tự chọn**). Nút gộp (cành, gốc) nằm ở trung điểm hai nút con kéo về gốc 0,2 × mức (gốc đúng chỗ cành chia ra từ thân). Trang `/dev/man-11-slots` vẽ 8 ô và các nút gộp lên ảnh cây, chọn ô rồi bấm/kéo trên ảnh, khối mã xuất chép vào `TREE_SLOTS`. Ảnh 8 ô chồng lên cây: `docs/screenshots/b13/01-tam-o-chong-cay.jpg`.
+
+**Bàn và diễn hoạt (`man11Anim.ts`):** bàn hiển thị gồm 49 miếng (mỗi miếng hai mesh: lá `ui/tiles/la-*`, lá giả `la-gia`, ô gió xoáy `o-gio`; hoa sen `o-hoa` vẽ phủ lên lá mang loại nên `o-hoa` và `o-gio` được tách nền như `la-*` trong `scripts/assets-build.mjs`). `planEvents(view, events, reduced)` đổi các sự kiện của MỘT thao tác thành dòng thời gian (khóa chuyển động từng miếng, lá bay, vòng nổ, độ ló của {phanDien}, mốc âm thanh và cây) và trả bàn hiển thị ở trạng thái cuối; cảnh lấy mẫu theo đồng hồ mỗi khung hình (`sampleTrack`), không cấp phát trong `useFrame`:
+
+| Sự kiện của logic | Hoạt cảnh (bình thường) |
+|---|---|
+| `swap`, `swapBack` | hai ô đổi chỗ 160 ms; không tạo hàng thì đổi rồi trả về (160 ms nữa), không mất lượt, lời "Chưa tạo được hàng…" |
+| `wave` | nghỉ 60 ms giữa hai đợt nổ liền nhau |
+| `spawnLotus`, `spawnWind` | miếng đổi mặt thành hoa sen (phủ trên lá mang loại) hay gió xoáy, nảy phóng 1,32 lần |
+| `clear` | các lá nổ 260 ms (phóng rồi nhỏ dần) kèm vòng nổ; hoa sen quét hàng ngang, trễ 30 ms mỗi cột |
+| `fakeGone` | lá giả nhỏ dần cùng lúc với đợt nổ |
+| `slotFilled` | một lá bay từ ô nổ lên đúng ô cây (560 ms, đường cong, xoay); mốc `slot` khi tới nơi mới hiện ô đầy |
+| `branchMerged`, `treeDone` | cành nối mọc dần (170 ms mỗi mức), nút gộp hiện, gốc sáng lên (vầng vàng nhịp nhẹ) |
+| `fall` | lá rơi 120 + 70 ms mỗi hàng (tối đa 430 ms), nảy khi chạm |
+| `fill` | lá mới hiện dần và rơi từ trên đầu bàn |
+| `throwFake` | {phanDien} ló ra (420 ms), vung tay (`swing`), lá giả rời tay và bay (460 ms) vào đúng ô logic chọn, ô đổi thành lá giả khi lá tới nơi, {phanDien} cười (`cheer`, 700 ms) rồi rụt lại |
+| `shuffle` | các lá thu nhỏ rồi đổi mặt rồi lớn lại (340 ms) |
+| `roundEnd` | mốc cuối của hoạt cảnh: hiện hộp hết vòng |
+
+Test (`man11Anim.test.ts`, `man11Engine.test.ts`): 120 ván ngẫu nhiên × 80 nước (hợp lệ hay không), sau MỖI thao tác bàn hiển thị khớp bàn của logic (mặt, ô, độ lớn, độ trong), khóa theo thứ tự thời gian, đủ mốc, số lá bay bằng số sự kiện `slotFilled` và `throwFake`; "Giảm chuyển động" cho cùng bàn cuối và không dài hơn; lấy mẫu đầu và cuối khớp bàn trước và sau; tạm dừng thì đồng hồ, mốc và cây đứng yên.
+
+**Cây:** mỗi ô có hình mờ loại lá cần (độ trong 0,42; đầy thì rõ và nảy). Hàng nổ loại X lấp ô thì một lá bay từ bàn lên ô đó. Hai ô anh em đầy thì hiện cành nối (đoạn xanh) và nút gộp; đủ cành thì gốc sáng lên; hộp hết vòng hiện dòng "Các lá gộp thành cành, cành gộp lên gốc — giống cây gộp sổ của làng Bạc!" (`match3Ui.cayGop`), thưởng xong cây (+200) và lượt dư (+20 mỗi lượt), nút "Vòng tiếp theo" ("Xem kết quả" ở vòng cuối). Hết lượt mà chưa đủ cây thì hộp nói "Hết lượt rồi, cây chưa đủ lá. Mình sang vòng sau nhé." (vẫn sang vòng sau, game không chặn đường).
+
+**{phanDien}:** cứ 5 lượt (sau lượt thứ 5, 10, …; theo sự kiện `throwFake` của logic) model 3D `characters/ti` ló ra mép bàn, vung tay (`swing`), lá giả bay vào ô logic chọn, rồi `cheer`.
+
+**Điều khiển:** kéo một ô sang ô kề (kéo quá 0,4 cạnh ô theo hướng nào thì đổi với ô kề hướng đó); hoặc chạm ô này rồi chạm ô kề (chạm lại ô đang chọn thì bỏ chọn); bàn phím: mũi tên di chuyển con trỏ, Enter hoặc Space chọn ô rồi mũi tên để đổi chỗ, Esc bỏ chọn. Ô đang chọn có viền tím dày, con trỏ bàn phím có viền nét đứt. Trong lúc diễn hoạt, khi hộp hết vòng mở hay khi tạm dừng thì không nhận thao tác. Lá giả: bấm đổi thì báo "Lá giả không đổi chỗ được." (không mất lượt).
+
+**Hướng dẫn và câu nhắc (luật chung, spec 03 mục 3.8 và 6):** phần `man-11` của "Hướng dẫn chơi" (mục 11 của `content/huongDanGame.ts`): 4 trang (đổi ô; hàng nổ, hoa sen, gió xoáy; cây; lá giả), hình vẽ bằng code trong `GuideArt.tsx` (`doi-o-phim`, `doi-o-vuot`, `hang-no`, `cay-gop`, `la-gia-no`), có bản riêng cho điện thoại ở trang 1. Nút "?" (phím H) tạm dừng thật (đồng hồ hoạt cảnh đứng yên: đã kiểm trên trình duyệt) và hiện "Việc của em lúc này: …" từ `hintFor(state)` (chỉ trả khóa, `match3Hint.ts`, test 300 trạng thái ngẫu nhiên không chỉ ô, hàng, cột hay loại lá). Các câu nhắc, theo thứ tự ưu tiên:
+- hết vòng: "Vòng này xong rồi. Bấm nút để sang vòng kế tiếp."; hết ván: "Ván này đã kết thúc.";
+- còn ≤ 3 lượt: "Sắp hết lượt: ghép đúng loại lá cây còn thiếu.";
+- có ô gió xoáy: "Ô gió xoáy: đổi chỗ nó với một lá để xóa mọi lá cùng loại với lá đó.";
+- có hoa sen: "Hoa sen trên bàn: khi nó nổ sẽ xóa cả hàng ngang của nó.";
+- có lá giả: "Lá giả của {phanDien} biến mất khi có hàng nổ ngay sát bên.";
+- còn lại: "Đổi 2 ô kề nhau để có 3 lá cùng loại thẳng hàng. Nhìn cây: ô còn trống cần loại lá nào thì ưu tiên ghép loại đó."
+
+**Màn kết quả:** điểm, mốc, và các phần: lá nổ (+1 mỗi lá), ô cây đã lấp (+50 mỗi ô), cây xong (n/3, +200 mỗi cây), lượt dư của cây xong (+20 mỗi lượt), lá giả đã gỡ (không điểm). Nút "Chơi tiếp" sang màn 12 (`nextReadyLevel(11)`).
+
+**"Giảm chuyển động" và "Chữ to":** giảm chuyển động thì không nảy, không vòng nổ, lá bay thẳng (không cong, không xoay), lá nổ mờ dần nhanh, lá rơi bằng cách mờ ở chỗ cũ rồi hiện ở chỗ mới, mọi thời lượng ngắn hơn (`REDUCED` trong `man11Anim.ts`). Chữ HUD theo rem (≥ 14 điểm ảnh), nên "Chữ to" nhân lên cùng giao diện; lớp HTML phủ chỉ dùng viền và nền phẳng (không bóng đổ, không lọc).
+
+**Mở khóa:** màn 11 mở khi xong bài học 10; màn 12 mở khi xong màn 11; Trang Sổ Vàng 4 VẪN chỉ trao sau màn 12 và cao trào (không đổi chỗ trao trang; test `unlock.test.ts`, `minimal.test.ts`). Nút "Chơi tiếp" ở bài 10 trỏ màn 11.
+
+**Số đo (bước B13)** (bản build `VITE_PROBE`, Chrome d3d11, máy phát triển cắm điện, mỗi mức 1 lượt, chơi 10 đến 14 nước ở 1366 × 768):
+- **Kích thước** (`pnpm build`): tổng JS của `apps/lang-bac` 1.934.258 → 1.989.334 byte (+55.076 byte, +2,8%; 29 → 33 tệp). Chunk `Man11` 43,40 kB (gzip 15,93 kB); `Scene25D` tách thành chunk riêng 71,26 kB (gzip 19,42 kB) dùng chung với màn 12 (trước đó nằm trong `Man12` 93,24 kB, gzip 28,41 kB; sau: `Man12` 30,01 kB, gzip 12,13 kB); `index` 285,84 → 288,86 kB (gzip 90,12 → 91,05 kB).
+- **Khung hình** (rAF, 60 giây): trung bình 6,9 ms mỗi khung (màn hình thử chạy khoảng 144 Hz), p99 7,2 đến 7,3 ms, khung chậm nhất Thấp 27,6 ms, Vừa 8,2 ms, Cao 14,6 ms, không khung nào quá 50 ms; 63 đến 76 draw call, 126 đến 152 tam giác (hình phẳng) khi chưa có {phanDien}.
+- **Bộ nhớ GPU và heap** (giữa vòng 1 và giữa vòng 3, rồi dựng lại cảnh 6 lần bằng "Chơi lại"): Thấp: giữa vòng 1 hình học 4, texture 21, draw call 63; giữa vòng 3 hình học 4, texture 21, draw call 71; sáu lần dựng lại (lần 2 đến 7) hình học 4, texture 21, draw call 60; heap 17.7 đến 27.1 MB; Vừa: giữa vòng 1 hình học 3, texture 20, draw call 63; giữa vòng 3 hình học 3, texture 20, draw call 78; sáu lần dựng lại (lần 2 đến 7) hình học 3, texture 20, draw call 60; heap 20.5 đến 25.9 MB; Cao: giữa vòng 1 hình học 3, texture 20, draw call 60; giữa vòng 3 hình học 3, texture 20, draw call 71; sáu lần dựng lại (lần 2 đến 7) hình học 3, texture 20, draw call 60; heap 20.9 đến 36.4 MB. Số hình học và texture đứng yên qua 6 lần dựng lại (không rò rỉ).
+- Chơi thử trên trình duyệt ở 360 × 640, 844 × 390, 1366 × 768: chơi hết ba vòng với bot, có nổ dây chuyền, hoa sen, {phanDien} ném lá giả, "?" tạm dừng thật, kéo, chạm hai ô và bàn phím đều đổi được; không lỗi trong console. Ảnh ở `docs/screenshots/b13/`.
+
+**Việc tự chọn (B13):** thời lượng hoạt cảnh và các hệ số trong bảng trên; cỡ khung ảnh từng mặt (`FACE_QUAD`) để phần có hình đầy khoảng 85% ô; hai hàng hai ô cho HUD khung dọc; vòng 1 dùng ô 0, 1, 6, 7 của cây; bỏ một đầu mút mỗi bên của cây; hộp hết vòng đặt giữa khung dọc và ở phần cây của khung ngang; lá giả bấm đổi thì báo lời nói (không mất lượt); HUD điểm và lượt cập nhật khi hoạt cảnh xong (lượt trừ ngay lúc đổi); `ui/tiles/o-hoa` và `o-gio` tách nền (đã chạy lại `pnpm assets:build`, chỉ hai tệp này đổi).
+
+**Điểm chưa chắc:** chưa thử trên điện thoại thật (chỉ giả lập khung 360 × 640 và cảm ứng của Chrome); số đo khung hình ở máy phát triển, chưa phải điện thoại tầm trung; ảnh nền `man-11-goc-da` có dải trắng ở nửa dưới (có sẵn trong ảnh, khay bàn che phần lớn).
+
 
 ## Màn 12 — Game phụ 2: "Leo cây tìm lá giả" (kiểu leo dây của Talking Tom) và cao trào
 
@@ -353,10 +417,10 @@ Bot giỏi 100% Vàng (có assert). Bot trung bình chỉ in bảng tỉ lệ, K
 
 - [ ] Test Bài 4 (giai đoạn 1), `match3Logic` và `climbLogic` đều ✅.
 - [ ] Màn 10: bẫy thứ tự T21 chạy đúng; ánh đỏ chạy đúng đường từ thẻ bị tráo lên gốc.
-- [ ] Màn 11:
-  - đổi ô mượt, nổ dây chuyền đúng;
+- [x] Màn 11 (bước B13):
+  - đổi ô mượt, nổ dây chuyền đúng (diễn hoạt theo đúng danh sách sự kiện của logic, test 120 ván ngẫu nhiên: bàn hiển thị luôn khớp bàn của logic);
   - lá giả chỉ mất khi có hàng nổ sát bên;
-  - cây lấp ô đúng loại lá.
+  - cây lấp ô đúng loại lá (lá bay lên đúng ô, cây chỉ hiện khi lá tới nơi).
   - **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
 - [ ] Màn 12:
   - canh nhảy chọn nhánh được trên cả điện thoại lẫn máy tính;

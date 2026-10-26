@@ -18,7 +18,7 @@ export interface GameText {
 /**
  * Chữ từng game phụ, theo số màn (1 đến 12): tên game ở đây; luật và cách điều khiển lấy từ `content/huongDanGame.ts` (chủ dự án sửa chữ ở đó). Chỉ có các màn đã ra mắt.
  */
-const textOf = (levelId: 2 | 3 | 5 | 6 | 8 | 9 | 12, ten: string): GameText => ({ ten, luat: HUONG_DAN_GAME[levelId].luat, dieuKhien: HUONG_DAN_GAME[levelId].dieuKhien });
+const textOf = (levelId: 2 | 3 | 5 | 6 | 8 | 9 | 11 | 12, ten: string): GameText => ({ ten, luat: HUONG_DAN_GAME[levelId].luat, dieuKhien: HUONG_DAN_GAME[levelId].dieuKhien });
 export const GAMES: Readonly<Partial<Record<number, GameText>>> = {
   2: textOf(2, 'Đuổi theo {phanDien}'),
   3: textOf(3, 'Ghép lại cuốn sổ'),
@@ -26,6 +26,7 @@ export const GAMES: Readonly<Partial<Record<number, GameText>>> = {
   6: textOf(6, 'Diều đưa sổ'),
   8: textOf(8, 'Lật thẻ tìm cặp khóa'),
   9: textOf(9, 'Chữa đàn gà'),
+  11: textOf(11, 'Ghép lá cây sổ'),
   12: textOf(12, 'Leo cây tìm lá giả'),
 };
 
@@ -331,4 +332,48 @@ export const chickenUi = {
   phanSai: 'Phát bắn sai',
   phanNap: 'Đợt nạp đạn không sai',
   phanTrum: 'Chữa xong gà trùm (1 là đã chữa)',
+} as const;
+
+/**
+ * Chữ trong màn 11 "Ghép lá cây sổ" (spec 08 mục Màn 11). Mọi câu đi qua fmt() ({phanDien}, {so}…). Hình lá, hoa sen, gió xoáy là ảnh (không có chữ trong ảnh); tên dưới đây chỉ cho trình đọc màn hình.
+ */
+export const match3Ui = {
+  /** Nhãn đọc màn hình của khung chơi */
+  khung: 'Bàn ghép lá. Phím mũi tên di chuyển con trỏ, Enter hoặc Space để chọn một ô rồi mũi tên để đổi chỗ với ô kề; hoặc kéo, hoặc chạm hai ô kề nhau.',
+  /** Dải trên cùng */
+  vong: 'Vòng {so}/{max}',
+  luot: 'Lượt còn: {so}',
+  cay: 'Cây xong: {so}/{max}',
+  diem: 'Điểm: {so}',
+  /** Tên sáu loại lá (theo loại 0 đến 5), lá giả, hoa sen, gió xoáy: cho trình đọc màn hình */
+  tenLa: ['lá bàng', 'lá chuối', 'lá đa', 'lá sen', 'lá trầu', 'lá tre'] as const,
+  laGia: 'lá giả',
+  hoaSen: 'hoa sen',
+  gioXoay: 'gió xoáy',
+  /** Mô tả một ô: hàng {x}, cột {y}, tên {la} */
+  o: 'Hàng {x}, cột {y}: {la}',
+  oChon: 'Hàng {x}, cột {y}: {la}, đang chọn',
+  /** Ô cây: loại lá cần, đã lấp hay chưa */
+  oCayTrong: 'Ô cây {so}: cần {la}',
+  oCayDay: 'Ô cây {so}: đã có {la}',
+  /** Lời nói ngắn khi chơi */
+  laGiaKhongDoi: 'Lá giả không đổi chỗ được.',
+  khongTaoHang: 'Chưa tạo được hàng, hai ô trở về chỗ cũ.',
+  phanDienNem: '{phanDien} ném thêm một lá giả!',
+  xaoBan: 'Hết nước đi, lá được xáo lại.',
+  hoaSenMoi: 'Hoa sen! Khi nổ sẽ xóa cả hàng ngang.',
+  gioXoayMoi: 'Gió xoáy! Đổi chỗ với một lá để xóa mọi lá cùng loại.',
+  /** Hết vòng */
+  cayXong: 'Cây xong rồi!',
+  cayGop: 'Các lá gộp thành cành, cành gộp lên gốc — giống cây gộp sổ của làng Bạc!',
+  thuong: 'Thưởng xong cây: +{diem} điểm. Còn dư {luot} lượt: +{so} điểm.',
+  hetLuot: 'Hết lượt rồi, cây chưa đủ lá. Mình sang vòng sau nhé.',
+  vongTiep: 'Vòng tiếp theo',
+  xemKetQua: 'Xem kết quả',
+  /** Phần điểm ở màn kết quả: số lượng, điểm */
+  phanLa: 'Lá nổ (+{diem} mỗi lá)',
+  phanO: 'Ô cây đã lấp (+{diem} mỗi ô)',
+  phanCay: 'Cây xong ({so}/{max}, +{diem} mỗi cây)',
+  phanDu: 'Lượt dư của cây xong (+{diem} mỗi lượt)',
+  phanLaGia: 'Lá giả đã gỡ',
 } as const;

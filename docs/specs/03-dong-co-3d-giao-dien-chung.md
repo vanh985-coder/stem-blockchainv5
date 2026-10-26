@@ -511,7 +511,7 @@ Dùng ở mọi chỗ có lựa chọn: câu hỏi, Đồng ý/Từ chối, lự
 - **Tạm dừng:** tab bị ẩn lúc đang chơi thì `paused` = true và hộp "Tạm dừng" giữ cho tới khi em bấm "Tiếp tục" (khỏi chạy tiếp lúc em chưa nhìn).
 - **Nút "?" trong lúc chơi (bước HD, luật chung cho mọi game):** nút tròn ≥ 44 px ở góc trên bên phải (`data-testid="nut-goi-y"`; các HUD của game chừa chỗ), phím **H** mở/đóng. Bấm thì `paused` = true (game DỪNG THẬT: tráo thẻ màn 8, tay nắm và đồng hồ vòng màn 12, chạy màn 2, đồng hồ màn 3; không chỉ che màn hình) và hiện hộp nhỏ: dòng **"Việc của em lúc này: …"** lấy từ `hintFor(state)`, nút **"Xem hướng dẫn đầy đủ"** (mở phần hướng dẫn của game; Esc đóng hướng dẫn rồi về hộp) và **"Chơi tiếp"** (Esc cũng đóng). Game đăng ký hàm nhắc bằng `useGameHint(setHint, () => hintFor(state))`; khung chỉ gọi hàm lúc em bấm. Chữ ở `content/gameHints.ts` (`gameHints`).
 - **Câu nhắc KHÔNG được lộ đáp án:** không nói thẻ nào, đèn lồng/tay nắm nào, làn nào, ô nào hay số nào là đúng; chỉ nhắc luật và việc cần làm theo trạng thái (số trong câu chỉ là số của luật: 5^x mod 23, 20 giây). Mỗi game có test 200 trạng thái ngẫu nhiên (`*Hint.test.ts`). Mỗi game cũng có hàm tick/`update` nhận `paused` và test "tạm dừng thì state không đổi" (`tickMemory`, `tickClimb`, `RunnerSession.update`).
-- **Câu nhắc từng game:** màn 2 (`runnerHint.ts`; pha chạy, chạy chậm, câu hỏi, đã trả lời, chạy tiếp; còn một tim; đang có đồ hỗ trợ; những giây đầu), màn 3 (`rebuildHint.ts`; nhét trang, bắt đầu, ghép, có trang giả, vòng giữ sổ chưa chạy, ô trống, giữ sổ, xong vòng), màn 8 (`memoryHint.ts`; chưa lật, đang cầm Khuôn tập, đang cầm Mẫu công khai, lật sai chờ úp, xong vòng; vòng 3 thêm câu tráo thẻ), màn 12 (`climbHint.ts`; mới lên tầng thì so Sổ và Nay, sau 4 giây thì canh giờ, còn một tim, tầng lá, xong vòng).
+- **Câu nhắc từng game:** màn 2 (`runnerHint.ts`; pha chạy, chạy chậm, câu hỏi, đã trả lời, chạy tiếp; còn một tim; đang có đồ hỗ trợ; những giây đầu), màn 3 (`rebuildHint.ts`; nhét trang, bắt đầu, ghép, có trang giả, vòng giữ sổ chưa chạy, ô trống, giữ sổ, xong vòng), màn 8 (`memoryHint.ts`; chưa lật, đang cầm Khuôn tập, đang cầm Mẫu công khai, lật sai chờ úp, xong vòng; vòng 3 thêm câu tráo thẻ), màn 12 (`climbHint.ts`; mới lên tầng thì so Sổ và Nay, sau 4 giây thì canh giờ, còn một tim, tầng lá, xong vòng), màn 11 (`match3Hint.ts`; sắp hết lượt khi còn từ 3 lượt trở xuống, ô gió xoáy, hoa sen, lá giả, còn lại nhắc đổi 2 ô kề và nhìn cây; xong vòng, hết ván; không chỉ ô, hàng hay loại lá nào).
 - Trang thử (chỉ khi chạy dev): `/dev/minigame` (game giả có các nút kết thúc với điểm cho trước).
 
 **Luật chung:**
@@ -540,9 +540,10 @@ Dùng ở mọi chỗ có lựa chọn: câu hỏi, Đồng ý/Từ chối, lự
 | Màn 3 là `coming-soon`; đã chơi màn 2 | Nhận Trang Sổ Vàng 1; màn 4 mở |
 | Màn 2 và màn 3 đều `coming-soon`; xong màn 1 | Nhận Trang Sổ Vàng 1; màn 4 mở |
 | Đã có Trang Sổ Vàng 1, sau đó màn 3 đổi sang `ready` | Vẫn giữ trang; màn 3 mở để chơi |
-| Màn 11 là `coming-soon`, màn 12 là `ready`; xong màn 10 | Màn 12 mở |
-| Màn 11 là `coming-soon`, màn 12 là `ready` (từ bước B5); xong màn 10 nhưng chưa chơi màn 12 | Màn 12 mở; chưa có Trang Sổ Vàng 4 (chỉ 3) |
-| Đã xong màn 10 và đã chơi màn 12 (thắng hay hết tim đều tính là đã chơi) | `golden_pages` = 4, ghi cùng kết quả ván (đóng tab giữa cảnh cao trào vẫn giữ trang) |
+| Màn 11 là `coming-soon` (giả định, test), màn 12 là `ready`; xong màn 10 | Màn 12 mở |
+| Màn 11 và màn 12 đều `ready` (từ bước B13); xong màn 10 | Màn 11 mở, màn 12 còn khóa; chưa có Trang Sổ Vàng 4 (chỉ 3); nút "Chơi tiếp" của bài 10 trỏ màn 11 |
+| Đã xong màn 10 và màn 11, chưa chơi màn 12 | Màn 12 mở; chưa có Trang Sổ Vàng 4 (chỉ 3) |
+| Đã xong màn 10, màn 11 và đã chơi màn 12 (thắng hay hết tim đều tính là đã chơi) | `golden_pages` = 4, ghi cùng kết quả ván (đóng tab giữa cảnh cao trào vẫn giữ trang): ra mắt màn 11 không đổi chỗ trao trang |
 | Tài khoản đã có `golden_pages` = 4 từ trước (luật mốc 1: trao ngay sau màn 10) | Giữ nguyên, không thu lại; màn 12 mở; cảnh cao trào bỏ bước trao trang |
 
 ## 7. Mọi chữ hiển thị nằm trong một thư mục (`packages/core/src/content/`)

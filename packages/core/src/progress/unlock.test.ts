@@ -77,13 +77,13 @@ describe('unlock: 9 tình huống của spec 03 mục 6', () => {
 });
 
 describe('unlock: các trường hợp bổ sung', () => {
-  it('bảng status mặc định (mốc 3 bước B11): màn 1 đến 10 và 12 là ready (chỉ màn 11 coming-soon); màn 2 khóa cho tới khi xong màn 1', () => {
+  it('bảng status mặc định (mốc 3 bước B13): cả 12 màn là ready (không còn màn coming-soon); màn 2 khóa cho tới khi xong màn 1', () => {
     const r = computeUnlock({ doneLevels: [] });
     expect(r.levels.map((l) => l.state)).toEqual([
       'open', 'locked', 'locked',
       'locked', 'locked', 'locked',
       'locked', 'locked', 'locked',
-      'locked', 'coming-soon', 'locked',
+      'locked', 'locked', 'locked',
     ]);
     expect(computeUnlock({ doneLevels: [1] }).goldenPages).toBe(0); // xong bài học chưa đủ: còn màn 2 và 3
     expect(computeUnlock({ doneLevels: [1, 2] }).goldenPages).toBe(0); // chơi màn 2 xong còn màn 3
@@ -100,24 +100,29 @@ describe('unlock: các trường hợp bổ sung', () => {
     expect(computeUnlock({ doneLevels: [1, 2, 3, 4, 5, 6, 7, 8] }).goldenPages).toBe(2);
     expect(computeUnlock({ doneLevels: [1, 2, 3, 4, 5, 6, 7, 8] }).levels.find((l) => l.id === 9)!.state).toBe('open');
     expect(computeUnlock({ doneLevels: [1, 2, 3, 4, 5, 6, 7, 8, 9] }).goldenPages).toBe(3);
-    // Làng Bạc (bước B5): màn 11 còn coming-soon, màn 12 ready nên Trang Sổ Vàng 4 chỉ có khi đã chơi màn 12, không phải khi mới xong màn 10
-    const noClimb = computeUnlock({ doneLevels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] });
+    // Làng Bạc (bước B13): màn 11 và 12 đều ready nên xong màn 10 mở màn 11 (màn 12 còn khóa); Trang Sổ Vàng 4 chỉ có khi đã chơi màn 12 (màn cuối), như trước khi màn 11 ra mắt
+    const noGames = computeUnlock({ doneLevels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] });
+    expect(noGames.goldenPages).toBe(3);
+    expect(noGames.levels.find((l) => l.id === 11)!.state).toBe('open');
+    expect(noGames.levels.find((l) => l.id === 12)!.state).toBe('locked');
+    const noClimb = computeUnlock({ doneLevels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] });
     expect(noClimb.goldenPages).toBe(3);
     expect(noClimb.levels.find((l) => l.id === 12)!.state).toBe('open');
-    expect(noClimb.levels.find((l) => l.id === 11)!.state).toBe('coming-soon');
-    const all = computeUnlock({ doneLevels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12] });
+    const all = computeUnlock({ doneLevels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] });
     expect(all.goldenPages).toBe(4);
   });
 
-  it('Trang Sổ Vàng 4 (bước B5): chơi màn 12 là đủ (kể cả hết tim: game đã chơi là xong); xong màn 10 mà chưa chơi màn 12 thì chưa có; trang đã trao thì không thu lại', () => {
+  it('Trang Sổ Vàng 4 (bước B5, B13): chơi màn 12 (sau màn 11) là đủ (kể cả hết tim: game đã chơi là xong); xong màn 10 hay 11 mà chưa chơi màn 12 thì chưa có; trang đã trao thì không thu lại', () => {
     const base = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     expect(computeUnlock({ doneLevels: [...base, 10] }).goldenPages).toBe(3);
-    expect(computeUnlock({ doneLevels: [...base, 12] }).goldenPages).toBe(3); // chưa xong bài học (màn 10)
-    expect(computeUnlock({ doneLevels: [...base, 10, 12] }).goldenPages).toBe(4);
+    expect(computeUnlock({ doneLevels: [...base, 10, 11] }).goldenPages).toBe(3);
+    expect(computeUnlock({ doneLevels: [...base, 11, 12] }).goldenPages).toBe(3); // chưa xong bài học (màn 10)
+    expect(computeUnlock({ doneLevels: [...base, 10, 12] }).goldenPages).toBe(3); // chưa chơi màn 11
+    expect(computeUnlock({ doneLevels: [...base, 10, 11, 12] }).goldenPages).toBe(4);
     // tài khoản đã có trang 4 từ trước (luật mốc 1: trao ngay sau màn 10): giữ nguyên, màn 12 mở, không thu lại
     const old = computeUnlock({ doneLevels: [...base, 10], goldenPages: 4 });
     expect(old.goldenPages).toBe(4);
-    expect(old.levels.find((l) => l.id === 12)!.state).toBe('open');
+    expect(old.levels.find((l) => l.id === 11)!.state).toBe('open');
     expect(computeUnlock({ doneLevels: [...base], goldenPages: 4 }).goldenPages).toBe(4);
   });
 
@@ -204,7 +209,7 @@ describe('unlock: các trường hợp bổ sung', () => {
     expect(state(r, 7).state).toBe('locked');
   });
 
-  it('giáo viên: màn đã xong hiện done, màn sẵn sàng mở hết, màn coming-soon vẫn không vào được', () => {
+  it('giáo viên: màn đã xong hiện done, màn sẵn sàng mở hết (cả màn 11 và 12 của làng Bạc); màn coming-soon (nếu có) vẫn không vào được', () => {
     const r = computeUnlock({ doneLevels: [1], isTeacher: true });
     expect(state(r, 1).state).toBe('done');
     expect(state(r, 2).state).toBe('open');
@@ -212,7 +217,9 @@ describe('unlock: các trường hợp bổ sung', () => {
     expect(state(r, 5).state).toBe('open'); // game làng Dệt đã ra mắt (bước B7)
     expect(state(r, 6).state).toBe('open'); // game thứ hai của làng Dệt đã ra mắt (bước B9)
     expect(state(r, 9).state).toBe('open'); // game thứ hai của làng Khắc Dấu đã ra mắt (bước B11)
-    expect(state(r, 11).state).toBe('coming-soon'); // game còn lại của làng Bạc chưa làm: vẫn không vào được
+    expect(state(r, 11).state).toBe('open'); // game đầu của làng Bạc đã ra mắt (bước B13)
+    expect(state(r, 12).state).toBe('open');
+    expect(state(computeUnlock({ doneLevels: [1], isTeacher: true, statuses: statuses(11) }), 11).state).toBe('coming-soon'); // màn coming-soon (giả định) vẫn không vào được
     expect(state(r, 4).state).toBe('open');
     expect(state(r, 10).state).toBe('open');
   });

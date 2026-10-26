@@ -35,7 +35,7 @@ export const LEVELS: readonly LevelDef[] = [
   { id: 8, lang: 'lang-khac-dau', kind: 'game', ten: 'Lật thẻ tìm cặp khóa', bien: 'Lật thẻ tìm cặp khóa', status: 'ready' },
   { id: 9, lang: 'lang-khac-dau', kind: 'game', ten: 'Chữa đàn gà', bien: 'Chữa đàn gà', status: 'ready' },
   { id: 10, lang: 'lang-bac', kind: 'lesson', ten: 'Cây gộp sổ', bien: 'Học cùng thầy Linh', status: 'ready' },
-  { id: 11, lang: 'lang-bac', kind: 'game', ten: 'Ghép lá cây sổ', bien: 'Ghép lá cây sổ', status: 'coming-soon' },
+  { id: 11, lang: 'lang-bac', kind: 'game', ten: 'Ghép lá cây sổ', bien: 'Ghép lá cây sổ', status: 'ready' },
   { id: 12, lang: 'lang-bac', kind: 'game', ten: 'Leo cây tìm lá giả', bien: 'Leo cây tìm lá giả', status: 'ready' },
 ];
 
@@ -48,7 +48,7 @@ export function levelsOfVillage(lang: VillageId): LevelDef[] {
 }
 
 /**
- * Màn kế tiếp đã ra mắt trong cùng làng sau màn `levelId` (bỏ qua màn 'coming-soon': Làng Bạc, xong màn 10 thì tới màn 12 vì màn 11 chưa có); không còn thì undefined.
+ * Màn kế tiếp đã ra mắt trong cùng làng sau màn `levelId` (bỏ qua màn 'coming-soon'; hiện chưa còn màn nào như vậy); không còn thì undefined.
  * Dùng chung cho trang bài học ("Chơi tiếp: …") và màn kết quả của game (nút "Chơi tiếp").
  */
 export function nextReadyLevel(levelId: number): LevelDef | undefined {

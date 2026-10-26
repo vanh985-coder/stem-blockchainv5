@@ -421,6 +421,90 @@ function KiteSky() {
   );
 }
 
+/** Màu sáu loại lá của màn 11 (hình minh họa; hình thật là ui/tiles/la-*). */
+const LEAF_COLORS = ['#e0544b', '#8fcf4a', '#2f6b3a', '#47b58c', '#9b6bd1', '#b9dc78'] as const;
+
+/** Một ô lá của bàn màn 11 (hình minh họa): nền giấy bo tròn và một chiếc lá màu `color`; `ring` vẽ viền đậm quanh ô (ô đang chọn). */
+function LeafTile({ x, y, color, size = 34, ring }: { x: number; y: number; color: string; size?: number; ring?: string }) {
+  const k = size / 34;
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <rect x={0} y={0} width={size} height={size} rx={7 * k} fill="#fffaf0" stroke={ring ?? C.wood} strokeWidth={ring ? 4 : 2} opacity={0.96} />
+      <g transform={`translate(${size / 2} ${size / 2}) scale(${0.62 * k})`}>
+        <path d="M0 -18 C16 -12 16 12 0 20 C-16 12 -16 -12 0 -18 Z" fill={color} stroke="#2b2b2b" strokeWidth={2.2} />
+        <path d="M0 -14 V17" stroke="#2b2b2b" strokeWidth={1.6} opacity={0.6} />
+      </g>
+    </g>
+  );
+}
+
+/** Lá giả của {phanDien} (hình minh họa): ô giấy với chiếc lá xám lấm mực. */
+function FakeTile({ x, y, size = 34 }: { x: number; y: number; size?: number }) {
+  const k = size / 34;
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <rect x={0} y={0} width={size} height={size} rx={7 * k} fill="#fffaf0" stroke={C.wood} strokeWidth={2} opacity={0.96} />
+      <g transform={`translate(${size / 2} ${size / 2}) scale(${0.62 * k})`}>
+        <path d="M0 -18 C16 -12 16 12 0 20 C-16 12 -16 -12 0 -18 Z" fill="#6b717c" stroke="#2b2b2b" strokeWidth={2.2} />
+        <circle cx={-3} cy={-2} r={5} fill="#23262b" />
+        <circle cx={5} cy={6} r={3} fill="#23262b" />
+      </g>
+    </g>
+  );
+}
+
+/** Hoa sen (4 lá thẳng hàng): bông hồng tám cánh. */
+function LotusTile({ x, y, size = 34 }: { x: number; y: number; size?: number }) {
+  const k = size / 34;
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <rect x={0} y={0} width={size} height={size} rx={7 * k} fill="#fffaf0" stroke={C.wood} strokeWidth={2} />
+      <g transform={`translate(${size / 2} ${size / 2}) scale(${k})`}>
+        {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
+          <ellipse key={a} cx={0} cy={-8} rx={4.6} ry={8} fill="#f7a8c4" stroke="#c0527e" strokeWidth={1.4} transform={`rotate(${a})`} />
+        ))}
+        <circle r={4} fill="#f6c84b" stroke={C.goldDark} strokeWidth={1.4} />
+      </g>
+    </g>
+  );
+}
+
+/** Gió xoáy (5 lá thẳng hàng): vòng xoáy xanh. */
+function WindTile({ x, y, size = 34 }: { x: number; y: number; size?: number }) {
+  const k = size / 34;
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <rect x={0} y={0} width={size} height={size} rx={7 * k} fill="#fffaf0" stroke={C.wood} strokeWidth={2} />
+      <g transform={`translate(${size / 2} ${size / 2}) scale(${k})`} fill="none" stroke="#2f9fd0" strokeWidth={3} strokeLinecap="round">
+        <path d="M-10 -8 q10 -6 20 0" />
+        <path d="M-8 -1 q8 -5 16 0" />
+        <path d="M-5 6 q5 -4 10 0" />
+        <path d="M-2 12 q2 -2 4 0" />
+      </g>
+    </g>
+  );
+}
+
+/** Cây của màn 11 (hình minh họa, vòng 1: bốn ô lá ở đầu nhánh): `filled` là ô đã có lá, `merged` là hai cành đã gộp; hai cành gộp xong thì gốc sáng lên. */
+function MiniTree({ x, y, filled, merged }: { x: number; y: number; filled: readonly boolean[]; merged: readonly boolean[] }) {
+  const tips: [number, number][] = [[-52, -20], [-26, -52], [26, -52], [52, -20]];
+  const nodes: [number, number][] = [[-39, -36], [39, -36]];
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <path d="M0 40 V8 M0 8 L-44 -30 M0 8 L44 -30 M-44 -30 L-52 -20 M-44 -30 L-26 -52 M44 -30 L52 -20 M44 -30 L26 -52" fill="none" stroke="#8b5e34" strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" />
+      {merged[0] && <path d={`M${tips[0][0]} ${tips[0][1]} L${nodes[0][0]} ${nodes[0][1]} L${tips[1][0]} ${tips[1][1]} M${nodes[0][0]} ${nodes[0][1]} L0 8`} fill="none" stroke={C.green} strokeWidth={3.5} strokeLinecap="round" />}
+      {merged[1] && <path d={`M${tips[2][0]} ${tips[2][1]} L${nodes[1][0]} ${nodes[1][1]} L${tips[3][0]} ${tips[3][1]} M${nodes[1][0]} ${nodes[1][1]} L0 8`} fill="none" stroke={C.green} strokeWidth={3.5} strokeLinecap="round" />}
+      {tips.map(([tx, ty], i) => (
+        <g key={i} opacity={filled[i] ? 1 : 0.45}>
+          <circle cx={tx} cy={ty} r={13} fill="#fffaf0" stroke={filled[i] ? C.green : C.wood} strokeWidth={filled[i] ? 3.5 : 2.5} strokeDasharray={filled[i] ? undefined : '4 3'} />
+          <path d="M0 -8 C7 -5 7 5 0 9 C-7 5 -7 -5 0 -8 Z" transform={`translate(${tx} ${ty})`} fill={LEAF_COLORS[[0, 3, 4, 1][i]]} stroke="#2b2b2b" strokeWidth={1.4} />
+        </g>
+      ))}
+      {merged[0] && merged[1] && <circle cx={0} cy={8} r={9} fill={C.gold} stroke={C.goldDark} strokeWidth={3} />}
+    </g>
+  );
+}
+
 const ARTS: Record<GuideArtId, () => ReactNode> = {
   'phim-di-chuyen': () => (
     <g>
@@ -952,6 +1036,84 @@ const ARTS: Record<GuideArtId, () => ReactNode> = {
       <Heart x={240} y={120} s={0.8} />
       <Heart x={272} y={120} s={0.8} />
       <Heart x={304} y={120} s={0.8} color="none" />
+    </g>
+  ),
+  'doi-o-phim': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      {[0, 1, 2].flatMap((r) => [0, 1, 2, 3].map((c) => <LeafTile key={`${r}${c}`} x={14 + c * 38} y={30 + r * 40} color={LEAF_COLORS[(r * 2 + c * 3) % 5]} ring={r === 1 && c === 1 ? C.purple : undefined} />))}
+      <Arrow x1={84} y1={90} x2={112} y2={90} width={4} />
+      <Key x={222} y={30} w={34} h={34} arrow="up" />
+      <Key x={182} y={70} w={34} h={34} arrow="left" />
+      <Key x={222} y={70} w={34} h={34} arrow="down" />
+      <Key x={262} y={70} w={34} h={34} arrow="right" />
+      <Key x={198} y={120} w={92} h={32} label="Enter" />
+    </g>
+  ),
+  'doi-o-vuot': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      {[0, 1, 2].flatMap((r) => [0, 1, 2, 3, 4].map((c) => <LeafTile key={`${r}${c}`} x={46 + c * 42} y={24 + r * 42} color={LEAF_COLORS[(r + c * 2) % 5]} />))}
+      <LeafTile x={88} y={66} color={LEAF_COLORS[1]} ring={C.purple} />
+      <Arrow x1={110} y1={86} x2={150} y2={86} width={5} />
+      <Finger x={106} y={86} />
+    </g>
+  ),
+  'hang-no': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      <g>
+        {[0, 1, 2].map((i) => (
+          <LeafTile key={i} x={20 + i * 36} y={18} color={LEAF_COLORS[0]} />
+        ))}
+        <Star x={128} y={35} r={12} />
+      </g>
+      <g>
+        {[0, 1, 2, 3].map((i) => (
+          <LeafTile key={i} x={20 + i * 36} y={70} color={LEAF_COLORS[3]} />
+        ))}
+        <Arrow x1={170} y1={87} x2={202} y2={87} width={4} />
+        <LotusTile x={210} y={70} />
+      </g>
+      <g>
+        {[0, 1, 2, 3, 4].map((i) => (
+          <LeafTile key={i} x={20 + i * 36} y={122} color={LEAF_COLORS[4]} />
+        ))}
+        <Arrow x1={206} y1={139} x2={234} y2={139} width={4} />
+        <WindTile x={242} y={122} />
+      </g>
+    </g>
+  ),
+  'cay-gop': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.sky} />
+      <rect x={0} y={150} width={ART_W} height={30} fill={C.grass} />
+      <MiniTree x={226} y={112} filled={[true, true, true, false]} merged={[true, false]} />
+      {[0, 1, 2].map((i) => (
+        <LeafTile key={i} x={20 + i * 36} y={96} color={LEAF_COLORS[4]} />
+      ))}
+      <path d="M92 90 Q130 30 196 70" fill="none" stroke={C.purple} strokeWidth={4} strokeLinecap="round" strokeDasharray="7 5" />
+      <polygon points="202,74 186,72 194,60" fill={C.purple} />
+      <Leaf x={150} y={52} rot={30} color={LEAF_COLORS[4]} />
+    </g>
+  ),
+  'la-gia-no': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      {[0, 1, 2].map((i) => (
+        <LeafTile key={i} x={20 + i * 36} y={100} color={LEAF_COLORS[2]} />
+      ))}
+      <Star x={74} y={90} r={12} />
+      <FakeTile x={128} y={100} />
+      <Cross x={152} y={96} />
+      <FakeTile x={128} y={62} />
+      <LeafTile x={20} y={62} color={LEAF_COLORS[1]} />
+      <LeafTile x={56} y={62} color={LEAF_COLORS[0]} />
+      <circle cx={246} cy={52} r={18} fill="#f2c9a0" stroke={C.ink} strokeWidth={3.5} />
+      <rect x={232} y={68} width={28} height={36} rx={8} fill="#6a4bb0" stroke={C.ink} strokeWidth={3.5} />
+      <path d="M232 76 L204 52" stroke={C.ink} strokeWidth={5} strokeLinecap="round" />
+      <FakeTile x={176} y={30} size={28} />
+      <Arrow x1={196} y1={68} x2={160} y2={86} color={C.red} width={4} />
     </g>
   ),
 };

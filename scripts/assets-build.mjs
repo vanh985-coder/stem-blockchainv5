@@ -36,8 +36,8 @@ function classify(key) {
     return { kind: 'nen', maxWidth: 1920, quality: 82, warnBig: true };
   }
   // Hình rời (sprites): ảnh do AI tạo hay in sẵn nền ô vuông hoặc nền một màu vào ảnh; tự tách nền (scripts/lib/cutout.mjs), ảnh đã trong suốt thật thì để nguyên.
-  // Lá trong ui/tiles (la-*) cũng in sẵn nền trắng vào ảnh và được dùng như hình rời (màn 12: lá giả trên ngọn cây, lá ở tầng trên cùng): tách nền như sprites. Ô lưới (o-*) giữ nguyên.
-  if (key.startsWith('sprites/') || /^ui\/tiles\/la-/.test(key)) return { kind: 'hinh-roi', box: 1024, quality: 85, autoCutout: true };
+  // Lá trong ui/tiles (la-*) cũng in sẵn nền trắng vào ảnh và được dùng như hình rời (màn 12: lá giả trên ngọn cây, lá ở tầng trên cùng): tách nền như sprites. Ô đặc biệt của màn 11 (o-hoa hoa sen, o-gio gió xoáy) vẽ phủ lên lá nên cũng cần nền trong suốt: tách nền như la-*.
+  if (key.startsWith('sprites/') || /^ui\/tiles\/(la|o)-/.test(key)) return { kind: 'hinh-roi', box: 1024, quality: 85, autoCutout: true };
   if (
     /^ui\/(cards|tiles|textures)\//.test(key) ||
     key === 'ui/logo-art' ||

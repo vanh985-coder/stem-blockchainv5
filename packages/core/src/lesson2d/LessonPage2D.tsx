@@ -180,7 +180,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   };
   const goMap = goVillage;
   const leaveLabel = ui.langScene.veLang;
-  // Game kế tiếp đã ra mắt trong làng (bỏ qua màn 'coming-soon': Làng Bạc, xong màn 10 thì mở màn 12 vì màn 11 chưa có)
+  // Game kế tiếp đã ra mắt trong làng (bỏ qua màn 'coming-soon'; Làng Bạc: xong màn 10 thì tới màn 11)
   const nextGame = nextReadyLevel(levelId);
   const playNextGame = nextGame ? { label: fmt(ui.langScene.choiTiep, { man: fmt(nextGame.ten) }), onClick: () => navigate(`/lang/${villageId}/man/${nextGame.id}`) } : undefined;
 

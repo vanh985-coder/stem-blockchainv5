@@ -71,7 +71,7 @@ export type { PickParams } from './quiz/pickQuestions';
 export { recordAnswer } from './quiz/recordAnswer';
 export { LEVELS, VILLAGE_ORDER, levelById, levelsOfVillage, nextReadyLevel } from './content/levels';
 export { medalOf, gameResultOf, summarizeGame } from './games/medals';
-export { GAMES, gameUi, runnerUi, runnerScoreLabels, rebuildUi, memoryUi, modCalcUi, climbUi, whackUi, kiteUi, chickenUi } from './content/games';
+export { GAMES, gameUi, runnerUi, runnerScoreLabels, rebuildUi, memoryUi, modCalcUi, climbUi, whackUi, kiteUi, chickenUi, match3Ui } from './content/games';
 export { gameHints } from './content/gameHints';
 export { useGameHint } from './ui/useGameHint';
 export { climaxUi } from './content/climax';

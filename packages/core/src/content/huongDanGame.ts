@@ -33,7 +33,6 @@ export interface GameGuide {
   nhac: Readonly<Record<string, string>>;
 }
 
-const EMPTY = { nhan: '', tieuDe: '', luat: [], dieuKhien: { mayTinh: '', dienThoai: '' }, trang: [], nhac: {} } as const satisfies GameGuide;
 
 export const HUONG_DAN_GAME = {
   // ---------------------------------------------------------------- Màn 2: Đuổi theo {phanDien} (Làng Giấy)
@@ -308,8 +307,51 @@ export const HUONG_DAN_GAME = {
       hetVan: 'Ván này đã kết thúc.',
     },
   },
-  // ---------------------------------------------------------------- Màn 11: Ghép lá cây sổ (Làng Bạc): chưa làm
-  11: EMPTY,
+  // ---------------------------------------------------------------- Màn 11: Ghép lá cây sổ (Làng Bạc)
+  11: {
+    nhan: 'Màn 11',
+    tieuDe: 'Màn 11: Ghép lá cây sổ',
+    luat: [
+      '{phanDien} rải lá giả khắp nơi để làm rối cây gộp sổ. Em ghép các lá cùng loại để dựng lại cây.',
+      'Đổi chỗ 2 ô kề nhau để có 3 lá cùng loại thẳng hàng: hàng đó nổ, lá phía trên rơi xuống. Ô nào trên cây cần loại lá nào thì hàng nổ đúng loại đó sẽ gửi một lá lên lấp ô.',
+      'Lá giả của {phanDien} không đổi chỗ được và biến mất khi có hàng nổ ngay sát bên. Cứ 5 lượt, {phanDien} lại ném thêm một lá giả.',
+      'Có 3 vòng, mỗi vòng một cây và số lượt có hạn. Dựng xong cây thì được thưởng, còn dư lượt thì được thưởng thêm.',
+    ],
+    dieuKhien: {
+      mayTinh: 'Kéo một ô sang ô kề, hoặc bấm ô này rồi bấm ô kề · phím mũi tên di chuyển con trỏ, Enter hoặc Space để chọn ô rồi mũi tên để đổi chỗ',
+      dienThoai: 'Vuốt từ một ô sang ô kề, hoặc chạm ô này rồi chạm ô kề',
+    },
+    trang: [
+      {
+        hinh: { art: 'doi-o-phim' },
+        hinhDt: { art: 'doi-o-vuot' },
+        may: 'Kéo một ô sang ô kề, hoặc bấm ô này rồi ô kề. Bàn phím: mũi tên di chuyển con trỏ, Enter chọn ô rồi mũi tên để đổi chỗ. Không tạo được hàng thì hai ô về chỗ cũ.',
+        dt: 'Vuốt từ một ô sang ô kề, hoặc chạm ô này rồi chạm ô kề. Không tạo được hàng thì hai ô về chỗ cũ.',
+      },
+      {
+        hinh: { art: 'hang-no' },
+        may: 'Từ 3 lá cùng loại thẳng hàng thì nổ. 4 lá tạo hoa sen, nổ xóa cả hàng ngang. 5 lá tạo gió xoáy: đổi chỗ với một lá để xóa mọi lá cùng loại.',
+      },
+      {
+        hinh: { art: 'cay-gop' },
+        may: 'Nhìn cây bên cạnh: mỗi ô cần một loại lá. Hàng nổ đúng loại thì một lá bay lên lấp ô. Hai ô cạnh nhau đầy thì gộp thành cành, đủ cành thì lên tới gốc.',
+      },
+      {
+        hinh: { art: 'la-gia-no' },
+        may: 'Lá giả của {phanDien} xám lấm mực, không đổi chỗ được. Cho một hàng nổ ngay sát bên thì lá giả biến mất. Hết nước đi thì bàn được xáo lại.',
+      },
+    ],
+    nhac: {
+      doiO: 'Đổi 2 ô kề nhau để có 3 lá cùng loại thẳng hàng.',
+      nhinCay: 'Nhìn cây: ô còn trống cần loại lá nào thì ưu tiên ghép loại đó.',
+      laGia: 'Lá giả của {phanDien} biến mất khi có hàng nổ ngay sát bên.',
+      hoaSen: 'Hoa sen trên bàn: khi nó nổ sẽ xóa cả hàng ngang của nó.',
+      gioXoay: 'Ô gió xoáy: đổi chỗ nó với một lá để xóa mọi lá cùng loại với lá đó.',
+      sapHet: 'Sắp hết lượt: ghép đúng loại lá cây còn thiếu.',
+      xongVong: 'Vòng này xong rồi. Bấm nút để sang vòng kế tiếp.',
+      hetVan: 'Ván này đã kết thúc.',
+    },
+  },
 
   // ---------------------------------------------------------------- Màn 12: Leo cây tìm lá giả (Làng Bạc)
   12: {

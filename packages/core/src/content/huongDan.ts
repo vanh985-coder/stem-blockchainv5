@@ -75,6 +75,12 @@ export const GUIDE_ART_IDS = [
   'ban-ga-phim',
   'ban-ga-cham',
   'ga-trum',
+  // màn 11 (bước B13)
+  'doi-o-phim',
+  'doi-o-vuot',
+  'hang-no',
+  'cay-gop',
+  'la-gia-no',
 ] as const;
 export type GuideArtId = (typeof GUIDE_ART_IDS)[number];
 
@@ -105,7 +111,7 @@ export interface GuideSection {
 
 const shot = (id: GuideShotId): GuideFigure => ({ shot: id });
 /** Phần riêng của một game: chữ (nhãn, tiêu đề, các trang) lấy từ `content/huongDanGame.ts`, mở từ thẻ bắt đầu của màn `levelId` */
-const ownSection = <I extends string, N extends 2 | 3 | 5 | 6 | 8 | 9 | 12>(id: I, levelId: N) => {
+const ownSection = <I extends string, N extends 2 | 3 | 5 | 6 | 8 | 9 | 11 | 12>(id: I, levelId: N) => {
   const g = HUONG_DAN_GAME[levelId];
   return { id, nhan: g.nhan, tieuDe: g.tieuDe, trang: g.trang, man: [levelId] as const, rieng: true as const };
 };
@@ -219,6 +225,7 @@ export const GUIDE_SECTIONS = [
   ownSection('man-5', 5),
   ownSection('man-6', 6),
   ownSection('man-9', 9),
+  ownSection('man-11', 11),
 ] as const satisfies readonly GuideSection[];
 
 export type GuideSectionId = (typeof GUIDE_SECTIONS)[number]['id'];

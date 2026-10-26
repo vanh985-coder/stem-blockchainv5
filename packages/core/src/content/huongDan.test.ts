@@ -8,9 +8,9 @@ const TOUCH_WORDS = /vuốt|chạm|cần điều khiển|nút bàn tay/i;
 const KEY_WORDS = /phím|bấm chuột|nhấp chuột|rê chuột|Shift|Space|Esc|bấm E\b/;
 
 describe('cấu trúc Hướng dẫn chơi', () => {
-  it('đủ các phần (6 phần của đề bài, rồi màn 8, màn 12 từ bước HD, màn 5 từ bước B7, màn 6 từ bước B9, màn 9 từ bước B11), id không trùng, thứ tự bit cố định (chỉ được thêm vào cuối)', () => {
+  it('đủ các phần (6 phần của đề bài, rồi màn 8, màn 12 từ bước HD, màn 5 từ bước B7, màn 6 từ bước B9, màn 9 từ bước B11, màn 11 từ bước B13), id không trùng, thứ tự bit cố định (chỉ được thêm vào cuối)', () => {
     expect(GUIDE_SECTION_IDS.slice(0, 6)).toEqual(['di-lai', 'noi-chuyen', 'bai-hoc', 'man-2', 'man-3', 'trang-vang']);
-    expect(GUIDE_SECTION_IDS.slice(6)).toEqual(['man-8', 'man-12', 'man-5', 'man-6', 'man-9']);
+    expect(GUIDE_SECTION_IDS.slice(6)).toEqual(['man-8', 'man-12', 'man-5', 'man-6', 'man-9', 'man-11']);
     expect(new Set(GUIDE_SECTION_IDS).size).toBe(GUIDE_SECTION_IDS.length);
     expect(GUIDE_SECTION_IDS.length).toBeLessThanOrEqual(31); // cờ lưu theo số bit
   });
@@ -86,6 +86,7 @@ describe('chọn theo thiết bị và theo màn', () => {
     expect(guideSectionOfLevel(6)).toBe('man-6');
     expect(guideSectionOfLevel(8)).toBe('man-8');
     expect(guideSectionOfLevel(9)).toBe('man-9');
+    expect(guideSectionOfLevel(11)).toBe('man-11');
     expect(guideSectionOfLevel(12)).toBe('man-12');
     expect(guideSectionOfLevel(1)).toBeNull();
     expect(guideSectionOfLevel(99)).toBeNull();
@@ -101,7 +102,7 @@ describe('chọn theo thiết bị và theo màn', () => {
 
 describe('hộp chung chỉ hiện các phần chung (bước X1)', () => {
   it('thứ tự và mã các phần cũ không đổi (cờ lưu theo bit): di-lai, noi-chuyen, bai-hoc, man-2, man-3, trang-vang', () => {
-    expect([...GUIDE_SECTION_IDS]).toEqual(['di-lai', 'noi-chuyen', 'bai-hoc', 'man-2', 'man-3', 'trang-vang', 'man-8', 'man-12', 'man-5', 'man-6', 'man-9']);
+    expect([...GUIDE_SECTION_IDS]).toEqual(['di-lai', 'noi-chuyen', 'bai-hoc', 'man-2', 'man-3', 'trang-vang', 'man-8', 'man-12', 'man-5', 'man-6', 'man-9', 'man-11']);
   });
   it('hộp chung (không id, id lạ, id phần chung): chỉ Đi lại và Nói chuyện, đúng thứ tự', () => {
     for (const id of [undefined, 'khong-co', 'di-lai', 'noi-chuyen']) expect(guideSectionsFor(id).map((s) => s.id)).toEqual(['di-lai', 'noi-chuyen']);
@@ -115,7 +116,8 @@ describe('hộp chung chỉ hiện các phần chung (bước X1)', () => {
     expect(guideSectionsFor('man-5').map((s) => s.id)).toEqual(['man-5']);
     expect(guideSectionsFor('man-6').map((s) => s.id)).toEqual(['man-6']);
     expect(guideSectionsFor('man-9').map((s) => s.id)).toEqual(['man-9']);
-    expect(rieng).toEqual(['bai-hoc', 'man-2', 'man-3', 'trang-vang', 'man-8', 'man-12', 'man-5', 'man-6', 'man-9']);
+    expect(guideSectionsFor('man-11').map((s) => s.id)).toEqual(['man-11']);
+    expect(rieng).toEqual(['bai-hoc', 'man-2', 'man-3', 'trang-vang', 'man-8', 'man-12', 'man-5', 'man-6', 'man-9', 'man-11']);
     for (const id of rieng) expect(guideSectionsFor(undefined).some((s) => s.id === id)).toBe(false);
   });
   it('mọi phần mở từ thẻ bắt đầu của game (có man) là phần riêng: không lọt vào hộp chung', () => {
