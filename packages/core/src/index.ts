@@ -75,6 +75,7 @@ export { GAMES, gameUi, runnerUi, runnerScoreLabels, rebuildUi, memoryUi, modCal
 export { gameHints } from './content/gameHints';
 export { useGameHint } from './ui/useGameHint';
 export { climaxUi } from './content/climax';
+export { DEV_PARTS_4, DEV_PARTS_5, devMiniGameText } from './content/devMiniGame';
 export { FESTIVAL_LAUNCHED } from './config/festival';
 export { GoldenPagesRow } from './three/village/GoldenPagesRow';
 export type { GameText } from './content/games';
