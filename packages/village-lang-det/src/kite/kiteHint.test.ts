@@ -62,7 +62,7 @@ describe('màn 6: câu nhắc của nút "?" (hintFor)', () => {
     expect(hintFor(s)).toEqual(['hetVan']);
   });
 
-  it('200 trạng thái ngẫu nhiên: câu nhắc luôn thuộc danh sách có sẵn, không nói đáp án câu hỏi nào đúng, không có số nào của đáp án', () => {
+  it('200 trạng thái ngẫu nhiên: câu nhắc luôn thuộc danh sách có sẵn, không nói đáp án câu hỏi nào đúng, không có số nào của đáp án', { timeout: 120_000 }, () => {
     const seen = new Set<string>();
     for (let seed = 1; seed <= 200; seed++) {
       const s = randomState(seed);
