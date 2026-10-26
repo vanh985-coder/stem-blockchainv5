@@ -251,7 +251,9 @@ sup {
   .mg-result-parts ul { font-size: 13px; }
   .mg-result-side p { font-size: 13px; }
   .mg-result-buttons { flex-direction: row; gap: 8px; }
-  .mg-result-buttons > * { flex: 1; min-height: 44px; padding-top: 0; padding-bottom: 0; }
+  /* Nhãn nút một dòng, không gãy chữ ("Chơi lại", "Chơi tiếp", "Về làng", "Xem lại cảnh cuối"): cỡ chữ 0,875rem = 14 px (nhỏ nhất cho phép; "Chữ to" nhân lên), lề ngang hẹp; nút chia chỗ theo độ dài nhãn */
+  .mg-result-buttons { flex-wrap: wrap; }
+  .mg-result-buttons > * { flex: 1 1 auto; min-width: fit-content; min-height: 44px; padding: 0 8px; font-size: 0.875rem; line-height: 1.1; white-space: nowrap; }
 }
 
 /* Lớp HTML phủ lên Scene25D (bảng điểm, thẻ, nút, câu hỏi): KHÔNG có bóng đổ (box-shadow, text-shadow, drop-shadow). Đo trên bản build ở Chrome + Intel UHD: lớp phủ nằm trên canvas WebGL nên

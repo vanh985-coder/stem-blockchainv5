@@ -2,14 +2,16 @@ import { useFrame } from '@react-three/fiber';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { CanvasTexture, Color, Group, Mesh, MeshBasicMaterial, PlaneGeometry, type Texture } from 'three';
 import { Actor25D, Character, type ClipName, type PoseRequest } from '@so-chung/core/three/index';
-import { FACE_COLORS, LOTUS_COLOR, TREE_COLOR, useSharedTextures, type Man11Textures } from './man11Art';
+import { coverSize } from '@so-chung/core/three/scene25d/layout25d';
+import { FACE_COLORS, LOTUS_COLOR, TREE_COLOR, makeGroundTexture, useSharedTextures, type Man11Textures } from './man11Art';
 import { FAKE_FACE, faceId, newSample, sampleTrack, villainAt, type Mark, type Sample } from './man11Anim';
 import type { Man11Engine } from './man11Engine';
-import { FACE_QUAD, GRID, LOTUS_QUAD, PANEL_PAD, SLOT_QUAD, nodePoint, slotPoint, type Man11Layout } from './man11Layout';
+import { FACE_QUAD, GRID, LOTUS_QUAD, PANEL_PAD, SLOT_QUAD, WORLD, nodePoint, slotPoint, treePoint, type Man11Layout } from './man11Layout';
+import { TREE_ROOT } from './man11Slots';
 
 /** Lớp theo trục Z (thấp hơn lớp của {phanDien}, để {phanDien} ló ra che lên bàn) và thứ tự vẽ của các hình trong suốt. */
-const Z = { panel: -1.7, tree: -1.8, slotBg: -1.5, slot: -1.45, seg: -1.4, node: -1.35, glow: -1.3, tile: -1, lotus: -0.95, burst: -0.9, flight: 3 } as const;
-const ORDER = { panel: 0, tree: 1, slotBg: 2, slot: 3, seg: 4, node: 5, glow: 6, tile: 10, lotus: 11, burst: 12, flight: 20 } as const;
+const Z = { ground: -10.4, backdrop: -10.2, shadow: -1.85, panel: -1.7, tree: -1.8, slotBg: -1.5, slot: -1.45, seg: -1.4, node: -1.35, glow: -1.3, tile: -1, lotus: -0.95, burst: -0.9, flight: 3 } as const;
+const ORDER = { ground: -12, backdrop: -11, shadow: 0, panel: 0, tree: 1, slotBg: 2, slot: 3, seg: 4, node: 5, glow: 6, tile: 10, lotus: 11, burst: 12, flight: 20 } as const;
 const BURSTS = 24;
 const FLIGHTS = 12;
 const MAX_SLOTS = 8;
@@ -79,11 +81,18 @@ export const Man11Stage = memo(function Man11Stage({ layout, engine, textures, n
   useEffect(() => () => geo.dispose(), [geo]);
   useEffect(() => () => blank.dispose(), [blank]);
 
+  // mặt đất vẽ bằng code (nằm sau ảnh nền đã bóc nền trắng), cùng tông với cỏ của ảnh
+  const grass = textures.backdrop?.grass;
+  const ground = useMemo(() => makeGroundTexture(grass ?? [140, 190, 90], !textures.backdrop), [grass, textures.backdrop]);
+  useEffect(() => () => ground.dispose(), [ground]);
   const faceColors = useMemo(() => FACE_COLORS.map((c) => new Color(c)), []);
   const lotusColor = useMemo(() => new Color(LOTUS_COLOR), []);
 
   const mats = useMemo(
     () => ({
+      ground: mat(ground, '#8cbe5a'),
+      backdrop: textures.backdrop ? mat(textures.backdrop.texture, '#ffffff') : null,
+      shadow: mat(shared.dot, '#1d2b12', { opacity: 0.3, tint: true }),
       panel: mat(shared.panel, '#fdf4dc'),
       tree: mat(textures.tree, TREE_COLOR),
       tiles: Array.from({ length: GRID * GRID }, () => mat(blank, '#ffffff')),
@@ -96,13 +105,16 @@ export const Man11Stage = memo(function Man11Stage({ layout, engine, textures, n
       bursts: Array.from({ length: BURSTS }, () => mat(shared.ring, '#ffffff', { tint: true })),
       flights: Array.from({ length: FLIGHTS }, () => mat(blank, '#ffffff')),
     }),
-    [shared, textures.tree, textures.lotus, blank],
+    [shared, textures.tree, textures.lotus, textures.backdrop, ground, blank],
   );
   useEffect(
     () => () => {
       mats.panel.dispose();
       mats.tree.dispose();
       mats.glow.dispose();
+      mats.ground.dispose();
+      mats.backdrop?.dispose();
+      mats.shadow.dispose();
       for (const list of [mats.tiles, mats.lotus, mats.slotBg, mats.slots, mats.segs, mats.nodes, mats.bursts, mats.flights]) for (const m of list) m.dispose();
     },
     [mats],
@@ -359,6 +371,9 @@ export const Man11Stage = memo(function Man11Stage({ layout, engine, textures, n
     }
   });
 
+  const world = WORLD[layout.frame];
+  const backdropSize = coverSize({ width: textures.backdrop?.width ?? 0, height: textures.backdrop?.height ?? 0 }, world);
+  const rootX = treePoint(layout, TREE_ROOT).x;
   const panelW = layout.panel.x1 - layout.panel.x0;
   const panelH = layout.panel.y1 - layout.panel.y0;
   const treeW = layout.tree.x1 - layout.tree.x0;
@@ -366,6 +381,9 @@ export const Man11Stage = memo(function Man11Stage({ layout, engine, textures, n
 
   return (
     <>
+      <mesh geometry={geo} material={mats.ground} position={[0, 0, Z.ground]} scale={[world.width, world.height, 1]} renderOrder={ORDER.ground} />
+      {mats.backdrop && textures.backdrop && <mesh geometry={geo} material={mats.backdrop} position={[0, 0, Z.backdrop]} scale={[backdropSize.width, backdropSize.height, 1]} renderOrder={ORDER.backdrop} />}
+      <mesh geometry={geo} material={mats.shadow} position={[rootX, layout.tree.y0 + 0.14, Z.shadow]} scale={[2.8, 0.6, 1]} renderOrder={ORDER.shadow} />
       <mesh geometry={geo} material={mats.panel} position={[(layout.panel.x0 + layout.panel.x1) / 2, (layout.panel.y0 + layout.panel.y1) / 2, Z.panel]} scale={[panelW, panelH, 1]} renderOrder={ORDER.panel} />
       <mesh geometry={geo} material={mats.tree} position={[(layout.tree.x0 + layout.tree.x1) / 2, (layout.tree.y0 + layout.tree.y1) / 2, Z.tree]} scale={[treeW, treeH, 1]} renderOrder={ORDER.tree} />
       {Array.from({ length: MAX_SLOTS }, (_, i) => (
@@ -462,6 +480,7 @@ export const Man11Stage = memo(function Man11Stage({ layout, engine, textures, n
       ))}
       {/* {phanDien} ló ra từ mép dưới khung (nhóm dời lên xuống theo dòng thời gian) */}
       <group ref={villain} visible={false}>
+        <mesh geometry={geo} material={mats.shadow} position={[0, 0.06, 0.9]} scale={[1.7, 0.42, 1]} renderOrder={ORDER.shadow} />
         <Actor25D x={0} y={0} height={layout.villain.height} layer="actorsFront">
           <Character id="characters/ti" animation={villainClip} trigger={villainTrigger} returnTo="idle" clips={VILLAIN_CLIPS} pose={pose} />
         </Actor25D>

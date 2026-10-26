@@ -5,9 +5,10 @@ import { Scene25D, isQualityChoice, type ClipName, type PoseRequest, type Qualit
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
 import { MATCH3_SPEC } from './match3Config';
 import { hintFor } from './match3Hint';
-import { advanceRound, createMatch3Game, match3Score, swapCells, type Cell, type Pos } from './match3Logic';
+import { match3Summary } from './match3Result';
+import { WIND, advanceRound, createMatch3Game, legalMoves, match3Score, swapCells, type Cell, type Pos } from './match3Logic';
 import type { Mark } from './man11Anim';
-import { BACKGROUND_PATH, useMan11Textures } from './man11Art';
+import { useMan11Textures } from './man11Art';
 import { Man11Engine } from './man11Engine';
 import { GRID, HUD_PX, man11Layout, type Man11Frame } from './man11Layout';
 import { Man11Stage } from './Man11Stage';
@@ -289,16 +290,15 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
     if (finished.current) return;
     finished.current = true;
     const P = MATCH3_SPEC.points;
-    const trees = state.results.filter((r) => r.done).length;
-    const spare = state.results.reduce((sum, r) => sum + (r.done ? r.turnsLeft : 0), 0);
+    const m = match3Summary(state);
     const parts: ScorePart[] = [
-      { label: fmt(match3Ui.phanLa, { diem: P.leaf }), count: state.stats.leavesCleared, points: state.stats.leavesCleared * P.leaf },
-      { label: fmt(match3Ui.phanO, { diem: P.slot }), count: state.stats.slotsFilled, points: state.stats.slotsFilled * P.slot },
-      { label: fmt(match3Ui.phanCay, { so: trees, max: state.spec.rounds.length, diem: P.tree }), count: trees, points: trees * P.tree },
-      { label: fmt(match3Ui.phanDu, { diem: P.spare }), count: spare, points: spare * P.spare },
-      { label: match3Ui.phanLaGia, count: state.stats.fakesGone, points: 0 },
+      { label: fmt(match3Ui.phanLa, { diem: P.leaf }), count: m.leaves, points: m.leaves * P.leaf },
+      { label: fmt(match3Ui.phanO, { diem: P.slot }), count: m.slots, points: m.slots * P.slot },
+      { label: fmt(match3Ui.phanCay, { so: m.trees, max: m.rounds, diem: P.tree }), count: m.trees, points: m.trees * P.tree },
+      { label: fmt(match3Ui.phanDu, { diem: P.spare }), count: m.spare, points: m.spare * P.spare },
+      { label: match3Ui.phanLaGia, count: m.fakesGone, points: 0 },
     ];
-    onFinish(match3Score(state), parts);
+    onFinish(m.score, parts);
   }, [onFinish, state]);
 
   const nextRound = useCallback(() => {
@@ -324,6 +324,28 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
       __match3: state,
       __match3Engine: engine,
       __match3Move: (a: Pos, b: Pos) => tryMove(a, b),
+      /** Tua tới hết ván bằng logic (nước đi hợp lệ đầu tiên, không diễn hoạt) rồi chuyển kết quả THẬT của ván sang màn kết quả */
+      __match3Rush: () => {
+        engine.finish();
+        let guard = 0;
+        while (state.phase !== 'ended' && guard++ < 3000) {
+          if (state.phase === 'roundEnd') {
+            advanceRound(state);
+            continue;
+          }
+          const m = legalMoves(state.board)[0];
+          if (!m) break;
+          swapCells(state, m.a, m.b);
+        }
+        finish();
+      },
+      /** Dựng bàn có sẵn một ô gió xoáy ở (r, c) (thay lá đang ở đó) để thử hoạt cảnh gió xoáy; bàn hiển thị dựng lại đúng bàn mới */
+      __match3PlaceWind: (r: number, c: number) => {
+        engine.finish();
+        state.board[r][c] = WIND;
+        engine.startRound(state.board, state.slots.length);
+        bump();
+      },
       __match3Finish: () => {
         engine.finish();
         finish();
@@ -355,7 +377,7 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
   return (
     <div className="fixed inset-0 select-none bg-black" data-testid="man11">
       <Scene25D
-        background={BACKGROUND_PATH}
+        background={null}
         quality={forced}
         allowPortrait
         hold={!ready}
@@ -420,8 +442,9 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
             {banner && (
               <div
                 role="status"
-                className="absolute z-20 flex w-[min(28rem,calc(100%-2rem))] flex-col items-center gap-3 rounded-2xl border-[3px] border-nau-go bg-giay p-4 text-center"
-                style={portrait ? { left: '50%', top: '42%', transform: 'translate(-50%, -50%)' } : { left: ((layout.tree.x0 + layout.tree.x1) / 2 + W / 2) * ppu, top: '58%', transform: 'translate(-50%, -50%)' }}
+                className="absolute z-20 flex flex-col items-center gap-2 rounded-2xl border-[3px] border-nau-go bg-giay p-3 text-center"
+                // đè lên BÀN (cả khung ngang lẫn khung dọc), để cây đầy và gốc sáng vẫn thấy rõ
+                style={{ left: (layout.board.x0 + layout.board.x1) / 2 * ppu + (W / 2) * ppu, top: (H / 2 - (layout.board.y0 + layout.board.y1) / 2) * ppu, width: Math.min(448, cellPx * GRID), transform: 'translate(-50%, -50%)' }}
                 data-testid="banner"
               >
                 {banner.done ? (

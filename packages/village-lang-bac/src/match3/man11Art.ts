@@ -5,6 +5,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CanvasTexture, LinearFilter, SRGBColorSpace, Texture } from 'three';
 import { ASSETS_URL, lookupAsset, useManifest } from '@so-chung/core';
+import { createMulberry32 } from '@so-chung/core/lib/rng';
+import { cutoutWhite, shade } from './man11Ground';
 import { TREE_ART } from './man11Slots';
 
 /** Đường dẫn hình theo số hiệu mặt (`faceId`): 0 đến 5 lá bàng, chuối, đa, sen, trầu, tre; 6 lá giả; 7 ô gió xoáy. */
@@ -23,6 +25,8 @@ export interface Man11Textures {
   faces: (Texture | null)[];
   lotus: Texture | null;
   tree: Texture | null;
+  /** Ảnh nền đã làm trong suốt phần nền trắng nửa dưới (mặt đất vẽ bằng code nằm sau nó); null nếu thiếu ảnh */
+  backdrop: { texture: Texture; width: number; height: number; grass: [number, number, number] } | null;
   /** Tất cả hình đã có kết quả (tải xong hay báo thiếu) */
   done: boolean;
 }
@@ -39,7 +43,7 @@ function prepare<T extends Texture>(t: T): T {
 /** Nạp mọi hình của màn (một lần), giải phóng khi rời màn. */
 export function useMan11Textures(): Man11Textures {
   const manifest = useManifest();
-  const [tex, setTex] = useState<Man11Textures>({ faces: FACE_PATHS.map(() => null), lotus: null, tree: null, done: false });
+  const [tex, setTex] = useState<Man11Textures>({ faces: FACE_PATHS.map(() => null), lotus: null, tree: null, backdrop: null, done: false });
   useEffect(() => {
     if (!manifest) return;
     let alive = true;
@@ -63,9 +67,32 @@ export function useMan11Textures(): Man11Textures {
         img.onerror = () => resolve(null);
         img.src = url;
       });
-    void Promise.all([...FACE_PATHS.map((p) => load(p)), load(LOTUS_PATH), load(TREE_PATH, TREE_ART)]).then((list) => {
+    const loadBackdrop = () =>
+      new Promise<Man11Textures['backdrop']>((resolve) => {
+        const url = lookupAsset(manifest, ASSETS_URL, BACKGROUND_PATH);
+        if (!url) return resolve(null);
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.decoding = 'async';
+        img.onload = () => {
+          const w = img.naturalWidth;
+          const h = img.naturalHeight;
+          const [c, ctx] = canvas(w, h);
+          if (!ctx || w === 0) return resolve(null);
+          ctx.drawImage(img, 0, 0);
+          const data = ctx.getImageData(0, 0, w, h);
+          const cut = cutoutWhite(data.data, w, h);
+          ctx.putImageData(data, 0, 0);
+          const t = prepare(new CanvasTexture(c));
+          made.push(t);
+          resolve({ texture: t, width: w, height: h, grass: cut.grass });
+        };
+        img.onerror = () => resolve(null);
+        img.src = url;
+      });
+    void Promise.all([...FACE_PATHS.map((p) => load(p)), load(LOTUS_PATH), load(TREE_PATH, TREE_ART), loadBackdrop()]).then((list) => {
       if (!alive) return;
-      setTex({ faces: list.slice(0, FACE_PATHS.length), lotus: list[FACE_PATHS.length], tree: list[FACE_PATHS.length + 1], done: true });
+      setTex({ faces: list.slice(0, FACE_PATHS.length) as (Texture | null)[], lotus: list[FACE_PATHS.length] as Texture | null, tree: list[FACE_PATHS.length + 1] as Texture | null, backdrop: list[FACE_PATHS.length + 2] as Man11Textures['backdrop'], done: true });
     });
     return () => {
       alive = false;
@@ -164,4 +191,53 @@ export function useSharedTextures(cell: number, pad: number, grid: number): { pa
   useEffect(() => () => dot.dispose(), [dot]);
   useEffect(() => () => line.dispose(), [line]);
   return { panel, ring, dot, line };
+}
+
+/**
+ * Mặt đất vẽ bằng code, phủ cả khung và nằm SAU ảnh nền (ảnh nền đã trong suốt ở nửa dưới, xem `man11Ground.ts`): cỏ cùng tông với cỏ của ảnh (`grass`), tối dần xuống dưới, có vài mảng đất và các nét cỏ rải bằng
+ * hạt giống cố định. Không có ảnh nền (`sky` true) thì phần trên là bầu trời để cảnh không trống. Cạnh trên của mặt đất không cần viền: nó nằm sau mép cỏ của ảnh nên mép cỏ của ảnh chính là viền mềm.
+ */
+export function makeGroundTexture(grass: readonly [number, number, number], sky: boolean): CanvasTexture {
+  const w = 512;
+  const h = 512;
+  const [c, ctx] = canvas(w, h);
+  if (ctx) {
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    if (sky) {
+      g.addColorStop(0, '#9fd0f0');
+      g.addColorStop(0.5, '#d6ecf7');
+      g.addColorStop(0.52, shade(grass, 1.3));
+    } else g.addColorStop(0, shade(grass, 1.3));
+    g.addColorStop(0.6, shade(grass, 1.26));
+    g.addColorStop(0.8, shade(grass, 1.1));
+    g.addColorStop(1, shade(grass, 0.88));
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    const rng = createMulberry32(1109);
+    // mảng đất nhạt và mảng cỏ đậm
+    for (let i = 0; i < 26; i++) {
+      const x = rng() * w;
+      const y = h * (0.58 + rng() * 0.42);
+      ctx.fillStyle = i % 3 === 0 ? 'rgba(168, 134, 82, 0.16)' : 'rgba(40, 90, 30, 0.10)';
+      ctx.beginPath();
+      ctx.ellipse(x, y, 30 + rng() * 60, 6 + rng() * 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // nét cỏ
+    ctx.lineCap = 'round';
+    for (let i = 0; i < 170; i++) {
+      const x = rng() * w;
+      const y = h * (0.58 + rng() * 0.42);
+      const len = 3 + rng() * 5;
+      ctx.strokeStyle = rng() < 0.55 ? shade(grass, 1.5) : shade(grass, 0.8);
+      ctx.globalAlpha = 0.22 + rng() * 0.22;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + (rng() - 0.5) * 4, y - len);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+  return prepare(new CanvasTexture(c));
 }

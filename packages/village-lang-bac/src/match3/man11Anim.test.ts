@@ -7,6 +7,7 @@ import {
   createMatch3Game,
   legalMoves,
   swapCells,
+  WIND,
   type Match3Event,
   type Match3State,
   type Pos,
@@ -312,6 +313,11 @@ describe('man11Anim: lá giả ném, hoa sen, gió xoáy, xáo bàn, hết vòng
     const { timeline } = planEvents(v, r.events);
     const end = timeline.marks.find((m) => m.type === 'roundEnd')!;
     for (const m of timeline.marks) expect(m.t).toBeLessThanOrEqual(end.t + 1e-6);
+    if (end.done) {
+      // cây xong: gộp cành và gốc sáng chạy hết, cây đầy được giữ ≥ treeHold trước khi hộp hết vòng hiện
+      const lastTree = Math.max(...timeline.marks.filter((m) => ['slot', 'branch', 'tree'].includes(m.type)).map((m) => m.t));
+      expect(end.t - lastTree).toBeGreaterThanOrEqual(NORMAL.treeHold - 1e-6);
+    } else expect(end.t - Math.max(...timeline.marks.filter((m) => m.type !== 'roundEnd').map((m) => m.t))).toBeLessThan(NORMAL.treeHold);
     expect(end.done).toBe(s.results[0].done);
     expect(end.turnsLeft).toBe(s.results[0].turnsLeft);
     const next = advanceRound(s);
@@ -339,5 +345,70 @@ describe('man11Anim: tạm dừng thật', () => {
     expect(stepClock(0, 5000, false, 2000)).toBe(100);
     expect(stepClock(1990, 50, false, 2000)).toBe(2000);
     expect(stepClock(10, -5, false, 2000)).toBe(10);
+  });
+});
+
+describe('man11Anim: cây xong giữ cây đầy cho em nhìn rồi mới hết vòng', () => {
+  const events: Match3Event[] = [
+    { type: 'swap', a: [0, 0], b: [0, 1] },
+    { type: 'wave', n: 1 },
+    { type: 'slotFilled', slot: 0, leaf: 0, from: [0, 0] },
+    { type: 'slotFilled', slot: 1, leaf: 1, from: [0, 1] },
+    { type: 'branchMerged', level: 1, index: 0, root: false },
+    { type: 'slotFilled', slot: 2, leaf: 2, from: [0, 2] },
+    { type: 'slotFilled', slot: 3, leaf: 3, from: [0, 3] },
+    { type: 'branchMerged', level: 1, index: 1, root: false },
+    { type: 'branchMerged', level: 2, index: 0, root: true },
+    { type: 'treeDone' },
+    { type: 'roundEnd', round: 0, done: true, turnsLeft: 3, bonus: 260 },
+  ];
+  const board = createMatch3Game(2).board;
+  it('hộp hết vòng hiện sau mốc gốc sáng ít nhất treeHold (bình thường ≥ 1,4 giây, giảm chuyển động ≥ 0,5 giây)', () => {
+    for (const reduced of [false, true]) {
+      const { timeline } = planEvents(viewFromBoard(board), events, reduced);
+      const tree = timeline.marks.find((m) => m.type === 'tree')!;
+      const end = timeline.marks.find((m) => m.type === 'roundEnd')!;
+      const hold = reduced ? REDUCED.treeHold : NORMAL.treeHold;
+      expect(end.t - tree.t).toBeGreaterThanOrEqual(hold - 1e-6);
+      expect(timeline.duration).toBeGreaterThanOrEqual(end.t);
+      for (const m of timeline.marks) expect(m.t).toBeLessThanOrEqual(end.t + 1e-6);
+    }
+    expect(NORMAL.treeHold).toBeGreaterThanOrEqual(1400);
+  });
+});
+
+describe('man11Anim: gió xoáy đổi chỗ với một lá', () => {
+  it('xóa đúng mọi lá cùng loại và chính ô gió (đợt nổ đầu), không lá loại khác; bàn hiển thị cuối khớp logic; mọi lá bị xóa có khóa mờ dần và vòng nổ', () => {
+    const s = createMatch3FromBoard('ABCDEFA / CDEFABC / EFABCDE / BCDEFAB / DEFABCD / FABCDEF / ABCDEFA', { slots: 'AAAA', turns: 10 });
+    s.board[3][3] = WIND; // đang là ô gió; ô (3,4) là lá loại E
+    const kind = s.board[3][4].leaf;
+    const expected = s.board.flat().filter((c) => c.kind === 'leaf' && c.leaf === kind).length;
+    expect(expected).toBeGreaterThan(5);
+    const before = viewFromBoard(s.board);
+    const r = swapCells(s, [3, 3], [3, 4]);
+    expect(r.ok).toBe(true);
+    const clear = r.events.find((e) => e.type === 'clear');
+    expect(clear && clear.type === 'clear' ? clear.windOf : -2).toBe(kind);
+    const cells = clear && clear.type === 'clear' ? clear.cells : [];
+    expect(cells.filter((c) => c.kind === 'leaf' || c.kind === 'lotus')).toHaveLength(expected);
+    expect(cells.filter((c) => c.kind === 'wind')).toHaveLength(1);
+    for (const c of cells) if (c.kind !== 'wind') expect(c.leaf).toBe(kind);
+    const { timeline, view } = planEvents(before, r.events);
+    expect(viewMismatch(view, s.board)).toBeNull();
+    expect(timeline.marks.filter((m) => m.type === 'clear')[0].count).toBe(expected + 1);
+    expect(timeline.bursts.filter((b) => b.leaf === kind).length).toBeGreaterThanOrEqual(expected);
+    // cuối đợt nổ đầu, mọi miếng bị xóa (lá loại đó và ô gió) đã mờ hẳn
+    const out = newSample();
+    const firstEnd = NORMAL.swap + NORMAL.clear;
+    let faded = 0;
+    for (const c of cells) {
+      const id = before.grid[c.pos[0]][c.pos[1]];
+      const tr = timeline.tracks.find((x) => x.id === id);
+      expect(tr, `miếng ${id}`).toBeDefined();
+      resetTimeline(timeline);
+      sampleTrack(tr!, firstEnd + 1, out);
+      if (out.a < 0.01) faded++;
+    }
+    expect(faded).toBe(cells.length);
   });
 });

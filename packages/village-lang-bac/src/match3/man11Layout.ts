@@ -151,7 +151,7 @@ export function man11Layout(frame: Man11Frame, framePx: number): Man11Layout {
     tree,
     hud,
     help,
-    villain: { x: villainX, height: VILLAIN_HEIGHT, hiddenY: bottom - VILLAIN_HEIGHT - 0.3, peekY: bottom - VILLAIN_HEIGHT * (frame === 'landscape' ? 0.12 : 0.32) },
+    villain: { x: villainX, height: VILLAIN_HEIGHT, hiddenY: bottom - VILLAIN_HEIGHT - 0.3, peekY: frame === 'landscape' ? bottom + 0.4 : bottom - VILLAIN_HEIGHT * 0.32 },
   };
 }
 

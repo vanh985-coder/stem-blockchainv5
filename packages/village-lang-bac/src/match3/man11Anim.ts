@@ -195,6 +195,8 @@ export interface Durations {
   flightStagger: number;
   branchStep: number;
   treeDone: number;
+  /** Cây đã xong: giữ cây đầy và gốc sáng thêm chừng này (ms) cho em nhìn rõ rồi mới hiện hộp hết vòng */
+  treeHold: number;
   fallBase: number;
   fallPerRow: number;
   fallMax: number;
@@ -224,6 +226,7 @@ export const NORMAL: Durations = {
   flightStagger: 70,
   branchStep: 170,
   treeDone: 260,
+  treeHold: 1400,
   fallBase: 120,
   fallPerRow: 70,
   fallMax: 430,
@@ -251,6 +254,7 @@ export const REDUCED: Durations = {
   flightStagger: 40,
   branchStep: 90,
   treeDone: 120,
+  treeHold: 500,
   fallBase: 90,
   fallPerRow: 0,
   fallMax: 90,
@@ -358,6 +362,7 @@ class Planner {
     let lastBranch = 0;
     let slotCount = 0;
     let waveSeen = 0;
+    let treeAt = -1;
     for (const e of events) {
       switch (e.type) {
         case 'swap':
@@ -441,7 +446,8 @@ class Planner {
           break;
         }
         case 'treeDone':
-          this.mark(Math.max(lastLand, lastBranch) + d.treeDone, { type: 'tree' });
+          treeAt = Math.max(lastLand, lastBranch) + d.treeDone;
+          this.mark(treeAt, { type: 'tree' });
           break;
         case 'fall': {
           let maxD = 0;
@@ -542,7 +548,8 @@ class Planner {
           break;
         }
         case 'roundEnd': {
-          const t = Math.max(this.T, this.tail) + d.roundEnd;
+          // cây xong: hộp hết vòng chỉ hiện khi mọi hoạt cảnh đã xong VÀ cây đầy, gốc sáng đã được giữ ít nhất `treeHold` kể từ mốc gốc sáng (cây thấy rõ)
+          const t = Math.max(Math.max(this.T, this.tail) + d.roundEnd, e.done && treeAt >= 0 ? treeAt + d.treeHold : 0);
           this.mark(t, { type: 'roundEnd', done: e.done, bonus: e.bonus, turnsLeft: e.turnsLeft, round: e.round });
           break;
         }
