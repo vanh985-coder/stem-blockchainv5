@@ -1,4 +1,4 @@
-# SPEC 10 — HỘI LÀNG, GỘP WEB & KIỂM TRA (mốc 3: hội làng; gộp web và kiểm tra làm sau cùng)
+# SPEC 10 — HỘI LÀNG, GỘP WEB & KIỂM TRA (mục 1, hội làng: thuộc CUỐI MỐC 4, làm sau cùng; mục 2 đến 4, gộp web, kiểm tra toàn bộ và ra mắt: thuộc CUỐI MỐC 3)
 
 ## 1. Hội làng `/hoi-lang` (trong hub)
 
@@ -50,7 +50,7 @@
 ## 3. Kiểm tra toàn bộ
 
 **Chơi trọn từ đầu:**
-- Tạo tài khoản mới, đi qua: trang chủ → truyện → chợ → 12 màn → hội làng → bằng khen → tỉnh giấc. Không gặp lỗi.
+- **Đường chơi trọn của mốc 3:** tạo tài khoản mới, đi qua trang chủ → truyện → chợ → 12 màn → cao trào. Không gặp lỗi. (Hội làng, bằng khen và tỉnh giấc thuộc cuối mốc 4, nên chưa có ở mốc 3; khi làm hội làng thì nối thêm vào cuối đường này: … → cao trào → hội làng → bằng khen → tỉnh giấc.)
 - Làm lại với tài khoản Google.
 - Chơi thử rồi mới đăng nhập: tiến độ được gộp.
 
