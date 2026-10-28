@@ -21,6 +21,7 @@
     "dev:assets": "node scripts/dev-assets.mjs",
     "check:text": "node scripts/check-text.mjs",
     "rls:check": "node scripts/rls-check.mjs",
+    "brand:build": "node scripts/brand-images.mjs",
     "guide:capture": "node scripts/guide-capture.mjs"
   },
   "devDependencies": {

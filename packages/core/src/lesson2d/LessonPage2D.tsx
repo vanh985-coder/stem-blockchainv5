@@ -4,6 +4,7 @@ import { asset, useManifest } from '../assets/store';
 import { useNavigate } from 'react-router';
 import { MERGED, URLS, villageWorldUrl } from '../config/urls';
 import { VILLAGE_THEME } from '../content/nenTrangTri';
+import { PROBE } from '../lib/dev';
 import { fmt } from '../content/characters';
 import { VILLAGE_ORDER, levelById, nextReadyLevel } from '../content/levels';
 import { ui } from '../content/ui';
@@ -233,6 +234,8 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
     );
   } else if (stage.kind === 'play') {
     const id = STATION_ORDER[stage.idx];
+    // Cầu nối đo kiểm: hoàn thành trạm đang chơi với số sao cho trước (mặc định 3) qua đúng đường onStationComplete (ghi tiến độ, màn "xong trạm")
+    if (PROBE) Object.assign(window, { __stationDone: (stars: 1 | 2 | 3 = 3) => onStationComplete(stage.idx, { stars, timeMs: 1000, learned: content.keyTakeaway }) });
     body = (
       <div ref={playArea}>
         <Panel className="p-2 sm:p-6" key={`p${attempt}-${id}`}>

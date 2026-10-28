@@ -7,6 +7,7 @@ import { gameHints } from '../content/gameHints';
 import { guideSectionOfLevel, huongDan } from '../content/huongDan';
 import { levelById, nextReadyLevel } from '../content/levels';
 import { gameResultOf, summarizeGame, type Medal, type MedalThresholds } from '../games/medals';
+import { PROBE } from '../lib/dev';
 import { formatNumber } from '../lib/format';
 import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
@@ -173,6 +174,8 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
   const moc = fmt(gameUi.cacMoc, { so: medals[0], so2: medals[1], so3: medals[2] });
 
   if (stage.kind === 'play') {
+    // Cầu nối đo kiểm: kết thúc ván với điểm cho trước (mặc định mốc Vàng) qua đúng đường onFinish của khung (ghi tiến độ, màn kết quả, cảnh cuối)
+    if (PROBE) Object.assign(window, { __miniFinish: (score?: number) => onFinish(score ?? medals[2]) });
     return (
       <div className="relative">
         {renderGame({ paused, attempt, onFinish, setHint })}
