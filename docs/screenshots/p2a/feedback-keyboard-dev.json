@@ -1,0 +1,1082 @@
+[
+ {
+  "man": 1,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "Enter nộp đáp án: hộp phản hồi vẫn mở sau 600 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "cha render lại 5 lần khi hộp mở: không phát lại âm (nốt phát thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "cha render lại 5 lần: không báo lại phản ứng nhân vật (báo thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "thả phím rồi nhấn Enter lần tiếp theo: hộp đóng (tiếp tục)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "giữ Enter + key repeat (9 lần keydown): hộp vẫn mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "sau khi thả rồi nhấn lại Enter: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "lần nộp thứ ba: hộp mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "bấm nút Tiếp bằng chuột/chạm: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "ba lần nộp phát âm một lần mỗi lần (nốt: 2, 2, 2); lần 1 và 3 cùng loại có số nốt bằng nhau",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "lần nộp 1 báo nhân vật đúng một lần cho hộp (báo: 2)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "Enter nộp đáp án: hộp phản hồi vẫn mở sau 600 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "cha render lại 5 lần khi hộp mở: không phát lại âm (nốt phát thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "cha render lại 5 lần: không báo lại phản ứng nhân vật (báo thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "thả phím rồi nhấn Enter lần tiếp theo: hộp đóng (tiếp tục)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "giữ Enter + key repeat (9 lần keydown): hộp vẫn mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "sau khi thả rồi nhấn lại Enter: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "lần nộp thứ ba: hộp mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "bấm nút Tiếp bằng chuột/chạm: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "ba lần nộp phát âm một lần mỗi lần (nốt: 2, 3, 2); lần 1 và 3 cùng loại có số nốt bằng nhau",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "lần nộp 1 báo nhân vật đúng một lần cho hộp (báo: 1)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "Enter nộp đáp án: hộp phản hồi vẫn mở sau 600 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "cha render lại 5 lần khi hộp mở: không phát lại âm (nốt phát thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "cha render lại 5 lần: không báo lại phản ứng nhân vật (báo thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "thả phím rồi nhấn Enter lần tiếp theo: hộp đóng (tiếp tục)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "giữ Enter + key repeat (9 lần keydown): hộp vẫn mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "sau khi thả rồi nhấn lại Enter: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "lần nộp thứ ba: hộp mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "bấm nút Tiếp bằng chuột/chạm: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "ba lần nộp phát âm một lần mỗi lần (nốt: 4, 4, 4); lần 1 và 3 cùng loại có số nốt bằng nhau",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "lần nộp 1 báo nhân vật đúng một lần cho hộp (báo: 2)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "Enter nộp đáp án: hộp phản hồi vẫn mở sau 600 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "cha render lại 5 lần khi hộp mở: không phát lại âm (nốt phát thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "cha render lại 5 lần: không báo lại phản ứng nhân vật (báo thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "thả phím rồi nhấn Enter lần tiếp theo: hộp đóng (tiếp tục)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "giữ Enter + key repeat (9 lần keydown): hộp vẫn mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "sau khi thả rồi nhấn lại Enter: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "lần nộp thứ ba: hộp mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "bấm nút Tiếp bằng chuột/chạm: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "ba lần nộp phát âm một lần mỗi lần (nốt: 2, 2, 2); lần 1 và 3 cùng loại có số nốt bằng nhau",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "1366x768",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "lần nộp 1 báo nhân vật đúng một lần cho hộp (báo: 2)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "Enter nộp đáp án: hộp phản hồi vẫn mở sau 600 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "cha render lại 5 lần khi hộp mở: không phát lại âm (nốt phát thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "cha render lại 5 lần: không báo lại phản ứng nhân vật (báo thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "thả phím rồi nhấn Enter lần tiếp theo: hộp đóng (tiếp tục)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "giữ Enter + key repeat (9 lần keydown): hộp vẫn mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "sau khi thả rồi nhấn lại Enter: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "lần nộp thứ ba: hộp mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "bấm nút Tiếp bằng chuột/chạm: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "ba lần nộp phát âm một lần mỗi lần (nốt: 2, 2, 2); lần 1 và 3 cùng loại có số nốt bằng nhau",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "lần nộp 1 báo nhân vật đúng một lần cho hộp (báo: 2)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "Enter nộp đáp án: hộp phản hồi vẫn mở sau 600 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "cha render lại 5 lần khi hộp mở: không phát lại âm (nốt phát thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "cha render lại 5 lần: không báo lại phản ứng nhân vật (báo thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "thả phím rồi nhấn Enter lần tiếp theo: hộp đóng (tiếp tục)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "giữ Enter + key repeat (9 lần keydown): hộp vẫn mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "sau khi thả rồi nhấn lại Enter: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "lần nộp thứ ba: hộp mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "bấm nút Tiếp bằng chuột/chạm: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "ba lần nộp phát âm một lần mỗi lần (nốt: 2, 3, 2); lần 1 và 3 cùng loại có số nốt bằng nhau",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "lần nộp 1 báo nhân vật đúng một lần cho hộp (báo: 1)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "Enter nộp đáp án: hộp phản hồi vẫn mở sau 600 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "cha render lại 5 lần khi hộp mở: không phát lại âm (nốt phát thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "cha render lại 5 lần: không báo lại phản ứng nhân vật (báo thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "thả phím rồi nhấn Enter lần tiếp theo: hộp đóng (tiếp tục)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "giữ Enter + key repeat (9 lần keydown): hộp vẫn mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "sau khi thả rồi nhấn lại Enter: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "lần nộp thứ ba: hộp mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "bấm nút Tiếp bằng chuột/chạm: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "ba lần nộp phát âm một lần mỗi lần (nốt: 4, 4, 4); lần 1 và 3 cùng loại có số nốt bằng nhau",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "lần nộp 1 báo nhân vật đúng một lần cho hộp (báo: 2)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "Enter nộp đáp án: hộp phản hồi vẫn mở sau 600 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "cha render lại 5 lần khi hộp mở: không phát lại âm (nốt phát thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "cha render lại 5 lần: không báo lại phản ứng nhân vật (báo thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "thả phím rồi nhấn Enter lần tiếp theo: hộp đóng (tiếp tục)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "giữ Enter + key repeat (9 lần keydown): hộp vẫn mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "sau khi thả rồi nhấn lại Enter: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "lần nộp thứ ba: hộp mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "bấm nút Tiếp bằng chuột/chạm: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "ba lần nộp phát âm một lần mỗi lần (nốt: 2, 2, 2); lần 1 và 3 cùng loại có số nốt bằng nhau",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "360x800",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "lần nộp 1 báo nhân vật đúng một lần cho hộp (báo: 2)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "Enter nộp đáp án: hộp phản hồi vẫn mở sau 600 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "cha render lại 5 lần khi hộp mở: không phát lại âm (nốt phát thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "cha render lại 5 lần: không báo lại phản ứng nhân vật (báo thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "thả phím rồi nhấn Enter lần tiếp theo: hộp đóng (tiếp tục)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "giữ Enter + key repeat (9 lần keydown): hộp vẫn mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "sau khi thả rồi nhấn lại Enter: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "lần nộp thứ ba: hộp mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "bấm nút Tiếp bằng chuột/chạm: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "ba lần nộp phát âm một lần mỗi lần (nốt: 2, 2, 2); lần 1 và 3 cùng loại có số nốt bằng nhau",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 1,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 1 · trạm Dễ (ô nhập mã trang, Enter trong ô)",
+  "name": "lần nộp 1 báo nhân vật đúng một lần cho hộp (báo: 2)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "Enter nộp đáp án: hộp phản hồi vẫn mở sau 600 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "cha render lại 5 lần khi hộp mở: không phát lại âm (nốt phát thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "cha render lại 5 lần: không báo lại phản ứng nhân vật (báo thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "thả phím rồi nhấn Enter lần tiếp theo: hộp đóng (tiếp tục)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "giữ Enter + key repeat (9 lần keydown): hộp vẫn mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "sau khi thả rồi nhấn lại Enter: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "lần nộp thứ ba: hộp mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "bấm nút Tiếp bằng chuột/chạm: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "ba lần nộp phát âm một lần mỗi lần (nốt: 2, 3, 2); lần 1 và 3 cùng loại có số nốt bằng nhau",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 4,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 2 · trạm Dễ (nút Đồng ý/Từ chối giữ focus, Enter trên nút)",
+  "name": "lần nộp 1 báo nhân vật đúng một lần cho hộp (báo: 1)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "Enter nộp đáp án: hộp phản hồi vẫn mở sau 600 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "cha render lại 5 lần khi hộp mở: không phát lại âm (nốt phát thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "cha render lại 5 lần: không báo lại phản ứng nhân vật (báo thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "thả phím rồi nhấn Enter lần tiếp theo: hộp đóng (tiếp tục)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "giữ Enter + key repeat (9 lần keydown): hộp vẫn mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "sau khi thả rồi nhấn lại Enter: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "lần nộp thứ ba: hộp mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "bấm nút Tiếp bằng chuột/chạm: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "ba lần nộp phát âm một lần mỗi lần (nốt: 4, 4, 4); lần 1 và 3 cùng loại có số nốt bằng nhau",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 7,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 3 · trạm Trung bình (nút \"Nộp kết quả thẩm định\", Enter trên nút)",
+  "name": "lần nộp 1 báo nhân vật đúng một lần cho hộp (báo: 2)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "Enter nộp đáp án: hộp phản hồi vẫn mở sau 600 ms",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "cha render lại 5 lần khi hộp mở: không phát lại âm (nốt phát thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "cha render lại 5 lần: không báo lại phản ứng nhân vật (báo thêm = 0)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "thả phím rồi nhấn Enter lần tiếp theo: hộp đóng (tiếp tục)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "giữ Enter + key repeat (9 lần keydown): hộp vẫn mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "sau khi thả rồi nhấn lại Enter: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "lần nộp thứ ba: hộp mở",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "bấm nút Tiếp bằng chuột/chạm: hộp đóng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "ba lần nộp phát âm một lần mỗi lần (nốt: 2, 2, 2); lần 1 và 3 cùng loại có số nốt bằng nhau",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "man": 10,
+  "size": "844x390",
+  "mode": "dev",
+  "vehicle": "bài 4 · trạm Dễ (ô nhập ghép cặp, Enter trong ô)",
+  "name": "lần nộp 1 báo nhân vật đúng một lần cho hộp (báo: 2)",
+  "ok": true,
+  "detail": ""
+ }
+]

@@ -58,7 +58,7 @@ Kiểm kèm theo mỗi lần khen (đều đạt): dải khen nằm trọn trong
 | Đổi media sang giảm chuyển động giữa chừng | hạt 24 → 0, chữ còn |
 | Đổi trạm khi đang khen | lời khen và hạt biến mất ngay, 2,3 giây sau không khen lại |
 | Rời bài (SPA) khi đang khen | vùng khen bị gỡ, không lỗi, không dựng lại |
-| `FeedbackSheet` render lại khi hộp ĐÚNG đang mở (đổi cỡ khung 4 lần → callback mới mỗi lần) | số đợt khen 1 → 1 trên cả **production** và **dev StrictMode**. Chứng cứ effect thật sự nối lại: nốt nhạc phát lại 8 lần (2 nốt × 4), tức là âm và phản ứng nhân vật **vẫn lặp như trước P2a** nhưng không còn lần nộp mới |
+| `FeedbackSheet` render lại khi hộp ĐÚNG đang mở (đổi cỡ khung 4 lần → callback mới mỗi lần) | số đợt khen 1 → 1 trên cả **production** và **dev StrictMode**. Ở lượt P2a đầu nốt nhạc vẫn phát lại 8 lần (2 nốt × 4); **đã sửa ở lượt sau** (0 lần, xem mục `FeedbackSheet`) |
 
 ## Lỗi tìm ra khi kiểm thật và đã sửa
 
@@ -74,14 +74,36 @@ So sánh với bản build trước sửa (`truoc-khi-sua.log`, cùng script, 13
 
 ## Ghi nhận ngoài phạm vi (không sửa)
 
-- Nộp **sai bằng phím Enter** ở ô nhập: phím Enter đó cũng kích `onKey` của `FeedbackSheet`, nên hộp phản hồi sai đóng ngay (em không kịp đọc). Thấy ở màn 1 Dễ và màn 10 Dễ; có sẵn từ trước P2a.
-- Khi cha render lại lúc hộp đang mở, âm và phản ứng nhân vật phát lại (giữ nguyên theo yêu cầu "không đổi phản ứng nhân vật").
 - Màn 3 nút "?" đè chữ "Soi công thức" (ghi nhận từ trước).
 - Màn 4 Khó hai node không đủ cọc "bỏ lượt" không gặp trong các lần chạy; logic đó chưa được kiểm qua DOM (khen không đụng tới).
+- Hai lỗi `FeedbackSheet` ghi nhận ở lượt P2a đầu (Enter đóng hộp ngay; âm và phản ứng nhân vật phát lại khi cha render lại) **đã sửa ở lượt sau**, xem mục dưới.
+
+## Sửa `FeedbackSheet` sau P2a (hai lỗi, cùng ngày)
+
+Tệp sửa: `packages/core/src/ui/FeedbackSheet.tsx`, `feedbackAnnounce.ts`, `feedbackAnnounce.test.ts`; kiểm: `scripts/p2a-feedback-check.mjs`. Không đổi luật, công thức, điểm, tiến độ, loại âm, tư thế nhân vật, hiệu ứng khen.
+
+1. **Enter nộp không đóng hộp vừa mở.** Phím Enter nộp đáp án kích luôn nghe-phím của hộp (effect chạy đồng bộ trong cùng sự kiện), nên hộp sai đóng ngay. Giờ `enterContinues` chỉ nhận keydown **không phải phím lặp** và **sau thời điểm hộp báo lần nộp** (`event.timeStamp > openedAt`); mọi Enter vẫn bị chặn mặc định để nút "Tiếp" đang giữ focus không bị bấm thêm. Em phải thả phím rồi nhấn Enter lần nữa mới tiếp tục; giữ phím (key repeat) không làm gì; bấm nút Tiếp bằng chuột/chạm bình thường.
+2. **Không phát lại âm và phản ứng nhân vật.** Trước đây effect phụ thuộc `onContinue` (hàm mới mỗi lần cha render) nên chạy lại và phát lại âm. Giờ tách hai effect: báo lần nộp phụ thuộc `[isOpen, isCorrect, khóa nội dung]` (`submissionKey`, `shouldAnnounce`), phím Enter dùng ref tới `onContinue` mới nhất. Mỗi lần nộp phát **đúng một lần** `sound.playCorrect()`/`playWrong()` như trước P2a (không còn tham số `answer`); hộp đóng rồi mở lại, hoặc đúng/sai/nội dung đổi lúc hộp mở là lần nộp mới, nên hai lần liên tiếp cùng đúng hay cùng sai đều phát đủ.
+
+### Test hồi quy
+
+- `feedbackAnnounce.test.ts` (hàm thuần): render lại 6 lần một lần nộp → 1 lần phát; hai lần cùng sai và hai lần cùng đúng (đóng giữa chừng) → 2 lần; đúng/sai hoặc nội dung đổi lúc mở → lần nộp mới; khóa khác nhau ở mọi trường; Enter nộp (nhấn trước hoặc đúng lúc mở) không tiếp tục, key repeat không tiếp tục, nhấn mới sau khi mở thì tiếp tục, lần nộp mới làm mới mốc.
+- **DOM thật bằng bàn phím** (`p2a-feedback-check.mjs`, bàn phím `keyboard.down/up` và chuột/chạm thật; không gọi `sound`/`onAnswer`), mỗi bài một trạm có hộp phản hồi: màn 1 Dễ (Enter trong ô nhập), màn 4 Dễ (Enter trên nút Đồng ý/Từ chối), màn 7 Trung bình (Enter trên nút nộp thẩm định), màn 10 Dễ (Enter trong ô ghép cặp); 3 cỡ; trên **production** (96 kiểm) và **dev StrictMode** (120 kiểm), đạt hết. Mỗi trạm kiểm:
+  - Enter nộp: hộp còn mở sau 600 ms;
+  - cha render lại 5 lần (đổi cỡ khung): hộp còn mở, **0 nốt nhạc phát thêm**; ở dev thêm đo người nghe `onAnswer` (chính đường phản ứng nhân vật): **0 lần báo thêm**;
+  - nhấn Enter mới: hộp đóng; giữ Enter + 8 key repeat: hộp vẫn mở, thả rồi nhấn lại: đóng;
+  - bấm nút Tiếp bằng chuột/chạm: hộp đóng; ba lần nộp liên tiếp mỗi lần phát âm một lần (số nốt lần 1 và 3 cùng loại bằng nhau).
+- **Đối chứng bản trước sửa** (`feedback-keyboard-truoc-khi-sua.json`, cùng script, 1366×768): **12/32 kiểm không đạt**: hộp đóng ngay khi Enter nộp (màn 1, 10), giữ Enter làm đóng (cả bốn bài), cha render lại làm phát thêm 5 lần âm (màn 4, 7).
+- Hồi quy lời khen P2a sau sửa: `p2a-real-check.mjs` chạy lại ở 1366×768 và 844×390 (trạm, vòng đời, hộp phản hồi, dev StrictMode): 86 nhóm, 0 lỗi; `p2a-check.mjs` (tín hiệu) đạt.
+- Số đo từng kiểm: `feedback-keyboard-production.json`, `feedback-keyboard-dev.json`.
+
+### Chưa xác minh (lượt này)
+
+Bàn phím vật lý trên thiết bị thật, bàn phím ảo, Safari/iPhone, trình đọc màn hình; các lần nộp bằng Enter trong trạm có hộp mà tôi chưa dùng làm phương tiện (màn 1 Trung bình/Khó, màn 4 Trung bình, màn 7 Dễ, màn 10 Trung bình/Khó) dùng chung `FeedbackSheet` nên chịu cùng quy tắc nhưng không được lái riêng; phản ứng nhân vật ở bản production chỉ kiểm gián tiếp qua nốt nhạc (không có hook vào module), ở dev đo trực tiếp.
 
 ## Kiểm tra bắt buộc
 
-`pnpm test --maxWorkers=2`: **2117 pass, 1 skipped** (193 file pass, 1 skipped; mới có test `feedbackAnnounce`, `emitSubmission`, `voteWasRight`). `pnpm typecheck` đạt. `pnpm check:text` sạch (428 file). `pnpm build` đạt (5 app, `VITE_MERGED=true`).
+`pnpm test --maxWorkers=2`: **2123 pass, 1 skipped** (193 file pass, 1 skipped; sau cả hai lượt, gồm test `feedbackAnnounce`, `emitSubmission`, `voteWasRight`). `pnpm typecheck` đạt. `pnpm check:text` sạch (428 file). `pnpm build` đạt (5 app, `VITE_MERGED=true`).
 
 ## Chưa xác minh
 
@@ -89,4 +111,4 @@ Thiết bị thật, Safari/iPhone, bàn phím ảo, trình đọc màn hình, F
 
 ## Tệp
 
-`real-measurements.json` (từng thao tác: mong đợi/thực tế, cuộn, bố cục, nốt nhạc), `real-shots.json`, `signal-measurements.json`, `truoc-khi-sua.log`, 57 ảnh `thuc-*.jpg`, `build.log`, `typecheck.log` (lượt mới), `bundle-*.json` (bản ghi cũ).
+`real-measurements.json` (từng thao tác: mong đợi/thực tế, cuộn, bố cục, nốt nhạc), `real-shots.json`, `signal-measurements.json`, `truoc-khi-sua.log`, `feedback-keyboard-*.json`, 57 ảnh `thuc-*.jpg`, `build.log`, `typecheck.log` (lượt mới), `bundle-*.json` (bản ghi cũ).

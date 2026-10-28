@@ -11,7 +11,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | Hosting | Windows Server, Docker Desktop (WSL2) + Caddy, cổng 18081–18086; Cloudflare Tunnel (dịch vụ Windows). `docs/DEPLOY.md` mục (h) deploy, (i) luật cache |
 | Supabase | Project `zlqxwbgcyudybxaynluf` (Singapore), migrations 0001, 0002; Edge Function `teacher-reset-password` |
 | Tài khoản thử | Giáo viên `gva`, `gvb`; học sinh `thu01`, `thu02` |
-| Người code | **Codex**, đọc **`AGENTS.md`** (từ mốc 4, P1a). **Tự commit** khi `pnpm test`, `pnpm typecheck`, `pnpm check:text`, `pnpm build` đạt; **không push**. Công việc mốc trước do Claude Code thực hiện |
+| Người code | **Claude Code**, đọc **`CLAUDE.md`** (từ lượt sửa `FeedbackSheet` sau P2a). **Tự commit** khi `pnpm test`, `pnpm typecheck`, `pnpm check:text`, `pnpm build` đạt; **không push** trừ khi chủ dự án bảo. P1a, P1b, P2a do Codex (đọc `AGENTS.md`) viết ban đầu, P2a hoàn thiện bởi Claude Code |
 | Ảnh chụp kiểm tra | Lưu vào `docs/screenshots/<bước>/` (< 300 KB mỗi ảnh); P1a: `docs/screenshots/p1a/` |
 
 ## Tiến độ
@@ -74,8 +74,17 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - **Kiểm thao tác thật** trên bản production (`scripts/p2a-real-check.mjs`): chuột/chạm/phím/kéo thả thật, 12 trạm, 3 cỡ (1366×768, 360×800, 844×390): 129 nhóm, 516 thao tác (111 khen đúng 1 đợt, 405 không khen), vòng đời (tắt âm, giảm chuyển động cài đặt và hệ điều hành, đổi media giữa chừng, đổi trạm, rời bài) 90/90, `FeedbackSheet` render lại trên production và dev StrictMode không phát trùng. Tách riêng khỏi kiểm tín hiệu `scripts/p2a-check.mjs`. Chi tiết, bảng thao tác và 57 ảnh (lớn nhất 104.885 byte) ở `docs/screenshots/p2a/README.md`.
 - **Lỗi tìm ra khi kiểm thật và đã sửa:** chữ `// isolate…` lộ ra mọi trang bài; màn 7 Dễ khen khi bấm kiểm tra chưa đặt thẻ; màn 7 Trung bình khen theo kết quả của Máy xác minh; màn 7 Khó trả lời đúng (phần 2, 3) không có khen; màn 10 Trung bình hoạt cảnh sửa trộm xóa lời khen; `FeedbackSheet` mất lần nộp khi đúng/sai đổi lúc hộp mở. Bản trước sửa không đạt 16 mục (`truoc-khi-sua.log`).
 - `pnpm test --maxWorkers=2`: **2117 pass, 1 skipped**; `pnpm typecheck`, `pnpm check:text` (428 file), `pnpm build` (5 app, `VITE_MERGED=true`) đạt.
-- **Ghi nhận ngoài phạm vi, chưa sửa:** nộp sai bằng Enter làm hộp phản hồi đóng ngay (Enter cũng kích `FeedbackSheet`); cha render lại lúc hộp mở thì âm và phản ứng nhân vật phát lại (giữ theo yêu cầu).
+- Hai lỗi `FeedbackSheet` thấy ở lượt này (Enter đóng hộp ngay; âm và phản ứng nhân vật phát lại khi cha render lại) **đã sửa ở mục dưới**.
 - Chưa xác minh: thiết bị thật, Safari/iPhone, bàn phím ảo, trình đọc màn hình, FPS điện thoại; ở 1366×768 vài trang vừa khung nên không cuộn được. Chưa push/deploy. Không làm P2b bản đồ thẻ.
+
+## Sửa FeedbackSheet sau P2a — đã xác minh (28/10/2026)
+
+- **Người code: Claude Code, đọc `CLAUDE.md`.** Chỉ sửa hai lỗi của `FeedbackSheet`, không đổi luật, công thức, điểm, tiến độ, loại âm, tư thế nhân vật, hiệu ứng khen. Kết quả P1a, P1b, P2a phía trên giữ nguyên.
+- **Enter nộp không đóng hộp vừa mở:** hộp chỉ tiếp tục khi có lần nhấn Enter mới sau lúc hộp mở, không phải phím giữ/key repeat (`enterContinues`); nút Tiếp bằng chuột/chạm vẫn bình thường.
+- **Không phát lại âm và phản ứng nhân vật:** mỗi lần nộp báo đúng một lần theo khóa nội dung (`submissionKey`, `shouldAnnounce`); cha render lại, callback đổi, effect nối lại (StrictMode) không phát lại; hai lần nộp liên tiếp cùng đúng hoặc cùng sai vẫn phát đủ.
+- Test hồi quy: `feedbackAnnounce.test.ts`. Kiểm DOM thật bằng bàn phím (`scripts/p2a-feedback-check.mjs`) ở cả bốn bài (màn 1, 4, 7, 10), 3 cỡ: production 96 kiểm, dev StrictMode 120 kiểm, đạt hết; bản trước sửa không đạt 12/32. Chạy lại bộ kiểm lời khen P2a: 86 nhóm, 0 lỗi. Chi tiết ở `docs/screenshots/p2a/README.md` (mục "Sửa FeedbackSheet sau P2a").
+- `pnpm test --maxWorkers=2`: **2123 pass, 1 skipped**; `pnpm typecheck`, `pnpm check:text` (428 file), `pnpm build` (5 app) đạt.
+- Chưa xác minh: bàn phím vật lý/ảo trên thiết bị thật, Safari/iPhone, trình đọc màn hình; phản ứng nhân vật ở bản production chỉ kiểm gián tiếp qua nốt nhạc (đo trực tiếp ở dev). Không làm P2b, không sửa nút "?" màn 3.
 
 ## Việc dời từ mốc 3 (làm CUỐI mốc 4, theo thứ tự)
 
@@ -135,7 +144,7 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 
 ## Tải lên project claude.ai
 
-Từ `docs/specs/` trong repo: 00, 01, 03, 04, 06, 07, 08, 10 (đều đã được Claude Code sửa trong mốc 3) và file này. Người code hiện tại là **Codex**, đọc **AGENTS.md**, tự commit khi kiểm tra đạt, không push.
+Từ `docs/specs/` trong repo: 00, 01, 03, 04, 06, 07, 08, 10 (đều đã được Claude Code sửa trong mốc 3) và file này. Người code hiện tại là **Claude Code**, đọc **CLAUDE.md**, tự commit khi kiểm tra đạt, không push trừ khi chủ dự án bảo.
 
 ## Câu mở đầu cho cửa sổ tiếp theo
 

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { sound } from '../audio/sound';
 import { ui } from '../content/ui';
 import { BottomSheet } from './BottomSheet';
-import { announceOnce } from './feedbackAnnounce';
+import { enterContinues, shouldAnnounce, submissionKey } from './feedbackAnnounce';
 import { Button } from './Button';
 import { PortraitFrame } from './PortraitFrame';
 
@@ -28,29 +28,36 @@ export function FeedbackSheet({
   onContinue,
   continueLabel = ui.phanHoi.tiepTuc,
 }: FeedbackSheetProps) {
-  // Kết quả đã báo cho lần mở này. Chỉ báo lại khi đúng/sai đổi lúc hộp vẫn mở (một lần nộp mới);
-  // callback đổi, render lại hay effect nối lại (StrictMode) thì không tính là lần nộp mới.
-  const announced = useRef<boolean | null>(null);
+  // Mỗi lần nộp báo đúng một lần (âm, phản ứng nhân vật, lời khen); quy tắc ở feedbackAnnounce.ts.
+  // Render lại, callback đổi hay effect nối lại (StrictMode) cùng một lần nộp thì không phát lại gì.
+  const key = submissionKey({ isCorrect, title, whatHappened, whyHappened, howToFix });
+  const announcedKey = useRef<string | null>(null);
+  const openedAt = useRef(0);
+  const continueRef = useRef(onContinue);
+  continueRef.current = onContinue;
   useEffect(() => {
-    if (!isOpen) announced.current = null;
-  }, [isOpen]);
-  // Phát âm thanh và hỗ trợ phím Enter
+    if (!isOpen) {
+      announcedKey.current = null;
+      return;
+    }
+    if (!shouldAnnounce(announcedKey.current, key)) return;
+    announcedKey.current = key;
+    openedAt.current = performance.now();
+    if (isCorrect) sound.playCorrect();
+    else sound.playWrong();
+  }, [isOpen, isCorrect, key]);
+  // Phím Enter tiếp tục: chỉ nhận lần nhấn mới sau khi hộp mở (không phải phím nộp, không phải phím giữ).
+  // Luôn chặn mặc định để Enter không bấm nút "Tiếp" (đang giữ focus) thêm một lần nữa.
   useEffect(() => {
     if (!isOpen) return;
-    const next = announceOnce(announced.current, isCorrect);
-    announced.current = next.announced;
-    const { answer } = next;
-    if (isCorrect) sound.playCorrect({ answer });
-    else sound.playWrong({ answer });
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        onContinue();
-      }
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      if (enterContinues(e, openedAt.current)) continueRef.current();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, isCorrect, onContinue]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
