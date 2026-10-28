@@ -4,7 +4,7 @@
  * Quy tắc:
  * - Cổng làng: luôn hiện, mở hoặc khóa.
  * - Biển màn chơi: bản đồ lớn hiện cả 4 làng; bản đồ nhỏ chỉ hiện biển của làng em đang ở (ở ngoài làng biển nằm quá xa, hiện lên chỉ rối). Trạng thái: xong, đang mở, khóa, sắp ra mắt.
- * - Thẻ "Em có biết?" chưa nhặt: chỉ hiện khi em đang ở trong làng đó (cả hai bản đồ); thẻ đã nhặt không hiện.
+ * - Thẻ "Em có biết?" chưa nhặt (P2b): cả 4 làng, cả hai bản đồ, kể cả khi em đang ngoài làng; thẻ đã nhặt không hiện. Bản đồ nhỏ chỉ VẼ thẻ nằm trong vòng đang hiện (`placeMarker` ẩn ký hiệu ngoài vòng).
  * - Điểm đến của nhiệm vụ: đúng nút mà mũi tên dưới chân đang chỉ tới.
  * - Tên làng: bản đồ nhỏ đặt cạnh đường ra làng (nhìn thấy khi ở chợ), bản đồ lớn đặt giữa chỗ của làng.
  */
@@ -74,11 +74,9 @@ export function mapMarkers(input: MarkerInput, scope: MapScope): MapMarker[] {
     if (scope === 'big' || input.inside === v.id) {
       for (const b of v.layout.boards) out.push({ id: `board:${v.id}:${b.level}`, kind: 'board', x: b.x, z: b.z, village: v.id, level: b.level, mark: boardMark(input.levelStates[b.level]) });
     }
-    if (input.inside === v.id) {
-      const mask = input.knowMasks[v.id] ?? 0;
-      for (const s of v.layout.scrolls ?? []) {
-        if (!hasKnowCard(mask, s.index)) out.push({ id: `scroll:${v.id}:${s.index}`, kind: 'scroll', x: s.x, z: s.z, village: v.id, index: s.index });
-      }
+    const mask = input.knowMasks[v.id] ?? 0;
+    for (const s of v.layout.scrolls ?? []) {
+      if (!hasKnowCard(mask, s.index)) out.push({ id: `scroll:${v.id}:${s.index}`, kind: 'scroll', x: s.x, z: s.z, village: v.id, index: s.index });
     }
   }
   if (input.target) out.push({ id: 'target', kind: 'target', x: input.target.x, z: input.target.z });

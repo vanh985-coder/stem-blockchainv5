@@ -53,7 +53,7 @@ export function MiniMap({ geo, markers, names, api, inside, rotate, size, touch,
     const view: MapView = { cx: 0, cz: 0, radius: 1, size, rotation: 0 };
     const pt: Point = { x: 0, y: 0 };
     const scratch = newScratch();
-    const placed: MarkerPlacement = { transform: '', pinned: false, pinAngle: 0 };
+    const placed: MarkerPlacement = { transform: '', pinned: false, pinAngle: 0, visible: true };
     const tick = () => {
       const p = api.player;
       if (!p) return;
@@ -65,6 +65,8 @@ export function MiniMap({ geo, markers, names, api, inside, rotate, size, touch,
         if (!el) continue;
         placeMarker(view, m.kind === 'target', m.x, m.z, scratch, placed);
         el.setAttribute('transform', placed.transform);
+        // Thẻ chưa nhặt chỉ vẽ khi nằm trong vòng đang hiện; ký hiệu khác giữ như cũ (phần ngoài vòng bị cắt).
+        if (m.kind === 'scroll') el.setAttribute('display', placed.visible ? 'inline' : 'none');
         if (m.kind === 'target') {
           const pr = pinRefs.current.get(m.id);
           if (pr) {

@@ -11,7 +11,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | Hosting | Windows Server, Docker Desktop (WSL2) + Caddy, cổng 18081–18086; Cloudflare Tunnel (dịch vụ Windows). `docs/DEPLOY.md` mục (h) deploy, (i) luật cache |
 | Supabase | Project `zlqxwbgcyudybxaynluf` (Singapore), migrations 0001, 0002; Edge Function `teacher-reset-password` |
 | Tài khoản thử | Giáo viên `gva`, `gvb`; học sinh `thu01`, `thu02` |
-| Người code | **Claude Code**, đọc **`CLAUDE.md`** (từ lượt sửa `FeedbackSheet` sau P2a). **Tự commit** khi `pnpm test`, `pnpm typecheck`, `pnpm check:text`, `pnpm build` đạt; **không push** trừ khi chủ dự án bảo. P1a, P1b, P2a do Codex (đọc `AGENTS.md`) viết ban đầu, P2a hoàn thiện bởi Claude Code |
+| Người code | **Claude Code**, đọc **`CLAUDE.md`** (từ lượt sửa `FeedbackSheet` sau P2a). **Tự commit và tự push nhánh đang làm lên `origin`** khi `pnpm test`, `pnpm typecheck`, `pnpm check:text`, `pnpm build` đạt, không cần hỏi lại (từ P2b; thay cho "không push" trước đây). Không force-push, không tự merge vào `main`. P1a, P1b, P2a do Codex (đọc `AGENTS.md`) viết ban đầu, P2a hoàn thiện bởi Claude Code |
 | Ảnh chụp kiểm tra | Lưu vào `docs/screenshots/<bước>/` (< 300 KB mỗi ảnh); P1a: `docs/screenshots/p1a/` |
 
 ## Tiến độ
@@ -20,7 +20,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 |---|---|
 | 0–2 | ✅ Xong (mốc 2 chưa deploy) |
 | 3. Nhân rộng | ✅ **Chốt.** Đủ 12 màn, cả 4 làng dựng to, **đã gộp web** (≈2086 test xanh). Việc còn dở dời xuống **cuối mốc 4** |
-| 4. Trau chuốt | **P1a, P1b, P2a đã xong và kiểm đạt** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
+| 4. Trau chuốt | **P1a, P1b, P2a, P2b đã xong và kiểm đạt** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
 
 **⚠️ 15b vẫn chưa làm:** server có thể đang 530, mốc 2 và toàn bộ mốc 3 (≈60 commit, mới nhất `2bd76bf`) chưa push, chưa chạy trên máy thật. Cách làm: khôi phục `cloudflared` + Docker, deploy theo `DEPLOY.md` (h), Cache Rule (i), thử trên điện thoại.
 
@@ -86,6 +86,16 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - `pnpm test --maxWorkers=2`: **2123 pass, 1 skipped**; `pnpm typecheck`, `pnpm check:text` (428 file), `pnpm build` (5 app) đạt.
 - Chưa xác minh: bàn phím vật lý/ảo trên thiết bị thật, Safari/iPhone, trình đọc màn hình; phản ứng nhân vật ở bản production chỉ kiểm gián tiếp qua nốt nhạc (đo trực tiếp ở dev). Không làm P2b, không sửa nút "?" màn 3.
 
+## P2b — thẻ "Em có biết?" chưa nhặt trên bản đồ — đã xác minh (28/10/2026)
+
+- **Người code: Claude Code, đọc `CLAUDE.md`; từ bước này tự commit và tự push nhánh đang làm lên `origin` khi `pnpm test`, `pnpm typecheck`, `pnpm check:text`, `pnpm build` đạt** (không force-push, không tự merge vào `main`; luật mới ở `CLAUDE.md` mục 12, thay cho "không push"). Đã push `6cfd1e3` (sửa `FeedbackSheet`; `c78bdff` đã có trên origin) trước khi làm P2b.
+- Hiện hình thoi vàng cho mọi thẻ chưa nhặt: **bản đồ lớn** (cả 4 làng, kể cả khi đang ngoài làng), **bản đồ nhỏ** (thẻ của cả 4 làng, chỉ vẽ thẻ trong vòng đang hiện, cả chế độ hướng bắc và xoay) và **`/ban-do`** (lớp phủ `ScrollMarks`, tải lười). Một nguồn dữ liệu `LOCAL_VILLAGES[...].scrolls` đổi bằng `placeVillage`, không chép tọa độ. Nhặt thẻ xong biểu tượng biến mất, tải lại trang khớp tiến độ lưu. Chú thích có chữ (`content/minimap.ts`, `banDoThe`); không đổi cơ chế nhặt, mở khóa, tiến độ.
+- **Giới hạn thẳng thắn:** `/ban-do` là ảnh vẽ tay, chữ tên làng chiếm hết vùng quanh điểm làng, nên thẻ chỉ được đặt **quanh làng theo hướng la bàn thật** (lệch trung bình 3°/24°/7° ở 1366×768/360×800/844×390), không phải đúng chỗ; 0/16 thẻ ở đúng vị trí công thức. Vị trí chính xác chỉ có ở bản đồ lớn và nhỏ.
+- Kiểm `scripts/p2b-check.mjs` (bản build có cầu nối đo, 3 cỡ, chuột/chạm): **123 kiểm đạt**: 16 vị trí khách mới, đã nhặt một phần/tất cả, khớp vật thể 3D thật (lệch 0,00 px khi đứng ngay chỗ thẻ), hướng bắc và xoay (lệch ≤ 0,06 px), nhặt thật rồi mở lại bản đồ và tải lại trang, khách mới không mang thẻ người trước, chữ to + giảm chuyển động. 26 ảnh (lớn nhất 158.305 byte) và báo cáo ở `docs/screenshots/p2b/`.
+- Khi kiểm lộ hai lỗi bố cục đã sửa: biểu tượng/chú thích đè chữ tên làng ở màn nhỏ; khung tên làng đổi cỡ khi phông chữ tải xong mà không đo lại.
+- `pnpm test --maxWorkers=2`: **2143 pass, 1 skipped**; `pnpm typecheck`, `pnpm check:text` (430 file), `pnpm build` (5 app) đạt. Bundle hub +10.176 byte (+5.533 gzip), `/ban-do` tải lười thêm ≈ 71,8 KB (25,6 KB gzip) dữ liệu bố cục làng. Không sửa dựng cảnh 3D nên không đo FPS.
+- Chưa xác minh: thiết bị thật/Safari, đổi tài khoản Supabase thật (không có khóa ở máy đo), nhặt thẻ bằng nút bàn tay trên cảm ứng, giáo viên; chưa hỏi có ẩn thẻ của làng chưa mở không. Không làm nút "?" màn 3 và các bước kế.
+
 ## Việc dời từ mốc 3 (làm CUỐI mốc 4, theo thứ tự)
 
 1. **15b deploy bản gộp:** `git pull`, `VITE_MERGED=true` trong `deploy/.env`, dựng lại theo `DEPLOY.md` mục (j); kiểm hub 200, 4 địa chỉ làng cũ trả 302 giữ đường dẫn; thử trên điện thoại. Quay về: mục (j) cách 1 hoặc 2.
@@ -144,10 +154,10 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 
 ## Tải lên project claude.ai
 
-Từ `docs/specs/` trong repo: 00, 01, 03, 04, 06, 07, 08, 10 (đều đã được Claude Code sửa trong mốc 3) và file này. Người code hiện tại là **Claude Code**, đọc **CLAUDE.md**, tự commit khi kiểm tra đạt, không push trừ khi chủ dự án bảo.
+Từ `docs/specs/` trong repo: 00, 01, 03, 04, 06, 07, 08, 10 (đều đã được Claude Code sửa trong mốc 3) và file này. Người code hiện tại là **Claude Code**, đọc **CLAUDE.md**, tự commit và tự push nhánh đang làm khi kiểm tra đạt (không force-push, không tự merge vào `main`).
 
 ## Câu mở đầu cho cửa sổ tiếp theo
 
 ```
-Tiếp tục mốc 4 (trau chuốt). Đọc AGENTS.md, tự commit khi kiểm tra đạt, không push. Đọc TRANG-THAI.md: P1a và P1b đã xong, không làm lại. Yêu cầu 10 là máy tính màn 4 – Làng Dệt, không phải Bài 4/màn 10 – Làng Bạc. Chờ lời giao việc tiếp theo. Các việc dời từ mốc 3 và hội làng để cuối mốc 4.
+Tiếp tục mốc 4 (trau chuốt). Đọc CLAUDE.md, tự commit và tự push nhánh đang làm khi kiểm tra đạt (không force-push, không tự merge vào main). Đọc TRANG-THAI.md: P1a và P1b đã xong, không làm lại. Yêu cầu 10 là máy tính màn 4 – Làng Dệt, không phải Bài 4/màn 10 – Làng Bạc. Chờ lời giao việc tiếp theo. Các việc dời từ mốc 3 và hội làng để cuối mốc 4.
 ```

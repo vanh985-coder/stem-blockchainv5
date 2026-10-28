@@ -110,7 +110,7 @@ Xếp theo ảnh `concept-toan-canh` và `concept-cho-phien`. Phải **đủ đ�
 
 ### HUD
 
-- **Góc trên trái:** (từ bước X4) **bản đồ nhỏ**, ngay dưới là dòng "Nhiệm vụ: …". Bản đồ nhỏ: hướng bắc ở trên (chữ B), thấy cả 4 lối ra khi ở chợ, thấy bán kính 60 quanh em khi ở trong làng; vẽ đường, chợ, viền các làng, tên làng, cổng (mở hoặc khóa), biển màn chơi (xong / đang mở / khóa / sắp ra mắt), điểm đến của nhiệm vụ (khớp mũi tên dưới chân) và thẻ "Em có biết?" chưa nhặt (chỉ trong làng đó). Bấm phím **M** hoặc chạm bản đồ nhỏ để mở **bản đồ lớn** (cả thế giới, chú thích, tiến độ từng làng, dòng "Việc tiếp theo"). Chi tiết kỹ thuật: spec 03 mục 3.10.
+- **Góc trên trái:** (từ bước X4) **bản đồ nhỏ**, ngay dưới là dòng "Nhiệm vụ: …". Bản đồ nhỏ: hướng bắc ở trên (chữ B), thấy cả 4 lối ra khi ở chợ, thấy bán kính 60 quanh em khi ở trong làng; vẽ đường, chợ, viền các làng, tên làng, cổng (mở hoặc khóa), biển màn chơi (xong / đang mở / khóa / sắp ra mắt), điểm đến của nhiệm vụ (khớp mũi tên dưới chân) và thẻ "Em có biết?" chưa nhặt (P2b: cả 4 làng; bản đồ nhỏ chỉ vẽ thẻ trong vòng đang hiện). Bấm phím **M** hoặc chạm bản đồ nhỏ để mở **bản đồ lớn** (cả thế giới, chú thích, tiến độ từng làng, dòng "Việc tiếp theo"). Chi tiết kỹ thuật: spec 03 mục 3.10.
 - **Góc trên phải:** 4 ô Trang Sổ Vàng (icon `trang-vang`; trang chưa có thì mờ), nút menu.
 - **Chỉ đường:** mũi tên trên đầu nhân vật chỉ về cổng cần tới.
 - (Bước 8: `MarketHud.tsx`. Nhiệm vụ lấy từ `content/dialogues.ts` (`NHIEM_VU`, mục 5; 0 trang là "Đến Làng Giấy ở phía bắc gặp bác An."; đủ 4 trang là "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở." khi cờ `FESTIVAL_LAUNCHED` (`config/festival.ts`, mặc định false) còn tắt: không mũi tên, không điểm đến trên bản đồ; bước H1 bật cờ thì thành "Cả làng đang mở hội. Hãy đến dự hội làng nhé!"; Bi nói tương ứng "Đủ 4 trang rồi! Hội làng sắp mở."; hàm `questLine`/`biQuestLine` ở `three/cho/marketQuest.ts`, bản đồ lớn dùng chung dòng này). 4 ô Trang Sổ Vàng theo `unlock.goldenPages`. Mũi tên là mũi tên vàng dẹt bay nhấp nhô (đứng yên khi "Giảm chuyển động"), quay mượt về cổng của nhiệm vụ, ẩn khi tới gần cổng 6 đơn vị hoặc đủ 4 trang. Nút Menu: máy tính nhả khóa chuột rồi menu hiện ra, điện thoại bật menu.)
@@ -207,6 +207,8 @@ Phần này để trống chỗ, **không làm trong đợt này**.
 - **Hết giới thiệu** (xong hoặc "Bỏ qua") thì mở bảng làng như cũ. Bảng làng có thêm nút **"Xem lại giới thiệu"**.
 - Hàm thuần có test: có hiện giới thiệu không (lần đầu / đã xem) và ghép danh sách nhiệm vụ (`progress/villageIntro.ts`). Phần giới thiệu tải theo route, chỉ khi cần.
 - **Thẻ "Em có biết?" ở giới thiệu làng (bước X3):** làng có thẻ rải (hiện là Làng Giấy) hiện thêm **4 thẻ** trong phần giới thiệu (nhãn "Em có biết? · Thẻ n/4"); phải đọc hết 4 thẻ thì nút "Vào" ở bảng làng mới hiện (khi chưa đọc đủ, bảng ghi "Em đọc đủ 4 thẻ …"). Đọc hết đặt cùng cờ `knowCards` với việc nhặt cuộn giấy trong làng (`markAllKnowCards`), nên làm bên nào cũng đủ cho bên kia. Chữ ở `content/knowScrolls.ts`.
+
+- **Thẻ "Em có biết?" chưa nhặt (P2b):** bản đồ vẽ hình thoi vàng (cùng ký hiệu với bản đồ trong game) cho mọi thẻ chưa nhặt của cả 4 làng, quanh điểm làng theo vị trí thật trong làng (khách mới: đủ 16 thẻ). Có chú thích bằng chữ và số thẻ còn lại ở góc dưới trái bản đồ; lớp phủ không bắt chuột/chạm nên không cản bấm vào làng. Nhặt thẻ ở trong làng 3D thì biểu tượng biến mất. Chi tiết: spec 03 mục 3.9.
 
 **Điện thoại:** bản đồ co theo chiều ngang; bảng danh sách màn hiện thành tấm trượt lên từ dưới.
 

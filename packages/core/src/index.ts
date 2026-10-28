@@ -23,6 +23,8 @@ export { GUIDE_SECTIONS, GUIDE_SECTION_IDS, GUIDE_ART_IDS, GUIDE_SHOT_IDS, GUIDE
 export type { GuideSection, GuidePage, GuideFigure, GuideDevice, GuideArtId, GuideShotId, GuideSectionId } from './content/huongDan';
 export { villageKnowCards } from './content/villageCards';
 export { knowScrollUi } from './content/knowScrolls';
+export { banDoThe } from './content/minimap';
+export { MapGlyph } from './three/world/map/MapGlyphs';
 export { GuideDialog, GuideFigureView, detectGuideDevice } from './ui/GuideDialog';
 export type { GuideDialogProps } from './ui/GuideDialog';
 export { GuideArt } from './ui/GuideArt';

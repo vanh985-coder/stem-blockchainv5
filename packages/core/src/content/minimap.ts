@@ -36,3 +36,16 @@ export const banDoNho = {
   tienDoTrangChua: 'Trang Sổ Vàng: chưa nhận',
   viecTiepTheo: 'Việc tiếp theo: {nd}',
 } as const;
+
+/** Thẻ "Em có biết?" chưa nhặt trên trang /ban-do (P2b); {n}, {tong}, {lang} đi qua fmt(). */
+export const banDoThe = {
+  /** Chú thích ký hiệu hình thoi vàng */
+  chuThich: 'Thẻ "Em có biết?" chưa nhặt',
+  /** Dòng đếm cạnh chú thích */
+  conLai: 'còn {n}/{tong} thẻ ở cả bốn làng',
+  het: 'em đã nhặt đủ ở cả bốn làng',
+  /** Lời đọc màn hình của từng làng */
+  theoLang: '{lang}: còn {n} thẻ "Em có biết?" chưa nhặt',
+  /** Ghi chú vị trí: bản vẽ tay không theo tỉ lệ thật */
+  viTri: 'Thẻ nằm quanh làng theo vị trí thật trong làng (bản vẽ không theo tỉ lệ).',
+} as const;

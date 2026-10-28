@@ -1,0 +1,863 @@
+[
+ {
+  "size": "1366x768",
+  "area": "dữ liệu",
+  "name": "16 vị trí thật từ bố cục thế giới (4 làng × 4 thẻ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "đủ 16 biểu tượng thẻ",
+  "ok": true,
+  "detail": "16"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "mỗi làng 4 thẻ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "biểu tượng nằm trong ảnh bản đồ và không dưới 18 px",
+  "ok": true,
+  "detail": "nhỏ nhất 27 px"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "lớp phủ không bắt chuột/chạm",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "chú thích có chữ: \"Thẻ \"Em có biết?\" chưa nhặt: còn 16/16 thẻ ở cả bốn làng\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "lời đọc màn hình theo từng làng (4 làng, mỗi làng còn 4)",
+  "ok": true,
+  "detail": "Thẻ nằm quanh làng theo vị trí thật trong làng (bản vẽ không theo tỉ lệ). | Làng Giấy: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Dệt: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Khắc Dấu: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Bạc: còn 4 thẻ \"Em có biết?\" chưa nhặt"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "vị trí quanh làng: 0/16 thẻ đúng vị trí công thức (phần còn lại dời ra mép chữ tên làng); không thẻ nào xa làng mình quá 208 px (xa nhất 84 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "hướng la bàn của thẻ quanh làng: lệch trung bình 3°, lớn nhất 7° so với hướng thật của thẻ trong làng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "không biểu tượng nào đè lên chữ tên của bất kỳ làng nào",
+  "ok": true,
+  "detail": "0 chỗ đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "không hai biểu tượng nào đè lên nhau",
+  "ok": true,
+  "detail": "0 cặp"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "mọi biểu tượng nằm trọn trong ảnh bản đồ",
+  "ok": true,
+  "detail": "0 thẻ bị cắt"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "chú thích ở góc dưới trái bản đồ và không đè lên biểu tượng nào",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "chỉ còn thẻ chưa nhặt (9 thẻ đúng bộ)",
+  "ok": true,
+  "detail": "9"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "chú thích đếm đúng: \"Thẻ \"Em có biết?\" chưa nhặt: còn 9/16 thẻ ở cả bốn làng\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "lời đọc màn hình theo làng khớp (2, 0, 4, 3)",
+  "ok": true,
+  "detail": "Làng Giấy: còn 2 thẻ \"Em có biết?\" chưa nhặt | Làng Dệt: còn 0 thẻ \"Em có biết?\" chưa nhặt | Làng Khắc Dấu: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Bạc: còn 3 thẻ \"Em có biết?\" chưa nhặt"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do đủ thẻ",
+  "name": "không còn biểu tượng nào; chú thích báo đã nhặt đủ",
+  "ok": true,
+  "detail": "0 | Thẻ \"Em có biết?\" chưa nhặt: em đã nhặt đủ ở cả bốn làng"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do chạm",
+  "name": "bấm nút làng bên cạnh biểu tượng thẻ vẫn mở bảng làng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "bản đồ nhỏ (ở chợ)",
+  "name": "chỉ vẽ thẻ trong vòng đang hiện (vẽ 0, kỳ vọng 0); DOM có đủ 16 ký hiệu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "bản đồ lớn khách mới",
+  "name": "đủ 16 biểu tượng của cả 4 làng khi em đang ở chợ (ngoài làng)",
+  "ok": true,
+  "detail": "16"
+ },
+ {
+  "size": "1366x768",
+  "area": "bản đồ lớn khách mới",
+  "name": "tọa độ từng biểu tượng trùng tọa độ thật của vật thể",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "bản đồ lớn khách mới",
+  "name": "có chú thích bằng chữ: Thẻ \"Em có biết?\" chưa nhặt",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "bản đồ lớn khách mới",
+  "name": "tiến độ thẻ từng làng 0/4",
+  "ok": true,
+  "detail": "Làng Giấy Màn đã xong: 0/3 Thẻ \"Em có biết?\": 0/4 Trang Sổ Vàng: chưa nhận | Làng Dệt Màn đã xong: 0/3 Thẻ \"Em có biết?\": 0/4 Trang Sổ Vàng: chưa nhận | Làng Kh"
+ },
+ {
+  "size": "1366x768",
+  "area": "khớp vật thể thật",
+  "name": "Làng Giấy: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (4 vật đã tải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "khớp vật thể thật",
+  "name": "Làng Giấy: đứng ngay chỗ từng thẻ thì ký hiệu nằm giữa bản đồ nhỏ (lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "khớp vật thể thật",
+  "name": "Làng Dệt: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (8 vật đã tải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "khớp vật thể thật",
+  "name": "Làng Dệt: đứng ngay chỗ từng thẻ thì ký hiệu nằm giữa bản đồ nhỏ (lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "khớp vật thể thật",
+  "name": "Làng Khắc Dấu: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (8 vật đã tải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "khớp vật thể thật",
+  "name": "Làng Khắc Dấu: đứng ngay chỗ từng thẻ thì ký hiệu nằm giữa bản đồ nhỏ (lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "khớp vật thể thật",
+  "name": "Làng Bạc: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (8 vật đã tải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "khớp vật thể thật",
+  "name": "Làng Bạc: đứng ngay chỗ từng thẻ thì ký hiệu nằm giữa bản đồ nhỏ (lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "bản đồ nhỏ (hướng bắc)",
+  "name": "5 chỗ đứng/hướng nhìn: vị trí ký hiệu khớp công thức chiếu (lệch lớn nhất 0.06 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "bản đồ nhỏ (hướng bắc)",
+  "name": "chỉ vẽ đúng các thẻ nằm trong vòng đang hiện",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "bản đồ nhỏ (xoay theo hướng nhìn)",
+  "name": "5 chỗ đứng/hướng nhìn: vị trí ký hiệu khớp công thức chiếu (lệch lớn nhất 0.05 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "bản đồ nhỏ (xoay theo hướng nhìn)",
+  "name": "chỉ vẽ đúng các thẻ nằm trong vòng đang hiện",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "nhặt thẻ",
+  "name": "sau khi nhặt (phím E, bấm \"Cất vào sổ\") ký hiệu thẻ đó biến mất khỏi bản đồ nhỏ, các thẻ khác còn nguyên",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "nhặt thẻ",
+  "name": "mở lại bản đồ lớn: còn 15 biểu tượng, thiếu đúng thẻ vừa nhặt",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "nhặt thẻ",
+  "name": "tiến độ Làng Giấy ghi 1/4",
+  "ok": true,
+  "detail": "Làng Giấy Màn đã xong: 0/3 Thẻ \"Em có biết?\": 1/4 Trang Sổ Vàng: chưa nhận"
+ },
+ {
+  "size": "1366x768",
+  "area": "tải lại trang",
+  "name": "tiến độ đã lưu (cookie khách: true) khớp: bản đồ lớn vẫn còn 15, thiếu thẻ đã nhặt",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "tải lại trang",
+  "name": "/ban-do cũng còn 15 biểu tượng, không có thẻ Làng Giấy số 2",
+  "ok": true,
+  "detail": "15"
+ },
+ {
+  "size": "1366x768",
+  "area": "đổi người chơi",
+  "name": "người chơi khác (cookie khách mới) thấy lại đủ 16 thẻ, không mang thẻ đã nhặt của người trước",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "/ban-do: đủ 16 biểu tượng và chú thích",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "bản đồ nhỏ nhân 1,15 (207 px) và vẫn có ký hiệu thẻ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "bản đồ lớn: đủ 16 biểu tượng và chú thích",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "không có phần tử nhấp nháy",
+  "ok": true,
+  "detail": "0"
+ },
+ {
+  "size": "360x800",
+  "area": "dữ liệu",
+  "name": "16 vị trí thật từ bố cục thế giới (4 làng × 4 thẻ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "đủ 16 biểu tượng thẻ",
+  "ok": true,
+  "detail": "16"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "mỗi làng 4 thẻ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "biểu tượng nằm trong ảnh bản đồ và không dưới 18 px",
+  "ok": true,
+  "detail": "nhỏ nhất 20 px"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "lớp phủ không bắt chuột/chạm",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "chú thích có chữ: \"Thẻ \"Em có biết?\" chưa nhặt: còn 16/16 thẻ ở cả bốn làng\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "lời đọc màn hình theo từng làng (4 làng, mỗi làng còn 4)",
+  "ok": true,
+  "detail": "Thẻ nằm quanh làng theo vị trí thật trong làng (bản vẽ không theo tỉ lệ). | Làng Giấy: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Dệt: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Khắc Dấu: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Bạc: còn 4 thẻ \"Em có biết?\" chưa nhặt"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "vị trí quanh làng: 0/16 thẻ đúng vị trí công thức (phần còn lại dời ra mép chữ tên làng); không thẻ nào xa làng mình quá 187 px (xa nhất 79 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "hướng la bàn của thẻ quanh làng: lệch trung bình 24°, lớn nhất 90° so với hướng thật của thẻ trong làng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "không biểu tượng nào đè lên chữ tên của bất kỳ làng nào",
+  "ok": true,
+  "detail": "0 chỗ đè"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "không hai biểu tượng nào đè lên nhau",
+  "ok": true,
+  "detail": "0 cặp"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "mọi biểu tượng nằm trọn trong ảnh bản đồ",
+  "ok": true,
+  "detail": "0 thẻ bị cắt"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "chú thích nằm ngoài bản đồ (màn hẹp) và không đè lên biểu tượng nào",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "chỉ còn thẻ chưa nhặt (9 thẻ đúng bộ)",
+  "ok": true,
+  "detail": "9"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "chú thích đếm đúng: \"Thẻ \"Em có biết?\" chưa nhặt: còn 9/16 thẻ ở cả bốn làng\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "lời đọc màn hình theo làng khớp (2, 0, 4, 3)",
+  "ok": true,
+  "detail": "Làng Giấy: còn 2 thẻ \"Em có biết?\" chưa nhặt | Làng Dệt: còn 0 thẻ \"Em có biết?\" chưa nhặt | Làng Khắc Dấu: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Bạc: còn 3 thẻ \"Em có biết?\" chưa nhặt"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do đủ thẻ",
+  "name": "không còn biểu tượng nào; chú thích báo đã nhặt đủ",
+  "ok": true,
+  "detail": "0 | Thẻ \"Em có biết?\" chưa nhặt: em đã nhặt đủ ở cả bốn làng"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do chạm",
+  "name": "chạm nút làng bên cạnh biểu tượng thẻ vẫn mở bảng làng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "bản đồ nhỏ (ở chợ)",
+  "name": "chỉ vẽ thẻ trong vòng đang hiện (vẽ 0, kỳ vọng 0); DOM có đủ 16 ký hiệu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "bản đồ lớn khách mới",
+  "name": "đủ 16 biểu tượng của cả 4 làng khi em đang ở chợ (ngoài làng)",
+  "ok": true,
+  "detail": "16"
+ },
+ {
+  "size": "360x800",
+  "area": "bản đồ lớn khách mới",
+  "name": "tọa độ từng biểu tượng trùng tọa độ thật của vật thể",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "bản đồ lớn khách mới",
+  "name": "có chú thích bằng chữ: Thẻ \"Em có biết?\" chưa nhặt",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "bản đồ lớn khách mới",
+  "name": "tiến độ thẻ từng làng 0/4",
+  "ok": true,
+  "detail": "Làng Giấy Màn đã xong: 0/3 Thẻ \"Em có biết?\": 0/4 Trang Sổ Vàng: chưa nhận | Làng Dệt Màn đã xong: 0/3 Thẻ \"Em có biết?\": 0/4 Trang Sổ Vàng: chưa nhận | Làng Kh"
+ },
+ {
+  "size": "360x800",
+  "area": "khớp vật thể thật",
+  "name": "Làng Giấy: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (4 vật đã tải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "khớp vật thể thật",
+  "name": "Làng Giấy: đứng ngay chỗ từng thẻ thì ký hiệu nằm giữa bản đồ nhỏ (lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "khớp vật thể thật",
+  "name": "Làng Dệt: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (8 vật đã tải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "khớp vật thể thật",
+  "name": "Làng Dệt: đứng ngay chỗ từng thẻ thì ký hiệu nằm giữa bản đồ nhỏ (lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "khớp vật thể thật",
+  "name": "Làng Khắc Dấu: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (8 vật đã tải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "khớp vật thể thật",
+  "name": "Làng Khắc Dấu: đứng ngay chỗ từng thẻ thì ký hiệu nằm giữa bản đồ nhỏ (lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "khớp vật thể thật",
+  "name": "Làng Bạc: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (8 vật đã tải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "khớp vật thể thật",
+  "name": "Làng Bạc: đứng ngay chỗ từng thẻ thì ký hiệu nằm giữa bản đồ nhỏ (lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "bản đồ nhỏ (hướng bắc)",
+  "name": "5 chỗ đứng/hướng nhìn: vị trí ký hiệu khớp công thức chiếu (lệch lớn nhất 0.03 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "bản đồ nhỏ (hướng bắc)",
+  "name": "chỉ vẽ đúng các thẻ nằm trong vòng đang hiện",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "bản đồ nhỏ (xoay theo hướng nhìn)",
+  "name": "5 chỗ đứng/hướng nhìn: vị trí ký hiệu khớp công thức chiếu (lệch lớn nhất 0.06 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "bản đồ nhỏ (xoay theo hướng nhìn)",
+  "name": "chỉ vẽ đúng các thẻ nằm trong vòng đang hiện",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "/ban-do: đủ 16 biểu tượng và chú thích",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "bản đồ nhỏ nhân 1,15 (138 px) và vẫn có ký hiệu thẻ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "bản đồ lớn: đủ 16 biểu tượng và chú thích",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "không có phần tử nhấp nháy",
+  "ok": true,
+  "detail": "0"
+ },
+ {
+  "size": "844x390",
+  "area": "dữ liệu",
+  "name": "16 vị trí thật từ bố cục thế giới (4 làng × 4 thẻ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "đủ 16 biểu tượng thẻ",
+  "ok": true,
+  "detail": "16"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "mỗi làng 4 thẻ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "biểu tượng nằm trong ảnh bản đồ và không dưới 18 px",
+  "ok": true,
+  "detail": "nhỏ nhất 20 px"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "lớp phủ không bắt chuột/chạm",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "chú thích có chữ: \"Thẻ \"Em có biết?\" chưa nhặt: còn 16/16 thẻ ở cả bốn làng\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "lời đọc màn hình theo từng làng (4 làng, mỗi làng còn 4)",
+  "ok": true,
+  "detail": "Thẻ nằm quanh làng theo vị trí thật trong làng (bản vẽ không theo tỉ lệ). | Làng Giấy: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Dệt: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Khắc Dấu: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Bạc: còn 4 thẻ \"Em có biết?\" chưa nhặt"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "vị trí quanh làng: 0/16 thẻ đúng vị trí công thức (phần còn lại dời ra mép chữ tên làng); không thẻ nào xa làng mình quá 208 px (xa nhất 81 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "hướng la bàn của thẻ quanh làng: lệch trung bình 7°, lớn nhất 34° so với hướng thật của thẻ trong làng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "không biểu tượng nào đè lên chữ tên của bất kỳ làng nào",
+  "ok": true,
+  "detail": "0 chỗ đè"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "không hai biểu tượng nào đè lên nhau",
+  "ok": true,
+  "detail": "0 cặp"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "mọi biểu tượng nằm trọn trong ảnh bản đồ",
+  "ok": true,
+  "detail": "0 thẻ bị cắt"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "chú thích nằm ngoài bản đồ (màn hẹp) và không đè lên biểu tượng nào",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "chỉ còn thẻ chưa nhặt (9 thẻ đúng bộ)",
+  "ok": true,
+  "detail": "9"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "chú thích đếm đúng: \"Thẻ \"Em có biết?\" chưa nhặt: còn 9/16 thẻ ở cả bốn làng\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "lời đọc màn hình theo làng khớp (2, 0, 4, 3)",
+  "ok": true,
+  "detail": "Làng Giấy: còn 2 thẻ \"Em có biết?\" chưa nhặt | Làng Dệt: còn 0 thẻ \"Em có biết?\" chưa nhặt | Làng Khắc Dấu: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Bạc: còn 3 thẻ \"Em có biết?\" chưa nhặt"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do đủ thẻ",
+  "name": "không còn biểu tượng nào; chú thích báo đã nhặt đủ",
+  "ok": true,
+  "detail": "0 | Thẻ \"Em có biết?\" chưa nhặt: em đã nhặt đủ ở cả bốn làng"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do chạm",
+  "name": "chạm nút làng bên cạnh biểu tượng thẻ vẫn mở bảng làng",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "bản đồ nhỏ (ở chợ)",
+  "name": "chỉ vẽ thẻ trong vòng đang hiện (vẽ 0, kỳ vọng 0); DOM có đủ 16 ký hiệu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "bản đồ lớn khách mới",
+  "name": "đủ 16 biểu tượng của cả 4 làng khi em đang ở chợ (ngoài làng)",
+  "ok": true,
+  "detail": "16"
+ },
+ {
+  "size": "844x390",
+  "area": "bản đồ lớn khách mới",
+  "name": "tọa độ từng biểu tượng trùng tọa độ thật của vật thể",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "bản đồ lớn khách mới",
+  "name": "có chú thích bằng chữ: Thẻ \"Em có biết?\" chưa nhặt",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "bản đồ lớn khách mới",
+  "name": "tiến độ thẻ từng làng 0/4",
+  "ok": true,
+  "detail": "Làng Giấy Màn đã xong: 0/3 Thẻ \"Em có biết?\": 0/4 Trang Sổ Vàng: chưa nhận | Làng Dệt Màn đã xong: 0/3 Thẻ \"Em có biết?\": 0/4 Trang Sổ Vàng: chưa nhận | Làng Kh"
+ },
+ {
+  "size": "844x390",
+  "area": "khớp vật thể thật",
+  "name": "Làng Giấy: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (4 vật đã tải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "khớp vật thể thật",
+  "name": "Làng Giấy: đứng ngay chỗ từng thẻ thì ký hiệu nằm giữa bản đồ nhỏ (lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "khớp vật thể thật",
+  "name": "Làng Dệt: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (8 vật đã tải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "khớp vật thể thật",
+  "name": "Làng Dệt: đứng ngay chỗ từng thẻ thì ký hiệu nằm giữa bản đồ nhỏ (lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "khớp vật thể thật",
+  "name": "Làng Khắc Dấu: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (8 vật đã tải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "khớp vật thể thật",
+  "name": "Làng Khắc Dấu: đứng ngay chỗ từng thẻ thì ký hiệu nằm giữa bản đồ nhỏ (lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "khớp vật thể thật",
+  "name": "Làng Bạc: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (8 vật đã tải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "khớp vật thể thật",
+  "name": "Làng Bạc: đứng ngay chỗ từng thẻ thì ký hiệu nằm giữa bản đồ nhỏ (lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "bản đồ nhỏ (hướng bắc)",
+  "name": "5 chỗ đứng/hướng nhìn: vị trí ký hiệu khớp công thức chiếu (lệch lớn nhất 0.03 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "bản đồ nhỏ (hướng bắc)",
+  "name": "chỉ vẽ đúng các thẻ nằm trong vòng đang hiện",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "bản đồ nhỏ (xoay theo hướng nhìn)",
+  "name": "5 chỗ đứng/hướng nhìn: vị trí ký hiệu khớp công thức chiếu (lệch lớn nhất 0.06 px)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "bản đồ nhỏ (xoay theo hướng nhìn)",
+  "name": "chỉ vẽ đúng các thẻ nằm trong vòng đang hiện",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "/ban-do: đủ 16 biểu tượng và chú thích",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "bản đồ nhỏ nhân 1,15 (138 px) và vẫn có ký hiệu thẻ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "bản đồ lớn: đủ 16 biểu tượng và chú thích",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "không có phần tử nhấp nháy",
+  "ok": true,
+  "detail": "0"
+ }
+]

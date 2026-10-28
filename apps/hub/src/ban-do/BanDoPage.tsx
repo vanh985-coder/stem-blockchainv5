@@ -29,6 +29,8 @@ import { LevelDot, STATE_TEXT, VillageDetails } from './parts';
 
 // Lời giới thiệu làng chỉ tải khi cần (lần đầu bấm vào làng, hoặc bấm "Xem lại giới thiệu").
 const VillageIntro = lazy(() => import('./VillageIntro'));
+// Thẻ "Em có biết?" chưa nhặt (P2b): cần dữ liệu bố cục làng nên cũng tải lười, hiện sau khi bản đồ đã hiện.
+const ScrollMarks = lazy(() => import('./ScrollMarks'));
 
 /** Màn hình khớp một truy vấn (ví dụ rộng từ 768px hoặc từ 1024px). */
 function useMedia(query: string): boolean {
@@ -102,6 +104,8 @@ export default function BanDoPage() {
   const [selected, setSelected] = useState<VillageId | null>(null);
   const [intro, setIntro] = useState<VillageId | null>(null);
   const [reading, setReading] = useState<VillageId | null>(null);
+  // Chỗ đặt chú thích thẻ chưa nhặt khi bản đồ không phải cỡ vừa màn hình (chú thích nằm ngoài bản đồ, không đè lên làng).
+  const [legendSlot, setLegendSlot] = useState<HTMLElement | null>(null);
   // Biết chắc đã xem hay chưa: chơi thử, hoặc đã kéo xong dữ liệu từ máy chủ (tránh hiện lại ở máy khác).
   const introKnown = mode === 'guest' || (mode === 'user' && synced);
 
@@ -126,13 +130,18 @@ export default function BanDoPage() {
   const name = profile?.display_name ?? fmt('{Ten}');
 
   // thẻ "Em có biết?" của làng (bước X3): đã đọc (hoặc nhặt trong làng 3D) đủ chưa; người đã xong màn 1 hay đã xem hộp cũ coi như đủ
-  const knowOf = (id: VillageId) => {
+  const maskOf = (id: VillageId) => {
     const total = villageKnowCards(id).length;
     const first = levelsOfVillage(id)[0]?.id;
     const lessonDone = first !== undefined && unlock.levels.find((u) => u.id === first)?.state === 'done';
-    const mask = effectiveKnowMask({ data: progress.game.data, village: id, total, lessonDone, seenOld: hasSeenKnow(progress.game.data, id) });
-    return { got: countKnowCards(mask, total), total };
+    return effectiveKnowMask({ data: progress.game.data, village: id, total, lessonDone, seenOld: hasSeenKnow(progress.game.data, id) });
   };
+  const knowOf = (id: VillageId) => {
+    const total = villageKnowCards(id).length;
+    return { got: countKnowCards(maskOf(id), total), total };
+  };
+  // Mặt nạ thẻ đã nhặt của cả 4 làng (cùng cách tính với bảng làng và thế giới 3D): thẻ chưa nhặt hiện trên bản đồ.
+  const masks = Object.fromEntries(VILLAGE_ORDER.map((id) => [id, maskOf(id)])) as Record<VillageId, number>;
   const details = selected && (
     <VillageDetails
       villageId={selected}
@@ -186,6 +195,7 @@ export default function BanDoPage() {
           <button
             key={id}
             type="button"
+            data-village={id}
             aria-pressed={on}
             onClick={() => pickVillage(id)}
             style={{ left: `${pos.x}%`, top: `${pos.y}%`, ...(fitted ? { minHeight: sc.target, minWidth: sc.target } : {}) }}
@@ -217,6 +227,9 @@ export default function BanDoPage() {
           </button>
         );
       })}
+      <Suspense fallback={null}>
+        <ScrollMarks masks={masks} ratio={ratio} mapW={fit?.w ?? undefined} legendIn={fitted ? null : legendSlot} />
+      </Suspense>
     </div>
   );
 
@@ -242,10 +255,13 @@ export default function BanDoPage() {
           </main>
         </div>
       ) : (
-        <main className="mx-auto w-full max-w-[1280px] gap-4 p-3 pt-0 md:flex md:items-start">
-          {mapBox}
-          {sidePanel}
-        </main>
+        <>
+          <div ref={setLegendSlot} className="mx-auto w-full max-w-[1280px] px-3 pb-2" />
+          <main className="mx-auto w-full max-w-[1280px] gap-4 p-3 pt-0 md:flex md:items-start">
+            {mapBox}
+            {sidePanel}
+          </main>
+        </>
       )}
 
       {!wide && (
