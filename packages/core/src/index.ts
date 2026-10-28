@@ -168,3 +168,4 @@ export {
 } from './three/quality';
 export type { QualityLevel, QualityChoice, QualityParams, DeviceInfo, FpsTracker } from './three/quality';
 export { LOD_SUFFIX, modelPath, lodId } from './three/modelIds';
+export { PageCodeCalculator } from './ui/PageCodeCalculator';

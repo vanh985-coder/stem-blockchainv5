@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
+  PageCodeCalculator,
   FeedbackSheet,
   Hearts,
   MatXich,
@@ -170,6 +171,7 @@ export function Easy({ onComplete, onFail }: { onComplete: (r: StationResult) =>
               <div className="mt-1">{fmt(T.de.buoc2, { x: lastCodeX, nd: currentRound.content })}</div>
               <div className="mt-1">{fmt(T.de.buoc3, { ma: currentRound.code })}</div>
             </div>
+            <PageCodeCalculator />
             <div className="grid grid-cols-2 gap-3 pt-1">
               <Button size="md" className="px-3! whitespace-nowrap" onClick={() => handleDecision(true)} disabled={feedback.isOpen}>
                 <span aria-hidden="true">✓ </span>

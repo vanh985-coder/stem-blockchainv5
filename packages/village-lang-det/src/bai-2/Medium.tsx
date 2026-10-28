@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import {
   Button,
+  PageCodeCalculator,
   FeedbackSheet,
   Hearts,
   MatXich,
@@ -245,6 +246,7 @@ export function Medium({ onComplete, onFail }: { onComplete: (r: StationResult) 
       </div>
 
       {/* Câu hỏi và nút biểu quyết */}
+      <PageCodeCalculator />
       <div className="flex flex-col items-center justify-between gap-4 rounded-bang border-2 border-nau-go/50 bg-white/60 p-4 sm:flex-row">
         <p className="text-center text-base sm:text-left">
           <strong>{T.tb.emHayKiemTra}</strong> {fmt(T.tb.cauHoiKiemTra, { nguoi: senderName })}

@@ -20,7 +20,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 |---|---|
 | 0–2 | ✅ Xong (mốc 2 chưa deploy) |
 | 3. Nhân rộng | ✅ **Chốt.** Đủ 12 màn, cả 4 làng dựng to, **đã gộp web** (≈2086 test xanh). Việc còn dở dời xuống **cuối mốc 4** |
-| 4. Trau chuốt | **P1a đã xong, kiểm local đạt** (Codex đọc `AGENTS.md`, chi tiết dưới). Phần máy tính còn lại của P1 chưa làm. Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
+| 4. Trau chuốt | **P1a và P1b đã xong, kiểm local đạt** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
 
 **⚠️ 15b vẫn chưa làm:** server có thể đang 530, mốc 2 và toàn bộ mốc 3 (≈60 commit, mới nhất `2bd76bf`) chưa push, chưa chạy trên máy thật. Cách làm: khôi phục `cloudflared` + Docker, deploy theo `DEPLOY.md` (h), Cache Rule (i), thử trên điện thoại.
 
@@ -28,7 +28,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 
 | Bước | Việc (số trong danh sách của chủ dự án) | Buổi |
 |---|---|---|
-| P1 | Sửa nhanh giao diện: (8a) đồng hồ màn 3 to rõ; (9) cột tre màn 6 (Làng Dệt) nét hơn; (12) máy tính mod màn 8 hiện sẵn trên màn hình; (13) cây ở trạm Khó bài 10 vừa khung, không phải cuộn; (10) máy tính ở trạm Dễ/Trung bình bài 4 đổi sang giao diện ModCalculator của màn 8, 9 (tính đúng công thức của bài 4) | 1 |
+| P1 | Sửa nhanh giao diện: (8a) đồng hồ màn 3 to rõ; (9) cột tre màn 6 (Làng Dệt) nét hơn; (12) máy tính mod màn 8 hiện sẵn trên màn hình; (13) cây ở trạm Khó bài 10 vừa khung, không phải cuộn; (10) máy tính ở trạm Dễ/Trung bình **màn 4 – Làng Dệt (Bài 2)** đổi sang kiểu ModCalculator màn 8–9, tính `(X × 2 + c) mod 100`; **không phải Bài 4/màn 10 – Làng Bạc** | 1 |
 | P2 | (5) Pháo hoa + lời khen khi trả lời đúng ở 4 trang bài học (màn 1, 4, 7, 10); "Giảm chuyển động" thì chỉ hiện lời khen. (4) Vị trí thẻ "Em có biết?" chưa nhặt hiện trên bản đồ lớn, bản đồ nhỏ và `/ban-do`, cả khi đang ở ngoài làng | 1 |
 | P3 | (6) Mở khóa tự do: mọi cổng làng mở từ đầu. Mặc định: trong mỗi làng vẫn giữ thứ tự thẻ → bài học → 2 game; Trang Sổ Vàng vẫn trao như cũ; cao trào vẫn sau màn 12. (2) Nút "Tự động hoàn thành": mặc định CHỈ hiện cho tài khoản giáo viên và bản dev, ghi màn là đã xong với cờ "tự hoàn thành", không cộng sao/xu, trang giáo viên thấy rõ cờ này | 2 |
 | P4 | (7) Màn 2 nhanh hơn: mặc định +20% tốc độ mọi vòng, chạy lại bot, chỉnh mốc nếu cần. (8b) Màn 3 bỏ vòng 3, còn 2 vòng: vòng "giữ sổ" (Tí tráo trang) đang ở vòng 3 → mặc định chuyển cơ chế tráo trang vào cuối vòng 2 để không mất bài học phát hiện sửa lén; đặt lại mốc | 1 |
@@ -57,6 +57,15 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 **Bundle hub production:** JS chính **237,40 kB**, gzip **74,58 kB**; lõi 3D tải lười **1016,12 kB**, gzip **271,87 kB** (gzip `node:zlib`, kB = 1000 byte; đây là từng chunk, không phải tổng tải trang). Build vẫn cảnh báo chunk 3D >500 kB.
 
 **Chưa xác minh:** thiết bị thật, Safari/iPhone, bàn phím ảo, đa chạm và ngưỡng 30 FPS trên điện thoại tầm trung. Chưa deploy/push. Phần máy tính còn lại của P1 để bước sau, không làm trong P1a.
+
+## P1b — đã xác minh (28/10/2026)
+
+- Chỉ thêm máy tính mã trang cho Dễ/Trung bình màn 4 – Làng Dệt. `PageCodeCalculator` trong core dùng kiểu bảng giấy/viền gỗ, ô nhập và kết quả trực tiếp như ModCalculator; gọi `pageCode`, không sao chép công thức lũy thừa. X/c khởi đầu trống, học sinh tự nhập; không nhận dữ liệu đề hay tự chọn đáp án.
+- Giữ nguyên đề, luật, tim, sao, tiến độ và trạm Khó; không sửa component máy tính màn 8–9. Kết quả P1a phía trên giữ nguyên như bản ghi lịch sử.
+- `pnpm test --maxWorkers=2`: **2105 pass, 1 skipped**, 191 file pass/1 skipped. `pnpm typecheck`, `pnpm check:text` (425 file), `pnpm build` (5 app) đạt. Test trình bày máy tính màn 8–9 vẫn đạt trong bộ test; không kiểm lại trình duyệt màn 8–9 vì không sửa component đó.
+- Chrome headless local dev (`VITE_MERGED=true`, `VITE_PROBE=true`), 1366×768 chuột, 360×800 và 844×390 chạm giả lập; cả hai trạm: ô trống không hiện kết quả, nhập 57/36 ra 50, Tab chuyển ô, nhập sai có lời nhắc, bấm Đồng ý mở phản hồi; không có `pageerror`. Máy tính nằm trong luồng nội dung, không phủ đề/nút, màn nhỏ cuộn dọc như cũ. 6 ảnh toàn trang ở `docs/screenshots/p1b/`, lớn nhất **141347 byte** (<300 KB). Script: `scripts/p1b-check.mjs`.
+- Không sửa 3D, không đo FPS mới. Bundle hub: chunk máy tính **1,84 kB / gzip 0,98 kB**, JS chính **237,40 kB / gzip 75,36 kB** (số Vite build); cảnh báo chunk 3D >500 kB vẫn còn.
+- Chưa xác minh: thiết bị thật, bàn phím ảo, Safari/iPhone, giao diện trên bản production (build đạt nhưng tương tác chạy dev), toàn bộ 5 vòng bằng thao tác thật (script dùng cầu nối dev để chuyển sang Trung bình). Chưa push/deploy.
 
 ## Việc dời từ mốc 3 (làm CUỐI mốc 4, theo thứ tự)
 
@@ -119,5 +128,5 @@ Từ `docs/specs/` trong repo: 00, 01, 03, 04, 06, 07, 08, 10 (đều đã đư�
 ## Câu mở đầu cho cửa sổ tiếp theo
 
 ```
-Tiếp tục mốc 4 (trau chuốt). Người code là Codex, đọc AGENTS.md, tự commit khi kiểm tra đạt, không push. Đọc TRANG-THAI.md: P1a đã xong, không làm lại; phần máy tính còn lại của P1 chưa làm. Chờ lời giao việc tiếp theo. Các việc dời từ mốc 3 và hội làng để cuối mốc 4.
+Tiếp tục mốc 4 (trau chuốt). Đọc AGENTS.md, tự commit khi kiểm tra đạt, không push. Đọc TRANG-THAI.md: P1a và P1b đã xong, không làm lại. Yêu cầu 10 là máy tính màn 4 – Làng Dệt, không phải Bài 4/màn 10 – Làng Bạc. Chờ lời giao việc tiếp theo. Các việc dời từ mốc 3 và hội làng để cuối mốc 4.
 ```
