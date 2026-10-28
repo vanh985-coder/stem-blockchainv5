@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { onAnswer } from '../audio/answerSignal';
+import { LessonPraise } from './LessonPraise';
 import { asset, useManifest } from '../assets/store';
 import { useNavigate } from 'react-router';
 import { MERGED, URLS, villageWorldUrl } from '../config/urls';
@@ -81,14 +81,12 @@ const STATION_PRELOAD_DELAY_MS = 1500;
  */
 export function LessonPage2D({ levelId, villageId, background, content, stations, onAnswer: onAnswerProp }: LessonPage2DProps) {
   const level = levelById(levelId);
+  const scrollArea = useRef<HTMLDivElement>(null);
   const villageIndex = VILLAGE_ORDER.indexOf(villageId);
   const { progress, record, saveNow, saving, goldenPages } = useProgress();
   const manifest = useManifest();
 
   // `onAnswer(dung)`: mọi lần em trả lời đúng/sai ở bất kỳ trạm nào đều đi qua sound.playCorrect/playWrong.
-  const answerRef = useRef(onAnswerProp);
-  answerRef.current = onAnswerProp;
-  useEffect(() => onAnswer((dung) => answerRef.current?.(dung)), []);
   // Rê chuột hoặc focus vào nút nào ở trạm thì học sinh 3D nhìn và chỉ về nút đó; vào bài mới thì xóa phản ứng cũ.
   const playArea = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -113,7 +111,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   // Mỗi lần đổi bước thì cuộn lên đầu trang.
   const stageKey = stage.kind + ('idx' in stage ? stage.idx : '');
   useEffect(() => {
-    window.scrollTo({ top: 0 });
+    scrollArea.current?.scrollTo({ top: 0 });
   }, [stageKey]);
 
   // Bài không có lời ở thời điểm này (ví dụ Bài 2 không có lời trước trạm Trung bình) thì đi thẳng bước kế.
@@ -333,6 +331,10 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   const onHard = currentIdx === STATION_ORDER.length - 1 && stage.kind !== 'complete';
 
   return (
+    <div className="lesson-screen">
+      <LessonPraise key={`${levelId}-${attempt}-${currentIdx}`} onResult={onAnswerProp} />
+      <div className="lesson-window">
+      <div className="lesson-scroll" ref={scrollArea} data-testid="lesson-scroll">
     // isolate: để lớp nền trang trí (z âm) nằm trên ảnh nền của làng nhưng dưới bảng bài học.
     <div className="isolate min-h-screen bg-giay bg-cover bg-center" style={bg ? { backgroundImage: `url("${bg}")` } : undefined}>
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20 bg-giay/55" />
@@ -416,7 +418,9 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
           </div>
         </header>
 
-        <main className={`mx-auto w-full ${boardMax} px-1 pb-10 pt-2 sm:px-3`}>{body}</main>
+        <main className={`mx-auto w-full ${boardMax} px-1 pb-10 pt-2 sm:px-3`}>
+          {body}
+        </main>
       </div>
 
       {twistOpen && content.twist && content.twist.length > 0 && (
@@ -428,6 +432,9 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
       )}
       {showCards && <EmCoBietDialog cards={onHard ? [...content.emCoBiet, ...(content.emCoBietKho ?? [])] : content.emCoBiet} onClose={() => setShowCards(false)} />}
       </div>
+    </div>
+    </div>
+    </div>
     </div>
   );
 }
@@ -447,4 +454,3 @@ function IconButton({ label, icon, onClick, disabled }: { label: string; icon: s
     </button>
   );
 }
-

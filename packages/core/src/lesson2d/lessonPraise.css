@@ -1,0 +1,11 @@
+.lesson-screen { position: fixed; inset: 0; display: flex; flex-direction: column; background: #F6EBD3; }
+.lesson-window { flex: 1; min-height: 0; position: relative; transform: translateZ(0); overflow: hidden; }
+.lesson-scroll { height: 100%; overflow: auto; scrollbar-gutter: stable; }
+.lesson-praise { position: relative; flex: 0 0 36px; height: 36px; overflow: hidden; pointer-events: none; text-align: center; color: #276c31; font-weight: 800; line-height: 36px; contain: layout paint; }
+/* Fixed sheets are contained by lesson-window, not by the scrolling content.
+   Even a long explanation scrolls below the reserved praise strip. */
+.lesson-window .fixed.z-50 > .relative { max-height: 100%; overflow-y: auto; }
+.lesson-fireworks { position: absolute; inset: 0; pointer-events: none; }
+.lesson-fireworks i { position: absolute; left: var(--origin); top: 50%; width: 4px; height: 4px; border-radius: 50%; background: var(--spark); animation: lesson-burst 700ms ease-out both; }
+@keyframes lesson-burst { from { transform: rotate(var(--angle)) translateX(0); opacity: 1; } to { transform: rotate(var(--angle)) translateX(var(--reach)); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .lesson-fireworks { display: none; } }

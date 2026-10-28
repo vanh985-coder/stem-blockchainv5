@@ -268,11 +268,12 @@ export function Medium({
   const handleInspect = (cell: InspectCell) => {
     if (!canInspectCell(cell)) return;
     const result = inspectCell(partBTree, tamperedTree, cell);
-    if (result.match) sound.playCorrect();
-    else sound.playWrong();
+    const hit = isTamperedLeafHit(cell, tamperedLeafIndex, result);
+    if (result.match) sound.playCorrect({ answer: null });
+    else sound.playWrong({ answer: hit ? true : null });
     setInspected((prev) => ({ ...prev, [cellKey(cell)]: result }));
     setLastInspected(cell);
-    if (isTamperedLeafHit(cell, tamperedLeafIndex, result)) {
+    if (hit) {
       setFound(true);
       timerRef.current = setTimeout(startTamperAnimation, 700);
     }

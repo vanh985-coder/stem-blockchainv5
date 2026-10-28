@@ -9,14 +9,17 @@
 export type AnswerListener = (correct: boolean) => void;
 
 const listeners = new Set<AnswerListener>();
+const submissionListeners = new Set<AnswerListener>();
 
 /** Đăng ký nghe. Trả về hàm hủy đăng ký. */
-export function onAnswer(listener: AnswerListener): () => void {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
+export function onAnswer(listener: AnswerListener, submissionsOnly = false): () => void {
+  const target = submissionsOnly ? submissionListeners : listeners;
+  target.add(listener);
+  return () => target.delete(listener);
 }
 
 /** Phát tín hiệu cho mọi người nghe. */
-export function emitAnswer(correct: boolean): void {
+export function emitAnswer(correct: boolean, submitted: boolean | null = correct): void {
   listeners.forEach((l) => l(correct));
+  if (submitted !== null) submissionListeners.forEach(l => l(submitted));
 }

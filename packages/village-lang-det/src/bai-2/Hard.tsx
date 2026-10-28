@@ -329,8 +329,9 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
 
     setHistory((h) => [...h, { creator, truth, accepted: res.accepted, deltas: res.deltas }]);
 
-    if (res.accepted) sound.playCorrect();
-    else sound.playWrong();
+    const answer = creator === 'em' ? null : (votes.em === 'agree') === (truth === 'valid');
+    if (res.accepted) sound.playCorrect({ answer });
+    else sound.playWrong({ answer });
 
     // Bong bóng suy nghĩ của {phanDien}: chỉ hiện SAU khi đã bỏ phiếu và lật mở
     setTiThought(creator === 'ti' && tiReason ? fmt(T.nghi[tiReason]) : null);

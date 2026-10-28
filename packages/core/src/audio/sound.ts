@@ -79,8 +79,8 @@ class SoundManager {
   /**
    * Âm đúng: 2 nốt đi lên vui tươi (E5 -> A5)
    */
-  public playCorrect(): void {
-    emitAnswer(true); // báo cho khung 3D (kể cả khi tắt âm thanh)
+  public playCorrect(options?: { answer: boolean | null }): void {
+    emitAnswer(true, options ? options.answer : true); // preserve character reactions independently of submission feedback
     const ctx = this.ensureContext();
     if (!ctx) return;
 
@@ -117,8 +117,8 @@ class SoundManager {
   /**
    * Âm sai: 1 nốt trầm ngắn (bút đỏ cô chấm bài)
    */
-  public playWrong(): void {
-    emitAnswer(false);
+  public playWrong(options?: { answer: boolean | null }): void {
+    emitAnswer(false, options ? options.answer : false);
     const ctx = this.ensureContext();
     if (!ctx) return;
 

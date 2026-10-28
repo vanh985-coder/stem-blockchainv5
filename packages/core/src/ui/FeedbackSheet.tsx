@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { sound } from '../audio/sound';
 import { ui } from '../content/ui';
 import { BottomSheet } from './BottomSheet';
@@ -27,12 +27,18 @@ export function FeedbackSheet({
   onContinue,
   continueLabel = ui.phanHoi.tiepTuc,
 }: FeedbackSheetProps) {
+  const announced = useRef(false);
+  // Preserve audio, but do not announce the same submission again on rerender/StrictMode.
+  useEffect(() => {
+    if (!isOpen) { announced.current = false; return; }
+  }, [isOpen]);
   // Phát âm thanh và hỗ trợ phím Enter
   useEffect(() => {
     if (!isOpen) return;
-    if (isCorrect) sound.playCorrect();
-    else sound.playWrong();
-
+    const answer = announced.current ? null : isCorrect;
+    announced.current = true;
+    if (isCorrect) sound.playCorrect({ answer });
+    else sound.playWrong({ answer });
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         e.preventDefault();

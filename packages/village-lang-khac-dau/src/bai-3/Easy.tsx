@@ -216,7 +216,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
     // Quét dòng 0 (Em - khóa 18) sau GAME_CONFIG.lesson3.verifyScanDelayMs
     scanTimerRef.current = window.setTimeout(() => {
       setScanIndex(0);
-      sound.playCorrect();
+      sound.playCorrect({ answer: null });
       setP1Led('green');
       setP1Step('verified_my');
     }, GAME_CONFIG.lesson3.verifyScanDelayMs);
@@ -253,7 +253,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
         } else {
           // Dòng 5: Tí (khóa 21)
           setScanIndex(5);
-          sound.playWrong();
+          sound.playWrong({ answer: null });
           setP1Led('red');
           setP1Step('ti_detected');
         }

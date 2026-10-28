@@ -67,6 +67,15 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - Không sửa 3D, không đo FPS mới. Bundle hub: chunk máy tính **1,84 kB / gzip 0,98 kB**, JS chính **237,40 kB / gzip 75,36 kB** (số Vite build); cảnh báo chunk 3D >500 kB vẫn còn.
 - Chưa xác minh: thiết bị thật, bàn phím ảo, Safari/iPhone, giao diện trên bản production (build đạt nhưng tương tác chạy dev), toàn bộ 5 vòng bằng thao tác thật (script dùng cầu nối dev để chuyển sang Trung bình). Chưa push/deploy.
 
+## P2a — đã triển khai, chưa chốt nghiệm thu (28/10/2026)
+
+- Chỉ làm pháo hoa CSS và lời khen dùng chung cho màn 1/4/7/10 qua `LessonPage2D`/`onAnswer`. Có gộp báo trùng, dọn timer/listener, không phát lại khi đổi màn/trạm; giảm chuyển động trong cài đặt hoặc hệ điều hành thì chỉ có chữ. Chữ ở `content/lessonPraise.ts`.
+- Phân biệt kết quả nộp bài với âm minh họa/quét dấu/dò tự động. Giữ hợp đồng người nghe sự kiện cũ, âm thanh, nhân vật, luật, điểm và tiến độ. Khó màn 4 khen theo phiếu em đúng; soi cây màn 10 chỉ khen khi tìm đúng lá bị sửa.
+- `pnpm test --maxWorkers=2`: **2108 pass, 1 skipped**, 192 file pass/1 skipped; `pnpm typecheck`, `pnpm check:text` (427 file), `pnpm build` (5 app, `VITE_MERGED=true`) đạt.
+- Kiểm production local ở 1366×768, 360×800, 844×390: 12 trạm × 3 cỡ màn hình bằng **tín hiệu kiểm thử**, gồm đúng/sai, trùng/liên tiếp, âm tắt, media giảm chuyển động, chiều cao/focus không đổi. Kiểm thêm cài đặt giảm chuyển động và rời bài qua SPA khi đang có hạt. **Không coi đây là đã nộp đáp án thật xuyên suốt 12 trạm.** 48 ảnh (<300 KB, lớn nhất 114697 byte), báo cáo và số đo ở `docs/screenshots/p2a/`; script `scripts/p2a-check.mjs`.
+- Bundle tham khảo so với dist trước sửa: tổng JS hub **+1723 byte / +714 byte gzip**; CSS riêng mới **624 / 354 byte gzip**. Chưa rebuild baseline commit gốc. Không sửa 3D, không đo FPS mới; cảnh báo chunk 3D >500 kB vẫn còn.
+- **Còn phải làm trước khi chốt:** nộp đáp án thật đủ các phần/vòng của 12 trạm; kiểm phản hồi khi cuộn sâu (vùng khen đầu bảng có thể ngoài khung nhìn), các hộp giải thích ở màn thấp, StrictMode/rerender FeedbackSheet trong trình duyệt và thiết bị thật. **Chưa commit** vì chưa đủ nghiệm thu; chưa push/deploy. Giữ nguyên kết quả P1a/P1b phía trên. Không làm P2b bản đồ thẻ.
+
 ## Việc dời từ mốc 3 (làm CUỐI mốc 4, theo thứ tự)
 
 1. **15b deploy bản gộp:** `git pull`, `VITE_MERGED=true` trong `deploy/.env`, dựng lại theo `DEPLOY.md` mục (j); kiểm hub 200, 4 địa chỉ làng cũ trả 302 giữ đường dẫn; thử trên điện thoại. Quay về: mục (j) cách 1 hoặc 2.
@@ -108,6 +117,8 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 **Ngân sách đã đo** (Thấp / Vừa / Cao, tam giác xấu nhất): Dệt 222k / 936k / 1,12M; Khắc Dấu ≈ 204k / 813k / 1,02M; Bạc 211k / 959k / 1,14M. Vùng làng thêm 3–6 MB. Bộ nhớ vào ra làng đứng yên. **Mức Vừa chỉ vẽ nhà, lều, tre ở xa trong tầm 260** (sương đã phủ kín từ ~300).
 
 ## Việc để sau / cần theo dõi
+
+- **Màn 3:** nút “?” đè chữ “Soi công thức”; ghi nhận để sửa riêng, không sửa trong P2a.
 
 - Sau gộp web, số nút DOM nhích 588 → 598 ở 2 vòng cuối một lượt đo; theo dõi.
 - Bạc mức Vừa: 1 trong 5 lượt có 1 khung 55,6 ms. Số đo Bạc mức Thấp/Cao chạy trên bản trước khi đặt tầm 260 (đường mã hai mức này không đổi).

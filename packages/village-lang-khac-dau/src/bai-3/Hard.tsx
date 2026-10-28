@@ -59,13 +59,13 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
     };
   }, []);
 
-  const testX = (xVal: number) => {
+  const testX = (xVal: number, automatic = false) => {
     const val = modPow(5, xVal, 23);
     const isMatch = val === 19;
     setP1History((prev) => [{ x: xVal, val, isMatch }, ...prev]);
 
     if (isMatch) {
-      sound.playCorrect();
+      sound.playCorrect({ answer: automatic ? null : true });
       setP1Found(true);
       setP1AutoRunning(false);
       if (p1AutoTimerRef.current !== null) {
@@ -100,7 +100,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
         setP1AutoRunning(false);
         return;
       }
-      testX(curr);
+      testX(curr, true);
       if (modPow(5, curr, 23) === 19) {
         return;
       }
@@ -262,7 +262,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
       setBruteState(next);
 
       if (next.found !== null) {
-        sound.playCorrect();
+        sound.playCorrect({ answer: null });
         setBruteRunning(false);
         if (cfg.p === 1000003) {
           p1MStatsRef.current = { elapsedMs: elapsed, tries: next.tries };
