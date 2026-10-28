@@ -24,8 +24,6 @@ export interface LevelCompleteProps {
   onNextLevel: () => void;
   hasNextLevel?: boolean;
   nextLabel?: string;
-  /** Khi không còn màn tiếp theo: sau onNextLevel, mở địa chỉ này (mốc 1: bản đồ ở web chính). */
-  nextLessonUrl?: string;
   /** Nút thêm sau nút chính (ví dụ "Chơi tiếp: [tên game 1]") */
   extraAction?: { label: string; onClick: () => void };
 }
@@ -41,7 +39,6 @@ export function LevelComplete({
   onNextLevel,
   hasNextLevel = true,
   nextLabel,
-  nextLessonUrl,
   extraAction,
 }: LevelCompleteProps) {
   const { settings } = useSettings();
@@ -143,14 +140,7 @@ export function LevelComplete({
               {nextLabel || ui.hoanThanh.manTiepTheo}
             </Button>
           ) : (
-            <Button
-              onClick={() => {
-                onNextLevel();
-                if (nextLessonUrl) window.location.assign(nextLessonUrl);
-              }}
-              fullWidth
-              className="sm:w-auto"
-            >
+            <Button onClick={onNextLevel} fullWidth className="sm:w-auto">
               {nextLabel || ui.chung.veBanDo}
             </Button>
           )}

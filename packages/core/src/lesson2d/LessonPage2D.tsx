@@ -308,7 +308,6 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
           onPlayAgain={restart}
           hasNextLevel
           nextLabel={awardNow ? ui.baiHoc.nhanTrang : leaveLabel}
-          nextLessonUrl={undefined}
           onNextLevel={() => {
             if (awardNow) setStage({ kind: 'award' });
             else goVillage();

@@ -1,6 +1,5 @@
 import { Canvas, useThree, type RootState } from '@react-three/fiber';
 import { Suspense, useCallback, useEffect, useState, type ReactNode } from 'react';
-import { ACESFilmicToneMapping } from 'three';
 import { useSettings } from '../settings/SettingsProvider';
 import { CanvasErrorBoundary } from './CanvasErrorBoundary';
 import { DayLight } from './DayLight';
@@ -12,6 +11,7 @@ import { Sky } from './Sky';
 import { effectiveDpr, type QualityChoice, type QualityLevel } from './quality';
 import { lowerSessionCap } from './qualityStore';
 import { SKY_HORIZON, SKY_RADIUS } from './skyLayout';
+import { trackedGl } from './rendererRelease';
 import { useQuality } from './useQuality';
 
 export interface Scene3DProps {
@@ -89,7 +89,7 @@ function Scene3DInner({
   const { settings } = useSettings();
   const [ready, setReady] = useState(false);
   // Khử răng cưa chỉ chọn được lúc tạo khung vẽ: lấy theo mức ban đầu.
-  const [antialias] = useState(level !== 'low');
+  const [glOptions] = useState(() => trackedGl({ antialias: level !== 'low', powerPreference: 'high-performance' }));
   const markReady = useCallback(() => {
     setReady(true);
     onReady?.();
@@ -110,7 +110,7 @@ function Scene3DInner({
       <Canvas
         dpr={dpr}
         shadows={level === 'low' ? false : 'percentage'}
-        gl={{ antialias, powerPreference: 'high-performance', toneMapping: ACESFilmicToneMapping }}
+        gl={glOptions}
         onCreated={onCreated}
         camera={{ position: camera?.position ?? [0, 4, 10], fov: camera?.fov ?? 45, near: camera?.near ?? 0.1, far: camera?.far ?? SKY_RADIUS * 2 }}
       >

@@ -2,7 +2,6 @@ import { PerspectiveCamera, View } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { ForcedCrash, forcedCanvasCrash } from './ForcedCrash';
 import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
-import { ACESFilmicToneMapping } from 'three';
 import { shouldHideForFps, type FrameLayout } from '../lesson2d/frames';
 import { Character } from './Character';
 import { DayLight } from './DayLight';
@@ -12,6 +11,7 @@ import { type Reaction, choiceReactions } from './choiceReactions';
 import { preloadModel, releaseModel, retainModel } from './modelLoader';
 import { aimFromRects } from './poses';
 import { effectiveDpr, type QualityLevel } from './quality';
+import { trackedGl } from './rendererRelease';
 import { useQuality } from './useQuality';
 import { rectOf, useReaction } from './useReaction';
 
@@ -19,6 +19,8 @@ import { rectOf, useReaction } from './useReaction';
 export const LESSON_STUDENT = 'characters/hoc-sinh-nam';
 export const LESSON_RIVAL = 'characters/ti';
 const CLIPS = ['idle', 'cheer'] as const;
+/** Cách tạo renderer của khung bài học (tự gỡ người nghe dispose khi rời trang, xem rendererRelease). */
+const LESSON_GL = trackedGl({ alpha: true, antialias: true, powerPreference: 'high-performance' });
 
 export interface LessonStage3DProps {
   /** Cỡ và chỗ đặt của hai khung (ô trống hai bên bảng), xem `lessonFrameLayout` */
@@ -149,7 +151,7 @@ export default function LessonStage3D({ layout, onFail, onSlow }: LessonStage3DP
           frameloop={active ? 'always' : 'never'}
           dpr={effectiveDpr(level, window.devicePixelRatio)}
           shadows="percentage"
-          gl={{ alpha: true, antialias: true, powerPreference: 'high-performance', toneMapping: ACESFilmicToneMapping }}
+          gl={LESSON_GL}
           eventSource={document.body}
           style={{ pointerEvents: 'none' }}
         >

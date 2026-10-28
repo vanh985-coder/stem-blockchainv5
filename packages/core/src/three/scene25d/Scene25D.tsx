@@ -13,6 +13,7 @@ import { QualityContext } from '../QualityContext';
 import { SceneWarmup } from '../SceneWarmup';
 import { StatsProbe } from '../StatsProbe';
 import { effectiveDpr, type QualityChoice, type QualityLevel } from '../quality';
+import { trackedGl } from '../rendererRelease';
 import { lowerSessionCap } from '../qualityStore';
 import { useQuality } from '../useQuality';
 import {
@@ -284,7 +285,7 @@ function Scene25DInner({ background, sprites = [], children, overlay, allowPortr
   const mode = frameMode(host, allowPortrait);
   const world = useMemo(() => worldSize(mode), [mode]);
   const frame = fitFrame(host, aspectOf(mode));
-  const [antialias] = useState(level !== 'low');
+  const [glOptions] = useState(() => trackedGl({ antialias: level !== 'low', powerPreference: 'high-performance' }));
   const dpr = effectiveDpr(level, typeof window === 'undefined' ? 1 : window.devicePixelRatio);
   const [sceneReady, setSceneReady] = useState(false);
   const spriteKey = sprites.map((s) => s.asset).join('|');
@@ -318,7 +319,7 @@ function Scene25DInner({ background, sprites = [], children, overlay, allowPortr
           <Canvas
             dpr={dpr}
             orthographic
-            gl={{ antialias, powerPreference: 'high-performance' }}
+            gl={glOptions}
             camera={{ position: [0, 0, CAMERA_Z], near: CAMERA_NEAR, far: CAMERA_FAR, manual: true, left: -8, right: 8, top: 4.5, bottom: -4.5 }}
             style={{ position: 'absolute', inset: 0 }}
           >
