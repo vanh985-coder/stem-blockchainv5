@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { useNavigate } from 'react-router';
 import { useAuth } from '../auth/AuthProvider';
-import { HUB_MAP_URL } from '../config/urls';
+import { goToMap } from '../auth/pages/shared';
 import { fmt } from '../content/characters';
 import { levelById } from '../content/levels';
 import { ui } from '../content/ui';
@@ -17,6 +18,7 @@ const WAIT_SYNC_MS = 3000;
  */
 export function LevelGuard({ levelId, children }: { levelId: number; children: ReactNode }) {
   const { loading, profileLoading } = useAuth();
+  const navigate = useNavigate();
   const { mode, synced, unlock } = useProgress();
   const [waited, setWaited] = useState(false);
 
@@ -43,7 +45,7 @@ export function LevelGuard({ levelId, children }: { levelId: number; children: R
           {ui.manKhoa.tieuDe}
         </h1>
         {blocker && <p className="text-lg">{fmt(ui.moKhoa.hoanThanh, { so: blocker.id, man: fmt(blocker.ten) })}</p>}
-        <Button onClick={() => window.location.assign(HUB_MAP_URL)}>{ui.manKhoa.veBanDo}</Button>
+        <Button onClick={() => goToMap(navigate)}>{ui.manKhoa.veBanDo}</Button>
       </Panel>
     </main>
   );

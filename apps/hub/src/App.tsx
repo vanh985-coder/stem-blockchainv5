@@ -1,7 +1,8 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react';
 import { Route, Routes } from 'react-router';
-import { RequireStory, accountRoutes, ui } from '@so-chung/core';
+import { MERGED, RequireStory, accountRoutes, ui } from '@so-chung/core';
 import { Home } from './pages/Home';
+import { villageRouteObjects } from './villageRoutes';
 
 // Trang tải theo route để trang đầu nhẹ (spec 04, spec 03 mục 9).
 const Story = lazy(() => import('./pages/Story'));
@@ -48,6 +49,10 @@ export function App() {
       <Route path="/giao-vien" element={<Lazy page={Teacher} />} />
       <Route path="/giao-vien/:classId" element={<Lazy page={Teacher} />} />
       {accountRoutes.map((r) => (
+        <Route key={r.path} path={r.path} element={r.element} />
+      ))}
+      {/* web đã gộp (VITE_MERGED=true): bốn làng là route lười dưới /lang/<id> */}
+      {villageRouteObjects(MERGED).map((r) => (
         <Route key={r.path} path={r.path} element={r.element} />
       ))}
       {DevAssets && <Route path="/dev/assets" element={<Lazy page={DevAssets} />} />}

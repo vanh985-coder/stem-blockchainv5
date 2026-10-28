@@ -1,4 +1,5 @@
-import { AssetImage, Button, LEVELS, fmt, knowScrollUi, levelById, levelUrl, URLS, ui, type LevelDef, type LevelState, type LevelUnlock, type Progress } from '@so-chung/core';
+import { useNavigate } from 'react-router';
+import { AssetImage, Button, LEVELS, fmt, knowScrollUi, levelById, openLevel, ui, type LevelDef, type LevelState, type LevelUnlock, type Progress } from '@so-chung/core';
 
 /** Chữ và hình cho từng trạng thái: phân biệt bằng hình và chữ, không chỉ bằng màu. */
 export const STATE_TEXT: Record<LevelState, string> = {
@@ -57,6 +58,7 @@ export function VillageDetails({
   /** Thẻ "Em có biết?" của làng (bước X3): chưa đọc đủ thì chưa vào được bài; `onRead` mở các thẻ để đọc */
   know?: { got: number; total: number; onRead: () => void };
 }) {
+  const navigate = useNavigate();
   const knowLocked = !!know && know.total > 0 && know.got < know.total;
   const levels = LEVELS.filter((l) => l.lang === villageId);
   return (
@@ -114,7 +116,7 @@ export function VillageDetails({
                   </span>
                 )}
                 {canEnter && (
-                  <Button size="sm" variant={u.state === 'done' ? 'secondary' : 'primary'} onClick={() => window.location.assign(levelUrl(URLS, def.lang, def.id))}>
+                  <Button size="sm" variant={u.state === 'done' ? 'secondary' : 'primary'} onClick={() => openLevel(navigate, def.lang, def.id)}>
                     {ui.banDo.vao}
                   </Button>
                 )}

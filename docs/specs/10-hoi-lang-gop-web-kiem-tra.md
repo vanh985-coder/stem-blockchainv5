@@ -36,6 +36,16 @@
 
 ## 2. Gộp các subdomain thành một web
 
+**Đã làm ở bước G1 (mốc 3):**
+- `apps/hub/src/villageRoutes.tsx` nạp 4 gói `@so-chung/village-*` bằng `import()` riêng từng làng (mỗi làng là một phần mã tải lười), gắn dưới `/lang/<id>/*` ở `apps/hub/src/App.tsx` khi `VITE_MERGED=true`; trong làng, `useRoutes` dựng lại các route `VillageModule` (`man/<n>` giữ nguyên). Tắt cờ thì hub không có các route này, các vỏ `apps/lang-*` chạy như trước.
+- Điều hướng nội bộ khi `VITE_MERGED=true`: cổng làng và biển gỗ trong chợ, "Về làng", "Về chợ", "Chơi tiếp", nút "Về bản đồ" của `LevelGuard` và nút "Vào" ở `/ban-do` (`openLevel` trong `config/urls.ts`: dùng `navigate` khi gộp, tải trang khi không gộp).
+- Cookie: không đổi gì. `sc_guest` và cookie phiên đã đặt `Domain=VITE_COOKIE_DOMAIN` (tên miền cha) từ đầu, nên người chơi cũ đọc được tiến độ ở web chính (test `progress/mergedCookies.test.ts`).
+- `deploy/Caddyfile`: 4 site làng (8082 đến 8085) chỉ còn `redir {$HUB_ORIGIN:https://stem-block.blockchainptit.com}{uri} 302` (giữ nguyên đường dẫn và tham số; `HUB_ORIGIN` do docker-compose đặt từ `VITE_HUB_URL`). Bản cũ để ở `deploy/Caddyfile.truoc-gop` để quay về. Deploy và quay về: `docs/DEPLOY.md` mục (j). Supabase Redirect URLs giữ nguyên.
+- Số đo bản build: trang đầu của hub 454.966 byte (gzip 133.009) trước, 460.346 (gzip 136.482) sau: +1,2% / +2,6%, dưới ngưỡng 5%. Mã từng làng chỉ tải khi vào: Làng Giấy gồm các màn 1 đến 3 khoảng 80,9 KB (gzip 28,5 KB), Làng Dệt 55,7 KB (22,1), Làng Khắc Dấu 61,9 KB (23,1), Làng Bạc 76,1 KB (28,7); phần dùng chung (three, trang bài học) đã nằm trong gói của hub. Kiểm bằng Chrome điều khiển tự động trên bản build: trang chủ → chợ → vào từng làng → một màn → "Về làng", 3 vòng liên tiếp: 1 lần tải trang (lần đầu), 0 lần sau đó; `/ban-do` mở được cả 12 màn bằng "Vào" không tải lại; F5 ở `/lang/lang-bac/man/12` vào đúng màn 12; số `geometries` và `textures` đứng yên (114 và 92) sau mỗi vòng. Spec 03 mục 9 giữ số đo 3D cũ (G1 không đổi cảnh).
+- Lệnh `pnpm try:lan` không có trong repo, nên không kiểm.
+
+**Việc gốc của mục 2** (giữ để đối chiếu):
+
 1. **Hub nhận các làng:** trong `apps/hub`, import 4 gói `@sochung/village-*` và gắn route của từng gói dưới `/lang/<id>`. Mỗi gói tải lười, chỉ tải khi vào làng đó.
 2. **Bật chế độ gộp:** đặt `VITE_MERGED=true`. Cổng làng trong chợ và nút "Về chợ" lúc này điều hướng nội bộ, không tải lại trang.
 3. **Chuyển hướng subdomain cũ:** sửa `deploy/Caddyfile` để 4 site làng (cổng 8082–8085) chuyển mọi đường dẫn về web chính. Ví dụ với Làng Giấy:

@@ -58,6 +58,20 @@ export function villageWorldUrl(urls: AppUrls, id: VillageId, merged: boolean): 
 /** Web đã gộp (spec 10): đặt VITE_MERGED=true. */
 export const MERGED = import.meta.env.VITE_MERGED === 'true';
 
+/** Đường dẫn nội bộ của màn n một làng, dạng /lang/<id>/man/<n> (cùng đường dẫn ở vỏ làng riêng và ở web đã gộp). */
+export function levelPath(id: VillageId, level: number): string {
+  return `/lang/${id}/man/${level}`;
+}
+
+/**
+ * Vào màn n của một làng: web đã gộp thì điều hướng nội bộ (không tải lại trang, các làng là route lười của hub); chưa gộp thì mở địa chỉ của làng (mỗi làng một tên miền).
+ * `navigate` là hàm của router; `merged` và `urls` có giá trị mặc định lấy từ môi trường, truyền vào để kiểm tra.
+ */
+export function openLevel(navigate: (to: string) => void, id: VillageId, level: number, merged: boolean = MERGED, urls: AppUrls = URLS): void {
+  if (merged) navigate(levelPath(id, level));
+  else window.location.assign(levelUrl(urls, id, level));
+}
+
 export function hubMapUrl(urls: AppUrls): string {
   return `${urls.hub}/ban-do`;
 }

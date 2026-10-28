@@ -238,6 +238,18 @@ importers:
       '@so-chung/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@so-chung/village-lang-bac':
+        specifier: workspace:*
+        version: link:../../packages/village-lang-bac
+      '@so-chung/village-lang-det':
+        specifier: workspace:*
+        version: link:../../packages/village-lang-det
+      '@so-chung/village-lang-giay':
+        specifier: workspace:*
+        version: link:../../packages/village-lang-giay
+      '@so-chung/village-lang-khac-dau':
+        specifier: workspace:*
+        version: link:../../packages/village-lang-khac-dau
       react:
         specifier: 'catalog:'
         version: 19.3.0

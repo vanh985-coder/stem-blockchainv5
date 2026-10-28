@@ -11,6 +11,10 @@
   },
   "dependencies": {
     "@so-chung/core": "workspace:*",
+    "@so-chung/village-lang-giay": "workspace:*",
+    "@so-chung/village-lang-det": "workspace:*",
+    "@so-chung/village-lang-khac-dau": "workspace:*",
+    "@so-chung/village-lang-bac": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-router": "catalog:"

@@ -1,4 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server';
+import { MemoryRouter } from 'react-router';
 import { describe, expect, it } from 'vitest';
 import { LEVELS, type LevelUnlock, type Progress } from '@so-chung/core';
 import { VillageDetails } from './parts';
@@ -6,7 +7,11 @@ import { VillageDetails } from './parts';
 const EMPTY: Progress = { levels: {}, game: { goldenPages: 0, coins: 0, data: {}, updatedAt: 0 } };
 const open: LevelUnlock[] = LEVELS.filter((l) => l.lang === 'lang-giay').map((l) => ({ id: l.id, state: 'open' as const }));
 const render = (know?: { got: number; total: number }) =>
-  renderToStaticMarkup(<VillageDetails villageId="lang-giay" unlockLevels={open} progress={EMPTY} goldenEarned={false} know={know ? { ...know, onRead: () => {} } : undefined} />);
+  renderToStaticMarkup(
+    <MemoryRouter>
+      <VillageDetails villageId="lang-giay" unlockLevels={open} progress={EMPTY} goldenEarned={false} know={know ? { ...know, onRead: () => {} } : undefined} />
+    </MemoryRouter>,
+  );
 
 describe('/ban-do: chi tiết làng và thẻ Em có biết (bước X3)', () => {
   it('chưa đọc đủ thẻ: có lời báo "đọc đủ 4 thẻ" (n/4), nút đọc thẻ, và không có nút "Vào" ở các màn mở', () => {

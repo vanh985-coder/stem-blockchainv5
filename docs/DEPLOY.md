@@ -23,6 +23,11 @@ Tất cả lệnh dưới đây chạy trong **PowerShell** trên server, trừ 
 - Ảnh hướng dẫn chơi nằm ở `assets-build/ui/huong-dan/` (10 ảnh WebP, khoảng 0,7 MB), do `pnpm guide:capture` chụp từ game rồi `pnpm assets:build` nén; làm trên máy dev, server chỉ nhận qua `git pull`.
 - `assets-build/` được commit vào Git; **trên server không có `assets/` (bản gốc) nên không chạy `pnpm assets:build` ở server**. Mỗi lần đổi đồ họa: chạy `pnpm assets:build` trên máy dev, commit `assets-build/` (không có `_preview/`), rồi `git pull` và dựng lại trên server (mục f).
 
+**Có gì mới ở bước G1 (gộp web, spec 10 mục 2):**
+- Bốn làng chạy NGAY TRONG hub dưới `/lang/<id>` (ví dụ `https://stem-block.blockchainptit.com/lang/lang-bac/man/12`), mỗi làng là một phần mã tải lười: chỉ tải khi em vào làng đó. Cổng làng trong chợ, biển gỗ, "Về làng", "Chơi tiếp", `/ban-do` đều điều hướng nội bộ, không tải lại trang. Bật bằng `VITE_MERGED=true` trong `deploy/.env` (mục j); đặt `false` thì web chạy như trước khi gộp.
+- **Bốn subdomain làng (`sb-lang-*`) chỉ còn chuyển hướng**: `deploy/Caddyfile` trả 302 về web chính, GIỮ NGUYÊN đường dẫn (`sb-lang-bac…/lang/lang-bac/man/12` → `stem-block…/lang/lang-bac/man/12`). Vẫn 6 hostname, 6 cổng, nên **không cần đổi gì ở Cloudflare Tunnel, DNS hay Supabase** (Redirect URLs giữ nguyên). `sb-assets` giữ nguyên.
+- Tiến độ và đăng nhập giữ nguyên: cookie `sc_guest` và cookie phiên vẫn ghi ở tên miền chung `.blockchainptit.com` (`VITE_COOKIE_DOMAIN`), người chơi cũ vẫn đọc được. Cách dựng và quay về bản cũ: mục (j).
+
 Muốn đổi cổng (nếu bị trùng) thì sửa `HUB_PORT`, `LANG_GIAY_PORT`, `LANG_DET_PORT`, `LANG_KHAC_DAU_PORT`, `LANG_BAC_PORT`, `ASSETS_PORT` trong `deploy/.env` (mục a.2), rồi nhớ dùng đúng số mới ở mục (b).
 
 ---
@@ -312,6 +317,78 @@ Mặc định Cloudflare **không** lưu cache file `.glb` ở biên (chỉ lưu
 
 ---
 
+## (j) Bản gộp web (bước G1): deploy và quay về bản cũ
+
+**Trước khi làm:** ghi lại mã commit đang chạy để quay về khi cần: `git log --oneline -1` (ví dụ `abc1234`). Cloudflare Tunnel, DNS và Supabase KHÔNG phải đổi.
+
+### 1. Deploy bản gộp
+
+```powershell
+cd D:\so-chung
+git status                         # không có thay đổi dở
+git log --oneline -1               # GHI LẠI mã này (bản chạy trước khi gộp) để quay về
+git pull
+
+# deploy/.env: đặt VITE_MERGED=true (nếu chưa có dòng này thì thêm vào cuối file). VITE_HUB_URL phải là địa chỉ web chính (https://stem-block.blockchainptit.com).
+Select-String -Path deploy\.env -Pattern '^VITE_(MERGED|HUB_URL|COOKIE_DOMAIN)='
+notepad deploy\.env
+
+docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d --build
+docker image prune -f
+```
+
+`deploy/Caddyfile` mới nằm trong image: bốn cổng làng trả 302. Địa chỉ đích lấy từ `VITE_HUB_URL` qua biến `HUB_ORIGIN` của container (không có thì dùng `https://stem-block.blockchainptit.com`).
+
+```
+http://:8082 {
+	redir {$HUB_ORIGIN:https://stem-block.blockchainptit.com}{uri} 302
+}
+```
+
+(tương tự cho `:8083`, `:8084`, `:8085`). Mỗi site làng chỉ có dòng `redir`, hub (`:8081`) và đồ họa (`:8086`) giữ nguyên.
+
+### 2. Kiểm tra tại chỗ
+
+```powershell
+docker ps                                                          # STATUS "Up ... (healthy)" (kiểm hub và đồ họa)
+curl.exe -s -o NUL -w "hub %{http_code}`n" http://localhost:18081/lang/lang-bac/man/12       # 200 (Caddy trả index.html, hub tự nhận route)
+curl.exe -s -o NUL -w "assets %{http_code}`n" http://localhost:18086/manifest.json            # 200
+foreach ($p in 18082,18083,18084,18085) { curl.exe -s -o NUL -w "$p %{http_code} -> %{redirect_url}`n" "http://localhost:$p/lang/lang-bac/man/12?x=1" }
+```
+
+Bốn dòng cuối phải là `302` và `redirect_url` là `https://stem-block.blockchainptit.com/lang/lang-bac/man/12?x=1` (giữ nguyên đường dẫn và tham số). Từ ngoài (qua Cloudflare): `curl.exe -s -o NUL -w "%{http_code} %{redirect_url}`n" https://sb-lang-bac.blockchainptit.com/lang/lang-bac/man/12` cũng phải ra 302 như trên.
+
+### 3. Kiểm tra bằng trình duyệt thật (mục g, thêm các ý sau)
+
+- [ ] Từ trang chủ vào chợ, đi vào từng làng, bấm biển vào một màn, "Về làng": **thanh địa chỉ đổi mà trang KHÔNG nháy trắng / tải lại** (mở F12 → Network, tick "Preserve log": không có dòng tải `document` mới sau lần đầu).
+- [ ] Mở thẳng `https://stem-block.blockchainptit.com/lang/lang-bac/man/12` rồi bấm F5: vẫn vào đúng màn 12 (hoặc báo khóa nếu chưa mở).
+- [ ] `/ban-do`: bấm "Vào" ở một màn đã mở khóa: vào đúng màn, không tải lại trang.
+- [ ] Mở link cũ `https://sb-lang-giay.blockchainptit.com/lang/lang-giay/man/2`: tự chuyển sang `stem-block…/lang/lang-giay/man/2`.
+- [ ] Người chơi cũ (đã có tiến độ ở tên miền chung): mở web chính, tiến độ và số Trang Sổ Vàng còn nguyên.
+
+### 4. Quay về bản cũ nếu có lỗi nặng
+
+Cách 1 (chắc nhất, quay về cả mã lẫn Caddyfile): dùng mã commit đã ghi ở bước trước.
+
+```powershell
+cd D:\so-chung
+git checkout <mã-commit-trước-khi-gộp>
+docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d --build
+# xong thì quay lại nhánh chính để lần sau git pull được: git checkout main
+```
+
+Cách 2 (không đổi mã, chỉ tắt chế độ gộp): sửa `deploy/.env` thành `VITE_MERGED=false`, và đưa Caddyfile cũ về chỗ cũ rồi dựng lại:
+
+```powershell
+Copy-Item deploy\Caddyfile.truoc-gop deploy\Caddyfile -Force     # bản Caddyfile trước khi gộp (4 site làng phục vụ lại app của làng)
+notepad deploy\.env                                              # VITE_MERGED=false
+docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d --build
+```
+
+Cách 2 đổi `deploy/Caddyfile` trong thư mục làm việc (git sẽ báo "modified"): khi sửa xong lỗi thì `git checkout deploy/Caddyfile` để lấy lại bản gộp, rồi làm lại bước 1. Hai cách đều KHÔNG đụng Cloudflare, DNS, Supabase và không mất tiến độ (cookie và tài khoản giữ nguyên).
+
+---
+
 ## Chạy thử Docker ngay trên máy (không cần tên miền)
 
 Dùng khi muốn kiểm tra image trước khi lên server:
@@ -335,4 +412,7 @@ Rồi mở http://localhost:18081 … 18086. Bản này dùng địa chỉ `loca
 | Hub mở được nhưng **không có hình** | Mở `https://sb-assets.blockchainptit.com/manifest.json`; nếu không mở được thì tunnel/DNS của `sb-assets` chưa đúng (mục b). |
 | Đăng nhập ở hub nhưng **làng không nhận** | Kiểm tra `VITE_COOKIE_DOMAIN=.blockchainptit.com` (có dấu chấm ở đầu) trong `deploy/.env`, rồi dựng lại. Xóa cookie cũ của trình duyệt. |
 | Đăng nhập Google quay về **trang lỗi** | Redirect URLs trong Supabase thiếu hostname đang dùng (mục c). |
+| Sau gộp web, mở `/lang/<id>/man/<n>` ở web chính ra **trang chủ** hoặc thấy làng cũ | `deploy/.env` chưa có `VITE_MERGED=true` (hoặc đang `false`); sửa rồi `up -d --build` (mục j). |
+| Link `sb-lang-*` cũ **không chuyển hướng** mà hiện app làng | Image còn Caddyfile cũ: kiểm `deploy/Caddyfile` có `redir` ở `:8082`…`:8085`, rồi `up -d --build` (mục j). |
+| Link cũ chuyển hướng **về nhầm địa chỉ** | `VITE_HUB_URL` trong `deploy/.env` sai (nó cũng là địa chỉ đích của redirect); sửa rồi dựng lại. |
 | Đổi `.env` nhưng **không thấy thay đổi** | Cần dựng lại: `up -d --build`. Trình duyệt giữ bản cũ thì Ctrl+Shift+R. |

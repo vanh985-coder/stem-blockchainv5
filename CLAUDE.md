@@ -14,7 +14,7 @@ Dự án chỉ dùng Claude Code; `GEMINI.md` đã bỏ, file này là hướng 
 - `pnpm assets:build`: nén đồ họa vào `assets-build/` và tạo `manifest.json`. `pnpm rls:check`: kiểm RLS Supabase.
 
 ## 3. Cấu trúc
-- `apps/hub`: web chính, trang `/cho` là thế giới mở (chợ + 4 làng trong một cảnh, `packages/core/src/three/world/`). `apps/lang-*`: vỏ chạy riêng từng làng, chỉ còn trang bài học và game (`/` và `/lang/<id>` chuyển sang `/cho?tu=<id>` ở hub).
+- `apps/hub`: web chính; từ bước G1 (gộp web) hub import cả 4 `village-*` (`src/villageRoutes.tsx`, mỗi làng một phần mã tải lười dưới `/lang/<id>/*`) khi `VITE_MERGED=true` (mẫu `deploy/.env.example`): mọi chỗ chuyển màn dùng `navigate` (`openLevel`, `levelPath` ở `config/urls.ts`, `goToMap`, `goToHub`), KHÔNG dùng `window.location.assign` cho đường đi giữa các màn. Trang `/cho` là thế giới mở (chợ + 4 làng trong một cảnh, `packages/core/src/three/world/`). `apps/lang-*`: vỏ chạy riêng từng làng (vẫn dùng khi `VITE_MERGED=false`; ở bản deploy gộp, 4 subdomain làng chỉ chuyển hướng 302 về hub, xem `docs/DEPLOY.md` mục j), chỉ còn trang bài học và game (`/` và `/lang/<id>` chuyển sang `/cho?tu=<id>` ở hub).
 - `packages/core`: giao diện, động cơ 3D, đăng nhập, tiến độ, câu hỏi, logic 4 bài.
 - `packages/village-*`: nội dung từng làng, export `VillageModule` (trang bài học, game, route).
 - `supabase/`: migrations SQL, edge functions.

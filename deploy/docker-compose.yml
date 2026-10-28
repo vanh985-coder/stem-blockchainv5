@@ -23,6 +23,9 @@ services:
         VITE_LANG_BAC_URL: ${VITE_LANG_BAC_URL:?Thiếu VITE_LANG_BAC_URL trong deploy/.env}
         VITE_MERGED: ${VITE_MERGED:-false}
     restart: unless-stopped
+    environment:
+      # Địa chỉ web chính cho 4 site làng cũ chuyển hướng 302 (deploy/Caddyfile); giống VITE_HUB_URL
+      HUB_ORIGIN: ${VITE_HUB_URL}
     # Cổng bên TRONG container giữ nguyên 8081–8086 (Caddyfile). Cổng trên server (bên trái) lấy từ deploy/.env,
     # mặc định 18081–18086 để khỏi trùng chương trình khác; đổi trong deploy/.env nếu bị trùng.
     ports:
@@ -33,10 +36,11 @@ services:
       - "127.0.0.1:${LANG_BAC_PORT:-18085}:8085" # lang-bac
       - "127.0.0.1:${ASSETS_PORT:-18086}:8086" # assets
     healthcheck:
-      # Chạy BÊN TRONG container nên dùng cổng trong (không đổi theo HUB_PORT…). Cả 6 cổng đều trả lời (5 app: trang chủ; đồ họa: manifest.json, vì cổng 8086 không có trang chủ)
+      # Chạy BÊN TRONG container nên dùng cổng trong (không đổi theo HUB_PORT…). Hub trả trang chủ, đồ họa trả manifest.json (cổng 8086 không có trang chủ). Từ bước G1 bốn cổng làng (8082 đến 8085) chỉ chuyển hướng ra web chính
+      # (https, ngoài container) nên không kiểm ở đây: kiểm bằng curl.exe -I (docs/DEPLOY.md mục j).
       test:
         - CMD-SHELL
-        - for p in 8081 8082 8083 8084 8085; do wget -q -O /dev/null http://127.0.0.1:$$p/ || exit 1; done; wget -q -O /dev/null http://127.0.0.1:8086/manifest.json
+        - wget -q -O /dev/null http://127.0.0.1:8081/ && wget -q -O /dev/null http://127.0.0.1:8086/manifest.json
       interval: 30s
       timeout: 5s
       retries: 3

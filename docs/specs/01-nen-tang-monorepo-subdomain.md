@@ -110,7 +110,7 @@ export interface VillageModule {
 
 **Web chính `apps/hub`:**
 - Lúc mới dựng, cổng mỗi làng trong chợ phiên trỏ tới subdomain của làng đó.
-- Khi gộp (spec 10), hub import thẳng 4 gói làng. Cổng làng đổi thành điều hướng nội bộ, bằng cách bật biến `VITE_MERGED=true`.
+- Từ bước G1 (gộp web, spec 10 mục 2), hub import thẳng 4 gói làng (`apps/hub/src/villageRoutes.tsx`, tải lười từng làng) và gắn route dưới `/lang/<id>/*` khi `VITE_MERGED=true`. Cổng làng, "Về làng", "Về chợ", "Chơi tiếp", `/ban-do` đều điều hướng nội bộ. Bốn subdomain làng chỉ còn chuyển hướng 302 về web chính, giữ nguyên đường dẫn (Caddy, mục 7). Các vỏ `apps/lang-*` vẫn dùng được để sửa lỗi riêng từng làng (đặt `VITE_MERGED=false`).
 
 ## 5. Đồ họa dùng chung
 
@@ -175,7 +175,7 @@ File trong assets-build/ mang mã băm nội dung trong tên (ten.<hash8>.webp);
 | `VITE_ASSETS_URL` | `https://assets.ten-mien.vn` | Lúc dev: `http://localhost:5180` |
 | `VITE_HUB_URL` | `https://ten-mien.vn` | |
 | `VITE_COOKIE_DOMAIN` | `.ten-mien.vn` | Để trống khi chạy localhost |
-| `VITE_MERGED` | `false` | Đặt `true` sau khi gộp |
+| `VITE_MERGED` | `false` | `true` từ bước G1 (gộp web): 4 làng chạy trong hub và điều hướng nội bộ. `deploy/.env.example` đặt `true` |
 
 ## 7. Deploy bằng Docker + Cloudflare Tunnel
 
@@ -197,6 +197,7 @@ File trong assets-build/ mang mã băm nội dung trong tên (ten.<hash8>.webp);
 - `.dockerignore`: `node_modules`, `dist`, `assets/`, `.env*`, `assets-build/_preview/`, `.git`.
 - `deploy/Caddyfile`:
   - 5 app: đường dẫn không phải file thì trả `index.html`; `index.html` là `no-cache`; file trong `/assets/` (có mã băm) là `public, max-age=31536000, immutable`; nén zstd/gzip; header `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` tắt camera, micro, định vị;
+  - từ bước G1, 4 site làng (8082 đến 8085) chỉ có `redir {$HUB_ORIGIN:https://stem-block.blockchainptit.com}{uri} 302` (bản cũ: `deploy/Caddyfile.truoc-gop`; deploy và quay về: `docs/DEPLOY.md` mục j);
   - assets: `Access-Control-Allow-Origin: *`; file có mã băm 8 ký tự là `immutable`, còn lại (như `manifest.json`) là `no-cache`; khai báo kiểu `.webp`, `.glb`, `.woff2` (giống `pnpm dev:assets`).
 - `deploy/docker-compose.yml`: 1 service, `restart: unless-stopped`, cổng trên server gắn vào `127.0.0.1` lấy từ `deploy/.env` (`HUB_PORT`, `LANG_GIAY_PORT`, `LANG_DET_PORT`, `LANG_KHAC_DAU_PORT`, `LANG_BAC_PORT`, `ASSETS_PORT`; mặc định 18081–18086 để khỏi trùng chương trình khác; cổng bên trong container giữ nguyên 8081–8086), build args lấy từ `deploy/.env` (không commit; mẫu ở `deploy/.env.example`), có healthcheck.
 

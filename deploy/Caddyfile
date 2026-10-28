@@ -1,4 +1,6 @@
 # Caddy trong container: 6 site theo cổng. HTTPS do Cloudflare Tunnel lo, nên Caddy chỉ nói HTTP.
+# Từ bước G1 (gộp web, spec 10 mục 2) 4 site làng cũ (8082 đến 8085) CHUYỂN HƯỚNG 302 về web chính, giữ nguyên đường dẫn; bản gốc trước khi gộp: deploy/Caddyfile.truoc-gop (docs/DEPLOY.md mục j).
+# HUB_ORIGIN là địa chỉ web chính (docker-compose đặt bằng VITE_HUB_URL); thiếu thì dùng địa chỉ mặc định bên dưới.
 # Tunnel trỏ hostname -> http://localhost:<cổng> (docs/DEPLOY.md). Dùng site theo cổng nên không phụ thuộc tên Host.
 {
 	auto_https off
@@ -34,20 +36,22 @@ http://:8081 {
 	import app /srv/hub
 }
 
+# ---------- 4 site làng cũ: chuyển hướng về web chính, giữ nguyên đường dẫn và tham số ----------
+# Ví dụ: sb-lang-bac.blockchainptit.com/lang/lang-bac/man/12 -> stem-block.blockchainptit.com/lang/lang-bac/man/12
 http://:8082 {
-	import app /srv/lang-giay
+	redir {$HUB_ORIGIN:https://stem-block.blockchainptit.com}{uri} 302
 }
 
 http://:8083 {
-	import app /srv/lang-det
+	redir {$HUB_ORIGIN:https://stem-block.blockchainptit.com}{uri} 302
 }
 
 http://:8084 {
-	import app /srv/lang-khac-dau
+	redir {$HUB_ORIGIN:https://stem-block.blockchainptit.com}{uri} 302
 }
 
 http://:8085 {
-	import app /srv/lang-bac
+	redir {$HUB_ORIGIN:https://stem-block.blockchainptit.com}{uri} 302
 }
 
 # ---------- Đồ họa (assets-build/): giống scripts/dev-assets.mjs ----------
