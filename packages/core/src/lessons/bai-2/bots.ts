@@ -14,6 +14,16 @@ export interface SettleRoundResult {
 }
 
 /**
+ * Phiếu của em có đúng không: đồng ý trang thật hoặc từ chối trang gian/tính nhầm.
+ * Chỉ nhìn sự thật của trang, KHÔNG nhìn việc trang cuối cùng được nhận hay bị loại (do phiếu của cả ba người).
+ * `undefined` (em chưa bỏ phiếu) thì trả null: chưa có câu trả lời nào để khen.
+ */
+export function voteWasRight(vote: Vote | undefined, truth: Truth): boolean | null {
+  if (vote === undefined) return null;
+  return (vote === 'agree') === (truth === 'valid');
+}
+
+/**
  * Tính toán kết quả biểu quyết và biến động điểm cọc sau mỗi lượt chơi:
  * - accepted = số phiếu 'agree' >= acceptThreshold (2)
  * - Lãi/lỗ ròng đã tính cọc 30:

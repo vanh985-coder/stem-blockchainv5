@@ -1,0 +1,290 @@
+[
+  {
+    "level": 1,
+    "station": 0,
+    "width": 1366,
+    "height": 768,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 1,
+    "station": 1,
+    "width": 1366,
+    "height": 768,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 1,
+    "station": 2,
+    "width": 1366,
+    "height": 768,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 4,
+    "station": 0,
+    "width": 1366,
+    "height": 768,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 4,
+    "station": 1,
+    "width": 1366,
+    "height": 768,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 4,
+    "station": 2,
+    "width": 1366,
+    "height": 768,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 7,
+    "station": 0,
+    "width": 1366,
+    "height": 768,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 7,
+    "station": 1,
+    "width": 1366,
+    "height": 768,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 7,
+    "station": 2,
+    "width": 1366,
+    "height": 768,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 10,
+    "station": 0,
+    "width": 1366,
+    "height": 768,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 10,
+    "station": 1,
+    "width": 1366,
+    "height": 768,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 10,
+    "station": 2,
+    "width": 1366,
+    "height": 768,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 1,
+    "station": 0,
+    "width": 360,
+    "height": 800,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 1,
+    "station": 1,
+    "width": 360,
+    "height": 800,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 1,
+    "station": 2,
+    "width": 360,
+    "height": 800,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 4,
+    "station": 0,
+    "width": 360,
+    "height": 800,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 4,
+    "station": 1,
+    "width": 360,
+    "height": 800,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 4,
+    "station": 2,
+    "width": 360,
+    "height": 800,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 7,
+    "station": 0,
+    "width": 360,
+    "height": 800,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 7,
+    "station": 1,
+    "width": 360,
+    "height": 800,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 7,
+    "station": 2,
+    "width": 360,
+    "height": 800,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 10,
+    "station": 0,
+    "width": 360,
+    "height": 800,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 10,
+    "station": 1,
+    "width": 360,
+    "height": 800,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 10,
+    "station": 2,
+    "width": 360,
+    "height": 800,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 1,
+    "station": 0,
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 1,
+    "station": 1,
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 1,
+    "station": 2,
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 4,
+    "station": 0,
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 4,
+    "station": 1,
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 4,
+    "station": 2,
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 7,
+    "station": 0,
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 7,
+    "station": 1,
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 7,
+    "station": 2,
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 10,
+    "station": 0,
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 10,
+    "station": 1,
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  },
+  {
+    "level": 10,
+    "station": 2,
+    "width": 844,
+    "height": 390,
+    "errors": [],
+    "scope": "production signal integration; muted; duplicate; consecutive; system reduced motion; station change"
+  }
+]

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { sound } from '../audio/sound';
 import { ui } from '../content/ui';
 import { BottomSheet } from './BottomSheet';
+import { announceOnce } from './feedbackAnnounce';
 import { Button } from './Button';
 import { PortraitFrame } from './PortraitFrame';
 
@@ -27,16 +28,18 @@ export function FeedbackSheet({
   onContinue,
   continueLabel = ui.phanHoi.tiepTuc,
 }: FeedbackSheetProps) {
-  const announced = useRef(false);
-  // Preserve audio, but do not announce the same submission again on rerender/StrictMode.
+  // Kết quả đã báo cho lần mở này. Chỉ báo lại khi đúng/sai đổi lúc hộp vẫn mở (một lần nộp mới);
+  // callback đổi, render lại hay effect nối lại (StrictMode) thì không tính là lần nộp mới.
+  const announced = useRef<boolean | null>(null);
   useEffect(() => {
-    if (!isOpen) { announced.current = false; return; }
+    if (!isOpen) announced.current = null;
   }, [isOpen]);
   // Phát âm thanh và hỗ trợ phím Enter
   useEffect(() => {
     if (!isOpen) return;
-    const answer = announced.current ? null : isCorrect;
-    announced.current = true;
+    const next = announceOnce(announced.current, isCorrect);
+    announced.current = next.announced;
+    const { answer } = next;
     if (isCorrect) sound.playCorrect({ answer });
     else sound.playWrong({ answer });
     const onKey = (e: KeyboardEvent) => {

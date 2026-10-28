@@ -26,6 +26,7 @@ import {
   summarizePlayer,
   tiDecide,
   updateBeliefs,
+  voteWasRight,
   type HistoryItem,
   type PlayerId,
   type TiDecisionReason,
@@ -329,7 +330,8 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
 
     setHistory((h) => [...h, { creator, truth, accepted: res.accepted, deltas: res.deltas }]);
 
-    const answer = creator === 'em' ? null : (votes.em === 'agree') === (truth === 'valid');
+    // Khen theo phiếu của em có đúng không, không theo việc trang được nhận; lượt em tạo trang đã báo lúc em nộp mã.
+    const answer = creator === 'em' ? null : voteWasRight(votes.em, truth);
     if (res.accepted) sound.playCorrect({ answer });
     else sound.playWrong({ answer });
 

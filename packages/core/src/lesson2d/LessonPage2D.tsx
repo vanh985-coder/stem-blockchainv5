@@ -335,7 +335,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
       <LessonPraise key={`${levelId}-${attempt}-${currentIdx}`} onResult={onAnswerProp} />
       <div className="lesson-window">
       <div className="lesson-scroll" ref={scrollArea} data-testid="lesson-scroll">
-    // isolate: để lớp nền trang trí (z âm) nằm trên ảnh nền của làng nhưng dưới bảng bài học.
+    {/* isolate: để lớp nền trang trí (z âm) nằm trên ảnh nền của làng nhưng dưới bảng bài học. */}
     <div className="isolate min-h-screen bg-giay bg-cover bg-center" style={bg ? { backgroundImage: `url("${bg}")` } : undefined}>
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20 bg-giay/55" />
       {/* Icon của làng: chỉ ở 2 khoảng trống hai bên bảng (màn từ 1296px, tối đa 4 mỗi bên), không bao giờ sau bảng; cảnh trao Trang Sổ Vàng thì rải cả màn kèm tia sáng. */}

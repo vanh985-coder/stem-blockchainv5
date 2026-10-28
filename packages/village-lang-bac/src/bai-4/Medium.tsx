@@ -239,19 +239,19 @@ export function Medium({
 
   const startTamperAnimation = useCallback(() => {
     setTamperStep(0);
-    sound.playWrong();
+    sound.playWrong({ answer: null });
 
     const delay = GAME_CONFIG.lesson4.tamperStepDelayMs || 600;
 
     // Bước 1: nút con cấp 1 (T34) đổi màu
     timerRef.current = setTimeout(() => {
       setTamperStep(1);
-      sound.playWrong();
+      sound.playWrong({ answer: null });
 
       // Bước 2: nút gốc đổi màu
       timerRef.current = setTimeout(() => {
         setTamperStep(2);
-        sound.playWrong();
+        sound.playWrong({ answer: null });
         onTwist?.();
       }, delay);
     }, delay);

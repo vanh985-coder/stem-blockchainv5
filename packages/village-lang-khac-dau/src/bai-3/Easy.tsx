@@ -368,6 +368,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
   // Kiểm tra kết quả Phần 2
   const handleCheckPart2 = () => {
     let hasMistake = false;
+    let newlyCorrect = 0;
     const newLocked = { ...lockedMatches };
     let returnedCards: number[] = [];
 
@@ -378,6 +379,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
 
       if (assigned === f.expectedPub) {
         newLocked[f.id] = true;
+        newlyCorrect += 1;
       } else {
         hasMistake = true;
         // Trả thẻ sai về pool
@@ -393,7 +395,8 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
       setCardsPool((pool) => [...pool, ...returnedCards]);
       setMatches({ ...matches });
     } else {
-      sound.playCorrect();
+      // Bấm kiểm tra khi chưa có thẻ mới nào được đặt thì chưa có câu trả lời nào để khen.
+      sound.playCorrect({ answer: newlyCorrect > 0 ? true : null });
       setHintMessage(null);
     }
 

@@ -20,7 +20,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 |---|---|
 | 0–2 | ✅ Xong (mốc 2 chưa deploy) |
 | 3. Nhân rộng | ✅ **Chốt.** Đủ 12 màn, cả 4 làng dựng to, **đã gộp web** (≈2086 test xanh). Việc còn dở dời xuống **cuối mốc 4** |
-| 4. Trau chuốt | **P1a và P1b đã xong, kiểm local đạt** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
+| 4. Trau chuốt | **P1a, P1b, P2a đã xong và kiểm đạt** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
 
 **⚠️ 15b vẫn chưa làm:** server có thể đang 530, mốc 2 và toàn bộ mốc 3 (≈60 commit, mới nhất `2bd76bf`) chưa push, chưa chạy trên máy thật. Cách làm: khôi phục `cloudflared` + Docker, deploy theo `DEPLOY.md` (h), Cache Rule (i), thử trên điện thoại.
 
@@ -67,14 +67,15 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - Không sửa 3D, không đo FPS mới. Bundle hub: chunk máy tính **1,84 kB / gzip 0,98 kB**, JS chính **237,40 kB / gzip 75,36 kB** (số Vite build); cảnh báo chunk 3D >500 kB vẫn còn.
 - Chưa xác minh: thiết bị thật, bàn phím ảo, Safari/iPhone, giao diện trên bản production (build đạt nhưng tương tác chạy dev), toàn bộ 5 vòng bằng thao tác thật (script dùng cầu nối dev để chuyển sang Trung bình). Chưa push/deploy.
 
-## P2a — đã triển khai, chưa chốt nghiệm thu (28/10/2026)
+## P2a — đã xác minh (28/10/2026)
 
-- Chỉ làm pháo hoa CSS và lời khen dùng chung cho màn 1/4/7/10 qua `LessonPage2D`/`onAnswer`. Có gộp báo trùng, dọn timer/listener, không phát lại khi đổi màn/trạm; giảm chuyển động trong cài đặt hoặc hệ điều hành thì chỉ có chữ. Chữ ở `content/lessonPraise.ts`.
-- Phân biệt kết quả nộp bài với âm minh họa/quét dấu/dò tự động. Giữ hợp đồng người nghe sự kiện cũ, âm thanh, nhân vật, luật, điểm và tiến độ. Khó màn 4 khen theo phiếu em đúng; soi cây màn 10 chỉ khen khi tìm đúng lá bị sửa.
-- `pnpm test --maxWorkers=2`: **2108 pass, 1 skipped**, 192 file pass/1 skipped; `pnpm typecheck`, `pnpm check:text` (427 file), `pnpm build` (5 app, `VITE_MERGED=true`) đạt.
-- Kiểm production local ở 1366×768, 360×800, 844×390: 12 trạm × 3 cỡ màn hình bằng **tín hiệu kiểm thử**, gồm đúng/sai, trùng/liên tiếp, âm tắt, media giảm chuyển động, chiều cao/focus không đổi. Kiểm thêm cài đặt giảm chuyển động và rời bài qua SPA khi đang có hạt. **Không coi đây là đã nộp đáp án thật xuyên suốt 12 trạm.** 48 ảnh (<300 KB, lớn nhất 114697 byte), báo cáo và số đo ở `docs/screenshots/p2a/`; script `scripts/p2a-check.mjs`.
-- Bundle tham khảo so với dist trước sửa: tổng JS hub **+1723 byte / +714 byte gzip**; CSS riêng mới **624 / 354 byte gzip**. Chưa rebuild baseline commit gốc. Không sửa 3D, không đo FPS mới; cảnh báo chunk 3D >500 kB vẫn còn.
-- **Còn phải làm trước khi chốt:** nộp đáp án thật đủ các phần/vòng của 12 trạm; kiểm phản hồi khi cuộn sâu (vùng khen đầu bảng có thể ngoài khung nhìn), các hộp giải thích ở màn thấp, StrictMode/rerender FeedbackSheet trong trình duyệt và thiết bị thật. **Chưa commit** vì chưa đủ nghiệm thu; chưa push/deploy. Giữ nguyên kết quả P1a/P1b phía trên. Không làm P2b bản đồ thẻ.
+- Lời khen và pháo hoa CSS dùng chung cho màn 1/4/7/10 (`LessonPraise`, `praiseSession`, chữ ở `content/lessonPraise.ts`). Dải khen cao 36 px nằm **ngoài vùng cuộn**, trên `.lesson-window`: luôn thấy khi cuộn sâu hoặc mở hộp phản hồi, không tự cuộn, không focus, không bắt chuột/chạm, không đổi bố cục. Giảm chuyển động (cài đặt hoặc hệ điều hành) chỉ còn chữ.
+- Không đổi công thức, luật, điểm, tiến độ, âm thanh, phản ứng nhân vật. Thêm `emitSubmission`, `voteWasRight`, `announceOnce` (có test).
+- **Kiểm thao tác thật** trên bản production (`scripts/p2a-real-check.mjs`): chuột/chạm/phím/kéo thả thật, 12 trạm, 3 cỡ (1366×768, 360×800, 844×390): 129 nhóm, 516 thao tác (111 khen đúng 1 đợt, 405 không khen), vòng đời (tắt âm, giảm chuyển động cài đặt và hệ điều hành, đổi media giữa chừng, đổi trạm, rời bài) 90/90, `FeedbackSheet` render lại trên production và dev StrictMode không phát trùng. Tách riêng khỏi kiểm tín hiệu `scripts/p2a-check.mjs`. Chi tiết, bảng thao tác và 57 ảnh (lớn nhất 104.885 byte) ở `docs/screenshots/p2a/README.md`.
+- **Lỗi tìm ra khi kiểm thật và đã sửa:** chữ `// isolate…` lộ ra mọi trang bài; màn 7 Dễ khen khi bấm kiểm tra chưa đặt thẻ; màn 7 Trung bình khen theo kết quả của Máy xác minh; màn 7 Khó trả lời đúng (phần 2, 3) không có khen; màn 10 Trung bình hoạt cảnh sửa trộm xóa lời khen; `FeedbackSheet` mất lần nộp khi đúng/sai đổi lúc hộp mở. Bản trước sửa không đạt 16 mục (`truoc-khi-sua.log`).
+- `pnpm test --maxWorkers=2`: **2117 pass, 1 skipped**; `pnpm typecheck`, `pnpm check:text` (428 file), `pnpm build` (5 app, `VITE_MERGED=true`) đạt.
+- **Ghi nhận ngoài phạm vi, chưa sửa:** nộp sai bằng Enter làm hộp phản hồi đóng ngay (Enter cũng kích `FeedbackSheet`); cha render lại lúc hộp mở thì âm và phản ứng nhân vật phát lại (giữ theo yêu cầu).
+- Chưa xác minh: thiết bị thật, Safari/iPhone, bàn phím ảo, trình đọc màn hình, FPS điện thoại; ở 1366×768 vài trang vừa khung nên không cuộn được. Chưa push/deploy. Không làm P2b bản đồ thẻ.
 
 ## Việc dời từ mốc 3 (làm CUỐI mốc 4, theo thứ tự)
 

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Avatar, Button, Card, Modal, NumberInput, fmt, sound, useAuth, type StationResult, formatPower, plainPower, rich } from '@so-chung/core';
+import { emitSubmission } from '@so-chung/core/audio/answerSignal';
 import { bai3Texts } from '@so-chung/core/content/lessons/bai-3';
 import { formatNumber, formatDecimal, formatTime } from '@so-chung/core/lib/format';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
@@ -169,6 +170,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
       }
       p2ElapsedSecRef.current = Math.max(1, Math.floor((Date.now() - p2StartTimeRef.current) / 1000));
       sound.playLevelComplete();
+      emitSubmission(true);
       setP2GuessedCorrectly(true);
     } else {
       sound.playClick();
@@ -322,6 +324,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
 
     if (opt.isCorrect) {
       sound.playLevelComplete();
+      emitSubmission(true);
       setP3IsCorrect(true);
       setP3Feedback(null);
 
