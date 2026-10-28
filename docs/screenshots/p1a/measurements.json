@@ -1,0 +1,91 @@
+{
+  "browser": "Chrome/156.0.8078.49",
+  "results": [
+    {
+      "width": 1366,
+      "height": 768,
+      "input": "mouse",
+      "memory": "visible calculator, no overlap, input 3→10, flips, focus pauses swap clock and blur resumes; hint pauses; mismatch flip-back still runs while using calculator",
+      "graphics": "ANGLE (Intel, Intel(R) UHD Graphics (0x000046A3) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "kiteFrames": {
+        "frames": 433,
+        "elapsedMs": 3003.5999999999995,
+        "fps": 144.1603409242243,
+        "maxFrameMs": 7.299999999999727
+      },
+      "kite": "pointer flap starts play",
+      "clock": {
+        "font": "35.4985px",
+        "width": 103.6875,
+        "height": 44,
+        "clearOfCards": true
+      },
+      "rebuild": "rounds 1/2 placed by real clicks/taps, keep clock visible",
+      "tree": {
+        "width": 825.453125,
+        "height": 289.1875,
+        "scroll": false,
+        "nodes": 15,
+        "minTarget": 47.46875,
+        "overlaps": false,
+        "covered": false,
+        "allNodesInViewport": true,
+        "placement": "tray piece selected and placed using real mouse/touch"
+      },
+      "errors": []
+    },
+    {
+      "width": 360,
+      "height": 800,
+      "input": "emulated touch",
+      "memory": "visible calculator, no overlap, input 3→10, flips, focus pauses swap clock and blur resumes; hint pauses; mismatch flip-back still runs while using calculator",
+      "kite": "portrait rotation notice",
+      "rebuild": "portrait rotation notice",
+      "tree": {
+        "width": 276,
+        "height": 308,
+        "scroll": false,
+        "nodes": 15,
+        "minTarget": 44,
+        "overlaps": false,
+        "covered": false,
+        "allNodesInViewport": true,
+        "placement": "tray piece selected and placed using real mouse/touch"
+      },
+      "errors": []
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "input": "emulated touch",
+      "memory": "visible calculator, no overlap, input 3→10, flips, focus pauses swap clock and blur resumes; hint pauses; mismatch flip-back still runs while using calculator",
+      "graphics": "ANGLE (Intel, Intel(R) UHD Graphics (0x000046A3) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "kiteFrames": {
+        "frames": 433,
+        "elapsedMs": 3003.7,
+        "fps": 144.15554149881814,
+        "maxFrameMs": 7.100000000000364
+      },
+      "kite": "pointer flap starts play",
+      "clock": {
+        "font": "24px",
+        "width": 79.828125,
+        "height": 44,
+        "clearOfCards": true
+      },
+      "rebuild": "rounds 1/2 placed by real clicks/taps, keep clock visible",
+      "tree": {
+        "width": 712,
+        "height": 268,
+        "scroll": false,
+        "nodes": 15,
+        "minTarget": 44,
+        "overlaps": false,
+        "covered": false,
+        "allNodesInViewport": true,
+        "placement": "tray piece selected and placed using real mouse/touch"
+      },
+      "errors": []
+    }
+  ]
+}

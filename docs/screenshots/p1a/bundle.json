@@ -1,0 +1,51 @@
+{
+  "build": "pnpm build (production, no VITE_PROBE)",
+  "gzip": "node:zlib gzipSync, default compression",
+  "chunks": [
+    {
+      "file": "CayMerkle-BXjk0fu6.js",
+      "bytes": 4861,
+      "gzipBytes": 2243
+    },
+    {
+      "file": "index-DjfdEYvr.js",
+      "bytes": 237402,
+      "gzipBytes": 74579
+    },
+    {
+      "file": "index-JfbHOpdq.css",
+      "bytes": 100772,
+      "gzipBytes": 16363
+    },
+    {
+      "file": "Man10-BovxCnXK.js",
+      "bytes": 2469,
+      "gzipBytes": 1088
+    },
+    {
+      "file": "Man3-Bx0BZLim.js",
+      "bytes": 35285,
+      "gzipBytes": 11502
+    },
+    {
+      "file": "Man6-CFBVgptp.js",
+      "bytes": 26240,
+      "gzipBytes": 10481
+    },
+    {
+      "file": "Man8-D9oS6F9Z.js",
+      "bytes": 19446,
+      "gzipBytes": 7966
+    },
+    {
+      "file": "ModCalculator-D_xQuYlL.js",
+      "bytes": 2407,
+      "gzipBytes": 1195
+    },
+    {
+      "file": "rendererRelease-ZORAoHul.js",
+      "bytes": 1016118,
+      "gzipBytes": 271873
+    }
+  ]
+}

@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { compactTree } from './compactTree';
 import { bai4Texts } from '@so-chung/core/content/lessons/bai-4';
 import { formatNumber } from '@so-chung/core/lib/format';
 
@@ -34,6 +35,7 @@ export interface CayMerkleProps {
   caption?: string;
   /** Hiện gợi ý "vuốt ngang" ở màn hình nhỏ (cây 8 lá luôn hiện) */
   scrollHint?: boolean;
+  compact?: boolean;
 }
 
 export const CayMerkle: React.FC<CayMerkleProps> = ({
@@ -47,18 +49,32 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
   className = '',
   caption,
   scrollHint = false,
+  compact = false,
 }) => {
+  const host = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(280);
+  useLayoutEffect(() => {
+    if (!compact || !host.current) return;
+    const el = host.current;
+    const measure = () => setWidth(el.clientWidth);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [compact]);
+  const fitted = useMemo(() => compactTree(width, treeValues), [width, treeValues]);
   const numLevels = treeValues.length;
   const numLeaves = treeValues[0]?.length || 4;
   const isEightLeaves = numLeaves >= 8;
 
   // Chiều rộng canvas SVG tối thiểu để không bị co chữ
-  const canvasWidth = isEightLeaves ? 720 : 420;
-  const canvasHeight = isEightLeaves ? 360 : 280;
+  const canvasWidth = compact ? fitted.width : isEightLeaves ? 720 : 420;
+  const canvasHeight = compact ? fitted.height : isEightLeaves ? 360 : 280;
 
   // Tính tọa độ (x, y) cho từng ô
   // Root ở trên cùng (y nhỏ), lá ở dưới cùng (y lớn)
   const nodePositions = useMemo(() => {
+    if (compact) return fitted.nodes;
     const positions: Array<Array<{ x: number; y: number; width: number; height: number }>> = [];
     const yPadding = 40;
     const availableHeight = canvasHeight - yPadding * 2;
@@ -89,7 +105,7 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
       positions.push(levelRow);
     }
     return positions;
-  }, [numLevels, numLeaves, canvasWidth, canvasHeight, treeValues, isEightLeaves]);
+  }, [numLevels, numLeaves, canvasWidth, canvasHeight, treeValues, isEightLeaves, compact, fitted]);
 
   // Sinh các đoạn đường nối giữa nút cha và 2 nút con
   const connectingLines = useMemo(() => {
@@ -172,9 +188,9 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
   };
 
   return (
-    <div className={`w-full flex flex-col items-center select-none ${className}`}>
+    <div ref={host} data-testid={compact ? 'cay-compact' : undefined} className={`w-full min-w-0 flex flex-col items-center select-none ${className}`}>
       {/* Gợi ý vuốt ngang cho điện thoại màn hình nhỏ */}
-      {(isEightLeaves || scrollHint) && (
+      {!compact && (isEightLeaves || scrollHint) && (
         <div className="sm:hidden text-sm text-nau-go-dam font-medium flex items-center gap-1 mb-2 bg-giay px-3 py-1 rounded-full border border-nau-go/30">
           <span>👉</span>
           <span>{T.vuotNgangDeXemCa}</span>
@@ -182,7 +198,7 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
       )}
 
       {/* Khung cuộn ngang */}
-      <div className="w-full overflow-x-auto pb-4 pt-1 flex">
+      <div className={`w-full ${compact ? 'pb-1' : 'overflow-x-auto pb-4'} pt-1 flex`}>
         <div
           style={{ width: canvasWidth, height: canvasHeight }}
           className="relative shrink-0 mx-auto"
@@ -261,7 +277,7 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
                   onClick={() => onCellClick?.(lvl, idx)}
                   className={`
                     rounded-[14px] border-2 flex flex-col items-center justify-center p-1
-                    transition-all duration-300 z-10
+                    ${compact ? 'transition-colors' : 'transition-all'} duration-300 z-10
                     ${onCellClick ? 'cursor-pointer hover:scale-105' : ''}
                     ${
                       isRoot

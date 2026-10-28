@@ -106,7 +106,7 @@ const clockText = (sec: number): string => `${Math.floor(sec / 60)}:${String(sec
 function HudBar({ hearts, round, score, soiOpen, onSoi, clock, status }: { hearts: number; round: number; score: number; soiOpen: boolean; onSoi: () => void; clock: number | null; status: 'dung' | 'lech' | null }) {
   return (
     <div className="absolute flex items-center justify-between" style={{ left: `${AREAS.hud.x0}cqw`, right: `${100 - AREAS.hud.x1}cqw`, top: `${AREAS.hud.y0}%` }}>
-      <div className="flex items-center gap-3 rounded-nut border-2 border-nau-go bg-giay/90 px-3 py-1" data-testid="hud">
+      <div className={`flex items-center rounded-nut border-2 border-nau-go bg-giay/90 px-3 ${clock !== null ? 'gap-2 py-0' : 'gap-3 py-1'}`} data-testid="hud">
         <Hearts current={hearts} max={SPEC.hearts} size="sm" />
         <span className="font-display text-base font-extrabold" data-testid="vong">
           {fmt(rebuildUi.vong, { so: round + 1, max: SPEC.rounds.length })}
@@ -115,7 +115,7 @@ function HudBar({ hearts, round, score, soiOpen, onSoi, clock, status }: { heart
           {fmt(rebuildUi.diem, { so: score })}
         </span>
         {clock !== null && (
-          <span role="timer" aria-label={fmt(rebuildUi.dongHo, { giay: clock })} className={`rounded-nut border-2 px-2 font-display text-base font-extrabold tabular-nums ${clock <= 10 ? 'border-do-son bg-do-son/20 text-do-son-dam' : 'border-nau-go bg-giay'}`} data-testid="dong-ho" data-sec={clock}>
+          <span role="timer" aria-label={fmt(rebuildUi.dongHo, { giay: clock })} className={`inline-flex min-h-11 min-w-[4.5rem] items-center justify-center rounded-nut border-[3px] px-3 font-display text-[clamp(1.5rem,2.6cqw,2.25rem)] leading-none font-extrabold tabular-nums ${clock <= 10 ? 'border-do-son bg-do-son/20 text-do-son-dam' : 'border-nau-go bg-giay'}`} data-testid="dong-ho" data-sec={clock}>
             {clockText(clock)}
           </span>
         )}
@@ -618,7 +618,7 @@ export function RebuildGame({ paused, attempt, onFinish, setHint }: MiniGameRend
         overlay={
           <div ref={overlayRef} className="absolute inset-0 select-none" style={{ containerType: 'size' }} data-testid="man3-khung" data-phase={phase} data-villain={villain.stage} data-flying={villain.flying ? (villain.landed ? 'landed' : 'start') : 'no'}>
             <HudBar hearts={state.hearts} round={state.round} score={score} soiOpen={soiOpen} onSoi={() => setSoiOpen((o) => !o)} clock={keepMode ? clock : null} status={keep ? keepChainStatus(keep) : null} />
-            <p className="absolute rounded-nut bg-giay/90 px-[1cqw] py-[0.15cqw] font-bold text-chu" style={{ left: `${AREAS.chain.x0}cqw`, top: '10.2%', fontSize: 'max(1.45cqw, 11px)' }}>
+            <p className="absolute rounded-nut bg-giay/90 px-[1cqw] py-[0.15cqw] font-bold text-chu" style={{ left: `${AREAS.chain.x0}cqw`, top: keepMode ? '35%' : '10.2%', fontSize: 'max(1.45cqw, 11px)' }}>
               {rebuildUi.chuThich}
             </p>
             {keep ? (

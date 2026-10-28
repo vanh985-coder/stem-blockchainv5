@@ -351,9 +351,9 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
 
           {/* Cây Merkle SVG */}
           <CayMerkle
+            compact
             treeValues={displayTreeValues}
             renderSlot={renderCustomSlot}
-            caption={T.vuotNgangDeXemDu}
           />
 
           {/* Cảnh báo chưa điền đủ */}
@@ -364,7 +364,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
           )}
 
           {/* Nút bấm Kiểm tra */}
-          <div className="flex justify-center pt-2 min-[1280px]:sticky min-[1280px]:bottom-3 min-[1280px]:z-20">
+          <div className="flex justify-center pt-2">
             <Button
               variant="primary"
               size="lg"

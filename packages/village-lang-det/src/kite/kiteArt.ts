@@ -1,5 +1,5 @@
 /**
- * Hình của màn 6: nạp hình theo manifest (thiếu file thì null, cảnh vẽ ô màu thay thế); đoạn thân cột tre cắt từ ảnh gốc (lặp lật gương theo chiều dọc), trang bản sao và cuốn sổ giao cho làng vẽ bằng code (canvas).
+ * Hình của màn 6: nạp hình theo manifest (thiếu file thì null, cảnh vẽ ô màu thay thế); thân tre vẽ nét theo khung crop cũ, trang bản sao và cuốn sổ giao cho làng vẽ bằng code (canvas).
  * Mọi texture do hook tạo ra đều được giải phóng khi rời màn, để rời cảnh dựng lại 6 lần không tăng bộ nhớ GPU.
  */
 import { useEffect, useMemo, useState } from 'react';
@@ -22,7 +22,7 @@ export interface KiteTextures {
   troi: Texture | null;
   doiXa: Texture | null;
   treGan: Texture | null;
-  /** Đoạn thân cột tre đã cắt (lặp lật gương theo chiều dọc) */
+  /** Thân tre nét, cùng tỉ lệ với khung cắt cũ (lặp lật gương theo chiều dọc) */
   cot: Texture | null;
   dieu: Texture | null;
   dieuDen: Texture | null;
@@ -121,12 +121,32 @@ export function makeBookTexture(): CanvasTexture {
   return prepare(new CanvasTexture(c)) as CanvasTexture;
 }
 
-/** Cắt đoạn thân cột tre từ ảnh gốc thành texture hẹp, lặp lật gương theo chiều dọc (chỗ nối không gãy). */
-function cropPole(img: CanvasImageSource & { width: number; height: number }): CanvasTexture | null {
-  const k = img.width / 1024; // ảnh có thể được phục vụ ở độ phân giải khác 1024
-  const [c, g] = canvasOf(Math.round(POLE_CROP.w * k), Math.round(POLE_CROP.h * k));
+/** Thay thân tre nguồn quá ít điểm ảnh bằng nét canvas; chỗ nối lặp không gãy. */
+function makePoleTexture(): CanvasTexture | null {
+  // Ảnh nguồn chỉ có thân rộng 20px, bị nghiêng và mềm sẵn; phóng crop
+  // bằng LinearFilter làm mờ thêm. Vẽ lại thân thẳng ở 4×, giữ đúng bề
+  // rộng 20/64 của tấm cũ nên không đổi mép cột hay vùng va chạm.
+  const k = 4;
+  const [c, g] = canvasOf(POLE_CROP.w * k, POLE_CROP.h * k);
   if (!g) return null;
-  g.drawImage(img, POLE_CROP.x0 * k, POLE_CROP.y0 * k, POLE_CROP.w * k, POLE_CROP.h * k, 0, 0, c.width, c.height);
+  g.scale(k, k);
+  const x = (POLE_CROP.w - POLE_CROP.poleW) / 2;
+  const fill = g.createLinearGradient(x, 0, x + POLE_CROP.poleW, 0);
+  fill.addColorStop(0, '#67722b');
+  fill.addColorStop(0.3, '#c6c76a');
+  fill.addColorStop(0.55, '#e5d990');
+  fill.addColorStop(1, '#89923b');
+  g.fillStyle = fill;
+  g.fillRect(x, 0, POLE_CROP.poleW, POLE_CROP.h);
+  g.strokeStyle = '#505b25';
+  g.lineWidth = 0.8;
+  g.strokeRect(x, -1, POLE_CROP.poleW, POLE_CROP.h + 2);
+  for (const y of [48, 145.5, 243]) {
+    g.fillStyle = '#68742c';
+    g.fillRect(x, y - 1.5, POLE_CROP.poleW, 3);
+    g.fillStyle = '#eee1a0';
+    g.fillRect(x + 1, y - 1, POLE_CROP.poleW - 2, 0.8);
+  }
   const t = prepare(new CanvasTexture(c)) as CanvasTexture;
   t.wrapS = ClampToEdgeWrapping;
   t.wrapT = MirroredRepeatWrapping;
@@ -169,7 +189,7 @@ export function useKiteTextures(): KiteTextures {
         const img = imgs[i];
         if (!img) return;
         if (k === 'cot') {
-          const t = cropPole(img);
+          const t = makePoleTexture();
           if (t) {
             made.push(t);
             out.cot = t;

@@ -170,7 +170,7 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
     setTimeout(() => setWarm(true), 900);
   }, []);
 
-  // ----- Vòng lặp thời gian: đồng hồ úp lại 800 ms và đồng hồ tráo bài (vòng 3). Mở Máy tính mod hay đang chiếu hoạt cảnh tráo thì đồng hồ tráo đứng yên.
+  // ----- Đồng hồ úp lại 800 ms vẫn chạy khi nhập máy tính; đồng hồ tráo (vòng 3) dừng trong lúc focus nhập hay đang chiếu hoạt cảnh tráo.
   const swapRef = useRef<SwapShow>(null);
   swapRef.current = swapShow;
   const pausedRef = useRef(paused);
@@ -322,7 +322,6 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
           <div ref={overlayRef} className="absolute inset-0" style={{ containerType: 'size', fontSize: textSize }} data-testid="man8-khung" data-phase={state.phase} data-round={state.round} data-swap={swapShow ? 'yes' : 'no'}>
             <div className={`absolute flex flex-col gap-2 p-2 ${portrait ? "pr-12" : ""}`} style={{ left: `${hudTL.left}%`, top: `${hudTL.top}%`, width: `${hudBR.left - hudTL.left}%`, height: `${hudBR.top - hudTL.top}%` }}>
               <div className={`flex ${portrait ? 'flex-row items-start justify-between' : 'flex-col'} gap-2`}>
-                <ModCalculator open={calcOpen} onOpenChange={setCalcOpen} className="relative z-30" />
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border-2 border-nau-go bg-giay px-3 py-1 font-display font-extrabold" data-testid="hud">
                   <span data-testid="vong">{fmt(memoryUi.vong, { so: state.round + 1, max: MEMORY_SPEC.rounds.length })}</span>
                   <span data-testid="diem">{fmt(memoryUi.diem, { so: score })}</span>
@@ -334,6 +333,10 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
                 <span aria-hidden="true">{rich(lineText || ' ')}</span>
               </p>
             </div>
+
+            <ModCalculator inline open={calcOpen} onOpenChange={setCalcOpen} className="absolute z-10" style={portrait
+              ? { left: '2%', bottom: '1%', width: '70%', fontSize: '14px' }
+              : { left: '0.8%', bottom: '2%', width: '19.5%', fontSize: 'clamp(14px, 1.5cqw, 18px)' }} />
 
             <div role="group" aria-label={memoryUi.luoi} onKeyDown={onGridKey} className="absolute" style={{ left: `${areaTL.left}%`, top: `${areaTL.top}%`, width: `${areaBR.left - areaTL.left}%`, height: `${areaBR.top - areaTL.top}%` }}>
               {shown.map((id, slot) => {
@@ -391,4 +394,3 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
     </div>
   );
 }
-

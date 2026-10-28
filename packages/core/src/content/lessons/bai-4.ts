@@ -210,7 +210,6 @@ export const bai4Texts = {
     cayMerkle8GiaoDich: 'cây Merkle 8 giao dịch',
     keoHoacChamManhTu: 'kéo hoặc chạm mảnh từ khay để điền vào các ô dấu hỏi chấm (?)',
     luotKiemTra: 'lượt kiểm tra: **{checkCount}**',
-    vuotNgangDeXemDu: 'vuốt ngang để xem đủ 8 nhánh nếu xem trên điện thoại',
     kiemTraCayMerkle: 'Kiểm tra cây Merkle 🔍',
     khayManhGhepManh: 'khay mảnh ghép ({so} / {so2} mảnh)',
     chua6GiaTriDung: 'chứa 6 giá trị đúng + 2 mảnh bẫy ghép ngược',
