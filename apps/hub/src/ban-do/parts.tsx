@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import { AssetImage, Button, LEVELS, fmt, knowScrollUi, levelById, openLevel, ui, type LevelDef, type LevelState, type LevelUnlock, type Progress } from '@so-chung/core';
 
@@ -47,6 +48,7 @@ export function VillageDetails({
   onClose,
   onReplayIntro,
   know,
+  scrollMap,
 }: {
   villageId: LevelDef['lang'];
   unlockLevels: LevelUnlock[];
@@ -57,6 +59,8 @@ export function VillageDetails({
   onReplayIntro?: () => void;
   /** Thẻ "Em có biết?" của làng (bước X3): chưa đọc đủ thì chưa vào được bài; `onRead` mở các thẻ để đọc */
   know?: { got: number; total: number; onRead: () => void };
+  /** Vùng bản đồ làng có thẻ "Em có biết?" chưa nhặt (P2b), đặt cuối bảng */
+  scrollMap?: ReactNode;
 }) {
   const navigate = useNavigate();
   const knowLocked = !!know && know.total > 0 && know.got < know.total;
@@ -130,6 +134,7 @@ export function VillageDetails({
           );
         })}
       </ul>
+      {scrollMap}
     </div>
   );
 }

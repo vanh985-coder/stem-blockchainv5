@@ -1,39 +1,47 @@
 [
  {
   "file": "ban-do-khach-moi-1366x768.jpg",
-  "bytes": 138320
+  "bytes": 154820
+ },
+ {
+  "file": "ban-do-lang-det-khach-moi-1366x768.jpg",
+  "bytes": 159939
+ },
+ {
+  "file": "ban-do-lang-bac-khach-moi-1366x768.jpg",
+  "bytes": 160300
  },
  {
   "file": "ban-do-mot-phan-1366x768.jpg",
-  "bytes": 156126
+  "bytes": 158720
  },
  {
   "file": "ban-do-du-the-1366x768.jpg",
-  "bytes": 137322
+  "bytes": 162036
  },
  {
   "file": "ban-do-lon-khach-moi-1366x768.jpg",
-  "bytes": 115811
+  "bytes": 115807
  },
  {
   "file": "ban-do-nho-bac-1366x768.jpg",
-  "bytes": 68617
+  "bytes": 68301
  },
  {
   "file": "ban-do-nho-xoay-1366x768.jpg",
-  "bytes": 68581
+  "bytes": 68776
  },
  {
   "file": "nhat-the-hop-thoai-1366x768.jpg",
-  "bytes": 98509
+  "bytes": 99152
  },
  {
   "file": "ban-do-lon-sau-khi-nhat-1366x768.jpg",
-  "bytes": 106291
+  "bytes": 106289
  },
  {
   "file": "ban-do-chu-to-1366x768.jpg",
-  "bytes": 158305
+  "bytes": 158186
  },
  {
   "file": "ban-do-lon-chu-to-1366x768.jpg",
@@ -41,63 +49,79 @@
  },
  {
   "file": "ban-do-khach-moi-360x800.jpg",
-  "bytes": 35936
+  "bytes": 33396
+ },
+ {
+  "file": "ban-do-lang-det-khach-moi-360x800.jpg",
+  "bytes": 32398
+ },
+ {
+  "file": "ban-do-lang-bac-khach-moi-360x800.jpg",
+  "bytes": 33748
  },
  {
   "file": "ban-do-mot-phan-360x800.jpg",
-  "bytes": 35710
+  "bytes": 31987
  },
  {
   "file": "ban-do-du-the-360x800.jpg",
-  "bytes": 35404
+  "bytes": 28980
  },
  {
   "file": "ban-do-lon-khach-moi-360x800.jpg",
-  "bytes": 38947
+  "bytes": 38739
  },
  {
   "file": "ban-do-nho-bac-360x800.jpg",
-  "bytes": 23580
+  "bytes": 23504
  },
  {
   "file": "ban-do-nho-xoay-360x800.jpg",
-  "bytes": 23641
+  "bytes": 23749
  },
  {
   "file": "ban-do-chu-to-360x800.jpg",
-  "bytes": 36560
+  "bytes": 32897
  },
  {
   "file": "ban-do-lon-chu-to-360x800.jpg",
-  "bytes": 42509
+  "bytes": 42537
  },
  {
   "file": "ban-do-khach-moi-844x390.jpg",
-  "bytes": 46997
+  "bytes": 28440
+ },
+ {
+  "file": "ban-do-lang-det-khach-moi-844x390.jpg",
+  "bytes": 27711
+ },
+ {
+  "file": "ban-do-lang-bac-khach-moi-844x390.jpg",
+  "bytes": 28142
  },
  {
   "file": "ban-do-mot-phan-844x390.jpg",
-  "bytes": 46739
+  "bytes": 28398
  },
  {
   "file": "ban-do-du-the-844x390.jpg",
-  "bytes": 46473
+  "bytes": 48418
  },
  {
   "file": "ban-do-lon-khach-moi-844x390.jpg",
-  "bytes": 39942
+  "bytes": 39951
  },
  {
   "file": "ban-do-nho-bac-844x390.jpg",
-  "bytes": 32681
+  "bytes": 32815
  },
  {
   "file": "ban-do-nho-xoay-844x390.jpg",
-  "bytes": 32881
+  "bytes": 33001
  },
  {
   "file": "ban-do-chu-to-844x390.jpg",
-  "bytes": 46570
+  "bytes": 24717
  },
  {
   "file": "ban-do-lon-chu-to-844x390.jpg",

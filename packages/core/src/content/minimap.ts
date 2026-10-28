@@ -37,15 +37,24 @@ export const banDoNho = {
   viecTiepTheo: 'Việc tiếp theo: {nd}',
 } as const;
 
-/** Thẻ "Em có biết?" chưa nhặt trên trang /ban-do (P2b); {n}, {tong}, {lang} đi qua fmt(). */
+/** Thẻ "Em có biết?" chưa nhặt trong vùng bản đồ làng của trang /ban-do (P2b); {n}, {tong}, {lang}, {khu} đi qua fmt(). */
 export const banDoThe = {
+  /** Tiêu đề vùng bản đồ làng */
+  tieuDe: 'Thẻ "Em có biết?" chưa nhặt',
   /** Chú thích ký hiệu hình thoi vàng */
   chuThich: 'Thẻ "Em có biết?" chưa nhặt',
-  /** Dòng đếm cạnh chú thích */
-  conLai: 'còn {n}/{tong} thẻ ở cả bốn làng',
-  het: 'em đã nhặt đủ ở cả bốn làng',
-  /** Lời đọc màn hình của từng làng */
-  theoLang: '{lang}: còn {n} thẻ "Em có biết?" chưa nhặt',
-  /** Ghi chú vị trí: bản vẽ tay không theo tỉ lệ thật */
-  viTri: 'Thẻ nằm quanh làng theo vị trí thật trong làng (bản vẽ không theo tỉ lệ).',
+  /** Dòng đếm dưới tiêu đề */
+  conLai: 'Còn {n}/{tong} thẻ trong {lang}',
+  /** Đã nhặt đủ: không vẽ bản đồ */
+  het: 'Em đã nhặt đủ thẻ "Em có biết?" của {lang}.',
+  /** Chữ "Bắc" ở mép trên bản đồ */
+  bac: 'Bắc',
+  /** Ghi chú cách đọc bản đồ */
+  viTri: 'Bản đồ bố cục thật của làng; hình thoi vàng đúng chỗ thẻ đang nằm.',
+  /** Lời đọc màn hình của vùng bản đồ */
+  docVung: 'Bản đồ {lang}',
+  /** Lời đọc màn hình của một thẻ */
+  docThe: 'Thẻ {so}, gần {khu}',
+  /** Dòng danh sách (số thẻ nằm ở hình tròn bên cạnh) */
+  dong: 'Gần {khu}',
 } as const;

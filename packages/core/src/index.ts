@@ -24,7 +24,9 @@ export type { GuideSection, GuidePage, GuideFigure, GuideDevice, GuideArtId, Gui
 export { villageKnowCards } from './content/villageCards';
 export { knowScrollUi } from './content/knowScrolls';
 export { banDoThe } from './content/minimap';
-export { MapGlyph } from './three/world/map/MapGlyphs';
+export { MapGlyph, MAP_COLORS } from './three/world/map/MapGlyphs';
+export { MapStaticLayer } from './three/world/map/MapStaticLayer';
+export { staticTransform } from './three/world/map/mapProjection';
 export { GuideDialog, GuideFigureView, detectGuideDevice } from './ui/GuideDialog';
 export type { GuideDialogProps } from './ui/GuideDialog';
 export { GuideArt } from './ui/GuideArt';

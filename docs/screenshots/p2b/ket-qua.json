@@ -9,119 +9,532 @@
  {
   "size": "1366x768",
   "area": "/ban-do khách mới",
-  "name": "đủ 16 biểu tượng thẻ",
+  "name": "Làng Giấy: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
   "ok": true,
-  "detail": "16"
+  "detail": "4"
  },
  {
   "size": "1366x768",
   "area": "/ban-do khách mới",
-  "name": "mỗi làng 4 thẻ",
-  "ok": true,
-  "detail": ""
- },
- {
-  "size": "1366x768",
-  "area": "/ban-do khách mới",
-  "name": "biểu tượng nằm trong ảnh bản đồ và không dưới 18 px",
-  "ok": true,
-  "detail": "nhỏ nhất 27 px"
- },
- {
-  "size": "1366x768",
-  "area": "/ban-do khách mới",
-  "name": "lớp phủ không bắt chuột/chạm",
+  "name": "Làng Giấy: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
   "ok": true,
   "detail": ""
  },
  {
   "size": "1366x768",
   "area": "/ban-do khách mới",
-  "name": "chú thích có chữ: \"Thẻ \"Em có biết?\" chưa nhặt: còn 16/16 thẻ ở cả bốn làng\"",
+  "name": "Làng Giấy: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.3e-3 đơn vị)",
   "ok": true,
   "detail": ""
  },
  {
   "size": "1366x768",
   "area": "/ban-do khách mới",
-  "name": "lời đọc màn hình theo từng làng (4 làng, mỗi làng còn 4)",
+  "name": "Làng Giấy: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
   "ok": true,
-  "detail": "Thẻ nằm quanh làng theo vị trí thật trong làng (bản vẽ không theo tỉ lệ). | Làng Giấy: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Dệt: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Khắc Dấu: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Bạc: còn 4 thẻ \"Em có biết?\" chưa nhặt"
+  "detail": "khung 272 px"
  },
  {
   "size": "1366x768",
   "area": "/ban-do khách mới",
-  "name": "vị trí quanh làng: 0/16 thẻ đúng vị trí công thức (phần còn lại dời ra mép chữ tên làng); không thẻ nào xa làng mình quá 208 px (xa nhất 84 px)",
+  "name": "Làng Giấy: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Giấy: lớp bố cục thật có mặt (đường/ao/viền, 14 nét vẽ); tâm viền làng ở giữa khung",
   "ok": true,
   "detail": ""
  },
  {
   "size": "1366x768",
   "area": "/ban-do khách mới",
-  "name": "hướng la bàn của thẻ quanh làng: lệch trung bình 3°, lớn nhất 7° so với hướng thật của thẻ trong làng",
+  "name": "Làng Giấy: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng làm giấy Gần xưởng làm giấy / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần cái ao làng Gần cái ao làng / 4 Thẻ 4, gần chợ làng Gần chợ làng)",
   "ok": true,
   "detail": ""
  },
  {
   "size": "1366x768",
   "area": "/ban-do khách mới",
-  "name": "không biểu tượng nào đè lên chữ tên của bất kỳ làng nào",
+  "name": "Làng Giấy: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Giấy)",
   "ok": true,
-  "detail": "0 chỗ đè"
+  "detail": ""
  },
  {
   "size": "1366x768",
   "area": "/ban-do khách mới",
-  "name": "không hai biểu tượng nào đè lên nhau",
+  "name": "Làng Giấy: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
   "ok": true,
-  "detail": "0 cặp"
+  "detail": ""
  },
  {
   "size": "1366x768",
   "area": "/ban-do khách mới",
-  "name": "mọi biểu tượng nằm trọn trong ảnh bản đồ",
+  "name": "Làng Dệt: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
   "ok": true,
-  "detail": "0 thẻ bị cắt"
+  "detail": "4"
  },
  {
   "size": "1366x768",
   "area": "/ban-do khách mới",
-  "name": "chú thích ở góc dưới trái bản đồ và không đè lên biểu tượng nào",
+  "name": "Làng Dệt: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 4.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": "khung 272 px"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: lớp bố cục thật có mặt (đường/ao/viền, 13 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần bãi phơi vải Gần bãi phơi vải / 2 Thẻ 2, gần xóm khung cửi Gần xóm khung cửi / 3 Thẻ 3, gần ao nhuộm Gần ao nhuộm / 4 Thẻ 4, gần chợ vải Gần chợ vải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Dệt)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.01 px)",
+  "ok": true,
+  "detail": "khung 272 px"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: lớp bố cục thật có mặt (đường/ao/viền, 12 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng khắc dấu Gần xưởng khắc dấu / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần trạm đưa thư Gần trạm đưa thư / 4 Thẻ 4, gần bãi đá Gần bãi đá)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Khắc Dấu)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.7e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.01 px)",
+  "ok": true,
+  "detail": "khung 272 px"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: lớp bố cục thật có mặt (đường/ao/viền, 15 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần quầy đổi bạc Gần quầy đổi bạc / 2 Thẻ 2, gần bến sông Gần bến sông / 3 Thẻ 3, gần nhà giữ sổ Gần nhà giữ sổ / 4 Thẻ 4, gần ao sen Gần ao sen)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Bạc)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "tổng 16/16 thẻ trên 4 làng; sai lệch vị trí lớn nhất 0.01 px",
   "ok": true,
   "detail": ""
  },
  {
   "size": "1366x768",
   "area": "/ban-do một phần",
-  "name": "chỉ còn thẻ chưa nhặt (9 thẻ đúng bộ)",
+  "name": "Làng Giấy: có vùng bản đồ làng, 2 thẻ chưa nhặt đúng bộ (2, 4)",
   "ok": true,
-  "detail": "9"
+  "detail": "2"
  },
  {
   "size": "1366x768",
   "area": "/ban-do một phần",
-  "name": "chú thích đếm đúng: \"Thẻ \"Em có biết?\" chưa nhặt: còn 9/16 thẻ ở cả bốn làng\"",
+  "name": "Làng Giấy: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
   "ok": true,
   "detail": ""
  },
  {
   "size": "1366x768",
   "area": "/ban-do một phần",
-  "name": "lời đọc màn hình theo làng khớp (2, 0, 4, 3)",
+  "name": "Làng Giấy: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.3e-3 đơn vị)",
   "ok": true,
-  "detail": "Làng Giấy: còn 2 thẻ \"Em có biết?\" chưa nhặt | Làng Dệt: còn 0 thẻ \"Em có biết?\" chưa nhặt | Làng Khắc Dấu: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Bạc: còn 3 thẻ \"Em có biết?\" chưa nhặt"
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": "khung 272 px"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: lớp bố cục thật có mặt (đường/ao/viền, 14 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: danh sách có số thẻ và tên khu bằng chữ (2 Thẻ 2, gần đình làng Gần đình làng / 4 Thẻ 4, gần chợ làng Gần chợ làng)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: đếm và chú thích bằng chữ (Còn 2/4 thẻ trong Làng Giấy)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
  },
  {
   "size": "1366x768",
   "area": "/ban-do đủ thẻ",
-  "name": "không còn biểu tượng nào; chú thích báo đã nhặt đủ",
+  "name": "Làng Dệt: nhặt đủ thì không còn bản đồ thẻ, có lời báo (Em đã nhặt đủ thẻ \"Em có biết?\" của Làng Dệt.)",
   "ok": true,
-  "detail": "0 | Thẻ \"Em có biết?\" chưa nhặt: em đã nhặt đủ ở cả bốn làng"
+  "detail": ""
  },
  {
   "size": "1366x768",
-  "area": "/ban-do chạm",
-  "name": "bấm nút làng bên cạnh biểu tượng thẻ vẫn mở bảng làng",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.01 px)",
+  "ok": true,
+  "detail": "khung 272 px"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: lớp bố cục thật có mặt (đường/ao/viền, 12 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng khắc dấu Gần xưởng khắc dấu / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần trạm đưa thư Gần trạm đưa thư / 4 Thẻ 4, gần bãi đá Gần bãi đá)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Khắc Dấu)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: có vùng bản đồ làng, 3 thẻ chưa nhặt đúng bộ (1, 2, 3)",
+  "ok": true,
+  "detail": "3"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.7e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.01 px)",
+  "ok": true,
+  "detail": "khung 272 px"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: lớp bố cục thật có mặt (đường/ao/viền, 15 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần quầy đổi bạc Gần quầy đổi bạc / 2 Thẻ 2, gần bến sông Gần bến sông / 3 Thẻ 3, gần nhà giữ sổ Gần nhà giữ sổ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: đếm và chú thích bằng chữ (Còn 3/4 thẻ trong Làng Bạc)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "phông tải muộn",
+  "name": "vị trí biểu tượng giống nhau trước và sau khi phông tải xong (lúc đo đầu 2028 ms, phông đã tải: false)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "1366x768",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.01 px)",
+  "ok": true,
+  "detail": "khung 272 px"
+ },
+ {
+  "size": "1366x768",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: lớp bố cục thật có mặt (đường/ao/viền, 12 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng khắc dấu Gần xưởng khắc dấu / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần trạm đưa thư Gần trạm đưa thư / 4 Thẻ 4, gần bãi đá Gần bãi đá)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Khắc Dấu)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do chọn làng",
+  "name": "chọn làng khác thì vùng bản đồ đổi sang làng đó",
   "ok": true,
   "detail": ""
  },
@@ -275,7 +688,7 @@
  {
   "size": "1366x768",
   "area": "tải lại trang",
-  "name": "/ban-do cũng còn 15 biểu tượng, không có thẻ Làng Giấy số 2",
+  "name": "/ban-do cũng còn 15 thẻ, không có thẻ Làng Giấy số 2 (tiến độ khớp)",
   "ok": true,
   "detail": "15"
  },
@@ -289,7 +702,266 @@
  {
   "size": "1366x768",
   "area": "chữ to + giảm chuyển động",
-  "name": "/ban-do: đủ 16 biểu tượng và chú thích",
+  "name": "Làng Giấy: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.3e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.17 px)",
+  "ok": true,
+  "detail": "khung 261 px"
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: biểu tượng không dưới 18 px (nhỏ nhất 21 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: lớp bố cục thật có mặt (đường/ao/viền, 14 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng làm giấy Gần xưởng làm giấy / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần cái ao làng Gần cái ao làng / 4 Thẻ 4, gần chợ làng Gần chợ làng)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Giấy)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 4.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.20 px)",
+  "ok": true,
+  "detail": "khung 261 px"
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: biểu tượng không dưới 18 px (nhỏ nhất 21 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: lớp bố cục thật có mặt (đường/ao/viền, 13 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần bãi phơi vải Gần bãi phơi vải / 2 Thẻ 2, gần xóm khung cửi Gần xóm khung cửi / 3 Thẻ 3, gần ao nhuộm Gần ao nhuộm / 4 Thẻ 4, gần chợ vải Gần chợ vải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Dệt)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.23 px)",
+  "ok": true,
+  "detail": "khung 261 px"
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: biểu tượng không dưới 18 px (nhỏ nhất 21 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: lớp bố cục thật có mặt (đường/ao/viền, 12 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng khắc dấu Gần xưởng khắc dấu / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần trạm đưa thư Gần trạm đưa thư / 4 Thẻ 4, gần bãi đá Gần bãi đá)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Khắc Dấu)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.7e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.21 px)",
+  "ok": true,
+  "detail": "khung 261 px"
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: biểu tượng không dưới 18 px (nhỏ nhất 21 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: lớp bố cục thật có mặt (đường/ao/viền, 15 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần quầy đổi bạc Gần quầy đổi bạc / 2 Thẻ 2, gần bến sông Gần bến sông / 3 Thẻ 3, gần nhà giữ sổ Gần nhà giữ sổ / 4 Thẻ 4, gần ao sen Gần ao sen)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Bạc)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "/ban-do: đủ 16/16 thẻ, sai lệch vị trí lớn nhất 0.23 px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "chữ to + giảm chuyển động",
+  "name": "vùng bản đồ làng không có phần tử chuyển động",
   "ok": true,
   "detail": ""
  },
@@ -324,119 +996,525 @@
  {
   "size": "360x800",
   "area": "/ban-do khách mới",
-  "name": "đủ 16 biểu tượng thẻ",
+  "name": "Làng Giấy: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
   "ok": true,
-  "detail": "16"
+  "detail": "4"
  },
  {
   "size": "360x800",
   "area": "/ban-do khách mới",
-  "name": "mỗi làng 4 thẻ",
-  "ok": true,
-  "detail": ""
- },
- {
-  "size": "360x800",
-  "area": "/ban-do khách mới",
-  "name": "biểu tượng nằm trong ảnh bản đồ và không dưới 18 px",
-  "ok": true,
-  "detail": "nhỏ nhất 20 px"
- },
- {
-  "size": "360x800",
-  "area": "/ban-do khách mới",
-  "name": "lớp phủ không bắt chuột/chạm",
+  "name": "Làng Giấy: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
   "ok": true,
   "detail": ""
  },
  {
   "size": "360x800",
   "area": "/ban-do khách mới",
-  "name": "chú thích có chữ: \"Thẻ \"Em có biết?\" chưa nhặt: còn 16/16 thẻ ở cả bốn làng\"",
+  "name": "Làng Giấy: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.3e-3 đơn vị)",
   "ok": true,
   "detail": ""
  },
  {
   "size": "360x800",
   "area": "/ban-do khách mới",
-  "name": "lời đọc màn hình theo từng làng (4 làng, mỗi làng còn 4)",
+  "name": "Làng Giấy: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
   "ok": true,
-  "detail": "Thẻ nằm quanh làng theo vị trí thật trong làng (bản vẽ không theo tỉ lệ). | Làng Giấy: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Dệt: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Khắc Dấu: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Bạc: còn 4 thẻ \"Em có biết?\" chưa nhặt"
+  "detail": "khung 280 px"
  },
  {
   "size": "360x800",
   "area": "/ban-do khách mới",
-  "name": "vị trí quanh làng: 0/16 thẻ đúng vị trí công thức (phần còn lại dời ra mép chữ tên làng); không thẻ nào xa làng mình quá 187 px (xa nhất 79 px)",
+  "name": "Làng Giấy: biểu tượng không dưới 18 px (nhỏ nhất 23 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Giấy: lớp bố cục thật có mặt (đường/ao/viền, 14 nét vẽ); tâm viền làng ở giữa khung",
   "ok": true,
   "detail": ""
  },
  {
   "size": "360x800",
   "area": "/ban-do khách mới",
-  "name": "hướng la bàn của thẻ quanh làng: lệch trung bình 24°, lớn nhất 90° so với hướng thật của thẻ trong làng",
+  "name": "Làng Giấy: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng làm giấy Gần xưởng làm giấy / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần cái ao làng Gần cái ao làng / 4 Thẻ 4, gần chợ làng Gần chợ làng)",
   "ok": true,
   "detail": ""
  },
  {
   "size": "360x800",
   "area": "/ban-do khách mới",
-  "name": "không biểu tượng nào đè lên chữ tên của bất kỳ làng nào",
+  "name": "Làng Giấy: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Giấy)",
   "ok": true,
-  "detail": "0 chỗ đè"
+  "detail": ""
  },
  {
   "size": "360x800",
   "area": "/ban-do khách mới",
-  "name": "không hai biểu tượng nào đè lên nhau",
+  "name": "Làng Giấy: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
   "ok": true,
-  "detail": "0 cặp"
+  "detail": ""
  },
  {
   "size": "360x800",
   "area": "/ban-do khách mới",
-  "name": "mọi biểu tượng nằm trọn trong ảnh bản đồ",
+  "name": "Làng Dệt: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
   "ok": true,
-  "detail": "0 thẻ bị cắt"
+  "detail": "4"
  },
  {
   "size": "360x800",
   "area": "/ban-do khách mới",
-  "name": "chú thích nằm ngoài bản đồ (màn hẹp) và không đè lên biểu tượng nào",
+  "name": "Làng Dệt: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 4.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": "khung 280 px"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: biểu tượng không dưới 18 px (nhỏ nhất 23 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: lớp bố cục thật có mặt (đường/ao/viền, 13 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần bãi phơi vải Gần bãi phơi vải / 2 Thẻ 2, gần xóm khung cửi Gần xóm khung cửi / 3 Thẻ 3, gần ao nhuộm Gần ao nhuộm / 4 Thẻ 4, gần chợ vải Gần chợ vải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Dệt)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.01 px)",
+  "ok": true,
+  "detail": "khung 280 px"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: biểu tượng không dưới 18 px (nhỏ nhất 23 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: lớp bố cục thật có mặt (đường/ao/viền, 12 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng khắc dấu Gần xưởng khắc dấu / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần trạm đưa thư Gần trạm đưa thư / 4 Thẻ 4, gần bãi đá Gần bãi đá)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Khắc Dấu)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.7e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.01 px)",
+  "ok": true,
+  "detail": "khung 280 px"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: biểu tượng không dưới 18 px (nhỏ nhất 23 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: lớp bố cục thật có mặt (đường/ao/viền, 15 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần quầy đổi bạc Gần quầy đổi bạc / 2 Thẻ 2, gần bến sông Gần bến sông / 3 Thẻ 3, gần nhà giữ sổ Gần nhà giữ sổ / 4 Thẻ 4, gần ao sen Gần ao sen)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Bạc)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "tổng 16/16 thẻ trên 4 làng; sai lệch vị trí lớn nhất 0.01 px",
   "ok": true,
   "detail": ""
  },
  {
   "size": "360x800",
   "area": "/ban-do một phần",
-  "name": "chỉ còn thẻ chưa nhặt (9 thẻ đúng bộ)",
+  "name": "Làng Giấy: có vùng bản đồ làng, 2 thẻ chưa nhặt đúng bộ (2, 4)",
   "ok": true,
-  "detail": "9"
+  "detail": "2"
  },
  {
   "size": "360x800",
   "area": "/ban-do một phần",
-  "name": "chú thích đếm đúng: \"Thẻ \"Em có biết?\" chưa nhặt: còn 9/16 thẻ ở cả bốn làng\"",
+  "name": "Làng Giấy: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
   "ok": true,
   "detail": ""
  },
  {
   "size": "360x800",
   "area": "/ban-do một phần",
-  "name": "lời đọc màn hình theo làng khớp (2, 0, 4, 3)",
+  "name": "Làng Giấy: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.3e-3 đơn vị)",
   "ok": true,
-  "detail": "Làng Giấy: còn 2 thẻ \"Em có biết?\" chưa nhặt | Làng Dệt: còn 0 thẻ \"Em có biết?\" chưa nhặt | Làng Khắc Dấu: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Bạc: còn 3 thẻ \"Em có biết?\" chưa nhặt"
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": "khung 280 px"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: biểu tượng không dưới 18 px (nhỏ nhất 23 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: lớp bố cục thật có mặt (đường/ao/viền, 14 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: danh sách có số thẻ và tên khu bằng chữ (2 Thẻ 2, gần đình làng Gần đình làng / 4 Thẻ 4, gần chợ làng Gần chợ làng)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: đếm và chú thích bằng chữ (Còn 2/4 thẻ trong Làng Giấy)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
  },
  {
   "size": "360x800",
   "area": "/ban-do đủ thẻ",
-  "name": "không còn biểu tượng nào; chú thích báo đã nhặt đủ",
+  "name": "Làng Dệt: nhặt đủ thì không còn bản đồ thẻ, có lời báo (Em đã nhặt đủ thẻ \"Em có biết?\" của Làng Dệt.)",
   "ok": true,
-  "detail": "0 | Thẻ \"Em có biết?\" chưa nhặt: em đã nhặt đủ ở cả bốn làng"
+  "detail": ""
  },
  {
   "size": "360x800",
-  "area": "/ban-do chạm",
-  "name": "chạm nút làng bên cạnh biểu tượng thẻ vẫn mở bảng làng",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.01 px)",
+  "ok": true,
+  "detail": "khung 280 px"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: biểu tượng không dưới 18 px (nhỏ nhất 23 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: lớp bố cục thật có mặt (đường/ao/viền, 12 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng khắc dấu Gần xưởng khắc dấu / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần trạm đưa thư Gần trạm đưa thư / 4 Thẻ 4, gần bãi đá Gần bãi đá)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Khắc Dấu)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: có vùng bản đồ làng, 3 thẻ chưa nhặt đúng bộ (1, 2, 3)",
+  "ok": true,
+  "detail": "3"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.7e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.01 px)",
+  "ok": true,
+  "detail": "khung 280 px"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: biểu tượng không dưới 18 px (nhỏ nhất 23 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: lớp bố cục thật có mặt (đường/ao/viền, 15 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần quầy đổi bạc Gần quầy đổi bạc / 2 Thẻ 2, gần bến sông Gần bến sông / 3 Thẻ 3, gần nhà giữ sổ Gần nhà giữ sổ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: đếm và chú thích bằng chữ (Còn 3/4 thẻ trong Làng Bạc)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "phông tải muộn",
+  "name": "vị trí biểu tượng giống nhau trước và sau khi phông tải xong (lúc đo đầu 1979 ms, phông đã tải: false)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "360x800",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.01 px)",
+  "ok": true,
+  "detail": "khung 280 px"
+ },
+ {
+  "size": "360x800",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: biểu tượng không dưới 18 px (nhỏ nhất 23 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "360x800",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: lớp bố cục thật có mặt (đường/ao/viền, 12 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng khắc dấu Gần xưởng khắc dấu / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần trạm đưa thư Gần trạm đưa thư / 4 Thẻ 4, gần bãi đá Gần bãi đá)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Khắc Dấu)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
   "ok": true,
   "detail": ""
  },
@@ -562,7 +1640,266 @@
  {
   "size": "360x800",
   "area": "chữ to + giảm chuyển động",
-  "name": "/ban-do: đủ 16 biểu tượng và chú thích",
+  "name": "Làng Giấy: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.3e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.31 px)",
+  "ok": true,
+  "detail": "khung 270 px"
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: lớp bố cục thật có mặt (đường/ao/viền, 14 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng làm giấy Gần xưởng làm giấy / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần cái ao làng Gần cái ao làng / 4 Thẻ 4, gần chợ làng Gần chợ làng)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Giấy)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 4.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.38 px)",
+  "ok": true,
+  "detail": "khung 270 px"
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: lớp bố cục thật có mặt (đường/ao/viền, 13 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần bãi phơi vải Gần bãi phơi vải / 2 Thẻ 2, gần xóm khung cửi Gần xóm khung cửi / 3 Thẻ 3, gần ao nhuộm Gần ao nhuộm / 4 Thẻ 4, gần chợ vải Gần chợ vải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Dệt)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.43 px)",
+  "ok": true,
+  "detail": "khung 270 px"
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: lớp bố cục thật có mặt (đường/ao/viền, 12 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng khắc dấu Gần xưởng khắc dấu / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần trạm đưa thư Gần trạm đưa thư / 4 Thẻ 4, gần bãi đá Gần bãi đá)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Khắc Dấu)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.7e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.40 px)",
+  "ok": true,
+  "detail": "khung 270 px"
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: lớp bố cục thật có mặt (đường/ao/viền, 15 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần quầy đổi bạc Gần quầy đổi bạc / 2 Thẻ 2, gần bến sông Gần bến sông / 3 Thẻ 3, gần nhà giữ sổ Gần nhà giữ sổ / 4 Thẻ 4, gần ao sen Gần ao sen)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Bạc)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "/ban-do: đủ 16/16 thẻ, sai lệch vị trí lớn nhất 0.43 px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "chữ to + giảm chuyển động",
+  "name": "vùng bản đồ làng không có phần tử chuyển động",
   "ok": true,
   "detail": ""
  },
@@ -597,119 +1934,532 @@
  {
   "size": "844x390",
   "area": "/ban-do khách mới",
-  "name": "đủ 16 biểu tượng thẻ",
+  "name": "Làng Giấy: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
   "ok": true,
-  "detail": "16"
+  "detail": "4"
  },
  {
   "size": "844x390",
   "area": "/ban-do khách mới",
-  "name": "mỗi làng 4 thẻ",
-  "ok": true,
-  "detail": ""
- },
- {
-  "size": "844x390",
-  "area": "/ban-do khách mới",
-  "name": "biểu tượng nằm trong ảnh bản đồ và không dưới 18 px",
-  "ok": true,
-  "detail": "nhỏ nhất 20 px"
- },
- {
-  "size": "844x390",
-  "area": "/ban-do khách mới",
-  "name": "lớp phủ không bắt chuột/chạm",
+  "name": "Làng Giấy: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
   "ok": true,
   "detail": ""
  },
  {
   "size": "844x390",
   "area": "/ban-do khách mới",
-  "name": "chú thích có chữ: \"Thẻ \"Em có biết?\" chưa nhặt: còn 16/16 thẻ ở cả bốn làng\"",
+  "name": "Làng Giấy: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.3e-3 đơn vị)",
   "ok": true,
   "detail": ""
  },
  {
   "size": "844x390",
   "area": "/ban-do khách mới",
-  "name": "lời đọc màn hình theo từng làng (4 làng, mỗi làng còn 4)",
+  "name": "Làng Giấy: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
   "ok": true,
-  "detail": "Thẻ nằm quanh làng theo vị trí thật trong làng (bản vẽ không theo tỉ lệ). | Làng Giấy: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Dệt: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Khắc Dấu: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Bạc: còn 4 thẻ \"Em có biết?\" chưa nhặt"
+  "detail": "khung 232 px"
  },
  {
   "size": "844x390",
   "area": "/ban-do khách mới",
-  "name": "vị trí quanh làng: 0/16 thẻ đúng vị trí công thức (phần còn lại dời ra mép chữ tên làng); không thẻ nào xa làng mình quá 208 px (xa nhất 81 px)",
+  "name": "Làng Giấy: biểu tượng không dưới 18 px (nhỏ nhất 19 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Giấy: lớp bố cục thật có mặt (đường/ao/viền, 14 nét vẽ); tâm viền làng ở giữa khung",
   "ok": true,
   "detail": ""
  },
  {
   "size": "844x390",
   "area": "/ban-do khách mới",
-  "name": "hướng la bàn của thẻ quanh làng: lệch trung bình 7°, lớn nhất 34° so với hướng thật của thẻ trong làng",
+  "name": "Làng Giấy: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng làm giấy Gần xưởng làm giấy / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần cái ao làng Gần cái ao làng / 4 Thẻ 4, gần chợ làng Gần chợ làng)",
   "ok": true,
   "detail": ""
  },
  {
   "size": "844x390",
   "area": "/ban-do khách mới",
-  "name": "không biểu tượng nào đè lên chữ tên của bất kỳ làng nào",
+  "name": "Làng Giấy: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Giấy)",
   "ok": true,
-  "detail": "0 chỗ đè"
+  "detail": ""
  },
  {
   "size": "844x390",
   "area": "/ban-do khách mới",
-  "name": "không hai biểu tượng nào đè lên nhau",
+  "name": "Làng Giấy: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
   "ok": true,
-  "detail": "0 cặp"
+  "detail": ""
  },
  {
   "size": "844x390",
   "area": "/ban-do khách mới",
-  "name": "mọi biểu tượng nằm trọn trong ảnh bản đồ",
+  "name": "Làng Dệt: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
   "ok": true,
-  "detail": "0 thẻ bị cắt"
+  "detail": "4"
  },
  {
   "size": "844x390",
   "area": "/ban-do khách mới",
-  "name": "chú thích nằm ngoài bản đồ (màn hẹp) và không đè lên biểu tượng nào",
+  "name": "Làng Dệt: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 4.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": "khung 232 px"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: biểu tượng không dưới 18 px (nhỏ nhất 19 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: lớp bố cục thật có mặt (đường/ao/viền, 13 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần bãi phơi vải Gần bãi phơi vải / 2 Thẻ 2, gần xóm khung cửi Gần xóm khung cửi / 3 Thẻ 3, gần ao nhuộm Gần ao nhuộm / 4 Thẻ 4, gần chợ vải Gần chợ vải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Dệt)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": "khung 232 px"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: biểu tượng không dưới 18 px (nhỏ nhất 19 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: lớp bố cục thật có mặt (đường/ao/viền, 12 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng khắc dấu Gần xưởng khắc dấu / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần trạm đưa thư Gần trạm đưa thư / 4 Thẻ 4, gần bãi đá Gần bãi đá)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Khắc Dấu)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.7e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": "khung 232 px"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: biểu tượng không dưới 18 px (nhỏ nhất 19 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: lớp bố cục thật có mặt (đường/ao/viền, 15 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần quầy đổi bạc Gần quầy đổi bạc / 2 Thẻ 2, gần bến sông Gần bến sông / 3 Thẻ 3, gần nhà giữ sổ Gần nhà giữ sổ / 4 Thẻ 4, gần ao sen Gần ao sen)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Bạc)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "tổng 16/16 thẻ trên 4 làng; sai lệch vị trí lớn nhất 0.00 px",
   "ok": true,
   "detail": ""
  },
  {
   "size": "844x390",
   "area": "/ban-do một phần",
-  "name": "chỉ còn thẻ chưa nhặt (9 thẻ đúng bộ)",
+  "name": "Làng Giấy: có vùng bản đồ làng, 2 thẻ chưa nhặt đúng bộ (2, 4)",
   "ok": true,
-  "detail": "9"
+  "detail": "2"
  },
  {
   "size": "844x390",
   "area": "/ban-do một phần",
-  "name": "chú thích đếm đúng: \"Thẻ \"Em có biết?\" chưa nhặt: còn 9/16 thẻ ở cả bốn làng\"",
+  "name": "Làng Giấy: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
   "ok": true,
   "detail": ""
  },
  {
   "size": "844x390",
   "area": "/ban-do một phần",
-  "name": "lời đọc màn hình theo làng khớp (2, 0, 4, 3)",
+  "name": "Làng Giấy: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.3e-3 đơn vị)",
   "ok": true,
-  "detail": "Làng Giấy: còn 2 thẻ \"Em có biết?\" chưa nhặt | Làng Dệt: còn 0 thẻ \"Em có biết?\" chưa nhặt | Làng Khắc Dấu: còn 4 thẻ \"Em có biết?\" chưa nhặt | Làng Bạc: còn 3 thẻ \"Em có biết?\" chưa nhặt"
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": "khung 232 px"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: biểu tượng không dưới 18 px (nhỏ nhất 19 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: lớp bố cục thật có mặt (đường/ao/viền, 14 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: danh sách có số thẻ và tên khu bằng chữ (2 Thẻ 2, gần đình làng Gần đình làng / 4 Thẻ 4, gần chợ làng Gần chợ làng)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: đếm và chú thích bằng chữ (Còn 2/4 thẻ trong Làng Giấy)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Giấy: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
  },
  {
   "size": "844x390",
   "area": "/ban-do đủ thẻ",
-  "name": "không còn biểu tượng nào; chú thích báo đã nhặt đủ",
+  "name": "Làng Dệt: nhặt đủ thì không còn bản đồ thẻ, có lời báo (Em đã nhặt đủ thẻ \"Em có biết?\" của Làng Dệt.)",
   "ok": true,
-  "detail": "0 | Thẻ \"Em có biết?\" chưa nhặt: em đã nhặt đủ ở cả bốn làng"
+  "detail": ""
  },
  {
   "size": "844x390",
-  "area": "/ban-do chạm",
-  "name": "chạm nút làng bên cạnh biểu tượng thẻ vẫn mở bảng làng",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": "khung 232 px"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: biểu tượng không dưới 18 px (nhỏ nhất 19 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: lớp bố cục thật có mặt (đường/ao/viền, 12 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng khắc dấu Gần xưởng khắc dấu / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần trạm đưa thư Gần trạm đưa thư / 4 Thẻ 4, gần bãi đá Gần bãi đá)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Khắc Dấu)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Khắc Dấu: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: có vùng bản đồ làng, 3 thẻ chưa nhặt đúng bộ (1, 2, 3)",
+  "ok": true,
+  "detail": "3"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.7e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": "khung 232 px"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: biểu tượng không dưới 18 px (nhỏ nhất 19 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: lớp bố cục thật có mặt (đường/ao/viền, 15 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần quầy đổi bạc Gần quầy đổi bạc / 2 Thẻ 2, gần bến sông Gần bến sông / 3 Thẻ 3, gần nhà giữ sổ Gần nhà giữ sổ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: đếm và chú thích bằng chữ (Còn 3/4 thẻ trong Làng Bạc)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do một phần",
+  "name": "Làng Bạc: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "phông tải muộn",
+  "name": "vị trí biểu tượng giống nhau trước và sau khi phông tải xong (lúc đo đầu 2005 ms, phông đã tải: false)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "844x390",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.00 px)",
+  "ok": true,
+  "detail": "khung 232 px"
+ },
+ {
+  "size": "844x390",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: biểu tượng không dưới 18 px (nhỏ nhất 19 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "844x390",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: lớp bố cục thật có mặt (đường/ao/viền, 12 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng khắc dấu Gần xưởng khắc dấu / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần trạm đưa thư Gần trạm đưa thư / 4 Thẻ 4, gần bãi đá Gần bãi đá)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Khắc Dấu)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "phông tải muộn",
+  "name": "Làng Khắc Dấu: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do chọn làng",
+  "name": "chọn làng khác thì vùng bản đồ đổi sang làng đó",
   "ok": true,
   "detail": ""
  },
@@ -793,7 +2543,7 @@
  {
   "size": "844x390",
   "area": "khớp vật thể thật",
-  "name": "Làng Bạc: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (8 vật đã tải)",
+  "name": "Làng Bạc: cả 4 vật tương tác (cuộn giấy trong cảnh 3D) đúng tọa độ ký hiệu (12 vật đã tải)",
   "ok": true,
   "detail": ""
  },
@@ -835,7 +2585,266 @@
  {
   "size": "844x390",
   "area": "chữ to + giảm chuyển động",
-  "name": "/ban-do: đủ 16 biểu tượng và chú thích",
+  "name": "Làng Giấy: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.3e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.17 px)",
+  "ok": true,
+  "detail": "khung 269 px"
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: lớp bố cục thật có mặt (đường/ao/viền, 14 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng làm giấy Gần xưởng làm giấy / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần cái ao làng Gần cái ao làng / 4 Thẻ 4, gần chợ làng Gần chợ làng)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Giấy)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Giấy: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 4.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.20 px)",
+  "ok": true,
+  "detail": "khung 269 px"
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: lớp bố cục thật có mặt (đường/ao/viền, 13 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần bãi phơi vải Gần bãi phơi vải / 2 Thẻ 2, gần xóm khung cửi Gần xóm khung cửi / 3 Thẻ 3, gần ao nhuộm Gần ao nhuộm / 4 Thẻ 4, gần chợ vải Gần chợ vải)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Dệt)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Dệt: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.8e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.23 px)",
+  "ok": true,
+  "detail": "khung 269 px"
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: lớp bố cục thật có mặt (đường/ao/viền, 12 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần xưởng khắc dấu Gần xưởng khắc dấu / 2 Thẻ 2, gần đình làng Gần đình làng / 3 Thẻ 3, gần trạm đưa thư Gần trạm đưa thư / 4 Thẻ 4, gần bãi đá Gần bãi đá)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Khắc Dấu)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Khắc Dấu: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: có vùng bản đồ làng, 4 thẻ chưa nhặt đúng bộ (1, 2, 3, 4)",
+  "ok": true,
+  "detail": "4"
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất 5.7e-3 đơn vị)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất 0.21 px)",
+  "ok": true,
+  "detail": "khung 269 px"
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: biểu tượng không dưới 18 px (nhỏ nhất 22 px), nằm trọn trong bản đồ, không đè nhau",
+  "ok": true,
+  "detail": "0 bị cắt, 0 cặp đè"
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: lớp bố cục thật có mặt (đường/ao/viền, 15 nét vẽ); tâm viền làng ở giữa khung",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: danh sách có số thẻ và tên khu bằng chữ (1 Thẻ 1, gần quầy đổi bạc Gần quầy đổi bạc / 2 Thẻ 2, gần bến sông Gần bến sông / 3 Thẻ 3, gần nhà giữ sổ Gần nhà giữ sổ / 4 Thẻ 4, gần ao sen Gần ao sen)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: đếm và chú thích bằng chữ (Còn 4/4 thẻ trong Làng Bạc)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "Làng Bạc: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "/ban-do: đủ 16/16 thẻ, sai lệch vị trí lớn nhất 0.23 px",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "chữ to + giảm chuyển động",
+  "name": "vùng bản đồ làng không có phần tử chuyển động",
   "ok": true,
   "detail": ""
  },

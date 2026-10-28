@@ -1,4 +1,4 @@
-// P2b: thẻ "Em có biết?" chưa nhặt trên /ban-do, bản đồ lớn và bản đồ nhỏ. Kiểm bằng thao tác thật (chuột/chạm/phím) trên BẢN BUILD CÓ CẦU NỐI ĐO.
+// P2b: thẻ "Em có biết?" chưa nhặt trên vùng bản đồ làng của /ban-do (chọn làng → bản đồ bố cục thật phóng to), bản đồ lớn và bản đồ nhỏ. Kiểm bằng thao tác thật (chuột/chạm/phím) trên BẢN BUILD CÓ CẦU NỐI ĐO.
 //
 // Chuẩn bị (CLAUDE.md mục 9): máy tắt server nền sau khi đo.
 //   pnpm dev:assets &
@@ -65,40 +65,132 @@ async function tap(ctx, handle) {
 }
 
 // ---------- /ban-do ----------
-async function banDo(ctx) {
-  await ctx.page.goto(`${BASE}/ban-do`, { waitUntil: 'networkidle0' });
-  await ctx.page.waitForSelector('[data-testid="ban-do-lop-the"]', { timeout: 15000 });
-  // Chờ bố cục ổn định (ảnh nền tải xong, khung bản đồ đạt cỡ thật): vị trí các biểu tượng không đổi qua hai lần đọc cách nhau 400 ms.
-  let prev = '';
-  for (let i = 0; i < 25; i++) {
-    await sleep(400);
-    const now = await ctx.page.evaluate(() => [...document.querySelectorAll('[data-testid="ban-do-the"]')].map((e) => { const r = e.getBoundingClientRect(); return `${Math.round(r.left)},${Math.round(r.top)}`; }).join('|') + '#' + Math.round(document.querySelector('[data-testid="ban-do-lop-the"]').parentElement.getBoundingClientRect().width));
-    if (now === prev) break;
-    prev = now;
-  }
-  return ctx.page.evaluate(() => {
-    const box = document.querySelector('[data-testid="ban-do-lop-the"]').parentElement.getBoundingClientRect();
-    const icons = [...document.querySelectorAll('[data-testid="ban-do-the"]')].map((e) => {
-      const r = e.getBoundingClientRect();
-      return { village: e.dataset.village, index: Number(e.dataset.index), x: ((r.left + r.width / 2 - box.left) / box.width) * 100, y: ((r.top + r.height / 2 - box.top) / box.height) * 100, w: r.width, h: r.height, vis: getComputedStyle(e).visibility !== 'hidden' };
+const MAP_SIZE = 300; // cạnh khung vẽ vùng bản đồ làng (VILLAGE_MAP_SIZE)
+const MAP_RADIUS = 125 + 8; // VILLAGE_RADIUS + dải bờ
+const K_MAP = MAP_SIZE / 2 / MAP_RADIUS;
+
+/** Bấm/chạm thật vào nút làng. Lần đầu chọn một làng, trang mở lời giới thiệu: em bấm "Bỏ qua" (đúng như người chơi) rồi bảng làng mới hiện. */
+async function selectVillage(ctx, village) {
+  const { page } = ctx;
+  await tap(ctx, await page.$(`button[data-village="${village}"]`));
+  await page.waitForFunction((v) => document.querySelector('[data-testid="ban-do-lang-the"], [data-testid="ban-do-the-het"]')?.dataset.village === v || [...document.querySelectorAll('button')].some((b) => /^Bỏ qua/.test(b.textContent.trim())), { timeout: 15000 }, village);
+  const skip = await page.evaluateHandle(() => [...document.querySelectorAll('button')].find((b) => /^Bỏ qua/.test(b.textContent.trim())) ?? null);
+  if (skip.asElement()) await tap(ctx, skip.asElement());
+  await page.waitForFunction((v) => document.querySelector('[data-testid="ban-do-lang-the"], [data-testid="ban-do-the-het"]')?.dataset.village === v, { timeout: 15000 }, village);
+}
+
+/** Mở /ban-do; nếu có `village` thì bấm/chạm thật vào nút làng đó rồi chờ vùng bản đồ làng. `fontDelay` (ms) trì hoãn mọi tải phông để thử phông tải muộn. */
+async function banDo(ctx, village = null, { fontDelay = 0 } = {}) {
+  const { page } = ctx;
+  if (fontDelay) {
+    await page.setCacheEnabled(false);
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+      if (req.resourceType() === 'font') setTimeout(() => req.continue().catch(() => {}), fontDelay);
+      else req.continue().catch(() => {});
     });
-    const hot = {};
-    const labels = {};
-    for (const b of document.querySelectorAll('button[data-village]')) {
-      const r = b.getBoundingClientRect();
-      const t = b.querySelector('span')?.textContent ?? '';
-      hot[t] = { x: ((r.left + r.width / 2 - box.left) / box.width) * 100, y: ((r.top + r.height / 2 - box.top) / box.height) * 100 };
-      labels[b.dataset.village] = { cx: r.left + r.width / 2 - box.left, cy: r.top + r.height / 2 - box.top, hw: r.width / 2, hh: r.height / 2 };
+  }
+  await page.goto(`${BASE}/ban-do`, { waitUntil: fontDelay ? 'domcontentloaded' : 'networkidle0' });
+  await page.waitForSelector('button[data-village]', { timeout: 20000 });
+  if (!village) return null;
+  await selectVillage(ctx, village);
+  return readVillageMap(ctx);
+}
+
+/** Đọc vùng bản đồ làng đang hiện. Chờ bố cục ổn định (hai lần đọc cách nhau 300 ms giống nhau). */
+async function readVillageMap(ctx) {
+  const { page } = ctx;
+  const read = () => page.evaluate(() => {
+    const sec = document.querySelector('[data-testid="ban-do-lang-the"]');
+    if (!sec) {
+      const het = document.querySelector('[data-testid="ban-do-the-het"]');
+      return { has: false, het: het ? het.innerText.trim() : null, village: het?.dataset.village ?? null, icons: [] };
     }
-    const leg = document.querySelector('[data-testid="ban-do-chu-thich-the"]');
+    sec.scrollIntoView({ block: 'center', behavior: 'instant' });
+    const svg = sec.querySelector('[data-testid="ban-do-ban-do-lang"]');
+    const sb = svg.getBoundingClientRect();
+    // khung vẽ (viewBox) nằm trong viền 2 px của <svg>: đo phần trong viền
+    const sr = { left: sb.left + svg.clientLeft, top: sb.top + svg.clientTop, width: svg.clientWidth, height: svg.clientHeight };
+    const icons = [...svg.querySelectorAll('[data-testid="ban-do-the"]')].map((g) => {
+      const r = g.querySelector('[data-glyph="scroll"] rect').getBoundingClientRect();
+      return { village: g.dataset.village, index: Number(g.dataset.index), px: Number(g.dataset.px), py: Number(g.dataset.py), cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width, h: r.height };
+    });
+    const outline = svg.querySelector('[data-testid="ban-do-tinh"] circle');
+    const orect = outline ? outline.getBoundingClientRect() : null;
+    const leg = sec.querySelector('[data-testid="ban-do-chu-thich-the"]');
     return {
-      icons, hot, labels, box: { w: box.width, h: box.height },
+      has: true,
+      village: sec.dataset.village,
+      svg: { left: sr.left, top: sr.top, w: sr.width, h: sr.height },
+      viewport: { w: window.innerWidth, h: window.innerHeight },
+      icons,
+      outline: orect ? { cx: orect.left + orect.width / 2, cy: orect.top + orect.height / 2, w: orect.width } : null,
+      houses: svg.querySelectorAll('[data-testid="ban-do-tinh"] path').length,
+      list: [...sec.querySelectorAll('[data-testid="ban-do-the-ds"] li')].map((li) => li.innerText.replace(/\s+/g, ' ').trim()),
+      sr: [...sec.querySelectorAll('[data-testid="ban-do-the-ds"] li .sr-only')].map((e) => e.textContent),
       legend: leg ? leg.innerText.replace(/\s+/g, ' ').trim() : null,
-      legendBox: leg ? (({ left, top, right, bottom }) => ({ left: left - box.left, top: top - box.top, right: right - box.left, bottom: bottom - box.top }))(leg.getBoundingClientRect()) : null,
-      sr: [...document.querySelectorAll('[data-testid="ban-do-the-doc"] li')].map((e) => e.textContent),
-      overlayPointer: getComputedStyle(document.querySelector('[data-testid="ban-do-lop-the"]')).pointerEvents,
+      count: sec.querySelector('p')?.innerText ?? '',
+      title: sec.querySelector('h3')?.innerText ?? '',
+      buttons: document.querySelectorAll('button[data-village]').length,
     };
   });
+  let prev = '';
+  let cur = null;
+  for (let i = 0; i < 30; i++) {
+    await sleep(300);
+    cur = await read();
+    const key = JSON.stringify([cur.svg, cur.icons.map((q) => [q.cx, q.cy])]);
+    if (key === prev) break;
+    prev = key;
+  }
+  return cur;
+}
+
+/** Mở từng làng (tải lại trang cho mỗi làng) và gom mọi biểu tượng thẻ. */
+async function collectAll(ctx) {
+  const all = [];
+  for (const id of ORDER) {
+    const b = await banDo(ctx, id);
+    all.push(...b.icons);
+  }
+  return all;
+}
+
+/** Kiểm vùng bản đồ một làng với dữ liệu thật của bố cục thế giới (độc lập với mã vẽ). Trả về sai lệch lớn nhất (px màn hình). */
+function verifyVillageMap(ctx, area, bd, id, spots, mask) {
+  const mine = spots.filter((s) => s.village === id);
+  const want = mine.filter((s) => !((mask >> s.index) & 1));
+  check(ctx, area, `${VNAME[id]}: có vùng bản đồ làng, ${want.length} thẻ chưa nhặt đúng bộ (${want.map((s) => s.index + 1).join(', ')})`, bd.has && JSON.stringify(bd.icons.map((i) => i.index).sort()) === JSON.stringify(want.map((s) => s.index).sort()), `${bd.icons.length}`);
+  if (!bd.has) return 0;
+  check(ctx, area, `${VNAME[id]}: vẫn có đủ 4 nút làng trên ảnh bản đồ chung để chọn`, bd.buttons === 4);
+  let worst = 0;
+  let outside = 0;
+  let overlap = 0;
+  let minSize = Infinity;
+  let dataErr = 0;
+  const kScreen = bd.svg.w / MAP_SIZE;
+  for (const i of bd.icons) {
+    const s = mine.find((q) => q.index === i.index);
+    // tọa độ trong khung vẽ theo công thức độc lập từ tọa độ thế giới thật (bắc ở trên, đông = −X ở bên phải)
+    const ex = MAP_SIZE / 2 - (s.x - s.cx) * K_MAP;
+    const ey = MAP_SIZE / 2 - (s.z - s.cz) * K_MAP;
+    dataErr = Math.max(dataErr, Math.hypot(i.px - ex, i.py - ey));
+    // vị trí trên màn hình đúng chỗ công thức
+    const sx = bd.svg.left + ex * kScreen;
+    const sy = bd.svg.top + ey * kScreen;
+    worst = Math.max(worst, Math.hypot(i.cx - sx, i.cy - sy));
+    minSize = Math.min(minSize, i.w, i.h);
+    if (i.cx - i.w / 2 < bd.svg.left - 0.5 || i.cx + i.w / 2 > bd.svg.left + bd.svg.w + 0.5 || i.cy - i.h / 2 < bd.svg.top - 0.5 || i.cy + i.h / 2 > bd.svg.top + bd.svg.h + 0.5) outside++;
+    for (const o of bd.icons) if (o !== i && Math.hypot(i.cx - o.cx, i.cy - o.cy) < i.w * 1.6) overlap++;
+  }
+  check(ctx, area, `${VNAME[id]}: tọa độ trong khung khớp công thức từ dữ liệu thật (sai lệch lớn nhất ${dataErr.toExponential(1)} đơn vị)`, dataErr < 0.01);
+  check(ctx, area, `${VNAME[id]}: biểu tượng nằm đúng chỗ trên màn hình (sai lệch lớn nhất ${worst.toFixed(2)} px)`, worst < 0.75, `khung ${bd.svg.w.toFixed(0)} px`);
+  check(ctx, area, `${VNAME[id]}: biểu tượng không dưới 18 px (nhỏ nhất ${minSize.toFixed(0)} px), nằm trọn trong bản đồ, không đè nhau`, minSize >= 18 && outside === 0 && overlap === 0, `${outside} bị cắt, ${overlap} cặp đè`);
+  check(ctx, area, `${VNAME[id]}: lớp bố cục thật có mặt (đường/ao/viền, ${bd.houses} nét vẽ); tâm viền làng ở giữa khung`, bd.outline && Math.hypot(bd.outline.cx - (bd.svg.left + bd.svg.w / 2), bd.outline.cy - (bd.svg.top + bd.svg.h / 2)) < 1.5 && bd.houses >= 1);
+  check(ctx, area, `${VNAME[id]}: danh sách có số thẻ và tên khu bằng chữ (${bd.list.join(' / ')})`, bd.list.length === want.length && bd.list.every((t) => /Gần /.test(t)));
+  check(ctx, area, `${VNAME[id]}: đếm và chú thích bằng chữ (${bd.count.trim()})`, new RegExp(`Còn ${want.length}/4 thẻ`).test(bd.count) && /Thẻ "Em có biết\?" chưa nhặt/.test(bd.legend ?? ''));
+  check(ctx, area, `${VNAME[id]}: vùng bản đồ nằm trong khung nhìn sau khi cuộn tới (chiều ngang)`, bd.svg.left >= -0.5 && bd.svg.left + bd.svg.w <= bd.viewport.w + 0.5);
+  return worst;
 }
 
 // ---------- thế giới ----------
@@ -204,100 +296,70 @@ async function runSize(browser, size) {
   const errors = [];
   let ctx;
 
-  // ===== 1. Khách mới: đủ 16 vị trí ở /ban-do =====
-  ctx = await newCtx(browser, size, { kc: [0, 0, 0, 0] });
+  // ===== 1. Khách mới: chọn từng làng, đủ 16 thẻ (4 làng × 4) đúng tọa độ thật =====
   const wdata = await (async () => { const c = await newCtx(browser, size); const d = await world(c); await c.page.close(); return d; })();
   const spots = wdata.villages.flatMap((v) => v.scrolls.map((s) => ({ village: v.id, index: s.index, x: s.x, z: s.z, cx: v.center.x, cz: v.center.z })));
-  check(ctx, 'dữ liệu', '16 vị trí thật từ bố cục thế giới (4 làng × 4 thẻ)', spots.length === 16 && ORDER.every((id) => spots.filter((s) => s.village === id).length === 4));
-
-  let bd = await banDo(ctx);
-  check(ctx, '/ban-do khách mới', 'đủ 16 biểu tượng thẻ', bd.icons.length === 16, `${bd.icons.length}`);
-  check(ctx, '/ban-do khách mới', 'mỗi làng 4 thẻ', ORDER.every((id) => bd.icons.filter((i) => i.village === id).length === 4));
-  check(ctx, '/ban-do khách mới', 'biểu tượng nằm trong ảnh bản đồ và không dưới 18 px', bd.icons.every((i) => i.x > 0 && i.x < 100 && i.y > 0 && i.y < 100 && i.w >= 18 && i.h >= 18), `nhỏ nhất ${Math.min(...bd.icons.map((i) => i.w)).toFixed(0)} px`);
-  check(ctx, '/ban-do khách mới', 'lớp phủ không bắt chuột/chạm', bd.overlayPointer === 'none');
-  check(ctx, '/ban-do khách mới', `chú thích có chữ: "${bd.legend}"`, bd.legend && /Thẻ "Em có biết\?" chưa nhặt/.test(bd.legend) && /16\/16/.test(bd.legend));
-  check(ctx, '/ban-do khách mới', 'lời đọc màn hình theo từng làng (4 làng, mỗi làng còn 4)', bd.sr.length === 5 && bd.sr.slice(1).every((t) => /còn 4 thẻ/.test(t)), bd.sr.join(' | '));
-  // vị trí: công thức độc lập từ tọa độ thế giới và điểm làng đọc từ nút làng trên chính trang
-  const RATIO = bd.box.w / bd.box.h;
-  const K = 11 / 125; // % bề ngang ứng với 1 đơn vị (bán kính làng 125 ↔ 11 %)
-  const hotOf = (id) => bd.hot[VNAME[id]];
-  // Vị trí theo công thức thu nhỏ đều quanh điểm làng; thẻ vướng chữ tên làng / mép bản đồ / thẻ khác được dời lên mép khung chữ của làng mình.
-  let farthest = 0;
-  let overlapLabel = 0;
-  let outOfMap = 0;
-  let overlapIcons = 0;
-  let exact = 0;
-  const angErr = [];
-  for (const i of bd.icons) {
-    const s = spots.find((q) => q.village === i.village && q.index === i.index);
-    const lab = bd.labels[i.village];
-    const hx = hotOf(i.village).x;
-    const hy = hotOf(i.village).y;
-    const ex = ((hx - (s.x - s.cx) * K) / 100) * bd.box.w;
-    const ey = ((hy - (s.z - s.cz) * K * RATIO) / 100) * bd.box.h;
-    const px = (i.x / 100) * bd.box.w;
-    const py = (i.y / 100) * bd.box.h;
-    if (Math.hypot(px - ex, py - ey) <= 1.5) exact++;
-    {
-      const ta = Math.atan2(ey - lab.cy, ex - lab.cx);
-      const da = Math.atan2(py - lab.cy, px - lab.cx);
-      let d = Math.abs(ta - da);
-      if (d > Math.PI) d = 2 * Math.PI - d;
-      angErr.push((d * 180) / Math.PI);
-    }
-    farthest = Math.max(farthest, Math.hypot(px - lab.cx, py - lab.cy));
-    for (const L of Object.values(bd.labels)) if (Math.abs(px - L.cx) < L.hw + i.w / 2 - 1 && Math.abs(py - L.cy) < L.hh + i.h / 2 - 1) overlapLabel++;
-    if (px - i.w / 2 < -0.5 || px + i.w / 2 > bd.box.w + 0.5 || py - i.h / 2 < -0.5 || py + i.h / 2 > bd.box.h + 0.5) outOfMap++;
-    for (const o of bd.icons) {
-      if (o === i) continue;
-      const qx = (o.x / 100) * bd.box.w;
-      const qy = (o.y / 100) * bd.box.h;
-      if (Math.hypot(px - qx, py - qy) < i.w * 0.9) overlapIcons++;
-    }
-    void lab;
+  check({ size }, 'dữ liệu', '16 vị trí thật từ bố cục thế giới (4 làng × 4 thẻ)', spots.length === 16 && ORDER.every((id) => spots.filter((s) => s.village === id).length === 4));
+  let total = 0;
+  let worstAll = 0;
+  for (const id of ORDER) {
+    ctx = await newCtx(browser, size, { kc: [0, 0, 0, 0] });
+    const bd = await banDo(ctx, id);
+    worstAll = Math.max(worstAll, verifyVillageMap(ctx, '/ban-do khách mới', bd, id, spots, 0));
+    total += bd.icons.length;
+    if (id === 'lang-det' || id === 'lang-bac') await shot(ctx, `ban-do-lang-${id.slice(5)}-khach-moi`);
+    if (id === 'lang-giay') await shot(ctx, 'ban-do-khach-moi');
+    if (ctx.errors.length) check(ctx, '/ban-do khách mới', 'không có lỗi trang', false, ctx.errors.join(' | '));
+    await ctx.page.close();
   }
-  const meanAng = angErr.reduce((a, b) => a + b, 0) / angErr.length;
-  const maxAng = Math.max(...angErr);
-  const labW = Math.max(...Object.values(bd.labels).map((L) => L.hw * 2));
-  check(ctx, '/ban-do khách mới', `vị trí quanh làng: ${exact}/16 thẻ đúng vị trí công thức (phần còn lại dời ra mép chữ tên làng); không thẻ nào xa làng mình quá ${Math.round(labW * 1.6)} px (xa nhất ${farthest.toFixed(0)} px)`, farthest <= labW * 1.6);
-  check(ctx, '/ban-do khách mới', `hướng la bàn của thẻ quanh làng: lệch trung bình ${meanAng.toFixed(0)}°, lớn nhất ${maxAng.toFixed(0)}° so với hướng thật của thẻ trong làng`, meanAng <= 50 && maxAng <= 120);
-  check(ctx, '/ban-do khách mới', 'không biểu tượng nào đè lên chữ tên của bất kỳ làng nào', overlapLabel === 0, `${overlapLabel} chỗ đè`);
-  check(ctx, '/ban-do khách mới', 'không hai biểu tượng nào đè lên nhau', overlapIcons === 0, `${overlapIcons} cặp`);
-  check(ctx, '/ban-do khách mới', 'mọi biểu tượng nằm trọn trong ảnh bản đồ', outOfMap === 0, `${outOfMap} thẻ bị cắt`);
-  const flowLegend = bd.legendBox && (bd.legendBox.top >= bd.box.h - 1 || bd.legendBox.bottom <= 1);
-  const legendOverlaps = !flowLegend && bd.icons.some((i) => { const px = (i.x / 100) * bd.box.w; const py = (i.y / 100) * bd.box.h; const L = bd.legendBox; return L && px > L.left - 8 && px < L.right + 8 && py > L.top - 8 && py < L.bottom + 8; });
-  check(ctx, '/ban-do khách mới', `chú thích ${flowLegend ? 'nằm ngoài bản đồ (màn hẹp)' : 'ở góc dưới trái bản đồ'} và không đè lên biểu tượng nào`, !legendOverlaps);
-  await shot(ctx, 'ban-do-khach-moi');
-  await ctx.page.close();
+  check({ size }, '/ban-do khách mới', `tổng ${total}/16 thẻ trên 4 làng; sai lệch vị trí lớn nhất ${worstAll.toFixed(2)} px`, total === 16 && worstAll < 0.75);
 
-  // ===== 2. Đã nhặt một phần / tất cả ở /ban-do =====
+  // ===== 2. Đã nhặt một phần / tất cả =====
   const PART = [0b0101, 15, 0, 0b1000]; // Giấy 2 thẻ (1,3), Dệt đủ, Khắc Dấu 4, Bạc 3 (0,1,2)
-  ctx = await newCtx(browser, size, { kc: PART });
-  bd = await banDo(ctx);
-  const want = ['lang-giay:1', 'lang-giay:3', 'lang-khac-dau:0', 'lang-khac-dau:1', 'lang-khac-dau:2', 'lang-khac-dau:3', 'lang-bac:0', 'lang-bac:1', 'lang-bac:2'].sort();
-  check(ctx, '/ban-do một phần', 'chỉ còn thẻ chưa nhặt (9 thẻ đúng bộ)', JSON.stringify(bd.icons.map((i) => `${i.village}:${i.index}`).sort()) === JSON.stringify(want), `${bd.icons.length}`);
-  check(ctx, '/ban-do một phần', `chú thích đếm đúng: "${bd.legend}"`, /9\/16/.test(bd.legend));
-  check(ctx, '/ban-do một phần', 'lời đọc màn hình theo làng khớp (2, 0, 4, 3)', [2, 0, 4, 3].every((n, k) => new RegExp(`còn ${n} thẻ`).test(bd.sr[k + 1])), bd.sr.slice(1).join(' | '));
-  await shot(ctx, 'ban-do-mot-phan');
-  await ctx.page.close();
-  ctx = await newCtx(browser, size, { kc: [15, 15, 15, 15] });
-  bd = await banDo(ctx);
-  check(ctx, '/ban-do đủ thẻ', 'không còn biểu tượng nào; chú thích báo đã nhặt đủ', bd.icons.length === 0 && /đã nhặt đủ/.test(bd.legend ?? ''), `${bd.icons.length} | ${bd.legend}`);
-  await shot(ctx, 'ban-do-du-the');
-  await ctx.page.close();
+  for (const [k, id] of ORDER.entries()) {
+    ctx = await newCtx(browser, size, { kc: PART });
+    const bd = await banDo(ctx, id);
+    if (PART[k] === 15) {
+      check(ctx, '/ban-do đủ thẻ', `${VNAME[id]}: nhặt đủ thì không còn bản đồ thẻ, có lời báo (${bd.het})`, !bd.has && /đã nhặt đủ/.test(bd.het ?? ''));
+      await shot(ctx, 'ban-do-du-the');
+    } else {
+      verifyVillageMap(ctx, '/ban-do một phần', bd, id, spots, PART[k]);
+      if (id === 'lang-giay') await shot(ctx, 'ban-do-mot-phan');
+    }
+    await ctx.page.close();
+  }
 
-  // ===== 3. Chuột/chạm trên /ban-do: biểu tượng không cản bấm vào làng =====
-  ctx = await newCtx(browser, size, { kc: [0, 0, 0, 0] });
-  bd = await banDo(ctx);
-  const btn = await ctx.page.evaluateHandle(() => [...document.querySelectorAll('button[aria-pressed]')].find((b) => b.textContent.includes('Làng Khắc Dấu')));
-  await tap(ctx, btn.asElement());
-  await sleep(700);
-  const opened = await ctx.page.evaluate(() => /Khắc Dấu/.test(document.body.innerText) && (document.querySelector('[aria-pressed="true"]') !== null || /Dòng chữ|Bài|Màn|Khóa|Thẻ/.test(document.body.innerText)));
-  check(ctx, '/ban-do chạm', `${ctx.touch ? 'chạm' : 'bấm'} nút làng bên cạnh biểu tượng thẻ vẫn mở bảng làng`, opened);
-  await ctx.page.close();
+  // ===== 3. Phông chữ tải muộn không làm lệch vị trí =====
+  {
+    ctx = await newCtx(browser, size, { kc: [0, 0, 0, 0] });
+    const t0 = Date.now();
+    const early = await banDo(ctx, 'lang-khac-dau', { fontDelay: 2500 });
+    const tEarly = Date.now() - t0;
+    const fontsLoadedEarly = await ctx.page.evaluate(() => document.fonts.status === 'loaded');
+    await ctx.page.evaluate(() => document.fonts.ready);
+    await sleep(3200);
+    const late = await readVillageMap(ctx);
+    // vị trí so với khung bản đồ (phông tải xong có thể làm trang giãn dòng nên khung dịch xuống, nhưng biểu tượng phải giữ đúng chỗ TRONG khung)
+    const rel = (b, i) => [(i.cx - b.svg.left) / b.svg.w, (i.cy - b.svg.top) / b.svg.w];
+    const same = early.icons.every((i, k) => { const a = rel(early, i); const c = rel(late, late.icons[k]); return Math.hypot(a[0] - c[0], a[1] - c[1]) * MAP_SIZE < 0.1; });
+    check(ctx, 'phông tải muộn', `vị trí biểu tượng giống nhau trước và sau khi phông tải xong (lúc đo đầu ${tEarly} ms, phông đã tải: ${fontsLoadedEarly})`, same);
+    verifyVillageMap(ctx, 'phông tải muộn', late, 'lang-khac-dau', spots, 0);
+    await ctx.page.close();
+  }
+
+  // ===== 4. Chuột/chạm: bấm lần nữa vào nút làng thì đóng; chọn làng khác thì đổi vùng bản đồ =====
+  if (!size.touch || size.w >= 768) {
+    ctx = await newCtx(browser, size, { kc: [0, 0, 0, 0] });
+    await banDo(ctx, 'lang-giay');
+    const other = await ctx.page.$('button[data-village="lang-bac"]');
+    void other;
+    await selectVillage(ctx, 'lang-bac');
+    check(ctx, '/ban-do chọn làng', 'chọn làng khác thì vùng bản đồ đổi sang làng đó', true);
+    await ctx.page.close();
+  }
 
   if (flag('ban-do')) return; // lặp nhanh: chỉ phần /ban-do
-  // ===== 4. Thế giới: bản đồ lớn và bản đồ nhỏ =====
+  // ===== 5. Thế giới: bản đồ lớn và bản đồ nhỏ =====
   ctx = await newCtx(browser, size, { kc: [0, 0, 0, 0] });
   await world(ctx);
   // bản đồ nhỏ ở chợ: không thẻ nào trong vòng 88 (Làng gần nhất cách cổng 72 + thẻ sâu trong làng)
@@ -413,21 +475,31 @@ async function runSize(browser, size) {
     bs = await bigState(ctx);
     check(ctx, 'tải lại trang', `tiến độ đã lưu (cookie khách: ${saved}) khớp: bản đồ lớn vẫn còn 15, thiếu thẻ đã nhặt`, saved && bs.scrolls.length === 15 && !bs.scrolls.some((s) => keyOf(s) === keyOf(target)));
     await closeBig(ctx);
-    bd = await banDo(ctx);
-    check(ctx, 'tải lại trang', '/ban-do cũng còn 15 biểu tượng, không có thẻ Làng Giấy số 2', bd.icons.length === 15 && !bd.icons.some((i) => i.village === 'lang-giay' && i.index === 1), `${bd.icons.length}`);
+    const after = await collectAll(ctx);
+    check(ctx, 'tải lại trang', '/ban-do cũng còn 15 thẻ, không có thẻ Làng Giấy số 2 (tiến độ khớp)', after.length === 15 && !after.some((i) => i.village === 'lang-giay' && i.index === 1), `${after.length}`);
     await ctx.page.close();
     // đổi người chơi (khách mới trên cùng trình duyệt: xóa cookie khách) không mang trạng thái thẻ của người trước sang
     ctx = await newCtx(browser, size, { kc: [0, 0, 0, 0] });
-    bd = await banDo(ctx);
-    check(ctx, 'đổi người chơi', 'người chơi khác (cookie khách mới) thấy lại đủ 16 thẻ, không mang thẻ đã nhặt của người trước', bd.icons.length === 16);
+    const fresh = await collectAll(ctx);
+    check(ctx, 'đổi người chơi', 'người chơi khác (cookie khách mới) thấy lại đủ 16 thẻ, không mang thẻ đã nhặt của người trước', fresh.length === 16);
     await ctx.page.close();
   }
 
   // ===== 7. Chữ to và giảm chuyển động =====
   ctx = await newCtx(browser, size, { kc: [0, 0, 0, 0], largeText: true, reducedMotion: true });
-  bd = await banDo(ctx);
-  check(ctx, 'chữ to + giảm chuyển động', '/ban-do: đủ 16 biểu tượng và chú thích', bd.icons.length === 16 && /chưa nhặt/.test(bd.legend ?? ''));
-  await shot(ctx, 'ban-do-chu-to');
+  {
+    let n = 0;
+    let worstBig = 0;
+    for (const id of ORDER) {
+      const b = await banDo(ctx, id);
+      n += b.icons.length;
+      worstBig = Math.max(worstBig, verifyVillageMap(ctx, 'chữ to + giảm chuyển động', b, id, spots, 0));
+      if (id === 'lang-khac-dau') await shot(ctx, 'ban-do-chu-to');
+    }
+    check(ctx, 'chữ to + giảm chuyển động', `/ban-do: đủ ${n}/16 thẻ, sai lệch vị trí lớn nhất ${worstBig.toFixed(2)} px`, n === 16 && worstBig < 0.75);
+    const moving = await ctx.page.evaluate(() => document.querySelectorAll('[data-testid="ban-do-lang-the"] .animate-pulse, [data-testid="ban-do-lang-the"] animate').length);
+    check(ctx, 'chữ to + giảm chuyển động', 'vùng bản đồ làng không có phần tử chuyển động', moving === 0);
+  }
   await world(ctx);
   ms = await miniState(ctx);
   check(ctx, 'chữ to + giảm chuyển động', `bản đồ nhỏ nhân 1,15 (${ms.size} px) và vẫn có ký hiệu thẻ`, ms.size === (size.touch ? 138 : 207) && ms.scrolls.length === 16);

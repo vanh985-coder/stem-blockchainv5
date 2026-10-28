@@ -208,7 +208,7 @@ Phần này để trống chỗ, **không làm trong đợt này**.
 - Hàm thuần có test: có hiện giới thiệu không (lần đầu / đã xem) và ghép danh sách nhiệm vụ (`progress/villageIntro.ts`). Phần giới thiệu tải theo route, chỉ khi cần.
 - **Thẻ "Em có biết?" ở giới thiệu làng (bước X3):** làng có thẻ rải (hiện là Làng Giấy) hiện thêm **4 thẻ** trong phần giới thiệu (nhãn "Em có biết? · Thẻ n/4"); phải đọc hết 4 thẻ thì nút "Vào" ở bảng làng mới hiện (khi chưa đọc đủ, bảng ghi "Em đọc đủ 4 thẻ …"). Đọc hết đặt cùng cờ `knowCards` với việc nhặt cuộn giấy trong làng (`markAllKnowCards`), nên làm bên nào cũng đủ cho bên kia. Chữ ở `content/knowScrolls.ts`.
 
-- **Thẻ "Em có biết?" chưa nhặt (P2b):** bản đồ vẽ hình thoi vàng (cùng ký hiệu với bản đồ trong game) cho mọi thẻ chưa nhặt của cả 4 làng, quanh điểm làng theo vị trí thật trong làng (khách mới: đủ 16 thẻ). Có chú thích bằng chữ và số thẻ còn lại ở góc dưới trái bản đồ; lớp phủ không bắt chuột/chạm nên không cản bấm vào làng. Nhặt thẻ ở trong làng 3D thì biểu tượng biến mất. Chi tiết: spec 03 mục 3.9.
+- **Thẻ "Em có biết?" chưa nhặt (P2b):** ảnh bản đồ chung chỉ để chọn làng. Chọn một làng thì bảng làng có thêm **vùng bản đồ làng phóng to** vẽ từ bố cục thật của làng đó (đường, ao, nhà, viền; bắc ở trên), trên đó mỗi thẻ chưa nhặt là một hình thoi vàng đặt đúng chỗ thẻ nằm trong làng, có số 1 đến 4; danh sách bên dưới ghi tên khu ("Gần đình làng"…), kèm chú thích bằng chữ và số thẻ còn lại. Nhặt đủ thì thay bằng lời báo; nhặt thẻ ở làng 3D thì thẻ biến mất. Không tải cảnh 3D để xem. Chi tiết: spec 03 mục 3.9.
 
 **Điện thoại:** bản đồ co theo chiều ngang; bảng danh sách màn hiện thành tấm trượt lên từ dưới.
 
