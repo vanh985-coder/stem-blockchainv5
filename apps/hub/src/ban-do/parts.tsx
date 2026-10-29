@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router';
-import { AssetImage, Button, LEVELS, fmt, knowScrollUi, levelById, openLevel, ui, type LevelDef, type LevelState, type LevelUnlock, type Progress } from '@so-chung/core';
+import { AssetImage, Button, LEVELS, climaxUi, fmt, knowScrollUi, levelById, openLevel, ui, type LevelDef, type LevelState, type LevelUnlock, type Progress } from '@so-chung/core';
 
 /** Chữ và hình cho từng trạng thái: phân biệt bằng hình và chữ, không chỉ bằng màu. */
 export const STATE_TEXT: Record<LevelState, string> = {
@@ -49,6 +49,7 @@ export function VillageDetails({
   onReplayIntro,
   know,
   scrollMap,
+  climax,
 }: {
   villageId: LevelDef['lang'];
   unlockLevels: LevelUnlock[];
@@ -61,6 +62,8 @@ export function VillageDetails({
   know?: { got: number; total: number; onRead: () => void };
   /** Vùng bản đồ làng có thẻ "Em có biết?" chưa nhặt (P2b), đặt cuối bảng */
   scrollMap?: ReactNode;
+  /** Cảnh cao trào (chỉ Làng Bạc, khi đủ 4 trang và đã chơi màn 12): `seen` là đã chiếu rồi; không truyền thì không có nút */
+  climax?: { seen: boolean; onWatch: () => void };
 }) {
   const navigate = useNavigate();
   const knowLocked = !!know && know.total > 0 && know.got < know.total;
@@ -134,6 +137,14 @@ export function VillageDetails({
           );
         })}
       </ul>
+      {climax && (
+        <div className="space-y-2 rounded-2xl border-2 border-vang bg-vang/15 p-3" data-testid="canh-cuoi-bang">
+          <p className="text-sm font-semibold">{climax.seen ? climaxUi.canhCuoiDaXem : climaxUi.canhCuoiCho}</p>
+          <Button size="sm" onClick={climax.onWatch} data-testid="xem-canh-cuoi">
+            {climax.seen ? climaxUi.xemLai : climaxUi.xemCanhCuoi}
+          </Button>
+        </div>
+      )}
       {scrollMap}
     </div>
   );

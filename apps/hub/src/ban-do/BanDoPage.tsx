@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import {
   AssetImage,
   BAN_DO_HOTSPOTS,
@@ -13,6 +13,9 @@ import {
   effectiveKnowMask,
   fmt,
   hasSeenKnow,
+  canWatchClimax,
+  hasSeenClimax,
+  openClimax,
   knowScrollUi,
   countKnowCards,
   levelsOfVillage,
@@ -100,6 +103,7 @@ export default function BanDoPage() {
   const stageRef = useRef<HTMLDivElement>(null);
   const manifest = useManifest();
   const { profile } = useAuth();
+  const navigate = useNavigate();
   const { unlock, progress, goldenPages, mode, synced, markVillageIntroSeen, markAllKnowCards } = useProgress();
   const [selected, setSelected] = useState<VillageId | null>(null);
   const [intro, setIntro] = useState<VillageId | null>(null);
@@ -147,6 +151,7 @@ export default function BanDoPage() {
       onClose={wide ? undefined : () => setSelected(null)}
       onReplayIntro={() => setIntro(selected)}
       know={{ ...knowOf(selected), onRead: () => setReading(selected) }}
+      climax={selected === 'lang-bac' && canWatchClimax(progress) ? { seen: hasSeenClimax(progress.game.data), onWatch: () => openClimax(navigate) } : undefined}
       scrollMap={
         <Suspense fallback={null}>
           <VillageScrollMap village={selected} mask={maskOf(selected)} />

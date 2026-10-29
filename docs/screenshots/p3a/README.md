@@ -42,3 +42,42 @@ P2b 2.774.099 → P3a **2.773.527 byte** (−572; gzip 860.705 → 860.518). Kh�
 - Sau lượt kiểm production chỉ đổi thêm một câu chữ Hướng dẫn chơi và test của nó (không ảnh hưởng 111 kiểm); `pnpm test`, `pnpm build` đã chạy lại sau đổi.
 - Cao trào khi chơi màn 12 trước: chỉ kiểm bằng logic (`ready`), chưa chạy ván thật ở trình duyệt.
 - Cảnh trao Trang Sổ Vàng khi các trang tới cùng lúc (ví dụ 0 → 4): mỗi làng vẫn chiếu khi em vào làng đó như cũ; chưa quan sát bằng tay ở trình duyệt.
+
+---
+
+# P3a hoàn thiện — trao Trang Sổ Vàng và cao trào (29/10/2026)
+
+## Vấn đề và cách làm
+
+Sau `28fe810`, cao trào chỉ chiếu khi đủ 4 trang, nên màn 12 xong trước thì phải chơi lại màn 12 mới xem được. Nay:
+
+- **Không chơi lại màn 12.** `progress/climaxState.ts`: `canWatchClimax` (đủ 4 trang và đã chơi màn 12), `climaxPending` (xem được và chưa có cờ `climaxSeen`). Khi đủ trang về sau, cảnh "đang chờ" hiện ở ba chỗ, đều là thao tác của em (không tự ngắt ván hay hộp phản hồi): (1) màn kết quả của game vừa làm đủ trang: lời báo và nút "Xem cảnh cuối"; (2) bảng Làng Bạc ở `/ban-do`: nút "Xem cảnh cuối" (đã chiếu thì "Xem lại cảnh cuối"); (3) dòng nhiệm vụ ở chợ: "Cảnh cuối đang chờ em…".
+- **Mở thẳng cảnh:** `/lang/lang-bac/man/12?canh=cuoi` (`openClimax`/`climaxPath`), chiếu cảnh không vào game, hết cảnh hay "Bỏ qua" thì về `/ban-do`. Chưa đủ điều kiện thì địa chỉ này chỉ hiện thẻ bắt đầu màn 12 (không chiếu, không nói "đủ 4 trang").
+- **Giữ nguyên:** thứ tự thường vẫn tự chiếu sau ván rồi mới tới màn kết quả; cờ `climaxSeen` (ghi khi hết hay "Bỏ qua", tải lại giữa cảnh thì chưa ghi); xem lại không ghi gì; số trang không đổi.
+- **Tự chọn:** bước d (cảnh trao trang) có ở lần xem đầu của mọi tài khoản và ở lần xem lại (trước đây bỏ khi đã có trang 4 trước ván); một cờ duy nhất quyết định nên không trao hai lần.
+- **Lỗi bắt được khi kiểm thật và đã sửa:** xem cảnh từ nút, hết cảnh thì cờ `climaxSeen` đổi, `award` đổi giữa lúc đang chiếu, bước d biến mất làm `ClimaxScene` lỗi (React #520, tự phục hồi). Nay chụp lúc vào trang (`Man12.tsx`) và `stepAt` kẹp chỉ số (test ở `climaxFlow.test.ts`).
+- Không đổi công thức, luật, điểm, điều kiện nội bộ; chữ mới ở `content/climax.ts`.
+
+## Kiểm DOM thật trên production (`node scripts/p3a-climax-check.mjs`)
+
+Bản build có cầu nối đo; tiến độ đầu vào đặt bằng cookie khách (đúng định dạng ứng dụng) để giảm thời gian; **hoàn thành màn và mở cao trào đều qua thao tác thật**: chơi thật màn 6 (diều: bắt đầu, để diều rơi tới hết tim, xem kết quả) và màn 12 (leo cây: nhảy bằng phím cách hay chạm, bấm hộp thoại của game tới hết), bấm nút xem cảnh, lật từng lượt bằng nút "Tiếp". **120 kiểm đạt** (1366×768: 40, 360×800: 40, 844×390: 40; màn 6 ở 360×800 chơi sau khi xoay ngang máy vì màn 6 chỉ chơi khung ngang). 27 ảnh mới (lớn nhất 162.762 byte); chi tiết `ket-qua-cao-trao.json`, `anh-cao-trao.json`.
+
+| Kịch bản | Kết quả |
+|---|---|
+| **A. Thứ tự thường** (11 màn đầu xong, 3 trang) | trước màn 12 chưa có nút xem cảnh cuối; chơi xong màn 12 thì cảnh tự chiếu, không hiện màn kết quả cùng lúc; đủ 4 bước (truyện, cảnh dưới gốc đa, truyện, trao trang) đúng thứ tự, bước trao trang nói "đủ 4 trang"; sang màn kết quả có "Xem lại cảnh cuối"; tiến độ: 4 trang, cờ đã chiếu, màn 12 đã ghi; xem lại không ghi thêm gì; bảng Làng Bạc đổi sang "Xem lại" |
+| **A2. Tải lại giữa cảnh** | trang 4 và kết quả màn 12 còn, cờ chưa ghi; sau tải lại bảng Làng Bạc có "Xem cảnh cuối"; xem hết từ nút, về `/ban-do`, cờ ghi đúng một lần |
+| **B. Màn 12 xong trước, làm nốt màn 6, xem từ màn kết quả** | trước đủ trang: bảng Làng Bạc không có nút, `/man/12?canh=cuoi` không chiếu và không nói "đủ 4 trang"; chơi thật màn 6: trang 1 → 4, kết quả màn 12 giữ nguyên; màn kết quả có lời báo và nút "Xem cảnh cuối", không hộp thoại chồng; bấm nút: đủ 4 bước, hết cảnh về `/ban-do`, cờ ghi, màn 12 không bị chơi lại; xem lại không ghi gì |
+| **C. Như B, xem từ bảng Làng Bạc sau tải lại** | tải lại ngay sau màn kết quả vẫn đủ tiến độ; bảng Làng Bạc có "Xem cảnh cuối"; xem đủ 4 bước; cờ và số trang đúng; không còn lỗi trang |
+| **D. Nhiều trang cùng lúc (2, 3, 4)** | sau màn 6: `gp` 1 → 4; vào Làng Dệt rồi Khắc Dấu ở thế giới: mỗi làng đúng 1 hộp trao trang (không chồng), cờ trao trang cả hai được ghi (không mất, không thêm); tải lại và vào lại Dệt: không chiếu lại; ở chợ dòng nhiệm vụ nhắc "Cảnh cuối đang chờ em" |
+
+## Test và lệnh bắt buộc
+
+Test hồi quy mới: `progress/climaxState.test.ts` (6 ca: thứ tự thường, màn 12 xong trước, đủ trang về sau mà kết quả màn 12 giữ nguyên, đã chiếu, chưa chơi màn 12 dù có 4 trang cũ, đường dẫn), `ban-do/parts.test.tsx` (nút ở bảng Làng Bạc: chưa đủ không có, chờ, đã chiếu), `climaxFlow.test.ts` (`stepAt`).
+`pnpm test --maxWorkers=2`: **2157 pass, 1 skipped** (197 file); `pnpm typecheck` đạt; `pnpm check:text` sạch (431 file); `pnpm build` đạt. Bundle hub 2.774.688 byte (trước 2.773.527, +1.161; gzip 860.614).
+
+## Chưa xác minh
+
+- Tài khoản Supabase thật (không có khóa ở máy đo): chỉ kiểm bằng test và cookie khách; đồng bộ cờ `climaxSeen` giữa máy đã có test hợp cờ từ trước.
+- Thiết bị thật, Safari/iPhone; chạm giả lập bằng Chrome; màn 6 ở 360×800 phải xoay ngang như thật.
+- Máy 3D phần mềm chậm: thời gian từng bước chỉ để tham khảo.
+- Ghi chú yêu cầu: mục "hướng dẫn focus và làm thử cho cả 12 màn" không có trong `TRANG-THAI.md` trên nhánh này (đã tìm theo "focus", "làm thử", "12 màn"; chỉ có ghi chú focus của màn 8 ở P1a, giữ nguyên). Nếu mục đó nằm ở bản bạn đang sửa, hãy thêm lại; tôi không tự tạo nội dung mới cho mục đó.

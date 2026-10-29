@@ -31,3 +31,27 @@ describe('/ban-do: chi tiết làng và thẻ Em có biết (bước X3)', () =>
     expect(render({ got: 0, total: 0 })).toContain('>Vào<');
   });
 });
+
+describe('/ban-do: nút xem cảnh cuối ở bảng Làng Bạc (P3a)', () => {
+  const bac: LevelUnlock[] = LEVELS.filter((l) => l.lang === 'lang-bac').map((l) => ({ id: l.id, state: 'done' as const }));
+  const renderBac = (climax?: { seen: boolean }) =>
+    renderToStaticMarkup(
+      <MemoryRouter>
+        <VillageDetails villageId="lang-bac" unlockLevels={bac} progress={EMPTY} goldenEarned={false} climax={climax ? { ...climax, onWatch: () => {} } : undefined} />
+      </MemoryRouter>,
+    );
+  it('không truyền cảnh (chưa đủ điều kiện): không có nút', () => {
+    expect(renderBac()).not.toContain('xem-canh-cuoi');
+  });
+  it('cảnh đang chờ: nút "Xem cảnh cuối" và lời báo không bắt chơi lại màn 12', () => {
+    const html = renderBac({ seen: false });
+    expect(html).toContain('data-testid="xem-canh-cuoi"');
+    expect(html).toContain('>Xem cảnh cuối<');
+    expect(html).toContain('không cần chơi lại màn 12');
+  });
+  it('đã chiếu: nút đổi thành "Xem lại cảnh cuối"', () => {
+    const html = renderBac({ seen: true });
+    expect(html).toContain('>Xem lại cảnh cuối<');
+    expect(html).not.toContain('>Xem cảnh cuối<');
+  });
+});

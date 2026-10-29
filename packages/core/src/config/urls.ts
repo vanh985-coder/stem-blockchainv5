@@ -72,6 +72,20 @@ export function openLevel(navigate: (to: string) => void, id: VillageId, level: 
   else window.location.assign(levelUrl(urls, id, level));
 }
 
+/** Tham số địa chỉ mở thẳng cảnh cao trào ở màn 12 (không phải chơi lại): `/lang/lang-bac/man/12?canh=cuoi`. */
+export const CLIMAX_QUERY = 'canh=cuoi';
+
+/** Đường dẫn nội bộ tới cảnh cao trào (màn 12 của Làng Bạc, chế độ xem cảnh). */
+export function climaxPath(): string {
+  return `${levelPath('lang-bac', 12)}?${CLIMAX_QUERY}`;
+}
+
+/** Mở cảnh cao trào: web đã gộp thì điều hướng nội bộ; chưa gộp thì mở địa chỉ Làng Bạc. */
+export function openClimax(navigate: (to: string) => void, merged: boolean = MERGED, urls: AppUrls = URLS): void {
+  if (merged) navigate(climaxPath());
+  else window.location.assign(`${levelUrl(urls, 'lang-bac', 12)}?${CLIMAX_QUERY}`);
+}
+
 export function hubMapUrl(urls: AppUrls): string {
   return `${urls.hub}/ban-do`;
 }

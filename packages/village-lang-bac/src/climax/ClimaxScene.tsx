@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { GoldenPagesRow, VnDialog, climaxUi, useAuth, useProgress, useSettings, type VnTurn } from '@so-chung/core';
 import { Actor25D, Character, Scene25D, type ClipName, type PoseRequest } from '@so-chung/core/three/index';
-import { climaxMotion, climaxSteps, finishLabelOf, type ClimaxMotion, type ClimaxStep, type ClimaxTurn } from './climaxFlow';
+import { climaxMotion, climaxSteps, finishLabelOf, stepAt, type ClimaxMotion, type ClimaxStep, type ClimaxTurn } from './climaxFlow';
 
 /** Nền: gốc đa của Làng Bạc (ảnh có sẵn của bài học 10). */
 const BACKGROUND = 'scenes/bai-hoc-lang-bac';
@@ -94,7 +94,7 @@ export function ClimaxScene({ award, replay, onDone }: ClimaxSceneProps) {
   const steps = useMemo(() => climaxSteps({ ten, award }), [ten, award]);
   const [index, setIndex] = useState(0);
   const [turn, setTurn] = useState(0);
-  const step: ClimaxStep = steps[index];
+  const step: ClimaxStep = stepAt(steps, index);
 
   const finish = useCallback(() => {
     if (!replay) markClimaxSeen();

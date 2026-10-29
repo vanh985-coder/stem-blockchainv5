@@ -105,6 +105,15 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - `pnpm test --maxWorkers=2`: **2147 pass, 1 skipped**; `pnpm typecheck`, `pnpm check:text` (430 file), `pnpm build` đạt. Bundle hub 2.773.527 byte (trước 2.774.099). Không sửa dựng 3D nên không đo FPS.
 - Chưa xác minh: **tài khoản Supabase thật** (không có khóa ở máy đo; chỉ kiểm bằng test và cookie khách, quyền giáo viên chỉ bằng test), thiết bị thật/Safari, joystick cảm ứng, cao trào khi chơi màn 12 trước ở trình duyệt, cảnh trao trang khi các trang tới cùng lúc. Chưa làm nút tự động hoàn thành; chưa sửa nút "?" màn 3.
 
+## P3a hoàn thiện — trao Trang Sổ Vàng và cao trào — đã xác minh (29/10/2026)
+
+- **Người code: Claude Code, đọc `CLAUDE.md`, tự commit và push khi 4 lệnh đạt.** Chỉ hoàn thiện luồng trao trang và cao trào sau `28fe810`; không đổi công thức, luật, điểm, điều kiện nội bộ; chưa làm nút tự động hoàn thành.
+- **Bỏ yêu cầu chơi lại màn 12 để xem cao trào.** `climaxState.ts` (`canWatchClimax`, `climaxPending`): cảnh chỉ chiếu khi đủ 4 trang và đã chơi màn 12 (không nói "đủ 4 trang" khi chưa đủ). Màn 12 xong trước: kết quả vẫn ghi; khi đủ trang về sau, cảnh đang chờ hiện ở màn kết quả của game vừa làm đủ trang (nút "Xem cảnh cuối"), ở bảng Làng Bạc trên `/ban-do` và ở dòng nhiệm vụ ở chợ; nút mở `/lang/lang-bac/man/12?canh=cuoi` chiếu thẳng cảnh, hết cảnh về `/ban-do`. Thứ tự thường vẫn tự chiếu sau ván. Không tự ngắt ván hay hộp phản hồi. Cờ `climaxSeen` (ghi khi hết hay "Bỏ qua"), xem lại không ghi, bước trao trang chỉ một lượt cho lần xem đầu (**tự chọn**: có ở lần xem đầu của mọi tài khoản).
+- Lỗi bắt được khi kiểm thật và đã sửa: cờ đổi giữa lúc chiếu làm bước d biến mất, `ClimaxScene` lỗi (tự phục hồi); nay chụp lúc vào trang và `stepAt` kẹp chỉ số.
+- Kiểm DOM thật (`scripts/p3a-climax-check.mjs`, bản build có cầu nối đo, tiến độ đầu vào bằng cookie, chơi thật màn 6 và màn 12, 3 cỡ): **120 kiểm đạt**: thứ tự thường (+ tải lại giữa cảnh), màn 12 xong trước rồi làm nốt làng và xem từ màn kết quả hay từ bảng Làng Bạc sau tải lại, nhiều trang (2, 3, 4) cùng lúc: mỗi cảnh trao trang đúng một lần, không chồng, không mất, tải lại không chiếu lại. 27 ảnh (lớn nhất 162.762 byte), báo cáo ở `docs/screenshots/p3a/`.
+- `pnpm test --maxWorkers=2`: **2157 pass, 1 skipped**; `pnpm typecheck`, `pnpm check:text` (431 file), `pnpm build` đạt. Bundle hub 2.774.688 byte (+1.161). Spec 03 mục 6, spec 04, spec 08 "Cảnh cao trào" đã cập nhật.
+- Chưa xác minh: tài khoản Supabase thật, thiết bị thật/Safari, chạm chỉ giả lập (màn 6 ở 360×800 chơi sau khi xoay ngang). **Mục "hướng dẫn focus và làm thử cho cả 12 màn" không có trong bản `TRANG-THAI.md` của nhánh này nên không sửa được; nếu nằm ở bản khác của bạn thì cần thêm lại.** Chưa sửa nút "?" màn 3.
+
 ## Việc dời từ mốc 3 (làm CUỐI mốc 4, theo thứ tự)
 
 1. **15b deploy bản gộp:** `git pull`, `VITE_MERGED=true` trong `deploy/.env`, dựng lại theo `DEPLOY.md` mục (j); kiểm hub 200, 4 địa chỉ làng cũ trả 302 giữ đường dẫn; thử trên điện thoại. Quay về: mục (j) cách 1 hoặc 2.

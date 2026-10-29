@@ -1,6 +1,7 @@
 export type { VillageModule, VillageId } from './village';
-export { URLS, HUB_MAP_URL, MERGED, VILLAGE_IDS, resolveUrls, levelUrl, levelPath, openLevel, villageWorldUrl, hubMapUrl, hubPageUrl } from './config/urls';
+export { URLS, HUB_MAP_URL, MERGED, VILLAGE_IDS, resolveUrls, levelUrl, levelPath, openLevel, CLIMAX_QUERY, climaxPath, openClimax, villageWorldUrl, hubMapUrl, hubPageUrl } from './config/urls';
 export type { AppUrls, UrlEnv } from './config/urls';
+export { goToMap } from './auth/pages/shared';
 export { VillageApp } from './ui/VillageApp';
 export { ExternalRedirect } from './ui/ExternalRedirect';
 export { RequireStory, useStoryGate } from './ui/RequireStory';
@@ -127,6 +128,7 @@ export { shouldShowIntro, hasSeenIntro, introTasks, goldenPageNumber, shouldShow
 export { shouldAutoOpenGuide, hasSeenGuide } from './progress/guideFlags';
 export { storyGate, hasReadStory, isReturningPlayer, type StoryGate } from './progress/storyFlags';
 export { hasSeenGameTip, hasSeenClimax } from './progress/gameTips';
+export { CLIMAX_LEVEL, canWatchClimax, climaxPending } from './progress/climaxState';
 export { knowCardMaskOf, effectiveKnowMask, knowCardsComplete, countKnowCards, hasKnowCard, fullKnowMask, firstLevelIdOf } from './progress/knowCards';
 export type { IntroTask } from './progress/villageIntro';
 export { VILLAGE_INTRO, villageIntroTexts } from './content/villageIntro';

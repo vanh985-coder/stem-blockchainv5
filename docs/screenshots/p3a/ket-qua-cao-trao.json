@@ -1,0 +1,842 @@
+[
+ {
+  "size": "1366x768",
+  "area": "A thứ tự thường",
+  "name": "trước màn 12: bảng Làng Bạc chưa có nút xem cảnh cuối (mới 3 trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "A thứ tự thường",
+  "name": "xong màn 12 theo thứ tự thường: cao trào tự chiếu sau ván, chưa hiện màn kết quả cùng lúc (không chồng)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "A thứ tự thường",
+  "name": "đủ 4 bước (truyện a, cảnh b, truyện c, cảnh d trao trang) theo thứ tự: sbsd",
+  "ok": true,
+  "detail": "s,b,s,d"
+ },
+ {
+  "size": "1366x768",
+  "area": "A thứ tự thường",
+  "name": "bước trao trang nói \"đủ 4 trang\" (đã đủ thật)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "A thứ tự thường",
+  "name": "hết cảnh thì sang màn kết quả, có nút \"Xem lại cảnh cuối\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "A thứ tự thường",
+  "name": "tiến độ: đủ 4 trang, cờ đã chiếu cao trào, màn 12 đã ghi",
+  "ok": true,
+  "detail": "{\"gp\":4,\"gt\":8191}"
+ },
+ {
+  "size": "1366x768",
+  "area": "A thứ tự thường",
+  "name": "xem lại không ghi thêm gì: vẫn gp=4, cờ đã chiếu, không đổi số trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "A thứ tự thường",
+  "name": "bảng Làng Bạc: có \"Xem lại cảnh cuối\", không còn lời cảnh đang chờ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "A thứ tự thường",
+  "name": "tải lại giữa cảnh: trang 4 và kết quả màn 12 vẫn còn, cờ đã chiếu CHƯA ghi",
+  "ok": true,
+  "detail": "{\"gp\":4,\"gt\":4095}"
+ },
+ {
+  "size": "1366x768",
+  "area": "A thứ tự thường",
+  "name": "sau khi tải lại: bảng Làng Bạc có \"Xem cảnh cuối\" (đang chờ), không bắt chơi lại màn 12",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "A thứ tự thường",
+  "name": "xem tiếp từ nút (/lang/lang-bac/man/12?canh=cuoi): đủ bước, hết cảnh về bản đồ",
+  "ok": true,
+  "detail": "s,b,s,d"
+ },
+ {
+  "size": "1366x768",
+  "area": "A thứ tự thường",
+  "name": "hết cảnh ghi cờ đã chiếu đúng một lần; số trang vẫn 4",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "B xem từ kết quả",
+  "name": "màn 12 đã xong nhưng mới 1 trang: bảng Làng Bạc chưa có nút xem cảnh cuối",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "B xem từ kết quả",
+  "name": "mở thẳng /man/12?canh=cuoi khi chưa đủ 4 trang: không chiếu cảnh, không nói \"đủ 4 trang\" (hiện thẻ bắt đầu màn 12)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "B xem từ kết quả",
+  "name": "xong màn 6 (thật): các trang 2, 3, 4 tới cùng lúc, tổng 4 trang; kết quả màn 12 giữ nguyên, không chơi lại",
+  "ok": true,
+  "detail": "{\"gp\":4,\"l12\":\"[1,1,3,100]\"}"
+ },
+ {
+  "size": "1366x768",
+  "area": "B xem từ kết quả",
+  "name": "màn kết quả của màn 6 có lời báo cảnh cuối đang chờ và nút \"Xem cảnh cuối\", không có hộp thoại nào chồng lên",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "B xem từ kết quả",
+  "name": "xem cao trào mà không chơi lại màn 12 (/lang/lang-bac/man/12?canh=cuoi): đủ 4 bước",
+  "ok": true,
+  "detail": "s,b,s,d"
+ },
+ {
+  "size": "1366x768",
+  "area": "B xem từ kết quả",
+  "name": "lúc này mới nói \"đủ 4 trang\" (bước trao trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "B xem từ kết quả",
+  "name": "hết cảnh: cờ đã chiếu được ghi, số trang vẫn 4, kết quả màn 12 giữ nguyên (không chơi lại)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "B xem từ kết quả",
+  "name": "hết cảnh quay về bản đồ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "B xem từ kết quả",
+  "name": "bảng Làng Bạc đổi thành \"Xem lại cảnh cuối\" (hết chờ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "B xem từ kết quả",
+  "name": "xem lại không ghi thêm gì (cùng cờ, cùng số trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "màn 12 đã xong nhưng mới 1 trang: bảng Làng Bạc chưa có nút xem cảnh cuối",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "mở thẳng /man/12?canh=cuoi khi chưa đủ 4 trang: không chiếu cảnh, không nói \"đủ 4 trang\" (hiện thẻ bắt đầu màn 12)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "xong màn 6 (thật): các trang 2, 3, 4 tới cùng lúc, tổng 4 trang; kết quả màn 12 giữ nguyên, không chơi lại",
+  "ok": true,
+  "detail": "{\"gp\":4,\"l12\":\"[1,1,3,100]\"}"
+ },
+ {
+  "size": "1366x768",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "màn kết quả của màn 6 có lời báo cảnh cuối đang chờ và nút \"Xem cảnh cuối\", không có hộp thoại nào chồng lên",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "tải lại trang sau màn kết quả: tiến độ còn nguyên (4 trang, màn 6 xong, màn 12 giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "bảng Làng Bạc có \"Xem cảnh cuối\" (đang chờ), không có nút nào bắt chơi lại màn 12",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "xem cao trào mà không chơi lại màn 12 (/lang/lang-bac/man/12?canh=cuoi): đủ 4 bước",
+  "ok": true,
+  "detail": "s,b,s,d"
+ },
+ {
+  "size": "1366x768",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "lúc này mới nói \"đủ 4 trang\" (bước trao trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "hết cảnh: cờ đã chiếu được ghi, số trang vẫn 4, kết quả màn 12 giữ nguyên (không chơi lại)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "hết cảnh quay về bản đồ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "bảng Làng Bạc đổi thành \"Xem lại cảnh cuối\" (hết chờ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "xem lại không ghi thêm gì (cùng cờ, cùng số trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "D nhiều trang cùng lúc",
+  "name": "sau màn 6: gp nhảy 1 → 4, cờ cảnh trao trang của Dệt và Khắc Dấu chưa ghi",
+  "ok": true,
+  "detail": "{\"gp\":4,\"gs\":1}"
+ },
+ {
+  "size": "1366x768",
+  "area": "D nhiều trang cùng lúc",
+  "name": "lang-det: vào làng thì có đúng 1 hộp thoại trao trang (không chồng)",
+  "ok": true,
+  "detail": "{\"dialogs\":1,\"text\":\"Đang tải cảnh… 100% Giấy Dệt Khắc Dấu Bạc B Nhiệm vụ: Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở. Trang Sổ Vàng 1: Đã nhận Trang Sổ Vàng "
+ },
+ {
+  "size": "1366x768",
+  "area": "D nhiều trang cùng lúc",
+  "name": "lang-khac-dau: vào làng thì có đúng 1 hộp thoại trao trang (không chồng)",
+  "ok": true,
+  "detail": "{\"dialogs\":1,\"text\":\"Đang tải cảnh… 100% Giấy Dệt Khắc Dấu Bạc B Nhiệm vụ: Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở. Trang Sổ Vàng 1: Đã nhận Trang Sổ Vàng "
+ },
+ {
+  "size": "1366x768",
+  "area": "D nhiều trang cùng lúc",
+  "name": "sau khi xem: cờ trao trang của Dệt và Khắc Dấu được ghi, số trang vẫn 4 (không mất, không thêm)",
+  "ok": true,
+  "detail": "{\"gp\":4,\"gs\":7}"
+ },
+ {
+  "size": "1366x768",
+  "area": "D nhiều trang cùng lúc",
+  "name": "tải lại rồi vào lại làng Dệt: cảnh trao trang không chiếu lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "D nhiều trang cùng lúc",
+  "name": "thế giới, ở chợ: dòng nhiệm vụ nhắc \"Cảnh cuối đang chờ em\" (đủ 4 trang, màn 12 xong, chưa xem)",
+  "ok": true,
+  "detail": "Nhiệm vụ: Cảnh cuối đang chờ em. Mở Bản đồ, chọn Làng Bạc rồi bấm \"Xem cảnh cuối\". Trang Sổ Vàng 1: Đã nhận Trang Sổ Vàn"
+ },
+ {
+  "size": "844x390",
+  "area": "A thứ tự thường",
+  "name": "trước màn 12: bảng Làng Bạc chưa có nút xem cảnh cuối (mới 3 trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "A thứ tự thường",
+  "name": "xong màn 12 theo thứ tự thường: cao trào tự chiếu sau ván, chưa hiện màn kết quả cùng lúc (không chồng)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "A thứ tự thường",
+  "name": "đủ 4 bước (truyện a, cảnh b, truyện c, cảnh d trao trang) theo thứ tự: sbsd",
+  "ok": true,
+  "detail": "s,b,s,d"
+ },
+ {
+  "size": "844x390",
+  "area": "A thứ tự thường",
+  "name": "bước trao trang nói \"đủ 4 trang\" (đã đủ thật)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "A thứ tự thường",
+  "name": "hết cảnh thì sang màn kết quả, có nút \"Xem lại cảnh cuối\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "A thứ tự thường",
+  "name": "tiến độ: đủ 4 trang, cờ đã chiếu cao trào, màn 12 đã ghi",
+  "ok": true,
+  "detail": "{\"gp\":4,\"gt\":8191}"
+ },
+ {
+  "size": "844x390",
+  "area": "A thứ tự thường",
+  "name": "xem lại không ghi thêm gì: vẫn gp=4, cờ đã chiếu, không đổi số trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "A thứ tự thường",
+  "name": "bảng Làng Bạc: có \"Xem lại cảnh cuối\", không còn lời cảnh đang chờ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "A thứ tự thường",
+  "name": "tải lại giữa cảnh: trang 4 và kết quả màn 12 vẫn còn, cờ đã chiếu CHƯA ghi",
+  "ok": true,
+  "detail": "{\"gp\":4,\"gt\":4095}"
+ },
+ {
+  "size": "844x390",
+  "area": "A thứ tự thường",
+  "name": "sau khi tải lại: bảng Làng Bạc có \"Xem cảnh cuối\" (đang chờ), không bắt chơi lại màn 12",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "A thứ tự thường",
+  "name": "xem tiếp từ nút (/lang/lang-bac/man/12?canh=cuoi): đủ bước, hết cảnh về bản đồ",
+  "ok": true,
+  "detail": "s,b,s,d"
+ },
+ {
+  "size": "844x390",
+  "area": "A thứ tự thường",
+  "name": "hết cảnh ghi cờ đã chiếu đúng một lần; số trang vẫn 4",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "B xem từ kết quả",
+  "name": "màn 12 đã xong nhưng mới 1 trang: bảng Làng Bạc chưa có nút xem cảnh cuối",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "B xem từ kết quả",
+  "name": "mở thẳng /man/12?canh=cuoi khi chưa đủ 4 trang: không chiếu cảnh, không nói \"đủ 4 trang\" (hiện thẻ bắt đầu màn 12)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "B xem từ kết quả",
+  "name": "xong màn 6 (thật): các trang 2, 3, 4 tới cùng lúc, tổng 4 trang; kết quả màn 12 giữ nguyên, không chơi lại",
+  "ok": true,
+  "detail": "{\"gp\":4,\"l12\":\"[1,1,3,100]\"}"
+ },
+ {
+  "size": "844x390",
+  "area": "B xem từ kết quả",
+  "name": "màn kết quả của màn 6 có lời báo cảnh cuối đang chờ và nút \"Xem cảnh cuối\", không có hộp thoại nào chồng lên",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "B xem từ kết quả",
+  "name": "xem cao trào mà không chơi lại màn 12 (/lang/lang-bac/man/12?canh=cuoi): đủ 4 bước",
+  "ok": true,
+  "detail": "s,b,s,d"
+ },
+ {
+  "size": "844x390",
+  "area": "B xem từ kết quả",
+  "name": "lúc này mới nói \"đủ 4 trang\" (bước trao trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "B xem từ kết quả",
+  "name": "hết cảnh: cờ đã chiếu được ghi, số trang vẫn 4, kết quả màn 12 giữ nguyên (không chơi lại)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "B xem từ kết quả",
+  "name": "hết cảnh quay về bản đồ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "B xem từ kết quả",
+  "name": "bảng Làng Bạc đổi thành \"Xem lại cảnh cuối\" (hết chờ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "B xem từ kết quả",
+  "name": "xem lại không ghi thêm gì (cùng cờ, cùng số trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "màn 12 đã xong nhưng mới 1 trang: bảng Làng Bạc chưa có nút xem cảnh cuối",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "mở thẳng /man/12?canh=cuoi khi chưa đủ 4 trang: không chiếu cảnh, không nói \"đủ 4 trang\" (hiện thẻ bắt đầu màn 12)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "xong màn 6 (thật): các trang 2, 3, 4 tới cùng lúc, tổng 4 trang; kết quả màn 12 giữ nguyên, không chơi lại",
+  "ok": true,
+  "detail": "{\"gp\":4,\"l12\":\"[1,1,3,100]\"}"
+ },
+ {
+  "size": "844x390",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "màn kết quả của màn 6 có lời báo cảnh cuối đang chờ và nút \"Xem cảnh cuối\", không có hộp thoại nào chồng lên",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "tải lại trang sau màn kết quả: tiến độ còn nguyên (4 trang, màn 6 xong, màn 12 giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "bảng Làng Bạc có \"Xem cảnh cuối\" (đang chờ), không có nút nào bắt chơi lại màn 12",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "xem cao trào mà không chơi lại màn 12 (/lang/lang-bac/man/12?canh=cuoi): đủ 4 bước",
+  "ok": true,
+  "detail": "s,b,s,d"
+ },
+ {
+  "size": "844x390",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "lúc này mới nói \"đủ 4 trang\" (bước trao trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "hết cảnh: cờ đã chiếu được ghi, số trang vẫn 4, kết quả màn 12 giữ nguyên (không chơi lại)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "hết cảnh quay về bản đồ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "bảng Làng Bạc đổi thành \"Xem lại cảnh cuối\" (hết chờ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "xem lại không ghi thêm gì (cùng cờ, cùng số trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "D nhiều trang cùng lúc",
+  "name": "sau màn 6: gp nhảy 1 → 4, cờ cảnh trao trang của Dệt và Khắc Dấu chưa ghi",
+  "ok": true,
+  "detail": "{\"gp\":4,\"gs\":1}"
+ },
+ {
+  "size": "844x390",
+  "area": "D nhiều trang cùng lúc",
+  "name": "lang-det: vào làng thì có đúng 1 hộp thoại trao trang (không chồng)",
+  "ok": true,
+  "detail": "{\"dialogs\":1,\"text\":\"Đang tải cảnh… 0% Giấy Dệt Khắc Dấu Bạc B Nhiệm vụ: Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở. Trang Sổ Vàng 1: Đã nhận Trang Sổ Vàng Tr"
+ },
+ {
+  "size": "844x390",
+  "area": "D nhiều trang cùng lúc",
+  "name": "lang-khac-dau: vào làng thì có đúng 1 hộp thoại trao trang (không chồng)",
+  "ok": true,
+  "detail": "{\"dialogs\":1,\"text\":\"Đang tải cảnh… 0% Giấy Dệt Khắc Dấu Bạc B Nhiệm vụ: Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở. Trang Sổ Vàng 1: Đã nhận Trang Sổ Vàng Tr"
+ },
+ {
+  "size": "844x390",
+  "area": "D nhiều trang cùng lúc",
+  "name": "sau khi xem: cờ trao trang của Dệt và Khắc Dấu được ghi, số trang vẫn 4 (không mất, không thêm)",
+  "ok": true,
+  "detail": "{\"gp\":4,\"gs\":7}"
+ },
+ {
+  "size": "844x390",
+  "area": "D nhiều trang cùng lúc",
+  "name": "tải lại rồi vào lại làng Dệt: cảnh trao trang không chiếu lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "D nhiều trang cùng lúc",
+  "name": "thế giới, ở chợ: dòng nhiệm vụ nhắc \"Cảnh cuối đang chờ em\" (đủ 4 trang, màn 12 xong, chưa xem)",
+  "ok": true,
+  "detail": "Nhiệm vụ: Cảnh cuối đang chờ em. Mở Bản đồ, chọn Làng Bạc rồi bấm \"Xem cảnh cuối\". Trang Sổ Vàng 1: Đã nhận Trang Sổ Vàn"
+ },
+ {
+  "size": "360x800",
+  "area": "A thứ tự thường",
+  "name": "trước màn 12: bảng Làng Bạc chưa có nút xem cảnh cuối (mới 3 trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "A thứ tự thường",
+  "name": "xong màn 12 theo thứ tự thường: cao trào tự chiếu sau ván, chưa hiện màn kết quả cùng lúc (không chồng)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "A thứ tự thường",
+  "name": "đủ 4 bước (truyện a, cảnh b, truyện c, cảnh d trao trang) theo thứ tự: sbsd",
+  "ok": true,
+  "detail": "s,b,s,d"
+ },
+ {
+  "size": "360x800",
+  "area": "A thứ tự thường",
+  "name": "bước trao trang nói \"đủ 4 trang\" (đã đủ thật)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "A thứ tự thường",
+  "name": "hết cảnh thì sang màn kết quả, có nút \"Xem lại cảnh cuối\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "A thứ tự thường",
+  "name": "tiến độ: đủ 4 trang, cờ đã chiếu cao trào, màn 12 đã ghi",
+  "ok": true,
+  "detail": "{\"gp\":4,\"gt\":8191}"
+ },
+ {
+  "size": "360x800",
+  "area": "A thứ tự thường",
+  "name": "xem lại không ghi thêm gì: vẫn gp=4, cờ đã chiếu, không đổi số trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "A thứ tự thường",
+  "name": "bảng Làng Bạc: có \"Xem lại cảnh cuối\", không còn lời cảnh đang chờ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "A thứ tự thường",
+  "name": "tải lại giữa cảnh: trang 4 và kết quả màn 12 vẫn còn, cờ đã chiếu CHƯA ghi",
+  "ok": true,
+  "detail": "{\"gp\":4,\"gt\":4095}"
+ },
+ {
+  "size": "360x800",
+  "area": "A thứ tự thường",
+  "name": "sau khi tải lại: bảng Làng Bạc có \"Xem cảnh cuối\" (đang chờ), không bắt chơi lại màn 12",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "A thứ tự thường",
+  "name": "xem tiếp từ nút (/lang/lang-bac/man/12?canh=cuoi): đủ bước, hết cảnh về bản đồ",
+  "ok": true,
+  "detail": "s,b,s,d"
+ },
+ {
+  "size": "360x800",
+  "area": "A thứ tự thường",
+  "name": "hết cảnh ghi cờ đã chiếu đúng một lần; số trang vẫn 4",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "B xem từ kết quả",
+  "name": "màn 12 đã xong nhưng mới 1 trang: bảng Làng Bạc chưa có nút xem cảnh cuối",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "B xem từ kết quả",
+  "name": "mở thẳng /man/12?canh=cuoi khi chưa đủ 4 trang: không chiếu cảnh, không nói \"đủ 4 trang\" (hiện thẻ bắt đầu màn 12)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "B xem từ kết quả",
+  "name": "xong màn 6 (thật): các trang 2, 3, 4 tới cùng lúc, tổng 4 trang; kết quả màn 12 giữ nguyên, không chơi lại",
+  "ok": true,
+  "detail": "{\"gp\":4,\"l12\":\"[1,1,3,100]\"}"
+ },
+ {
+  "size": "360x800",
+  "area": "B xem từ kết quả",
+  "name": "màn kết quả của màn 6 có lời báo cảnh cuối đang chờ và nút \"Xem cảnh cuối\", không có hộp thoại nào chồng lên",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "B xem từ kết quả",
+  "name": "xem cao trào mà không chơi lại màn 12 (/lang/lang-bac/man/12?canh=cuoi): đủ 4 bước",
+  "ok": true,
+  "detail": "s,b,s,d"
+ },
+ {
+  "size": "360x800",
+  "area": "B xem từ kết quả",
+  "name": "lúc này mới nói \"đủ 4 trang\" (bước trao trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "B xem từ kết quả",
+  "name": "hết cảnh: cờ đã chiếu được ghi, số trang vẫn 4, kết quả màn 12 giữ nguyên (không chơi lại)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "B xem từ kết quả",
+  "name": "hết cảnh quay về bản đồ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "B xem từ kết quả",
+  "name": "bảng Làng Bạc đổi thành \"Xem lại cảnh cuối\" (hết chờ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "B xem từ kết quả",
+  "name": "xem lại không ghi thêm gì (cùng cờ, cùng số trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "màn 12 đã xong nhưng mới 1 trang: bảng Làng Bạc chưa có nút xem cảnh cuối",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "mở thẳng /man/12?canh=cuoi khi chưa đủ 4 trang: không chiếu cảnh, không nói \"đủ 4 trang\" (hiện thẻ bắt đầu màn 12)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "xong màn 6 (thật): các trang 2, 3, 4 tới cùng lúc, tổng 4 trang; kết quả màn 12 giữ nguyên, không chơi lại",
+  "ok": true,
+  "detail": "{\"gp\":4,\"l12\":\"[1,1,3,100]\"}"
+ },
+ {
+  "size": "360x800",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "màn kết quả của màn 6 có lời báo cảnh cuối đang chờ và nút \"Xem cảnh cuối\", không có hộp thoại nào chồng lên",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "tải lại trang sau màn kết quả: tiến độ còn nguyên (4 trang, màn 6 xong, màn 12 giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "bảng Làng Bạc có \"Xem cảnh cuối\" (đang chờ), không có nút nào bắt chơi lại màn 12",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "xem cao trào mà không chơi lại màn 12 (/lang/lang-bac/man/12?canh=cuoi): đủ 4 bước",
+  "ok": true,
+  "detail": "s,b,s,d"
+ },
+ {
+  "size": "360x800",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "lúc này mới nói \"đủ 4 trang\" (bước trao trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "hết cảnh: cờ đã chiếu được ghi, số trang vẫn 4, kết quả màn 12 giữ nguyên (không chơi lại)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "hết cảnh quay về bản đồ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "bảng Làng Bạc đổi thành \"Xem lại cảnh cuối\" (hết chờ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "C xem từ bản đồ sau tải lại",
+  "name": "xem lại không ghi thêm gì (cùng cờ, cùng số trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "D nhiều trang cùng lúc",
+  "name": "sau màn 6: gp nhảy 1 → 4, cờ cảnh trao trang của Dệt và Khắc Dấu chưa ghi",
+  "ok": true,
+  "detail": "{\"gp\":4,\"gs\":1}"
+ },
+ {
+  "size": "360x800",
+  "area": "D nhiều trang cùng lúc",
+  "name": "lang-det: vào làng thì có đúng 1 hộp thoại trao trang (không chồng)",
+  "ok": true,
+  "detail": "{\"dialogs\":1,\"text\":\"Đang tải cảnh… 0% Giấy Dệt Khắc Dấu Bạc B Nhiệm vụ: Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở. Trang Sổ Vàng 1: Đã nhận Trang Sổ Vàng Tr"
+ },
+ {
+  "size": "360x800",
+  "area": "D nhiều trang cùng lúc",
+  "name": "lang-khac-dau: vào làng thì có đúng 1 hộp thoại trao trang (không chồng)",
+  "ok": true,
+  "detail": "{\"dialogs\":1,\"text\":\"Đang tải cảnh… 100% Giấy Dệt Khắc Dấu Bạc B Nhiệm vụ: Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở. Trang Sổ Vàng 1: Đã nhận Trang Sổ Vàng "
+ },
+ {
+  "size": "360x800",
+  "area": "D nhiều trang cùng lúc",
+  "name": "sau khi xem: cờ trao trang của Dệt và Khắc Dấu được ghi, số trang vẫn 4 (không mất, không thêm)",
+  "ok": true,
+  "detail": "{\"gp\":4,\"gs\":7}"
+ },
+ {
+  "size": "360x800",
+  "area": "D nhiều trang cùng lúc",
+  "name": "tải lại rồi vào lại làng Dệt: cảnh trao trang không chiếu lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "D nhiều trang cùng lúc",
+  "name": "thế giới, ở chợ: dòng nhiệm vụ nhắc \"Cảnh cuối đang chờ em\" (đủ 4 trang, màn 12 xong, chưa xem)",
+  "ok": true,
+  "detail": "Nhiệm vụ: Cảnh cuối đang chờ em. Mở Bản đồ, chọn Làng Bạc rồi bấm \"Xem cảnh cuối\". Trang Sổ Vàng 1: Đã nhận Trang Sổ Vàn"
+ }
+]

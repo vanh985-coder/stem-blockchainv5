@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
-import { MERGED, URLS, villageWorldUrl } from '../config/urls';
+import { MERGED, URLS, openClimax, villageWorldUrl } from '../config/urls';
+import { climaxUi } from '../content/climax';
 import { fmt } from '../content/characters';
 import { GAMES, gameUi } from '../content/games';
 import { gameHints } from '../content/gameHints';
@@ -9,6 +10,7 @@ import { levelById, nextReadyLevel } from '../content/levels';
 import { gameResultOf, summarizeGame, type Medal, type MedalThresholds } from '../games/medals';
 import { PROBE } from '../lib/dev';
 import { formatNumber } from '../lib/format';
+import { CLIMAX_LEVEL, climaxPending } from '../progress/climaxState';
 import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
 import { Button } from './Button';
@@ -269,6 +271,15 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
               </section>
             )}
             <p className="text-sm">{moc}</p>
+            {levelId !== CLIMAX_LEVEL && climaxPending(progress) && (
+              // P3a: game này vừa làm đủ 4 trang khi màn 12 đã xong từ trước: cảnh cuối đang chờ, xem ngay không cần chơi lại màn 12
+              <div className="space-y-2 rounded-2xl border-2 border-vang bg-vang/15 p-3" data-testid="canh-cuoi-cho">
+                <p className="text-sm font-semibold">{climaxUi.canhCuoiCho}</p>
+                <Button size="lg" data-testid="xem-canh-cuoi" onClick={() => openClimax(navigate)}>
+                  {climaxUi.xemCanhCuoi}
+                </Button>
+              </div>
+            )}
             {stage.coins > 0 && <p className="font-semibold">{fmt(gameUi.xuNhan, { so: stage.coins })}</p>}
             <div className="mg-result-buttons flex flex-col justify-center gap-3 sm:flex-row">
               <Button size="lg" variant={next ? 'secondary' : 'primary'} onClick={start}>

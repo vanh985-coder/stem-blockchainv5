@@ -18,6 +18,8 @@ import { countKnowCards, effectiveKnowMask } from '../../progress/knowCards';
 import { useProgress } from '../../progress/ProgressProvider';
 import type { LevelState } from '../../progress/unlock';
 import { hasSeenKnow, pendingGateOpening, shouldShowGolden, shouldShowKnow, shouldShowScene } from '../../progress/villageIntro';
+import { climaxPending } from '../../progress/climaxState';
+import { climaxUi } from '../../content/climax';
 import { useSettings } from '../../settings/SettingsProvider';
 import { EmCoBietDialog } from '../../ui/EmCoBietDialog';
 import { KnowCollectionDialog } from '../../ui/KnowCollectionDialog';
@@ -214,14 +216,17 @@ export function WorldPage() {
   const insideLevelIds = useMemo(() => (inside ? levelsOfVillage(inside).map((l) => l.id) : []), [inside]);
   const nextBoard = inside ? nextLevel(insideLevelIds, stateOf) : null;
   const insideName = inside ? ui.lang[inside] : '';
+  // P3a: màn 12 xong từ trước, nay đủ 4 trang mà chưa xem cảnh cuối: nhắc ở dòng nhiệm vụ (nút xem nằm ở bảng Làng Bạc trong Bản đồ)
+  const cinemaPending = !isTeacher && climaxPending(progress.progress);
   const qPages = seqActive ? Math.max(0, effPages - 1) : effPages;
   const questText = useMemo(() => {
     if (inside && insideGated) return fmt(knowScrollUi.nhiemVu, { n: knowGot(inside), tong: scrollTotals[inside] });
     if (inside && nextBoard !== null) return fmt(ui.langScene.nhiemVuMan, { bien: fmt(levelById(nextBoard)?.bien ?? '') });
     if (inside && ceremonyPending) return fmt(ui.langScene.nhiemVuXong, { lang: insideName });
+    if (!inside && cinemaPending) return fmt(climaxUi.nhiemVuCanhCuoi);
     return fmt(questLine(qPages));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inside, insideGated, knowMasks, scrollTotals, nextBoard, ceremonyPending, insideName, qPages]);
+  }, [inside, insideGated, knowMasks, scrollTotals, nextBoard, ceremonyPending, insideName, qPages, cinemaPending]);
   // làng của nhiệm vụ: đang ở trong làng nào thì làng đó, không thì làng có cổng của nhiệm vụ theo số Trang Sổ Vàng
   const questG = questGate(effPages);
   const missionVillage: VillageId | null = inside ?? (questG ? GATE_VILLAGE[questG] : null);
