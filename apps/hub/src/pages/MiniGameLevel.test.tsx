@@ -37,6 +37,39 @@ function render(progress: Progress): string {
   );
 }
 
+describe('MiniGameLevel: điểm cao nhất và kỷ lục từ phiên bản trước (màn 3 sau P4b)', () => {
+  const withBest = (best: number): Progress => ({ ...decodeProgress(null), levels: { 3: { played: true, completed: false, stars: { game: 3 }, bestScore: best, updatedAt: 1 } } });
+  const card = (best: number | null, max?: number): string =>
+    renderToStaticMarkup(
+      <ProgressContext.Provider value={stateOf(best === null ? decodeProgress(null) : withBest(best))}>
+        <MemoryRouter>
+          <MiniGameLevel levelId={3} medals={[290, 320, 330]} maxScore={max} renderGame={() => <div />} />
+        </MemoryRouter>
+      </ProgressContext.Provider>,
+    );
+  it('chưa có kỷ lục: "Em chưa chơi màn này", không chú thích', () => {
+    const html = card(null, 355);
+    expect(html).toContain('Em chưa chơi màn này.');
+    expect(html).not.toContain('Kỷ lục từ phiên bản trước');
+  });
+  it('kỷ lục trong khoảng 0 đến 355 (kể cả đúng 355): hiện điểm, KHÔNG chú thích (điểm ≤ 355 chưa phân biệt được phiên bản)', () => {
+    for (const b of [1, 300, 355]) {
+      const html = card(b, 355);
+      expect(html).toContain(`Điểm cao nhất: ${b}`);
+      expect(html).not.toContain('Kỷ lục từ phiên bản trước');
+    }
+  });
+  it('kỷ lục cũ trên 355: giữ nguyên điểm và thêm chú thích "Kỷ lục từ phiên bản trước"', () => {
+    const html = card(480, 355);
+    expect(html).toContain('Điểm cao nhất: 480');
+    expect(html).toContain('Kỷ lục từ phiên bản trước');
+    expect(html).toContain('data-testid="ky-luc-cu"');
+  });
+  it('game không khai báo điểm tối đa (maxScore) thì không bao giờ có chú thích', () => {
+    expect(card(9999)).not.toContain('Kỷ lục từ phiên bản trước');
+  });
+});
+
 describe('MiniGameLevel: thẻ bắt đầu', () => {
   const empty = decodeProgress(null);
   it('hiện tên game (qua fmt, có {phanDien}), luật, cách điều khiển cho máy tính và điện thoại, mốc điểm và nút "Bắt đầu"', () => {

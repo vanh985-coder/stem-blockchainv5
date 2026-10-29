@@ -254,6 +254,9 @@ export function rebuildScore(s: Pick<RebuildState, 'parts'>): number {
   return s.parts.reduce((a, p) => a + p.points, 0);
 }
 
+/** Điểm tối đa của một ván (ghép hoàn hảo cả hai vòng, bỏ đúng trang giả, sửa nhanh mọi lần tráo): 100 + 130 + 5 × 25 = 355. Điểm cao nhất lưu trước P4b có thể vượt số này (thang cũ tối đa 505). */
+export const REBUILD_MAX_SCORE: number = 2 * SPEC.roundBase + SPEC.fakeBonus + swapSchedule().length * (KEEP.fixPoints + KEEP.fastBonus);
+
 export function rebuildMedal(score: number): Medal {
   return medalOf(score, SPEC.medals);
 }

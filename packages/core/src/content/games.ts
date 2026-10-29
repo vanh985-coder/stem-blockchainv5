@@ -76,6 +76,8 @@ export const gameUi = {
   moc: ['Chưa đạt mốc', 'Đồng', 'Bạc', 'Vàng'] as const,
   mocDatDuoc: 'Mốc em đạt: {muc}',
   kyLucMoi: 'Kỷ lục mới!',
+  /** Chú thích cạnh điểm cao nhất đã lưu khi nó vượt điểm tối đa của phiên bản hiện tại (game đã đổi thang điểm, vd. màn 3 sau P4b) */
+  kyLucCu: 'Kỷ lục từ phiên bản trước',
   xuNhan: 'Em nhận được {so} xu.',
   /** Một dòng điểm thành phần ở màn kết quả: tên phần, số lượng, điểm */
   dongDiem: '{nhan}: {so} → {diem} điểm',

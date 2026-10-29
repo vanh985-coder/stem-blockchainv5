@@ -7,3 +7,8 @@ Báo cáo đầy đủ: `docs/specs/05-bai1-lang-giay.md` (mục "P4b") và `doc
 - Thời lượng thật cả ván (cùng kịch bản): 158,7 → 103,3 giây (1366×768, −35%), 116,8 → 70,6 giây (360×800, −40%), 118,7 → 70,8 giây (844×390, −40%); đoạn giữ sổ 127,1 → 70,1; 92,1 → 45,9; 93,2 → 46,4 giây (90 → 45 giây danh nghĩa).
 - Khung dọc 360×800: nhắc "Xoay ngang để chơi"; xoay ngang rồi chơi; xoay dọc giữa đoạn giữ sổ thì đồng hồ đứng yên (lỗi cũ: vẫn chạy và vẫn tráo, đã sửa), xoay lại chạy tiếp.
 - **FPS GL phần mềm KHÔNG dùng để kết luận hiệu năng thiết bị thật**; điện thoại thật chưa kiểm.
+
+## Hoàn thiện sau P4b: mốc 290 / 320 / 330 và chú thích kỷ lục cũ
+
+- Mốc Vàng 330 là ngoại lệ với p10 bot giỏi (= 355 = điểm tối đa) để cho phép sai sót nhỏ; bot (300 ván): giỏi Vàng 100%; trung bình chưa 13,7%, Đồng 44,3%, Bạc 25,3%, Vàng 16,7%. Mốc tạm.
+- `scripts/p4b-record-check.mjs`: thẻ bắt đầu và màn kết quả với ba trường hợp (chưa có kỷ lục, kỷ lục 300, kỷ lục cũ 480 > 355) ở 3 cỡ, **54 kiểm đạt**, ảnh `ky-luc-*.jpg`, `ket-qua-ky-luc.json`. Điểm cao nhất và huy chương đã lưu không đổi, không hạ. Giới hạn: điểm cũ ≤ 355 chưa phân biệt được phiên bản (không chú thích).

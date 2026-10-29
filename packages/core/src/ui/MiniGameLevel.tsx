@@ -64,6 +64,8 @@ export interface MiniGameLevelProps {
   medals: MedalThresholds;
   /** Vẽ phần chơi (bước 11 đến 12 của màn 2, tương tự cho các game khác) */
   renderGame: (props: MiniGameRenderProps) => ReactNode;
+  /** Điểm tối đa của phiên bản hiện tại (không bắt buộc): điểm cao nhất đã lưu vượt số này là kỷ lục của thang điểm cũ, hiện chú thích `gameUi.kyLucCu` (không đổi hay quy đổi điểm) */
+  maxScore?: number;
   /** Bấm "Về làng": mặc định về làng của màn này trong thế giới mở ở hub (`/cho?tu=<làng>`) */
   onLeave?: () => void;
   /** Cảnh cuối sau ván (tùy game) */
@@ -91,7 +93,7 @@ function useTabHidden(): boolean {
  * Chơi xong (thắng hay thua) ghi `played = true`, `best_score` lấy số lớn hơn, `stars {"game": 0 đến 3}` theo mốc, qua lớp tiến độ có sẵn (đăng nhập hay khách):
  * `record` ghi vào máy ngay, đẩy lên máy chủ sau (như các trạm bài học). Tab bị ẩn thì tạm dừng và chờ em bấm "Tiếp tục".
  */
-export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: MiniGameLevelProps) {
+export function MiniGameLevel({ levelId, medals, maxScore, renderGame, onLeave, finale }: MiniGameLevelProps) {
   const { progress, record, saveNow } = useProgress();
   const navigate = useNavigate();
   const def = levelById(levelId);
@@ -182,6 +184,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
   const next = nextReadyLevel(levelId);
   const title = fmt(text?.ten ?? def?.ten ?? '');
   const best = progress.levels[levelId]?.bestScore ?? 0;
+  const legacyBest = maxScore !== undefined && best > maxScore;
   const moc = fmt(gameUi.cacMoc, { so: medals[0], so2: medals[1], so3: medals[2] });
 
   // Tự hoàn thành (P3b): ván không còn chạy (khung game đã gỡ nên đồng hồ và vật lý dừng), không chấm điểm, không `record`, không trao thưởng
@@ -271,6 +274,11 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
               {fmt(gameUi.diem, { diem: formatNumber(stage.score) })}
             </p>
             {stage.newBest && <p className="font-bold text-xanh-la-dam">{gameUi.kyLucMoi}</p>}
+            {legacyBest && !stage.newBest && (
+              <p className="text-sm font-semibold" data-testid="ky-luc-cu-ket-qua">
+                {fmt(gameUi.diemCao, { diem: formatNumber(best) })} <span className="font-bold text-nau-go-dam">({gameUi.kyLucCu})</span>
+              </p>
+            )}
             <div className="mg-result-stars flex justify-center">
               <Stars earned={stage.medal} max={3} size="lg" />
             </div>
@@ -353,6 +361,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
         )}
         <p className="font-semibold" data-testid="diem-cao">
           {best > 0 ? fmt(gameUi.diemCao, { diem: formatNumber(best) }) : gameUi.chuaChoi}
+          {legacyBest && <span className="ml-2 text-sm font-bold text-nau-go-dam" data-testid="ky-luc-cu">({gameUi.kyLucCu})</span>}
         </p>
         <p className="text-sm">{moc}</p>
         </div>

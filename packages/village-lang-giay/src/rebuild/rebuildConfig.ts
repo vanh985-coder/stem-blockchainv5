@@ -14,8 +14,10 @@ export const REBUILD_SPEC = {
   roundBase: 100,
   perError: 10,
   fakeBonus: 30,
-  /** Đồng, Bạc, Vàng (tổng điểm cả ván). P4b: đặt lại theo quy tắc phân vị bot (Đồng = p25 bot trung bình, Bạc = p75 bot trung bình, Vàng = p10 bot giỏi; 300 ván mỗi bot): 290 / 320 / 355; Vàng bằng điểm tối đa (355), xem spec 05 mục "P4b". Trước P4b (3 vòng): 200 / 400 / 475 */
-  medals: [290, 320, 355] as const,
+  /**
+   * Đồng, Bạc, Vàng (tổng điểm cả ván). P4b: Đồng = p25 bot trung bình (290), Bạc = p75 bot trung bình (320); Vàng 330 là NGOẠI LỆ với "p10 bot giỏi" vì p10 bot giỏi bằng điểm tối đa 355 (bot giỏi luôn đủ điểm): đặt 330 để cho phép sai sót nhỏ (dư 25 điểm). Mốc tạm, đánh giá lại sau khi học sinh chơi thật. Xem spec 05 mục "P4b". Trước P4b: 200 / 400 / 475.
+   */
+  medals: [290, 320, 330] as const,
 } as const;
 
 /**

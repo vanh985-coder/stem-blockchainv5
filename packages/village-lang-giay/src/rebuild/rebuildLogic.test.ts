@@ -17,6 +17,7 @@ import {
   inspectCard,
   placeCard,
   placeInSlot,
+  REBUILD_MAX_SCORE,
   rebuildMedal,
   rebuildScore,
   roundScore,
@@ -270,10 +271,12 @@ describe('vòng, tim, điểm', () => {
     expect(rebuildMedal(rebuildScore(s))).toBe(3);
   });
 
-  it('mốc điểm (P4b, theo phân vị bot): 290 Đồng, 320 Bạc, 355 Vàng (355 = điểm tối đa)', () => {
-    expect(SPEC.medals).toEqual([290, 320, 355]);
-    expect([0, 289, 290, 319, 320, 354, 355, 600].map(rebuildMedal)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
-    expect(SPEC.medals[2]).toBe(100 + 130 + PERFECT_KEEP);
+  it('mốc điểm (P4b): 290 Đồng, 320 Bạc, 330 Vàng (Vàng 330 là ngoại lệ của p10 bot giỏi = 355 = điểm tối đa, dư 25 điểm)', () => {
+    expect(SPEC.medals).toEqual([290, 320, 330]);
+    expect([0, 289, 290, 319, 320, 329, 330, 355, 600].map(rebuildMedal)).toEqual([0, 0, 1, 1, 2, 2, 3, 3, 3]);
+    expect(REBUILD_MAX_SCORE).toBe(355);
+    expect(REBUILD_MAX_SCORE).toBe(100 + 130 + PERFECT_KEEP);
+    expect(REBUILD_MAX_SCORE - SPEC.medals[2]).toBe(25); // cho phép sai sót nhỏ: một đoạn giữ sổ sửa chậm cả 5 lần
   });
 
   it('roundScore không âm và đúng công thức', () => {
@@ -282,7 +285,7 @@ describe('vòng, tim, điểm', () => {
     expect(roundScore(11, false)).toBe(0);
   });
 
-  it('sai 2 lần ở vòng 1 (còn 1 tim) rồi chơi hoàn hảo: 100 − 20 + 130 + 125 = 335, Bạc; vào đoạn giữ sổ được hồi đủ tim', () => {
+  it('sai 2 lần ở vòng 1 (còn 1 tim) rồi chơi hoàn hảo: 100 − 20 + 130 + 125 = 335, Vàng (≥ 330, mốc có chừa dư); vào đoạn giữ sổ được hồi đủ tim', () => {
     const s = createRebuild(9);
     placeCard(s, s.tray.find((c) => c.prev !== tailCode(s))!.id);
     placeCard(s, s.tray.find((c) => c.prev !== tailCode(s))!.id);
@@ -296,7 +299,8 @@ describe('vòng, tim, điểm', () => {
     expect(s.hearts).toBe(SPEC.hearts); // bước X3: vào đoạn giữ sổ được hồi đủ tim
     expect(rebuildScore(s)).toBe(80 + 130 + PERFECT_KEEP);
     expect(rebuildScore(s)).toBe(335);
-    expect(rebuildMedal(rebuildScore(s))).toBe(2);
+    expect(rebuildMedal(rebuildScore(s))).toBe(3);
+    expect(rebuildMedal(335 - 10)).toBe(2); // sai thêm một lần nữa ở vòng ghép: Bạc
   });
 
   it('tất định: cùng seed và cùng thao tác thì cùng kết quả', () => {

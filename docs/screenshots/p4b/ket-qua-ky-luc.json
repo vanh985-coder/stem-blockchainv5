@@ -1,0 +1,402 @@
+{
+ "results": [
+  {
+   "size": "1366x768",
+   "area": "chưa có kỷ lục",
+   "name": "thẻ bắt đầu: \"Em chưa chơi màn này.\", không chú thích",
+   "ok": true,
+   "detail": "Em chưa chơi màn này."
+  },
+  {
+   "size": "1366x768",
+   "area": "chưa có kỷ lục",
+   "name": "thẻ bắt đầu hiện mốc 290 · 320 · 330",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "chưa có kỷ lục",
+   "name": "kết quả (điểm 330): \"Kỷ lục mới!\"",
+   "ok": true,
+   "detail": "Ghép lại cuốn sổ Kết quả Điểm: 330 Kỷ lục mới! Mốc em đạt: Vàng Mốc điểm: Đồng 290 · Bạc 320 · Vàng 330 Em nhận được 30 xu. Chơi lại Về làng"
+  },
+  {
+   "size": "1366x768",
+   "area": "chưa có kỷ lục",
+   "name": "kết quả: không có chú thích kỷ lục cũ",
+   "ok": true,
+   "detail": "null"
+  },
+  {
+   "size": "1366x768",
+   "area": "chưa có kỷ lục",
+   "name": "đã lưu: điểm cao nhất 330, huy chương không hạ (mốc ≥ 0)",
+   "ok": true,
+   "detail": "[1,1,3,330]"
+  },
+  {
+   "size": "1366x768",
+   "area": "chưa có kỷ lục",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "thẻ bắt đầu: \"Điểm cao nhất: 300\", KHÔNG chú thích",
+   "ok": true,
+   "detail": "Điểm cao nhất: 300"
+  },
+  {
+   "size": "1366x768",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "thẻ bắt đầu hiện mốc 290 · 320 · 330",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "kết quả (điểm 250): không \"Kỷ lục mới!\"",
+   "ok": true,
+   "detail": "Ghép lại cuốn sổ Kết quả Điểm: 250 Mốc em đạt: Chưa đạt mốc Mốc điểm: Đồng 290 · Bạc 320 · Vàng 330 Chơi lại Về làng"
+  },
+  {
+   "size": "1366x768",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "kết quả: không có chú thích kỷ lục cũ",
+   "ok": true,
+   "detail": "null"
+  },
+  {
+   "size": "1366x768",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "đã lưu: điểm cao nhất 300, huy chương không hạ (mốc ≥ 2)",
+   "ok": true,
+   "detail": "[1,1,2,300]"
+  },
+  {
+   "size": "1366x768",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "thẻ bắt đầu: \"Điểm cao nhất: 480\" kèm chú thích \"Kỷ lục từ phiên bản trước\"",
+   "ok": true,
+   "detail": "Điểm cao nhất: 480(Kỷ lục từ phiên bản trước)"
+  },
+  {
+   "size": "1366x768",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "thẻ bắt đầu hiện mốc 290 · 320 · 330",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "kết quả (điểm 340): không \"Kỷ lục mới!\"",
+   "ok": true,
+   "detail": "Ghép lại cuốn sổ Kết quả Điểm: 340 Điểm cao nhất: 480 (Kỷ lục từ phiên bản trước) Mốc em đạt: Vàng Mốc điểm: Đồng 290 · Bạc 320 · Vàng 330 Chơi lại Về làng"
+  },
+  {
+   "size": "1366x768",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "kết quả: điểm cao nhất cũ vẫn hiện kèm \"Kỷ lục từ phiên bản trước\"",
+   "ok": true,
+   "detail": "Điểm cao nhất: 480 (Kỷ lục từ phiên bản trước)"
+  },
+  {
+   "size": "1366x768",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "đã lưu: điểm cao nhất 480, huy chương không hạ (mốc ≥ 3)",
+   "ok": true,
+   "detail": "[1,1,3,480]"
+  },
+  {
+   "size": "1366x768",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "chưa có kỷ lục",
+   "name": "thẻ bắt đầu: \"Em chưa chơi màn này.\", không chú thích",
+   "ok": true,
+   "detail": "Em chưa chơi màn này."
+  },
+  {
+   "size": "360x800",
+   "area": "chưa có kỷ lục",
+   "name": "thẻ bắt đầu hiện mốc 290 · 320 · 330",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "chưa có kỷ lục",
+   "name": "kết quả (điểm 330): \"Kỷ lục mới!\"",
+   "ok": true,
+   "detail": "Ghép lại cuốn sổ Kết quả Điểm: 330 Kỷ lục mới! Mốc em đạt: Vàng Mốc điểm: Đồng 290 · Bạc 320 · Vàng 330 Em nhận được 30 xu. Chơi lại Về làng"
+  },
+  {
+   "size": "360x800",
+   "area": "chưa có kỷ lục",
+   "name": "kết quả: không có chú thích kỷ lục cũ",
+   "ok": true,
+   "detail": "null"
+  },
+  {
+   "size": "360x800",
+   "area": "chưa có kỷ lục",
+   "name": "đã lưu: điểm cao nhất 330, huy chương không hạ (mốc ≥ 0)",
+   "ok": true,
+   "detail": "[1,1,3,330]"
+  },
+  {
+   "size": "360x800",
+   "area": "chưa có kỷ lục",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "thẻ bắt đầu: \"Điểm cao nhất: 300\", KHÔNG chú thích",
+   "ok": true,
+   "detail": "Điểm cao nhất: 300"
+  },
+  {
+   "size": "360x800",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "thẻ bắt đầu hiện mốc 290 · 320 · 330",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "kết quả (điểm 250): không \"Kỷ lục mới!\"",
+   "ok": true,
+   "detail": "Ghép lại cuốn sổ Kết quả Điểm: 250 Mốc em đạt: Chưa đạt mốc Mốc điểm: Đồng 290 · Bạc 320 · Vàng 330 Chơi lại Về làng"
+  },
+  {
+   "size": "360x800",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "kết quả: không có chú thích kỷ lục cũ",
+   "ok": true,
+   "detail": "null"
+  },
+  {
+   "size": "360x800",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "đã lưu: điểm cao nhất 300, huy chương không hạ (mốc ≥ 2)",
+   "ok": true,
+   "detail": "[1,1,2,300]"
+  },
+  {
+   "size": "360x800",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "thẻ bắt đầu: \"Điểm cao nhất: 480\" kèm chú thích \"Kỷ lục từ phiên bản trước\"",
+   "ok": true,
+   "detail": "Điểm cao nhất: 480(Kỷ lục từ phiên bản trước)"
+  },
+  {
+   "size": "360x800",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "thẻ bắt đầu hiện mốc 290 · 320 · 330",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "kết quả (điểm 340): không \"Kỷ lục mới!\"",
+   "ok": true,
+   "detail": "Ghép lại cuốn sổ Kết quả Điểm: 340 Điểm cao nhất: 480 (Kỷ lục từ phiên bản trước) Mốc em đạt: Vàng Mốc điểm: Đồng 290 · Bạc 320 · Vàng 330 Chơi lại Về làng"
+  },
+  {
+   "size": "360x800",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "kết quả: điểm cao nhất cũ vẫn hiện kèm \"Kỷ lục từ phiên bản trước\"",
+   "ok": true,
+   "detail": "Điểm cao nhất: 480 (Kỷ lục từ phiên bản trước)"
+  },
+  {
+   "size": "360x800",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "đã lưu: điểm cao nhất 480, huy chương không hạ (mốc ≥ 3)",
+   "ok": true,
+   "detail": "[1,1,3,480]"
+  },
+  {
+   "size": "360x800",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "chưa có kỷ lục",
+   "name": "thẻ bắt đầu: \"Em chưa chơi màn này.\", không chú thích",
+   "ok": true,
+   "detail": "Em chưa chơi màn này."
+  },
+  {
+   "size": "844x390",
+   "area": "chưa có kỷ lục",
+   "name": "thẻ bắt đầu hiện mốc 290 · 320 · 330",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "chưa có kỷ lục",
+   "name": "kết quả (điểm 330): \"Kỷ lục mới!\"",
+   "ok": true,
+   "detail": "Ghép lại cuốn sổ Kết quả Điểm: 330 Kỷ lục mới! Mốc em đạt: Vàng Mốc điểm: Đồng 290 · Bạc 320 · Vàng 330 Em nhận được 30 xu. Chơi lại Về làng"
+  },
+  {
+   "size": "844x390",
+   "area": "chưa có kỷ lục",
+   "name": "kết quả: không có chú thích kỷ lục cũ",
+   "ok": true,
+   "detail": "null"
+  },
+  {
+   "size": "844x390",
+   "area": "chưa có kỷ lục",
+   "name": "đã lưu: điểm cao nhất 330, huy chương không hạ (mốc ≥ 0)",
+   "ok": true,
+   "detail": "[1,1,3,330]"
+  },
+  {
+   "size": "844x390",
+   "area": "chưa có kỷ lục",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "thẻ bắt đầu: \"Điểm cao nhất: 300\", KHÔNG chú thích",
+   "ok": true,
+   "detail": "Điểm cao nhất: 300"
+  },
+  {
+   "size": "844x390",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "thẻ bắt đầu hiện mốc 290 · 320 · 330",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "kết quả (điểm 250): không \"Kỷ lục mới!\"",
+   "ok": true,
+   "detail": "Ghép lại cuốn sổ Kết quả Điểm: 250 Mốc em đạt: Chưa đạt mốc Mốc điểm: Đồng 290 · Bạc 320 · Vàng 330 Chơi lại Về làng"
+  },
+  {
+   "size": "844x390",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "kết quả: không có chú thích kỷ lục cũ",
+   "ok": true,
+   "detail": "null"
+  },
+  {
+   "size": "844x390",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "đã lưu: điểm cao nhất 300, huy chương không hạ (mốc ≥ 2)",
+   "ok": true,
+   "detail": "[1,1,2,300]"
+  },
+  {
+   "size": "844x390",
+   "area": "kỷ lục 300 (trong 0-355)",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "thẻ bắt đầu: \"Điểm cao nhất: 480\" kèm chú thích \"Kỷ lục từ phiên bản trước\"",
+   "ok": true,
+   "detail": "Điểm cao nhất: 480(Kỷ lục từ phiên bản trước)"
+  },
+  {
+   "size": "844x390",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "thẻ bắt đầu hiện mốc 290 · 320 · 330",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "kết quả (điểm 340): không \"Kỷ lục mới!\"",
+   "ok": true,
+   "detail": "Ghép lại cuốn sổ Kết quả Điểm: 340 Điểm cao nhất: 480 (Kỷ lục từ phiên bản trước) Mốc em đạt: Vàng Mốc điểm: Đồng 290 · Bạc 320 · Vàng 330 Chơi lại Về làng"
+  },
+  {
+   "size": "844x390",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "kết quả: điểm cao nhất cũ vẫn hiện kèm \"Kỷ lục từ phiên bản trước\"",
+   "ok": true,
+   "detail": "Điểm cao nhất: 480 (Kỷ lục từ phiên bản trước)"
+  },
+  {
+   "size": "844x390",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "đã lưu: điểm cao nhất 480, huy chương không hạ (mốc ≥ 3)",
+   "ok": true,
+   "detail": "[1,1,3,480]"
+  },
+  {
+   "size": "844x390",
+   "area": "kỷ lục cũ 480 (trên 355)",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  }
+ ],
+ "shots": [
+  "ky-luc-chua-co-the-bat-dau-1366x768.jpg",
+  "ky-luc-chua-co-ket-qua-1366x768.jpg",
+  "ky-luc-trong-khoang-the-bat-dau-1366x768.jpg",
+  "ky-luc-trong-khoang-ket-qua-1366x768.jpg",
+  "ky-luc-cu-tren-355-the-bat-dau-1366x768.jpg",
+  "ky-luc-cu-tren-355-ket-qua-1366x768.jpg",
+  "ky-luc-chua-co-the-bat-dau-360x800.jpg",
+  "ky-luc-chua-co-ket-qua-360x800.jpg",
+  "ky-luc-trong-khoang-the-bat-dau-360x800.jpg",
+  "ky-luc-trong-khoang-ket-qua-360x800.jpg",
+  "ky-luc-cu-tren-355-the-bat-dau-360x800.jpg",
+  "ky-luc-cu-tren-355-ket-qua-360x800.jpg",
+  "ky-luc-chua-co-the-bat-dau-844x390.jpg",
+  "ky-luc-chua-co-ket-qua-844x390.jpg",
+  "ky-luc-trong-khoang-the-bat-dau-844x390.jpg",
+  "ky-luc-trong-khoang-ket-qua-844x390.jpg",
+  "ky-luc-cu-tren-355-the-bat-dau-844x390.jpg",
+  "ky-luc-cu-tren-355-ket-qua-844x390.jpg"
+ ]
+}
