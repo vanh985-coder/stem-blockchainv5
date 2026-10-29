@@ -76,7 +76,7 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 
 **Đường chạy:**
 - 3 làn (x = −2, 0, 2). Nhân vật tự chạy.
-- Tốc độ bắt đầu **10** đơn vị/giây, tăng **0,3** mỗi 5 giây (theo bậc), tối đa **18**. (Bước X1: trước đó 8, 0,25 và 16; **đổi vì người dùng thấy màn 2 chạy chậm**. Cân bằng chạy lại ở dưới.)
+- Tốc độ bắt đầu **12** đơn vị/giây, tăng **0,36** mỗi 5 giây (theo bậc), tối đa **21,6**. (**P4a: gấp 1,2 lần** mức trước, 10 / 0,3 / 18; bước X1: trước đó 8, 0,25 và 16; đổi vì người dùng thấy màn 2 chạy chậm. Cân bằng chạy lại ở dưới và ở mục "P4a".)
 - {phanDien} luôn chạy ở phía trước, xa xa.
 
 **Điều khiển:**
@@ -135,9 +135,11 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 
 | Mốc | Điểm |
 |---|---|
-| Đồng | 200 |
-| Bạc | 380 |
-| Vàng | 520 |
+| Đồng | 216 |
+| Bạc | 499 |
+| Vàng | 638 |
+
+(**P4a:** mốc đặt lại theo quy tắc phân vị bot sau khi tăng tốc: Đồng = p25 bot trung bình, Bạc = p75 bot trung bình, Vàng = p10 bot giỏi; trước P4a là 200 / 380 / 520. Xem mục "P4a".)
 
 **Đã làm (mốc 2, bước 10 — chỉ phần luật, chưa vẽ):** `packages/village-lang-giay/src/runner/`:
 - `runnerLogic.ts`: `createRunner({ seed })` và `stepRunner(state, input, dt)` (sửa state tại chỗ, không cấp phát lúc chạy; cùng seed và cùng lệnh thì cùng kết quả). Bước 11 chỉ việc vẽ `state` (làn, `x`, `y`, `rows`, `items`, `villain`, `events`) và nối phím vào `input` (`move`, `jump`, `slide`; lúc hỏi: `answer`, `resume`). Hàm thuần: `speedAt`, `runnerScore`, `runnerMedal`, `minGap`.
@@ -157,7 +159,7 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 
 **Đã làm (mốc 2, bước 12 — vật nhặt, rơm, câu hỏi, điểm):** màn 2 chơi trọn được, `levels.ts` màn 2 là "ready", biển "Đuổi theo {phanDien}" mở theo `unlock.ts`, cuối màn 1 có nút "Chơi tiếp: Đuổi theo {phanDien}".
 - **Ván 4 vòng:** mỗi vòng 25 giây; hết vòng thì chạy chậm lại, hiện QuizCard (ngân hàng câu hỏi Bài 1, tên phản diện lấy từ `{phanDien}`). Đúng +3 trang; sai −1 tim và hiện giải thích; trả lời xong bấm tiếp thì tăng tốc lại theo `runnerLogic`. Ván kết thúc sau vòng 4 hoặc khi hết tim.
-- **Tốc độ** đúng spec: bắt đầu 10, **cộng 0,3 mỗi 5 giây theo bậc** (không tăng liên tục), tối đa 18 (`speedAt`, có test; bước X1, trước đó 8, 0,25 và 16).
+- **Tốc độ** đúng spec (P4a: số hiện hành 12 / 0,36 / 21,6): bắt đầu 10 (trước P4a), **cộng 0,3 mỗi 5 giây theo bậc** (không tăng liên tục), tối đa 18 (`speedAt`, có test; bước X1, trước đó 8, 0,25 và 16).
 - **Cân bằng sau khi tăng tốc (bước X1, 300 ván mỗi bot, cùng 300 seed; không đổi mốc điểm và tần suất vật nhặt):**
 
   | | Bot giỏi: Vàng | Bot giỏi: điểm trung bình (thấp nhất) | Bot trung bình: chưa đạt mốc | Đồng | Bạc | Vàng | điểm trung bình |
@@ -192,6 +194,37 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 | Ở độ cao 0,5, gặp đầu xe chở hàng | Va |
 | Có nón lá, va 2 lần liên tiếp | Lần đầu không mất tim, lần sau mất tim |
 | 23 trang, 50 tiền, 1080 m, 3 câu đúng | Điểm 478 |
+
+
+## P4a — Màn 2 nhanh hơn: tăng 20% tốc độ ở mọi vòng (29/10/2026)
+
+**Thay đổi (mức thử ban đầu theo yêu cầu):** tốc độ bắt đầu 10 → **12**, bước tăng 0,3 → **0,36** mỗi 5 giây, tối đa 18 → **21,6** (đúng 1,2 lần ở mọi giờ chạy: `SPEED_BOOST = 1,2` ở `runnerConfig.ts`). **Giữ nguyên:** 4 vòng × 25 giây, 15 giây trả lời câu hỏi, 3 tim và luật va chạm, điều khiển, nhảy (v0 7, g 22) và trượt (0,6 giây), vật nhặt và công thức điểm. Màn 3 chưa đổi (còn hai vòng ở bước sau).
+
+**Rà tình huống không thể vượt khi nhanh hơn** (test `runnerSpeed.test.ts`, 7 ca; ba ca kiểm đỏ khi bỏ bản sửa):
+- **Khoảng sinh chướng ngại** tính theo THỜI GIAN (≥ tốc độ × 1,2 giữa hai hàng, thêm chiều dài xe chở hàng) nên tự nới theo tốc độ: khoảng cách mép–mép giữa hai hàng liên tiếp luôn lớn hơn một cú nhảy có guốc mộc (0,91 giây) và ≥ 0,95 giây ở mọi tốc độ (4 seed × 600 hàng).
+- **Quãng nhảy/trượt**: nhảy 0,64 giây (0,91 có guốc), trượt 0,6 giây không đổi; chướng ngại dày 1 đến 1,6 mét nên ở tốc độ cao thời gian người chơi nằm trong chướng ngại càng ngắn (dễ vượt hơn, không khó hơn).
+- **Khoảng báo trước** tính theo mét nên phải sửa 2 chỗ: (1) **rơm {phanDien} ném** rơi cách ≥ 22 mét, bay 0,7 giây: ở tốc độ 21,6 chỉ còn 0,32 giây sau khi rơm hạ (mức cũ xấu nhất 0,52 giây ở tốc độ 18). Nay rơm phải cách ≥ tốc độ × (0,7 + `throwLeadSec` 0,52) mét (26,4 mét ở tốc độ tối đa). (2) **Trang rơi** cách ≥ 20 mét, nằm xuống sau 1,0 giây: nay cách ≥ tốc độ × (1,0 + `drop.leadSec` 0,11) mét (24 mét ở tốc độ tối đa). Hai hằng số lấy từ mức xấu nhất của tốc độ cũ, không phải số mới.
+- **Tầm nhìn**: mức Thấp thấy trước 60 mét = 2,8 giây ở tốc độ tối đa (≥ 2,5 giây, gấp 4 lần thời gian một cú trượt). Mức Vừa 90 mét, Cao 120 mét. Không đổi.
+- **Hết vòng và câu hỏi**: chạy chậm dần 1,2 giây (quãng ≤ 13 mét) và tăng tốc lại 1 giây (≤ 10,8 mét) đều nhỏ hơn 14 mét chướng ngại bị xóa phía trước.
+
+**Bot trước/sau** (`runnerBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300):
+
+| | Trước (10 / 0,3 / 18; mốc 200 / 380 / 520) | Sau, mốc cũ | Sau, mốc mới (216 / 499 / 638) |
+|---|---|---|---|
+| Bot giỏi: điểm trung bình (thấp nhất; p10) | 720 (551; 616) | 749 (565; 638) | 749 (565; 638) |
+| Bot giỏi: Vàng | 100% | 100% | **90,7%** (≥ 90%) |
+| Quãng đường bot giỏi (m) | 1.339 | 1.606 | 1.606 |
+| Bot trung bình: điểm trung bình (p25; p75) | 341 (201; 489) | 357 (216; 499) | 357 (216; 499) |
+| Bot trung bình: chưa / Đồng / Bạc / Vàng | 25,0 / 32,0 / 24,3 / 18,7% | 20,7 / 38,3 / 19,3 / **21,7%** | 24,0 / 51,0 / 19,0 / 6,0% |
+| Bot trung bình: va mỗi ván; hết tim | 1,40; 226/300 | 1,42; 228/300 | 1,42; 228/300 |
+
+**Vì sao đổi mốc:** với mốc cũ, bot trung bình đạt Vàng 21,7% (vượt giới hạn 20% của `runnerBalance.test.ts`) vì nhanh hơn thì quãng đường dài hơn, điểm tăng. Mốc mới theo quy tắc phân vị đã chốt (Đồng = p25 bot trung bình = 216; Bạc = p75 bot trung bình = 499; Vàng = p10 bot giỏi = 638, số thật của mẫu 300 ván, không làm tròn). Điều kiện đạt: bot giỏi ≥ 90% Vàng (90,7%, sát giới hạn: chạy lại bot nếu đổi cấu hình); bot trung bình chủ yếu Đồng/Bạc (70,0%), Vàng 6,0% ("hầu như không Vàng"). Bạc tăng 380 → 499 và Vàng 520 → 638 nên học sinh cần điểm cao hơn một chút cho cùng huy chương (bù lại ván dài hơn): **tạm, chỉnh khi học sinh chơi thật**.
+
+**Kiểm bản build (`VITE_PROBE`, Chrome headless, GL phần mềm SwiftShader; `scripts/p4a-check.mjs`, ảnh và số đo ở `docs/screenshots/p4a/`):** 49 kiểm đạt ở 1366×768 (chuột, bàn phím), 360×800 và 844×390 (chạm giả lập, vuốt). Tốc độ thật (quãng đường mỗi bước mô phỏng) = danh nghĩa 12 đầu ván, trung bình 8 giây đầu 12,15 (trước P4a 10,00 đo cùng cách), lệch ≤ 0,15 (một khung vắt qua bậc tăng); tạm dừng 2 giây: ván đứng yên hẳn; sau tiếp tục tốc độ không nhảy vọt; hết vòng chạy chậm dần về 0, câu hỏi còn 15 giây, trả lời đúng +3 trang, tăng tốc lại đều rồi chạy 13,8 (vòng 2); điều khiển (đổi làn, nhảy, trượt) có hiệu lực; khung dọc 360×800 xoay ngang giữa ván rồi xoay lại: ván không gián đoạn, tốc độ không bất thường. Để ván không kết thúc khi đo, kịch bản tốc độ đặt 99 tim qua cầu nối `__runner` (chỉ có ở bản dev và bản `VITE_PROBE`, nay đổi từ chỉ dev sang `PROBE`); mô phỏng giữ nguyên.
+
+**FPS:** KHÔNG đo được số có nghĩa: Chrome headless với GL phần mềm chỉ đạt 1 đến 6 khung/giây ở cả bản cũ lẫn mới (tốc độ không đổi chi phí vẽ). Tốc độ mô phỏng không phụ thuộc FPS (bước cố định 1/60 giây, tối đa 5 bước mỗi khung). Mức Thấp ≥ 30 FPS trên điện thoại tầm trung **chưa kiểm** (cần máy thật). Độ trễ lệnh vuốt/phím đo bằng số bước mô phỏng (17 đến 25 bước) bị khung hình chậm chi phối, không phản ánh máy thật.
+
+**Chưa kiểm:** điện thoại và máy tính bảng thật (cảm giác tốc độ, vuốt, FPS), Safari/iPhone, độ khó thật với học sinh (mức 20% là mức thử; chủ dự án chốt sau khi chơi thử). Bundle hub: JS tổng 2.786.167 byte (P3b: 2.781.350; chênh +4.817 gồm sửa ghi chú P3b hoàn thiện và P4a).
 
 ## Màn 3 — Game phụ 2: "Ghép lại cuốn sổ" (kiểu domino)
 

@@ -31,7 +31,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | P1 | Sửa nhanh giao diện: (8a) đồng hồ màn 3 to rõ; (9) cột tre màn 6 (Làng Dệt) nét hơn; (12) máy tính mod màn 8 hiện sẵn trên màn hình; (13) cây ở trạm Khó bài 10 vừa khung, không phải cuộn; (10) máy tính ở trạm Dễ/Trung bình **màn 4 – Làng Dệt (Bài 2)** đổi sang kiểu ModCalculator màn 8–9, tính `(X × 2 + c) mod 100`; **không phải Bài 4/màn 10 – Làng Bạc** | 1 |
 | P2 | (5) Pháo hoa + lời khen khi trả lời đúng ở 4 trang bài học (màn 1, 4, 7, 10); "Giảm chuyển động" thì chỉ hiện lời khen. (4) Vị trí thẻ "Em có biết?" chưa nhặt hiện trên bản đồ lớn, bản đồ nhỏ và `/ban-do`, cả khi đang ở ngoài làng | 1 |
 | P3 | (6) Mở khóa tự do: mọi cổng làng mở từ đầu. Mặc định: trong mỗi làng vẫn giữ thứ tự thẻ → bài học → 2 game; Trang Sổ Vàng vẫn trao như cũ; cao trào vẫn sau màn 12. (2) Nút "Tự động hoàn thành": mặc định CHỈ hiện cho tài khoản giáo viên và bản dev, ghi màn là đã xong với cờ "tự hoàn thành", không cộng sao/xu, trang giáo viên thấy rõ cờ này | 2 |
-| P4 | (7) Màn 2 nhanh hơn: mặc định +20% tốc độ mọi vòng, chạy lại bot, chỉnh mốc nếu cần. (8b) Màn 3 bỏ vòng 3, còn 2 vòng: vòng "giữ sổ" (Tí tráo trang) đang ở vòng 3 → mặc định chuyển cơ chế tráo trang vào cuối vòng 2 để không mất bài học phát hiện sửa lén; đặt lại mốc | 1 |
+| P4 | **P4a ĐÃ XONG (29/10/2026, mục "P4a" bên dưới): (7) Màn 2 nhanh hơn: +20% tốc độ mọi vòng (12 / 0,36 / 21,6), mốc đặt lại 216 / 499 / 638 theo phân vị bot.** P4b còn lại: (8b) Màn 3 bỏ vòng 3, còn 2 vòng: vòng "giữ sổ" (Tí tráo trang) đang ở vòng 3 → mặc định chuyển cơ chế tráo trang vào cuối vòng 2 để không mất bài học phát hiện sửa lén; đặt lại mốc | 1 |
 | P5 | (1) Biển chọn màn trong làng làm thành cột sáng giống cuộn "Em có biết?" (mỗi màn một cột, màu theo trạng thái, giữ chữ tên màn) | 1 |
 | P6 | (3) Sau khi đọc thẻ "Em có biết?": 1 ví dụ ngắn + 1 câu hỏi ABCD (hoặc điền số). Mặc định: trả lời sai vẫn nhận thẻ, hiện giải thích. Claude soạn 16 câu (4 làng × 4 thẻ), chủ dự án duyệt trước khi code | 1–2 |
 | P7 | (11) Làm lại màn 5 thành game đập chuột 2D kiểu Whack-a-Mole (My Talking Tom): lưới hang, chuột thường và chuột câu hỏi (đập trúng thì hiện câu hỏi). Cần ảnh mẫu của chủ dự án. Logic + bot + cảnh + hướng dẫn mới | 3–4 |
@@ -139,6 +139,16 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - **Kiểm hồi quy chốt P3b (sau 445752a):** dev `real`+`all12` 15 kiểm đạt; bản phát hành `--mode=prod` 42 kiểm đạt (3 cỡ). Cùng với 207 (dev levels/double/mid) và 156 (máy chủ giả) là đủ bộ kịch bản P3b. Vẫn CHƯA nghiệm thu Supabase thật; không áp migration production.
 - **Cần xử lý trước khi dùng thật (có từ trước, chưa sửa):** học sinh tự sửa được `completed`/`played`/`stars`/`best_score`/`coins`/`golden_pages` của mình qua API.
 - **Chưa xác minh:** tài khoản giáo viên thật và Supabase thật (migration, trigger, `rls:check`, trang giáo viên với dữ liệu thật); kiểm quyền chỉ bằng test; thiết bị thật/Safari.
+
+## P4a — Màn 2 nhanh hơn (+20% tốc độ mọi vòng) — đã kiểm bằng bản build, FPS thiết bị thật CHƯA kiểm (29/10/2026)
+
+- **Người code: Claude Code, đọc `CLAUDE.md`, tự commit và push khi 4 lệnh đạt.** Chưa rút màn 3 còn hai vòng (P4b). Giữ mục P8 (hướng dẫn focus/làm thử) ở trên, chưa làm.
+- **Mức thử:** tốc độ 10 → 12, bước tăng 0,3 → 0,36, tối đa 18 → 21,6 (`SPEED_BOOST` 1,2). Giữ thời gian câu hỏi 15 giây, 3 tim, điều khiển, nhảy/trượt, phần thưởng, công thức điểm.
+- **Rà không thể vượt:** khoảng sinh chướng ngại, nhảy/trượt vốn tính theo thời gian nên tự nới; sửa 2 chỗ tính theo mét: rơm {phanDien} ném (`throwLeadSec` 0,52 giây) và trang rơi (`drop.leadSec` 0,11 giây), cùng mức xấu nhất của tốc độ cũ. Test mới `runnerSpeed.test.ts` (7 ca).
+- **Bot (300 ván/bot):** bot giỏi Vàng 100% → 90,7% sau khi đặt mốc mới (≥ 90%); bot trung bình chưa/Đồng/Bạc/Vàng 25,0/32,0/24,3/18,7% → 24,0/51,0/19,0/6,0%. Mốc **200 / 380 / 520 → 216 / 499 / 638** theo quy tắc phân vị (p25 và p75 bot trung bình, p10 bot giỏi) vì mốc cũ cho bot trung bình Vàng 21,7% (> 20%). Mốc tạm, chỉnh khi học sinh chơi thật.
+- **Kiểm bản build** (`scripts/p4a-check.mjs`, 3 cỡ, chuột/phím và chạm giả lập, xoay ngang khung dọc): **49 kiểm đạt**; tốc độ thật trung bình 8 giây đầu 12,15 (trước 10,00); tạm dừng, câu hỏi, tiếp tục không làm tốc độ nhảy vọt. Ảnh và số đo: `docs/screenshots/p4a/`.
+- **FPS: chưa đo được số có nghĩa** (Chrome headless GL phần mềm 1 đến 6 khung/giây, cả cũ lẫn mới). Chưa kiểm: điện thoại thật (mức Thấp ≥ 30 FPS, cảm giác tốc độ, vuốt), Safari/iPhone. Bundle hub JS 2.786.167 byte (+4.817 so với P3b).
+- `pnpm test --maxWorkers=2`: 2206 đạt, 4 bỏ qua (như trước); `pnpm typecheck`, `pnpm check:text`, `pnpm build` đạt. Spec 05 đã cập nhật (tốc độ, mốc, mục "P4a").
 
 ## Việc dời từ mốc 3 (làm CUỐI mốc 4, theo thứ tự)
 

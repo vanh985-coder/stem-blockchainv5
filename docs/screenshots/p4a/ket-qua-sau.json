@@ -1,0 +1,394 @@
+[
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tốc độ",
+  "name": "khi chạy: tốc độ thật bằng tốc độ danh nghĩa (12 đầu ván, tăng 0,36 mỗi 5 giây), lệch ≤ 1%",
+  "ok": true,
+  "detail": "{\"frames\":103,\"meanSpeed\":12.153786407767086,\"maxSpeed\":12.360000000000184,\"worstDeviation\":1.8474111129762605e-13,\"maxStepsPerFrame\":5}"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tốc độ",
+  "name": "tốc độ trung bình 8 giây đầu nằm trong [12; 12,4]",
+  "ok": true,
+  "detail": "12.154"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tốc độ",
+  "name": "tạm dừng 2 giây: ván đứng yên hẳn (số bước, quãng đường, giờ chạy không đổi quá 3 bước)",
+  "ok": true,
+  "detail": "{\"before\":{\"steps\":513,\"z\":103.88400000000097,\"time\":8.550000000000004},\"during\":{\"steps\":513,\"z\":103.88400000000097,\"time\":8.550000000000004}}"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tốc độ",
+  "name": "sau khi tiếp tục: không dồn bước (nhiều nhất vài bước mỗi khung) và tốc độ vẫn bằng danh nghĩa, không nhảy vọt",
+  "ok": true,
+  "detail": "{\"frames\":8,\"meanSpeed\":12.360000000000184,\"maxSpeed\":12.360000000000184,\"worstDeviation\":1.8474111129762605e-13,\"maxStepsPerFrame\":5}"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tốc độ",
+  "name": "hết vòng 1: chạy chậm dần về 0 (không phanh gấp, không tăng lại), rồi hiện câu hỏi",
+  "ok": true,
+  "detail": "scale cuối 0"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tốc độ",
+  "name": "trong lúc chạy chậm tốc độ không vượt mức danh nghĩa",
+  "ok": true,
+  "detail": "13.51"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tốc độ",
+  "name": "câu hỏi vẫn có 15 giây trả lời (còn ≥ 14 giây sau 0,5 giây đầu)",
+  "ok": true,
+  "detail": "14.899999999999995"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tốc độ",
+  "name": "sau câu hỏi: tăng tốc đều từ 0 lên 1 trong khoảng 1 giây, rồi chạy đúng tốc độ danh nghĩa của vòng 2 (13,8)",
+  "ok": true,
+  "detail": "{\"up\":true,\"spA\":{\"frames\":13,\"meanSpeed\":13.800000000001091,\"maxSpeed\":13.800000000001091,\"worstDeviation\":1.0906830993917538e-12,\"maxStepsPerFrame\":5},\"expect\":13.8}"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tốc độ",
+  "name": "đúng câu hỏi: ván ghi nhận câu đúng (+3 trang), thời gian trả lời 15 giây không đổi",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tốc độ",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "điều khiển",
+  "name": "bàn phím: sang trái đổi đúng một làn (làn 1 → 2), sau 5 bước mô phỏng",
+  "ok": true,
+  "detail": "{\"ok\":true,\"steps\":5,\"maxY\":0,\"maxSlide\":0,\"lane\":2}"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "điều khiển",
+  "name": "bàn phím: sang phải về lại làn 1, sau 5 bước",
+  "ok": true,
+  "detail": "{\"ok\":true,\"steps\":5,\"maxY\":0,\"maxSlide\":0,\"lane\":1}"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "điều khiển",
+  "name": "bàn phím: nhảy lên (rời đất), sau 5 bước",
+  "ok": true,
+  "detail": "{\"ok\":true,\"steps\":5,\"maxY\":0.5069444444444445,\"maxSlide\":0,\"lane\":1}"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "điều khiển",
+  "name": "bàn phím: trượt, sau 5 bước",
+  "ok": true,
+  "detail": "{\"ok\":true,\"steps\":5,\"maxY\":0,\"maxSlide\":0.5166666666666664,\"lane\":1}"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "điều khiển",
+  "name": "chuột: mở rồi đóng hộp \"?\" (tạm dừng), ván chạy tiếp",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "điều khiển",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tốc độ",
+  "name": "khi chạy: tốc độ thật bằng tốc độ danh nghĩa (12 đầu ván, tăng 0,36 mỗi 5 giây), lệch ≤ 1%",
+  "ok": true,
+  "detail": "{\"frames\":108,\"meanSpeed\":12.153333333333428,\"maxSpeed\":12.360000000000184,\"worstDeviation\":1.8474111129762605e-13,\"maxStepsPerFrame\":5}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tốc độ",
+  "name": "tốc độ trung bình 8 giây đầu nằm trong [12; 12,4]",
+  "ok": true,
+  "detail": "12.153"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tốc độ",
+  "name": "tạm dừng 2 giây: ván đứng yên hẳn (số bước, quãng đường, giờ chạy không đổi quá 3 bước)",
+  "ok": true,
+  "detail": "{\"before\":{\"steps\":530,\"z\":107.38600000000102,\"time\":8.833333333333352},\"during\":{\"steps\":530,\"z\":107.38600000000102,\"time\":8.833333333333352}}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tốc độ",
+  "name": "sau khi tiếp tục: không dồn bước (nhiều nhất vài bước mỗi khung) và tốc độ vẫn bằng danh nghĩa, không nhảy vọt",
+  "ok": true,
+  "detail": "{\"frames\":13,\"meanSpeed\":12.360000000000184,\"maxSpeed\":12.360000000000184,\"worstDeviation\":1.8474111129762605e-13,\"maxStepsPerFrame\":5}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tốc độ",
+  "name": "hết vòng 1: chạy chậm dần về 0 (không phanh gấp, không tăng lại), rồi hiện câu hỏi",
+  "ok": true,
+  "detail": "scale cuối 0"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tốc độ",
+  "name": "trong lúc chạy chậm tốc độ không vượt mức danh nghĩa",
+  "ok": true,
+  "detail": "13.44"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tốc độ",
+  "name": "câu hỏi vẫn có 15 giây trả lời (còn ≥ 14 giây sau 0,5 giây đầu)",
+  "ok": true,
+  "detail": "14.683333333333318"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tốc độ",
+  "name": "sau câu hỏi: tăng tốc đều từ 0 lên 1 trong khoảng 1 giây, rồi chạy đúng tốc độ danh nghĩa của vòng 2 (13,8)",
+  "ok": true,
+  "detail": "{\"up\":true,\"spA\":{\"frames\":25,\"meanSpeed\":13.800000000001091,\"maxSpeed\":13.800000000001091,\"worstDeviation\":1.0906830993917538e-12,\"maxStepsPerFrame\":5},\"expect\":13.8}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tốc độ",
+  "name": "đúng câu hỏi: ván ghi nhận câu đúng (+3 trang), thời gian trả lời 15 giây không đổi",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tốc độ",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "điều khiển",
+  "name": "vuốt (chạm giả lập): sang trái đổi đúng một làn (làn 1 → 2), sau 16 bước mô phỏng",
+  "ok": true,
+  "detail": "{\"ok\":true,\"steps\":16,\"maxY\":0,\"maxSlide\":0,\"lane\":2}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "điều khiển",
+  "name": "vuốt (chạm giả lập): sang phải về lại làn 1, sau 19 bước",
+  "ok": true,
+  "detail": "{\"ok\":true,\"steps\":19,\"maxY\":0,\"maxSlide\":0,\"lane\":1}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "điều khiển",
+  "name": "vuốt (chạm giả lập): nhảy lên (rời đất), sau 16 bước",
+  "ok": true,
+  "detail": "{\"ok\":true,\"steps\":16,\"maxY\":0.11361111111111111,\"maxSlide\":0,\"lane\":1}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "điều khiển",
+  "name": "vuốt (chạm giả lập): trượt, sau 25 bước",
+  "ok": true,
+  "detail": "{\"ok\":true,\"steps\":25,\"maxY\":0,\"maxSlide\":0.5166666666666664,\"lane\":1}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "điều khiển",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "xoay ngang",
+  "name": "xoay ngang giữa ván: khung 3D đổi theo cỡ mới và ván chạy tiếp",
+  "ok": true,
+  "detail": "{\"portraitBox\":[360,800],\"landBox\":[800,360],\"steps\":[129,195]}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "xoay ngang",
+  "name": "sau hai lần xoay: tốc độ vẫn bằng danh nghĩa (không nhảy vọt), không dồn bước",
+  "ok": true,
+  "detail": "{\"frames\":58,\"meanSpeed\":12.000000000000068,\"maxSpeed\":12.00000000000017,\"worstDeviation\":1.7053025658242404e-13,\"maxStepsPerFrame\":5}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "xoay ngang",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tốc độ",
+  "name": "khi chạy: tốc độ thật bằng tốc độ danh nghĩa (12 đầu ván, tăng 0,36 mỗi 5 giây), lệch ≤ 1%",
+  "ok": true,
+  "detail": "{\"frames\":103,\"meanSpeed\":12.155883495145728,\"maxSpeed\":12.360000000000184,\"worstDeviation\":0.14399999999982072,\"maxStepsPerFrame\":5}"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tốc độ",
+  "name": "tốc độ trung bình 8 giây đầu nằm trong [12; 12,4]",
+  "ok": true,
+  "detail": "12.156"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tốc độ",
+  "name": "tạm dừng 2 giây: ván đứng yên hẳn (số bước, quãng đường, giờ chạy không đổi quá 3 bước)",
+  "ok": true,
+  "detail": "{\"before\":{\"steps\":534,\"z\":108.21000000000103,\"time\":8.900000000000022},\"during\":{\"steps\":534,\"z\":108.21000000000103,\"time\":8.900000000000022}}"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tốc độ",
+  "name": "sau khi tiếp tục: không dồn bước (nhiều nhất vài bước mỗi khung) và tốc độ vẫn bằng danh nghĩa, không nhảy vọt",
+  "ok": true,
+  "detail": "{\"frames\":14,\"meanSpeed\":12.360000000000184,\"maxSpeed\":12.360000000000184,\"worstDeviation\":1.8474111129762605e-13,\"maxStepsPerFrame\":5}"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tốc độ",
+  "name": "hết vòng 1: chạy chậm dần về 0 (không phanh gấp, không tăng lại), rồi hiện câu hỏi",
+  "ok": true,
+  "detail": "scale cuối 0"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tốc độ",
+  "name": "trong lúc chạy chậm tốc độ không vượt mức danh nghĩa",
+  "ok": true,
+  "detail": "13.44"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tốc độ",
+  "name": "câu hỏi vẫn có 15 giây trả lời (còn ≥ 14 giây sau 0,5 giây đầu)",
+  "ok": true,
+  "detail": "14.716666666666653"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tốc độ",
+  "name": "sau câu hỏi: tăng tốc đều từ 0 lên 1 trong khoảng 1 giây, rồi chạy đúng tốc độ danh nghĩa của vòng 2 (13,8)",
+  "ok": true,
+  "detail": "{\"up\":true,\"spA\":{\"frames\":24,\"meanSpeed\":13.800000000001091,\"maxSpeed\":13.800000000001091,\"worstDeviation\":1.0906830993917538e-12,\"maxStepsPerFrame\":5},\"expect\":13.8}"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tốc độ",
+  "name": "đúng câu hỏi: ván ghi nhận câu đúng (+3 trang), thời gian trả lời 15 giây không đổi",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tốc độ",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "điều khiển",
+  "name": "vuốt (chạm giả lập): sang trái đổi đúng một làn (làn 1 → 2), sau 25 bước mô phỏng",
+  "ok": true,
+  "detail": "{\"ok\":true,\"steps\":25,\"maxY\":0,\"maxSlide\":0,\"lane\":2}"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "điều khiển",
+  "name": "vuốt (chạm giả lập): sang phải về lại làn 1, sau 20 bước",
+  "ok": true,
+  "detail": "{\"ok\":true,\"steps\":20,\"maxY\":0,\"maxSlide\":0,\"lane\":1}"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "điều khiển",
+  "name": "vuốt (chạm giả lập): nhảy lên (rời đất), sau 21 bước",
+  "ok": true,
+  "detail": "{\"ok\":true,\"steps\":21,\"maxY\":0.11361111111111111,\"maxSlide\":0,\"lane\":1}"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "điều khiển",
+  "name": "vuốt (chạm giả lập): trượt, sau 23 bước",
+  "ok": true,
+  "detail": "{\"ok\":true,\"steps\":23,\"maxY\":0,\"maxSlide\":0.5166666666666664,\"lane\":1}"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "điều khiển",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ }
+]
