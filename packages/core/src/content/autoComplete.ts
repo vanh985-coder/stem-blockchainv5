@@ -16,4 +16,12 @@ export const autoCompleteUi = {
   trangThai: 'Tự hoàn thành',
   /** Dòng thay cho "n/9 sao" ở bảng làng */
   khongCoDiem: 'Không có điểm hay sao',
+  /** Máy chủ chưa hỗ trợ (chưa chạy migration 0003): nút bị vô hiệu; tiến độ chơi thật vẫn lưu bình thường */
+  chuaHoTro: 'Máy chủ chưa hỗ trợ "Tự hoàn thành" (cơ sở dữ liệu chưa được cập nhật nên chưa dùng được). Tiến độ chơi thật vẫn lưu bình thường.',
+  /** Máy chủ từ chối tài khoản này */
+  biTuChoi: 'Máy chủ không cho tài khoản này dùng "Tự hoàn thành". Chưa ghi gì; tiến độ chơi thật vẫn lưu bình thường.',
+  /** Đã ghi ở máy nhưng chưa lên được máy chủ (mất mạng...) */
+  chuaLuu: 'Chưa lưu được lên máy chủ (có thể mất mạng). Màn này chỉ được ghi ở máy này, máy sẽ thử gửi lại khi có mạng.',
+  /** Không dùng được ở lúc này (chưa đăng nhập xong, không được phép) */
+  khongDung: 'Chưa dùng được "Tự hoàn thành" lúc này.',
 } as const;

@@ -59,14 +59,14 @@ export function VillageDetails({
   /** Mở lại lời giới thiệu làng */
   onReplayIntro?: () => void;
   /** Thẻ "Em có biết?" của làng (bước X3): chưa đọc đủ thì chưa vào được bài; `onRead` mở các thẻ để đọc */
-  know?: { got: number; total: number; onRead: () => void };
+  know?: { got: number; total: number; onRead: () => void; /** bài học đầu chỉ tự hoàn thành (P3b): bỏ điều kiện chặn nhưng không ghi đã nhặt thẻ */ bypass?: boolean };
   /** Vùng bản đồ làng có thẻ "Em có biết?" chưa nhặt (P2b), đặt cuối bảng */
   scrollMap?: ReactNode;
   /** Cảnh cao trào (chỉ Làng Bạc, khi đủ 4 trang và đã chơi màn 12): `seen` là đã chiếu rồi; không truyền thì không có nút */
   climax?: { seen: boolean; onWatch: () => void };
 }) {
   const navigate = useNavigate();
-  const knowLocked = !!know && know.total > 0 && know.got < know.total;
+  const knowLocked = !!know && know.total > 0 && know.got < know.total && !know.bypass;
   const levels = LEVELS.filter((l) => l.lang === villageId);
   return (
     <div className="space-y-3" data-testid="ban-do-bang-lang" data-village={villageId}>

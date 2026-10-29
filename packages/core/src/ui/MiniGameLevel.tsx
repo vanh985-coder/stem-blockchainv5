@@ -185,7 +185,9 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
   const moc = fmt(gameUi.cacMoc, { so: medals[0], so2: medals[1], so3: medals[2] });
 
   // Tự hoàn thành (P3b): ván không còn chạy (khung game đã gỡ nên đồng hồ và vật lý dừng), không chấm điểm, không `record`, không trao thưởng
-  const toAuto = () => {
+  const [autoNote, setAutoNote] = useState<string | undefined>();
+  const toAuto = (note?: string) => {
+    setAutoNote(note);
     finished.current = true; // một lần `onFinish` trễ của ván cũ không được ghi điểm
     closeHint();
     setStage({ kind: 'auto' });
@@ -193,7 +195,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
   if (stage.kind === 'auto') {
     return (
       <div className="mx-auto w-full max-w-xl px-4 py-8">
-        <AutoCompletedPanel levelId={levelId} onPlayReal={start} onNext={next ? () => navigate(`/lang/${next.lang}/man/${next.id}`) : undefined} onLeave={leave} />
+        <AutoCompletedPanel notice={autoNote} levelId={levelId} onPlayReal={start} onNext={next ? () => navigate(`/lang/${next.lang}/man/${next.id}`) : undefined} onLeave={leave} />
       </div>
     );
   }

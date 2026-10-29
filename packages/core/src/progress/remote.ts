@@ -1,4 +1,5 @@
 import { getSupabase } from '../auth/client';
+import { classifyAutoError } from './autoError';
 import type { RemoteApi } from './manager';
 import { emptyLevel, emptyProgress, type GameState, type LevelProgress, type Progress, type Stars } from './types';
 
@@ -112,6 +113,15 @@ export const supabaseRemote: RemoteApi = {
     const sb = await client();
     const { error } = await sb.from('game_state').upsert(gameToRow(userId, game), { onConflict: 'user_id' });
     if (error) throw error;
+  },
+
+  /** Máy chủ đã có cột `auto_completed` (migration 0003) chưa? Ném lỗi khi không xác định được (mất mạng): chưa biết. */
+  async supportsAutoComplete() {
+    const sb = await client();
+    const { error } = await sb.from('level_progress').select('auto_completed').limit(1);
+    if (!error) return true;
+    if (classifyAutoError(error) === 'missing-column') return false;
+    throw error;
   },
 
   async insertQuizAnswer(userId, levelId, questionId, correct) {

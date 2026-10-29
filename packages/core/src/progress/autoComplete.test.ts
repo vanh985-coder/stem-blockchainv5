@@ -3,12 +3,13 @@ import { canSeeTeacherPage, canUseAutoComplete } from '../auth/roles';
 import { LEVELS, VILLAGE_ORDER, levelsOfVillage } from '../content/levels';
 import { decodeProgress, encodeProgress } from './compact';
 import { GUEST_COOKIE } from './cookies';
+import { classifyAutoError } from './autoError';
 import { ProgressManager, PUSH_DEBOUNCE_MS, type CookieJar, type KeyValueStore, type RemoteApi } from './manager';
 import { mergeProgress, sameLevel } from './merge';
 import { levelFromRow, levelToRow, type LevelRow } from './remote';
 import { autoCompleteLevel, autoLevels, doneLevels, recordLevelResult, unlockOf, withGoldenPages } from './record';
 import { emptyProgress, isRealDone, type GameState, type LevelProgress, type Progress } from './types';
-import { cellText, levelCell, buildProgressTable, type ClassProgressRow } from '../teacher/progress';
+import { cellText, levelCell, buildProgressTable, progressRowText, type ClassProgressRow } from '../teacher/progress';
 
 const T0 = 1_700_000_000_000;
 const real = (p: Progress, id: number, t = 0): Progress => {
@@ -206,7 +207,7 @@ describe('ProgressManager: quyền và luồng lưu', () => {
   it('không được phép (học sinh/khách ở bản phát hành): autoComplete không làm gì, không ghi, không đẩy', async () => {
     const m = make();
     await m.setUser('student');
-    expect(m.autoComplete(1)).toBe(false);
+    expect(await m.requestAutoComplete(1)).toBe('unavailable');
     expect(m.getSnapshot().progress.levels).toEqual({});
     await vi.advanceTimersByTimeAsync(PUSH_DEBOUNCE_MS + 10);
     expect(remote.pushes).toEqual([]);
@@ -216,9 +217,9 @@ describe('ProgressManager: quyền và luồng lưu', () => {
     const m = make();
     m.setAutoAllowed(true);
     await m.setUser('teacher');
-    expect(m.autoComplete(7)).toBe(true);
-    expect(m.autoComplete(7)).toBe(false);
-    expect(m.autoComplete(7)).toBe(false);
+    expect(await m.requestAutoComplete(7)).toBe('done');
+    expect(await m.requestAutoComplete(7)).toBe('noop');
+    expect(await m.requestAutoComplete(7)).toBe('noop');
     await vi.advanceTimersByTimeAsync(PUSH_DEBOUNCE_MS + 10);
     expect(remote.pushes).toHaveLength(1);
     expect(remote.pushes[0]).toMatchObject({ levelId: 7, progress: { auto: true, played: false, completed: false, stars: {}, bestScore: 0 } });
@@ -254,7 +255,7 @@ describe('ProgressManager: quyền và luồng lưu', () => {
     const m = make();
     m.setAutoAllowed(true);
     await m.setUser(null);
-    expect(m.autoComplete(4)).toBe(true);
+    expect(await m.requestAutoComplete(4)).toBe('done');
     const raw = cookies.get(GUEST_COOKIE)!;
     expect(decodeProgress(raw).levels[4].auto).toBe(true);
     const m2 = make();
@@ -312,5 +313,154 @@ describe('mọi làng: tự hoàn thành đủ cả làng chỉ mở theo thứ 
       });
       expect(ids.every((id) => state(p, id).state === 'done')).toBe(true);
     }
+  });
+});
+
+describe('tương thích khi máy chủ chưa chạy migration 0003 (P3b hoàn thiện)', () => {
+  /** Máy chủ giả có thể: chưa có cột (mọi hàng có cờ bị từ chối như Postgres 42703), từ chối người dùng (trigger), hay mất mạng riêng đường cờ. */
+  class StrictRemote extends FakeRemote {
+    mode: 'ok' | 'no-column' | 'forbidden' | 'offline-auto' = 'ok';
+    probe: 'ok' | 'throw' = 'ok';
+    upsertLevels = async (_u: string, rows: Array<{ levelId: number; progress: LevelProgress }>) => {
+      if (rows.some((r) => r.progress.auto)) {
+        if (this.mode === 'no-column') throw { code: '42703', message: 'column "auto_completed" of relation "level_progress" does not exist' };
+        if (this.mode === 'forbidden') throw { code: 'P0001', message: 'Chỉ giáo viên mới dùng được tự hoàn thành' };
+        if (this.mode === 'offline-auto') throw new TypeError('Failed to fetch');
+      }
+      this.attempts.push(rows.map((r) => r.levelId));
+      for (const r of rows) {
+        this.pushes.push(structuredClone(r));
+        this.account.levels[r.levelId] = structuredClone(r.progress);
+      }
+    };
+    attempts: number[][] = [];
+    supportsAutoComplete = async () => {
+      if (this.probe === 'throw') throw new TypeError('Failed to fetch');
+      return this.mode !== 'no-column';
+    };
+  }
+  let remote: StrictRemote;
+  let store: FakeStore;
+  let cookies: FakeCookies;
+  const make = () => new ProgressManager({ store, cookies, remote, now: () => T0 });
+  beforeEach(() => {
+    vi.useFakeTimers();
+    remote = new StrictRemote();
+    store = new FakeStore();
+    cookies = new FakeCookies();
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('máy chủ chưa hỗ trợ (thăm dò báo thiếu cột): nút vô hiệu (autoStatus no), bấm không ghi gì, KHÔNG báo đã lưu; tiến độ chơi thật vẫn lưu và đồng bộ', async () => {
+    remote.mode = 'no-column';
+    const m = make();
+    m.setAutoAllowed(true);
+    await m.setUser('teacher');
+    await vi.advanceTimersByTimeAsync(10);
+    expect(m.getSnapshot().autoStatus).toBe('no');
+    expect(await m.requestAutoComplete(7)).toBe('unsupported');
+    expect(m.getSnapshot().progress.levels[7]).toBeUndefined();
+    m.record(2, { score: 100, stars: { game: 2 } });
+    expect(await m.saveNow()).toBe('saved');
+    expect(remote.account.levels[2]).toMatchObject({ played: true, bestScore: 100, stars: { game: 2 } });
+    expect(remote.account.game.coins).toBe(20);
+  });
+
+  it('thăm dò chưa xác định (mất mạng) rồi đẩy báo thiếu cột: cờ bị gỡ khỏi máy, trạng thái no, và thành tích thật CÙNG LẦN ĐẨY vẫn lên máy chủ (không lỗi dây chuyền)', async () => {
+    remote.mode = 'no-column';
+    remote.probe = 'throw';
+    const m = make();
+    m.setAutoAllowed(true);
+    await m.setUser('teacher');
+    await vi.advanceTimersByTimeAsync(10);
+    expect(m.getSnapshot().autoStatus).toBe('unknown');
+    m.record(2, { score: 100, stars: { game: 2 } });
+    const r = await m.requestAutoComplete(7);
+    expect(r).toBe('unsupported'); // KHÔNG phải 'done'
+    expect(m.getSnapshot().autoStatus).toBe('no');
+    expect(m.getSnapshot().progress.levels[7]?.auto).toBeUndefined(); // không giả vờ đã lưu
+    expect(remote.account.levels[2]).toMatchObject({ played: true, bestScore: 100 }); // thật vẫn lưu
+    expect(remote.account.levels[7]).toBeUndefined();
+    // các lần đẩy sau không còn thử cờ nữa và tiến độ thật tiếp tục đồng bộ
+    m.record(3, { score: 50, stars: { game: 1 } });
+    expect(await m.saveNow()).toBe('saved');
+    expect(remote.account.levels[3]).toMatchObject({ played: true, bestScore: 50 });
+  });
+
+  it('máy chủ từ chối (trigger): trạng thái rejected, cờ gỡ khỏi máy, KHÔNG báo đã lưu, thành tích thật vẫn lưu', async () => {
+    remote.mode = 'forbidden';
+    const m = make();
+    m.setAutoAllowed(true);
+    await m.setUser('teacher');
+    await vi.advanceTimersByTimeAsync(10);
+    m.record(2, { score: 100, stars: { game: 2 } });
+    expect(await m.requestAutoComplete(7)).toBe('rejected');
+    expect(m.getSnapshot().autoStatus).toBe('rejected');
+    expect(m.getSnapshot().progress.levels[7]?.auto).toBeUndefined();
+    expect(remote.account.levels[2]?.played).toBe(true);
+    expect(await m.requestAutoComplete(8)).toBe('rejected'); // không thử lại
+    expect(m.getSnapshot().progress.levels[8]).toBeUndefined();
+  });
+
+  it('mất mạng riêng ở đường cờ: kết quả "pending" (đã ghi ở máy, CHƯA lưu), cờ giữ lại; có mạng lại thì đẩy tiếp và hết pending', async () => {
+    remote.mode = 'offline-auto';
+    const m = make();
+    m.setAutoAllowed(true);
+    await m.setUser('teacher');
+    await vi.advanceTimersByTimeAsync(10);
+    expect(await m.requestAutoComplete(7)).toBe('pending');
+    expect(m.getSnapshot().progress.levels[7].auto).toBe(true);
+    expect(remote.account.levels[7]).toBeUndefined();
+    remote.mode = 'ok';
+    expect(await m.flush()).toBe(true);
+    expect(remote.account.levels[7]).toMatchObject({ auto: true });
+  });
+
+  it('chơi thật rồi tự hoàn thành ở máy chủ có hỗ trợ: đúng một hàng cho mỗi màn, không bản ghi trùng', async () => {
+    const m = make();
+    m.setAutoAllowed(true);
+    await m.setUser('teacher');
+    await vi.advanceTimersByTimeAsync(10);
+    m.record(2, { score: 100, stars: { game: 2 } });
+    await m.saveNow();
+    expect(await m.requestAutoComplete(3)).toBe('done');
+    expect(await m.requestAutoComplete(3)).toBe('noop');
+    await vi.advanceTimersByTimeAsync(PUSH_DEBOUNCE_MS + 10);
+    const sent = remote.attempts.flat();
+    expect(sent.filter((id) => id === 3)).toHaveLength(1);
+    expect(Object.keys(remote.account.levels).sort()).toEqual(['2', '3']);
+  });
+});
+
+describe('classifyAutoError (thông báo lỗi thật của Postgres/PostgREST)', () => {
+  it('thiếu cột → missing-column', () => {
+    expect(classifyAutoError({ code: '42703', message: 'column "auto_completed" of relation "level_progress" does not exist' })).toBe('missing-column');
+    expect(classifyAutoError({ code: 'PGRST204', message: "Could not find the 'auto_completed' column of 'level_progress' in the schema cache" })).toBe('missing-column');
+    expect(classifyAutoError({ message: 'column level_progress.auto_completed does not exist' })).toBe('missing-column');
+  });
+  it('trigger/RLS từ chối → forbidden', () => {
+    expect(classifyAutoError({ code: 'P0001', message: 'Chỉ giáo viên mới dùng được tự hoàn thành' })).toBe('forbidden');
+    expect(classifyAutoError({ code: '42501', message: 'new row violates row-level security policy for table "level_progress"' })).toBe('forbidden');
+  });
+  it('lỗi khác (mất mạng, hết phiên) → other, kể cả giá trị lạ', () => {
+    expect(classifyAutoError(new TypeError('Failed to fetch'))).toBe('other');
+    expect(classifyAutoError({ code: 'PGRST301', message: 'JWT expired' })).toBe('other');
+    expect(classifyAutoError(null)).toBe('other');
+    expect(classifyAutoError('boom')).toBe('other');
+  });
+});
+
+describe('hoàn thành thật sau tự hoàn thành: bảng giáo viên và phần thưởng đúng một lần', () => {
+  it('bảng/CSV hiện kết quả thật (không bị cờ che); xu tính đúng một lần dù chơi thật nhiều lần', () => {
+    let p = autoCompleteLevel(emptyProgress(), 5, T0);
+    p = recordLevelResult(p, 5, { score: 100, stars: { game: 3 } }, T0 + 1).progress;
+    p = recordLevelResult(p, 5, { score: 100, stars: { game: 3 } }, T0 + 2).progress; // chơi lại cùng mốc
+    expect(p.game.coins).toBe(30); // 3 sao mới × 10, một lần
+    const row = { student_id: 's', display_name: 'An', level_id: 5, played: p.levels[5].played, completed: p.levels[5].completed, stars: p.levels[5].stars, best_score: p.levels[5].bestScore, updated_at: new Date(T0).toISOString(), golden_pages: 0, auto_completed: true } as ClassProgressRow;
+    const [s] = buildProgressTable([row]);
+    const def = LEVELS.find((l) => l.id === 5)!;
+    expect(cellText(levelCell(def, s.levels[5]))).toBe('✓ vàng'); // kết quả thật, không bị "Tự hoàn thành" che
+    expect(progressRowText(s).join('|')).not.toContain('Tự hoàn thành');
+    expect(autoLevels(p)).toEqual([]);
   });
 });

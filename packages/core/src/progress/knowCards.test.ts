@@ -9,6 +9,7 @@ import {
   knowCardMaskOf,
   knowCardsComplete,
   knowCardsDataFromMask,
+  knowBypassedByAuto,
   knowCardsMask,
   mergeKnowCards,
   withAllKnowCards,
@@ -150,5 +151,17 @@ describe('Làng Dệt (mốc 3, bước L1): 4 thẻ rải, người chơi cũ k
     const p = emptyProgress();
     p.game = { ...p.game, data: d, updatedAt: 3 };
     expect(knowCardMaskOf(decodeProgress(encodeProgress(p)).game.data, 'lang-det')).toBe(0b1001);
+  });
+});
+
+describe('tự hoàn thành (P3b) không coi là đã nhặt thẻ', () => {
+  it('bài học đầu chỉ có cờ: bỏ điều kiện chặn nhưng mặt nạ thẻ giữ nguyên (không ghi đã nhặt, ký hiệu trên bản đồ không biến mất)', () => {
+    const levels = [{ id: 1, state: 'done', auto: true }, { id: 2, state: 'open' }];
+    expect(knowBypassedByAuto(levels, 'lang-giay')).toBe(true);
+    expect(knowBypassedByAuto([{ id: 1, state: 'done' }], 'lang-giay')).toBe(false); // xong thật: dùng đường "đã xong màn 1" như cũ
+    expect(knowBypassedByAuto([{ id: 4, state: 'done', auto: true }], 'lang-giay')).toBe(false); // làng khác không liên quan
+    // mặt nạ hiệu lực chỉ theo thẻ thật (lessonDone chỉ true khi xong thật): chưa nhặt thẻ nào thì vẫn 0/4
+    expect(effectiveKnowMask({ data: {}, village: 'lang-giay', total: 4, lessonDone: false, seenOld: false })).toBe(0);
+    expect(countKnowCards(effectiveKnowMask({ data: {}, village: 'lang-giay', total: 4, lessonDone: false, seenOld: false }), 4)).toBe(0);
   });
 });

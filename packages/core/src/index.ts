@@ -131,7 +131,7 @@ export { shouldAutoOpenGuide, hasSeenGuide } from './progress/guideFlags';
 export { storyGate, hasReadStory, isReturningPlayer, type StoryGate } from './progress/storyFlags';
 export { hasSeenGameTip, hasSeenClimax } from './progress/gameTips';
 export { CLIMAX_LEVEL, canWatchClimax, climaxPending } from './progress/climaxState';
-export { knowCardMaskOf, effectiveKnowMask, knowCardsComplete, countKnowCards, hasKnowCard, fullKnowMask, firstLevelIdOf } from './progress/knowCards';
+export { knowCardMaskOf, effectiveKnowMask, knowCardsComplete, countKnowCards, hasKnowCard, fullKnowMask, firstLevelIdOf, knowBypassedByAuto } from './progress/knowCards';
 export type { IntroTask } from './progress/villageIntro';
 export { VILLAGE_INTRO, villageIntroTexts } from './content/villageIntro';
 export { recordLevelResult, doneLevels, withGoldenPages, unlockOf } from './progress/record';

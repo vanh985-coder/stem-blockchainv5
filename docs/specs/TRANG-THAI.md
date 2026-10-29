@@ -134,6 +134,8 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - Trang giáo viên phân biệt "⏭ Tự hoàn thành" với hoàn thành thật (bảng, CSV, chi tiết, chú thích). Spec 02 (đồng bộ), 03 mục 6, 09 và `CLAUDE.md` đã cập nhật.
 - Kiểm DOM thật (`scripts/p3b-check.mjs`, 3 cỡ): **bản dev 222 kiểm đạt** (đủ 12 màn, bấm lặp, giữa ván, chơi thật sau, đủ 12 màn không trang/xu/cao trào, tải lại); **bản phát hành 42 kiểm đạt** (khách không thấy nút ở 12 màn, cookie giả bị bỏ qua). 30 ảnh (lớn nhất 162.266 byte) ở `docs/screenshots/p3b/`.
 - `pnpm test --maxWorkers=2`: **2185 pass, 1 skipped**; `pnpm typecheck`, `pnpm check:text` (432 file), `pnpm build` đạt. Bundle hub 2.781.350 byte (+6.662).
+- **Bổ sung tương thích và kiểm quyền (29/10/2026):** cờ đi đường đẩy riêng với tiến độ thật; máy chủ chưa chạy 0003 thì nút vô hiệu kèm thông báo, tiến độ thật vẫn đồng bộ, không báo đã lưu khi bị từ chối. Thẻ "Em có biết?": tự hoàn thành chỉ bỏ điều kiện chặn, không ghi đã nhặt. Migration 0003 + RLS kiểm trên **PostgreSQL biệt lập (không phải Supabase thật)** bằng `scripts/db-test-p3b.sh`: 51/51 đạt; chi tiết `docs/screenshots/p3b/KIEM-SUPABASE.md`. `pnpm rls:check` chưa chạy được (thiếu `.env.local`/dự án TEST): **phần quyền máy chủ CHƯA nghiệm thu**.
+- **Cần xử lý trước khi dùng thật (có từ trước, chưa sửa):** học sinh tự sửa được `completed`/`played`/`stars`/`best_score`/`coins`/`golden_pages` của mình qua API.
 - **Chưa xác minh:** tài khoản giáo viên thật và Supabase thật (migration, trigger, `rls:check`, trang giáo viên với dữ liệu thật); kiểm quyền chỉ bằng test; thiết bị thật/Safari.
 
 ## Việc dời từ mốc 3 (làm CUỐI mốc 4, theo thứ tự)

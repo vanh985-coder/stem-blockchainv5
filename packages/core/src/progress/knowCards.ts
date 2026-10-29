@@ -111,3 +111,12 @@ export function knowCardsComplete(i: KnowCardsInput): boolean {
 export function firstLevelIdOf(village: VillageId): number | undefined {
   return levelsOfVillage(village)[0]?.id;
 }
+
+/**
+ * Bài học đầu của làng chỉ có cờ "tự hoàn thành" (P3b)? Khi đó điều kiện chặn bài học/game của làng vì chưa đủ thẻ được BỎ QUA (giáo viên/bản dev đi tiếp được),
+ * nhưng KHÔNG ghi là đã nhặt thẻ nào: mặt nạ thẻ (`effectiveKnowMask`) vẫn chỉ theo thẻ thật đã nhặt, nên ký hiệu thẻ trên bản đồ và số "n/4" không đổi.
+ */
+export function knowBypassedByAuto(levels: readonly { id: number; state: string; auto?: boolean }[], village: VillageId): boolean {
+  const first = firstLevelIdOf(village);
+  return first !== undefined && levels.some((l) => l.id === first && l.state === 'done' && l.auto === true);
+}

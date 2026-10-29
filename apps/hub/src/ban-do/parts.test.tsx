@@ -6,7 +6,7 @@ import { VillageDetails } from './parts';
 
 const EMPTY: Progress = { levels: {}, game: { goldenPages: 0, coins: 0, data: {}, updatedAt: 0 } };
 const open: LevelUnlock[] = LEVELS.filter((l) => l.lang === 'lang-giay').map((l) => ({ id: l.id, state: 'open' as const }));
-const render = (know?: { got: number; total: number }) =>
+const render = (know?: { got: number; total: number; bypass?: boolean }) =>
   renderToStaticMarkup(
     <MemoryRouter>
       <VillageDetails villageId="lang-giay" unlockLevels={open} progress={EMPTY} goldenEarned={false} know={know ? { ...know, onRead: () => {} } : undefined} />
@@ -20,6 +20,11 @@ describe('/ban-do: chi tiết làng và thẻ Em có biết (bước X3)', () =>
     expect(html).toContain('2/4');
     expect(html).toContain('Đọc thẻ Em có biết');
     expect(html).not.toContain('>Vào<');
+  });
+  it('bài học đầu chỉ tự hoàn thành (P3b): bỏ điều kiện chặn (có nút "Vào") nhưng số thẻ vẫn là 0/4, không ghi đã nhặt', () => {
+    const html = render({ got: 0, total: 4, bypass: true });
+    expect(html).not.toContain('can-doc-the');
+    expect(html).toContain('>Vào<');
   });
   it('đã đủ thẻ: không có lời báo, các màn mở có nút "Vào"', () => {
     const html = render({ got: 4, total: 4 });

@@ -13,6 +13,7 @@ import {
   effectiveKnowMask,
   fmt,
   hasSeenKnow,
+  knowBypassedByAuto,
   canWatchClimax,
   hasSeenClimax,
   openClimax,
@@ -135,7 +136,9 @@ export default function BanDoPage() {
   const maskOf = (id: VillageId) => {
     const total = villageKnowCards(id).length;
     const first = levelsOfVillage(id)[0]?.id;
-    const lessonDone = first !== undefined && unlock.levels.find((u) => u.id === first)?.state === 'done';
+    const firstState = unlock.levels.find((u) => u.id === first);
+    // tự hoàn thành (P3b) không phải đã xong bài học thật: không làm đủ thẻ
+    const lessonDone = first !== undefined && firstState?.state === 'done' && !firstState.auto;
     return effectiveKnowMask({ data: progress.game.data, village: id, total, lessonDone, seenOld: hasSeenKnow(progress.game.data, id) });
   };
   const knowOf = (id: VillageId) => {
@@ -150,7 +153,7 @@ export default function BanDoPage() {
       goldenEarned={VILLAGE_ORDER.indexOf(selected) < goldenPages}
       onClose={wide ? undefined : () => setSelected(null)}
       onReplayIntro={() => setIntro(selected)}
-      know={{ ...knowOf(selected), onRead: () => setReading(selected) }}
+      know={{ ...knowOf(selected), bypass: knowBypassedByAuto(unlock.levels, selected), onRead: () => setReading(selected) }}
       climax={selected === 'lang-bac' && canWatchClimax(progress) ? { seen: hasSeenClimax(progress.game.data), onWatch: () => openClimax(navigate) } : undefined}
       scrollMap={
         <Suspense fallback={null}>

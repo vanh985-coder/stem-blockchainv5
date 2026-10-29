@@ -24,7 +24,7 @@ const stateOf = (progress: Progress): ProgressState => ({
   markGuideSeen: () => {},
   markStoryRead: () => {},
   markGameTipSeen: () => {},
-  markClimaxSeen: () => {}, canAutoComplete: false, autoComplete: () => false,
+  markClimaxSeen: () => {}, canAutoComplete: false, autoStatus: 'yes', autoComplete: async () => 'unavailable',
 });
 
 function render(progress: Progress): string {

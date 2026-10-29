@@ -69,7 +69,7 @@ type Stage =
   | { kind: 'outro' }
   | { kind: 'complete' }
   | { kind: 'award' }
-  | { kind: 'auto' };
+  | { kind: 'auto'; note?: string };
 
 const TEN_TRAM = ui.baiHoc.tram;
 
@@ -326,7 +326,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
     );
   } else if (stage.kind === 'auto') {
     // Tự hoàn thành (P3b): chỉ ghi cờ, không điểm, sao, xu hay Trang Sổ Vàng; muốn học thật thì bấm "Chơi thật"
-    body = <AutoCompletedPanel levelId={levelId} onPlayReal={restart} onNext={nextGame ? () => navigate(`/lang/${villageId}/man/${nextGame.id}`) : undefined} onLeave={goMap} />;
+    body = <AutoCompletedPanel notice={stage.note} levelId={levelId} onPlayReal={restart} onNext={nextGame ? () => navigate(`/lang/${villageId}/man/${nextGame.id}`) : undefined} onLeave={goMap} />;
   } else {
     body = content.award ? <GoldenPageScene villageId={villageId} award={content.award} onLeave={goMap} leaveLabel={leaveLabel} /> : null;
   }
@@ -418,8 +418,8 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
             )}
             {stage.kind !== 'saving' && stage.kind !== 'award' && stage.kind !== 'auto' && stage.kind !== 'outro' && (
               <>
-                <AutoCompleteButton levelId={levelId} className="max-[480px]:hidden" onDone={() => setStage({ kind: 'auto' })} />
-                <AutoCompleteButton levelId={levelId} variant="icon" className="hidden max-[480px]:grid" onDone={() => setStage({ kind: 'auto' })} />
+                <AutoCompleteButton levelId={levelId} className="max-[480px]:hidden" onDone={(note) => setStage({ kind: 'auto', note })} />
+                <AutoCompleteButton levelId={levelId} variant="icon" className="hidden max-[480px]:grid" onDone={(note) => setStage({ kind: 'auto', note })} />
               </>
             )}
             <Button variant="secondary" size="sm" className="max-[480px]:hidden" disabled={saving} onClick={goMap}>

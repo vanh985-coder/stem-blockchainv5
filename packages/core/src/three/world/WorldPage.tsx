@@ -14,7 +14,7 @@ import { knowScrollUi } from '../../content/knowScrolls';
 import { banDoNho } from '../../content/minimap';
 import { MERGED, URLS, levelUrl } from '../../config/urls';
 import { shouldAutoOpenGuide } from '../../progress/guideFlags';
-import { countKnowCards, effectiveKnowMask } from '../../progress/knowCards';
+import { countKnowCards, effectiveKnowMask, knowBypassedByAuto } from '../../progress/knowCards';
 import { useProgress } from '../../progress/ProgressProvider';
 import type { LevelState } from '../../progress/unlock';
 import { hasSeenKnow, pendingGateOpening, shouldShowGolden, shouldShowKnow, shouldShowScene } from '../../progress/villageIntro';
@@ -186,6 +186,8 @@ export function WorldPage() {
   const fallingGate = seq === 'fall' ? openingGate : null;
 
   const stateOf = useCallback((id: number) => unlock.levels.find((u) => u.id === id)?.state, [unlock.levels]);
+  // P3b: bài học đầu của làng chỉ "tự hoàn thành" (giáo viên/bản dev): bỏ điều kiện chặn vì chưa đủ thẻ, nhưng KHÔNG coi là đã nhặt thẻ (mặt nạ và ký hiệu thẻ trên bản đồ giữ nguyên)
+  const autoBypass = (id: VillageId): boolean => knowBypassedByAuto(unlock.levels, id);
   // ---- thẻ "Em có biết?" rải trong làng (bước X3): mặt nạ hiệu lực theo làng (đã nhặt, hoặc coi như đủ nếu đã xong màn 1 hay đã xem hộp cũ), số thẻ cần nhặt và việc có chặn biển hay không
   const scrollTotals = useMemo(() => Object.fromEntries(world.villages.map((v) => [v.id, v.layout.scrolls?.length ?? 0])) as Record<VillageId, number>, [world.villages]);
   const knowMasks = useMemo(
@@ -193,19 +195,19 @@ export function WorldPage() {
       Object.fromEntries(
         VILLAGE_ORDER.map((id) => {
           const first = levelsOfVillage(id)[0]?.id;
-          return [id, effectiveKnowMask({ data, village: id, total: scrollTotals[id], lessonDone: first !== undefined && stateOf(first) === 'done', seenOld: hasSeenKnow(data, id) })];
+          return [id, effectiveKnowMask({ data, village: id, total: scrollTotals[id], lessonDone: first !== undefined && stateOf(first) === 'done' && !unlock.levels.find((u) => u.id === first)?.auto, seenOld: hasSeenKnow(data, id) })];
         }),
       ) as Record<VillageId, number>,
-    [data, scrollTotals, stateOf],
+    [data, scrollTotals, stateOf, unlock.levels],
   );
   const knowGot = (id: VillageId): number => countKnowCards(knowMasks[id], scrollTotals[id]);
   /** Làng còn thẻ phải nhặt trước khi vào màn (giáo viên không bị chặn) */
-  const knowGated = (id: VillageId): boolean => !isTeacher && scrollTotals[id] > 0 && knowGot(id) < scrollTotals[id];
+  const knowGated = (id: VillageId): boolean => !isTeacher && scrollTotals[id] > 0 && knowGot(id) < scrollTotals[id] && !autoBypass(id);
   const levelStates = useMemo(
     () =>
       Object.fromEntries(
         unlock.levels.map((u) => {
-          const gated = u.state === 'open' && !isTeacher && VILLAGE_ORDER.some((id) => scrollTotals[id] > 0 && knowGot(id) < scrollTotals[id] && levelsOfVillage(id).some((l) => l.id === u.id));
+          const gated = u.state === 'open' && !isTeacher && VILLAGE_ORDER.some((id) => scrollTotals[id] > 0 && knowGot(id) < scrollTotals[id] && !autoBypass(id) && levelsOfVillage(id).some((l) => l.id === u.id));
           return [u.id, gated ? 'locked' : u.state];
         }),
       ) as Record<number, LevelState | undefined>,

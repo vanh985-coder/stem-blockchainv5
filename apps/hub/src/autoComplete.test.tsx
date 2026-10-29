@@ -27,7 +27,8 @@ const stateOf = (over: Partial<ProgressState> = {}): ProgressState => ({
   markGameTipSeen: () => {},
   markClimaxSeen: () => {},
   canAutoComplete: false,
-  autoComplete: () => false,
+  autoStatus: 'yes',
+  autoComplete: async () => 'done',
   ...over,
 });
 const wrap = (state: ProgressState, node: React.ReactNode) =>
@@ -66,6 +67,25 @@ describe('nút "Tự hoàn thành" (P3b)', () => {
     expect(html).toContain('Không có điểm, sao, huy chương hay xu');
     expect(html).toContain(autoCompleteUi.choiThat);
     expect(html).toContain('data-testid="tu-hoan-thanh-choi-tiep"');
+  });
+
+  it('máy chủ chưa hỗ trợ (chưa chạy migration 0003): nút bị vô hiệu kèm thông báo rõ; từ chối thì thông báo riêng; hỗ trợ thì nút dùng được', () => {
+    const no = wrap(stateOf({ canAutoComplete: true, autoStatus: 'no' }), <AutoCompleteButton levelId={5} onDone={() => {}} />).replace(/&amp;/g, '&').replace(/&quot;/g, '"');
+    expect(no).toContain('disabled');
+    expect(no).toContain('data-testid="tu-hoan-thanh-ghi-chu"');
+    expect(no).toContain(autoCompleteUi.chuaHoTro);
+    const rej = wrap(stateOf({ canAutoComplete: true, autoStatus: 'rejected' }), <AutoCompleteButton levelId={5} onDone={() => {}} />).replace(/&quot;/g, '"');
+    expect(rej).toContain(autoCompleteUi.biTuChoi);
+    const ok = wrap(stateOf({ canAutoComplete: true, autoStatus: 'yes' }), <AutoCompleteButton levelId={5} onDone={() => {}} />);
+    expect(ok).not.toContain('disabled');
+    expect(ok).not.toContain('tu-hoan-thanh-ghi-chu');
+  });
+
+  it('khung sau khi bấm nói rõ khi chưa lưu được lên máy chủ (không giả vờ đã lưu)', () => {
+    const t = stateOf({ canAutoComplete: true });
+    const html = wrap(t, <AutoCompletedPanel levelId={1} notice={autoCompleteUi.chuaLuu} onPlayReal={() => {}} onLeave={() => {}} />);
+    expect(html).toContain('data-testid="tu-hoan-thanh-chua-luu"');
+    expect(wrap(t, <AutoCompletedPanel levelId={1} onPlayReal={() => {}} onLeave={() => {}} />)).not.toContain('tu-hoan-thanh-chua-luu');
   });
 
   it('bảng làng ở /ban-do: màn chỉ tự hoàn thành hiện "Tự hoàn thành" thay cho số sao', () => {
