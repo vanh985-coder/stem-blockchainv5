@@ -44,6 +44,11 @@ const SCENARIOS = {
     progress: cookieOf({ lv: lvDone([1]), kc: [15, 15, 0, 0] }),
     expect: { 1: 'done', 2: 'open', 3: 'locked', 4: 'open', 5: 'locked', 6: 'locked', 7: 'locked', 8: 'locked', 9: 'locked', 10: 'locked', 11: 'locked', 12: 'locked' },
   },
+  // Làng Bạc: bài học xong, game 1 đang mở, game 2 khóa (cả hai dáng cột "mở" và "xong" trong cùng một cảnh trước cây đa)
+  'bac-mo': {
+    progress: cookieOf({ lv: lvDone([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), gp: 3, kc: [15, 15, 15, 15] }),
+    expect: { 1: 'done', 2: 'done', 3: 'done', 4: 'done', 5: 'done', 6: 'done', 7: 'done', 8: 'done', 9: 'done', 10: 'done', 11: 'open', 12: 'locked' },
+  },
   'hoan-thanh': { progress: cookieOf({ lv: lvDone(ALL), gp: 4, kc: [15, 15, 15, 15] }), expect: Object.fromEntries(ALL.map((i) => [i, 'done'])) },
 };
 
@@ -206,7 +211,7 @@ async function runSize(browser, size) {
   if (ONLY.includes('shots') || ONLY.includes('kinds')) {
     const scenarios = SC_ONLY ? SC_ONLY.split(',') : size.name === '1366x768' ? Object.keys(SCENARIOS) : ['mot-phan'];
     for (const sc of scenarios) {
-      const ctx = await newCtx(browser, size, SCENARIOS[sc].progress);
+      const ctx = await newCtx(browser, size, SCENARIOS[sc].progress, { reduced: flag('reduced') });
       for (const id of ORDER) {
         await openVillage(ctx, id);
         const info = await boardInfo(ctx, id);

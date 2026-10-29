@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { LEVELS } from '../../content/levels';
 import { ui } from '../../content/ui';
 import { createEmblemGeometry } from './boardEmblems';
-import { PILLAR, PILLAR_RADIUS_BASE, emblemMotion, pillarKindOf } from './boardPillar';
+import { EMBLEM_SCALE, EMBLEM_Y, PILLAR, PILLAR_RADIUS_BASE, emblemMotion, pillarKindOf } from './boardPillar';
 
 describe('dáng cột sáng theo trạng thái màn', () => {
   it('mở → open, xong (thật hay tự hoàn thành) → done, mọi trạng thái còn lại → locked', () => {
@@ -59,5 +59,20 @@ describe('hình học vật nổi', () => {
       g.dispose();
     }
     expect(new Set(tris).size).toBe(3);
+  });
+});
+
+describe('vật nổi không che nội dung phía sau (P5 hoàn thiện)', () => {
+  it('nằm trên đỉnh tấm biển (1,875) kể cả lúc nhấp nhô, và rộng không quá 1,2', () => {
+    for (const k of ['open', 'done', 'locked'] as const) {
+      const g = createEmblemGeometry(k);
+      g.computeBoundingBox();
+      const box = g.boundingBox!;
+      const bob = k === 'open' ? 0.12 : 0;
+      expect(EMBLEM_Y + box.min.y * EMBLEM_SCALE - bob).toBeGreaterThan(1.875);
+      expect((box.max.x - box.min.x) * EMBLEM_SCALE).toBeLessThanOrEqual(1.2);
+      expect((box.max.y - box.min.y) * EMBLEM_SCALE).toBeLessThanOrEqual(1.2);
+      g.dispose();
+    }
   });
 });

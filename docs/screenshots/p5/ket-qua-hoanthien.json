@@ -1,0 +1,235 @@
+{
+ "results": [
+  {
+   "size": "360x800",
+   "area": "hoan-thanh/lang-khac-dau",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "7,8,9"
+  },
+  {
+   "size": "360x800",
+   "area": "hoan-thanh/lang-khac-dau",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,done,done / mong done,done,done"
+  },
+  {
+   "size": "360x800",
+   "area": "hoan-thanh/lang-khac-dau",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "360x800",
+   "area": "hoan-thanh/lang-bac",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "10,11,12"
+  },
+  {
+   "size": "360x800",
+   "area": "hoan-thanh/lang-bac",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,done,done / mong done,done,done"
+  },
+  {
+   "size": "360x800",
+   "area": "hoan-thanh/lang-bac",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "360x800",
+   "area": "hoan-thanh",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "bac-mo/lang-khac-dau",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "7,8,9"
+  },
+  {
+   "size": "360x800",
+   "area": "bac-mo/lang-khac-dau",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,done,done / mong done,done,done"
+  },
+  {
+   "size": "360x800",
+   "area": "bac-mo/lang-khac-dau",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "360x800",
+   "area": "bac-mo/lang-bac",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "10,11,12"
+  },
+  {
+   "size": "360x800",
+   "area": "bac-mo/lang-bac",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,open,locked / mong done,open,locked"
+  },
+  {
+   "size": "360x800",
+   "area": "bac-mo/lang-bac",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "360x800",
+   "area": "bac-mo",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hoan-thanh/lang-khac-dau",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "7,8,9"
+  },
+  {
+   "size": "844x390",
+   "area": "hoan-thanh/lang-khac-dau",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,done,done / mong done,done,done"
+  },
+  {
+   "size": "844x390",
+   "area": "hoan-thanh/lang-khac-dau",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "844x390",
+   "area": "hoan-thanh/lang-bac",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "10,11,12"
+  },
+  {
+   "size": "844x390",
+   "area": "hoan-thanh/lang-bac",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,done,done / mong done,done,done"
+  },
+  {
+   "size": "844x390",
+   "area": "hoan-thanh/lang-bac",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "844x390",
+   "area": "hoan-thanh",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "bac-mo/lang-khac-dau",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "7,8,9"
+  },
+  {
+   "size": "844x390",
+   "area": "bac-mo/lang-khac-dau",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,done,done / mong done,done,done"
+  },
+  {
+   "size": "844x390",
+   "area": "bac-mo/lang-khac-dau",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "844x390",
+   "area": "bac-mo/lang-bac",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "10,11,12"
+  },
+  {
+   "size": "844x390",
+   "area": "bac-mo/lang-bac",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,open,locked / mong done,open,locked"
+  },
+  {
+   "size": "844x390",
+   "area": "bac-mo/lang-bac",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "844x390",
+   "area": "bac-mo",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  }
+ ],
+ "shots": [
+  {
+   "file": "hoanthien-hoan-thanh-lang-khac-dau-360x800.jpg",
+   "bytes": 36176
+  },
+  {
+   "file": "hoanthien-hoan-thanh-lang-bac-360x800.jpg",
+   "bytes": 46929
+  },
+  {
+   "file": "hoanthien-bac-mo-lang-khac-dau-360x800.jpg",
+   "bytes": 36742
+  },
+  {
+   "file": "hoanthien-bac-mo-lang-bac-360x800.jpg",
+   "bytes": 46063
+  },
+  {
+   "file": "hoanthien-hoan-thanh-lang-khac-dau-844x390.jpg",
+   "bytes": 38957
+  },
+  {
+   "file": "hoanthien-hoan-thanh-lang-bac-844x390.jpg",
+   "bytes": 46768
+  },
+  {
+   "file": "hoanthien-bac-mo-lang-khac-dau-844x390.jpg",
+   "bytes": 39313
+  },
+  {
+   "file": "hoanthien-bac-mo-lang-bac-844x390.jpg",
+   "bytes": 46854
+  }
+ ],
+ "metrics": []
+}

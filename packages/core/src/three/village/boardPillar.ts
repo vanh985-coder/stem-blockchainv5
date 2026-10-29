@@ -22,8 +22,8 @@ export const PILLAR_RADIUS_TOP = 0.45;
 export const PILLAR_RADIUS_BASE = 0.95;
 export const PILLAR_DISC_RADIUS = 1.2;
 /** Vật nổi nằm trên tấm biển (đỉnh tấm biển cao 1,875). */
-export const EMBLEM_Y = 2.85;
-export const EMBLEM_SCALE = 1.7;
+export const EMBLEM_Y = 2.45;
+export const EMBLEM_SCALE = 1.05;
 
 /** Chuyển động của vật nổi theo dáng (khi không "Giảm chuyển động"): quay, nhấp nhô, lắc. Hàm thuần để test. */
 export function emblemMotion(kind: PillarKind, t: number, i: number): { yaw: number; bob: number } {
