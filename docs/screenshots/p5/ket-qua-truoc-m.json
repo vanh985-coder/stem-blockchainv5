@@ -1,0 +1,90 @@
+{
+ "results": [
+  {
+   "size": "360x800",
+   "area": "mot-phan/lang-giay",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "1,2,3"
+  },
+  {
+   "size": "360x800",
+   "area": "mot-phan/lang-det",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "4,5,6"
+  },
+  {
+   "size": "360x800",
+   "area": "mot-phan",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "mot-phan/lang-giay",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "1,2,3"
+  },
+  {
+   "size": "844x390",
+   "area": "mot-phan/lang-det",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "4,5,6"
+  },
+  {
+   "size": "844x390",
+   "area": "mot-phan",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  }
+ ],
+ "shots": [
+  {
+   "file": "truoc-m-mot-phan-lang-giay-360x800.jpg",
+   "bytes": 51421
+  },
+  {
+   "file": "truoc-m-mot-phan-lang-det-360x800.jpg",
+   "bytes": 33704
+  },
+  {
+   "file": "truoc-m-mot-phan-lang-giay-844x390.jpg",
+   "bytes": 46805
+  },
+  {
+   "file": "truoc-m-mot-phan-lang-det-844x390.jpg",
+   "bytes": 39968
+  }
+ ],
+ "metrics": [
+  {
+   "size": "360x800",
+   "lang": "lang-giay",
+   "fps": 6.2,
+   "p95ms": 316.6,
+   "maxMs": 333.3,
+   "heapMB": 67.5,
+   "geometries": 45,
+   "textures": 56,
+   "calls": 50,
+   "triangles": 66834
+  },
+  {
+   "size": "844x390",
+   "lang": "lang-giay",
+   "fps": 5.7,
+   "p95ms": 216.7,
+   "maxMs": 250,
+   "heapMB": 67.9,
+   "geometries": 78,
+   "textures": 60,
+   "calls": 93,
+   "triangles": 105782
+  }
+ ]
+}

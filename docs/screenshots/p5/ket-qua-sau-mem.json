@@ -1,0 +1,98 @@
+{
+ "results": [
+  {
+   "size": "1366x768",
+   "area": "vào/ra làng 12 lần",
+   "name": "geometries và textures đứng yên sau vài lần đầu",
+   "ok": true,
+   "detail": "[[110,57],[111,72],[111,72],[111,72],[111,72],[111,72],[111,72],[111,72],[111,72],[111,72],[111,72],[111,72]]"
+  },
+  {
+   "size": "1366x768",
+   "area": "vào/ra làng 12 lần",
+   "name": "heap tăng ≤ 0,3 MB mỗi lần",
+   "ok": true,
+   "detail": "0.04 MB/lần"
+  }
+ ],
+ "shots": [],
+ "metrics": [
+  {
+   "size": "1366x768",
+   "vaoRa": [
+    {
+     "n": 1,
+     "geometries": 110,
+     "textures": 57,
+     "heapMB": 68.4
+    },
+    {
+     "n": 2,
+     "geometries": 111,
+     "textures": 72,
+     "heapMB": 68.6
+    },
+    {
+     "n": 3,
+     "geometries": 111,
+     "textures": 72,
+     "heapMB": 68.6
+    },
+    {
+     "n": 4,
+     "geometries": 111,
+     "textures": 72,
+     "heapMB": 68.9
+    },
+    {
+     "n": 5,
+     "geometries": 111,
+     "textures": 72,
+     "heapMB": 68.9
+    },
+    {
+     "n": 6,
+     "geometries": 111,
+     "textures": 72,
+     "heapMB": 69
+    },
+    {
+     "n": 7,
+     "geometries": 111,
+     "textures": 72,
+     "heapMB": 69
+    },
+    {
+     "n": 8,
+     "geometries": 111,
+     "textures": 72,
+     "heapMB": 69.1
+    },
+    {
+     "n": 9,
+     "geometries": 111,
+     "textures": 72,
+     "heapMB": 69.2
+    },
+    {
+     "n": 10,
+     "geometries": 111,
+     "textures": 72,
+     "heapMB": 69.2
+    },
+    {
+     "n": 11,
+     "geometries": 111,
+     "textures": 72,
+     "heapMB": 69.2
+    },
+    {
+     "n": 12,
+     "geometries": 111,
+     "textures": 72,
+     "heapMB": 69.2
+    }
+   ]
+  }
+ ]
+}

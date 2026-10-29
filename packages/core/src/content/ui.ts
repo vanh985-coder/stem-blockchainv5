@@ -629,6 +629,7 @@ export const ui = {
     /** Biển còn khóa (kèm "Hoàn thành … để mở" của ui.moKhoa) và màn sắp ra mắt */
     bienSapRaMat: 'Màn "{bien}" sắp ra mắt. Em cứ làm việc khác trước nhé.',
     /** Nhãn trạng thái vẽ trên biển gỗ */
+    bienMo: 'Đã mở',
     bienDaXong: 'Đã xong',
     bienKhoa: 'Khóa',
     bienSapRaMat2: 'Sắp ra mắt',

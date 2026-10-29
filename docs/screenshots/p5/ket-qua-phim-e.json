@@ -1,0 +1,22 @@
+[
+ {
+  "name": "màn 2 (mở): lời nhắc \"E: …\" hiện sau khi bấm chuột thật vào cảnh",
+  "ok": false,
+  "detail": " (khóa chuột giả không, 136 cú bấm)"
+ },
+ {
+  "name": "màn 2 (mở): nhấn phím E (bàn phím thật) mở đúng /lang/lang-giay/man/2",
+  "ok": true,
+  "detail": "http://localhost:5193/lang/lang-giay/man/2"
+ },
+ {
+  "name": "màn 3 (khóa): lời nhắc \"E: Xem biển: …\" hiện",
+  "ok": false,
+  "detail": " (khóa chuột giả không)"
+ },
+ {
+  "name": "màn 3 (khóa): nhấn phím E hiện hộp báo \"Hoàn thành màn 2 … để mở\" và không chuyển trang",
+  "ok": true,
+  "detail": ""
+ }
+]

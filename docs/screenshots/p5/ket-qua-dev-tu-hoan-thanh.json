@@ -1,0 +1,62 @@
+[
+ {
+  "name": "lang-giay: cả 3 cột hiện dáng \"xong\" (tự hoàn thành)",
+  "ok": true,
+  "detail": "done,done,done"
+ },
+ {
+  "name": "lang-giay: không phát sinh phần thưởng",
+  "ok": true,
+  "detail": "gp=0 xu=0 lv: 12 hàng rỗng (chỉ mang cờ tự hoàn thành, không điểm, không sao, chưa chơi, chưa xong) cờ ac=4095"
+ },
+ {
+  "name": "lang-giay: không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "lang-det: cả 3 cột hiện dáng \"xong\" (tự hoàn thành)",
+  "ok": true,
+  "detail": "done,done,done"
+ },
+ {
+  "name": "lang-det: không phát sinh phần thưởng",
+  "ok": true,
+  "detail": "gp=0 xu=0 lv: 12 hàng rỗng (chỉ mang cờ tự hoàn thành, không điểm, không sao, chưa chơi, chưa xong) cờ ac=4095"
+ },
+ {
+  "name": "lang-det: không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "lang-khac-dau: cả 3 cột hiện dáng \"xong\" (tự hoàn thành)",
+  "ok": true,
+  "detail": "done,done,done"
+ },
+ {
+  "name": "lang-khac-dau: không phát sinh phần thưởng",
+  "ok": true,
+  "detail": "gp=0 xu=0 lv: 12 hàng rỗng (chỉ mang cờ tự hoàn thành, không điểm, không sao, chưa chơi, chưa xong) cờ ac=4095"
+ },
+ {
+  "name": "lang-khac-dau: không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "name": "lang-bac: cả 3 cột hiện dáng \"xong\" (tự hoàn thành)",
+  "ok": true,
+  "detail": "done,done,done"
+ },
+ {
+  "name": "lang-bac: không phát sinh phần thưởng",
+  "ok": true,
+  "detail": "gp=0 xu=0 lv: 12 hàng rỗng (chỉ mang cờ tự hoàn thành, không điểm, không sao, chưa chơi, chưa xong) cờ ac=4095"
+ },
+ {
+  "name": "lang-bac: không lỗi trang",
+  "ok": true,
+  "detail": ""
+ }
+]

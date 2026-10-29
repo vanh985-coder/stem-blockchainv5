@@ -1,0 +1,71 @@
+{
+ "results": [
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-bac",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "10,11,12"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-bac",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,done,done / mong done,done,done"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-bac",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "bac-mo/lang-bac",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "10,11,12"
+  },
+  {
+   "size": "1366x768",
+   "area": "bac-mo/lang-bac",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,open,locked / mong done,open,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "bac-mo/lang-bac",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "bac-mo",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  }
+ ],
+ "shots": [
+  {
+   "file": "hoanthien-giam-hoan-thanh-lang-bac-1366x768.jpg",
+   "bytes": 125873
+  },
+  {
+   "file": "hoanthien-giam-bac-mo-lang-bac-1366x768.jpg",
+   "bytes": 124747
+  }
+ ],
+ "metrics": []
+}
