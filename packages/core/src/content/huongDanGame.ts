@@ -90,7 +90,7 @@ export const HUONG_DAN_GAME = {
     luat: [
       'Em mang các trang lấy lại về bàn của bác An, ghép lại cuốn sổ như ban đầu. Mỗi thẻ ghi: mã trang trước · nội dung · mã trang.',
       'Thẻ đặt vào ô kế tiếp phải có mã trang trước bằng mã của trang cuối chuỗi, và mã trang phải đúng công thức. Đặt sai thì thẻ bật về và em mất 1 tim.',
-      '{phanDien} hay nhét một trang giả vào xấp giấy: mã trang trước khớp nhưng mã trang sai công thức. Kéo trang giả vào rổ để được thêm 30 điểm.',
+      '{phanDien} hay nhét một trang giả vào xấp giấy: mã trang trước khớp nhưng mã trang sai công thức. Kéo trang giả vào rổ để được thêm 30 điểm. Ghép xong vòng 2, {phanDien} còn quay lại tráo trang trong chuỗi suốt 45 giây: em soi công thức, bỏ trang giả vào rổ rồi đặt đúng trang thật vào chỗ trống.',
     ],
     dieuKhien: {
       mayTinh: 'Kéo thẻ vào chuỗi hoặc vào rổ, hoặc bấm chọn thẻ rồi bấm vào chuỗi hoặc rổ · nút "Soi công thức" để tự tính mã trang.',
@@ -113,7 +113,7 @@ export const HUONG_DAN_GAME = {
       },
       {
         hinh: { art: 'ro-trang' },
-        may: 'Vòng 3 là giữ sổ trong 90 giây. {phanDien} liên tục tráo trang trong chuỗi: em kéo trang giả vào rổ rồi đặt đúng trang thật vào chỗ trống.',
+        may: 'Ghép xong chuỗi ở vòng 2 là tới đoạn giữ sổ 45 giây. {phanDien} liên tục tráo trang trong chuỗi: em kéo trang giả vào rổ rồi đặt đúng trang thật vào chỗ trống.',
       },
     ],
     nhac: {
@@ -121,7 +121,7 @@ export const HUONG_DAN_GAME = {
       batDau: 'Chọn thẻ có mã trang trước bằng mã G của trang bìa, rồi đặt vào ô đầu tiên của chuỗi.',
       ghep: 'Tìm thẻ có mã trang trước bằng mã trang của thẻ cuối chuỗi. Nghi mã trang sai thì bấm "Soi công thức".',
       coTrangGia: 'Trong xấp giấy có một trang giả: mã trang trước khớp nhưng mã trang sai công thức. Soi công thức rồi kéo nó vào rổ.',
-      giuSoChuaChay: 'Vòng giữ sổ: bấm "Bắt đầu giữ sổ" khi em sẵn sàng thì đồng hồ mới chạy.',
+      giuSoChuaChay: 'Đoạn giữ sổ: bấm "Bắt đầu giữ sổ" khi em sẵn sàng thì đồng hồ mới chạy.',
       oTrong: 'Chuỗi có ô trống: đặt đúng trang thật vào đó. Soi công thức nếu chưa chắc.',
       giuSo: '{phanDien} đang tráo trang trong chuỗi. Soi công thức, kéo trang giả vào rổ rồi đặt trang thật vào chỗ trống.',
       xongVong: 'Vòng này xong rồi. Bấm nút để sang vòng kế tiếp.',

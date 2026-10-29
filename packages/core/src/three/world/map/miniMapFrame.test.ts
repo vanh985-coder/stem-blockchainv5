@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { PIN_MARGIN, newScratch, placeMarker, placeView, type MarkerPlacement } from './miniMapFrame';
+import { PIN_MARGIN, VISIBLE_MARGIN, newScratch, placeMarker, placeView, type MarkerPlacement } from './miniMapFrame';
 import { MAP_RADIUS_OUTSIDE, MAP_RADIUS_VILLAGE, type MapView } from './mapProjection';
 
 const fresh = (): MapView => ({ cx: 0, cz: 0, radius: 1, size: 180, rotation: 0 });
-const out = (): MarkerPlacement => ({ transform: '', pinned: false, pinAngle: 0 });
+const out = (): MarkerPlacement => ({ transform: '', pinned: false, pinAngle: 0, visible: true });
 
 describe('một nhịp cập nhật của bản đồ nhỏ', () => {
   it('khung nhìn theo em: tâm là vị trí em, ở ngoài làng bán kính 88, trong làng bán kính 60', () => {
@@ -58,5 +58,35 @@ describe('một nhịp cập nhật của bản đồ nhỏ', () => {
       expect(p.pinned).toBe(true);
       expect(p.pinAngle).toBeCloseTo(0, 6);
     }
+  });
+
+  describe('ký hiệu chỉ vẽ khi nằm trong vòng đang hiện (thẻ chưa nhặt trên bản đồ nhỏ)', () => {
+    const near = (yaw: number, rotate: boolean) => placeView(fresh(), { x: 0, z: 0 }, yaw, rotate, false, 180);
+    it('trong vòng: hiện; ngoài vòng: ẩn; mép vòng cộng biên vẫn hiện', () => {
+      const v = near(0, false);
+      expect(placeMarker(v, false, 0, 40, newScratch(), out()).visible).toBe(true);
+      expect(placeMarker(v, false, 0, MAP_RADIUS_OUTSIDE, newScratch(), out()).visible).toBe(true);
+      expect(placeMarker(v, false, 0, MAP_RADIUS_OUTSIDE * (1 + VISIBLE_MARGIN / 90) - 0.5, newScratch(), out()).visible).toBe(true);
+      expect(placeMarker(v, false, 0, MAP_RADIUS_OUTSIDE * 1.5, newScratch(), out()).visible).toBe(false);
+      expect(placeMarker(v, false, 300, 0, newScratch(), out()).visible).toBe(false);
+    });
+    it('điểm đến luôn hiện (được kéo về mép)', () => {
+      expect(placeMarker(near(0, false), true, 0, 500, newScratch(), out()).visible).toBe(true);
+    });
+    it('hướng bắc và xoay theo hướng nhìn cho cùng kết luận trong/ngoài vòng (xoay không đổi khoảng cách)', () => {
+      const points: [number, number][] = [[10, 20], [-50, 30], [0, 95], [80, 80], [-130, 0], [30, -70]];
+      for (const yaw of [0, 0.7, 2.1, -1.4]) {
+        for (const [x, z] of points) {
+          const north = placeMarker(near(yaw, false), false, x, z, newScratch(), out()).visible;
+          const rotated = placeMarker(near(yaw, true), false, x, z, newScratch(), out()).visible;
+          expect(rotated).toBe(north);
+        }
+      }
+    });
+    it('trong làng (bán kính 60) vòng hẹp hơn: thẻ cách 70 ẩn, cách 50 hiện', () => {
+      const v = placeView(fresh(), { x: 0, z: 0 }, 0, false, true, 180);
+      expect(placeMarker(v, false, 0, 70, newScratch(), out()).visible).toBe(false);
+      expect(placeMarker(v, false, 0, 50, newScratch(), out()).visible).toBe(true);
+    });
   });
 });

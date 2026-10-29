@@ -117,10 +117,11 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
         ownerName = T.khoaLaKhongCoTrong;
       }
 
+      // Máy xác minh chỉ là công cụ: kết quả của máy chưa phải câu trả lời của em (em còn phải nộp thẩm định).
       if (isValid) {
-        sound.playCorrect();
+        sound.playCorrect({ answer: null });
       } else {
-        sound.playWrong();
+        sound.playWrong({ answer: null });
       }
 
       setVerifyResult({

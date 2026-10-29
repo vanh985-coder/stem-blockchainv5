@@ -31,7 +31,7 @@ export const STORY: readonly StoryFrame[] = [
   {
     n: 5,
     image: 'story/05-ti-chay',
-    text: '{phanDien}, cậu thiếu niên muốn thành lái buôn giàu nhất vùng, lẻn đi sửa sổ, giả dấu, trộn giao dịch. Sổ các làng lệch nhau, cổng làng đóng hết!',
+    text: '{phanDien}, cậu thiếu niên muốn thành lái buôn giàu nhất vùng, lẻn đi sửa sổ, giả dấu, trộn giao dịch. Sổ các làng lệch nhau, cả bốn làng đều đang cần giúp!',
   },
   {
     n: 6,

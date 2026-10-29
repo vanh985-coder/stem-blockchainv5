@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { AssetImage, Button, Hearts, Panel, ProgressBar, QuizCard, fmt, gameUi, pickQuestions, runnerScoreLabels, runnerUi, useGameHint, type MiniGameRenderProps, type Question, type ScorePart } from '@so-chung/core';
 import { Scene3D, isQualityChoice, type QualityChoice } from '@so-chung/core/three/index';
+import { PROBE } from '@so-chung/core/lib/dev';
 import { RUNNER_SPEC as SPEC } from './runnerConfig';
 import { SWIPE_MIN_PX, keyToCommand, swipeToCommand } from './runnerCommands';
 import { hintFor } from './runnerHint';
@@ -144,7 +145,8 @@ export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   const session = useMemo(() => new RunnerSession({ seed: newSeed() }), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
   // 4 câu hỏi Bài 1 cho ván này (không lặp, đã trộn thứ tự đáp án)
   const questions = useMemo(() => pickQuestions({ bai: 1, soCau: SPEC.rounds, seed: session.seed }), [session]);
-  if (import.meta.env.DEV) Object.assign(window, { __runner: session, __runnerQuestions: questions, __makeCell: makeCell });
+  // chỉ bản dev và bản đo `VITE_PROBE`: để script kiểm đọc trạng thái ván (tốc độ, tim, điểm)
+  if (PROBE) Object.assign(window, { __runner: session, __runnerQuestions: questions, __makeCell: makeCell });
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
   // Nút "?": câu nhắc theo trạng thái ván (không lộ đáp án)

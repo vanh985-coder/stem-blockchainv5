@@ -123,10 +123,7 @@ async function marketShots(browser) {
   await page.addStyleTag({ content: HIDE_WALK });
   await sleep(3500);
   await save(page, 'cho-di-lai');
-  // thế giới mở (bước W1): cổng ở đầu làng, cách tâm chợ 72; đứng trên đường cách cổng 9
-  await place(page, 0, -63, Math.PI);
-  await sleep(5000);
-  await save(page, 'cong-dong');
+  // thế giới mở (bước W1): cổng ở đầu làng, cách tâm chợ 72; đứng trên đường cách cổng 9 (P3a: cả 4 cổng mở từ đầu nên không còn ảnh cổng đóng)
   await place(page, 0, 63, 0);
   await sleep(5000);
   await save(page, 'cong-mo');

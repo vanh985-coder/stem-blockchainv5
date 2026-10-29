@@ -1,0 +1,26 @@
+[
+ {
+  "label": "truoc",
+  "size": "1366x768",
+  "area": "tốc độ",
+  "name": "bản cũ: tốc độ trung bình 10.00 (danh nghĩa 10 đầu ván)",
+  "ok": true,
+  "detail": "{\"frames\":32,\"meanSpeed\":10.000000000000018,\"maxSpeed\":10.000000000000071,\"worstDeviation\":7.105427357601002e-14,\"maxStepsPerFrame\":5}"
+ },
+ {
+  "label": "truoc",
+  "size": "360x800",
+  "area": "tốc độ",
+  "name": "bản cũ: tốc độ trung bình 10.04 (danh nghĩa 10 đầu ván)",
+  "ok": true,
+  "detail": "{\"frames\":68,\"meanSpeed\":10.042352941176443,\"maxSpeed\":10.300000000000011,\"worstDeviation\":0.12000000000005073,\"maxStepsPerFrame\":5}"
+ },
+ {
+  "label": "truoc",
+  "size": "844x390",
+  "area": "tốc độ",
+  "name": "bản cũ: tốc độ trung bình 10.05 (danh nghĩa 10 đầu ván)",
+  "ok": true,
+  "detail": "{\"frames\":70,\"meanSpeed\":10.052285714285683,\"maxSpeed\":10.300000000000011,\"worstDeviation\":0.05999999999988859,\"maxStepsPerFrame\":5}"
+ }
+]

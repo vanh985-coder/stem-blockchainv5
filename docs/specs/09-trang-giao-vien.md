@@ -22,6 +22,7 @@
 - Chưa chơi: ô trống.
 - Bài học: số sao (★ 0–3) của từng trạm Dễ / Trung bình / Khó.
 - Game: ✓ nếu đã chơi, kèm mốc đồng / bạc / vàng nếu đạt.
+- **Tự hoàn thành (P3b):** màn chỉ có cờ "tự hoàn thành" (giáo viên/bản thử bấm để đi tiếp, không điểm, sao hay xu) hiện "⏭ Tự hoàn thành", KHÁC hoàn thành thật (có sao hoặc mốc); đã chơi dở mà còn cờ thì thêm hậu tố " · tự hoàn thành"; đã xong thật thì không hiện cờ. Có dòng chú thích dưới bảng, ô trong CSV cùng chữ, chi tiết học sinh ghi "Tự hoàn thành, không có điểm hay sao". Cờ không tính là "chơi gần nhất". Dữ liệu: hàm `class_progress` trả thêm cột `auto_completed` (`supabase/migrations/0003_auto_complete.sql`, xóa hàm cũ rồi tạo lại); máy chủ chưa chạy migration thì không có cột, trang vẫn đọc được.
 
 **Tab Tiến độ còn có:**
 - Ô tìm theo tên.

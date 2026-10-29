@@ -1,0 +1,25 @@
+✗ màn 7 trạm 0 @ 1366x768: 15 bước, 5 đợt khen đúng
+✗ màn 7 trạm 1 @ 1366x768: 37 bước, 2 đợt khen đúng
+✗ màn 7 trạm 2 @ 1366x768: 19 bước, 2 đợt khen đúng
+✗ màn 7 trạm 2 (máy tự dò) @ 1366x768: 6 bước, 1 đợt khen đúng
+✗ màn 10 trạm 0 @ 1366x768: 12 bước, 6 đợt khen đúng
+✗ màn 10 trạm 1 @ 1366x768: 20 bước, 5 đợt khen đúng
+✗ màn 10 trạm 2 @ 1366x768: 7 bước, 2 đợt khen đúng
+
+LỖI:
+màn 7 trạm 0 @ 1366x768 — trang bài không in ra chú thích của mã nguồn: kỳ vọng 1, thực tế 0
+màn 7 trạm 0 @ 1366x768 — phần 2: bấm "Kiểm tra kết quả" khi CHƯA đặt thẻ nào: kỳ vọng 0 đợt khen, thực tế 1
+màn 7 trạm 0 @ 1366x768 — phần 2: bấm "Kiểm tra" lần nữa khi không có thẻ mới (không khen lại): kỳ vọng 0 đợt khen, thực tế 1
+màn 7 trạm 1 @ 1366x768 — trang bài không in ra chú thích của mã nguồn: kỳ vọng 1, thực tế 0
+màn 7 trạm 1 @ 1366x768 — máy xác minh: bấm "Kiểm tra chữ ký" thẻ 1 (kết quả của máy không được khen): kỳ vọng 0 đợt khen, thực tế 1
+màn 7 trạm 1 @ 1366x768 — máy xác minh: bấm "Kiểm tra chữ ký" thẻ 2 (kết quả của máy không được khen): kỳ vọng 0 đợt khen, thực tế 1
+màn 7 trạm 1 @ 1366x768 — máy xác minh: bấm "Kiểm tra chữ ký" thẻ 2 (kết quả của máy không được khen): kỳ vọng 0 đợt khen, thực tế 1
+màn 7 trạm 1 @ 1366x768 — máy xác minh: bấm "Kiểm tra chữ ký" thẻ 4 (kết quả của máy không được khen): kỳ vọng 0 đợt khen, thực tế 1
+màn 7 trạm 2 @ 1366x768 — trang bài không in ra chú thích của mã nguồn: kỳ vọng 1, thực tế 0
+màn 7 trạm 2 @ 1366x768 — phần 2: gõ x = 405547 (em tự đoán trúng) rồi bấm "Thử giá trị x": kỳ vọng 1 đợt khen, thực tế 0
+màn 7 trạm 2 @ 1366x768 — phần 3: chọn đáp án ĐÚNG "Không ai cả": kỳ vọng 1 đợt khen, thực tế 0
+màn 7 trạm 2 (máy tự dò) @ 1366x768 — trang bài không in ra chú thích của mã nguồn: kỳ vọng 1, thực tế 0
+màn 10 trạm 0 @ 1366x768 — trang bài không in ra chú thích của mã nguồn: kỳ vọng 1, thực tế 0
+màn 10 trạm 1 @ 1366x768 — trang bài không in ra chú thích của mã nguồn: kỳ vọng 1, thực tế 0
+màn 10 trạm 1 @ 1366x768 — hoạt cảnh sửa trộm phát tiếng sai 1 giây sau khi trúng nhưng lời khen vẫn hiện: kỳ vọng 1, thực tế 0
+màn 10 trạm 2 @ 1366x768 — trang bài không in ra chú thích của mã nguồn: kỳ vọng 1, thực tế 0

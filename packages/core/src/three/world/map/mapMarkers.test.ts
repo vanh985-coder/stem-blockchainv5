@@ -64,24 +64,37 @@ describe('ký hiệu trên bản đồ', () => {
     expect(of(ms, 'board').every((b) => b.mark === 'open')).toBe(true);
   });
 
-  it('thẻ chưa nhặt: chỉ hiện khi đang ở trong làng đó; thẻ đã nhặt biến mất', () => {
-    expect(of(mapMarkers(base(), 'mini'), 'scroll')).toHaveLength(0);
-    expect(of(mapMarkers(base(), 'big'), 'scroll')).toHaveLength(0);
-    expect(of(mapMarkers(base({ inside: 'lang-bac' }), 'mini'), 'scroll')).toHaveLength(4); // Làng Bạc có 4 thẻ rải (bước L5)
-    expect(of(mapMarkers(base({ inside: 'lang-khac-dau' }), 'mini'), 'scroll')).toHaveLength(4); // Làng Khắc Dấu có 4 thẻ rải (bước L3)
-    expect(of(mapMarkers(base({ inside: 'lang-det' }), 'mini'), 'scroll')).toHaveLength(4); // Làng Dệt có 4 thẻ rải
+  it('thẻ chưa nhặt (P2b): khách mới thấy đủ 16 thẻ của cả 4 làng ở cả hai bản đồ, kể cả khi đang ngoài làng', () => {
     for (const scope of ['mini', 'big'] as const) {
-      const all = of(mapMarkers(base({ inside: 'lang-giay' }), scope), 'scroll');
-      expect(all.map((s) => s.index)).toEqual([0, 1, 2, 3]);
-      const some = of(mapMarkers(base({ inside: 'lang-giay', knowMasks: { 'lang-giay': 0b0101 } }), scope), 'scroll');
-      expect(some.map((s) => s.index)).toEqual([1, 3]);
-      expect(of(mapMarkers(base({ inside: 'lang-giay', knowMasks: { 'lang-giay': 15 } }), scope), 'scroll')).toHaveLength(0);
+      for (const inside of [null, 'lang-giay', 'lang-bac'] as const) {
+        const all = of(mapMarkers(base({ inside }), scope), 'scroll');
+        expect(all).toHaveLength(16);
+        for (const id of ['lang-giay', 'lang-det', 'lang-khac-dau', 'lang-bac'] as const) expect(all.filter((s) => s.village === id).map((s) => s.index)).toEqual([0, 1, 2, 3]);
+      }
+    }
+  });
+
+  it('thẻ đã nhặt biến mất, thẻ còn lại giữ đúng chỗ thật của vật thể trong bố cục', () => {
+    for (const scope of ['mini', 'big'] as const) {
+      const some = of(mapMarkers(base({ knowMasks: { 'lang-giay': 0b0101, 'lang-det': 15, 'lang-bac': 0b1000 } }), scope), 'scroll');
+      expect(some.filter((s) => s.village === 'lang-giay').map((s) => s.index)).toEqual([1, 3]);
+      expect(some.filter((s) => s.village === 'lang-det')).toHaveLength(0);
+      expect(some.filter((s) => s.village === 'lang-khac-dau')).toHaveLength(4);
+      expect(some.filter((s) => s.village === 'lang-bac').map((s) => s.index)).toEqual([0, 1, 2]);
+      expect(some).toHaveLength(2 + 0 + 4 + 3);
+      for (const m of some) {
+        const v = world.villages.find((q) => q.id === m.village)!;
+        const real = v.layout.scrolls!.find((q) => q.index === m.index)!;
+        expect([m.x, m.z]).toEqual([real.x, real.z]);
+      }
+      expect(of(mapMarkers(base({ knowMasks: { 'lang-giay': 15, 'lang-det': 15, 'lang-khac-dau': 15, 'lang-bac': 15 } }), scope), 'scroll')).toHaveLength(0);
     }
   });
 
   it('thẻ nằm đúng chỗ cuộn giấy trong làng', () => {
     const giay = world.villages[0];
-    const ms = of(mapMarkers(base({ inside: 'lang-giay' }), 'mini'), 'scroll');
+    const ms = of(mapMarkers(base({ inside: 'lang-giay' }), 'mini'), 'scroll').filter((m) => m.village === 'lang-giay');
+    expect(ms).toHaveLength(4);
     for (const s of ms) {
       const sc = giay.layout.scrolls!.find((q) => q.index === s.index)!;
       expect([s.x, s.z]).toEqual([sc.x, sc.z]);

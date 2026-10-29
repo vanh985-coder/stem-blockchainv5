@@ -8,7 +8,8 @@ import { RIVER_CENTER_X, RIVER_TRUNK_HALF, RIVER_TRUNK_WIDTH, riverBranch, smoot
 import { BRIDGE_HALF_WIDTH } from '../worldLayout';
 import type { WorldLayout } from '../worldLayout';
 import { reservedCenter } from '../worldLayout';
-import { VILLAGE_RADIUS } from '../worldFrames';
+import { VILLAGE_RADIUS, type VillageFrame } from '../worldFrames';
+import type { VillageLayoutInput } from '../../village/villageLayout';
 
 export interface RoadStroke {
   /** Đường vẽ: các đoạn thẳng "M x z L x z" cùng bề rộng và loại */
@@ -66,7 +67,15 @@ export function ribbonPolygon(points: readonly RiverPoint[]): string {
   return `M${left.join(' L')} L${right.reverse().join(' L')} Z`;
 }
 
-export function buildMapGeometry(world: Pick<WorldLayout, 'roads' | 'villages'>): MapGeometry {
+/** Phần của một làng mà bản đồ cần: bố cục đã ở tọa độ thế giới (`WorldVillage` hay kết quả `placeVillage` đều khớp). */
+export interface MapGeometryVillage {
+  id: VillageId;
+  frame: VillageFrame;
+  center: { x: number; z: number };
+  layout: Pick<VillageLayoutInput, 'roads' | 'ponds' | 'streams' | 'placements' | 'wall'>;
+}
+
+export function buildMapGeometry(world: { roads: WorldLayout['roads']; villages: readonly MapGeometryVillage[] }): MapGeometry {
   const groups = new Map<string, { width: number; kind: 'dat' | 'gach'; segs: string[] }>();
   const addRoad = (x0: number, z0: number, x1: number, z1: number, width: number, kind: 'dat' | 'gach') => {
     const key = `${width}|${kind}`;

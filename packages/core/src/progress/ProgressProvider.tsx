@@ -1,10 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from 'react';
 import { useAuth } from '../auth/AuthProvider';
-import { canSeeTeacherPage } from '../auth/roles';
+import { IS_DEV_BUILD, canSeeTeacherPage, canUseAutoComplete } from '../auth/roles';
 import { ui } from '../content/ui';
 import { Button } from '../ui/Button';
 import { Panel } from '../ui/Panel';
-import { type Snapshot, type SaveStatus } from './manager';
+import { type AutoResult, type AutoStatus, type Snapshot, type SaveStatus } from './manager';
 import { progressManager } from './singleton';
 import type { LevelResult } from './types';
 import type { VillageId } from '../village';
@@ -21,6 +21,12 @@ export interface ProgressState {
   saving: boolean;
   /** Đã kéo xong tiến độ từ máy chủ (chỉ có nghĩa khi đã đăng nhập) */
   synced: boolean;
+  /** Được thấy nút "Tự hoàn thành" (giáo viên/admin, bản dev; P3b) */
+  canAutoComplete: boolean;
+  /** Máy chủ dùng được cờ không: 'no' (chưa chạy migration 0003) và 'rejected' (từ chối tài khoản này) thì nút bị vô hiệu kèm thông báo; tiến độ chơi thật vẫn lưu bình thường */
+  autoStatus: AutoStatus;
+  /** Ghi cờ tự hoàn thành cho một màn (chỉ khi `canAutoComplete`) rồi đẩy ngay; kết quả nói rõ đã lưu, chưa lưu hay bị từ chối. Không điểm, sao, xu hay Trang Sổ Vàng. */
+  autoComplete: (levelId: number) => Promise<AutoResult>;
   /** Ghi kết quả một màn; trả số xu vừa nhận */
   record: (levelId: number, result: LevelResult) => { coinsEarned: number };
   /** Xong một màn: đẩy ngay, chờ xong mới cho rời trang */
@@ -65,8 +71,15 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   }, [loading, userId]);
 
   const isTeacher = canSeeTeacherPage(profile?.role);
-  const unlock = useMemo(() => progressManager.unlock(isTeacher), [snap.progress, isTeacher]);
+  const canAutoComplete = canUseAutoComplete(profile?.role, IS_DEV_BUILD);
+  // quyền dùng cờ tự hoàn thành đi theo vai trò hiện tại (đổi thì manager phát lại snapshot nên mở khóa bên dưới tính lại)
+  useEffect(() => {
+    progressManager.setAutoAllowed(canAutoComplete);
+  }, [canAutoComplete]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const unlock = useMemo(() => progressManager.unlock(isTeacher), [snap, isTeacher, canAutoComplete]);
 
+  const autoComplete = useCallback((levelId: number) => progressManager.requestAutoComplete(levelId), []);
   const record = useCallback((levelId: number, result: LevelResult) => progressManager.record(levelId, result), []);
   const saveNow = useCallback(() => progressManager.saveNow(), []);
   const startGuest = useCallback(() => progressManager.startGuest(), []);
@@ -89,6 +102,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       coins: snap.progress.game.coins,
       goldenPages: unlock.goldenPages,
       unlock,
+      canAutoComplete,
+      autoStatus: snap.autoStatus,
+      autoComplete,
       saving: snap.saving,
       synced: snap.synced,
       record,
@@ -123,6 +139,9 @@ const FALLBACK: ProgressState = {
   coins: 0,
   goldenPages: 0,
   unlock: progressManager.unlock(),
+  canAutoComplete: false,
+  autoStatus: 'yes',
+  autoComplete: async () => 'unavailable',
   saving: false,
   synced: false,
   record: () => ({ coinsEarned: 0 }),

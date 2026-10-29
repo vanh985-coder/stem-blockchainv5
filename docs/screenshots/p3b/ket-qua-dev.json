@@ -1,0 +1,1778 @@
+[
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 1: bản dev có nút \"Tự hoàn thành\" (trên thanh đầu bài học)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 1: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 1: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":1,\"row\":[0,0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 1: sau tự hoàn thành, màn 2 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 1: màn 3 vẫn khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 1: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 2: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 2: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 2: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":2,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 2: sau tự hoàn thành, màn 3 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 2: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 3: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 3: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 3: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":4,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 3: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 4: bản dev có nút \"Tự hoàn thành\" (trên thanh đầu bài học)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 4: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 4: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":8,\"row\":[0,0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 4: sau tự hoàn thành, màn 5 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 4: màn 6 vẫn khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 4: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 5: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 5: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 5: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":16,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 5: sau tự hoàn thành, màn 6 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 5: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 6: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 6: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 6: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":32,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 6: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 7: bản dev có nút \"Tự hoàn thành\" (trên thanh đầu bài học)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 7: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 7: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":64,\"row\":[0,0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 7: sau tự hoàn thành, màn 8 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 7: màn 9 vẫn khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 7: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 8: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 8: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 8: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":128,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 8: sau tự hoàn thành, màn 9 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 8: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 9: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 9: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 9: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":256,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 9: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 10: bản dev có nút \"Tự hoàn thành\" (trên thanh đầu bài học)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 10: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 10: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":512,\"row\":[0,0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 10: sau tự hoàn thành, màn 11 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 10: màn 12 vẫn khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 10: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 11: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 11: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 11: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":1024,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 11: sau tự hoàn thành, màn 12 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 11: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 12: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 12: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 12: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":2048,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "dev",
+  "name": "màn 12: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "bấm lặp",
+  "name": "bấm 3 lần liên tiếp: đúng một cờ, một dòng tiến độ, xu 0, trang 0",
+  "ok": true,
+  "detail": "{\"ac\":1,\"lv\":{\"1\":[0,0,0,0,0]},\"c\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "bấm lặp",
+  "name": "tải lại: màn đã tự hoàn thành thì không còn nút để bấm lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "bấm lặp",
+  "name": "tải lại: tiến độ giữ nguyên (không bản ghi trùng)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "giữa ván",
+  "name": "màn 6: hộp \"?\" (ván đang tạm dừng) có nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "giữa ván",
+  "name": "màn 6: ván dừng (khung game đã gỡ), không hiện màn kết quả, không ghi điểm/sao/xu",
+  "ok": true,
+  "detail": "{\"ac\":32,\"row\":[0,0,0,0]}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "giữa ván",
+  "name": "màn 12: hộp \"?\" (ván đang tạm dừng) có nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "giữa ván",
+  "name": "màn 12: ván dừng (khung game đã gỡ), không hiện màn kết quả, không ghi điểm/sao/xu",
+  "ok": true,
+  "detail": "{\"ac\":2048,\"row\":[0,0,0,0]}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "giữa ván",
+  "name": "màn 11: hộp \"?\" (ván đang tạm dừng) có nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "giữa ván",
+  "name": "màn 11: ván dừng (khung game đã gỡ), không hiện màn kết quả, không ghi điểm/sao/xu",
+  "ok": true,
+  "detail": "{\"ac\":1024,\"row\":[0,0,0,0]}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "chơi thật sau",
+  "name": "chơi thật màn 6 sau khi tự hoàn thành: ghi kết quả thật bình thường (đã chơi, có điểm), không bị cờ cản",
+  "ok": true,
+  "detail": "[1,0,0,30]"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "chơi thật sau",
+  "name": "cờ không bị xóa hay ghi đè thành tích; màn hiện \"Xong\" thật (không còn là chỉ tự hoàn thành)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "đủ 12 màn",
+  "name": "tự hoàn thành lần lượt cả 12 màn: đủ 12 cờ, không xu, không Trang Sổ Vàng",
+  "ok": true,
+  "detail": "{\"ac\":4095,\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "đủ 12 màn",
+  "name": "/ban-do: 0/4 Trang Sổ Vàng đã nhận (tự hoàn thành không trao trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "đủ 12 màn",
+  "name": "bảng Làng Bạc: cả 3 màn \"Tự hoàn thành\", KHÔNG có nút \"Xem cảnh cuối\" (cao trào chỉ mở bằng hoàn thành thật)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 1: bản dev có nút \"Tự hoàn thành\" (trên thanh đầu bài học)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 1: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 1: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":1,\"row\":[0,0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 1: sau tự hoàn thành, màn 2 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 1: màn 3 vẫn khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 1: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 2: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 2: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 2: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":2,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 2: sau tự hoàn thành, màn 3 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 2: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 3: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 3: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 3: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":4,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 3: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 4: bản dev có nút \"Tự hoàn thành\" (trên thanh đầu bài học)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 4: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 4: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":8,\"row\":[0,0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 4: sau tự hoàn thành, màn 5 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 4: màn 6 vẫn khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 4: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 5: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 5: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 5: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":16,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 5: sau tự hoàn thành, màn 6 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 5: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 6: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 6: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 6: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":32,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 6: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 7: bản dev có nút \"Tự hoàn thành\" (trên thanh đầu bài học)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 7: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 7: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":64,\"row\":[0,0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 7: sau tự hoàn thành, màn 8 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 7: màn 9 vẫn khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 7: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 8: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 8: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 8: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":128,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 8: sau tự hoàn thành, màn 9 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 8: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 9: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 9: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 9: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":256,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 9: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 10: bản dev có nút \"Tự hoàn thành\" (trên thanh đầu bài học)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 10: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 10: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":512,\"row\":[0,0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 10: sau tự hoàn thành, màn 11 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 10: màn 12 vẫn khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 10: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 11: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 11: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 11: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":1024,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 11: sau tự hoàn thành, màn 12 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 11: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 12: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 12: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 12: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":2048,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "dev",
+  "name": "màn 12: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "bấm lặp",
+  "name": "bấm 3 lần liên tiếp: đúng một cờ, một dòng tiến độ, xu 0, trang 0",
+  "ok": true,
+  "detail": "{\"ac\":1,\"lv\":{\"1\":[0,0,0,0,0]},\"c\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "bấm lặp",
+  "name": "tải lại: màn đã tự hoàn thành thì không còn nút để bấm lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "bấm lặp",
+  "name": "tải lại: tiến độ giữ nguyên (không bản ghi trùng)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "giữa ván",
+  "name": "màn 6: hộp \"?\" (ván đang tạm dừng) có nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "giữa ván",
+  "name": "màn 6: ván dừng (khung game đã gỡ), không hiện màn kết quả, không ghi điểm/sao/xu",
+  "ok": true,
+  "detail": "{\"ac\":32,\"row\":[0,0,0,0]}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "giữa ván",
+  "name": "màn 12: hộp \"?\" (ván đang tạm dừng) có nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "giữa ván",
+  "name": "màn 12: ván dừng (khung game đã gỡ), không hiện màn kết quả, không ghi điểm/sao/xu",
+  "ok": true,
+  "detail": "{\"ac\":2048,\"row\":[0,0,0,0]}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "giữa ván",
+  "name": "màn 11: hộp \"?\" (ván đang tạm dừng) có nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "giữa ván",
+  "name": "màn 11: ván dừng (khung game đã gỡ), không hiện màn kết quả, không ghi điểm/sao/xu",
+  "ok": true,
+  "detail": "{\"ac\":1024,\"row\":[0,0,0,0]}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "chơi thật sau",
+  "name": "chơi thật màn 6 sau khi tự hoàn thành: ghi kết quả thật bình thường (đã chơi, có điểm), không bị cờ cản",
+  "ok": true,
+  "detail": "[1,0,0,40]"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "chơi thật sau",
+  "name": "cờ không bị xóa hay ghi đè thành tích; màn hiện \"Xong\" thật (không còn là chỉ tự hoàn thành)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "đủ 12 màn",
+  "name": "tự hoàn thành lần lượt cả 12 màn: đủ 12 cờ, không xu, không Trang Sổ Vàng",
+  "ok": true,
+  "detail": "{\"ac\":4095,\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "đủ 12 màn",
+  "name": "/ban-do: 0/4 Trang Sổ Vàng đã nhận (tự hoàn thành không trao trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "đủ 12 màn",
+  "name": "bảng Làng Bạc: cả 3 màn \"Tự hoàn thành\", KHÔNG có nút \"Xem cảnh cuối\" (cao trào chỉ mở bằng hoàn thành thật)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 1: bản dev có nút \"Tự hoàn thành\" (trên thanh đầu bài học)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 1: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 1: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":1,\"row\":[0,0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 1: sau tự hoàn thành, màn 2 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 1: màn 3 vẫn khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 1: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 2: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 2: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 2: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":2,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 2: sau tự hoàn thành, màn 3 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 2: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 3: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 3: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 3: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":4,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 3: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 4: bản dev có nút \"Tự hoàn thành\" (trên thanh đầu bài học)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 4: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 4: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":8,\"row\":[0,0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 4: sau tự hoàn thành, màn 5 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 4: màn 6 vẫn khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 4: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 5: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 5: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 5: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":16,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 5: sau tự hoàn thành, màn 6 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 5: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 6: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 6: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 6: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":32,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 6: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 7: bản dev có nút \"Tự hoàn thành\" (trên thanh đầu bài học)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 7: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 7: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":64,\"row\":[0,0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 7: sau tự hoàn thành, màn 8 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 7: màn 9 vẫn khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 7: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 8: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 8: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 8: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":128,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 8: sau tự hoàn thành, màn 9 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 8: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 9: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 9: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 9: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":256,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 9: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 10: bản dev có nút \"Tự hoàn thành\" (trên thanh đầu bài học)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 10: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 10: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":512,\"row\":[0,0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 10: sau tự hoàn thành, màn 11 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 10: màn 12 vẫn khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 10: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 11: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 11: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 11: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":1024,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 11: sau tự hoàn thành, màn 12 (kế tiếp trong làng) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 11: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 12: bản dev có nút \"Tự hoàn thành\" (ở thẻ bắt đầu game)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 12: hiện khung \"Đã tự hoàn thành\", nói rõ không có điểm, sao, huy chương hay xu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 12: tiến độ chỉ có cờ (không điểm/sao/xu/trang; màn khác không đổi)",
+  "ok": true,
+  "detail": "{\"ac\":2048,\"row\":[0,0,0,0],\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "dev",
+  "name": "màn 12: tải lại và mở /ban-do: bảng làng ghi \"Tự hoàn thành\" (không số sao), cờ còn trong cookie",
+  "ok": true,
+  "detail": "chips=1"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "bấm lặp",
+  "name": "bấm 3 lần liên tiếp: đúng một cờ, một dòng tiến độ, xu 0, trang 0",
+  "ok": true,
+  "detail": "{\"ac\":1,\"lv\":{\"1\":[0,0,0,0,0]},\"c\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "bấm lặp",
+  "name": "tải lại: màn đã tự hoàn thành thì không còn nút để bấm lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "bấm lặp",
+  "name": "tải lại: tiến độ giữ nguyên (không bản ghi trùng)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "giữa ván",
+  "name": "màn 6: hộp \"?\" (ván đang tạm dừng) có nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "giữa ván",
+  "name": "màn 6: ván dừng (khung game đã gỡ), không hiện màn kết quả, không ghi điểm/sao/xu",
+  "ok": true,
+  "detail": "{\"ac\":32,\"row\":[0,0,0,0]}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "giữa ván",
+  "name": "màn 12: hộp \"?\" (ván đang tạm dừng) có nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "giữa ván",
+  "name": "màn 12: ván dừng (khung game đã gỡ), không hiện màn kết quả, không ghi điểm/sao/xu",
+  "ok": true,
+  "detail": "{\"ac\":2048,\"row\":[0,0,0,0]}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "giữa ván",
+  "name": "màn 11: hộp \"?\" (ván đang tạm dừng) có nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "giữa ván",
+  "name": "màn 11: ván dừng (khung game đã gỡ), không hiện màn kết quả, không ghi điểm/sao/xu",
+  "ok": true,
+  "detail": "{\"ac\":1024,\"row\":[0,0,0,0]}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "chơi thật sau",
+  "name": "chơi thật màn 6 sau khi tự hoàn thành: ghi kết quả thật bình thường (đã chơi, có điểm), không bị cờ cản",
+  "ok": true,
+  "detail": "[1,0,0,30]"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "chơi thật sau",
+  "name": "cờ không bị xóa hay ghi đè thành tích; màn hiện \"Xong\" thật (không còn là chỉ tự hoàn thành)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "đủ 12 màn",
+  "name": "tự hoàn thành lần lượt cả 12 màn: đủ 12 cờ, không xu, không Trang Sổ Vàng",
+  "ok": true,
+  "detail": "{\"ac\":4095,\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "đủ 12 màn",
+  "name": "/ban-do: 0/4 Trang Sổ Vàng đã nhận (tự hoàn thành không trao trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "đủ 12 màn",
+  "name": "bảng Làng Bạc: cả 3 màn \"Tự hoàn thành\", KHÔNG có nút \"Xem cảnh cuối\" (cao trào chỉ mở bằng hoàn thành thật)",
+  "ok": true,
+  "detail": ""
+ }
+]

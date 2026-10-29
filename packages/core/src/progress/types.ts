@@ -13,6 +13,11 @@ export interface LevelProgress {
   stars: Stars;
   bestScore: number;
   updatedAt: number;
+  /**
+   * Cờ "tự hoàn thành" (P3b): giáo viên hay bản dev bấm nút để đi tiếp theo điều kiện mở màn. KHÔNG phải kết quả chơi: không có điểm, sao, huy chương hay xu;
+   * `played`, `completed`, `stars`, `bestScore` giữ nguyên thành tích thật (nếu có). Chỉ có mặt khi true.
+   */
+  auto?: true;
 }
 
 export interface GameState {
@@ -56,4 +61,10 @@ export function emptyProgress(): Progress {
 /** Có dữ liệu đáng giữ không (đã chơi màn nào, hoặc có xu, hoặc có Trang Sổ Vàng). */
 export function hasProgress(p: Progress): boolean {
   return Object.keys(p.levels).length > 0 || p.game.coins > 0 || p.game.goldenPages > 0;
+}
+
+/** Màn đã xong THẬT: bài học đủ 3 trạm (`completed`), game đã chơi (`played`, thắng hay thua). Không tính cờ tự hoàn thành. */
+export function isRealDone(kind: 'lesson' | 'game' | undefined, lv: LevelProgress | undefined): boolean {
+  if (!lv) return false;
+  return kind === 'lesson' ? lv.completed : lv.played || lv.completed;
 }

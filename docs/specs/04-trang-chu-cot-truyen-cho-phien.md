@@ -105,12 +105,13 @@ Xếp theo ảnh `concept-toan-canh` và `concept-cho-phien`. Phải **đủ đ�
 - **Mỗi làng một model riêng:** `env/cong-lang-giay`, `env/cong-lang-det`, `env/cong-lang-khac-dau`, `env/cong-lang-bac`. Không đổi màu.
 - **Cổng đã mở:**
   - (Từ bước W1) cổng đã mở thì đi thẳng qua, không còn bấm E hay chuyển trang: làng nằm trong cùng cảnh `/cho`, sau cổng. Chỉ cổng đang đóng mới có vật tương tác. (Trước W1: `gateUrl` chuyển sang subdomain; nay thay bằng `villageWorldUrl(urls, id, merged)` dùng cho "Về làng" / "Về chợ".)
-- **Cổng còn khóa:** code thêm thanh then gỗ và dây đỏ chắn ngang vòm cổng. Tương tác thì hiện "Cổng làng đóng vì sổ đang lệch. Hãy giúp [làng trước] trước nhé."
+- **(P3a, 29/10/2026) Cả 4 cổng mở từ đầu** cho học sinh đăng nhập và khách (xem spec 03 mục 6 "Mở khóa"): không còn cổng đóng, không còn hiệu ứng mở cổng; mô tả "cổng còn khóa" bên dưới chỉ còn là mã dự phòng (`isGateOpen` đóng khi `villageOpen` nói rõ `false`). Nhiệm vụ theo số Trang Sổ Vàng chỉ là gợi ý làng, không chặn làng nào.
+- **Cổng còn khóa (trước P3a):** code thêm thanh then gỗ và dây đỏ chắn ngang vòm cổng. Tương tác thì hiện "Cổng làng đóng vì sổ đang lệch. Hãy giúp [làng trước] trước nhé."
   - (Bước 8: lời của Bi trong hộp thoại; thanh then gỗ, hai thanh ngang, hai sợi dây đỏ bắt chéo và chùm tua do code dựng (`GateBarrier.tsx`); cổng đóng có vật cản mỏng chắn kín lối đi. Cổng thứ k mở khi có k Trang Sổ Vàng (`computeUnlock().villageOpen`), tài khoản giáo viên mở hết; hàm thuần ở `three/cho/marketQuest.ts`. Lời nhắc: "E: Vào Làng Giấy" (mở) hay "E: Xem cổng Làng Dệt" (đóng).)
 
 ### HUD
 
-- **Góc trên trái:** (từ bước X4) **bản đồ nhỏ**, ngay dưới là dòng "Nhiệm vụ: …". Bản đồ nhỏ: hướng bắc ở trên (chữ B), thấy cả 4 lối ra khi ở chợ, thấy bán kính 60 quanh em khi ở trong làng; vẽ đường, chợ, viền các làng, tên làng, cổng (mở hoặc khóa), biển màn chơi (xong / đang mở / khóa / sắp ra mắt), điểm đến của nhiệm vụ (khớp mũi tên dưới chân) và thẻ "Em có biết?" chưa nhặt (chỉ trong làng đó). Bấm phím **M** hoặc chạm bản đồ nhỏ để mở **bản đồ lớn** (cả thế giới, chú thích, tiến độ từng làng, dòng "Việc tiếp theo"). Chi tiết kỹ thuật: spec 03 mục 3.10.
+- **Góc trên trái:** (từ bước X4) **bản đồ nhỏ**, ngay dưới là dòng "Nhiệm vụ: …". Bản đồ nhỏ: hướng bắc ở trên (chữ B), thấy cả 4 lối ra khi ở chợ, thấy bán kính 60 quanh em khi ở trong làng; vẽ đường, chợ, viền các làng, tên làng, cổng (mở hoặc khóa), biển màn chơi (xong / đang mở / khóa / sắp ra mắt), điểm đến của nhiệm vụ (khớp mũi tên dưới chân) và thẻ "Em có biết?" chưa nhặt (P2b: cả 4 làng; bản đồ nhỏ chỉ vẽ thẻ trong vòng đang hiện). Bấm phím **M** hoặc chạm bản đồ nhỏ để mở **bản đồ lớn** (cả thế giới, chú thích, tiến độ từng làng, dòng "Việc tiếp theo"). Chi tiết kỹ thuật: spec 03 mục 3.10.
 - **Góc trên phải:** 4 ô Trang Sổ Vàng (icon `trang-vang`; trang chưa có thì mờ), nút menu.
 - **Chỉ đường:** mũi tên trên đầu nhân vật chỉ về cổng cần tới.
 - (Bước 8: `MarketHud.tsx`. Nhiệm vụ lấy từ `content/dialogues.ts` (`NHIEM_VU`, mục 5; 0 trang là "Đến Làng Giấy ở phía bắc gặp bác An."; đủ 4 trang là "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở." khi cờ `FESTIVAL_LAUNCHED` (`config/festival.ts`, mặc định false) còn tắt: không mũi tên, không điểm đến trên bản đồ; bước H1 bật cờ thì thành "Cả làng đang mở hội. Hãy đến dự hội làng nhé!"; Bi nói tương ứng "Đủ 4 trang rồi! Hội làng sắp mở."; hàm `questLine`/`biQuestLine` ở `three/cho/marketQuest.ts`, bản đồ lớn dùng chung dòng này). 4 ô Trang Sổ Vàng theo `unlock.goldenPages`. Mũi tên là mũi tên vàng dẹt bay nhấp nhô (đứng yên khi "Giảm chuyển động"), quay mượt về cổng của nhiệm vụ, ẩn khi tới gần cổng 6 đơn vị hoặc đủ 4 trang. Nút Menu: máy tính nhả khóa chuột rồi menu hiện ra, điện thoại bật menu.)
@@ -138,7 +139,7 @@ Bỏ qua được bằng nút "Bỏ qua".
 1. Lần lượt chiếu ảnh truyện 1, 2, 3, mỗi ảnh kèm lời truyện; bấm để sang ảnh tiếp.
 2. Vào cảnh 3D: Bi bay ra. Bi: "Chào {ten}! Đây là giấc mơ của cậu. Muốn tỉnh dậy, cậu phải học bí quyết giữ Sổ Chung của bốn làng. Mỗi làng trao một Trang Sổ Vàng, đủ 4 trang là cậu tỉnh!"
 3. {phanDien} chạy vụt qua chợ, ôm xấp trang sổ. {phanDien}: "Sổ mà có tên {phanDien} giàu nhất vùng thì ai cũng phải nể!" Rồi {phanDien} chạy mất về phía Làng Giấy.
-4. Tiếng mõ vang lên, 3 cổng làng đóng sập. Bi: "Chỉ còn cổng Làng Giấy mở. Đi thôi!"
+4. (P3a: cả 4 cổng mở từ đầu, không còn cổng đóng sập.) Bi: "Cả bốn làng đều đang chờ em. Mình ghé Làng Giấy trước nhé!"
 5. Nhiệm vụ mới: "Đến Làng Giấy ở phía bắc gặp bác An."
 
 ## 5. Khi nhận Trang Sổ Vàng
@@ -151,12 +152,12 @@ Bỏ qua được bằng nút "Bỏ qua".
 
 | Trang | Bi nói | Nhiệm vụ mới |
 |---|---|---|
-| 1 | "Một trang rồi! Cổng Làng Dệt đã mở." | Đến Làng Dệt ở phía nam gặp cụ Bình |
+| 1 | "Một trang rồi! Giờ mình tới Làng Dệt." | Đến Làng Dệt ở phía nam gặp cụ Bình |
 | 2 | "Hai trang! Giờ tới Làng Khắc Dấu." | Đến Làng Khắc Dấu ở phía tây gặp chú Dũng |
 | 3 | "Ba trang! Chỉ còn Làng Bạc thôi." | Đến Làng Bạc ở phía đông gặp thầy Linh |
 | 4 | "Đủ 4 trang rồi! Cả làng đang mở hội." | Chuyển sang `/hoi-lang` (spec 10) |
 
-**Trang Sổ Vàng 4 (mốc 3, bước B5):** không trao ở thế giới mở và không trao ngay sau màn 10. Trang thứ tư trao trong **cảnh cao trào sau màn 12** (spec 08): thầy Linh trao, hàng 4 ô, Bi nói "Đủ 4 trang rồi! Cả làng đang chuẩn bị mở hội." kèm dòng "Hội làng sắp mở" (khi `FESTIVAL_LAUNCHED` = true: "Cả làng đang mở hội.", không dòng đó; chi tiết ở spec 08). Vì vậy Làng Bạc không có cảnh trao trang riêng ở thế giới mở (`VILLAGE_SCENE` không có `lang-bac`) và không có hiệu ứng mở cổng nào sau trang 4.
+**Trang Sổ Vàng 4 (mốc 3, bước B5):** không trao ở thế giới mở và không trao ngay sau màn 10. Trang thứ tư trao trong **cảnh cao trào sau màn 12** (spec 08): thầy Linh trao, hàng 4 ô, Bi nói "Đủ 4 trang rồi! Cả làng đang chuẩn bị mở hội." kèm dòng "Hội làng sắp mở" (khi `FESTIVAL_LAUNCHED` = true: "Cả làng đang mở hội.", không dòng đó; chi tiết ở spec 08). Vì vậy Làng Bạc không có cảnh trao trang riêng ở thế giới mở (`VILLAGE_SCENE` không có `lang-bac`) và không có hiệu ứng mở cổng nào sau trang 4. **(P3a, hoàn thiện)** Các làng vào độc lập nên màn 12 có thể xong trước: cảnh chỉ chiếu khi đủ 4 trang; nếu đủ về sau thì xem từ màn kết quả của game vừa làm đủ trang, từ bảng Làng Bạc ở `/ban-do` hay theo dòng nhiệm vụ ở chợ, không phải chơi lại màn 12 (spec 08 "Cảnh cao trào").
 
 **Bản làm (mốc 2, bước 15a):**
 - **Cờ chiếu một lần**, mỗi làng một cờ trong `game_state.data` (chơi thử: một bit trong cookie `sc_guest`), hợp cờ khi gộp tiến độ: `goldenSeen` (cảnh người dẫn trao trang ở làng; cookie `gs`) và `gateOpenSeen` (hiệu ứng mở cổng ở chợ; cookie `go`). Hàm thuần `shouldShowGolden`, `pendingGateOpening` ở `progress/villageIntro.ts`, có test (`goldenFlags.test.ts`). Tài khoản giáo viên không chiếu.
@@ -167,8 +168,8 @@ Bỏ qua được bằng nút "Bỏ qua".
 
 Chợ và 4 làng nằm trong một cảnh 3D ở hub, địa chỉ vẫn `/cho` (kỹ thuật: spec 03 mục 6 "`WorldScene`").
 - **Sơ đồ** (nhìn từ trên, Bắc = +Z lên trên, Tây = +X sang trái màn hình khi nhìn từ phía nam): chợ ở giữa bán kính 42; Bắc Giấy, Nam Dệt, Tây Khắc Dấu, Đông Bạc; mỗi hướng một con đường đất dài 30 từ rìa chợ tới cổng làng (cách tâm chợ 72). Đường sang Bạc đi qua một cây cầu gỗ bắc qua sông ở phía đông chợ. Xem `/cho?cam=top` để nhìn cả thế giới từ trên cao.
-- **Cổng dời ra đầu mỗi làng.** Rìa chợ chỉ còn lối ra đường và **biển chỉ đường** gỗ ghi tên làng. Cổng làng chưa mở: có then gỗ, dây đỏ; thấy làng từ ngoài, không vào được; bấm E hiện "Cổng làng đóng…" như cũ.
-- **Mở đầu làng:** cảnh mở đầu và "Em có biết?" của làng chạy khi người chơi lần đầu bước qua cổng làng. Cảnh mở cổng Làng Dệt (bước 15a) chạy khi người chơi tới gần cổng Dệt lần đầu sau khi nhận Trang Sổ Vàng 1; dòng nhiệm vụ đổi ngay sau cảnh trao trang.
+- **Cổng dời ra đầu mỗi làng.** Rìa chợ chỉ còn lối ra đường và **biển chỉ đường** gỗ ghi tên làng. Cả 4 cổng làng mở từ đầu (P3a); mã cổng đóng (then gỗ, dây đỏ) chỉ còn là dự phòng.
+- **Mở đầu làng:** cảnh mở đầu và "Em có biết?" của làng chạy khi người chơi lần đầu bước qua cổng làng. (Trước P3a: cảnh mở cổng Làng Dệt chạy khi tới gần cổng Dệt lần đầu sau khi nhận Trang Sổ Vàng 1; đã tắt vì cổng mở từ đầu.) Dòng nhiệm vụ đổi ngay sau cảnh trao trang.
 - **Mũi tên dưới chân:** chỉ theo đường tới mục tiêu nhiệm vụ, ẩn khi gần mục tiêu; mũi tên trên đầu của chợ (bước 8) được thay bằng mũi tên này.
 - **Chỗ dành riêng bán kính 125 cho cả 4 làng (bước X3):** sau mỗi cổng (vẫn cách tâm chợ 72) có chỗ hình tròn bán kính 125, tâm cách tâm chợ 197; các chỗ cách nhau trên 25 và biên đi lại thế giới (`WORLD_BOUNDS` 345) bao hết cả bốn. **Sông** vẽ lại để không cắt qua làng nào: thân sông chạy dọc phía đông chợ (x từ −52 tới −37, tới z = ±40), hai nhánh uốn qua khe giữa các làng (Bắc–Đông và Nam–Đông; trung điểm (−98,5; ±98,5), rộng 9), cầu sang Làng Bạc vẫn bắc qua thân sông; hai bờ rải đá, mặt nước có vật cản (`three/world/river.ts`, có test).
 - **Làng Giấy dựng đủ (bước X3):** làng bán kính 125 với lũy tre, khu giữa làng (ba biển, bác An), xưởng làm giấy lớn, khu nhà ở 33 nhà, đình và sân đình, ao lớn có cầu ao, chợ làng nhỏ, giếng, vườn cây ăn quả, đồi tre, ruộng, 6 dân làng (chi tiết spec 05). Mũi tên dưới chân đi theo đường làng tới từng biển, tới bác An và tới cuộn giấy "Em có biết?" gần nhất chưa nhặt. `?tu=lang-giay` đưa người chơi tới (0, −99) trong làng, cách ba biển chừng 7.
@@ -193,7 +194,7 @@ Phần này để trống chỗ, **không làm trong đợt này**.
 - **Nền:** ảnh `ui/ban-do`, đã có sẵn trong `assets/ui/ban-do.jpg` (bản đồ vẽ tay bạn đã tạo theo DO-HOA-05). Tọa độ 4 điểm làng chỉnh bằng trang `/dev/ban-do-hotspots`, giống cách căn làn ở màn 5.
 - **4 điểm làng:** đặt trên ảnh theo tọa độ trong `banDoHotspots.ts`. Mỗi điểm có tên làng (code viết), 3 chấm nhỏ ứng với 3 màn, và icon Trang Sổ Vàng nếu đã nhận.
 - **Bấm vào một làng:** mở bảng bên cạnh, liệt kê 3 màn của làng đó. Mỗi màn hiện một trong các trạng thái:
-  - 🔒 Khóa (kèm dòng "Hoàn thành … để mở");
+  - 🔒 Khóa (kèm dòng "Hoàn thành … để mở": từ P3a chỉ khi màn trước TRONG CÙNG LÀNG chưa xong; làng nào cũng vào được từ đầu);
   - Mở (nút "Vào");
   - ✓ Đã xong (kèm số sao hoặc mốc điểm);
   - "Sắp ra mắt".
@@ -207,6 +208,8 @@ Phần này để trống chỗ, **không làm trong đợt này**.
 - **Hết giới thiệu** (xong hoặc "Bỏ qua") thì mở bảng làng như cũ. Bảng làng có thêm nút **"Xem lại giới thiệu"**.
 - Hàm thuần có test: có hiện giới thiệu không (lần đầu / đã xem) và ghép danh sách nhiệm vụ (`progress/villageIntro.ts`). Phần giới thiệu tải theo route, chỉ khi cần.
 - **Thẻ "Em có biết?" ở giới thiệu làng (bước X3):** làng có thẻ rải (hiện là Làng Giấy) hiện thêm **4 thẻ** trong phần giới thiệu (nhãn "Em có biết? · Thẻ n/4"); phải đọc hết 4 thẻ thì nút "Vào" ở bảng làng mới hiện (khi chưa đọc đủ, bảng ghi "Em đọc đủ 4 thẻ …"). Đọc hết đặt cùng cờ `knowCards` với việc nhặt cuộn giấy trong làng (`markAllKnowCards`), nên làm bên nào cũng đủ cho bên kia. Chữ ở `content/knowScrolls.ts`.
+
+- **Thẻ "Em có biết?" chưa nhặt (P2b):** ảnh bản đồ chung chỉ để chọn làng. Chọn một làng thì bảng làng có thêm **vùng bản đồ làng phóng to** vẽ từ bố cục thật của làng đó (đường, ao, nhà, viền; bắc ở trên), trên đó mỗi thẻ chưa nhặt là một hình thoi vàng đặt đúng chỗ thẻ nằm trong làng, có số 1 đến 4; danh sách bên dưới ghi tên khu ("Gần đình làng"…), kèm chú thích bằng chữ và số thẻ còn lại. Nhặt đủ thì thay bằng lời báo; nhặt thẻ ở làng 3D thì thẻ biến mất. Không tải cảnh 3D để xem. Chi tiết: spec 03 mục 3.9.
 
 **Điện thoại:** bản đồ co theo chiều ngang; bảng danh sách màn hiện thành tấm trượt lên từ dưới.
 

@@ -24,18 +24,11 @@ describe('cổng theo tiến độ', () => {
     expect(new Set(GATES.map((g) => g.id))).toEqual(new Set(GATE_ORDER));
   });
 
-  it('0 trang: chỉ cổng Giấy mở; mỗi trang mở thêm một cổng (tính từ computeUnlock)', () => {
-    const want: Record<number, boolean[]> = {
-      0: [true, false, false, false],
-      1: [true, true, false, false],
-      2: [true, true, true, false],
-      3: [true, true, true, true],
-      4: [true, true, true, true],
-    };
+  it('P3a: cả 4 cổng mở từ đầu, ở mọi số Trang Sổ Vàng (tính từ computeUnlock), cho học sinh và khách', () => {
     for (const pages of [0, 1, 2, 3, 4]) {
       const unlock = computeUnlock({ doneLevels: [], goldenPages: pages });
       const s = gateStates(unlock.villageOpen, false);
-      expect(GATE_ORDER.map((g) => s[g]), `${pages} trang`).toEqual(want[pages]);
+      expect(GATE_ORDER.map((g) => s[g]), `${pages} trang`).toEqual([true, true, true, true]);
     }
   });
 
@@ -45,18 +38,18 @@ describe('cổng theo tiến độ', () => {
     expect(GATE_ORDER.every((g) => s[g])).toBe(true);
   });
 
-  it('cổng đầu luôn mở, kể cả khi thiếu dữ liệu', () => {
+  it('thiếu dữ liệu thì cổng mở; chỉ đóng khi nói rõ false', () => {
     expect(isGateOpen('giay', [], false)).toBe(true);
-    expect(isGateOpen('det', [], false)).toBe(false);
+    expect(isGateOpen('det', [], false)).toBe(true);
+    expect(isGateOpen('bac', [true, true, true, false], false)).toBe(false);
+    expect(isGateOpen('bac', [true, true, true, false], true)).toBe(true);
   });
 
-  it('xong bài học làng Giấy chưa mở cổng Dệt; chơi xong màn 3 (màn sẵn sàng cuối) thì cổng Dệt mở', () => {
-    expect(gateStates(computeUnlock({ doneLevels: [1] }).villageOpen, false).det).toBe(false);
-    expect(gateStates(computeUnlock({ doneLevels: [1, 2] }).villageOpen, false).det).toBe(false);
-    const unlock = computeUnlock({ doneLevels: [1, 2, 3] });
-    expect(unlock.goldenPages).toBe(1);
-    expect(gateStates(unlock.villageOpen, false).det).toBe(true);
-    expect(gateStates(unlock.villageOpen, false)['khac-dau']).toBe(false);
+  it('xong làng sau trước làng trước không làm cổng nào đổi: Bạc mở ngay từ đầu, không cần Khắc Dấu', () => {
+    expect(gateStates(computeUnlock({ doneLevels: [] }).villageOpen, false).bac).toBe(true);
+    const bacOnly = computeUnlock({ doneLevels: [10, 11, 12] });
+    expect(gateStates(bacOnly.villageOpen, false)).toEqual({ giay: true, det: true, 'khac-dau': true, bac: true });
+    expect(bacOnly.goldenPages).toBe(0); // chưa trao trang nào sớm
   });
 
   it('làng cần giúp trước: Dệt → Giấy, Khắc Dấu → Dệt, Bạc → Khắc Dấu; Giấy không có', () => {

@@ -1,0 +1,53 @@
+[
+ {
+  "size": "1366x768",
+  "label": "truoc",
+  "frames": 32,
+  "meanSpeed": 10.000000000000018,
+  "maxSpeed": 10.000000000000071,
+  "worstDeviation": 7.105427357601002e-14,
+  "maxStepsPerFrame": 5,
+  "fps": {
+   "frames": 33,
+   "meanFps": 2.8,
+   "p5Fps": 1.5,
+   "worstFrameMs": 864,
+   "over50ms": 29,
+   "over100ms": 28
+  }
+ },
+ {
+  "size": "360x800",
+  "label": "truoc",
+  "frames": 68,
+  "meanSpeed": 10.042352941176443,
+  "maxSpeed": 10.300000000000011,
+  "worstDeviation": 0.12000000000005073,
+  "maxStepsPerFrame": 5,
+  "fps": {
+   "frames": 69,
+   "meanFps": 5.8,
+   "p5Fps": 4.3,
+   "worstFrameMs": 440,
+   "over50ms": 67,
+   "over100ms": 66
+  }
+ },
+ {
+  "size": "844x390",
+  "label": "truoc",
+  "frames": 70,
+  "meanSpeed": 10.052285714285683,
+  "maxSpeed": 10.300000000000011,
+  "worstDeviation": 0.05999999999988859,
+  "maxStepsPerFrame": 5,
+  "fps": {
+   "frames": 70,
+   "meanFps": 5.9,
+   "p5Fps": 4.3,
+   "worstFrameMs": 898,
+   "over50ms": 67,
+   "over100ms": 66
+  }
+ }
+]

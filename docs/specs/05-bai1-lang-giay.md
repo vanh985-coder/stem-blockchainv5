@@ -76,7 +76,7 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 
 **Đường chạy:**
 - 3 làn (x = −2, 0, 2). Nhân vật tự chạy.
-- Tốc độ bắt đầu **10** đơn vị/giây, tăng **0,3** mỗi 5 giây (theo bậc), tối đa **18**. (Bước X1: trước đó 8, 0,25 và 16; **đổi vì người dùng thấy màn 2 chạy chậm**. Cân bằng chạy lại ở dưới.)
+- Tốc độ bắt đầu **12** đơn vị/giây, tăng **0,36** mỗi 5 giây (theo bậc), tối đa **21,6**. (**P4a: gấp 1,2 lần** mức trước, 10 / 0,3 / 18; bước X1: trước đó 8, 0,25 và 16; đổi vì người dùng thấy màn 2 chạy chậm. Cân bằng chạy lại ở dưới và ở mục "P4a".)
 - {phanDien} luôn chạy ở phía trước, xa xa.
 
 **Điều khiển:**
@@ -135,9 +135,11 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 
 | Mốc | Điểm |
 |---|---|
-| Đồng | 200 |
-| Bạc | 380 |
-| Vàng | 520 |
+| Đồng | 216 |
+| Bạc | 499 |
+| Vàng | 638 |
+
+(**P4a:** mốc đặt lại theo quy tắc phân vị bot sau khi tăng tốc: Đồng = p25 bot trung bình, Bạc = p75 bot trung bình, Vàng = p10 bot giỏi; trước P4a là 200 / 380 / 520. Xem mục "P4a".)
 
 **Đã làm (mốc 2, bước 10 — chỉ phần luật, chưa vẽ):** `packages/village-lang-giay/src/runner/`:
 - `runnerLogic.ts`: `createRunner({ seed })` và `stepRunner(state, input, dt)` (sửa state tại chỗ, không cấp phát lúc chạy; cùng seed và cùng lệnh thì cùng kết quả). Bước 11 chỉ việc vẽ `state` (làn, `x`, `y`, `rows`, `items`, `villain`, `events`) và nối phím vào `input` (`move`, `jump`, `slide`; lúc hỏi: `answer`, `resume`). Hàm thuần: `speedAt`, `runnerScore`, `runnerMedal`, `minGap`.
@@ -157,7 +159,7 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 
 **Đã làm (mốc 2, bước 12 — vật nhặt, rơm, câu hỏi, điểm):** màn 2 chơi trọn được, `levels.ts` màn 2 là "ready", biển "Đuổi theo {phanDien}" mở theo `unlock.ts`, cuối màn 1 có nút "Chơi tiếp: Đuổi theo {phanDien}".
 - **Ván 4 vòng:** mỗi vòng 25 giây; hết vòng thì chạy chậm lại, hiện QuizCard (ngân hàng câu hỏi Bài 1, tên phản diện lấy từ `{phanDien}`). Đúng +3 trang; sai −1 tim và hiện giải thích; trả lời xong bấm tiếp thì tăng tốc lại theo `runnerLogic`. Ván kết thúc sau vòng 4 hoặc khi hết tim.
-- **Tốc độ** đúng spec: bắt đầu 10, **cộng 0,3 mỗi 5 giây theo bậc** (không tăng liên tục), tối đa 18 (`speedAt`, có test; bước X1, trước đó 8, 0,25 và 16).
+- **Tốc độ** đúng spec (P4a: số hiện hành 12 / 0,36 / 21,6): bắt đầu 10 (trước P4a), **cộng 0,3 mỗi 5 giây theo bậc** (không tăng liên tục), tối đa 18 (`speedAt`, có test; bước X1, trước đó 8, 0,25 và 16).
 - **Cân bằng sau khi tăng tốc (bước X1, 300 ván mỗi bot, cùng 300 seed; không đổi mốc điểm và tần suất vật nhặt):**
 
   | | Bot giỏi: Vàng | Bot giỏi: điểm trung bình (thấp nhất) | Bot trung bình: chưa đạt mốc | Đồng | Bạc | Vàng | điểm trung bình |
@@ -193,6 +195,37 @@ Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).
 | Có nón lá, va 2 lần liên tiếp | Lần đầu không mất tim, lần sau mất tim |
 | 23 trang, 50 tiền, 1080 m, 3 câu đúng | Điểm 478 |
 
+
+## P4a — Màn 2 nhanh hơn: tăng 20% tốc độ ở mọi vòng (29/10/2026)
+
+**Thay đổi (mức thử ban đầu theo yêu cầu):** tốc độ bắt đầu 10 → **12**, bước tăng 0,3 → **0,36** mỗi 5 giây, tối đa 18 → **21,6** (đúng 1,2 lần ở mọi giờ chạy: `SPEED_BOOST = 1,2` ở `runnerConfig.ts`). **Giữ nguyên:** 4 vòng × 25 giây, 15 giây trả lời câu hỏi, 3 tim và luật va chạm, điều khiển, nhảy (v0 7, g 22) và trượt (0,6 giây), vật nhặt và công thức điểm. Màn 3 chưa đổi (còn hai vòng ở bước sau).
+
+**Rà tình huống không thể vượt khi nhanh hơn** (test `runnerSpeed.test.ts`, 7 ca; ba ca kiểm đỏ khi bỏ bản sửa):
+- **Khoảng sinh chướng ngại** tính theo THỜI GIAN (≥ tốc độ × 1,2 giữa hai hàng, thêm chiều dài xe chở hàng) nên tự nới theo tốc độ: khoảng cách mép–mép giữa hai hàng liên tiếp luôn lớn hơn một cú nhảy có guốc mộc (0,91 giây) và ≥ 0,95 giây ở mọi tốc độ (4 seed × 600 hàng).
+- **Quãng nhảy/trượt**: nhảy 0,64 giây (0,91 có guốc), trượt 0,6 giây không đổi; chướng ngại dày 1 đến 1,6 mét nên ở tốc độ cao thời gian người chơi nằm trong chướng ngại càng ngắn (dễ vượt hơn, không khó hơn).
+- **Khoảng báo trước** tính theo mét nên phải sửa 2 chỗ: (1) **rơm {phanDien} ném** rơi cách ≥ 22 mét, bay 0,7 giây: ở tốc độ 21,6 chỉ còn 0,32 giây sau khi rơm hạ (mức cũ xấu nhất 0,52 giây ở tốc độ 18). Nay rơm phải cách ≥ tốc độ × (0,7 + `throwLeadSec` 0,52) mét (26,4 mét ở tốc độ tối đa). (2) **Trang rơi** cách ≥ 20 mét, nằm xuống sau 1,0 giây: nay cách ≥ tốc độ × (1,0 + `drop.leadSec` 0,11) mét (24 mét ở tốc độ tối đa). Hai hằng số lấy từ mức xấu nhất của tốc độ cũ, không phải số mới.
+- **Tầm nhìn**: mức Thấp thấy trước 60 mét = 2,8 giây ở tốc độ tối đa (≥ 2,5 giây, gấp 4 lần thời gian một cú trượt). Mức Vừa 90 mét, Cao 120 mét. Không đổi.
+- **Hết vòng và câu hỏi**: chạy chậm dần 1,2 giây (quãng ≤ 13 mét) và tăng tốc lại 1 giây (≤ 10,8 mét) đều nhỏ hơn 14 mét chướng ngại bị xóa phía trước.
+
+**Bot trước/sau** (`runnerBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300):
+
+| | Trước (10 / 0,3 / 18; mốc 200 / 380 / 520) | Sau, mốc cũ | Sau, mốc mới (216 / 499 / 638) |
+|---|---|---|---|
+| Bot giỏi: điểm trung bình (thấp nhất; p10) | 720 (551; 616) | 749 (565; 638) | 749 (565; 638) |
+| Bot giỏi: Vàng | 100% | 100% | **90,7%** (≥ 90%) |
+| Quãng đường bot giỏi (m) | 1.339 | 1.606 | 1.606 |
+| Bot trung bình: điểm trung bình (p25; p75) | 341 (201; 489) | 357 (216; 499) | 357 (216; 499) |
+| Bot trung bình: chưa / Đồng / Bạc / Vàng | 25,0 / 32,0 / 24,3 / 18,7% | 20,7 / 38,3 / 19,3 / **21,7%** | 24,0 / 51,0 / 19,0 / 6,0% |
+| Bot trung bình: va mỗi ván; hết tim | 1,40; 226/300 | 1,42; 228/300 | 1,42; 228/300 |
+
+**Vì sao đổi mốc:** với mốc cũ, bot trung bình đạt Vàng 21,7% (vượt giới hạn 20% của `runnerBalance.test.ts`) vì nhanh hơn thì quãng đường dài hơn, điểm tăng. Mốc mới theo quy tắc phân vị đã chốt (Đồng = p25 bot trung bình = 216; Bạc = p75 bot trung bình = 499; Vàng = p10 bot giỏi = 638, số thật của mẫu 300 ván, không làm tròn). Điều kiện đạt: bot giỏi ≥ 90% Vàng (90,7%, sát giới hạn: chạy lại bot nếu đổi cấu hình); bot trung bình chủ yếu Đồng/Bạc (70,0%), Vàng 6,0% ("hầu như không Vàng"). Bạc tăng 380 → 499 và Vàng 520 → 638 nên học sinh cần điểm cao hơn một chút cho cùng huy chương (bù lại ván dài hơn): **tạm, chỉnh khi học sinh chơi thật**.
+
+**Kiểm bản build (`VITE_PROBE`, Chrome headless, GL phần mềm SwiftShader; `scripts/p4a-check.mjs`, ảnh và số đo ở `docs/screenshots/p4a/`):** 49 kiểm đạt ở 1366×768 (chuột, bàn phím), 360×800 và 844×390 (chạm giả lập, vuốt). Tốc độ thật (quãng đường mỗi bước mô phỏng) = danh nghĩa 12 đầu ván, trung bình 8 giây đầu 12,15 (trước P4a 10,00 đo cùng cách), lệch ≤ 0,15 (một khung vắt qua bậc tăng); tạm dừng 2 giây: ván đứng yên hẳn; sau tiếp tục tốc độ không nhảy vọt; hết vòng chạy chậm dần về 0, câu hỏi còn 15 giây, trả lời đúng +3 trang, tăng tốc lại đều rồi chạy 13,8 (vòng 2); điều khiển (đổi làn, nhảy, trượt) có hiệu lực; khung dọc 360×800 xoay ngang giữa ván rồi xoay lại: ván không gián đoạn, tốc độ không bất thường. Để ván không kết thúc khi đo, kịch bản tốc độ đặt 99 tim qua cầu nối `__runner` (chỉ có ở bản dev và bản `VITE_PROBE`, nay đổi từ chỉ dev sang `PROBE`); mô phỏng giữ nguyên.
+
+**FPS:** KHÔNG đo được số có nghĩa: Chrome headless với GL phần mềm chỉ đạt 1 đến 6 khung/giây ở cả bản cũ lẫn mới (tốc độ không đổi chi phí vẽ). Tốc độ mô phỏng không phụ thuộc FPS (bước cố định 1/60 giây, tối đa 5 bước mỗi khung). Mức Thấp ≥ 30 FPS trên điện thoại tầm trung **chưa kiểm** (cần máy thật). Độ trễ lệnh vuốt/phím đo bằng số bước mô phỏng (17 đến 25 bước) bị khung hình chậm chi phối, không phản ánh máy thật.
+
+**Chưa kiểm:** điện thoại và máy tính bảng thật (cảm giác tốc độ, vuốt, FPS), Safari/iPhone, độ khó thật với học sinh (mức 20% là mức thử; chủ dự án chốt sau khi chơi thử). Bundle hub: JS tổng 2.786.167 byte (P3b: 2.781.350; chênh +4.817 gồm sửa ghi chú P3b hoàn thiện và P4a).
+
 ## Màn 3 — Game phụ 2: "Ghép lại cuốn sổ" (kiểu domino)
 
 Logic đặt trong `rebuildLogic.ts` (hàm thuần, có test).
@@ -217,7 +250,9 @@ Logic đặt trong `rebuildLogic.ts` (hàm thuần, có test).
   - Kéo nó vào **"Rổ trang giả"**: +30 điểm.
 - **Nút "Soi công thức":** hiện phép tính của thẻ đang chọn, ví dụ "(31 × 2 + 7) mod 100 = 69 → khớp".
 
-**3 vòng:**
+> **Đã thay ở P4b (29/10/2026): màn 3 chỉ còn HAI vòng.** Vòng 1 (5 trang) và vòng 2 (7 trang, 1 trang giả) giữ nguyên; cơ chế "giữ sổ" của vòng 3 cũ nằm ở ĐOẠN CUỐI vòng 2 (45 giây, 5 lần tráo) ngay sau khi ghép xong chuỗi 7 trang. Mọi chỗ dưới đây nói "vòng 3" là lịch sử (bước X2, X3); số hiện hành ở mục "P4b" cuối phần Màn 3.
+
+**3 vòng (trước P4b):**
 
 | Vòng | Số trang | Trang giả |
 |---|---|---|
@@ -235,7 +270,7 @@ Logic đặt trong `rebuildLogic.ts` (hàm thuần, có test).
 
 Trước vòng 2, {phanDien} lẻn tới nhét trang giả vào xấp giấy, cười khúc khích.
 
-**Vòng 3 — giữ sổ 90 giây (bước X2):**
+**Vòng 3 — giữ sổ 90 giây (bước X2; từ P4b là đoạn giữ sổ 45 giây ở cuối vòng 2, xem mục "P4b"):**
 - Đầu vòng: chuỗi 6 trang **đúng** (tạo bằng `buildChain`, mã trang không trùng nhau). Mặt bàn trống. Thẻ giới thiệu "Vòng 3: Giữ sổ" nằm sẵn, bấm "Bắt đầu giữ sổ" thì đồng hồ 90 giây mới chạy.
 - **Lịch tráo:** lần đầu ở giây 6; sau mỗi lần tráo ở giây `t`, lần kế tiếp cách `9 − 3 × t/90` giây (khoảng cách giảm tuyến tính từ 9 giây xuống **6 giây** theo giờ chơi; bước X2: xuống 4 giây, bước X2b: 5 giây, **bước X3 nâng lên 6** vì vòng vẫn quá dồn). Không tráo trong 6 giây cuối (để trang nào bị tráo cũng còn thời gian sửa). Lịch đủ **11 lần**, ở giây 6; 14,8; 23,3; 31,5; 39,5; 47,2; 54,6; 61,8; 68,7; 75,4; 81,9.
 - **Một lần tráo:** {phanDien} chạy vào (1 giây), cười và ném trang thật ra bàn (1,5 giây là đúng lúc tráo), chạy ra (xong lúc 2,9 giây, ngắn hơn khoảng cách nhỏ nhất 6 giây nên hai lần không chồng nhau). Một **trang thật** bất kỳ trong chuỗi (không bao giờ chọn ô đã là trang giả hay đang trống) thành **trang giả**; trang thật bị ném ra bàn, đi kèm **1 trang mồi**.
@@ -318,6 +353,46 @@ Trước vòng 2, {phanDien} lẻn tới nhét trang giả vào xấp giấy, c�
 4. **Chống khựng lần đầu:** `KeepWarm` trong `RebuildGame.tsx` dựng sẵn (mờ 1%, góc dưới phải) đồng hồ đỏ, hai thanh trạng thái chuỗi, bong bóng lời Bi, ô trống nhấp nháy và nháy đỏ, thẻ mới/rung/đang chọn, bảng hết giờ; trạng thái chuỗi chuyển vào thanh trên (hết đè lên nút "Soi công thức" ở điện thoại). Tiếng không cần nạp trước: `AudioContext` đã có từ lần bấm nút đầu, mỗi tiếng chỉ tạo vài nút âm. Số đo ở báo cáo bước X2b.
 
 - **Mở khóa:** màn 3 sẵn sàng nên Trang Sổ Vàng 1 chỉ được trao khi chơi xong màn 3 (người đã có trang từ trước vẫn giữ); biển "Ghép lại cuốn sổ" mở sau khi chơi màn 2.
+
+### P4b — Màn 3 còn hai vòng, đoạn giữ sổ ở cuối vòng 2 (29/10/2026)
+
+**Thiết kế (đã chốt):** vòng 1 và vòng 2 (ghép sổ) giữ nguyên luật và test. Không còn vòng 3 riêng. Ghép xong chuỗi 7 trang ở vòng 2 (đã bỏ trang giả vào rổ hoặc không) thì KHÔNG hiện bảng "Vòng 2 xong" mà vào ngay **đoạn giữ sổ**: chuỗi vừa ghép (7 trang đúng) trở thành chuỗi cần giữ, mặt bàn trống, thẻ giới thiệu "Giữ sổ" (Bác An hồi đủ 3 tim, như bước X3), bấm "Bắt đầu giữ sổ" thì đồng hồ mới chạy. Cơ chế tráo, trang mồi, sửa ô, phạt, gợi ý của Bi, công thức mã trang và cách phát hiện sửa lén **giữ nguyên** (dùng lại `stepKeep`, `placeInSlot`, `binFromSlot`, `binFromTable`, `checkPlacement`, `formulaHolds`). Hết giờ giữ sổ (hay hết tim) thì ván xong, "Xem kết quả".
+
+**Thay đổi so với vòng 3 cũ:** đồng hồ 90 → **45 giây**; chuỗi 6 → **7 ô** (đúng chuỗi vừa ghép, nửa trái là 4 ô đầu, nửa phải là 3 ô sau khi Bi gợi ý); số lần tráo 11 → **5** (giây 6; 14,6; 22,6; 30,1; 37,1; khoảng cách vẫn giảm tuyến tính từ 9 xuống 6 giây theo giờ của đoạn, không tráo trong 6 giây cuối). `REBUILD_SPEC.rounds` còn 2 phần tử (vòng 2 có `keep: true`), chỉ số vòng lớn nhất là 1, nhãn "Vòng 1/2", "Vòng 2/2". Phần điểm giữ sổ ở màn kết quả ghi "Giữ sổ: …" (không có "vòng 3"). Điểm ghép hai vòng ghi ngay lúc ghép xong (230 khi hoàn hảo); điểm giữ sổ ghi riêng khi hết giờ hay hết tim, nên hết tim giữa đoạn giữ sổ vẫn giữ điểm ghép và các ô đã sửa. Không còn "vòng giữ sổ dở dang" làm mất điểm vòng ghép.
+
+**Vì sao 45 giây và 5 lần tráo (ngắn hơn, vẫn đủ thực hành):** mục tiêu là giảm thời lượng chứ không chỉ đổi nhãn. Lịch tráo theo độ dài đoạn: 30 giây = 3 lần (tối đa 305 điểm), 40 giây = 4 lần (330), **45 giây = 5 lần (355)**, 60 giây = 7 lần (405), 90 giây cũ = 11 lần (505). Mỗi lần tráo là một chu trình đủ ba kỹ năng của bài (soi công thức để PHÁT HIỆN trang giả, bỏ nó vào rổ, đặt lại đúng trang thật), nên cần ít nhất 4 lần để luyện lặp; 45 giây cho 5 lần, đủ một lần thử, hai lần làm quen, hai lần thành thạo, và còn chỗ cho một ô sửa chậm quá 10 giây để Bi gợi ý. 30 và 40 giây chỉ còn 3 đến 4 lần, bot trung bình (sửa 6 đến 9 giây) gần như không bao giờ có hai ô chưa sửa cùng lúc nên không còn tình huống "đầy ô". 45 giây còn có 2 lần đủ gần nhau (khoảng 7 đến 8 giây) để có lúc hai ô chưa sửa cùng lúc. Tối đa 3 ô chưa sửa giữ nguyên; vì chỉ có 5 lần tráo nên "đầy ô" làm mất tối đa 2 tim, riêng nó không thể làm hết 3 tim (hết tim ở đoạn này chỉ do kéo nhầm trang thật vào rổ hay đặt sai ô).
+
+**Thời lượng trước/sau, CÙNG kịch bản** (`scripts/p4b-check.mjs`, bản build `VITE_PROBE`, Chrome headless, một người chơi giỏi bằng thao tác thật, cùng thời gian chờ giữa các thao tác; thời gian thật gồm cả nạp màn và 3 giây chạy thử chuyển động ban đầu, GL phần mềm nên chỉ so sánh trước/sau trong cùng môi trường):
+
+| Cỡ | Trước: cả ván (3 vòng) | Sau: cả ván (2 vòng) | Giảm | Đoạn giữ sổ trước → sau | Ghép sổ trước khi giữ sổ |
+|---|---|---|---|---|---|
+| 1366×768 (chuột kéo thả) | 158,7 giây | 103,3 giây | −35% | 127,1 → 70,1 giây | 25,4 → 26,6 giây |
+| 360×800 (chạm, chơi ngang) | 116,8 giây | 70,6 giây | −40% | 92,1 → 45,9 giây | 20,1 → 20,0 giây |
+| 844×390 (chạm) | 118,7 giây | 70,8 giây | −40% | 93,2 → 46,4 giây | 20,9 → 20,0 giây |
+
+Thời gian danh nghĩa của giữ sổ: 90 giây → 45 giây (hết nửa); còn bỏ thêm bước "Vòng 3" riêng (thẻ giới thiệu vòng 3 và bảng "Vòng 2 xong" trước đó). Số lần tráo phải xử lý 11 → 5. Ván ngắn 35 đến 40% (phần ghép sổ gần như không đổi; toàn bộ mức giảm nằm ở đoạn giữ sổ, 90 → 45 giây danh nghĩa).
+
+**Bot trước/sau** (`rebuildBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300):
+
+| Bot | | Trước (3 vòng; mốc 200 / 400 / 475; tối đa 505) | Sau (2 vòng; mốc 290 / 320 / 330; tối đa 355) |
+|---|---|---|---|
+| Giỏi | điểm trung bình; Vàng; hết tim | 505; 100%; 0 | 355; 100%; 0 |
+| Trung bình chính (sai ở vòng 1, 2; giữ sổ sửa 6 đến 9 giây, 15% kéo nhầm) | điểm trung bình (p25; p75) | 392,2 | 292,0 (290; 320) |
+| | chưa / Đồng / Bạc / Vàng | 7,7 / 15,7 / 76,7 / 0% | 13,7 / 44,3 / 25,3 / 16,7% (41 / 133 / 76 / 50 ván) |
+| | hết tim | 89 ván (29,7%) | 29 ván (9,7%) |
+| Trung bình chơi hoàn hảo vòng 1, 2 | điểm trung bình; hết tim | 425,4; 69 ván (23,0%) | 316,5; 6 ván (2,0%); Đồng 135, Vàng 165 (điểm 330) |
+
+**Mốc điểm: Đồng 290, Bạc 320, Vàng 330 (tạm).** Đồng = p25 bot trung bình (290) và Bạc = p75 bot trung bình (320) theo quy tắc phân vị đã chốt (test `rebuildBalance.test.ts` kiểm đúng hai số này từ 300 ván). **Vàng 330 là NGOẠI LỆ với "p10 bot giỏi":** bot giỏi luôn đạt đúng 355 (điểm tối đa) nên p10 bot giỏi cũng là 355, tức Vàng sẽ đòi ghép hoàn hảo cả hai vòng, bỏ đúng trang giả và sửa nhanh (≤ 5 giây) cả 5 lần, không cho sai sót nào. Đặt Vàng **330** (dư 25 điểm = một lần sửa chậm cả 5 lần, hay hai lần sai nhỏ ở vòng ghép) để **cho phép sai sót nhỏ**. Test vẫn kiểm p10 bot giỏi bằng 355 và Vàng bằng 330. Phân bố thực tế sau khi chạy lại bot (300 ván): bot giỏi Vàng 300/300 (100%); bot trung bình chính chưa đạt 41 (13,7%), Đồng 133 (44,3%), Bạc 76 (25,3%), Vàng 50 (16,7%; điểm 330, dưới 20%), hết tim 29 ván (9,7%); bot trung bình hoàn hảo vòng 1, 2: Đồng 135, Vàng 165. Trước P4b: 200 / 400 / 475. **Mốc tạm, đánh giá lại sau khi học sinh chơi thật** (Vàng 330 chưa có dữ liệu người thật).
+
+**Điểm cao nhất cũ so với thang mới (không đặt lại tiến độ, không xóa thành tích):** `record.ts` giữ `bestScore = max(cũ, mới)` và huy chương `stars.game` = mốc cao nhất đã đạt; P4b không đụng vào hai số đó. Hệ quả: (1) học sinh đã chơi màn 3 trước P4b có thể có điểm cao nhất cũ tới 505 (cao hơn mọi điểm có thể đạt ở thang mới, tối đa 355), nên thẻ bắt đầu vẫn hiện "Điểm cao nhất" theo thang cũ và ván mới thường không phá được kỷ lục ("Kỷ lục mới!" không hiện); (2) huy chương đã có (Đồng, Bạc, Vàng theo mốc cũ) GIỮ NGUYÊN, không bị hạ, không bị tính lại theo mốc mới; (3) chơi lại vẫn có thể nâng huy chương lên cao hơn mốc đang có (huy chương mới tính theo mốc mới); (4) Trang Sổ Vàng và mở màn tính từ cờ hoàn thành, không phụ thuộc điểm nên không đổi. Không có cột hay cờ nào để đánh dấu thang điểm cũ/mới (không thêm tính năng ngoài lời giao).
+
+**Cách hiển thị kỷ lục (sau P4b, `MiniGameLevel` prop `maxScore`):** màn 3 truyền `maxScore` = điểm tối đa hiện hành 355 (`REBUILD_MAX_SCORE`, tính từ config: 100 + 130 + 5 × 25). Điểm cao nhất đã lưu **vượt 355** thì hiện chú thích **"Kỷ lục từ phiên bản trước"** cạnh điểm đó ở thẻ bắt đầu ("Điểm cao nhất: 480 (Kỷ lục từ phiên bản trước)") và ở màn kết quả khi ván mới không phá kỷ lục. Chữ ở `content/games.ts` (`gameUi.kyLucCu`). Không xóa, quy đổi hay hạ điểm cao nhất và huy chương; không đổi cấu trúc lưu; ván mới vẫn ghi bình thường (`max`). **Giới hạn:** chú thích chỉ dựa vào điểm, nên điểm cũ ≤ 355 (kể cả đúng 355) KHÔNG phân biệt được là của phiên bản nào và không có chú thích; kỷ lục cũ ≤ 355 vẫn được so như điểm mới. Game không truyền `maxScore` thì không có chú thích. Kiểm bản build `scripts/p4b-record-check.mjs` (3 cỡ × 3 trường hợp: chưa có kỷ lục, kỷ lục 300, kỷ lục cũ 480): 54 kiểm đạt; thẻ bắt đầu và màn kết quả đúng, điểm cao nhất và huy chương đã lưu không đổi hay hạ.
+
+**Kiểm bản build** (`scripts/p4b-check.mjs`, chuột kéo thả ở 1366×768, chạm giả lập chạm-chọn-rồi-chạm-đặt ở 360×800 và 844×390; ảnh và số đo ở `docs/screenshots/p4b/`): chơi trọn hai vòng đến màn kết quả; chuyển từ ghép sổ sang giữ sổ đúng một lần (chuỗi phase: play, roundDone, villain, play, keep, roundDone); không còn vòng 3 (chỉ số vòng lớn nhất là 1; thẻ giới thiệu, bảng hết giờ, màn kết quả, hướng dẫn và câu nhắc của "?" không nhắc "vòng 3"); đồng hồ lớn của P1a vẫn rõ (35,5 px ở 1366×768, 24 px ở hai cỡ còn lại, cao 44 px) và không đè chuỗi, khay, rổ hay nút "Soi công thức"; tạm dừng bằng "?" làm đồng hồ giữ sổ đứng yên và chạy tiếp từ chỗ cũ; hết giờ với ô chưa sửa: −10 mỗi ô, có dòng "Giữ sổ: ô còn lệch"; hết tim (kéo nhầm trang thật vào rổ ba lần): bảng "Hết tim rồi!", điểm 230; chơi lại: ván mới từ vòng 1, đủ 3 tim, không còn đồng hồ cũ.
+
+**Lỗi tìm thấy khi kiểm xoay màn hình và đã sửa (liên quan trực tiếp đoạn giữ sổ):** màn 3 không dùng `onModeChange` của `Scene25D` nên khi điện thoại xoay dọc (hiện nhắc "Xoay ngang để chơi") đồng hồ giữ sổ vẫn chạy và {phanDien} vẫn tráo trang sau lớp nhắc (đo được: 2,4 → 5,2 giây trong 3 giây ở khung dọc, kèm một lần tráo) trong khi em không chơi được; có từ bước X2, không phải do P4b nhưng đoạn giữ sổ ngắn nên mất 3 giây là đáng kể. Nay màn 3 dừng như màn 6 (đo lại: 2,15 → 2,15 giây; xoay ngang lại thì chạy tiếp từ chỗ cũ). Nút "?" đè chữ "Soi công thức" ở màn 3 (mục "Ghi nhận" ở TRANG-THAI) KHÔNG sửa trong bước này, theo lời giao.
+
+**Chưa kiểm:** điện thoại và máy tính bảng thật (kéo thả, chạm, xoay), Safari/iPhone; FPS của GL phần mềm không dùng để kết luận hiệu năng thiết bị thật; cảm nhận độ khó thật của học sinh (mốc tạm).
 
 ## Kết thúc làng
 

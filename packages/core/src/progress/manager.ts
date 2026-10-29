@@ -1,7 +1,8 @@
+import { classifyAutoError } from './autoError';
 import { decodePendingMap, decodeProgress, encodePendingMap, encodeProgress } from './compact';
 import { GUEST_COOKIE, PENDING_COOKIE } from './cookies';
 import { mergeProgress, sameGame, sameLevel } from './merge';
-import { recordLevelResult, unlockOf, withGoldenPages, type ProgressOptions } from './record';
+import { autoCompleteLevel, recordLevelResult, unlockOf, withGoldenPages, type ProgressOptions } from './record';
 import { emptyProgress, hasProgress, type GameState, type LevelProgress, type LevelResult, type Progress } from './types';
 import type { UnlockResult } from './unlock';
 import { hasSeenGuide, withGuideSeen } from './guideFlags';
@@ -31,6 +32,8 @@ export interface RemoteApi {
   upsertLevels(userId: string, rows: Array<{ levelId: number; progress: LevelProgress }>): Promise<void>;
   upsertGame(userId: string, game: GameState): Promise<void>;
   insertQuizAnswer(userId: string, levelId: number, questionId: string, correct: boolean): Promise<void>;
+  /** Máy chủ đã hỗ trợ cờ tự hoàn thành (migration 0003) chưa. Không có hàm này (bản giả trong test) thì coi là có. Ném lỗi khi không xác định được. */
+  supportsAutoComplete?(): Promise<boolean>;
 }
 
 export interface ManagerDeps {
@@ -59,9 +62,18 @@ export interface Snapshot {
   synced: boolean;
   /** Có tiến độ chơi thử ở cookie sc_guest, đang chờ em chọn Gộp hay Không gộp */
   guestPrompt: boolean;
+  /** Cờ tự hoàn thành dùng được với máy chủ không (P3b): 'unknown' chưa kiểm xong, 'yes', 'no' (máy chủ chưa chạy migration 0003), 'rejected' (máy chủ từ chối tài khoản này). Chơi thử luôn 'yes'. */
+  autoStatus: AutoStatus;
 }
 
+export type AutoStatus = 'unknown' | 'yes' | 'no' | 'rejected';
+/** Kết quả bấm "Tự hoàn thành": 'done' đã ghi và đã lưu; 'pending' đã ghi ở máy, chưa lên được máy chủ (sẽ thử lại); 'unsupported' / 'rejected' KHÔNG ghi gì; 'unavailable' không được phép; 'noop' đã xong hay đã có cờ. */
+export type AutoResult = 'done' | 'pending' | 'unsupported' | 'rejected' | 'unavailable' | 'noop';
+
 export type SaveStatus = 'saved' | 'pending';
+
+/** Chờ tối đa bấy nhiêu mili giây cho lần thăm dò hỗ trợ cờ trước khi ghi cờ. */
+const AUTO_PROBE_WAIT_MS = 3000;
 
 const withTimeout = <T>(p: Promise<T>, ms: number): Promise<T | 'timeout'> =>
   new Promise((resolve) => {
@@ -94,6 +106,11 @@ export class ProgressManager {
   private pendingMerged = false;
   private saving = false;
   private guestPrompt = false;
+  /** Được dùng cờ "tự hoàn thành" (giáo viên/admin, bản dev): quyết định ở ProgressProvider. Chưa được thì cờ bị bỏ qua khi tính mở khóa và KHÔNG đẩy lên máy chủ. */
+  private autoAllowed = false;
+  private autoSupport: 'unknown' | 'yes' | 'no' = 'unknown';
+  private autoRejected = false;
+  private probing: Promise<void> | null = null;
   private timer: ReturnType<typeof setTimeout> | null = null;
   private chain: Promise<unknown> = Promise.resolve();
   private snap: Snapshot;
@@ -115,7 +132,81 @@ export class ProgressManager {
     return this.userId;
   }
   unlock(isTeacher = false): UnlockResult {
-    return unlockOf(this.progress, { ...this.opts, isTeacher });
+    return unlockOf(this.progress, { ...this.opts, isTeacher, honorAuto: this.autoAllowed });
+  }
+
+  /** Đặt quyền dùng cờ tự hoàn thành. Quyền thật do máy chủ quyết (trigger ở migration 0003); đây chỉ để giao diện và việc đẩy dữ liệu. */
+  setAutoAllowed(allowed: boolean): void {
+    if (this.autoAllowed === allowed) return;
+    this.autoAllowed = allowed;
+    this.emit();
+    if (allowed) {
+      void this.ensureAutoSupport();
+      this.scheduleFlush();
+    }
+  }
+  isAutoAllowed(): boolean {
+    return this.autoAllowed;
+  }
+
+  /** Hỏi máy chủ đã hỗ trợ cờ chưa (một lần mỗi phiên; chỉ khi đã đăng nhập, đã kéo xong và được phép). Mất mạng thì để 'unknown', lần đẩy đầu tiên sẽ tự phân loại lỗi. */
+  private ensureAutoSupport(): Promise<void> {
+    if (this.mode !== 'user' || !this.pulled || !this.autoAllowed || this.autoSupport !== 'unknown') return Promise.resolve();
+    // một lần thăm dò chạy tại một thời điểm: bấm nút lúc đang thăm dò thì dùng chung, không gửi thêm
+    this.probing ??= this.probeAutoSupport().finally(() => {
+      this.probing = null;
+    });
+    return this.probing;
+  }
+
+  private async probeAutoSupport(): Promise<void> {
+    const probe = this.deps.remote.supportsAutoComplete;
+    const userId = this.userId;
+    if (!probe) {
+      this.autoSupport = 'yes';
+      this.emit();
+      return;
+    }
+    try {
+      const ok = await probe.call(this.deps.remote);
+      // phản hồi đến muộn không được ghi đè kết luận chắc chắn hơn (ví dụ cờ đã lưu thành công trong lúc chờ)
+      if (this.userId !== userId || this.autoSupport !== 'unknown') return;
+      this.autoSupport = ok ? 'yes' : 'no';
+      this.emit();
+    } catch {
+      /* chưa biết */
+    }
+  }
+
+  /**
+   * Tự hoàn thành một màn (giáo viên/admin, bản dev): ghi cờ vào tiến độ rồi đẩy ngay qua luồng lưu hiện có. Không điểm, sao, huy chương, xu hay Trang Sổ Vàng.
+   * Máy chủ chưa hỗ trợ ('unsupported') hay từ chối ('rejected') thì KHÔNG ghi gì và nói rõ; mất mạng thì 'pending' (cờ ở máy, sẽ thử lại, KHÔNG báo là đã lưu).
+   * Không được phép, màn đã xong thật hay đã có cờ thì không làm gì (bấm lặp không tạo thêm).
+   */
+  async requestAutoComplete(levelId: number): Promise<AutoResult> {
+    if (this.mode === 'loading' || !this.autoAllowed) return 'unavailable';
+    if (this.mode === 'user') {
+      // thăm dò treo (máy chủ chậm) không được giữ nút mãi: quá hạn thì cứ ghi, lần đẩy sẽ tự phân loại lỗi
+      await withTimeout(this.ensureAutoSupport(), AUTO_PROBE_WAIT_MS);
+      if (this.autoRejected) return 'rejected';
+      if (this.autoSupport === 'no') return 'unsupported';
+    }
+    const next = autoCompleteLevel(this.progress, levelId, this.now(), this.opts);
+    if (next === this.progress) return 'noop';
+    this.progress = next;
+    this.persistLocal();
+    this.emit();
+    if (this.mode !== 'user') return 'done';
+    const ok = await this.flush();
+    if (this.autoRejected) return 'rejected';
+    if (this.autoSupport === 'no') return 'unsupported';
+    return ok ? 'done' : 'pending';
+  }
+
+  private autoStatusNow(): AutoStatus {
+    if (this.mode !== 'user') return 'yes';
+    if (this.autoRejected) return 'rejected';
+    return this.autoSupport;
   }
 
   private makeSnapshot(): Snapshot {
@@ -126,6 +217,7 @@ export class ProgressManager {
       saving: this.saving,
       synced: this.pulled,
       guestPrompt: this.guestPrompt,
+      autoStatus: this.autoStatusNow(),
     };
   }
   private emit(): void {
@@ -142,6 +234,9 @@ export class ProgressManager {
     this.remoteCopy = null;
     this.pendingMerged = false;
     this.saving = false;
+    this.autoSupport = 'unknown';
+    this.autoRejected = false;
+    this.probing = null;
     this.userId = userId;
 
     if (userId === null) {
@@ -201,6 +296,7 @@ export class ProgressManager {
     this.pulled = true;
     this.persistLocal();
     this.emit();
+    void this.ensureAutoSupport();
     await this.flush();
   }
 
@@ -237,25 +333,65 @@ export class ProgressManager {
     const base = this.remoteCopy;
     if (this.mode !== 'user' || !userId || !this.pulled || !base) return false;
     const snapshot = this.progress;
-    const rows: Array<{ levelId: number; progress: LevelProgress }> = [];
+    const strip = (lv: LevelProgress): LevelProgress => (lv.auto ? { ...lv, auto: undefined } : lv);
+    // Thành tích thật và cờ tự hoàn thành đi HAI đường riêng: cờ lỗi (máy chủ chưa migration, từ chối) không bao giờ chặn việc lưu tiến độ thật.
+    const realRows: Array<{ levelId: number; progress: LevelProgress }> = [];
+    const autoRows: Array<{ levelId: number; progress: LevelProgress }> = [];
+    const canSendAuto = this.autoAllowed && this.autoSupport !== 'no' && !this.autoRejected;
     for (const [idStr, lv] of Object.entries(snapshot.levels)) {
       const id = Number(idStr);
-      if (!sameLevel(lv, base.levels[id])) rows.push({ levelId: id, progress: lv });
+      const b = base.levels[id];
+      // màn mới chỉ có cờ (chưa có dữ liệu thật) không tạo hàng "thật" rỗng: hàng của nó đi cùng cờ ở đường riêng
+      const hasReal = lv.played || lv.completed || lv.bestScore > 0 || Object.values(lv.stars).some((n) => (n ?? 0) > 0);
+      if (!sameLevel(strip(lv), b ? strip(b) : b) && (b || hasReal)) realRows.push({ levelId: id, progress: strip(lv) });
+      if (canSendAuto && lv.auto && !b?.auto) autoRows.push({ levelId: id, progress: lv });
     }
     const gameChanged = !sameGame(snapshot.game, base.game);
     try {
-      if (rows.length) await this.deps.remote.upsertLevels(userId, rows);
+      if (realRows.length) await this.deps.remote.upsertLevels(userId, realRows);
       if (gameChanged) await this.deps.remote.upsertGame(userId, snapshot.game);
     } catch {
       return false; // xếp hàng: lần sau (có mạng, hoặc thay đổi mới) sẽ đẩy lại
     }
+    // đường cờ (riêng)
+    let autoSent = false;
+    let autoRetry = false;
+    if (autoRows.length) {
+      try {
+        await this.deps.remote.upsertLevels(userId, autoRows);
+        autoSent = true;
+        if (this.autoSupport === 'unknown') this.autoSupport = 'yes';
+      } catch (err) {
+        const kind = classifyAutoError(err);
+        if (kind === 'missing-column') this.autoSupport = 'no';
+        else if (kind === 'forbidden') this.autoRejected = true;
+        else autoRetry = true; // mất mạng…: giữ cờ ở máy, thử lại lần sau, và nói là CHƯA lưu
+      }
+    }
     if (this.userId !== userId) return true;
-    this.remoteCopy = mergeProgress(base, snapshot);
+    // Máy chủ chưa hỗ trợ hay từ chối: gỡ các cờ chưa lên được khỏi máy để giao diện không giả vờ đã lưu (thành tích thật giữ nguyên)
+    const unsynced = Object.entries(this.progress.levels).filter(([idStr, lv]) => lv.auto && !base.levels[Number(idStr)]?.auto);
+    const dropped = this.autoAllowed && (this.autoSupport === 'no' || this.autoRejected) && unsynced.length > 0;
+    if (dropped) {
+      const levels = { ...this.progress.levels };
+      for (const [idStr, lv] of unsynced) levels[Number(idStr)] = strip(lv);
+      this.progress = { ...this.progress, levels };
+      this.persistLocal();
+    }
+    // bản máy chủ đang có: phần thật đã đẩy, cộng cờ chỉ khi cờ đã lên được
+    const sentLevels: Progress['levels'] = {};
+    for (const [idStr, lv] of Object.entries(snapshot.levels)) {
+      const id = Number(idStr);
+      sentLevels[id] = autoSent || base.levels[id]?.auto ? lv : strip(lv);
+    }
+    this.remoteCopy = mergeProgress(base, { levels: sentLevels, game: snapshot.game });
     if (this.pendingMerged) {
       this.removePending(userId);
       this.pendingMerged = false;
     }
-    return true;
+    if (dropped) this.emit();
+    else if (autoSent) this.emit();
+    return !autoRetry;
   }
 
   // ---------- sc_pending: map { userId: bản tóm tắt } ----------

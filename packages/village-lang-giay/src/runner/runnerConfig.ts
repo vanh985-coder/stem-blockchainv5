@@ -10,13 +10,18 @@
  */
 
 /** Số liệu có trong spec. */
+/** Hệ số tăng tốc của P4a so với bước X1 (tốc độ cũ 10, 0,3, 18). */
+export const SPEED_BOOST = 1.2;
+
 export const RUNNER_SPEC = {
   /** 3 làn: x = −2, 0, 2 (chỉ số làn 0, 1, 2) */
   laneX: [-2, 0, 2] as const,
   /**
-   * Tốc độ bắt đầu 10, tăng 0,3 mỗi 5 giây (theo bậc: 10 trong 5 giây đầu, 10,3 trong 5 giây kế…), tối đa 18. Bước X1: trước đó là 8, 0,25 và 16; đổi vì người dùng thấy màn 2 chạy chậm.
+   * Tốc độ (P4a, bước thử ban đầu): tăng 20% ở MỌI vòng so với bước X1, tức nhân cả tốc độ bắt đầu, bước tăng và mức tối đa với `SPEED_BOOST` = 1,2:
+   * bắt đầu 12, tăng 0,36 mỗi 5 giây (theo bậc: 12 trong 5 giây đầu, 12,36 trong 5 giây kế…), tối đa 21,6. Trước P4a: 10, 0,3 và 18 (bước X1; trước nữa là 8, 0,25 và 16).
+   * Giữ nguyên thời gian trả lời câu hỏi (15 giây), luật tim, điều khiển, nhảy, trượt, phần thưởng và công thức điểm.
    */
-  speed: { start: 10, add: 0.3, everySec: 5, max: 18 },
+  speed: { start: 12, add: 0.36, everySec: 5, max: 21.6 },
   /** Nhảy: vận tốc đầu 7, trọng lực 22 (đỉnh ≈ 1,11, cả cú nhảy 0,64 giây); có guốc mộc thì vận tốc đầu 10 (0,91 giây) */
   jump: { v0: 7, v0Boots: 10, gravity: 22 },
   /** Trượt kéo dài 0,6 giây; khi trượt, thân cao 0,6 */
@@ -40,8 +45,8 @@ export const RUNNER_SPEC = {
   magnetRange: 6,
   /** Điểm = trang × 10 + tiền đồng + quãng đường ÷ 10 + câu đúng × 30 */
   score: { perPage: 10, perCoin: 1, perMeters: 10, perCorrect: 30 },
-  /** Mốc điểm: Đồng, Bạc, Vàng */
-  medals: [200, 380, 520] as const,
+  /** Mốc điểm: Đồng, Bạc, Vàng. P4a: theo quy tắc phân vị bot (Đồng = p25 bot trung bình, Bạc = p75 bot trung bình, Vàng = p10 bot giỏi; 300 ván mỗi bot, seed 1 đến 300, sau khi tăng tốc 20%). Trước P4a: 200 / 380 / 520. */
+  medals: [216, 499, 638] as const,
   /** {phanDien} chạy ở phía trước cách 12 đến 15 đơn vị; khoảng mỗi 6 giây ném một đống rơm */
   villainAhead: [12, 15] as const,
   throwEverySec: 6,
@@ -110,12 +115,17 @@ export const RUNNER_TUNING = {
   /**
    * {phanDien} làm rơi 2 đến 4 trang sổ (khoảng mỗi `everySec` ± `jitterSec` giây): trang bay lả tả `flightSec` giây rồi nằm trên một làn, cách `spacing` mét, ở chỗ nhặt được
    * (không trong chướng ngại, cách chướng ngại ≥ `margin`, không chồng lên vật nhặt khác), cách người chơi ≥ `aheadMin` mét. Số trang rơi được trừ vào số trang của các chuỗi vật nhặt sinh sau
-   * (ngân sách trang sổ không đổi). Chưa có chỗ phù hợp thì thử lại sau `retrySec`.
+   * (ngân sách trang sổ không đổi). Chưa có chỗ phù hợp thì thử lại sau `retrySec`. P4a: ngoài `aheadMin`, trang phải cách ≥ tốc độ × (`flightSec` + `leadSec`) mét để chạy nhanh vẫn kịp thấy trang đã nằm xuống (0,11 giây là mức xấu nhất ở tốc độ 18: 20 mét).
    */
-  drop: { everySec: 16, jitterSec: 3, min: 2, max: 4, spacing: 1.5, aheadMin: 20, flightSec: 1.0, retrySec: 0.4, margin: 1.0 },
+  drop: { everySec: 16, jitterSec: 3, min: 2, max: 4, spacing: 1.5, aheadMin: 20, flightSec: 1.0, retrySec: 0.4, margin: 1.0, leadSec: 0.11 },
   /** Ném rơm: rơm rơi xuống hàng đầu tiên cách người chơi ít nhất bấy nhiêu mét (còn chỗ trống), bay mất bấy nhiêu giây (chưa va được trong lúc bay); ngẫu nhiên ± giây */
   throwAheadMin: 22,
   throwFlightSec: 0.7,
+  /**
+   * P4a: rơm không được rơi sát người chơi khi chạy nhanh. Ngoài mức `throwAheadMin` mét, rơm phải ở cách ít nhất tốc độ × (`throwFlightSec` + `throwLeadSec`) mét: sau khi rơm hạ xuống
+   * người chơi còn ≥ `throwLeadSec` giây tới nó. 0,52 giây là mức xấu nhất của bước X1 (tốc độ 18: 22 mét = 1,22 giây, trừ 0,7 giây bay). Ở tốc độ 21,6 thì rơm cách ≥ 26,4 mét.
+   */
+  throwLeadSec: 0.52,
   throwJitterSec: 1.0,
   /** Chưa có hàng nào hợp lệ để ném rơm thì thử lại sau chừng này giây */
   throwRetrySec: 0.25,

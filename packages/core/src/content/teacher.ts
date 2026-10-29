@@ -69,6 +69,16 @@ export const teacherTexts = {
     game: '✓',
     gameMoc: '✓ {moc}',
     moc: ['', 'đồng', 'bạc', 'vàng'],
+    /** Màn chỉ có cờ tự hoàn thành (chưa xong thật): không có sao hay điểm (P3b) */
+    tuHoanThanh: '⏭ Tự hoàn thành',
+    /** Màn đã chơi thật dở dang nhưng cũng có cờ tự hoàn thành: thêm hậu tố */
+    kemTuHoanThanh: ' · tự hoàn thành',
+  },
+
+  /** Chú thích bảng tiến độ về cờ tự hoàn thành (P3b) */
+  tuHoanThanh: {
+    chuThich: '⏭ Tự hoàn thành: giáo viên hay bản thử ghi màn là đã xong để đi tiếp, không có điểm, sao hay xu; khác với hoàn thành thật (có sao hoặc mốc).',
+    chiTiet: 'Tự hoàn thành (không có điểm hay sao)',
   },
 
   /** Chi tiết một học sinh */
@@ -83,6 +93,7 @@ export const teacherTexts = {
     chuaChoi: 'Chưa chơi',
     chuaCoGame: 'Chưa có game nào được chơi.',
     diem: '{diem} điểm',
+    tuHoanThanh: 'Tự hoàn thành, không có điểm hay sao',
     tiLeDung: 'Tỉ lệ trả lời đúng',
     tiLeDungGiaTri: '{dung}/{tong} câu ({phanTram}%)',
     chuaTraLoi: 'Chưa trả lời câu hỏi nào',

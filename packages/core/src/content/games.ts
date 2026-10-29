@@ -76,6 +76,8 @@ export const gameUi = {
   moc: ['Chưa đạt mốc', 'Đồng', 'Bạc', 'Vàng'] as const,
   mocDatDuoc: 'Mốc em đạt: {muc}',
   kyLucMoi: 'Kỷ lục mới!',
+  /** Chú thích cạnh điểm cao nhất đã lưu khi nó vượt điểm tối đa của phiên bản hiện tại (game đã đổi thang điểm, vd. màn 3 sau P4b) */
+  kyLucCu: 'Kỷ lục từ phiên bản trước',
   xuNhan: 'Em nhận được {so} xu.',
   /** Một dòng điểm thành phần ở màn kết quả: tên phần, số lượng, điểm */
   dongDiem: '{nhan}: {so} → {diem} điểm',
@@ -134,11 +136,11 @@ export const rebuildUi = {
   /** Phần điểm ở màn kết quả: số lần sai và trang giả */
   phanVong: 'Vòng {so} (số lần sai)',
   phanTrangGia: 'Vòng {so}: bỏ đúng trang giả vào rổ',
-  /** Vòng 3 "giữ sổ" (bước X2): {phanDien} liên tục tráo trang, em sửa liên tục */
-  giuSoTieuDe: 'Vòng {so}: Giữ sổ',
-  giuSoLoi: '{phanDien} sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt {giay} giây. Em soi công thức, bỏ trang giả vào rổ, rồi đặt đúng trang thật vào chỗ trống. Sửa trong {nhanh} giây thì được thêm điểm.',
+  /** Đoạn "giữ sổ" ở cuối vòng 2 (P4b; bước X2 là vòng 3): {phanDien} liên tục tráo trang, em sửa liên tục */
+  giuSoTieuDe: 'Giữ sổ',
+  giuSoLoi: 'Chuỗi em vừa ghép xong chưa yên đâu! {phanDien} sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt {giay} giây. Em soi công thức, bỏ trang giả vào rổ, rồi đặt đúng trang thật vào chỗ trống. Sửa trong {nhanh} giây thì được thêm điểm.',
   giuSoBatDau: 'Bắt đầu giữ sổ',
-  /** Bác An động viên trước vòng 3, kèm việc hồi đủ tim (bước X3) */
+  /** Bác An động viên trước đoạn giữ sổ, kèm việc hồi đủ tim (bước X3) */
   bacAnDongVien: 'Bác An: "Cố lên con! Cuốn sổ này nhờ con giữ đấy. Bác hồi lại đủ sức cho con rồi, các tim của con đầy cả."',
   chuoiGiuSo: 'Chuỗi trang. Mỗi ô là một chỗ đặt trang.',
   chuoiLech: 'Chuỗi đang lệch',
@@ -153,11 +155,11 @@ export const rebuildUi = {
   biLechQua: 'Chuỗi lệch quá nhiều! {phanDien} cười khoái chí. Em mất 1 tim.',
   biGoiYTrai: 'Bi thấy có gì lạ ở nửa bên trái của chuỗi.',
   biGoiYPhai: 'Bi thấy có gì lạ ở nửa bên phải của chuỗi.',
-  hetGio: 'Hết giờ! Em sửa được {sua} ô, còn lệch {lech} ô. Vòng {so} được {diem} điểm.',
-  /** Phần điểm vòng 3 ở màn kết quả */
-  phanSua: 'Vòng {so}: ô đã sửa xong (+{diem} mỗi ô)',
-  phanNhanh: 'Vòng {so}: sửa trong {giay} giây (thêm +{diem} mỗi ô)',
-  phanConLech: 'Vòng {so}: ô còn lệch khi hết giờ (−{diem} mỗi ô)',
+  hetGio: 'Hết giờ giữ sổ! Em sửa được {sua} ô, còn lệch {lech} ô. Đoạn giữ sổ được {diem} điểm.',
+  /** Phần điểm của đoạn giữ sổ ở màn kết quả */
+  phanSua: 'Giữ sổ: ô đã sửa xong (+{diem} mỗi ô)',
+  phanNhanh: 'Giữ sổ: sửa trong {giay} giây (thêm +{diem} mỗi ô)',
+  phanConLech: 'Giữ sổ: ô còn lệch khi hết giờ (−{diem} mỗi ô)',
 } as const;
 
 /** Chữ trong màn 8 "Lật thẻ tìm cặp khóa" (spec 07 mục Màn 8). Thẻ chỉ ghi số: không tên, không chân dung. */

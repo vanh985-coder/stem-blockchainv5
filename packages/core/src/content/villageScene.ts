@@ -27,7 +27,7 @@ export const VILLAGE_SCENE: Partial<Record<VillageId, VillageSceneText>> = {
       lesson: 'Em ra biển gỗ "Học cùng bác An" nhé. Bác sẽ chỉ em cách các trang sổ móc nối vào nhau.',
       game1: 'Giờ tới biển "Đuổi theo {phanDien}" nhé. Nó ôm xấp trang bị trộm chạy qua sân phơi giấy đấy!',
       game2: 'Còn biển "Ghép lại cuốn sổ": giúp bác ghép lại những trang sổ bị xé nhé.',
-      done: 'Làng Giấy cảm ơn em nhiều! Em quay về chợ để sang làng kế tiếp nhé.',
+      done: 'Làng Giấy cảm ơn em nhiều! Em quay về chợ để ghé làng khác nhé.',
     },
     award: {
       loi: [
@@ -44,7 +44,7 @@ export const VILLAGE_SCENE: Partial<Record<VillageId, VillageSceneText>> = {
       lesson: 'Em ra biển gỗ "Học cùng cụ Bình" nhé. Cụ sẽ chỉ em cách cả làng cùng kiểm một trang sổ trước khi ghi.',
       game1: 'Giờ tới biển "Đập {phanDien}" nhé. Nó gấp trang giả thành chuột giấy, thả xuống làm loang mực cuốn sổ của làng đấy!',
       game2: 'Còn biển "Diều đưa sổ": cụ nhờ em thả diều mang bản sao sổ mới tới những làng xa, để làng nào cũng có sổ giống nhau.',
-      done: 'Làng Dệt cảm ơn em nhiều! Em quay về chợ để sang làng kế tiếp nhé.',
+      done: 'Làng Dệt cảm ơn em nhiều! Em quay về chợ để ghé làng khác nhé.',
     },
     award: {
       loi: [
@@ -61,7 +61,7 @@ export const VILLAGE_SCENE: Partial<Record<VillageId, VillageSceneText>> = {
       lesson: 'Em ra biển gỗ "Học cùng chú Dũng" nhé. Chú sẽ chỉ em cách đóng dấu bằng khuôn riêng và kiểm dấu bằng mẫu chung.',
       game1: 'Giờ tới biển "Lật thẻ tìm cặp khóa" nhé. {phanDien} trộn lung tung bộ khuôn tập của chú đấy!',
       game2: 'Còn biển "Chữa đàn gà": {phanDien} lùa một đàn gà bệnh vào làng, em dùng ná bắn viên thuốc đúng loại để chữa cho gà nhé.',
-      done: 'Làng Khắc Dấu cảm ơn em nhiều! Em quay về chợ để sang làng kế tiếp nhé.',
+      done: 'Làng Khắc Dấu cảm ơn em nhiều! Em quay về chợ để ghé làng khác nhé.',
     },
     award: {
       loi: [

@@ -11,6 +11,7 @@ import { ui } from '../content/ui';
 import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
 import type { SaveStatus } from '../progress/manager';
+import { AutoCompleteButton, AutoCompletedPanel } from '../ui/AutoComplete';
 import { Button } from '../ui/Button';
 import { NenTrangTri } from '../ui/NenTrangTri';
 import { DialogueBox } from '../ui/DialogueBox';
@@ -67,7 +68,8 @@ type Stage =
   | { kind: 'saving' }
   | { kind: 'outro' }
   | { kind: 'complete' }
-  | { kind: 'award' };
+  | { kind: 'award' }
+  | { kind: 'auto'; note?: string };
 
 const TEN_TRAM = ui.baiHoc.tram;
 
@@ -96,6 +98,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
 
   // Vào lại màn: bắt đầu ở trạm đầu tiên chưa có sao (đã xong cả 3 thì ở trạm Dễ).
   const [stage, setStage] = useState<Stage>(() => ({ kind: 'dialogue', idx: startStationIndex(progress.levels[levelId]?.stars ?? {}) }));
+  const [autoNote, setAutoNote] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [showCards, setShowCards] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
@@ -322,6 +325,9 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
         )}
       </>
     );
+  } else if (stage.kind === 'auto') {
+    // Tự hoàn thành (P3b): chỉ ghi cờ, không điểm, sao, xu hay Trang Sổ Vàng; muốn học thật thì bấm "Chơi thật"
+    body = <AutoCompletedPanel notice={stage.note} levelId={levelId} onPlayReal={restart} onNext={nextGame ? () => navigate(`/lang/${villageId}/man/${nextGame.id}`) : undefined} onLeave={goMap} />;
   } else {
     body = content.award ? <GoldenPageScene villageId={villageId} award={content.award} onLeave={goMap} leaveLabel={leaveLabel} /> : null;
   }
@@ -335,7 +341,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
       <LessonPraise key={`${levelId}-${attempt}-${currentIdx}`} onResult={onAnswerProp} />
       <div className="lesson-window">
       <div className="lesson-scroll" ref={scrollArea} data-testid="lesson-scroll">
-    // isolate: để lớp nền trang trí (z âm) nằm trên ảnh nền của làng nhưng dưới bảng bài học.
+    {/* isolate: để lớp nền trang trí (z âm) nằm trên ảnh nền của làng nhưng dưới bảng bài học. */}
     <div className="isolate min-h-screen bg-giay bg-cover bg-center" style={bg ? { backgroundImage: `url("${bg}")` } : undefined}>
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20 bg-giay/55" />
       {/* Icon của làng: chỉ ở 2 khoảng trống hai bên bảng (màn từ 1296px, tối đa 4 mỗi bên), không bao giờ sau bảng; cảnh trao Trang Sổ Vàng thì rải cả màn kèm tia sáng. */}
@@ -411,12 +417,20 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
                 <IconButton label={ui.baiHoc.emCoBiet} icon="💡" onClick={() => setShowCards(true)} />
               </>
             )}
+            {stage.kind !== 'saving' && stage.kind !== 'award' && stage.kind !== 'auto' && stage.kind !== 'outro' && (
+              <AutoCompleteButton levelId={levelId} variant="responsive" onNote={setAutoNote} onDone={(note) => setStage({ kind: 'auto', note })} />
+            )}
             <Button variant="secondary" size="sm" className="max-[480px]:hidden" disabled={saving} onClick={goMap}>
               {leaveLabel}
             </Button>
             <IconButton label={leaveLabel} icon="🏡" disabled={saving} onClick={goMap} />
           </div>
         </header>
+        {autoNote && (
+          <p role="status" data-testid="tu-hoan-thanh-ghi-chu" className="mx-auto w-full max-w-3xl rounded-2xl border-2 border-muc-tim bg-white/90 p-3 text-sm font-semibold text-muc-tim-dam">
+            {autoNote}
+          </p>
+        )}
 
         <main className={`mx-auto w-full ${boardMax} px-1 pb-10 pt-2 sm:px-3`}>
           {body}

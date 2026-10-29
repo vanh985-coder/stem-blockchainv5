@@ -417,7 +417,13 @@ Chạy ngay sau khi màn 12 kết thúc (hết vòng 4, hoặc hết tim sau khi
 **Trang Sổ Vàng thứ tư:**
 - Trao khi đã xong màn 10 và đã chơi màn 12 (kể cả hết tim: `doneLevels` tính game đã chơi). Giá trị `golden_pages` = 4 được ghi cùng kết quả ván, TRƯỚC cảnh, nên đóng tab giữa cảnh vẫn giữ trang. Chỉ hiện ở HUD thế giới mở khi người chơi về làng.
 - Xong màn 10 mà chưa chơi màn 12: chưa có trang 4.
-- Tài khoản đã có trang 4 từ trước (luật mốc 1): giữ nguyên, không trao lại; cảnh cao trào lần đầu bỏ bước d (chụp số trang trước ván ở `Man12.tsx`); xem lại thì có bước d.
+- Tài khoản đã có trang 4 từ trước (luật mốc 1): giữ nguyên số trang, không trao thêm. (P3a hoàn thiện: bước d là cảnh trao trang nên có ở LẦN XEM ĐẦU của mọi tài khoản, tức khi cờ `climaxSeen` chưa có, và ở lần xem lại; trước đó bước d bỏ khi đã có trang 4 trước ván. **Tự chọn**: một cờ duy nhất quyết định, không trao hai lần.)
+
+**Các làng vào độc lập (P3a): màn 12 xong trước các làng khác.** Cổng làng mở từ đầu nên màn 12 có thể xong khi còn làng chưa xong (chưa đủ 4 trang):
+- Kết quả màn 12 vẫn được ghi như thường. Cảnh cao trào CHỈ chiếu khi đã đủ 4 trang và đã chơi màn 12 (`progress/climaxState.ts`: `canWatchClimax`; `MiniGameFinale.ready`), nên không bao giờ nói "đủ 4 trang" khi chưa đủ; chơi màn 12 lúc chưa đủ trang thì đi thẳng tới màn kết quả.
+- Khi làng còn thiếu xong về sau (các trang tới cùng lúc), KHÔNG phải chơi lại màn 12: cảnh "đang chờ" (`climaxPending` = xem được và chưa có cờ `climaxSeen`) hiện ở ba chỗ, đều là thao tác của em, không tự ngắt ván hay hộp phản hồi đang mở: (1) màn kết quả của game vừa làm đủ trang: lời báo và nút "Xem cảnh cuối" (`MiniGameLevel`); (2) bảng Làng Bạc ở `/ban-do`: nút "Xem cảnh cuối" (đã chiếu rồi thì "Xem lại cảnh cuối"); (3) dòng nhiệm vụ ở chợ nhắc "Cảnh cuối đang chờ em" (ngoài làng).
+- Hai nút mở `/lang/lang-bac/man/12?canh=cuoi` (`openClimax`, `climaxPath` ở `config/urls.ts`): trang này chiếu thẳng cảnh (không vào game), hết cảnh hay "Bỏ qua" thì về `/ban-do`. Lần xem đầu (cờ chưa có): có bước d và ghi `climaxSeen` khi hết hay "Bỏ qua"; tải lại giữa cảnh thì cờ chưa ghi nên cảnh vẫn đang chờ. Xem lại: không ghi gì. Lượt chiếu đầu/xem lại được chụp lúc vào trang để cờ `climaxSeen` đổi giữa cảnh không làm số bước đổi theo (lỗi đã gặp khi kiểm: bước d biến mất lúc đang chiếu làm `ClimaxScene` lỗi; nay chụp lúc vào trang và `stepAt` kẹp chỉ số).
+- Đi theo thứ tự thường (màn 12 là màn cuối): giữ nguyên, cảnh tự chiếu sau ván rồi mới tới màn kết quả.
 - Ở thế giới mở, Làng Bạc không chiếu thêm cảnh trao trang riêng (`VILLAGE_SCENE` không có `lang-bac`).
 
 ### Test (`climbLogic.ts`)

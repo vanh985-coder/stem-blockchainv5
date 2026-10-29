@@ -213,7 +213,7 @@ function pickWeighted<K extends string>(s: { rng: number }, weights: Readonly<Re
 // ---------------------------------------------------------------------------
 // Số liệu theo luật
 
-/** Tốc độ theo giờ chạy: 10, tăng 0,3 mỗi 5 giây THEO BẬC (10 trong 5 giây đầu, 10,3 trong 5 giây kế…), tối đa 18 (spec 05, bước X1). */
+/** Tốc độ theo giờ chạy: 12, tăng 0,36 mỗi 5 giây THEO BẬC (12 trong 5 giây đầu, 12,36 trong 5 giây kế…), tối đa 21,6 (spec 05, P4a: gấp 1,2 lần bước X1). */
 export function speedAt(time: number): number {
   const { start, add, everySec, max } = SPEC.speed;
   return Math.min(max, start + add * Math.floor(Math.max(0, time) / everySec + 1e-9));
@@ -241,7 +241,7 @@ export function scoreParts(s: Pick<RunnerState, 'pages' | 'coins' | 'distance' |
   ];
 }
 
-/** Mốc điểm: 0 chưa tới Đồng, 1 Đồng (200), 2 Bạc (380), 3 Vàng (520). */
+/** Mốc điểm: 0 chưa tới Đồng, 1 Đồng (216), 2 Bạc (499), 3 Vàng (638) (P4a, theo phân vị bot). */
 export function runnerMedal(score: number): Medal {
   return medalOf(score, SPEC.medals);
 }
@@ -483,7 +483,7 @@ export function dropPages(s: RunnerState): { lane: Lane; z: number; n: number } 
   const D = T.drop;
   const n = D.min + Math.floor(rand(s) * (D.max - D.min + 1));
   const span = (n - 1) * D.spacing;
-  const minZ = s.z + D.aheadMin;
+  const minZ = s.z + Math.max(D.aheadMin, speedAt(s.time) * (D.flightSec + D.leadSec));
   // các khoảng trống giữa hai hàng liên tiếp, chỉ lấy phần ≥ minZ
   const spans: { a: number; b: number }[] = [];
   for (let i = 0; i + 1 < s.rows.length; i++) {
@@ -521,7 +521,7 @@ export function dropPages(s: RunnerState): { lane: Lane; z: number; n: number } 
  * rơm là chướng ngại thấp, chỉ thêm vào làn đang trống, nên ô ở làn đi qua được không thành chắn làn). Trả về hàng và làn, hoặc null nếu chưa có hàng nào hợp lệ.
  */
 export function throwStraw(s: RunnerState): { row: Row; lane: Lane } | null {
-  const minZ = s.z + T.throwAheadMin;
+  const minZ = s.z + Math.max(T.throwAheadMin, speedAt(s.time) * (T.throwFlightSec + T.throwLeadSec));
   for (const row of s.rows) {
     if (row.z < minZ || occupiedCount(row) > 1) continue;
     const free: Lane[] = [];

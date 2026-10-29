@@ -602,7 +602,7 @@ export const ui = {
     nhanNoiChuyen: 'Nói chuyện với {nguoi}',
     nhanCongDong: 'Xem cổng {lang}',
     /** Cổng làng còn khóa: {truoc} là tên làng phải giúp trước */
-    congDong: 'Cổng làng đóng vì sổ đang lệch. Hãy giúp {truoc} trước nhé.',
+    congDong: 'Cổng làng này đang đóng. Em thử lại sau nhé.',
     /** Menu của chợ (hộp hiện khi nhả khóa chuột hoặc bấm nút menu) */
     menu: {
       tiepTuc: 'Tiếp tục',
@@ -622,7 +622,7 @@ export const ui = {
     nhanBienKhoa: 'Xem biển: {bien}',
     /** Dòng nhiệm vụ ({bien}: chữ trên biển; {lang}: tên làng) */
     nhiemVuMan: 'Đến biển "{bien}".',
-    nhiemVuXong: '{lang} đã xong việc! Quay về chợ để sang làng kế tiếp.',
+    nhiemVuXong: '{lang} đã xong việc! Quay về chợ rồi ghé làng khác nhé.',
     /** Bi nhắc việc khi nói chuyện */
     biNhacMan: 'Việc tiếp theo ở {lang}: đến biển "{bien}".',
     biNhacXong: '{lang} xong hết rồi! Mình quay về chợ nhé.',

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { FESTIVAL_LAUNCHED, STORY, fmt, phanDien } from '@so-chung/core';
-import { climaxMotion, climaxSteps, finishLabelOf } from './climaxFlow';
+import { climaxMotion, climaxSteps, finishLabelOf, stepAt } from './climaxFlow';
 
 const TEN = 'Minh';
 
@@ -78,5 +78,18 @@ describe('cảnh cao trào sau màn 12', () => {
     expect(climaxMotion(d, 1)).toEqual({ tiBow: false, tiCheer: false, talking: null });
     // chỉ số ngoài khoảng được kẹp lại
     expect(climaxMotion(b, 99).tiCheer).toBe(false);
+  });
+});
+
+describe('bước cao trào khi số bước đổi giữa lúc chiếu (P3a)', () => {
+  it('chỉ số vượt số bước (bước d biến mất vì cờ trao trang đổi) thì lấy bước cuối, không lỗi', () => {
+    const three = climaxSteps({ ten: TEN, award: false });
+    expect(three).toHaveLength(3);
+    expect(stepAt(three, 3).id).toBe('c');
+    expect(stepAt(three, 99).id).toBe('c');
+    expect(stepAt(three, -1).id).toBe('a');
+    const four = climaxSteps({ ten: TEN, award: true });
+    expect(stepAt(four, 3).id).toBe('d');
+    expect(stepAt(four, 1).id).toBe('b');
   });
 });

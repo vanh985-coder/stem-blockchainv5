@@ -1,5 +1,6 @@
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router';
-import { AssetImage, Button, LEVELS, fmt, knowScrollUi, levelById, openLevel, ui, type LevelDef, type LevelState, type LevelUnlock, type Progress } from '@so-chung/core';
+import { AssetImage, Button, LEVELS, autoCompleteUi, climaxUi, fmt, knowScrollUi, levelById, openLevel, ui, type LevelDef, type LevelState, type LevelUnlock, type Progress } from '@so-chung/core';
 
 /** Chữ và hình cho từng trạng thái: phân biệt bằng hình và chữ, không chỉ bằng màu. */
 export const STATE_TEXT: Record<LevelState, string> = {
@@ -47,6 +48,8 @@ export function VillageDetails({
   onClose,
   onReplayIntro,
   know,
+  scrollMap,
+  climax,
 }: {
   villageId: LevelDef['lang'];
   unlockLevels: LevelUnlock[];
@@ -56,13 +59,17 @@ export function VillageDetails({
   /** Mở lại lời giới thiệu làng */
   onReplayIntro?: () => void;
   /** Thẻ "Em có biết?" của làng (bước X3): chưa đọc đủ thì chưa vào được bài; `onRead` mở các thẻ để đọc */
-  know?: { got: number; total: number; onRead: () => void };
+  know?: { got: number; total: number; onRead: () => void; /** bài học đầu chỉ tự hoàn thành (P3b): bỏ điều kiện chặn nhưng không ghi đã nhặt thẻ */ bypass?: boolean };
+  /** Vùng bản đồ làng có thẻ "Em có biết?" chưa nhặt (P2b), đặt cuối bảng */
+  scrollMap?: ReactNode;
+  /** Cảnh cao trào (chỉ Làng Bạc, khi đủ 4 trang và đã chơi màn 12): `seen` là đã chiếu rồi; không truyền thì không có nút */
+  climax?: { seen: boolean; onWatch: () => void };
 }) {
   const navigate = useNavigate();
-  const knowLocked = !!know && know.total > 0 && know.got < know.total;
+  const knowLocked = !!know && know.total > 0 && know.got < know.total && !know.bypass;
   const levels = LEVELS.filter((l) => l.lang === villageId);
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" data-testid="ban-do-bang-lang" data-village={villageId}>
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-2xl">{ui.lang[villageId]}</h2>
         {onClose && (
@@ -109,7 +116,14 @@ export function VillageDetails({
                   <span aria-hidden="true">{STATE_ICON[u.state]}</span>
                   {STATE_TEXT[u.state]}
                 </span>
-                {u.state === 'done' && (
+                {u.state === 'done' && u.auto && (
+                  // P3b: chỉ có cờ tự hoàn thành (giáo viên/bản dev): không có sao hay điểm
+                  <span className="inline-flex items-center gap-1 font-semibold" data-testid="tu-hoan-thanh">
+                    <span aria-hidden="true">⏭</span>
+                    {autoCompleteUi.trangThai}. {autoCompleteUi.khongCoDiem}
+                  </span>
+                )}
+                {u.state === 'done' && !u.auto && (
                   <span className="inline-flex items-center gap-1 font-semibold">
                     <AssetImage path="ui/icons/ngoi-sao" alt="" className="size-6 object-contain" />
                     {fmt(ui.banDo.soSao, stars)}
@@ -130,6 +144,15 @@ export function VillageDetails({
           );
         })}
       </ul>
+      {climax && (
+        <div className="space-y-2 rounded-2xl border-2 border-vang bg-vang/15 p-3" data-testid="canh-cuoi-bang">
+          <p className="text-sm font-semibold">{climax.seen ? climaxUi.canhCuoiDaXem : climaxUi.canhCuoiCho}</p>
+          <Button size="sm" onClick={climax.onWatch} data-testid="xem-canh-cuoi">
+            {climax.seen ? climaxUi.xemLai : climaxUi.xemCanhCuoi}
+          </Button>
+        </div>
+      )}
+      {scrollMap}
     </div>
   );
 }

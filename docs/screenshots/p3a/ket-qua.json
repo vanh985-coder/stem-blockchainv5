@@ -1,0 +1,779 @@
+[
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Giấy: bài học Mở; game 1 và game 2 Khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": "open,locked,locked"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Giấy: lý do khóa chỉ nhắc màn trong cùng làng (màn 1), không nhắc làng khác",
+  "ok": true,
+  "detail": "GAME Đuổi theo Tí 🔒 Khóa Hoàn thành màn 1 (Trang nối trang) để mở"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Giấy: chưa đọc thẻ \"Em có biết?\" thì bài học chưa có nút Vào (điều kiện thẻ giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: bài học Mở; game 1 và game 2 Khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": "open,locked,locked"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: lý do khóa chỉ nhắc màn trong cùng làng (màn 4), không nhắc làng khác",
+  "ok": true,
+  "detail": "GAME Đập Tí 🔒 Khóa Hoàn thành màn 4 (Cả làng cùng giữ sổ) để mở"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: chưa đọc thẻ \"Em có biết?\" thì bài học chưa có nút Vào (điều kiện thẻ giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: bài học Mở; game 1 và game 2 Khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": "open,locked,locked"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: lý do khóa chỉ nhắc màn trong cùng làng (màn 7), không nhắc làng khác",
+  "ok": true,
+  "detail": "GAME Lật thẻ tìm cặp khóa 🔒 Khóa Hoàn thành màn 7 (Khuôn riêng, mẫu chung) để mở"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: chưa đọc thẻ \"Em có biết?\" thì bài học chưa có nút Vào (điều kiện thẻ giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: bài học Mở; game 1 và game 2 Khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": "open,locked,locked"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: lý do khóa chỉ nhắc màn trong cùng làng (màn 10), không nhắc làng khác",
+  "ok": true,
+  "detail": "GAME Ghép lá cây sổ 🔒 Khóa Hoàn thành màn 10 (Cây gộp sổ) để mở"
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: chưa đọc thẻ \"Em có biết?\" thì bài học chưa có nút Vào (điều kiện thẻ giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "/ban-do khách mới",
+  "name": "xem cả 4 làng không tự ghi trang, xu hay màn xong vào tiến độ",
+  "ok": true,
+  "detail": "{\"gp\":0,\"c\":0,\"lv\":{}}"
+ },
+ {
+  "size": "1366x768",
+  "area": "thế giới khách mới",
+  "name": "bản đồ lớn: cả 4 ký hiệu cổng là \"mở\" (1,1,1,1)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "thế giới khách mới",
+  "name": "Làng Giấy: đi thẳng qua cổng vào làng (vượt cổng 1.9 đơn vị, trong làng: lang-giay)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "thế giới khách mới",
+  "name": "Làng Dệt: đi thẳng qua cổng vào làng (vượt cổng 1.5 đơn vị, trong làng: lang-det)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "thế giới khách mới",
+  "name": "Làng Khắc Dấu: đi thẳng qua cổng vào làng (vượt cổng 1.9 đơn vị, trong làng: lang-khac-dau)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "thế giới khách mới",
+  "name": "Làng Bạc: đi thẳng qua cổng vào làng (vượt cổng 1.5 đơn vị, trong làng: lang-bac)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "URL trực tiếp",
+  "name": "Làng Giấy: /lang/lang-giay/man/1 (bài học) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "URL trực tiếp",
+  "name": "Làng Giấy: /man/2 (game 1) còn khóa theo thứ tự trong làng, nhắc màn 1 (🔒 Màn này đang khóa Hoàn thành màn 1 (Trang nối trang) để mở Về bản đ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "URL trực tiếp",
+  "name": "Làng Dệt: /lang/lang-det/man/4 (bài học) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "URL trực tiếp",
+  "name": "Làng Dệt: /man/5 (game 1) còn khóa theo thứ tự trong làng, nhắc màn 4 (🔒 Màn này đang khóa Hoàn thành màn 4 (Cả làng cùng giữ sổ) để mở Về b)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "URL trực tiếp",
+  "name": "Làng Khắc Dấu: /lang/lang-khac-dau/man/7 (bài học) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "URL trực tiếp",
+  "name": "Làng Khắc Dấu: /man/8 (game 1) còn khóa theo thứ tự trong làng, nhắc màn 7 (🔒 Màn này đang khóa Hoàn thành màn 7 (Khuôn riêng, mẫu chung) để mở V)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "URL trực tiếp",
+  "name": "Làng Bạc: /lang/lang-bac/man/10 (bài học) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "URL trực tiếp",
+  "name": "Làng Bạc: /man/11 (game 1) còn khóa theo thứ tự trong làng, nhắc màn 10 (🔒 Màn này đang khóa Hoàn thành màn 10 (Cây gộp sổ) để mở Về bản đồ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "làng sau xong trước",
+  "name": "Làng Bạc: cả 3 màn Xong",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "làng sau xong trước",
+  "name": "chưa có Trang Sổ Vàng nào được trao (0/4), kể cả của Làng Bạc",
+  "ok": true,
+  "detail": "[false,false,false,false]"
+ },
+ {
+  "size": "1366x768",
+  "area": "làng sau xong trước",
+  "name": "Làng Giấy: vẫn Mở bài học, hai game còn Khóa như làng mới",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "làng sau xong trước",
+  "name": "Làng Dệt: vẫn Mở bài học, hai game còn Khóa như làng mới",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "làng sau xong trước",
+  "name": "Làng Khắc Dấu: vẫn Mở bài học, hai game còn Khóa như làng mới",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "làng sau xong trước",
+  "name": "tiến độ lưu không bị đổi: trang 0, các màn 10 đến 12 giữ nguyên, không thêm màn nào",
+  "ok": true,
+  "detail": "{\"gp\":0,\"lv\":[\"10\",\"11\",\"12\"]}"
+ },
+ {
+  "size": "1366x768",
+  "area": "làng sau xong trước",
+  "name": "điều hướng: vào bài học Làng Giấy bằng đường dẫn vẫn được",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "tiến độ cũ",
+  "name": "2 Trang Sổ Vàng đã có vẫn hiện, Làng Dệt 3 màn Xong",
+  "ok": true,
+  "detail": "[true,true,false,false]"
+ },
+ {
+  "size": "1366x768",
+  "area": "tiến độ cũ",
+  "name": "Làng Khắc Dấu: bài học Mở, hai game Khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "1366x768",
+  "area": "tiến độ cũ",
+  "name": "tải lại trang: cookie vẫn gp=2 và 6 màn đã xong",
+  "ok": true,
+  "detail": "{\"gp\":2,\"n\":6}"
+ },
+ {
+  "size": "1366x768",
+  "area": "thứ tự trong làng",
+  "name": "đủ 4 thẻ Làng Bạc: bài học có nút Vào, hai game Khóa và không có nút Vào",
+  "ok": true,
+  "detail": "[true,false,false]"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Giấy: bài học Mở; game 1 và game 2 Khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": "open,locked,locked"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Giấy: lý do khóa chỉ nhắc màn trong cùng làng (màn 1), không nhắc làng khác",
+  "ok": true,
+  "detail": "GAME Đuổi theo Tí 🔒 Khóa Hoàn thành màn 1 (Trang nối trang) để mở"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Giấy: chưa đọc thẻ \"Em có biết?\" thì bài học chưa có nút Vào (điều kiện thẻ giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: bài học Mở; game 1 và game 2 Khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": "open,locked,locked"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: lý do khóa chỉ nhắc màn trong cùng làng (màn 4), không nhắc làng khác",
+  "ok": true,
+  "detail": "GAME Đập Tí 🔒 Khóa Hoàn thành màn 4 (Cả làng cùng giữ sổ) để mở"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: chưa đọc thẻ \"Em có biết?\" thì bài học chưa có nút Vào (điều kiện thẻ giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: bài học Mở; game 1 và game 2 Khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": "open,locked,locked"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: lý do khóa chỉ nhắc màn trong cùng làng (màn 7), không nhắc làng khác",
+  "ok": true,
+  "detail": "GAME Lật thẻ tìm cặp khóa 🔒 Khóa Hoàn thành màn 7 (Khuôn riêng, mẫu chung) để mở"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: chưa đọc thẻ \"Em có biết?\" thì bài học chưa có nút Vào (điều kiện thẻ giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: bài học Mở; game 1 và game 2 Khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": "open,locked,locked"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: lý do khóa chỉ nhắc màn trong cùng làng (màn 10), không nhắc làng khác",
+  "ok": true,
+  "detail": "GAME Ghép lá cây sổ 🔒 Khóa Hoàn thành màn 10 (Cây gộp sổ) để mở"
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: chưa đọc thẻ \"Em có biết?\" thì bài học chưa có nút Vào (điều kiện thẻ giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "/ban-do khách mới",
+  "name": "xem cả 4 làng không tự ghi trang, xu hay màn xong vào tiến độ",
+  "ok": true,
+  "detail": "{\"gp\":0,\"c\":0,\"lv\":{}}"
+ },
+ {
+  "size": "360x800",
+  "area": "thế giới khách mới",
+  "name": "bản đồ lớn: cả 4 ký hiệu cổng là \"mở\" (1,1,1,1)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "thế giới khách mới",
+  "name": "Làng Giấy: đi thẳng qua cổng vào làng (vượt cổng 1.6 đơn vị, trong làng: lang-giay)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "thế giới khách mới",
+  "name": "Làng Dệt: đi thẳng qua cổng vào làng (vượt cổng 1.9 đơn vị, trong làng: lang-det)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "thế giới khách mới",
+  "name": "Làng Khắc Dấu: đi thẳng qua cổng vào làng (vượt cổng 1.8 đơn vị, trong làng: lang-khac-dau)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "thế giới khách mới",
+  "name": "Làng Bạc: đi thẳng qua cổng vào làng (vượt cổng 1.9 đơn vị, trong làng: lang-bac)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "URL trực tiếp",
+  "name": "Làng Giấy: /lang/lang-giay/man/1 (bài học) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "URL trực tiếp",
+  "name": "Làng Giấy: /man/2 (game 1) còn khóa theo thứ tự trong làng, nhắc màn 1 (🔒 Màn này đang khóa Hoàn thành màn 1 (Trang nối trang) để mở Về bản đ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "URL trực tiếp",
+  "name": "Làng Dệt: /lang/lang-det/man/4 (bài học) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "URL trực tiếp",
+  "name": "Làng Dệt: /man/5 (game 1) còn khóa theo thứ tự trong làng, nhắc màn 4 (🔒 Màn này đang khóa Hoàn thành màn 4 (Cả làng cùng giữ sổ) để mở Về b)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "URL trực tiếp",
+  "name": "Làng Khắc Dấu: /lang/lang-khac-dau/man/7 (bài học) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "URL trực tiếp",
+  "name": "Làng Khắc Dấu: /man/8 (game 1) còn khóa theo thứ tự trong làng, nhắc màn 7 (🔒 Màn này đang khóa Hoàn thành màn 7 (Khuôn riêng, mẫu chung) để mở V)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "URL trực tiếp",
+  "name": "Làng Bạc: /lang/lang-bac/man/10 (bài học) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "URL trực tiếp",
+  "name": "Làng Bạc: /man/11 (game 1) còn khóa theo thứ tự trong làng, nhắc màn 10 (🔒 Màn này đang khóa Hoàn thành màn 10 (Cây gộp sổ) để mở Về bản đồ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "làng sau xong trước",
+  "name": "Làng Bạc: cả 3 màn Xong",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "làng sau xong trước",
+  "name": "chưa có Trang Sổ Vàng nào được trao (0/4), kể cả của Làng Bạc",
+  "ok": true,
+  "detail": "[false,false,false,false]"
+ },
+ {
+  "size": "360x800",
+  "area": "làng sau xong trước",
+  "name": "Làng Giấy: vẫn Mở bài học, hai game còn Khóa như làng mới",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "làng sau xong trước",
+  "name": "Làng Dệt: vẫn Mở bài học, hai game còn Khóa như làng mới",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "làng sau xong trước",
+  "name": "Làng Khắc Dấu: vẫn Mở bài học, hai game còn Khóa như làng mới",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "làng sau xong trước",
+  "name": "tiến độ lưu không bị đổi: trang 0, các màn 10 đến 12 giữ nguyên, không thêm màn nào",
+  "ok": true,
+  "detail": "{\"gp\":0,\"lv\":[\"10\",\"11\",\"12\"]}"
+ },
+ {
+  "size": "360x800",
+  "area": "làng sau xong trước",
+  "name": "điều hướng: vào bài học Làng Giấy bằng đường dẫn vẫn được",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "tiến độ cũ",
+  "name": "2 Trang Sổ Vàng đã có vẫn hiện, Làng Dệt 3 màn Xong",
+  "ok": true,
+  "detail": "[true,true,false,false]"
+ },
+ {
+  "size": "360x800",
+  "area": "tiến độ cũ",
+  "name": "Làng Khắc Dấu: bài học Mở, hai game Khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "360x800",
+  "area": "tiến độ cũ",
+  "name": "tải lại trang: cookie vẫn gp=2 và 6 màn đã xong",
+  "ok": true,
+  "detail": "{\"gp\":2,\"n\":6}"
+ },
+ {
+  "size": "360x800",
+  "area": "thứ tự trong làng",
+  "name": "đủ 4 thẻ Làng Bạc: bài học có nút Vào, hai game Khóa và không có nút Vào",
+  "ok": true,
+  "detail": "[true,false,false]"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Giấy: bài học Mở; game 1 và game 2 Khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": "open,locked,locked"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Giấy: lý do khóa chỉ nhắc màn trong cùng làng (màn 1), không nhắc làng khác",
+  "ok": true,
+  "detail": "GAME Đuổi theo Tí 🔒 Khóa Hoàn thành màn 1 (Trang nối trang) để mở"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Giấy: chưa đọc thẻ \"Em có biết?\" thì bài học chưa có nút Vào (điều kiện thẻ giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: bài học Mở; game 1 và game 2 Khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": "open,locked,locked"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: lý do khóa chỉ nhắc màn trong cùng làng (màn 4), không nhắc làng khác",
+  "ok": true,
+  "detail": "GAME Đập Tí 🔒 Khóa Hoàn thành màn 4 (Cả làng cùng giữ sổ) để mở"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Dệt: chưa đọc thẻ \"Em có biết?\" thì bài học chưa có nút Vào (điều kiện thẻ giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: bài học Mở; game 1 và game 2 Khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": "open,locked,locked"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: lý do khóa chỉ nhắc màn trong cùng làng (màn 7), không nhắc làng khác",
+  "ok": true,
+  "detail": "GAME Lật thẻ tìm cặp khóa 🔒 Khóa Hoàn thành màn 7 (Khuôn riêng, mẫu chung) để mở"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Khắc Dấu: chưa đọc thẻ \"Em có biết?\" thì bài học chưa có nút Vào (điều kiện thẻ giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: bài học Mở; game 1 và game 2 Khóa (thứ tự trong làng giữ nguyên)",
+  "ok": true,
+  "detail": "open,locked,locked"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: lý do khóa chỉ nhắc màn trong cùng làng (màn 10), không nhắc làng khác",
+  "ok": true,
+  "detail": "GAME Ghép lá cây sổ 🔒 Khóa Hoàn thành màn 10 (Cây gộp sổ) để mở"
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "Làng Bạc: chưa đọc thẻ \"Em có biết?\" thì bài học chưa có nút Vào (điều kiện thẻ giữ nguyên)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "/ban-do khách mới",
+  "name": "xem cả 4 làng không tự ghi trang, xu hay màn xong vào tiến độ",
+  "ok": true,
+  "detail": "{\"gp\":0,\"c\":0,\"lv\":{}}"
+ },
+ {
+  "size": "844x390",
+  "area": "thế giới khách mới",
+  "name": "bản đồ lớn: cả 4 ký hiệu cổng là \"mở\" (1,1,1,1)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "thế giới khách mới",
+  "name": "Làng Giấy: đi thẳng qua cổng vào làng (vượt cổng 2.0 đơn vị, trong làng: lang-giay)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "thế giới khách mới",
+  "name": "Làng Dệt: đi thẳng qua cổng vào làng (vượt cổng 1.9 đơn vị, trong làng: lang-det)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "thế giới khách mới",
+  "name": "Làng Khắc Dấu: đi thẳng qua cổng vào làng (vượt cổng 1.8 đơn vị, trong làng: lang-khac-dau)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "thế giới khách mới",
+  "name": "Làng Bạc: đi thẳng qua cổng vào làng (vượt cổng 1.9 đơn vị, trong làng: lang-bac)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "URL trực tiếp",
+  "name": "Làng Giấy: /lang/lang-giay/man/1 (bài học) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "URL trực tiếp",
+  "name": "Làng Giấy: /man/2 (game 1) còn khóa theo thứ tự trong làng, nhắc màn 1 (🔒 Màn này đang khóa Hoàn thành màn 1 (Trang nối trang) để mở Về bản đ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "URL trực tiếp",
+  "name": "Làng Dệt: /lang/lang-det/man/4 (bài học) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "URL trực tiếp",
+  "name": "Làng Dệt: /man/5 (game 1) còn khóa theo thứ tự trong làng, nhắc màn 4 (🔒 Màn này đang khóa Hoàn thành màn 4 (Cả làng cùng giữ sổ) để mở Về b)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "URL trực tiếp",
+  "name": "Làng Khắc Dấu: /lang/lang-khac-dau/man/7 (bài học) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "URL trực tiếp",
+  "name": "Làng Khắc Dấu: /man/8 (game 1) còn khóa theo thứ tự trong làng, nhắc màn 7 (🔒 Màn này đang khóa Hoàn thành màn 7 (Khuôn riêng, mẫu chung) để mở V)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "URL trực tiếp",
+  "name": "Làng Bạc: /lang/lang-bac/man/10 (bài học) vào được, không báo khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "URL trực tiếp",
+  "name": "Làng Bạc: /man/11 (game 1) còn khóa theo thứ tự trong làng, nhắc màn 10 (🔒 Màn này đang khóa Hoàn thành màn 10 (Cây gộp sổ) để mở Về bản đồ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "làng sau xong trước",
+  "name": "Làng Bạc: cả 3 màn Xong",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "làng sau xong trước",
+  "name": "chưa có Trang Sổ Vàng nào được trao (0/4), kể cả của Làng Bạc",
+  "ok": true,
+  "detail": "[false,false,false,false]"
+ },
+ {
+  "size": "844x390",
+  "area": "làng sau xong trước",
+  "name": "Làng Giấy: vẫn Mở bài học, hai game còn Khóa như làng mới",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "làng sau xong trước",
+  "name": "Làng Dệt: vẫn Mở bài học, hai game còn Khóa như làng mới",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "làng sau xong trước",
+  "name": "Làng Khắc Dấu: vẫn Mở bài học, hai game còn Khóa như làng mới",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "làng sau xong trước",
+  "name": "tiến độ lưu không bị đổi: trang 0, các màn 10 đến 12 giữ nguyên, không thêm màn nào",
+  "ok": true,
+  "detail": "{\"gp\":0,\"lv\":[\"10\",\"11\",\"12\"]}"
+ },
+ {
+  "size": "844x390",
+  "area": "làng sau xong trước",
+  "name": "điều hướng: vào bài học Làng Giấy bằng đường dẫn vẫn được",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "tiến độ cũ",
+  "name": "2 Trang Sổ Vàng đã có vẫn hiện, Làng Dệt 3 màn Xong",
+  "ok": true,
+  "detail": "[true,true,false,false]"
+ },
+ {
+  "size": "844x390",
+  "area": "tiến độ cũ",
+  "name": "Làng Khắc Dấu: bài học Mở, hai game Khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "size": "844x390",
+  "area": "tiến độ cũ",
+  "name": "tải lại trang: cookie vẫn gp=2 và 6 màn đã xong",
+  "ok": true,
+  "detail": "{\"gp\":2,\"n\":6}"
+ },
+ {
+  "size": "844x390",
+  "area": "thứ tự trong làng",
+  "name": "đủ 4 thẻ Làng Bạc: bài học có nút Vào, hai game Khóa và không có nút Vào",
+  "ok": true,
+  "detail": "[true,false,false]"
+ }
+]

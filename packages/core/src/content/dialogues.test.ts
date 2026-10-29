@@ -29,7 +29,7 @@ describe('dialogues.ts', () => {
   });
 
   it('Bi nói đúng câu của bảng mục 5 (spec 04)', () => {
-    expect(BI_NHAC_NHIEM[1]).toBe('Một trang rồi! Cổng Làng Dệt đã mở.');
+    expect(BI_NHAC_NHIEM[1]).toBe('Một trang rồi! Giờ mình tới Làng Dệt.');
     expect(BI_NHAC_NHIEM[2]).toBe('Hai trang! Giờ tới Làng Khắc Dấu.');
     expect(BI_NHAC_NHIEM[3]).toBe('Ba trang! Chỉ còn Làng Bạc thôi.');
     expect(BI_NHAC_NHIEM[4]).toBe('Đủ 4 trang rồi! Cả làng đang mở hội.');

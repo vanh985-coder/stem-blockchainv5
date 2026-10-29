@@ -54,8 +54,8 @@ export const MARKET_TALKERS: readonly MarketTalker[] = [
  * mục 4); câu sau là nhiệm vụ hiện tại.
  */
 export const BI_NHAC_NHIEM: readonly string[] = [
-  'Chỉ còn cổng Làng Giấy mở. Đi thôi!',
-  'Một trang rồi! Cổng Làng Dệt đã mở.',
+  'Cả bốn làng đều đang chờ em. Mình ghé Làng Giấy trước nhé!',
+  'Một trang rồi! Giờ mình tới Làng Dệt.',
   'Hai trang! Giờ tới Làng Khắc Dấu.',
   'Ba trang! Chỉ còn Làng Bạc thôi.',
   'Đủ 4 trang rồi! Cả làng đang mở hội.',

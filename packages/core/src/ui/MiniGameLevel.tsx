@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
-import { MERGED, URLS, villageWorldUrl } from '../config/urls';
+import { MERGED, URLS, openClimax, villageWorldUrl } from '../config/urls';
+import { climaxUi } from '../content/climax';
 import { fmt } from '../content/characters';
 import { GAMES, gameUi } from '../content/games';
 import { gameHints } from '../content/gameHints';
@@ -9,8 +10,10 @@ import { levelById, nextReadyLevel } from '../content/levels';
 import { gameResultOf, summarizeGame, type Medal, type MedalThresholds } from '../games/medals';
 import { PROBE } from '../lib/dev';
 import { formatNumber } from '../lib/format';
+import { CLIMAX_LEVEL, climaxPending } from '../progress/climaxState';
 import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
+import { AutoCompleteButton, AutoCompletedPanel } from './AutoComplete';
 import { Button } from './Button';
 import { rich } from './rich';
 import { GuideDialog } from './GuideDialog';
@@ -47,6 +50,11 @@ export interface MiniGameFinale {
   render: (p: { replay: boolean; onDone: () => void }) => ReactNode;
   /** Chữ nút xem lại ở màn kết quả ("Xem lại cảnh cuối") */
   replayLabel: string;
+  /**
+   * Có chiếu cảnh được không (xét đúng lúc ván kết thúc, SAU khi đã ghi kết quả, và mỗi lần vẽ màn kết quả để hiện nút xem lại). Không có thì luôn được.
+   * Màn 12 dùng để chỉ chiếu cao trào khi đã đủ 4 Trang Sổ Vàng (P3a: các làng chơi không theo thứ tự thì chưa đủ).
+   */
+  ready?: () => boolean;
 }
 
 export interface MiniGameLevelProps {
@@ -56,6 +64,8 @@ export interface MiniGameLevelProps {
   medals: MedalThresholds;
   /** Vẽ phần chơi (bước 11 đến 12 của màn 2, tương tự cho các game khác) */
   renderGame: (props: MiniGameRenderProps) => ReactNode;
+  /** Điểm tối đa của phiên bản hiện tại (không bắt buộc): điểm cao nhất đã lưu vượt số này là kỷ lục của thang điểm cũ, hiện chú thích `gameUi.kyLucCu` (không đổi hay quy đổi điểm) */
+  maxScore?: number;
   /** Bấm "Về làng": mặc định về làng của màn này trong thế giới mở ở hub (`/cho?tu=<làng>`) */
   onLeave?: () => void;
   /** Cảnh cuối sau ván (tùy game) */
@@ -63,7 +73,7 @@ export interface MiniGameLevelProps {
 }
 
 type ResultStage = { kind: 'result'; score: number; medal: Medal; newBest: boolean; coins: number; parts: readonly ScorePart[] };
-type Stage = { kind: 'card' } | { kind: 'play' } | ResultStage | { kind: 'finale'; result: ResultStage; replay: boolean };
+type Stage = { kind: 'card' } | { kind: 'play' } | { kind: 'auto' } | ResultStage | { kind: 'finale'; result: ResultStage; replay: boolean };
 
 /** Theo dõi tab có đang bị ẩn không (đọc lại khi đổi trạng thái). */
 function useTabHidden(): boolean {
@@ -83,7 +93,7 @@ function useTabHidden(): boolean {
  * Chơi xong (thắng hay thua) ghi `played = true`, `best_score` lấy số lớn hơn, `stars {"game": 0 đến 3}` theo mốc, qua lớp tiến độ có sẵn (đăng nhập hay khách):
  * `record` ghi vào máy ngay, đẩy lên máy chủ sau (như các trạm bài học). Tab bị ẩn thì tạm dừng và chờ em bấm "Tiếp tục".
  */
-export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: MiniGameLevelProps) {
+export function MiniGameLevel({ levelId, medals, maxScore, renderGame, onLeave, finale }: MiniGameLevelProps) {
   const { progress, record, saveNow } = useProgress();
   const navigate = useNavigate();
   const def = levelById(levelId);
@@ -138,6 +148,8 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
   }, [stage.kind]);
 
   const finished = useRef(false);
+  const finaleRef = useRef(finale);
+  finaleRef.current = finale;
   const onFinish = useCallback(
     (score: number, parts: readonly ScorePart[] = []) => {
       if (finished.current) return; // chỉ nhận một lần cho mỗi ván
@@ -147,9 +159,10 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
       void saveNow();
       const sum = summarizeGame(score, medals, before);
       const result: ResultStage = { kind: 'result', score: sum.score, medal: sum.medal, newBest: sum.newBest, coins: coinsEarned, parts };
-      setStage(finale?.auto ? { kind: 'finale', result, replay: false } : result);
+      const f = finaleRef.current;
+      setStage(f?.auto && (f.ready?.() ?? true) ? { kind: 'finale', result, replay: false } : result);
     },
-    [levelId, medals, record, saveNow, finale?.auto],
+    [levelId, medals, record, saveNow],
   );
 
   const start = () => {
@@ -171,8 +184,24 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
   const next = nextReadyLevel(levelId);
   const title = fmt(text?.ten ?? def?.ten ?? '');
   const best = progress.levels[levelId]?.bestScore ?? 0;
+  const legacyBest = maxScore !== undefined && best > maxScore;
   const moc = fmt(gameUi.cacMoc, { so: medals[0], so2: medals[1], so3: medals[2] });
 
+  // Tự hoàn thành (P3b): ván không còn chạy (khung game đã gỡ nên đồng hồ và vật lý dừng), không chấm điểm, không `record`, không trao thưởng
+  const [autoNote, setAutoNote] = useState<string | undefined>();
+  const toAuto = (note?: string) => {
+    setAutoNote(note);
+    finished.current = true; // một lần `onFinish` trễ của ván cũ không được ghi điểm
+    closeHint();
+    setStage({ kind: 'auto' });
+  };
+  if (stage.kind === 'auto') {
+    return (
+      <div className="mx-auto w-full max-w-xl px-4 py-8">
+        <AutoCompletedPanel notice={autoNote} levelId={levelId} onPlayReal={start} onNext={next ? () => navigate(`/lang/${next.lang}/man/${next.id}`) : undefined} onLeave={leave} />
+      </div>
+    );
+  }
   if (stage.kind === 'play') {
     // Cầu nối đo kiểm: kết thúc ván với điểm cho trước (mặc định mốc Vàng) qua đúng đường onFinish của khung (ghi tiến độ, màn kết quả, cảnh cuối)
     if (PROBE) Object.assign(window, { __miniFinish: (score?: number) => onFinish(score ?? medals[2]) });
@@ -204,6 +233,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
                 <Button size="md" autoFocus className="min-h-11 whitespace-nowrap" onClick={closeHint}>
                   {gameHints.tiepTuc}
                 </Button>
+                <AutoCompleteButton levelId={levelId} onDone={toAuto} className="min-h-11 whitespace-nowrap" />
               </div>
             </Panel>
           </div>
@@ -244,6 +274,11 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
               {fmt(gameUi.diem, { diem: formatNumber(stage.score) })}
             </p>
             {stage.newBest && <p className="font-bold text-xanh-la-dam">{gameUi.kyLucMoi}</p>}
+            {legacyBest && !stage.newBest && (
+              <p className="text-sm font-semibold" data-testid="ky-luc-cu-ket-qua">
+                {fmt(gameUi.diemCao, { diem: formatNumber(best) })} <span className="font-bold text-nau-go-dam">({gameUi.kyLucCu})</span>
+              </p>
+            )}
             <div className="mg-result-stars flex justify-center">
               <Stars earned={stage.medal} max={3} size="lg" />
             </div>
@@ -261,6 +296,15 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
               </section>
             )}
             <p className="text-sm">{moc}</p>
+            {levelId !== CLIMAX_LEVEL && climaxPending(progress) && (
+              // P3a: game này vừa làm đủ 4 trang khi màn 12 đã xong từ trước: cảnh cuối đang chờ, xem ngay không cần chơi lại màn 12
+              <div className="space-y-2 rounded-2xl border-2 border-vang bg-vang/15 p-3" data-testid="canh-cuoi-cho">
+                <p className="text-sm font-semibold">{climaxUi.canhCuoiCho}</p>
+                <Button size="lg" data-testid="xem-canh-cuoi" onClick={() => openClimax(navigate)}>
+                  {climaxUi.xemCanhCuoi}
+                </Button>
+              </div>
+            )}
             {stage.coins > 0 && <p className="font-semibold">{fmt(gameUi.xuNhan, { so: stage.coins })}</p>}
             <div className="mg-result-buttons flex flex-col justify-center gap-3 sm:flex-row">
               <Button size="lg" variant={next ? 'secondary' : 'primary'} onClick={start}>
@@ -274,7 +318,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
               <Button size="lg" variant="secondary" onClick={leave}>
                 {gameUi.veLang}
               </Button>
-              {finale && (
+              {finale && (finale.ready?.() ?? true) && (
                 <Button size="lg" variant="secondary" data-testid="xem-lai-canh-cuoi" onClick={() => setStage({ kind: 'finale', result: stage, replay: true })}>
                   {finale.replayLabel}
                 </Button>
@@ -317,13 +361,15 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
         )}
         <p className="font-semibold" data-testid="diem-cao">
           {best > 0 ? fmt(gameUi.diemCao, { diem: formatNumber(best) }) : gameUi.chuaChoi}
+          {legacyBest && <span className="ml-2 text-sm font-bold text-nau-go-dam" data-testid="ky-luc-cu">({gameUi.kyLucCu})</span>}
         </p>
         <p className="text-sm">{moc}</p>
         </div>
-        <div className="flex shrink-0 flex-col justify-center gap-2 sm:flex-row sm:justify-end sm:gap-3" data-testid="nut-the-bat-dau">
+        <div className="flex shrink-0 flex-col justify-center gap-2 sm:flex-row sm:flex-wrap sm:justify-end sm:gap-3" data-testid="nut-the-bat-dau">
           <Button size="lg" variant="secondary" fullWidth className="sm:w-auto" onClick={() => setGuideOpen(true)}>
             {huongDan.nut}
           </Button>
+          <AutoCompleteButton levelId={levelId} onDone={toAuto} className="min-h-12 w-full sm:w-auto" />
           <Button size="lg" fullWidth className="sm:w-auto" onClick={start}>
             {gameUi.batDau}
           </Button>

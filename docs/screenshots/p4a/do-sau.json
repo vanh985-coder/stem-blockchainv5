@@ -1,0 +1,80 @@
+[
+ {
+  "size": "1366x768",
+  "label": "sau",
+  "nominalStart": 12,
+  "meanSpeedFirst8s": 12.154,
+  "worstDeviation": 0,
+  "maxSpeed": 13.8,
+  "fps": {
+   "frames": 141,
+   "meanFps": 1.1,
+   "p5Fps": 1.5,
+   "worstFrameMs": 71964.9,
+   "over50ms": 135,
+   "over100ms": 133
+  },
+  "fps8s": {
+   "frames": 103,
+   "meanFps": 2.8,
+   "p5Fps": 1.5,
+   "worstFrameMs": 730.2,
+   "over50ms": 98,
+   "over100ms": 96
+  },
+  "wallSeconds": 125,
+  "glRenderer": "SwiftShader (Chrome headless, GL phần mềm)"
+ },
+ {
+  "size": "360x800",
+  "label": "sau",
+  "nominalStart": 12,
+  "meanSpeedFirst8s": 12.153,
+  "worstDeviation": 0,
+  "maxSpeed": 13.8,
+  "fps": {
+   "frames": 179,
+   "meanFps": 2.6,
+   "p5Fps": 3.2,
+   "worstFrameMs": 36458.6,
+   "over50ms": 156,
+   "over100ms": 151
+  },
+  "fps8s": {
+   "frames": 109,
+   "meanFps": 6.3,
+   "p5Fps": 3.4,
+   "worstFrameMs": 782.8,
+   "over50ms": 96,
+   "over100ms": 93
+  },
+  "wallSeconds": 69,
+  "glRenderer": "SwiftShader (Chrome headless, GL phần mềm)"
+ },
+ {
+  "size": "844x390",
+  "label": "sau",
+  "nominalStart": 12,
+  "meanSpeedFirst8s": 12.156,
+  "worstDeviation": 0.144,
+  "maxSpeed": 13.8,
+  "fps": {
+   "frames": 167,
+   "meanFps": 2.3,
+   "p5Fps": 3.4,
+   "worstFrameMs": 38525.9,
+   "over50ms": 157,
+   "over100ms": 155
+  },
+  "fps8s": {
+   "frames": 103,
+   "meanFps": 5.1,
+   "p5Fps": 3.7,
+   "worstFrameMs": 371.2,
+   "over50ms": 100,
+   "over100ms": 100
+  },
+  "wallSeconds": 74,
+  "glRenderer": "SwiftShader (Chrome headless, GL phần mềm)"
+ }
+]

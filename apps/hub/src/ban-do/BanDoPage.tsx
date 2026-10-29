@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import {
   AssetImage,
   BAN_DO_HOTSPOTS,
@@ -13,6 +13,10 @@ import {
   effectiveKnowMask,
   fmt,
   hasSeenKnow,
+  knowBypassedByAuto,
+  canWatchClimax,
+  hasSeenClimax,
+  openClimax,
   knowScrollUi,
   countKnowCards,
   levelsOfVillage,
@@ -29,6 +33,8 @@ import { LevelDot, STATE_TEXT, VillageDetails } from './parts';
 
 // Lời giới thiệu làng chỉ tải khi cần (lần đầu bấm vào làng, hoặc bấm "Xem lại giới thiệu").
 const VillageIntro = lazy(() => import('./VillageIntro'));
+// Vùng bản đồ làng có thẻ "Em có biết?" chưa nhặt (P2b): cần dữ liệu bố cục làng nên chỉ tải khi chọn làng.
+const VillageScrollMap = lazy(() => import('./VillageScrollMap'));
 
 /** Màn hình khớp một truy vấn (ví dụ rộng từ 768px hoặc từ 1024px). */
 function useMedia(query: string): boolean {
@@ -98,6 +104,7 @@ export default function BanDoPage() {
   const stageRef = useRef<HTMLDivElement>(null);
   const manifest = useManifest();
   const { profile } = useAuth();
+  const navigate = useNavigate();
   const { unlock, progress, goldenPages, mode, synced, markVillageIntroSeen, markAllKnowCards } = useProgress();
   const [selected, setSelected] = useState<VillageId | null>(null);
   const [intro, setIntro] = useState<VillageId | null>(null);
@@ -126,12 +133,17 @@ export default function BanDoPage() {
   const name = profile?.display_name ?? fmt('{Ten}');
 
   // thẻ "Em có biết?" của làng (bước X3): đã đọc (hoặc nhặt trong làng 3D) đủ chưa; người đã xong màn 1 hay đã xem hộp cũ coi như đủ
-  const knowOf = (id: VillageId) => {
+  const maskOf = (id: VillageId) => {
     const total = villageKnowCards(id).length;
     const first = levelsOfVillage(id)[0]?.id;
-    const lessonDone = first !== undefined && unlock.levels.find((u) => u.id === first)?.state === 'done';
-    const mask = effectiveKnowMask({ data: progress.game.data, village: id, total, lessonDone, seenOld: hasSeenKnow(progress.game.data, id) });
-    return { got: countKnowCards(mask, total), total };
+    const firstState = unlock.levels.find((u) => u.id === first);
+    // tự hoàn thành (P3b) không phải đã xong bài học thật: không làm đủ thẻ
+    const lessonDone = first !== undefined && firstState?.state === 'done' && !firstState.auto;
+    return effectiveKnowMask({ data: progress.game.data, village: id, total, lessonDone, seenOld: hasSeenKnow(progress.game.data, id) });
+  };
+  const knowOf = (id: VillageId) => {
+    const total = villageKnowCards(id).length;
+    return { got: countKnowCards(maskOf(id), total), total };
   };
   const details = selected && (
     <VillageDetails
@@ -141,7 +153,13 @@ export default function BanDoPage() {
       goldenEarned={VILLAGE_ORDER.indexOf(selected) < goldenPages}
       onClose={wide ? undefined : () => setSelected(null)}
       onReplayIntro={() => setIntro(selected)}
-      know={{ ...knowOf(selected), onRead: () => setReading(selected) }}
+      know={{ ...knowOf(selected), bypass: knowBypassedByAuto(unlock.levels, selected), onRead: () => setReading(selected) }}
+      climax={selected === 'lang-bac' && canWatchClimax(progress) ? { seen: hasSeenClimax(progress.game.data), onWatch: () => openClimax(navigate) } : undefined}
+      scrollMap={
+        <Suspense fallback={null}>
+          <VillageScrollMap village={selected} mask={maskOf(selected)} />
+        </Suspense>
+      }
     />
   );
 
@@ -186,6 +204,7 @@ export default function BanDoPage() {
           <button
             key={id}
             type="button"
+            data-village={id}
             aria-pressed={on}
             onClick={() => pickVillage(id)}
             style={{ left: `${pos.x}%`, top: `${pos.y}%`, ...(fitted ? { minHeight: sc.target, minWidth: sc.target } : {}) }}
@@ -242,10 +261,12 @@ export default function BanDoPage() {
           </main>
         </div>
       ) : (
-        <main className="mx-auto w-full max-w-[1280px] gap-4 p-3 pt-0 md:flex md:items-start">
-          {mapBox}
-          {sidePanel}
-        </main>
+        <>
+          <main className="mx-auto w-full max-w-[1280px] gap-4 p-3 pt-0 md:flex md:items-start">
+            {mapBox}
+            {sidePanel}
+          </main>
+        </>
       )}
 
       {!wide && (

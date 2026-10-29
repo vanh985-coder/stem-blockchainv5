@@ -148,8 +148,8 @@ describe('bảng test của spec 05, Màn 2 (9 ca)', () => {
     expect(s.grounded).toBe(true);
     expect(s.onRoof).toBe(true);
     expect(s.y).toBeCloseTo(SPEC.roofHeight, 6);
-    // và chạy được trên nóc suốt chiều dài xe, rồi rơi xuống đất ở cuối xe (bước X1 đổi tốc độ bắt đầu từ 8 lên 10 nên số bước từ 20 xuống 12: vẫn nằm trong chiều dài xe, quãng đường tổng 3,7 đơn vị thay vì 4,0)
-    for (let i = 0; i < 12; i++) stepRunner(s, {}, DT);
+    // và chạy được trên nóc suốt chiều dài xe, rồi rơi xuống đất ở cuối xe (bước X1 đổi tốc độ bắt đầu từ 8 lên 10 nên số bước từ 20 xuống 12; P4a nâng lên 12 nên còn 8 bước: quãng đường tổng 18 bước × 1/60 giây × 12 = 3,6 đơn vị, vẫn nằm trong chiều dài xe 4,26)
+    for (let i = 0; i < 8; i++) stepRunner(s, {}, DT);
     expect(s.y).toBeCloseTo(SPEC.roofHeight, 6);
     for (let i = 0; i < 90; i++) stepRunner(s, {}, DT);
     expect(s.y).toBe(0);
@@ -192,18 +192,20 @@ describe('bảng test của spec 05, Màn 2 (9 ca)', () => {
 });
 
 describe('tốc độ, nhảy, trượt', () => {
-  it('tốc độ 10, tăng 0,3 mỗi 5 giây THEO BẬC (spec 05 dòng 50, bước X1), tối đa 18', () => {
-    expect(speedAt(0)).toBe(10);
-    expect(speedAt(4.999)).toBe(10);
-    expect(speedAt(5)).toBeCloseTo(10.3, 9);
-    expect(speedAt(9.999)).toBeCloseTo(10.3, 9);
-    expect(speedAt(10)).toBeCloseTo(10.6, 9);
-    expect(speedAt(100)).toBeCloseTo(16, 9);
-    expect(speedAt(100 - 0.001)).toBeCloseTo(15.7, 9);
-    expect(speedAt(134.999)).toBeCloseTo(17.8, 9); // 26 bậc
-    expect(speedAt(135)).toBe(18); // bậc thứ 27 sẽ là 18,1: chặn ở 18
-    expect(speedAt(1000)).toBe(18);
-    expect(speedAt(-3)).toBe(10);
+  it('tốc độ 12, tăng 0,36 mỗi 5 giây THEO BẬC (P4a: gấp 1,2 lần bước X1), tối đa 21,6', () => {
+    expect(speedAt(0)).toBe(12);
+    expect(speedAt(4.999)).toBe(12);
+    expect(speedAt(5)).toBeCloseTo(12.36, 9);
+    expect(speedAt(9.999)).toBeCloseTo(12.36, 9);
+    expect(speedAt(10)).toBeCloseTo(12.72, 9);
+    expect(speedAt(100)).toBeCloseTo(19.2, 9);
+    expect(speedAt(100 - 0.001)).toBeCloseTo(18.84, 9);
+    expect(speedAt(134.999)).toBeCloseTo(21.36, 9); // 26 bậc
+    expect(speedAt(135)).toBe(21.6); // bậc thứ 27 sẽ là 21,72: chặn ở 21,6
+    expect(speedAt(1000)).toBe(21.6);
+    // đúng 1,2 lần tốc độ cũ ở mọi giờ chạy (10 + 0,3 × bậc, tối đa 18)
+    for (const t of [0, 5, 20, 55, 100, 134, 135, 300]) expect(speedAt(t)).toBeCloseTo(1.2 * Math.min(18, 10 + 0.3 * Math.floor(t / 5)), 9);
+    expect(speedAt(-3)).toBe(12);
   });
 
   /** Nhảy một lần ở chỗ trống, trả về đỉnh cao và thời gian bay. */
@@ -556,8 +558,8 @@ describe('điểm và mốc', () => {
     expect(runnerScore({ pages: 0, coins: 0, distance: 0, correct: 4 })).toBe(120);
   });
 
-  it('mốc Đồng 200, Bạc 380, Vàng 520', () => {
-    expect([0, 199, 200, 379, 380, 519, 520, 9999].map(runnerMedal)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
+  it('mốc Đồng 216, Bạc 499, Vàng 638 (P4a, theo phân vị bot)', () => {
+    expect([0, 215, 216, 498, 499, 637, 638, 9999].map(runnerMedal)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
   });
 });
 

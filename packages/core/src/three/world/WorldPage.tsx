@@ -14,10 +14,12 @@ import { knowScrollUi } from '../../content/knowScrolls';
 import { banDoNho } from '../../content/minimap';
 import { MERGED, URLS, levelUrl } from '../../config/urls';
 import { shouldAutoOpenGuide } from '../../progress/guideFlags';
-import { countKnowCards, effectiveKnowMask } from '../../progress/knowCards';
+import { countKnowCards, effectiveKnowMask, knowBypassedByAuto } from '../../progress/knowCards';
 import { useProgress } from '../../progress/ProgressProvider';
 import type { LevelState } from '../../progress/unlock';
 import { hasSeenKnow, pendingGateOpening, shouldShowGolden, shouldShowKnow, shouldShowScene } from '../../progress/villageIntro';
+import { climaxPending } from '../../progress/climaxState';
+import { climaxUi } from '../../content/climax';
 import { useSettings } from '../../settings/SettingsProvider';
 import { EmCoBietDialog } from '../../ui/EmCoBietDialog';
 import { KnowCollectionDialog } from '../../ui/KnowCollectionDialog';
@@ -33,7 +35,7 @@ import { useWalkSession } from '../useWalkSession';
 import { createWalkApi } from '../walkApi';
 import { MarketHud } from '../cho/MarketHud';
 import { MarketMenu } from '../cho/MarketMenu';
-import { GATE_VILLAGE, biQuestLine, gateOpenedAfter, gateStates, previousVillage, questGate, questLine } from '../cho/marketQuest';
+import { GATE_OPENING_CEREMONY, GATE_VILLAGE, biQuestLine, gateOpenedAfter, gateStates, previousVillage, questGate, questLine } from '../cho/marketQuest';
 import { densityFor, type GateId } from '../cho/marketLayout';
 import { GoldenPagesRow } from '../village/GoldenPagesRow';
 import { guideTopic, lockedBy, nextLevel } from '../village/villageQuest';
@@ -175,7 +177,8 @@ export function WorldPage() {
   const ceremonyPending = !isTeacher && giverVillage !== null && VILLAGE_SCENE[giverVillage]?.award !== undefined && shouldShowGolden(data, giverVillage, pages);
   const effPages = effectivePages(pages, ceremonyPending);
   // Hiệu ứng mở cổng còn chờ (cổng của làng kế tiếp vẫn đóng cho tới khi chiếu xong)
-  const openingGiver = isTeacher ? null : pendingGateOpening(data, pages);
+  // (tắt từ P3a: cả 4 cổng mở từ đầu nên không còn cổng nào phải "mở" sau khi nhận trang)
+  const openingGiver = isTeacher || !GATE_OPENING_CEREMONY ? null : pendingGateOpening(data, pages);
   const openingGate = openingGiver ? gateOpenedAfter(openingGiver) : null;
   const gateOpenBase = useMemo(() => gateStates(unlock.villageOpen, isTeacher), [unlock.villageOpen, isTeacher]);
   const seqActive = seq === 'wait' || seq === 'fall' || seq === 'talk';
@@ -183,6 +186,8 @@ export function WorldPage() {
   const fallingGate = seq === 'fall' ? openingGate : null;
 
   const stateOf = useCallback((id: number) => unlock.levels.find((u) => u.id === id)?.state, [unlock.levels]);
+  // P3b: bài học đầu của làng chỉ "tự hoàn thành" (giáo viên/bản dev): bỏ điều kiện chặn vì chưa đủ thẻ, nhưng KHÔNG coi là đã nhặt thẻ (mặt nạ và ký hiệu thẻ trên bản đồ giữ nguyên)
+  const autoBypass = (id: VillageId): boolean => knowBypassedByAuto(unlock.levels, id);
   // ---- thẻ "Em có biết?" rải trong làng (bước X3): mặt nạ hiệu lực theo làng (đã nhặt, hoặc coi như đủ nếu đã xong màn 1 hay đã xem hộp cũ), số thẻ cần nhặt và việc có chặn biển hay không
   const scrollTotals = useMemo(() => Object.fromEntries(world.villages.map((v) => [v.id, v.layout.scrolls?.length ?? 0])) as Record<VillageId, number>, [world.villages]);
   const knowMasks = useMemo(
@@ -190,19 +195,19 @@ export function WorldPage() {
       Object.fromEntries(
         VILLAGE_ORDER.map((id) => {
           const first = levelsOfVillage(id)[0]?.id;
-          return [id, effectiveKnowMask({ data, village: id, total: scrollTotals[id], lessonDone: first !== undefined && stateOf(first) === 'done', seenOld: hasSeenKnow(data, id) })];
+          return [id, effectiveKnowMask({ data, village: id, total: scrollTotals[id], lessonDone: first !== undefined && stateOf(first) === 'done' && !unlock.levels.find((u) => u.id === first)?.auto, seenOld: hasSeenKnow(data, id) })];
         }),
       ) as Record<VillageId, number>,
-    [data, scrollTotals, stateOf],
+    [data, scrollTotals, stateOf, unlock.levels],
   );
   const knowGot = (id: VillageId): number => countKnowCards(knowMasks[id], scrollTotals[id]);
   /** Làng còn thẻ phải nhặt trước khi vào màn (giáo viên không bị chặn) */
-  const knowGated = (id: VillageId): boolean => !isTeacher && scrollTotals[id] > 0 && knowGot(id) < scrollTotals[id];
+  const knowGated = (id: VillageId): boolean => !isTeacher && scrollTotals[id] > 0 && knowGot(id) < scrollTotals[id] && !autoBypass(id);
   const levelStates = useMemo(
     () =>
       Object.fromEntries(
         unlock.levels.map((u) => {
-          const gated = u.state === 'open' && !isTeacher && VILLAGE_ORDER.some((id) => scrollTotals[id] > 0 && knowGot(id) < scrollTotals[id] && levelsOfVillage(id).some((l) => l.id === u.id));
+          const gated = u.state === 'open' && !isTeacher && VILLAGE_ORDER.some((id) => scrollTotals[id] > 0 && knowGot(id) < scrollTotals[id] && !autoBypass(id) && levelsOfVillage(id).some((l) => l.id === u.id));
           return [u.id, gated ? 'locked' : u.state];
         }),
       ) as Record<number, LevelState | undefined>,
@@ -213,14 +218,17 @@ export function WorldPage() {
   const insideLevelIds = useMemo(() => (inside ? levelsOfVillage(inside).map((l) => l.id) : []), [inside]);
   const nextBoard = inside ? nextLevel(insideLevelIds, stateOf) : null;
   const insideName = inside ? ui.lang[inside] : '';
+  // P3a: màn 12 xong từ trước, nay đủ 4 trang mà chưa xem cảnh cuối: nhắc ở dòng nhiệm vụ (nút xem nằm ở bảng Làng Bạc trong Bản đồ)
+  const cinemaPending = !isTeacher && climaxPending(progress.progress);
   const qPages = seqActive ? Math.max(0, effPages - 1) : effPages;
   const questText = useMemo(() => {
     if (inside && insideGated) return fmt(knowScrollUi.nhiemVu, { n: knowGot(inside), tong: scrollTotals[inside] });
     if (inside && nextBoard !== null) return fmt(ui.langScene.nhiemVuMan, { bien: fmt(levelById(nextBoard)?.bien ?? '') });
     if (inside && ceremonyPending) return fmt(ui.langScene.nhiemVuXong, { lang: insideName });
+    if (!inside && cinemaPending) return fmt(climaxUi.nhiemVuCanhCuoi);
     return fmt(questLine(qPages));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inside, insideGated, knowMasks, scrollTotals, nextBoard, ceremonyPending, insideName, qPages]);
+  }, [inside, insideGated, knowMasks, scrollTotals, nextBoard, ceremonyPending, insideName, qPages, cinemaPending]);
   // làng của nhiệm vụ: đang ở trong làng nào thì làng đó, không thì làng có cổng của nhiệm vụ theo số Trang Sổ Vàng
   const questG = questGate(effPages);
   const missionVillage: VillageId | null = inside ?? (questG ? GATE_VILLAGE[questG] : null);

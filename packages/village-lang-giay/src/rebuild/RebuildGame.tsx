@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import { BiAvatar, Button, Hearts, fmt, rebuildUi, sound, useGameHint, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { Scene25D, isQualityChoice, type QualityChoice, type Sprite25D } from '@so-chung/core/three/index';
+import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
 import { REBUILD_KEEP as KEEP, REBUILD_SPEC as SPEC } from './rebuildConfig';
 import { hintFor } from './rebuildHint';
 import { BacAnActor, StudentActor, VillainActor, type Reaction } from './RebuildActors';
@@ -102,7 +103,7 @@ function InspectPanel({ card, onClose }: { card: Card | null; onClose: () => voi
 /** m:ss từ số giây còn lại. */
 const clockText = (sec: number): string => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
 
-/** Thanh trên: tim, vòng, điểm, (vòng 3: đồng hồ 90 giây và thanh trạng thái chuỗi), nút "Soi công thức". */
+/** Thanh trên: tim, vòng, điểm, (đoạn giữ sổ cuối vòng 2: đồng hồ 45 giây và thanh trạng thái chuỗi), nút "Soi công thức". */
 function HudBar({ hearts, round, score, soiOpen, onSoi, clock, status }: { hearts: number; round: number; score: number; soiOpen: boolean; onSoi: () => void; clock: number | null; status: 'dung' | 'lech' | null }) {
   return (
     <div className="absolute flex items-center justify-between" style={{ left: `${AREAS.hud.x0}cqw`, right: `${100 - AREAS.hud.x1}cqw`, top: `${AREAS.hud.y0}%` }}>
@@ -128,7 +129,7 @@ function HudBar({ hearts, round, score, soiOpen, onSoi, clock, status }: { heart
   );
 }
 
-/** Thanh trạng thái chuỗi của vòng 3 (nằm trong thanh trên): chỉ nói "Chuỗi đang lệch" hay "Chuỗi đúng", không chỉ ra ô nào lệch. */
+/** Thanh trạng thái chuỗi của đoạn giữ sổ (nằm trong thanh trên): chỉ nói "Chuỗi đang lệch" hay "Chuỗi đúng", không chỉ ra ô nào lệch. */
 function ChainStatus({ status }: { status: 'dung' | 'lech' }) {
   return (
     <span
@@ -143,7 +144,7 @@ function ChainStatus({ status }: { status: 'dung' | 'lech' }) {
 }
 
 /**
- * Dựng sẵn các thành phần lần đầu xuất hiện ở vòng 3 (bước X2b): đồng hồ đỏ, hai thanh trạng thái chuỗi, bong bóng lời của Bi, ô trống nhấp nháy và nháy đỏ, thẻ mới ném ra bàn,
+ * Dựng sẵn các thành phần lần đầu xuất hiện ở đoạn giữ sổ (bước X2b): đồng hồ đỏ, hai thanh trạng thái chuỗi, bong bóng lời của Bi, ô trống nhấp nháy và nháy đỏ, thẻ mới ném ra bàn,
  * thẻ rung, thẻ đang chọn, và bảng hết giờ. Cùng cách với thẻ kéo dựng sẵn (bước 14b): nằm ở góc dưới phải, gần như trong suốt (độ mờ 0,4%, chưa tới một mức màu) và không bắt chuột, để trình duyệt vẽ sẵn các lớp này (và nạp sẵn
  * chữ có dấu, hoạt ảnh CSS) lúc màn hình tải còn che cảnh, nên lần sửa thành công đầu tiên, gợi ý của Bi hay lúc hết giờ không phải vẽ lần đầu giữa lúc chơi.
  */
@@ -171,7 +172,7 @@ function KeepWarm({ width }: { width: number }) {
         </div>
       </div>
       <div className="flex flex-col items-center gap-2 rounded-[1.4cqw] border-[0.3cqw] border-nau-go bg-giay p-[1.6cqw] text-center" style={{ fontSize: 'max(1.9cqw, 13px)' }}>
-        <p className="font-display font-extrabold">{fmt(rebuildUi.hetGio, { so: 3, sua: 12, lech: 0, diem: 300 })}</p>
+        <p className="font-display font-extrabold">{fmt(rebuildUi.hetGio, { sua: 5, lech: 0, diem: 125 })}</p>
         <Button size="md" tabIndex={-1}>
           {rebuildUi.xemKetQua}
         </Button>
@@ -221,11 +222,15 @@ function rowLabel(r: ScorePartRow): string {
 /**
  * Màn 3 "Ghép lại cuốn sổ" (spec 05): Scene25D (nền xưởng giấy, rổ trang giả là hình rời, Bác An, học sinh và {phanDien} là model 3D) và lớp HTML phủ lên: thẻ trang kéo thả
  * (chuột, ngón tay) hoặc chạm chọn rồi chạm đặt, soi công thức, thanh trên. Luật nằm hết ở `rebuildLogic`; ở đây chỉ nối thao tác, hoạt cảnh và âm thanh vào luật.
- * Vòng 3 (giữ sổ 90 giây) chạy bằng vòng lặp `requestAnimationFrame` gọi `stepKeep`; {phanDien} chạy vào trước giờ tráo `KEEP_VILLAIN_TIMING.dropAt` giây để lần tráo rơi đúng lúc nó cười.
+ * Đoạn giữ sổ (cuối vòng 2, 45 giây; P4b) chạy bằng vòng lặp `requestAnimationFrame` gọi `stepKeep`; {phanDien} chạy vào trước giờ tráo `KEEP_VILLAIN_TIMING.dropAt` giây để lần tráo rơi đúng lúc nó cười.
  */
-export function RebuildGame({ paused, attempt, onFinish, setHint }: MiniGameRenderProps) {
+export function RebuildGame({ paused: pausedByFrame, attempt, onFinish, setHint }: MiniGameRenderProps) {
   const { settings } = useSettings();
   const reduced = settings.reducedMotion;
+  // Điện thoại xoay dọc thì cảnh hiện nhắc "Xoay ngang để chơi" phủ kín: đồng hồ giữ sổ và {phanDien} phải đứng yên (như màn 6), không phạt em lúc em không chơi được (P4b)
+  const [frame, setFrame] = useState<FrameMode>('landscape');
+  const onModeChange = useCallback((m: FrameMode) => setFrame(m), []);
+  const paused = pausedByFrame || frame === 'rotate';
   const forced = useMemo(forcedQuality, []);
   const state = useMemo<RebuildState>(() => createRebuild(newSeed()), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
   const [version, bump] = useReducer((n: number) => n + 1, 0);
@@ -368,7 +373,8 @@ export function RebuildGame({ paused, attempt, onFinish, setHint }: MiniGameRend
         setFresh(null);
         if (r.roundDone) {
           sound.playLevelComplete();
-          speak(rebuildUi.biDuChuoi, 'tot');
+          // ghép xong chuỗi ở vòng 2 thì vào đoạn giữ sổ: thẻ giới thiệu "Giữ sổ" hiện ngay trong dải giữa nên không nói thêm lời của Bi ở đó
+          if (!r.keep) speak(rebuildUi.biDuChuoi, 'tot');
           react('cheer');
         }
       } else if (r.kind === 'badPrev' || r.kind === 'fake') {
@@ -404,7 +410,7 @@ export function RebuildGame({ paused, attempt, onFinish, setHint }: MiniGameRend
     [hitHeartsOut, react, speak, state],
   );
 
-  // ----- Vòng 3: đặt trang thật vào ô trống, kéo trang vào rổ
+  // ----- Đoạn giữ sổ: đặt trang thật vào ô trống, kéo trang vào rổ
   const doKeepPlace = useCallback(
     (id: string, slot: number) => {
       const r = placeInSlot(state, id, slot);
@@ -485,14 +491,14 @@ export function RebuildGame({ paused, attempt, onFinish, setHint }: MiniGameRend
     else speak(rebuildUi.nhacChon, 'tin');
   }, [doBin, doKeepBin, playing, selected, speak, state]);
 
-  // Thẻ đang chọn hay đang kéo: ở khay (bàn), hoặc ở một ô của chuỗi (vòng 3)
+  // Thẻ đang chọn hay đang kéo: ở khay (bàn), hoặc ở một ô của chuỗi (đoạn giữ sổ)
   const findCard = useCallback((id: string | null): Card | null => (id ? (state.tray.find((c) => c.id === id) ?? state.keep?.slots.find((c) => c?.id === id) ?? null) : null), [state]);
   const selectedCard = findCard(selected);
   useEffect(() => {
     if (selected && !findCard(selected)) setSelected(null);
   });
 
-  // ----- Vòng 3: đồng hồ và {phanDien} chạy vào tráo trang (vòng lặp requestAnimationFrame, không dùng useFrame nên không đụng cảnh 3D)
+  // ----- Đoạn giữ sổ: đồng hồ và {phanDien} chạy vào tráo trang (vòng lặp requestAnimationFrame, không dùng useFrame nên không đụng cảnh 3D)
   const handleKeepEvents = useCallback(
     (events: readonly KeepEvent[]) => {
       for (const e of events) {
@@ -615,6 +621,7 @@ export function RebuildGame({ paused, attempt, onFinish, setHint }: MiniGameRend
         quality={forced}
         hold={!warm}
         onReady={warmUp}
+        onModeChange={onModeChange}
         overlay={
           <div ref={overlayRef} className="absolute inset-0 select-none" style={{ containerType: 'size' }} data-testid="man3-khung" data-phase={phase} data-villain={villain.stage} data-flying={villain.flying ? (villain.landed ? 'landed' : 'start') : 'no'}>
             <HudBar hearts={state.hearts} round={state.round} score={score} soiOpen={soiOpen} onSoi={() => setSoiOpen((o) => !o)} clock={keepMode ? clock : null} status={keep ? keepChainStatus(keep) : null} />

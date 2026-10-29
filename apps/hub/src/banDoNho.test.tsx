@@ -35,12 +35,12 @@ describe('bản đồ nhỏ (dựng tĩnh)', () => {
     for (const id of Object.keys(names)) expect(html).toContain(names[id as VillageId]);
   });
 
-  it('có phần tĩnh, mũi tên học sinh, ký hiệu cổng, biển, thẻ chưa nhặt (2 trong 4) và điểm đến', () => {
+  it('có phần tĩnh, mũi tên học sinh, ký hiệu cổng, biển, thẻ chưa nhặt (14 trong 16) và điểm đến', () => {
     expect(html).toContain('data-testid="ban-do-tinh"');
     expect(html).toContain('data-glyph="student"');
     expect((html.match(/data-glyph="gate"/g) ?? []).length).toBe(4);
     expect((html.match(/data-glyph="board"/g) ?? []).length).toBe(3);
-    expect((html.match(/data-glyph="scroll"/g) ?? []).length).toBe(2);
+    expect((html.match(/data-glyph="scroll"/g) ?? []).length).toBe(14); // 2 thẻ chưa nhặt của Làng Giấy cộng 12 thẻ của ba làng kia (P2b: cả 4 làng)
     expect((html.match(/data-glyph="target"/g) ?? []).length).toBe(1);
   });
 

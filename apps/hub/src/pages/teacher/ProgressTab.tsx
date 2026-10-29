@@ -79,6 +79,9 @@ export function ProgressTab({ students, className, onSelect }: { students: Stude
 
       <p className="text-sm">{T.chuThich}</p>
       <p className="text-sm">{T.bamXemChiTiet}</p>
+      <p className="text-sm" data-testid="chu-thich-tu-hoan-thanh">
+        {teacherTexts.tuHoanThanh.chuThich}
+      </p>
 
       {shown.length === 0 ? (
         <p className="py-4 text-base">{T.khongThay}</p>

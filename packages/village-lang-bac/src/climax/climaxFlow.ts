@@ -101,3 +101,8 @@ export function climaxMotion(step: ClimaxStep, turnIndex: number): ClimaxMotion 
     talking: id === 'cuBinh' || id === 'thayLinh' ? id : null,
   };
 }
+
+/** Bước hiện tại theo chỉ số; chỉ số vượt số bước (ví dụ bước d biến mất giữa lúc đang chiếu vì cờ trao trang đổi) thì lấy bước cuối, không lỗi. */
+export function stepAt(steps: readonly ClimaxStep[], index: number): ClimaxStep {
+  return steps[Math.max(0, Math.min(steps.length - 1, Math.floor(index)))];
+}

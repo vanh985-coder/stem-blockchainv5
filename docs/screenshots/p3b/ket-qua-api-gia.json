@@ -1,0 +1,1250 @@
+[
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "chưa có cột",
+  "name": "nút bị vô hiệu và ghi rõ máy chủ chưa hỗ trợ (cơ sở dữ liệu chưa cập nhật)",
+  "ok": true,
+  "detail": "Máy chủ chưa hỗ trợ \"Tự hoàn thành\" (cơ sở dữ liệu chưa được cập nhật nên chưa dùng được). Tiến độ chơi thật vẫn lưu bình thường."
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "chưa có cột",
+  "name": "ghi chú hiện đúng một chỗ, đủ rộng, nằm trong màn hình (không bị bóp thành cột chữ hẹp)",
+  "ok": true,
+  "detail": "{\"count\":1,\"ok\":true,\"rect\":[150,218,1037,90]}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "chưa có cột",
+  "name": "bấm nút bị vô hiệu: không hiện khung \"Đã tự hoàn thành\", không báo đã lưu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "chưa có cột",
+  "name": "máy chủ không nhận bản ghi cờ nào (kể cả thử)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "chưa có cột",
+  "name": "tiến độ chơi thật (bài 4, đã chơi dở) vẫn đồng bộ lên máy chủ khi đường cờ bị khóa",
+  "ok": true,
+  "detail": "{\"auto_completed\":false,\"user_id\":\"00000000-0000-0000-0000-0000000000b1\",\"level_id\":4,\"played\":true,\"completed\":false,\"stars\":{\"de\":2,\"tb\":0,\"kho\":0},\"best_score\":0,\"updated_at\":\"2026-10-29T04:36:56.487Z\"}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "chưa có cột",
+  "name": "bản ghi thật không mang cờ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "chưa có cột",
+  "name": "trên máy không có cờ ở màn 1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "chưa có cột",
+  "name": "tải lại, mở /ban-do: bảng Làng Giấy KHÔNG ghi \"Tự hoàn thành\" ở màn nào (không có cờ nào có hiệu lực)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "chưa có cột",
+  "name": "tải lại màn 1: nút vẫn vô hiệu kèm thông báo (máy chủ vẫn thiếu cột)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "chưa có cột",
+  "name": "màn game (thẻ bắt đầu): nút vô hiệu, ghi chú đọc được",
+  "ok": true,
+  "detail": "{\"count\":1,\"ok\":true,\"rect\":[447,584,472,40]}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "chưa có cột",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "thiếu cột lúc ghi",
+  "name": "hiện thông báo máy chủ chưa hỗ trợ, nút bị vô hiệu, KHÔNG hiện khung \"Đã tự hoàn thành\"",
+  "ok": true,
+  "detail": "Máy chủ chưa hỗ trợ \"Tự hoàn thành\" (cơ sở dữ liệu chưa được cập nhật nên chưa dùng được). Tiến độ chơi thật vẫn lưu bình thường."
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "thiếu cột lúc ghi",
+  "name": "tiến độ chơi thật cùng lượt đẩy vẫn lên máy chủ dù đường cờ lỗi",
+  "ok": true,
+  "detail": "{\"auto_completed\":false,\"user_id\":\"00000000-0000-0000-0000-0000000000b1\",\"level_id\":4,\"played\":true,\"completed\":false,\"stars\":{\"de\":2,\"tb\":0,\"kho\":0},\"best_score\":0,\"updated_at\":\"2026-10-29T04:37:03.593Z\"}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "thiếu cột lúc ghi",
+  "name": "cờ không lên máy chủ (1 lần thử bị 42703) và bị gỡ khỏi máy",
+  "ok": true,
+  "detail": "[{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true,\"failed\":\"42703\"}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "thiếu cột lúc ghi",
+  "name": "tải lại, mở /ban-do: không màn nào ghi \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "thiếu cột lúc ghi",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "từ chối quyền",
+  "name": "hiện thông báo máy chủ không cho tài khoản này dùng, nút vô hiệu, KHÔNG báo đã lưu",
+  "ok": true,
+  "detail": "Máy chủ không cho tài khoản này dùng \"Tự hoàn thành\". Chưa ghi gì; tiến độ chơi thật vẫn lưu bình thường."
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "từ chối quyền",
+  "name": "thông báo khác với \"chưa hỗ trợ\" và \"mất mạng\" (đúng nguyên nhân)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "từ chối quyền",
+  "name": "tiến độ chơi thật vẫn đồng bộ cùng lượt",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "từ chối quyền",
+  "name": "cờ không lên máy chủ (đúng 1 lần thử, bị P0001) và bị gỡ khỏi máy",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "từ chối quyền",
+  "name": "tải lại, mở /ban-do: cờ bị từ chối không có hiệu lực (không màn nào ghi \"Tự hoàn thành\")",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "từ chối quyền",
+  "name": "bấm lại sau khi tải lại: vẫn bị từ chối, vẫn không có cờ nào trên máy chủ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "từ chối quyền",
+  "name": "ghi chú từ chối ở thanh đầu bài học đọc được",
+  "ok": true,
+  "detail": "{\"count\":1,\"ok\":true,\"rect\":[150,218,1037,63]}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "từ chối quyền",
+  "name": "màn game (thẻ bắt đầu): bị từ chối, nút vô hiệu, ghi chú đọc được, không có cờ",
+  "ok": true,
+  "detail": "{\"count\":1,\"ok\":true,\"rect\":[447,584,472,40]}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "từ chối quyền",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "mất mạng",
+  "name": "khung hiện kèm lời nói rõ CHƯA lưu được lên máy chủ (có thể mất mạng)",
+  "ok": true,
+  "detail": "Chưa lưu được lên máy chủ (có thể mất mạng). Màn này chỉ được ghi ở máy này, máy sẽ thử gửi lại khi có mạng."
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "mất mạng",
+  "name": "không kết luận nhầm là thiếu migration hay bị từ chối",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "mất mạng",
+  "name": "máy chủ chưa có cờ; trên máy đã ghi cờ để thử lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "mất mạng",
+  "name": "không khóa vĩnh viễn: sang màn 2 (mở nhờ cờ trên máy) nút vẫn dùng được, không có ghi chú khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "mất mạng",
+  "name": "có mạng lại: cờ tự lên máy chủ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "mất mạng",
+  "name": "thử lại không ghi trùng: đúng 1 lần ghi cờ thành công, một hàng màn 1",
+  "ok": true,
+  "detail": "[{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "mất mạng",
+  "name": "hàng cờ không mang điểm/sao/hoàn thành thật, xu 0",
+  "ok": true,
+  "detail": "{\"auto_completed\":true,\"user_id\":\"00000000-0000-0000-0000-0000000000b1\",\"level_id\":1,\"played\":false,\"completed\":false,\"stars\":{},\"best_score\":0,\"updated_at\":\"2026-10-29T04:37:11.948Z\"}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "mất mạng",
+  "name": "xóa dữ liệu trên máy rồi tải lại: /ban-do vẫn ghi màn 1 \"Tự hoàn thành\" (cờ lấy từ máy chủ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "mất mạng",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "thăm dò lỗi mạng",
+  "name": "thăm dò lỗi mạng: chưa biết máy chủ có hỗ trợ không nên nút KHÔNG bị khóa và không có ghi chú",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "thăm dò lỗi mạng",
+  "name": "ghi cờ lỗi tạm thời: nói rõ chưa lưu được, không nhầm là thiếu cột hay bị từ chối",
+  "ok": true,
+  "detail": "Chưa lưu được lên máy chủ (có thể mất mạng). Màn này chỉ được ghi ở máy này, máy sẽ thử gửi lại khi có mạng."
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "thăm dò lỗi mạng",
+  "name": "hết lỗi: cờ lên máy chủ đúng một lần",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "thăm dò lỗi mạng",
+  "name": "không ghi trùng sau khi đã lưu",
+  "ok": true,
+  "detail": "[{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true,\"failed\":\"network\"},{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true,\"failed\":\"network\"},{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "thăm dò lỗi mạng",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "lưu thành công",
+  "name": "hiện khung \"Đã tự hoàn thành\" KHÔNG kèm lời cảnh báo chưa lưu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "lưu thành công",
+  "name": "bấm 3 lần liên tiếp: máy chủ nhận đúng 1 lần ghi cờ, 1 hàng",
+  "ok": true,
+  "detail": "[{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "lưu thành công",
+  "name": "hàng trên máy chủ chỉ có cờ (không chơi, không hoàn thành, không sao/điểm); xu 0, trang 0",
+  "ok": true,
+  "detail": "{\"auto_completed\":true,\"user_id\":\"00000000-0000-0000-0000-0000000000b1\",\"level_id\":1,\"played\":false,\"completed\":false,\"stars\":{},\"best_score\":0,\"updated_at\":\"2026-10-29T04:37:28.212Z\"}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "lưu thành công",
+  "name": "xóa dữ liệu trên máy rồi tải lại: /ban-do ghi màn 1 \"Tự hoàn thành\" (cờ lấy từ máy chủ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "lưu thành công",
+  "name": "màn 1 đã tự hoàn thành: không còn nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "lưu thành công",
+  "name": "không có lần ghi nào thêm sau khi tải lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "lưu thành công",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "phản hồi đến muộn",
+  "name": "lưu thành công trong lúc phản hồi thăm dò cũ còn treo",
+  "ok": true,
+  "detail": "[{\"t\":1793248654615,\"result\":\"\"}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "phản hồi đến muộn",
+  "name": "phản hồi cũ (báo thiếu cột) đã đến muộn sau 15 giây",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "phản hồi đến muộn",
+  "name": "khung \"Đã tự hoàn thành\" còn nguyên, không thông báo chưa hỗ trợ, không bị hoàn lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "phản hồi đến muộn",
+  "name": "sang màn 2: nút vẫn dùng được (trạng thái không bị đổi thành \"chưa hỗ trợ\")",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "phản hồi đến muộn",
+  "name": "cờ trên máy chủ và trên máy còn nguyên, chỉ một lần ghi",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "1366x768",
+  "area": "phản hồi đến muộn",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "chưa có cột",
+  "name": "nút bị vô hiệu và ghi rõ máy chủ chưa hỗ trợ (cơ sở dữ liệu chưa cập nhật)",
+  "ok": true,
+  "detail": "Máy chủ chưa hỗ trợ \"Tự hoàn thành\" (cơ sở dữ liệu chưa được cập nhật nên chưa dùng được). Tiến độ chơi thật vẫn lưu bình thường."
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "chưa có cột",
+  "name": "ghi chú hiện đúng một chỗ, đủ rộng, nằm trong màn hình (không bị bóp thành cột chữ hẹp)",
+  "ok": true,
+  "detail": "{\"count\":1,\"ok\":true,\"rect\":[0,92,360,88]}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "chưa có cột",
+  "name": "bấm nút bị vô hiệu: không hiện khung \"Đã tự hoàn thành\", không báo đã lưu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "chưa có cột",
+  "name": "máy chủ không nhận bản ghi cờ nào (kể cả thử)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "chưa có cột",
+  "name": "tiến độ chơi thật (bài 4, đã chơi dở) vẫn đồng bộ lên máy chủ khi đường cờ bị khóa",
+  "ok": true,
+  "detail": "{\"auto_completed\":false,\"user_id\":\"00000000-0000-0000-0000-0000000000b1\",\"level_id\":4,\"played\":true,\"completed\":false,\"stars\":{\"de\":2,\"tb\":0,\"kho\":0},\"best_score\":0,\"updated_at\":\"2026-10-29T04:37:50.532Z\"}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "chưa có cột",
+  "name": "bản ghi thật không mang cờ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "chưa có cột",
+  "name": "trên máy không có cờ ở màn 1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "chưa có cột",
+  "name": "tải lại, mở /ban-do: bảng Làng Giấy KHÔNG ghi \"Tự hoàn thành\" ở màn nào (không có cờ nào có hiệu lực)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "chưa có cột",
+  "name": "tải lại màn 1: nút vẫn vô hiệu kèm thông báo (máy chủ vẫn thiếu cột)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "chưa có cột",
+  "name": "màn game (thẻ bắt đầu): nút vô hiệu, ghi chú đọc được",
+  "ok": true,
+  "detail": "{\"count\":1,\"ok\":true,\"rect\":[36,616,288,80]}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "chưa có cột",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "thiếu cột lúc ghi",
+  "name": "hiện thông báo máy chủ chưa hỗ trợ, nút bị vô hiệu, KHÔNG hiện khung \"Đã tự hoàn thành\"",
+  "ok": true,
+  "detail": "Máy chủ chưa hỗ trợ \"Tự hoàn thành\" (cơ sở dữ liệu chưa được cập nhật nên chưa dùng được). Tiến độ chơi thật vẫn lưu bình thường."
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "thiếu cột lúc ghi",
+  "name": "tiến độ chơi thật cùng lượt đẩy vẫn lên máy chủ dù đường cờ lỗi",
+  "ok": true,
+  "detail": "{\"auto_completed\":false,\"user_id\":\"00000000-0000-0000-0000-0000000000b1\",\"level_id\":4,\"played\":true,\"completed\":false,\"stars\":{\"de\":2,\"tb\":0,\"kho\":0},\"best_score\":0,\"updated_at\":\"2026-10-29T04:37:55.406Z\"}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "thiếu cột lúc ghi",
+  "name": "cờ không lên máy chủ (1 lần thử bị 42703) và bị gỡ khỏi máy",
+  "ok": true,
+  "detail": "[{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true,\"failed\":\"42703\"}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "thiếu cột lúc ghi",
+  "name": "tải lại, mở /ban-do: không màn nào ghi \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "thiếu cột lúc ghi",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "từ chối quyền",
+  "name": "hiện thông báo máy chủ không cho tài khoản này dùng, nút vô hiệu, KHÔNG báo đã lưu",
+  "ok": true,
+  "detail": "Máy chủ không cho tài khoản này dùng \"Tự hoàn thành\". Chưa ghi gì; tiến độ chơi thật vẫn lưu bình thường."
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "từ chối quyền",
+  "name": "thông báo khác với \"chưa hỗ trợ\" và \"mất mạng\" (đúng nguyên nhân)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "từ chối quyền",
+  "name": "tiến độ chơi thật vẫn đồng bộ cùng lượt",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "từ chối quyền",
+  "name": "cờ không lên máy chủ (đúng 1 lần thử, bị P0001) và bị gỡ khỏi máy",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "từ chối quyền",
+  "name": "tải lại, mở /ban-do: cờ bị từ chối không có hiệu lực (không màn nào ghi \"Tự hoàn thành\")",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "từ chối quyền",
+  "name": "bấm lại sau khi tải lại: vẫn bị từ chối, vẫn không có cờ nào trên máy chủ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "từ chối quyền",
+  "name": "ghi chú từ chối ở thanh đầu bài học đọc được",
+  "ok": true,
+  "detail": "{\"count\":1,\"ok\":true,\"rect\":[0,92,360,88]}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "từ chối quyền",
+  "name": "màn game (thẻ bắt đầu): bị từ chối, nút vô hiệu, ghi chú đọc được, không có cờ",
+  "ok": true,
+  "detail": "{\"count\":1,\"ok\":true,\"rect\":[36,636,288,60]}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "từ chối quyền",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "mất mạng",
+  "name": "khung hiện kèm lời nói rõ CHƯA lưu được lên máy chủ (có thể mất mạng)",
+  "ok": true,
+  "detail": "Chưa lưu được lên máy chủ (có thể mất mạng). Màn này chỉ được ghi ở máy này, máy sẽ thử gửi lại khi có mạng."
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "mất mạng",
+  "name": "không kết luận nhầm là thiếu migration hay bị từ chối",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "mất mạng",
+  "name": "máy chủ chưa có cờ; trên máy đã ghi cờ để thử lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "mất mạng",
+  "name": "không khóa vĩnh viễn: sang màn 2 (mở nhờ cờ trên máy) nút vẫn dùng được, không có ghi chú khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "mất mạng",
+  "name": "có mạng lại: cờ tự lên máy chủ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "mất mạng",
+  "name": "thử lại không ghi trùng: đúng 1 lần ghi cờ thành công, một hàng màn 1",
+  "ok": true,
+  "detail": "[{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "mất mạng",
+  "name": "hàng cờ không mang điểm/sao/hoàn thành thật, xu 0",
+  "ok": true,
+  "detail": "{\"auto_completed\":true,\"user_id\":\"00000000-0000-0000-0000-0000000000b1\",\"level_id\":1,\"played\":false,\"completed\":false,\"stars\":{},\"best_score\":0,\"updated_at\":\"2026-10-29T04:38:03.081Z\"}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "mất mạng",
+  "name": "xóa dữ liệu trên máy rồi tải lại: /ban-do vẫn ghi màn 1 \"Tự hoàn thành\" (cờ lấy từ máy chủ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "mất mạng",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "thăm dò lỗi mạng",
+  "name": "thăm dò lỗi mạng: chưa biết máy chủ có hỗ trợ không nên nút KHÔNG bị khóa và không có ghi chú",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "thăm dò lỗi mạng",
+  "name": "ghi cờ lỗi tạm thời: nói rõ chưa lưu được, không nhầm là thiếu cột hay bị từ chối",
+  "ok": true,
+  "detail": "Chưa lưu được lên máy chủ (có thể mất mạng). Màn này chỉ được ghi ở máy này, máy sẽ thử gửi lại khi có mạng."
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "thăm dò lỗi mạng",
+  "name": "hết lỗi: cờ lên máy chủ đúng một lần",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "thăm dò lỗi mạng",
+  "name": "không ghi trùng sau khi đã lưu",
+  "ok": true,
+  "detail": "[{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true,\"failed\":\"network\"},{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true,\"failed\":\"network\"},{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "thăm dò lỗi mạng",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "lưu thành công",
+  "name": "hiện khung \"Đã tự hoàn thành\" KHÔNG kèm lời cảnh báo chưa lưu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "lưu thành công",
+  "name": "bấm 3 lần liên tiếp: máy chủ nhận đúng 1 lần ghi cờ, 1 hàng",
+  "ok": true,
+  "detail": "[{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "lưu thành công",
+  "name": "hàng trên máy chủ chỉ có cờ (không chơi, không hoàn thành, không sao/điểm); xu 0, trang 0",
+  "ok": true,
+  "detail": "{\"auto_completed\":true,\"user_id\":\"00000000-0000-0000-0000-0000000000b1\",\"level_id\":1,\"played\":false,\"completed\":false,\"stars\":{},\"best_score\":0,\"updated_at\":\"2026-10-29T04:38:19.099Z\"}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "lưu thành công",
+  "name": "xóa dữ liệu trên máy rồi tải lại: /ban-do ghi màn 1 \"Tự hoàn thành\" (cờ lấy từ máy chủ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "lưu thành công",
+  "name": "màn 1 đã tự hoàn thành: không còn nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "lưu thành công",
+  "name": "không có lần ghi nào thêm sau khi tải lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "lưu thành công",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "phản hồi đến muộn",
+  "name": "lưu thành công trong lúc phản hồi thăm dò cũ còn treo",
+  "ok": true,
+  "detail": "[{\"t\":1793248705112,\"result\":\"\"}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "phản hồi đến muộn",
+  "name": "phản hồi cũ (báo thiếu cột) đã đến muộn sau 15 giây",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "phản hồi đến muộn",
+  "name": "khung \"Đã tự hoàn thành\" còn nguyên, không thông báo chưa hỗ trợ, không bị hoàn lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "phản hồi đến muộn",
+  "name": "sang màn 2: nút vẫn dùng được (trạng thái không bị đổi thành \"chưa hỗ trợ\")",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "phản hồi đến muộn",
+  "name": "cờ trên máy chủ và trên máy còn nguyên, chỉ một lần ghi",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "360x800",
+  "area": "phản hồi đến muộn",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "chưa có cột",
+  "name": "nút bị vô hiệu và ghi rõ máy chủ chưa hỗ trợ (cơ sở dữ liệu chưa cập nhật)",
+  "ok": true,
+  "detail": "Máy chủ chưa hỗ trợ \"Tự hoàn thành\" (cơ sở dữ liệu chưa được cập nhật nên chưa dùng được). Tiến độ chơi thật vẫn lưu bình thường."
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "chưa có cột",
+  "name": "ghi chú hiện đúng một chỗ, đủ rộng, nằm trong màn hình (không bị bóp thành cột chữ hẹp)",
+  "ok": true,
+  "detail": "{\"count\":1,\"ok\":true,\"rect\":[38,172,768,68]}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "chưa có cột",
+  "name": "bấm nút bị vô hiệu: không hiện khung \"Đã tự hoàn thành\", không báo đã lưu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "chưa có cột",
+  "name": "máy chủ không nhận bản ghi cờ nào (kể cả thử)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "chưa có cột",
+  "name": "tiến độ chơi thật (bài 4, đã chơi dở) vẫn đồng bộ lên máy chủ khi đường cờ bị khóa",
+  "ok": true,
+  "detail": "{\"auto_completed\":false,\"user_id\":\"00000000-0000-0000-0000-0000000000b1\",\"level_id\":4,\"played\":true,\"completed\":false,\"stars\":{\"de\":2,\"tb\":0,\"kho\":0},\"best_score\":0,\"updated_at\":\"2026-10-29T04:38:40.793Z\"}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "chưa có cột",
+  "name": "bản ghi thật không mang cờ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "chưa có cột",
+  "name": "trên máy không có cờ ở màn 1",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "chưa có cột",
+  "name": "tải lại, mở /ban-do: bảng Làng Giấy KHÔNG ghi \"Tự hoàn thành\" ở màn nào (không có cờ nào có hiệu lực)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "chưa có cột",
+  "name": "tải lại màn 1: nút vẫn vô hiệu kèm thông báo (máy chủ vẫn thiếu cột)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "chưa có cột",
+  "name": "màn game (thẻ bắt đầu): nút vô hiệu, ghi chú đọc được",
+  "ok": true,
+  "detail": "{\"count\":1,\"ok\":true,\"rect\":[166,252,512,40]}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "chưa có cột",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "thiếu cột lúc ghi",
+  "name": "hiện thông báo máy chủ chưa hỗ trợ, nút bị vô hiệu, KHÔNG hiện khung \"Đã tự hoàn thành\"",
+  "ok": true,
+  "detail": "Máy chủ chưa hỗ trợ \"Tự hoàn thành\" (cơ sở dữ liệu chưa được cập nhật nên chưa dùng được). Tiến độ chơi thật vẫn lưu bình thường."
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "thiếu cột lúc ghi",
+  "name": "tiến độ chơi thật cùng lượt đẩy vẫn lên máy chủ dù đường cờ lỗi",
+  "ok": true,
+  "detail": "{\"auto_completed\":false,\"user_id\":\"00000000-0000-0000-0000-0000000000b1\",\"level_id\":4,\"played\":true,\"completed\":false,\"stars\":{\"de\":2,\"tb\":0,\"kho\":0},\"best_score\":0,\"updated_at\":\"2026-10-29T04:38:45.308Z\"}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "thiếu cột lúc ghi",
+  "name": "cờ không lên máy chủ (1 lần thử bị 42703) và bị gỡ khỏi máy",
+  "ok": true,
+  "detail": "[{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true,\"failed\":\"42703\"}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "thiếu cột lúc ghi",
+  "name": "tải lại, mở /ban-do: không màn nào ghi \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "thiếu cột lúc ghi",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "từ chối quyền",
+  "name": "hiện thông báo máy chủ không cho tài khoản này dùng, nút vô hiệu, KHÔNG báo đã lưu",
+  "ok": true,
+  "detail": "Máy chủ không cho tài khoản này dùng \"Tự hoàn thành\". Chưa ghi gì; tiến độ chơi thật vẫn lưu bình thường."
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "từ chối quyền",
+  "name": "thông báo khác với \"chưa hỗ trợ\" và \"mất mạng\" (đúng nguyên nhân)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "từ chối quyền",
+  "name": "tiến độ chơi thật vẫn đồng bộ cùng lượt",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "từ chối quyền",
+  "name": "cờ không lên máy chủ (đúng 1 lần thử, bị P0001) và bị gỡ khỏi máy",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "từ chối quyền",
+  "name": "tải lại, mở /ban-do: cờ bị từ chối không có hiệu lực (không màn nào ghi \"Tự hoàn thành\")",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "từ chối quyền",
+  "name": "bấm lại sau khi tải lại: vẫn bị từ chối, vẫn không có cờ nào trên máy chủ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "từ chối quyền",
+  "name": "ghi chú từ chối ở thanh đầu bài học đọc được",
+  "ok": true,
+  "detail": "{\"count\":1,\"ok\":true,\"rect\":[38,172,768,48]}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "từ chối quyền",
+  "name": "màn game (thẻ bắt đầu): bị từ chối, nút vô hiệu, ghi chú đọc được, không có cờ",
+  "ok": true,
+  "detail": "{\"count\":1,\"ok\":true,\"rect\":[166,252,512,40]}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "từ chối quyền",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "mất mạng",
+  "name": "khung hiện kèm lời nói rõ CHƯA lưu được lên máy chủ (có thể mất mạng)",
+  "ok": true,
+  "detail": "Chưa lưu được lên máy chủ (có thể mất mạng). Màn này chỉ được ghi ở máy này, máy sẽ thử gửi lại khi có mạng."
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "mất mạng",
+  "name": "không kết luận nhầm là thiếu migration hay bị từ chối",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "mất mạng",
+  "name": "máy chủ chưa có cờ; trên máy đã ghi cờ để thử lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "mất mạng",
+  "name": "không khóa vĩnh viễn: sang màn 2 (mở nhờ cờ trên máy) nút vẫn dùng được, không có ghi chú khóa",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "mất mạng",
+  "name": "có mạng lại: cờ tự lên máy chủ",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "mất mạng",
+  "name": "thử lại không ghi trùng: đúng 1 lần ghi cờ thành công, một hàng màn 1",
+  "ok": true,
+  "detail": "[{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "mất mạng",
+  "name": "hàng cờ không mang điểm/sao/hoàn thành thật, xu 0",
+  "ok": true,
+  "detail": "{\"auto_completed\":true,\"user_id\":\"00000000-0000-0000-0000-0000000000b1\",\"level_id\":1,\"played\":false,\"completed\":false,\"stars\":{},\"best_score\":0,\"updated_at\":\"2026-10-29T04:38:52.744Z\"}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "mất mạng",
+  "name": "xóa dữ liệu trên máy rồi tải lại: /ban-do vẫn ghi màn 1 \"Tự hoàn thành\" (cờ lấy từ máy chủ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "mất mạng",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "thăm dò lỗi mạng",
+  "name": "thăm dò lỗi mạng: chưa biết máy chủ có hỗ trợ không nên nút KHÔNG bị khóa và không có ghi chú",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "thăm dò lỗi mạng",
+  "name": "ghi cờ lỗi tạm thời: nói rõ chưa lưu được, không nhầm là thiếu cột hay bị từ chối",
+  "ok": true,
+  "detail": "Chưa lưu được lên máy chủ (có thể mất mạng). Màn này chỉ được ghi ở máy này, máy sẽ thử gửi lại khi có mạng."
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "thăm dò lỗi mạng",
+  "name": "hết lỗi: cờ lên máy chủ đúng một lần",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "thăm dò lỗi mạng",
+  "name": "không ghi trùng sau khi đã lưu",
+  "ok": true,
+  "detail": "[{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true,\"failed\":\"network\"},{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true,\"failed\":\"network\"},{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "thăm dò lỗi mạng",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "lưu thành công",
+  "name": "hiện khung \"Đã tự hoàn thành\" KHÔNG kèm lời cảnh báo chưa lưu",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "lưu thành công",
+  "name": "bấm 3 lần liên tiếp: máy chủ nhận đúng 1 lần ghi cờ, 1 hàng",
+  "ok": true,
+  "detail": "[{\"table\":\"level_progress\",\"levels\":[1],\"auto\":true}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "lưu thành công",
+  "name": "hàng trên máy chủ chỉ có cờ (không chơi, không hoàn thành, không sao/điểm); xu 0, trang 0",
+  "ok": true,
+  "detail": "{\"auto_completed\":true,\"user_id\":\"00000000-0000-0000-0000-0000000000b1\",\"level_id\":1,\"played\":false,\"completed\":false,\"stars\":{},\"best_score\":0,\"updated_at\":\"2026-10-29T04:39:08.871Z\"}"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "lưu thành công",
+  "name": "xóa dữ liệu trên máy rồi tải lại: /ban-do ghi màn 1 \"Tự hoàn thành\" (cờ lấy từ máy chủ)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "lưu thành công",
+  "name": "màn 1 đã tự hoàn thành: không còn nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "lưu thành công",
+  "name": "không có lần ghi nào thêm sau khi tải lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "lưu thành công",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "phản hồi đến muộn",
+  "name": "lưu thành công trong lúc phản hồi thăm dò cũ còn treo",
+  "ok": true,
+  "detail": "[{\"t\":1793248755170,\"result\":\"\"}]"
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "phản hồi đến muộn",
+  "name": "phản hồi cũ (báo thiếu cột) đã đến muộn sau 15 giây",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "phản hồi đến muộn",
+  "name": "khung \"Đã tự hoàn thành\" còn nguyên, không thông báo chưa hỗ trợ, không bị hoàn lại",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "phản hồi đến muộn",
+  "name": "sang màn 2: nút vẫn dùng được (trạng thái không bị đổi thành \"chưa hỗ trợ\")",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "phản hồi đến muộn",
+  "name": "cờ trên máy chủ và trên máy còn nguyên, chỉ một lần ghi",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "api-gia",
+  "size": "844x390",
+  "area": "phản hồi đến muộn",
+  "name": "không lỗi trang (pageerror)",
+  "ok": true,
+  "detail": ""
+ }
+]

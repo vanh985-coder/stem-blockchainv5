@@ -1,6 +1,7 @@
 export type { VillageModule, VillageId } from './village';
-export { URLS, HUB_MAP_URL, MERGED, VILLAGE_IDS, resolveUrls, levelUrl, levelPath, openLevel, villageWorldUrl, hubMapUrl, hubPageUrl } from './config/urls';
+export { URLS, HUB_MAP_URL, MERGED, VILLAGE_IDS, resolveUrls, levelUrl, levelPath, openLevel, CLIMAX_QUERY, climaxPath, openClimax, villageWorldUrl, hubMapUrl, hubPageUrl } from './config/urls';
 export type { AppUrls, UrlEnv } from './config/urls';
+export { goToMap } from './auth/pages/shared';
 export { VillageApp } from './ui/VillageApp';
 export { ExternalRedirect } from './ui/ExternalRedirect';
 export { RequireStory, useStoryGate } from './ui/RequireStory';
@@ -23,6 +24,10 @@ export { GUIDE_SECTIONS, GUIDE_SECTION_IDS, GUIDE_ART_IDS, GUIDE_SHOT_IDS, GUIDE
 export type { GuideSection, GuidePage, GuideFigure, GuideDevice, GuideArtId, GuideShotId, GuideSectionId } from './content/huongDan';
 export { villageKnowCards } from './content/villageCards';
 export { knowScrollUi } from './content/knowScrolls';
+export { banDoThe } from './content/minimap';
+export { MapGlyph, MAP_COLORS } from './three/world/map/MapGlyphs';
+export { MapStaticLayer } from './three/world/map/MapStaticLayer';
+export { staticTransform } from './three/world/map/mapProjection';
 export { GuideDialog, GuideFigureView, detectGuideDevice } from './ui/GuideDialog';
 export type { GuideDialogProps } from './ui/GuideDialog';
 export { GuideArt } from './ui/GuideArt';
@@ -75,6 +80,8 @@ export { GAMES, gameUi, runnerUi, runnerScoreLabels, rebuildUi, memoryUi, modCal
 export { gameHints } from './content/gameHints';
 export { useGameHint } from './ui/useGameHint';
 export { climaxUi } from './content/climax';
+export { autoCompleteUi } from './content/autoComplete';
+export { AutoCompleteButton, AutoCompletedPanel } from './ui/AutoComplete';
 export { DEV_PARTS_4, DEV_PARTS_5, devMiniGameText } from './content/devMiniGame';
 export { FESTIVAL_LAUNCHED } from './config/festival';
 export { GoldenPagesRow } from './three/village/GoldenPagesRow';
@@ -87,7 +94,7 @@ export type { LevelDef, LevelKind, LevelStatus } from './content/levels';
 export { computeUnlock } from './progress/unlock';
 export type { LevelState, LevelUnlock, UnlockInput, UnlockResult } from './progress/unlock';
 export { AuthProvider, AuthContext, useAuth } from './auth/AuthProvider';
-export { canSeeTeacherPage } from './auth/roles';
+export { canSeeTeacherPage, canUseAutoComplete, IS_DEV_BUILD } from './auth/roles';
 export type { AuthState, Profile, Role } from './auth/AuthProvider';
 export { accountRoutes } from './auth/routes';
 export { AccountBar } from './auth/AccountBar';
@@ -123,7 +130,8 @@ export { shouldShowIntro, hasSeenIntro, introTasks, goldenPageNumber, shouldShow
 export { shouldAutoOpenGuide, hasSeenGuide } from './progress/guideFlags';
 export { storyGate, hasReadStory, isReturningPlayer, type StoryGate } from './progress/storyFlags';
 export { hasSeenGameTip, hasSeenClimax } from './progress/gameTips';
-export { knowCardMaskOf, effectiveKnowMask, knowCardsComplete, countKnowCards, hasKnowCard, fullKnowMask, firstLevelIdOf } from './progress/knowCards';
+export { CLIMAX_LEVEL, canWatchClimax, climaxPending } from './progress/climaxState';
+export { knowCardMaskOf, effectiveKnowMask, knowCardsComplete, countKnowCards, hasKnowCard, fullKnowMask, firstLevelIdOf, knowBypassedByAuto } from './progress/knowCards';
 export type { IntroTask } from './progress/villageIntro';
 export { VILLAGE_INTRO, villageIntroTexts } from './content/villageIntro';
 export { recordLevelResult, doneLevels, withGoldenPages, unlockOf } from './progress/record';

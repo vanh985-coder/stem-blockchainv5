@@ -1,0 +1,122 @@
+[
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "chơi thật sau",
+  "name": "chơi thật màn 6 sau khi tự hoàn thành: ghi kết quả thật bình thường (đã chơi, có điểm), không bị cờ cản",
+  "ok": true,
+  "detail": "[1,0,0,30]"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "chơi thật sau",
+  "name": "cờ không bị xóa hay ghi đè thành tích; màn hiện \"Xong\" thật (không còn là chỉ tự hoàn thành)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "đủ 12 màn",
+  "name": "tự hoàn thành lần lượt cả 12 màn: đủ 12 cờ, không xu, không Trang Sổ Vàng",
+  "ok": true,
+  "detail": "{\"ac\":4095,\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "đủ 12 màn",
+  "name": "/ban-do: 0/4 Trang Sổ Vàng đã nhận (tự hoàn thành không trao trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "1366x768",
+  "area": "đủ 12 màn",
+  "name": "bảng Làng Bạc: cả 3 màn \"Tự hoàn thành\", KHÔNG có nút \"Xem cảnh cuối\" (cao trào chỉ mở bằng hoàn thành thật)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "chơi thật sau",
+  "name": "chơi thật màn 6 sau khi tự hoàn thành: ghi kết quả thật bình thường (đã chơi, có điểm), không bị cờ cản",
+  "ok": true,
+  "detail": "[1,0,0,40]"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "chơi thật sau",
+  "name": "cờ không bị xóa hay ghi đè thành tích; màn hiện \"Xong\" thật (không còn là chỉ tự hoàn thành)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "đủ 12 màn",
+  "name": "tự hoàn thành lần lượt cả 12 màn: đủ 12 cờ, không xu, không Trang Sổ Vàng",
+  "ok": true,
+  "detail": "{\"ac\":4095,\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "đủ 12 màn",
+  "name": "/ban-do: 0/4 Trang Sổ Vàng đã nhận (tự hoàn thành không trao trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "360x800",
+  "area": "đủ 12 màn",
+  "name": "bảng Làng Bạc: cả 3 màn \"Tự hoàn thành\", KHÔNG có nút \"Xem cảnh cuối\" (cao trào chỉ mở bằng hoàn thành thật)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "chơi thật sau",
+  "name": "chơi thật màn 6 sau khi tự hoàn thành: ghi kết quả thật bình thường (đã chơi, có điểm), không bị cờ cản",
+  "ok": true,
+  "detail": "[1,0,0,45]"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "chơi thật sau",
+  "name": "cờ không bị xóa hay ghi đè thành tích; màn hiện \"Xong\" thật (không còn là chỉ tự hoàn thành)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "đủ 12 màn",
+  "name": "tự hoàn thành lần lượt cả 12 màn: đủ 12 cờ, không xu, không Trang Sổ Vàng",
+  "ok": true,
+  "detail": "{\"ac\":4095,\"c\":0,\"gp\":0}"
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "đủ 12 màn",
+  "name": "/ban-do: 0/4 Trang Sổ Vàng đã nhận (tự hoàn thành không trao trang)",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "dev",
+  "size": "844x390",
+  "area": "đủ 12 màn",
+  "name": "bảng Làng Bạc: cả 3 màn \"Tự hoàn thành\", KHÔNG có nút \"Xem cảnh cuối\" (cao trào chỉ mở bằng hoàn thành thật)",
+  "ok": true,
+  "detail": ""
+ }
+]

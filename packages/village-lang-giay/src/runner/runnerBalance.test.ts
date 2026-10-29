@@ -5,11 +5,12 @@ import { AVERAGE_BOT, GOOD_BOT, playBot, type BotProfile, type BotResult } from 
 /**
  * Kiểm tra cân bằng bằng mô phỏng (không vẽ): 300 ván mỗi loại bot trên cùng 300 seed.
  * Mục tiêu: bot giỏi đạt Vàng (≥ 520) ở ít nhất 90% số ván; bot trung bình chủ yếu Đồng hoặc Bạc.
- * Chỉ chỉnh được tần suất vật nhặt trong `runnerConfig.ts` (RUNNER_TUNING.chain, power, roof); KHÔNG đổi công thức điểm hay mốc điểm của spec.
- * Kết quả đã chạy với cấu hình hiện tại (300 ván mỗi bot, đã tính trang sổ {phanDien} làm rơi và tốc độ tăng từng bậc), tốc độ bắt đầu 10, tăng 0,3 mỗi 5 giây, tối đa 18 (bước X1):
- * bot giỏi Vàng 100% (điểm trung bình 720, thấp nhất 551); bot trung bình điểm trung bình 341: chưa đạt mốc 25,0%, Đồng 32,0%, Bạc 24,3%, Vàng 18,7%.
- * Trước bước X1 (tốc độ 8, tăng 0,25, tối đa 16): bot giỏi Vàng 99,7% (trung bình 688, thấp nhất 512); bot trung bình trung bình 314: chưa đạt mốc 27,3%, Đồng 35,3%, Bạc 24,7%, Vàng 12,7%.
- * Chạy nhanh hơn thì đường dài hơn (quãng đường trung bình của bot giỏi 1.081 lên 1.339 mét) nên điểm tăng. Đổi cấu hình thì chạy lại và cập nhật các con số này.
+ * Chỉ chỉnh được tần suất vật nhặt trong `runnerConfig.ts` (RUNNER_TUNING.chain, power, roof); KHÔNG đổi công thức điểm. Mốc điểm chỉ đổi theo quy tắc phân vị (P4a).
+ * P4a (tăng tốc 20%: tốc độ bắt đầu 12, tăng 0,36 mỗi 5 giây, tối đa 21,6; mốc đặt lại theo phân vị bot 216 / 499 / 638). Kết quả 300 ván mỗi bot, seed 1 đến 300:
+ * bot giỏi Vàng 90,7% (điểm trung bình 749, thấp nhất 565, p10 638, không va, hết 4 vòng); bot trung bình điểm trung bình 357 (p25 216, p75 499): chưa đạt mốc 24,0%, Đồng 51,0%, Bạc 19,0%, Vàng 6,0%, hết tim 228/300.
+ * Trước P4a (tốc độ 10, 0,3, 18; mốc 200 / 380 / 520): bot giỏi Vàng 100% (trung bình 720, thấp nhất 551, p10 616); bot trung bình trung bình 341 (p25 201, p75 489): chưa đạt mốc 25,0%, Đồng 32,0%, Bạc 24,3%, Vàng 18,7%.
+ * Với mốc cũ sau khi tăng tốc: bot trung bình Vàng 21,7% (quá 20% của luật) vì quãng đường dài hơn (bot giỏi 1.339 lên 1.606 mét) nên điểm tăng; do đó đặt lại mốc theo quy tắc phân vị: Đồng = p25 bot trung bình (216), Bạc = p75 bot trung bình (499), Vàng = p10 bot giỏi (638).
+ * Trước X1 (tốc độ 8, 0,25, 16): bot giỏi Vàng 99,7%; bot trung bình trung bình 314. Đổi cấu hình thì chạy lại và cập nhật các con số này.
  */
 const GAMES = 300;
 

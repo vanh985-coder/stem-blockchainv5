@@ -21,4 +21,12 @@ export const climaxUi = {
   xong: 'Xong',
   /** Nút ở màn kết quả của màn 12 */
   xemLai: 'Xem lại cảnh cuối',
+  /** Cảnh đang chờ em (đủ 4 trang, đã chơi màn 12, chưa chiếu): nút ở màn kết quả của game vừa làm đủ trang và ở bảng Làng Bạc */
+  xemCanhCuoi: 'Xem cảnh cuối',
+  /** Lời báo cạnh nút khi cảnh đang chờ */
+  canhCuoiCho: 'Em đã đủ 4 Trang Sổ Vàng. Cảnh cuối của câu chuyện đang chờ em, không cần chơi lại màn 12.',
+  /** Lời ở bảng Làng Bạc khi đã chiếu rồi */
+  canhCuoiDaXem: 'Em đã xem cảnh cuối. Em muốn xem lại không?',
+  /** Dòng nhiệm vụ ở thế giới khi cảnh đang chờ */
+  nhiemVuCanhCuoi: 'Cảnh cuối đang chờ em. Mở Bản đồ, chọn Làng Bạc rồi bấm "Xem cảnh cuối".',
 } as const;

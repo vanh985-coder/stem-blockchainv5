@@ -18,6 +18,14 @@ export function onAnswer(listener: AnswerListener, submissionsOnly = false): () 
   return () => target.delete(listener);
 }
 
+/**
+ * Báo một lần nộp bài cho riêng người nghe kết quả nộp (lời khen). Dùng khi trạm đã có âm báo khác
+ * (ví dụ `playLevelComplete`) nên không đổi âm thanh, cũng không đổi phản ứng nhân vật.
+ */
+export function emitSubmission(correct: boolean): void {
+  submissionListeners.forEach(l => l(correct));
+}
+
 /** Phát tín hiệu cho mọi người nghe. */
 export function emitAnswer(correct: boolean, submitted: boolean | null = correct): void {
   listeners.forEach((l) => l(correct));

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { choiceReactions } from '../three/choiceReactions';
-import { emitAnswer, onAnswer } from './answerSignal';
+import { emitAnswer, emitSubmission, onAnswer } from './answerSignal';
 import { sound } from './sound';
 
 afterEach(() => {
@@ -60,5 +60,32 @@ describe('tín hiệu onAnswer', () => {
     sound.playCorrect();
     expect(choiceReactions.getState().student.clip).toBe('cheer');
     expect(choiceReactions.getState().rival.clip).toBe('idle');
+  });
+
+  it('emitSubmission chỉ báo cho người nghe lần nộp, không đụng người nghe thường (nhân vật)', () => {
+    const everyAnswer = vi.fn();
+    const submissions = vi.fn();
+    const offA = onAnswer(everyAnswer);
+    const offB = onAnswer(submissions, true);
+    emitSubmission(true);
+    expect(submissions.mock.calls).toEqual([[true]]);
+    expect(everyAnswer).not.toHaveBeenCalled();
+    offA();
+    offB();
+  });
+
+  it('playCorrect({ answer: null }) báo người nghe thường nhưng không báo lần nộp; answer khác với kết quả vẫn được tôn trọng', () => {
+    const everyAnswer = vi.fn();
+    const submissions = vi.fn();
+    const offA = onAnswer(everyAnswer);
+    const offB = onAnswer(submissions, true);
+    sound.setEnabled(false);
+    sound.playCorrect({ answer: null });
+    sound.playWrong({ answer: true }); // trang bị loại nhưng phiếu của em đúng
+    sound.playCorrect({ answer: false }); // trang được nhận nhưng phiếu của em sai
+    offA();
+    offB();
+    expect(everyAnswer.mock.calls).toEqual([[true], [false], [true]]);
+    expect(submissions.mock.calls).toEqual([[true], [false]]);
   });
 });

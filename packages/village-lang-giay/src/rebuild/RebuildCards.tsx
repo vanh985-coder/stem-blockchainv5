@@ -64,7 +64,7 @@ export function CoverFace({ code, width }: { code: number; width: number }) {
 // ---------------------------------------------------------------------------
 // Kéo thả (chuột và ngón tay, qua Pointer Events) hoặc chạm chọn rồi chạm đặt
 
-/** Vùng thả: cả hàng chuỗi (vòng 1, 2), rổ, hoặc một ô cụ thể của chuỗi `slot:3` (vòng 3, chỉ số ô từ 0). */
+/** Vùng thả: cả hàng chuỗi (vòng 1, 2), rổ, hoặc một ô cụ thể của chuỗi `slot:3` (đoạn giữ sổ, chỉ số ô từ 0). */
 export type DropTarget = 'chain' | 'basket' | `slot:${number}`;
 
 const SLOT_DROP = /^slot:\d+$/;
@@ -255,7 +255,7 @@ export interface TrayProps {
   shake: { id: string; n: number } | null;
   /** Thẻ vừa được nhét vào khay (trang giả) hoặc vừa nhấc ra: id của thẻ mới */
   fresh: string | null;
-  /** Vòng 3: các thẻ vừa bị ném ra bàn (trang thật và trang mồi, không phân biệt) */
+  /** Đoạn giữ sổ: các thẻ vừa bị ném ra bàn (trang thật và trang mồi, không phân biệt) */
   freshIds?: readonly string[];
   dragId: string | null;
   enabled: boolean;
@@ -323,7 +323,7 @@ export interface KeepChainRowProps {
 }
 
 /**
- * Hàng chuỗi của vòng 3: trang bìa rồi sáu ô; mỗi ô là một vùng thả riêng (`data-drop="slot:N"`). Ô có trang là nút kéo được (vào rổ) và chọn được (để soi công thức); ô trống là
+ * Hàng chuỗi của đoạn giữ sổ: trang bìa rồi từng ô của chuỗi (7 ô); mỗi ô là một vùng thả riêng (`data-drop="slot:N"`). Ô có trang là nút kéo được (vào rổ) và chọn được (để soi công thức); ô trống là
  * nút bấm được. Mọi trang trông giống nhau (viền nâu): không có dấu hiệu nào cho biết ô nào bị tráo, em phải soi công thức.
  */
 export const KeepChainRow = memo(function KeepChainRow({ width, genesis, slots, selected, shake, dragId, enabled, armed, hoverSlot, badSlot, bind, onSelectKey, onSlotActivate, version }: KeepChainRowProps) {
