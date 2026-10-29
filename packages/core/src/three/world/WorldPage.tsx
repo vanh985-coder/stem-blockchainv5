@@ -33,7 +33,7 @@ import { useWalkSession } from '../useWalkSession';
 import { createWalkApi } from '../walkApi';
 import { MarketHud } from '../cho/MarketHud';
 import { MarketMenu } from '../cho/MarketMenu';
-import { GATE_VILLAGE, biQuestLine, gateOpenedAfter, gateStates, previousVillage, questGate, questLine } from '../cho/marketQuest';
+import { GATE_OPENING_CEREMONY, GATE_VILLAGE, biQuestLine, gateOpenedAfter, gateStates, previousVillage, questGate, questLine } from '../cho/marketQuest';
 import { densityFor, type GateId } from '../cho/marketLayout';
 import { GoldenPagesRow } from '../village/GoldenPagesRow';
 import { guideTopic, lockedBy, nextLevel } from '../village/villageQuest';
@@ -175,7 +175,8 @@ export function WorldPage() {
   const ceremonyPending = !isTeacher && giverVillage !== null && VILLAGE_SCENE[giverVillage]?.award !== undefined && shouldShowGolden(data, giverVillage, pages);
   const effPages = effectivePages(pages, ceremonyPending);
   // Hiệu ứng mở cổng còn chờ (cổng của làng kế tiếp vẫn đóng cho tới khi chiếu xong)
-  const openingGiver = isTeacher ? null : pendingGateOpening(data, pages);
+  // (tắt từ P3a: cả 4 cổng mở từ đầu nên không còn cổng nào phải "mở" sau khi nhận trang)
+  const openingGiver = isTeacher || !GATE_OPENING_CEREMONY ? null : pendingGateOpening(data, pages);
   const openingGate = openingGiver ? gateOpenedAfter(openingGiver) : null;
   const gateOpenBase = useMemo(() => gateStates(unlock.villageOpen, isTeacher), [unlock.villageOpen, isTeacher]);
   const seqActive = seq === 'wait' || seq === 'fall' || seq === 'talk';

@@ -66,7 +66,7 @@ export function VillageDetails({
   const knowLocked = !!know && know.total > 0 && know.got < know.total;
   const levels = LEVELS.filter((l) => l.lang === villageId);
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" data-testid="ban-do-bang-lang" data-village={villageId}>
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-2xl">{ui.lang[villageId]}</h2>
         {onClose && (

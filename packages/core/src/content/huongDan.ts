@@ -14,7 +14,6 @@ import { HUONG_DAN_GAME } from './huongDanGame';
 /** Hình chụp thật từ game: đường dẫn trong assets là `ui/huong-dan/<id>` */
 export const GUIDE_SHOT_IDS = [
   'cho-di-lai',
-  'cong-dong',
   'cong-mo',
   'bien-go',
   'bai-hoc',
@@ -163,13 +162,8 @@ export const GUIDE_SECTIONS = [
         dt: 'Đứng gần một người hoặc một vật, bấm nút bàn tay ở góc phải để nói chuyện.',
       },
       {
-        hinh: shot('cong-dong'),
-        may: 'Cổng có then gỗ và dây đỏ là cổng chưa mở, em không vào được. Đứng gần cổng và bấm E để nghe lý do. Hãy giúp làng trước, cổng sẽ mở ra.',
-        dt: 'Cổng có then gỗ và dây đỏ là cổng chưa mở, em không vào được. Đứng gần cổng và bấm nút bàn tay để nghe lý do. Hãy giúp làng trước, cổng sẽ mở ra.',
-      },
-      {
         hinh: shot('cong-mo'),
-        may: 'Cổng đã mở thì em đi thẳng qua cổng để vào làng, không cần bấm gì. Đi theo biển chỉ đường gỗ để biết đường tới từng làng.',
+        may: 'Cả bốn cổng làng đều mở, em vào làng nào trước cũng được. Em đi thẳng qua cổng, không cần bấm gì, và theo biển chỉ đường gỗ.',
       },
       {
         hinh: shot('bien-go'),

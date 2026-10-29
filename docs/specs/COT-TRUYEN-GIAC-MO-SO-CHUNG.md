@@ -53,7 +53,7 @@ Nhưng Tí, một cậu thiếu niên lanh lợi muốn thành lái buôn giàu 
 
 **Tí xuất hiện.** Tí chạy vụt qua chợ, ôm một xấp trang sổ, cười hì hì: "Sổ mà có tên Tí giàu nhất vùng thì ai cũng phải nể!" Ngay sau đó, tiếng mõ vang khắp nơi: sổ lệch rồi, các làng đóng cổng!
 
-> **Bi:** "Chỉ còn cổng Làng Giấy mở. Đi thôi!"
+> **Bi:** "Cả bốn làng đều đang chờ em. Mình ghé Làng Giấy trước nhé!" *(P3a: cả 4 cổng mở từ đầu; câu cũ "Chỉ còn cổng Làng Giấy mở" đã bỏ)*
 
 ---
 

@@ -30,14 +30,16 @@ export interface UnlockResult {
   levels: LevelUnlock[];
   /** max(đã lưu, số tính được), từ 0 đến 4 */
   goldenPages: number;
-  /** Làng nào đang mở, theo VILLAGE_ORDER */
+  /** Làng nào đang mở, theo VILLAGE_ORDER. Từ P3a cả 4 làng luôn mở (vào độc lập, không cần xong làng trước); giữ trường này cho cổng, bản đồ và /ban-do dùng chung một nguồn. */
   villageOpen: boolean[];
 }
 
 /**
  * Hàm thuần: tính trạng thái mở khóa 12 màn (spec 03 mục 6).
- * - Trong làng: bài học, rồi game 1, rồi game 2. Màn 'coming-soon' được tính như đã qua.
- * - Trang Sổ Vàng của làng được trao khi xong màn 'ready' cuối cùng của làng; làng kế tiếp mở khi có trang đó.
+ * - Từ P3a cả 4 làng mở từ đầu (học sinh đăng nhập và khách): vào làng nào cũng được, không cần xong làng trước.
+ * - Trong làng vẫn giữ thứ tự: bài học, rồi game 1, rồi game 2. Màn 'coming-soon' được tính như đã qua. (Thẻ "Em có biết?" chặn bài học ở lớp thế giới/bản đồ, không nằm ở đây.)
+ * - Trang Sổ Vàng của làng được trao khi xong màn 'ready' cuối cùng của làng VÀ đã có trang của làng đứng trước (đếm liền từ làng đầu): chơi sai thứ tự thì không mất gì,
+ *   các trang tới cùng lúc khi làng còn thiếu xong. Mở cổng không tự trao trang, tự xong màn hay tự nhận thẻ, sao, xu.
  * - Số Trang Sổ Vàng = max(đã lưu, tính được); không bao giờ giảm.
  */
 export function computeUnlock(input: UnlockInput): UnlockResult {
@@ -48,24 +50,15 @@ export function computeUnlock(input: UnlockInput): UnlockResult {
 
   const villages = VILLAGE_ORDER.map((id) => levels.filter((l) => l.lang === id));
 
-  // Số Trang Sổ Vàng: duyệt từng làng theo thứ tự.
+  // Số Trang Sổ Vàng: duyệt từng làng theo thứ tự (trang của làng v chỉ trao khi đã có trang của các làng trước).
   let golden = Math.max(0, Math.min(VILLAGE_ORDER.length, Math.floor(input.goldenPages ?? 0)));
   villages.forEach((list, v) => {
-    const open = v === 0 || golden >= v;
-    if (open && golden < v + 1 && list.every(isPassed)) golden = v + 1;
+    if (golden >= v && golden < v + 1 && list.every(isPassed)) golden = v + 1;
   });
-  const villageOpen = villages.map((_, v) => v === 0 || golden >= v);
-
-  /** Màn cần xong đầu tiên để làng v mở: màn chưa qua đầu tiên của làng trước (đệ quy nếu làng trước cũng khóa). */
-  const gateOfVillage = (v: number): number | undefined => {
-    if (v === 0) return undefined;
-    const first = villages[v - 1].find((l) => !isPassed(l));
-    if (first && villageOpen[v - 1]) return first.id;
-    return gateOfVillage(v - 1) ?? first?.id;
-  };
+  const villageOpen = villages.map(() => true);
 
   const out: LevelUnlock[] = [];
-  villages.forEach((list, v) => {
+  villages.forEach((list) => {
     list.forEach((l, i) => {
       if (statusOf(l) === 'coming-soon') {
         out.push({ id: l.id, state: 'coming-soon' });
@@ -73,8 +66,6 @@ export function computeUnlock(input: UnlockInput): UnlockResult {
         out.push({ id: l.id, state: 'done' });
       } else if (input.isTeacher) {
         out.push({ id: l.id, state: 'open' });
-      } else if (!villageOpen[v]) {
-        out.push({ id: l.id, state: 'locked', lockedBy: gateOfVillage(v) });
       } else {
         const blocker = list.slice(0, i).find((p) => !isPassed(p));
         out.push(blocker ? { id: l.id, state: 'locked', lockedBy: blocker.id } : { id: l.id, state: 'open' });

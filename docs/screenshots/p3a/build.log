@@ -1,0 +1,363 @@
+$ pnpm -r --filter "./apps/*" build
+apps/hub build$ tsc --noEmit && vite build
+apps/lang-bac build$ tsc --noEmit && vite build
+apps/lang-det build$ tsc --noEmit && vite build
+apps/lang-giay build$ tsc --noEmit && vite build
+apps/lang-bac build: vite v8.3.3 building client environment for production...
+apps/lang-bac build: transforming...
+apps/lang-giay build: vite v8.3.3 building client environment for production...
+apps/lang-det build: vite v8.3.3 building client environment for production...
+apps/lang-giay build: transforming...
+apps/lang-det build: transforming...
+apps/hub build: vite v8.3.3 building client environment for production...
+apps/hub build: transforming...
+apps/lang-bac build: ✓ 1416 modules transformed.
+apps/lang-det build: ✓ 1408 modules transformed.
+apps/lang-bac build: rendering chunks...
+apps/lang-giay build: ✓ 1409 modules transformed.
+apps/lang-det build: rendering chunks...
+apps/lang-giay build: rendering chunks...
+apps/lang-bac build: computing gzip size...
+apps/lang-bac build: dist/index.html                                                      0.75 kB │ gzip:   0.39 kB
+apps/lang-bac build: dist/assets/baloo-2-vietnamese-800-normal-ConLnEgt.woff2             4.79 kB
+apps/lang-bac build: dist/assets/baloo-2-vietnamese-700-normal-h4tlcePq.woff2             5.41 kB
+apps/lang-bac build: dist/assets/be-vietnam-pro-vietnamese-400-normal-CRcqvyg1.woff2     11.53 kB
+apps/lang-bac build: dist/assets/be-vietnam-pro-vietnamese-600-normal-nyU-ZL2p.woff2     12.17 kB
+apps/lang-bac build: dist/assets/baloo-2-latin-800-normal-BbF3Etk1.woff2                 18.63 kB
+apps/lang-bac build: dist/assets/baloo-2-latin-700-normal-CqTg7A15.woff2                 19.43 kB
+apps/lang-bac build: dist/assets/be-vietnam-pro-latin-400-normal-PpnXBOrz.woff2          21.16 kB
+apps/lang-bac build: dist/assets/be-vietnam-pro-latin-600-normal-BZDkUTrt.woff2          22.03 kB
+apps/lang-bac build: dist/assets/Man10-C_EHvI81.css                                       0.95 kB │ gzip:   0.48 kB
+apps/lang-bac build: dist/assets/index-CQs-vUpE.css                                      97.02 kB │ gzip:  15.86 kB
+apps/lang-bac build: dist/assets/jsx-runtime-NZYk81nU.js                                  0.43 kB │ gzip:   0.30 kB
+apps/lang-bac build: dist/assets/ProgressBar-DrG5KbAP.js                                  0.61 kB │ gzip:   0.38 kB
+apps/lang-bac build: dist/assets/rng-DJLLedxu.js                                          0.62 kB │ gzip:   0.40 kB
+apps/lang-bac build: dist/assets/rolldown-runtime-hePW80VL.js                             0.71 kB │ gzip:   0.42 kB
+apps/lang-bac build: dist/assets/rich-uRQ34mYl.js                                         0.79 kB │ gzip:   0.47 kB
+apps/lang-bac build: dist/assets/PrivacyPage-DaW3VEdH.js                                  0.81 kB │ gzip:   0.44 kB
+apps/lang-bac build: dist/assets/LoginPage-yeE3ezNF.js                                    2.12 kB │ gzip:   1.04 kB
+apps/lang-bac build: dist/assets/useQuality-NgAF41iz.js                                   2.40 kB │ gzip:   1.32 kB
+apps/lang-bac build: dist/assets/RegisterPage-BiWPvoBn.js                                 2.43 kB │ gzip:   1.13 kB
+apps/lang-bac build: dist/assets/nguoi-DkzUfEIe.js                                        2.80 kB │ gzip:   1.33 kB
+apps/lang-bac build: dist/assets/ProfilePage-ByGrkXgm.js                                  3.08 kB │ gzip:   1.28 kB
+apps/lang-bac build: dist/assets/PortraitFrame-CbILekqZ.js                                3.12 kB │ gzip:   1.39 kB
+apps/lang-bac build: dist/assets/logic-M-HmUBNJ.js                                        3.73 kB │ gzip:   1.76 kB
+apps/lang-bac build: dist/assets/CayMerkle-CUUIr37t.js                                    4.87 kB │ gzip:   2.26 kB
+apps/lang-bac build: dist/assets/Easy-CrwG2Qfu.js                                         7.33 kB │ gzip:   2.47 kB
+apps/lang-bac build: dist/assets/nenTrangTriIcons-DkNB_wn3.js                            10.56 kB │ gzip:   3.33 kB
+apps/lang-bac build: dist/assets/confetti.module-BYDB1iN2.js                             10.57 kB │ gzip:   4.20 kB
+apps/lang-bac build: dist/assets/LessonStage3D-7vDKGh5Y.js                               10.79 kB │ gzip:   4.65 kB
+apps/lang-bac build: dist/assets/Medium-BMfyAQbQ.js                                      15.29 kB │ gzip:   5.13 kB
+apps/lang-bac build: dist/assets/VnDialog-BHaLr_nL.js                                    18.70 kB │ gzip:   7.29 kB
+apps/lang-bac build: dist/assets/Panel-CPghZD6k.js                                       23.99 kB │ gzip:   9.24 kB
+apps/lang-bac build: dist/assets/Man12-BcEiL9zO.js                                       30.09 kB │ gzip:  12.17 kB
+apps/lang-bac build: dist/assets/Man10-BVycD3km.js                                       30.21 kB │ gzip:   9.68 kB
+apps/lang-bac build: dist/assets/SettingsProvider-CihbwPRM.js                            35.93 kB │ gzip:  14.06 kB
+apps/lang-bac build: dist/assets/Hard-DOKQ25qO.js                                        46.48 kB │ gzip:  15.30 kB
+apps/lang-bac build: dist/assets/Man11-c-XQmbDE.js                                       47.05 kB │ gzip:  17.27 kB
+apps/lang-bac build: dist/assets/Scene25D-CnnKpBCi.js                                    71.37 kB │ gzip:  19.47 kB
+apps/lang-bac build: dist/assets/FeedbackSheet-CjdLxMP8.js                               78.91 kB │ gzip:  27.84 kB
+apps/lang-bac build: dist/assets/module-6OIHGOL6.js                                     229.22 kB │ gzip:  59.89 kB
+apps/lang-bac build: dist/assets/index-BIiIvgGl.js                                      291.58 kB │ gzip:  92.07 kB
+apps/lang-bac build: dist/assets/rendererRelease-BxSgCsIE.js                          1,008.37 kB │ gzip: 271.29 kB
+apps/lang-bac build: 
+apps/lang-bac build: [plugin builtin:vite-reporter] 
+apps/lang-bac build: (!) Some chunks are larger than 500 kB after minification. Consider:
+apps/lang-bac build: - Using dynamic import() to code-split the application
+apps/lang-bac build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+apps/lang-bac build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+apps/lang-bac build: ✓ built in 7.30s
+apps/hub build: ✓ 1525 modules transformed.
+apps/lang-bac build: Done
+apps/lang-khac-dau build$ tsc --noEmit && vite build
+apps/lang-giay build: computing gzip size...
+apps/lang-giay build: dist/index.html                                                      0.75 kB │ gzip:   0.39 kB
+apps/lang-giay build: dist/assets/baloo-2-vietnamese-800-normal-ConLnEgt.woff2             4.79 kB
+apps/lang-giay build: dist/assets/baloo-2-vietnamese-700-normal-h4tlcePq.woff2             5.41 kB
+apps/lang-giay build: dist/assets/be-vietnam-pro-vietnamese-400-normal-CRcqvyg1.woff2     11.53 kB
+apps/lang-giay build: dist/assets/be-vietnam-pro-vietnamese-600-normal-nyU-ZL2p.woff2     12.17 kB
+apps/lang-giay build: dist/assets/baloo-2-latin-800-normal-BbF3Etk1.woff2                 18.63 kB
+apps/lang-giay build: dist/assets/baloo-2-latin-700-normal-CqTg7A15.woff2                 19.43 kB
+apps/lang-giay build: dist/assets/be-vietnam-pro-latin-400-normal-PpnXBOrz.woff2          21.16 kB
+apps/lang-giay build: dist/assets/be-vietnam-pro-latin-600-normal-BZDkUTrt.woff2          22.03 kB
+apps/lang-giay build: dist/assets/Man1-C_EHvI81.css                                        0.95 kB │ gzip:   0.48 kB
+apps/lang-giay build: dist/assets/index-CQs-vUpE.css                                      97.02 kB │ gzip:  15.86 kB
+apps/lang-giay build: dist/assets/jsx-runtime-NZYk81nU.js                                  0.43 kB │ gzip:   0.30 kB
+apps/lang-giay build: dist/assets/rng-C2A-FyCZ.js                                          0.47 kB │ gzip:   0.33 kB
+apps/lang-giay build: dist/assets/rolldown-runtime-hePW80VL.js                             0.71 kB │ gzip:   0.42 kB
+apps/lang-giay build: dist/assets/PrivacyPage-B1tyJIol.js                                  0.81 kB │ gzip:   0.44 kB
+apps/lang-giay build: dist/assets/ReflectionQuestion-D0v07qCK.js                           1.87 kB │ gzip:   0.91 kB
+apps/lang-giay build: dist/assets/LoginPage-ChfrhI6T.js                                    2.12 kB │ gzip:   1.04 kB
+apps/lang-giay build: dist/assets/DayLight-Nmv0nO6y.js                                     2.33 kB │ gzip:   1.28 kB
+apps/lang-giay build: dist/assets/useQuality-BwojDsee.js                                   2.40 kB │ gzip:   1.33 kB
+apps/lang-giay build: dist/assets/RegisterPage-DR62d2UU.js                                 2.43 kB │ gzip:   1.13 kB
+apps/lang-giay build: dist/assets/logic-CHlythwd.js                                        2.46 kB │ gzip:   1.20 kB
+apps/lang-giay build: dist/assets/ProfilePage-B4Lvj_Fr.js                                  3.08 kB │ gzip:   1.28 kB
+apps/lang-giay build: dist/assets/PortraitFrame-BNLoYj81.js                                3.12 kB │ gzip:   1.40 kB
+apps/lang-giay build: dist/assets/useReaction-DnnIxySQ.js                                  3.28 kB │ gzip:   1.33 kB
+apps/lang-giay build: dist/assets/Easy-kUtQkIB6.js                                         3.67 kB │ gzip:   1.68 kB
+apps/lang-giay build: dist/assets/Medium-B7HONawZ.js                                       5.87 kB │ gzip:   2.35 kB
+apps/lang-giay build: dist/assets/Hard-CRTZrCZM.js                                         7.57 kB │ gzip:   2.70 kB
+apps/lang-giay build: dist/assets/LessonStage3D-Co9x7DKI.js                                9.27 kB │ gzip:   3.95 kB
+apps/lang-giay build: dist/assets/nenTrangTriIcons-DkNB_wn3.js                            10.56 kB │ gzip:   3.33 kB
+apps/lang-giay build: dist/assets/confetti.module-BYDB1iN2.js                             10.57 kB │ gzip:   4.20 kB
+apps/lang-giay build: dist/assets/ChainStrip-x10w1MT8.js                                  11.28 kB │ gzip:   3.80 kB
+apps/lang-giay build: dist/assets/urls-Qj8zMlFJ.js                                        23.42 kB │ gzip:   8.94 kB
+apps/lang-giay build: dist/assets/SettingsProvider-CfKNCq0E.js                            35.95 kB │ gzip:  14.07 kB
+apps/lang-giay build: dist/assets/Man1-BKkbJcOa.js                                        41.47 kB │ gzip:  13.36 kB
+apps/lang-giay build: dist/assets/Man3-DxTQ3fF3.js                                        41.86 kB │ gzip:  14.02 kB
+apps/lang-giay build: dist/assets/Man2-CrBN6WZh.js                                        64.01 kB │ gzip:  23.82 kB
+apps/lang-giay build: dist/assets/StatsProbe-5ZAcH5Lj.js                                  68.53 kB │ gzip:  18.32 kB
+apps/lang-giay build: dist/assets/stars-Ddrs8JFE.js                                       78.24 kB │ gzip:  27.56 kB
+apps/lang-giay build: dist/assets/module-6OIHGOL6.js                                     229.22 kB │ gzip:  59.89 kB
+apps/lang-giay build: dist/assets/index-CO5mfY0g.js                                      292.01 kB │ gzip:  92.23 kB
+apps/lang-giay build: dist/assets/rendererRelease-1CVRjbBL.js                          1,012.53 kB │ gzip: 272.37 kB
+apps/lang-giay build: 
+apps/lang-giay build: [plugin builtin:vite-reporter] 
+apps/lang-giay build: (!) Some chunks are larger than 500 kB after minification. Consider:
+apps/lang-giay build: - Using dynamic import() to code-split the application
+apps/lang-giay build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+apps/lang-giay build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+apps/lang-det build: computing gzip size...
+apps/lang-giay build: ✓ built in 7.03s
+apps/lang-det build: dist/index.html                                                      0.91 kB │ gzip:   0.42 kB
+apps/lang-det build: dist/assets/baloo-2-vietnamese-800-normal-ConLnEgt.woff2             4.79 kB
+apps/lang-det build: dist/assets/baloo-2-vietnamese-700-normal-h4tlcePq.woff2             5.41 kB
+apps/lang-det build: dist/assets/be-vietnam-pro-vietnamese-400-normal-CRcqvyg1.woff2     11.53 kB
+apps/lang-det build: dist/assets/be-vietnam-pro-vietnamese-600-normal-nyU-ZL2p.woff2     12.17 kB
+apps/lang-det build: dist/assets/baloo-2-latin-800-normal-BbF3Etk1.woff2                 18.63 kB
+apps/lang-det build: dist/assets/baloo-2-latin-700-normal-CqTg7A15.woff2                 19.43 kB
+apps/lang-det build: dist/assets/be-vietnam-pro-latin-400-normal-PpnXBOrz.woff2          21.16 kB
+apps/lang-det build: dist/assets/be-vietnam-pro-latin-600-normal-BZDkUTrt.woff2          22.03 kB
+apps/lang-det build: dist/assets/Man4-C_EHvI81.css                                        0.95 kB │ gzip:   0.48 kB
+apps/lang-det build: dist/assets/index-CQs-vUpE.css                                      97.02 kB │ gzip:  15.86 kB
+apps/lang-det build: dist/assets/rng-DPV0JjeY.js                                          0.31 kB │ gzip:   0.23 kB
+apps/lang-det build: dist/assets/jsx-runtime-NZYk81nU.js                                  0.43 kB │ gzip:   0.30 kB
+apps/lang-det build: dist/assets/rolldown-runtime-hePW80VL.js                             0.71 kB │ gzip:   0.42 kB
+apps/lang-det build: dist/assets/PrivacyPage-CnxQR6qb.js                                  0.81 kB │ gzip:   0.44 kB
+apps/lang-det build: dist/assets/Panel-CfnUPx1e.js                                        1.99 kB │ gzip:   1.10 kB
+apps/lang-det build: dist/assets/LoginPage-dOB4kZxU.js                                    2.16 kB │ gzip:   1.05 kB
+apps/lang-det build: dist/assets/RegisterPage-DJttG2C7.js                                 2.47 kB │ gzip:   1.15 kB
+apps/lang-det build: dist/assets/PortraitFrame-CVb0FQ-s.js                                3.11 kB │ gzip:   1.39 kB
+apps/lang-det build: dist/assets/ProfilePage-DR7y05fR.js                                  3.12 kB │ gzip:   1.29 kB
+apps/lang-det build: dist/assets/AuthProvider-DUhwwiks.js                                 3.16 kB │ gzip:   1.49 kB
+apps/lang-det build: dist/assets/Easy-DZX51AHJ.js                                         5.20 kB │ gzip:   1.91 kB
+apps/lang-det build: dist/assets/useQuality-CO3lTxu0.js                                   5.57 kB │ gzip:   2.48 kB
+apps/lang-det build: dist/assets/Medium-B1wvbRpj.js                                       7.36 kB │ gzip:   2.51 kB
+apps/lang-det build: dist/assets/nenTrangTriIcons-DkNB_wn3.js                            10.56 kB │ gzip:   3.33 kB
+apps/lang-det build: dist/assets/confetti.module-BYDB1iN2.js                             10.57 kB │ gzip:   4.20 kB
+apps/lang-det build: dist/assets/LessonStage3D-CJSxUvDZ.js                               10.79 kB │ gzip:   4.66 kB
+apps/lang-det build: dist/assets/nguoi-Bki7lCaC.js                                       11.76 kB │ gzip:   4.17 kB
+apps/lang-det build: dist/assets/urls-DHqBCuQt.js                                        22.03 kB │ gzip:   8.37 kB
+apps/lang-det build: dist/assets/Hard-D-fS3w8j.js                                        25.69 kB │ gzip:   7.78 kB
+apps/lang-det build: dist/assets/Man6-BVxwwVG0.js                                        26.06 kB │ gzip:  10.48 kB
+apps/lang-det build: dist/assets/Man5-7wrMeVB-.js                                        27.22 kB │ gzip:  10.63 kB
+apps/lang-det build: dist/assets/SettingsProvider-CJ82t4su.js                            35.92 kB │ gzip:  14.06 kB
+apps/lang-det build: dist/assets/Man4-9Vw14NF1.js                                        45.51 kB │ gzip:  14.64 kB
+apps/lang-det build: dist/assets/PageCodeCalculator-DAvD0fZ7.js                          80.72 kB │ gzip:  28.68 kB
+apps/lang-det build: dist/assets/Scene25D-BPlFP62y.js                                    84.09 kB │ gzip:  23.35 kB
+apps/lang-det build: dist/assets/module-6OIHGOL6.js                                     229.22 kB │ gzip:  59.89 kB
+apps/lang-det build: dist/assets/index-D6vwp_ra.js                                      288.73 kB │ gzip:  90.98 kB
+apps/lang-det build: dist/assets/rendererRelease-D9ZpINF4.js                          1,008.44 kB │ gzip: 271.32 kB
+apps/lang-det build: 
+apps/lang-det build: ✓ built in 6.94s
+apps/lang-det build: [plugin builtin:vite-reporter] 
+apps/lang-det build: (!) Some chunks are larger than 500 kB after minification. Consider:
+apps/lang-det build: - Using dynamic import() to code-split the application
+apps/lang-det build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+apps/lang-det build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+apps/lang-giay build: Done
+apps/lang-det build: Done
+apps/hub build: rendering chunks...
+apps/hub build: computing gzip size...
+apps/hub build: dist/index.html                                                      3.11 kB │ gzip:   0.93 kB
+apps/hub build: dist/assets/baloo-2-vietnamese-800-normal-ConLnEgt.woff2             4.79 kB
+apps/hub build: dist/assets/baloo-2-vietnamese-700-normal-h4tlcePq.woff2             5.41 kB
+apps/hub build: dist/assets/be-vietnam-pro-vietnamese-400-normal-CRcqvyg1.woff2     11.53 kB
+apps/hub build: dist/assets/be-vietnam-pro-vietnamese-600-normal-nyU-ZL2p.woff2     12.17 kB
+apps/hub build: dist/assets/baloo-2-latin-800-normal-BbF3Etk1.woff2                 18.63 kB
+apps/hub build: dist/assets/baloo-2-latin-700-normal-CqTg7A15.woff2                 19.43 kB
+apps/hub build: dist/assets/be-vietnam-pro-latin-400-normal-PpnXBOrz.woff2          21.16 kB
+apps/hub build: dist/assets/be-vietnam-pro-latin-600-normal-BZDkUTrt.woff2          22.03 kB
+apps/hub build: dist/assets/LessonPage2D-C_EHvI81.css                                0.95 kB │ gzip:   0.48 kB
+apps/hub build: dist/assets/index-B1gwj3-3.css                                      99.56 kB │ gzip:  16.30 kB
+apps/hub build: dist/assets/roles-bWEfOfpd.js                                        0.06 kB │ gzip:   0.07 kB
+apps/hub build: dist/assets/stars-XK_yMyWn.js                                        0.09 kB │ gzip:   0.08 kB
+apps/hub build: dist/assets/canvasLog-Ce3IY8p2.js                                    0.09 kB │ gzip:   0.10 kB
+apps/hub build: dist/assets/nguoi-qP-C9fD0.js                                        0.15 kB │ gzip:   0.15 kB
+apps/hub build: dist/assets/villageCards-DxJQ_JPA.js                                 0.29 kB │ gzip:   0.19 kB
+apps/hub build: dist/assets/types-CSKSNCvn.js                                        0.32 kB │ gzip:   0.22 kB
+apps/hub build: dist/assets/nguoi-CssO9TzD.js                                        0.33 kB │ gzip:   0.26 kB
+apps/hub build: dist/assets/chain-BkwGGxoG.js                                        0.38 kB │ gzip:   0.24 kB
+apps/hub build: dist/assets/jsx-runtime-NZYk81nU.js                                  0.43 kB │ gzip:   0.30 kB
+apps/hub build: dist/assets/Avatar-CDkYWaUM.js                                       0.43 kB │ gzip:   0.31 kB
+apps/hub build: dist/assets/Panel-CBLbabum.js                                        0.60 kB │ gzip:   0.41 kB
+apps/hub build: dist/assets/ProgressBar-DrG5KbAP.js                                  0.61 kB │ gzip:   0.38 kB
+apps/hub build: dist/assets/rng-DJLLedxu.js                                          0.62 kB │ gzip:   0.40 kB
+apps/hub build: dist/assets/frames-B8Ze8IOs.js                                       0.63 kB │ gzip:   0.37 kB
+apps/hub build: dist/assets/format-Dae23TsQ.js                                       0.66 kB │ gzip:   0.38 kB
+apps/hub build: dist/assets/rolldown-runtime-hePW80VL.js                             0.71 kB │ gzip:   0.42 kB
+apps/hub build: dist/assets/useQuality-BfNkZar8.js                                   0.72 kB │ gzip:   0.45 kB
+apps/hub build: dist/assets/Toast-Cz6-nmLX.js                                        0.74 kB │ gzip:   0.49 kB
+apps/hub build: dist/assets/Card-CMEh3Kfc.js                                         0.75 kB │ gzip:   0.43 kB
+apps/hub build: dist/assets/rich-aFML2Szi.js                                         0.79 kB │ gzip:   0.46 kB
+apps/hub build: dist/assets/PrivacyPage-CzsrQBr0.js                                  0.80 kB │ gzip:   0.43 kB
+apps/hub build: dist/assets/Hearts-CKYLmmF3.js                                       0.88 kB │ gzip:   0.55 kB
+apps/hub build: dist/assets/logic-vQWpTlfK.js                                        0.90 kB │ gzip:   0.49 kB
+apps/hub build: dist/assets/Stars-DoRqSQDP.js                                        1.10 kB │ gzip:   0.66 kB
+apps/hub build: dist/assets/knowCards-D1svixoh.js                                    1.19 kB │ gzip:   0.64 kB
+apps/hub build: dist/assets/gameConfig-B0noVR0_.js                                   1.34 kB │ gzip:   0.71 kB
+apps/hub build: dist/assets/preload-helper-DjzSQ1t3.js                               1.38 kB │ gzip:   0.75 kB
+apps/hub build: dist/assets/knowScrolls-DebNoiLz.js                                  1.38 kB │ gzip:   0.73 kB
+apps/hub build: dist/assets/Button-Bua587_b.js                                       1.45 kB │ gzip:   0.75 kB
+apps/hub build: dist/assets/Modal-D8kLAjvz.js                                        1.49 kB │ gzip:   0.79 kB
+apps/hub build: dist/assets/GuestBar-cop0pUCy.js                                     1.51 kB │ gzip:   0.60 kB
+apps/hub build: dist/assets/modelSizes-ndF9owqU.js                                   1.55 kB │ gzip:   0.74 kB
+apps/hub build: dist/assets/guardedRoute-UnuNR0Pu.js                                 1.60 kB │ gzip:   0.84 kB
+apps/hub build: dist/assets/levels-BrUajjKx.js                                       1.60 kB │ gzip:   0.57 kB
+apps/hub build: dist/assets/EmCoBietDialog-DY1dcYYz.js                               1.61 kB │ gzip:   0.86 kB
+apps/hub build: dist/assets/PageCodeCalculator-D2dby0yU.js                           1.85 kB │ gzip:   0.98 kB
+apps/hub build: dist/assets/Story-BDKWbxcO.js                                        1.88 kB │ gzip:   0.97 kB
+apps/hub build: dist/assets/ReflectionQuestion-tuqiezk8.js                           1.93 kB │ gzip:   0.92 kB
+apps/hub build: dist/assets/shared-CU9oA8Q_.js                                       2.00 kB │ gzip:   0.92 kB
+apps/hub build: dist/assets/ChainStrip-BsNAMd3R.js                                   2.12 kB │ gzip:   1.03 kB
+apps/hub build: dist/assets/logic-y5ix0LX0.js                                        2.27 kB │ gzip:   1.01 kB
+apps/hub build: dist/assets/NumberInput-G_FY_rbD.js                                  2.29 kB │ gzip:   1.11 kB
+apps/hub build: dist/assets/LoginPage-DDWE1F9w.js                                    2.30 kB │ gzip:   1.10 kB
+apps/hub build: dist/assets/story-8WLi9C0F.js                                        2.32 kB │ gzip:   1.18 kB
+apps/hub build: dist/assets/ModCalculator-D_4HxuJg.js                                2.41 kB │ gzip:   1.19 kB
+apps/hub build: dist/assets/logic-DI0JlF3g.js                                        2.43 kB │ gzip:   1.13 kB
+apps/hub build: dist/assets/Man7-CAhGcic1.js                                         2.48 kB │ gzip:   1.10 kB
+apps/hub build: dist/assets/villageIntro-CyrkPaDM.js                                 2.50 kB │ gzip:   0.95 kB
+apps/hub build: dist/assets/Man1-DG1-mXuF.js                                         2.55 kB │ gzip:   1.13 kB
+apps/hub build: dist/assets/Man4-nF7ljK_9.js                                         2.55 kB │ gzip:   1.13 kB
+apps/hub build: dist/assets/Man10-DcZPH0Fs.js                                        2.55 kB │ gzip:   1.11 kB
+apps/hub build: dist/assets/RegisterPage-Cn4LKmpi.js                                 2.56 kB │ gzip:   1.18 kB
+apps/hub build: dist/assets/src-DjgFIBwZ.js                                          2.58 kB │ gzip:   1.21 kB
+apps/hub build: dist/assets/src-DqHVV853.js                                          2.59 kB │ gzip:   1.19 kB
+apps/hub build: dist/assets/src-k3vrCsZX.js                                          2.61 kB │ gzip:   1.20 kB
+apps/hub build: dist/assets/PortraitFrame-DIavjbJb.js                                2.68 kB │ gzip:   1.20 kB
+apps/hub build: dist/assets/src-Caj9Qb_g.js                                          2.70 kB │ gzip:   1.28 kB
+apps/hub build: dist/assets/FeedbackSheet-BmcT3EAR.js                                2.81 kB │ gzip:   1.23 kB
+apps/hub build: dist/assets/api-BHZMUXKn.js                                          2.98 kB │ gzip:   1.15 kB
+apps/hub build: dist/assets/nguoi-DWriXg64.js                                        3.15 kB │ gzip:   1.29 kB
+apps/hub build: dist/assets/components-9uhEwt-R.js                                   3.16 kB │ gzip:   1.54 kB
+apps/hub build: dist/assets/AuthProvider-xrr9eSPX.js                                 3.17 kB │ gzip:   1.49 kB
+apps/hub build: dist/assets/SettingsProvider-DPyb_Fhx.js                             3.27 kB │ gzip:   1.42 kB
+apps/hub build: dist/assets/ProfilePage-t9s10ukD.js                                  3.29 kB │ gzip:   1.35 kB
+apps/hub build: dist/assets/useReaction-8YoJHZCl.js                                  3.34 kB │ gzip:   1.35 kB
+apps/hub build: dist/assets/VillageScrollMap-3y8Rd6QQ.js                             3.59 kB │ gzip:   1.52 kB
+apps/hub build: dist/assets/parts-C6tysR0k.js                                        3.59 kB │ gzip:   1.52 kB
+apps/hub build: dist/assets/VillageIntro-CIPsD_PH.js                                 3.60 kB │ gzip:   1.83 kB
+apps/hub build: dist/assets/Easy-BK6UE8Vw.js                                         3.81 kB │ gzip:   1.73 kB
+apps/hub build: dist/assets/CayMerkle-BuMYXedp.js                                    4.86 kB │ gzip:   2.25 kB
+apps/hub build: dist/assets/pickQuestions-ccPiFCBu.js                                5.11 kB │ gzip:   2.13 kB
+apps/hub build: dist/assets/store-D3PV9aPW.js                                        5.29 kB │ gzip:   1.85 kB
+apps/hub build: dist/assets/Easy-Cs5CeTUM.js                                         5.34 kB │ gzip:   1.96 kB
+apps/hub build: dist/assets/bai-1-DJn3Pi5h.js                                        5.95 kB │ gzip:   2.40 kB
+apps/hub build: dist/assets/Medium-BtcmUyUS.js                                       6.09 kB │ gzip:   2.43 kB
+apps/hub build: dist/assets/Scene25D-Cg90EoTR.js                                     7.06 kB │ gzip:   3.10 kB
+apps/hub build: dist/assets/Hard-DZgLt1DK.js                                         7.17 kB │ gzip:   2.55 kB
+apps/hub build: dist/assets/TrangSo-CIsflEY9.js                                      7.19 kB │ gzip:   2.32 kB
+apps/hub build: dist/assets/Medium-pWwlVp3z.js                                       7.51 kB │ gzip:   2.56 kB
+apps/hub build: dist/assets/questions-DmT1X_FY.js                                    7.52 kB │ gzip:   2.56 kB
+apps/hub build: dist/assets/Easy-D9jKCfNt.js                                         7.53 kB │ gzip:   2.54 kB
+apps/hub build: dist/assets/Hard-DmnfnQrE.js                                         8.18 kB │ gzip:   2.86 kB
+apps/hub build: dist/assets/VnDialog-N_WKVVcS.js                                     8.35 kB │ gzip:   3.07 kB
+apps/hub build: dist/assets/BanDoPage-CRlwBssv.js                                    8.71 kB │ gzip:   3.67 kB
+apps/hub build: dist/assets/LessonStage3D-Bbk4k4g-.js                                9.30 kB │ gzip:   3.97 kB
+apps/hub build: dist/assets/bai-2-DcZHjlwf.js                                       10.09 kB │ gzip:   3.72 kB
+apps/hub build: dist/assets/bai-4-B84JpmJh.js                                       10.45 kB │ gzip:   4.17 kB
+apps/hub build: dist/assets/nenTrangTriIcons-DkNB_wn3.js                            10.56 kB │ gzip:   3.33 kB
+apps/hub build: dist/assets/confetti.module-BYDB1iN2.js                             10.57 kB │ gzip:   4.20 kB
+apps/hub build: dist/assets/TheGiaoDich-4xf90RUe.js                                 11.23 kB │ gzip:   2.33 kB
+apps/hub build: dist/assets/Medium-BLvDt7_P.js                                      15.48 kB │ gzip:   5.19 kB
+apps/hub build: dist/assets/Medium-zy4QEztX.js                                      17.84 kB │ gzip:   4.77 kB
+apps/hub build: dist/assets/Man8-ldFsM_YE.js                                        19.47 kB │ gzip:   8.02 kB
+apps/hub build: dist/assets/Hard-CaOE5AKl.js                                        20.33 kB │ gzip:   6.08 kB
+apps/hub build: dist/assets/hooks-5Iz3pmta.js                                       21.22 kB │ gzip:   8.08 kB
+apps/hub build: [plugin builtin:vite-reporter] 
+apps/hub build: (!) Some chunks are larger than 500 kB after minification. Consider:
+apps/hub build: - Using dynamic import() to code-split the application
+apps/hub build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+apps/hub build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+apps/hub build: dist/assets/MiniGameLevel-Cw1NX1w1.js                               21.92 kB │ gzip:   8.07 kB
+apps/hub build: dist/assets/Easy-DCpabJIR.js                                        23.49 kB │ gzip:   5.90 kB
+apps/hub build: dist/assets/bai-3-6J89ov98.js                                       23.87 kB │ gzip:   9.51 kB
+apps/hub build: dist/assets/LessonPage2D-CJ8bdRff.js                                24.30 kB │ gzip:   7.92 kB
+apps/hub build: dist/assets/Man6-B13F-PvO.js                                        26.27 kB │ gzip:  10.56 kB
+apps/hub build: dist/assets/Man12-DVxYnKTu.js                                       26.64 kB │ gzip:  10.61 kB
+apps/hub build: dist/assets/Man5-BWekoH6a.js                                        27.44 kB │ gzip:  10.72 kB
+apps/hub build: dist/assets/characters-Cu5WKsTP.js                                  27.85 kB │ gzip:  11.25 kB
+apps/hub build: dist/assets/Hard-BbuRAoRL.js                                        28.50 kB │ gzip:   6.86 kB
+apps/hub build: dist/assets/Teacher-3OBS9iFW.js                                     31.93 kB │ gzip:   9.73 kB
+apps/hub build: dist/assets/Man3-BVqkSopT.js                                        35.32 kB │ gzip:  11.60 kB
+apps/hub build: dist/assets/TapOrDrag-BulG-AJr.js                                   38.62 kB │ gzip:  12.95 kB
+apps/hub build: dist/assets/Man9-BZ32R6sz.js                                        40.28 kB │ gzip:  14.26 kB
+apps/hub build: dist/assets/Man2-Delb6P_b.js                                        43.40 kB │ gzip:  16.10 kB
+apps/hub build: dist/assets/ProgressProvider-CGkN_UEp.js                            46.17 kB │ gzip:  14.38 kB
+apps/hub build: dist/assets/Man11-Bg4Insma.js                                       47.17 kB │ gzip:  17.31 kB
+apps/hub build: dist/assets/BottomSheet-QC3paaoT.js                                 75.66 kB │ gzip:  26.70 kB
+apps/hub build: dist/assets/mapGeometry-DY1leFmU.js                                 80.65 kB │ gzip:  28.85 kB
+apps/hub build: dist/assets/module-6OIHGOL6.js                                     229.22 kB │ gzip:  59.89 kB
+apps/hub build: dist/assets/index-spegg0ya.js                                      237.67 kB │ gzip:  75.48 kB
+apps/hub build: dist/assets/three-_O_pyHV1.js                                      242.61 kB │ gzip:  78.86 kB
+apps/hub build: dist/assets/rendererRelease-cUmKy5z4.js                          1,014.55 kB │ gzip: 273.36 kB
+apps/hub build: 
+apps/hub build: ✓ built in 4.86s
+apps/hub build: Done
+apps/lang-khac-dau build: vite v8.3.3 building client environment for production...
+apps/lang-khac-dau build: transforming...
+apps/lang-khac-dau build: ✓ 1412 modules transformed.
+apps/lang-khac-dau build: rendering chunks...
+apps/lang-khac-dau build: computing gzip size...
+apps/lang-khac-dau build: dist/index.html                                                      0.91 kB │ gzip:   0.42 kB
+apps/lang-khac-dau build: dist/assets/baloo-2-vietnamese-800-normal-ConLnEgt.woff2             4.79 kB
+apps/lang-khac-dau build: dist/assets/baloo-2-vietnamese-700-normal-h4tlcePq.woff2             5.41 kB
+apps/lang-khac-dau build: dist/assets/be-vietnam-pro-vietnamese-400-normal-CRcqvyg1.woff2     11.53 kB
+apps/lang-khac-dau build: dist/assets/be-vietnam-pro-vietnamese-600-normal-nyU-ZL2p.woff2     12.17 kB
+apps/lang-khac-dau build: dist/assets/baloo-2-latin-800-normal-BbF3Etk1.woff2                 18.63 kB
+apps/lang-khac-dau build: dist/assets/baloo-2-latin-700-normal-CqTg7A15.woff2                 19.43 kB
+apps/lang-khac-dau build: dist/assets/be-vietnam-pro-latin-400-normal-PpnXBOrz.woff2          21.16 kB
+apps/lang-khac-dau build: dist/assets/be-vietnam-pro-latin-600-normal-BZDkUTrt.woff2          22.03 kB
+apps/lang-khac-dau build: dist/assets/Man7-C_EHvI81.css                                        0.95 kB │ gzip:   0.48 kB
+apps/lang-khac-dau build: dist/assets/index-CQs-vUpE.css                                      97.02 kB │ gzip:  15.86 kB
+apps/lang-khac-dau build: dist/assets/rng-DPV0JjeY.js                                          0.31 kB │ gzip:   0.23 kB
+apps/lang-khac-dau build: dist/assets/jsx-runtime-NZYk81nU.js                                  0.43 kB │ gzip:   0.30 kB
+apps/lang-khac-dau build: dist/assets/rolldown-runtime-hePW80VL.js                             0.71 kB │ gzip:   0.42 kB
+apps/lang-khac-dau build: dist/assets/Card-CMEh3Kfc.js                                         0.75 kB │ gzip:   0.43 kB
+apps/lang-khac-dau build: dist/assets/nguoi-D0OHaaWH.js                                        0.76 kB │ gzip:   0.50 kB
+apps/lang-khac-dau build: dist/assets/PrivacyPage-BBSBtMX2.js                                  0.80 kB │ gzip:   0.43 kB
+apps/lang-khac-dau build: dist/assets/preload-helper-DjzSQ1t3.js                               1.38 kB │ gzip:   0.75 kB
+apps/lang-khac-dau build: dist/assets/Modal-C4eOlLbC.js                                        1.45 kB │ gzip:   0.78 kB
+apps/lang-khac-dau build: dist/assets/LoginPage-DqYFMjMG.js                                    2.15 kB │ gzip:   1.04 kB
+apps/lang-khac-dau build: dist/assets/RegisterPage-C9PeLalR.js                                 2.45 kB │ gzip:   1.14 kB
+apps/lang-khac-dau build: dist/assets/logic-BMJ0x-j8.js                                        3.00 kB │ gzip:   1.36 kB
+apps/lang-khac-dau build: dist/assets/PortraitFrame-C5qZyreg.js                                3.09 kB │ gzip:   1.38 kB
+apps/lang-khac-dau build: dist/assets/ProfilePage-Dd6bSWQq.js                                  3.11 kB │ gzip:   1.28 kB
+apps/lang-khac-dau build: dist/assets/Button-CJyqPkCv.js                                       4.53 kB │ gzip:   2.10 kB
+apps/lang-khac-dau build: dist/assets/nenTrangTriIcons-DkNB_wn3.js                            10.56 kB │ gzip:   3.33 kB
+apps/lang-khac-dau build: dist/assets/confetti.module-BYDB1iN2.js                             10.57 kB │ gzip:   4.20 kB
+apps/lang-khac-dau build: dist/assets/LessonStage3D-D2DDEMAw.js                               10.80 kB │ gzip:   4.65 kB
+apps/lang-khac-dau build: dist/assets/Man8-C6EJQW2x.js                                        19.32 kB │ gzip:   7.95 kB
+apps/lang-khac-dau build: dist/assets/urls-VWCXtREJ.js                                        22.02 kB │ gzip:   8.36 kB
+apps/lang-khac-dau build: dist/assets/Easy-Bz_9wCHv.js                                        24.58 kB │ gzip:   6.45 kB
+apps/lang-khac-dau build: dist/assets/useQuality-CIWA-BI1.js                                  26.35 kB │ gzip:  10.97 kB
+apps/lang-khac-dau build: dist/assets/Hard-YGC6aR3A.js                                        30.43 kB │ gzip:   7.51 kB
+apps/lang-khac-dau build: dist/assets/store-BiWjk95E.js                                       32.99 kB │ gzip:  12.95 kB
+apps/lang-khac-dau build: dist/assets/Man7-Dk_MTmSa.js                                        38.15 kB │ gzip:  11.83 kB
+apps/lang-khac-dau build: dist/assets/Man9-MTpDcz9y.js                                        40.11 kB │ gzip:  14.20 kB
+apps/lang-khac-dau build: dist/assets/TheGiaoDich-D8_I-cBv.js                                 49.64 kB │ gzip:  14.93 kB
+apps/lang-khac-dau build: dist/assets/ModCalculator-DTa3BCS4.js                               74.64 kB │ gzip:  20.43 kB
+apps/lang-khac-dau build: dist/assets/Medium-D6XsbNKp.js                                      95.79 kB │ gzip:  31.76 kB
+apps/lang-khac-dau build: dist/assets/module-6OIHGOL6.js                                     229.22 kB │ gzip:  59.89 kB
+apps/lang-khac-dau build: dist/assets/index-Bm2MkG9t.js                                      290.87 kB │ gzip:  91.65 kB
+apps/lang-khac-dau build: dist/assets/rendererRelease-C7N8XKn1.js                          1,008.35 kB │ gzip: 271.28 kB
+apps/lang-khac-dau build: 
+apps/lang-khac-dau build: [plugin builtin:vite-reporter] 
+apps/lang-khac-dau build: (!) Some chunks are larger than 500 kB after minification. Consider:
+apps/lang-khac-dau build: - Using dynamic import() to code-split the application
+apps/lang-khac-dau build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+apps/lang-khac-dau build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+apps/lang-khac-dau build: ✓ built in 1.37s
+apps/lang-khac-dau build: Done

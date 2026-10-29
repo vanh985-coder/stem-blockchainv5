@@ -54,7 +54,7 @@ Dự án chỉ dùng Claude Code; `GEMINI.md` đã bỏ, file này là hướng 
 - **Đồ vật động**: `three/DynamicInstances.tsx` (`DynamicModel`, `DynamicBoxes`: InstancedMesh tạo sẵn sức chứa, bật/tắt bản theo lệnh, không cấp phát trong `useFrame`).
 - **Cỡ và va chạm**: `three/modelSizes.ts` (`MODEL_SIZES`: chiều cao thật, `dims`), `three/cho/footprints.ts` (chân tường thật của model làm vật cản; sinh lại: `GEN_FOOTPRINTS=<file.json> pnpm vitest run footprintGen`), `three/collision.ts`. Xem vật cản bằng `?debug=colliders`.
 - **Chữ** `content/`: `ui.ts` (chữ chung), `levels.ts` (12 màn, tên, chữ biển, `status`), `dialogues.ts`, `story.ts`, `characters.ts` (`{phanDien}`, `fmt`), `games.ts`, `villageScene.ts`, `villageIntro.ts`, `huongDan.ts` (Hướng dẫn chơi), `minimap.ts`, `lessons/`. Hướng dẫn chơi thêm phần mới ở CUỐI `GUIDE_SECTIONS` (cờ lưu theo bit).
-- **Tiến độ** `progress/`: `unlock.ts` (mở màn, cổng), `manager.ts`, `merge.ts`, `compact.ts`, các cờ (`knowCards`, `guideFlags`, `villageIntro`...).
+- **Tiến độ** `progress/`: `unlock.ts` (mở màn, cổng; từ P3a cả 4 làng mở từ đầu, màn trong làng vẫn theo thứ tự, Trang Sổ Vàng đếm liền từ làng đầu), `manager.ts`, `merge.ts`, `compact.ts`, các cờ (`knowCards`, `guideFlags`, `villageIntro`...).
 
 ## 7. Làm một game mới theo mẫu màn 2, 3
 1. Thư mục `packages/village-<làng>/src/<game>/`. `<game>Config.ts`: số liệu đúng spec (mốc Đồng/Bạc/Vàng, tim, thời gian) kèm chú thích; số spec chưa nói ghi riêng và báo "tự chọn".

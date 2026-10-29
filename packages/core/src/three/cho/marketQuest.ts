@@ -1,6 +1,6 @@
 /**
  * Nhiệm vụ, cổng mở/khóa và mũi tên chỉ đường ở chợ phiên 3D (spec 04 mục 3 "Cổng làng", "HUD" và mục 5). Hàm thuần, không import three.
- * Cổng mở theo tiến độ: cổng làng thứ k mở khi đã có k Trang Sổ Vàng (làng đầu luôn mở); tài khoản giáo viên mở hết (unlock.ts).
+ * Từ P3a cả 4 cổng mở từ đầu (unlock.ts); nhiệm vụ vẫn gợi ý làng theo số Trang Sổ Vàng nhưng không chặn làng nào.
  */
 import { FESTIVAL_LAUNCHED } from '../../config/festival';
 import { BI_NHAC_HOI_SAP_MO, BI_NHAC_NHIEM, NHIEM_VU, NHIEM_VU_HOI_SAP_MO } from '../../content/dialogues';
@@ -29,14 +29,19 @@ export function clampPages(goldenPages: number): number {
 }
 
 /**
- * Cổng `id` đang mở không: giáo viên mở hết; còn lại theo `villageOpen` (từ `computeUnlock`, theo thứ tự `VILLAGE_ORDER`). Cổng đầu tiên (Làng Giấy)
- * luôn mở.
+ * Cổng `id` đang mở không: giáo viên mở hết; còn lại theo `villageOpen` (từ `computeUnlock`, theo thứ tự `VILLAGE_ORDER`). Từ P3a cả 4 cổng mở từ đầu
+ * (`computeUnlock` trả cả 4 làng mở); thiếu dữ liệu thì coi là mở, chỉ đóng khi `villageOpen` nói rõ `false`.
  */
 export function isGateOpen(id: GateId, villageOpen: readonly boolean[], isTeacher: boolean): boolean {
   if (isTeacher) return true;
   const k = GATE_ORDER.indexOf(id);
-  return k === 0 || villageOpen[k] === true;
+  return villageOpen[k] !== false;
 }
+
+/**
+ * Hiệu ứng "then gỗ và dây đỏ rơi" khi tới cổng làng kế tiếp sau khi nhận Trang Sổ Vàng: tắt từ P3a vì cổng đã mở từ đầu (mã hiệu ứng và cờ `gateOpenSeen` đã lưu được giữ nguyên, không đặt lại tiến độ).
+ */
+export const GATE_OPENING_CEREMONY = false;
 
 /** Trạng thái mở của cả 4 cổng. */
 export function gateStates(villageOpen: readonly boolean[], isTeacher: boolean): Record<GateId, boolean> {

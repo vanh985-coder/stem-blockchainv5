@@ -20,7 +20,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 |---|---|
 | 0–2 | ✅ Xong (mốc 2 chưa deploy) |
 | 3. Nhân rộng | ✅ **Chốt.** Đủ 12 màn, cả 4 làng dựng to, **đã gộp web** (≈2086 test xanh). Việc còn dở dời xuống **cuối mốc 4** |
-| 4. Trau chuốt | **P1a, P1b, P2a, P2b đã xong và kiểm đạt** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
+| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a đã xong và kiểm đạt** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
 
 **⚠️ 15b vẫn chưa làm:** server có thể đang 530, mốc 2 và toàn bộ mốc 3 (≈60 commit, mới nhất `2bd76bf`) chưa push, chưa chạy trên máy thật. Cách làm: khôi phục `cloudflared` + Docker, deploy theo `DEPLOY.md` (h), Cache Rule (i), thử trên điện thoại.
 
@@ -94,6 +94,16 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - Kiểm `scripts/p2b-check.mjs` (bản build có cầu nối đo, 3 cỡ, chuột/chạm giả lập): **410 kiểm đạt**. Đủ 16 thẻ (4 làng × 4); tọa độ từng thẻ so với dữ liệu thật `__world` (sai < 0,01 đơn vị khung, < 0,75 px trên màn hình); một phần/đủ thẻ; chọn làng khác; phông tải muộn (trì hoãn 2,5 s) không lệch; chữ to + giảm chuyển động; nhặt thật rồi tải lại; khách mới không mang thẻ người trước; bản đồ lớn/nhỏ giữ nguyên đạt. 32 ảnh (lớn nhất 162.036 byte) và báo cáo ở `docs/screenshots/p2b/`.
 - `pnpm test --maxWorkers=2`: **2138 pass, 1 skipped**; `pnpm typecheck`, `pnpm check:text` (430 file), `pnpm build` đạt. Bundle hub 2.774.099 byte (trước P2b 2.764.071); chunk lười `VillageScrollMap` 3.594 byte (1.521 gzip). Không sửa dựng 3D nên không đo FPS.
 - Chưa xác minh: thiết bị thật/Safari, **đổi tài khoản Supabase thật (không có khóa ở máy đo; chỉ kiểm khách mới thấy lại 16 thẻ)**, nhặt thẻ bằng nút bàn tay trên cảm ứng, giáo viên; chưa hỏi có ẩn thẻ của làng chưa mở không.
+
+## P3a — vào độc lập cả 4 làng — đã xác minh (29/10/2026)
+
+- **Người code: Claude Code, đọc `CLAUDE.md`, tự commit và push khi 4 lệnh đạt.**
+- Cả 4 cổng làng mở từ đầu cho học sinh đăng nhập và khách (`computeUnlock().villageOpen` luôn true; một nguồn cho cổng ở thế giới, `/ban-do`, URL trực tiếp). Trong làng giữ thứ tự thẻ "Em có biết?" → bài học → game 1 → game 2. Mở cổng không tự hoàn thành màn, không tự nhận thẻ, sao, xu, Trang Sổ Vàng. Giáo viên giữ quyền cũ.
+- Trang Sổ Vàng vẫn theo điều kiện cũ và đếm liền từ Làng Giấy (chơi làng sau trước thì chưa có trang, tới cùng lúc khi làng còn thiếu xong). Cao trào vẫn sau màn 12, chỉ chiếu khi đủ 4 trang (`MiniGameFinale.ready`; **tự chọn**). Hiệu ứng mở cổng tắt (`GATE_OPENING_CEREMONY = false`), tiến độ cũ và cờ `gateOpenSeen` giữ nguyên, không đặt lại dữ liệu.
+- Đã sửa chữ còn đòi xong làng trước (lời Bi, cảnh trao trang, `nhiemVuXong`, `congDong`, truyện số 5, Hướng dẫn chơi); spec 03 mục 6, spec 04 (mục 5, 5b, `/ban-do`), `COT-TRUYEN`, `CLAUDE.md` đã cập nhật.
+- Kiểm `scripts/p3a-check.mjs` (bản build có cầu nối đo, 3 cỡ, chuột/chạm giả lập): **111 kiểm đạt**: khách mới vào cả 4 làng (`/ban-do`, đi bộ qua cổng, URL trực tiếp), thứ tự trong làng và điều kiện thẻ giữ nguyên, làng Bạc xong trước không trao trang và không đổi tiến độ, tiến độ cũ (2 trang, 6 màn) giữ nguyên sau tải lại. 24 ảnh (lớn nhất 164.272 byte), báo cáo ở `docs/screenshots/p3a/`.
+- `pnpm test --maxWorkers=2`: **2147 pass, 1 skipped**; `pnpm typecheck`, `pnpm check:text` (430 file), `pnpm build` đạt. Bundle hub 2.773.527 byte (trước 2.774.099). Không sửa dựng 3D nên không đo FPS.
+- Chưa xác minh: **tài khoản Supabase thật** (không có khóa ở máy đo; chỉ kiểm bằng test và cookie khách, quyền giáo viên chỉ bằng test), thiết bị thật/Safari, joystick cảm ứng, cao trào khi chơi màn 12 trước ở trình duyệt, cảnh trao trang khi các trang tới cùng lúc. Chưa làm nút tự động hoàn thành; chưa sửa nút "?" màn 3.
 
 ## Việc dời từ mốc 3 (làm CUỐI mốc 4, theo thứ tự)
 

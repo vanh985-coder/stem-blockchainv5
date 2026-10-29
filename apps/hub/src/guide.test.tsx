@@ -74,14 +74,15 @@ describe('GuideDialog (Hướng dẫn chơi)', () => {
     expect(html).toContain('Màn 3: Ghép lại cuốn sổ');
     expect(html).not.toContain('role="tab"');
   });
-  it('lời hướng dẫn khớp thế giới mở: cổng mở thì đi thẳng vào (không bấm E), cổng đóng bấm E để nghe lý do, mũi tên dưới chân', () => {
+  it('lời hướng dẫn khớp thế giới mở: cả 4 cổng mở từ đầu (P3a) nên đi thẳng vào (không bấm E), không còn lời về cổng đóng hay giúp làng trước, mũi tên dưới chân', () => {
     const texts = ['di-lai', 'noi-chuyen'].flatMap((id) => (GUIDE_SECTIONS.find((s) => s.id === id)!.trang as readonly GuidePage[]).flatMap((p) => [p.may, p.dt ?? '']));
     const all = texts.join(' | ');
     expect(all).toContain('mũi tên vàng dưới chân');
     expect(all).not.toContain('mũi tên vàng trên đầu');
     expect(all).toContain('đi thẳng qua cổng');
-    expect(all).toContain('bấm E để nghe lý do');
-    expect(all).toContain('bấm nút bàn tay để nghe lý do');
+    expect(all).toContain('Cả bốn cổng làng đều mở');
+    expect(all).not.toContain('nghe lý do');
+    expect(all).not.toMatch(/giúp làng trước|then gỗ|dây đỏ/);
     expect(all).not.toContain('đứng sát cổng và bấm E để vào làng');
   });
   it('id phần không đúng thì mở phần đầu', () => {

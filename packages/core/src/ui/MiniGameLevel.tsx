@@ -47,6 +47,11 @@ export interface MiniGameFinale {
   render: (p: { replay: boolean; onDone: () => void }) => ReactNode;
   /** Chữ nút xem lại ở màn kết quả ("Xem lại cảnh cuối") */
   replayLabel: string;
+  /**
+   * Có chiếu cảnh được không (xét đúng lúc ván kết thúc, SAU khi đã ghi kết quả, và mỗi lần vẽ màn kết quả để hiện nút xem lại). Không có thì luôn được.
+   * Màn 12 dùng để chỉ chiếu cao trào khi đã đủ 4 Trang Sổ Vàng (P3a: các làng chơi không theo thứ tự thì chưa đủ).
+   */
+  ready?: () => boolean;
 }
 
 export interface MiniGameLevelProps {
@@ -138,6 +143,8 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
   }, [stage.kind]);
 
   const finished = useRef(false);
+  const finaleRef = useRef(finale);
+  finaleRef.current = finale;
   const onFinish = useCallback(
     (score: number, parts: readonly ScorePart[] = []) => {
       if (finished.current) return; // chỉ nhận một lần cho mỗi ván
@@ -147,9 +154,10 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
       void saveNow();
       const sum = summarizeGame(score, medals, before);
       const result: ResultStage = { kind: 'result', score: sum.score, medal: sum.medal, newBest: sum.newBest, coins: coinsEarned, parts };
-      setStage(finale?.auto ? { kind: 'finale', result, replay: false } : result);
+      const f = finaleRef.current;
+      setStage(f?.auto && (f.ready?.() ?? true) ? { kind: 'finale', result, replay: false } : result);
     },
-    [levelId, medals, record, saveNow, finale?.auto],
+    [levelId, medals, record, saveNow],
   );
 
   const start = () => {
@@ -274,7 +282,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
               <Button size="lg" variant="secondary" onClick={leave}>
                 {gameUi.veLang}
               </Button>
-              {finale && (
+              {finale && (finale.ready?.() ?? true) && (
                 <Button size="lg" variant="secondary" data-testid="xem-lai-canh-cuoi" onClick={() => setStage({ kind: 'finale', result: stage, replay: true })}>
                   {finale.replayLabel}
                 </Button>
