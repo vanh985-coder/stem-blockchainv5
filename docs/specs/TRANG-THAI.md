@@ -20,7 +20,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 |---|---|
 | 0–2 | ✅ Xong (mốc 2 chưa deploy) |
 | 3. Nhân rộng | ✅ **Chốt.** Đủ 12 màn, cả 4 làng dựng to, **đã gộp web** (≈2086 test xanh). Việc còn dở dời xuống **cuối mốc 4** |
-| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a đã xong và kiểm đạt** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
+| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b đã xong và kiểm đạt (P3b chưa có Supabase thật)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
 
 **⚠️ 15b vẫn chưa làm:** server có thể đang 530, mốc 2 và toàn bộ mốc 3 (≈60 commit, mới nhất `2bd76bf`) chưa push, chưa chạy trên máy thật. Cách làm: khôi phục `cloudflared` + Docker, deploy theo `DEPLOY.md` (h), Cache Rule (i), thử trên điện thoại.
 
@@ -35,8 +35,19 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | P5 | (1) Biển chọn màn trong làng làm thành cột sáng giống cuộn "Em có biết?" (mỗi màn một cột, màu theo trạng thái, giữ chữ tên màn) | 1 |
 | P6 | (3) Sau khi đọc thẻ "Em có biết?": 1 ví dụ ngắn + 1 câu hỏi ABCD (hoặc điền số). Mặc định: trả lời sai vẫn nhận thẻ, hiện giải thích. Claude soạn 16 câu (4 làng × 4 thẻ), chủ dự án duyệt trước khi code | 1–2 |
 | P7 | (11) Làm lại màn 5 thành game đập chuột 2D kiểu Whack-a-Mole (My Talking Tom): lưới hang, chuột thường và chuột câu hỏi (đập trúng thì hiện câu hỏi). Cần ảnh mẫu của chủ dự án. Logic + bot + cảnh + hướng dẫn mới | 3–4 |
+| P8 | **Hướng dẫn focus và làm thử cho cả 12 màn** (yêu cầu đã được chủ dự án duyệt, CHƯA triển khai, xem mục ngay dưới). Làm thành bước riêng SAU KHI chốt thay đổi lối chơi màn 2, 3, 5 (P4, P7) | 2–3 |
 
 Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mốc 3 và hội làng.
+
+### P8 — Hướng dẫn focus và làm thử cho cả 12 màn (đã duyệt, chưa triển khai)
+
+- Làm tối phần còn lại của màn hình, làm nổi vùng cần chú ý, hiện lời nhắc ngắn.
+- Cho học sinh thực hành một tình huống ngắn theo từng bước.
+- Lần đầu vào màn tự hiện; có nút "Bỏ qua"; mở lại được qua "Hướng dẫn chơi".
+- Lượt thử dùng dữ liệu riêng: không mất tim, không chạy giờ của lượt chính, không cộng điểm, không ghi hoàn thành.
+- Hỗ trợ chuột/bàn phím và cảm ứng; "Giảm chuyển động" thì đứng yên.
+- Mọi chữ nằm trong `packages/core/src/content/`.
+- Làm thành bước riêng sau khi chốt thay đổi lối chơi màn 2, 3, 5 (P4, P7). **Không triển khai trong P3b.**
 
 ## P1a — đã xác minh (28/10/2026)
 
@@ -113,6 +124,17 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - Kiểm DOM thật (`scripts/p3a-climax-check.mjs`, bản build có cầu nối đo, tiến độ đầu vào bằng cookie, chơi thật màn 6 và màn 12, 3 cỡ): **120 kiểm đạt**: thứ tự thường (+ tải lại giữa cảnh), màn 12 xong trước rồi làm nốt làng và xem từ màn kết quả hay từ bảng Làng Bạc sau tải lại, nhiều trang (2, 3, 4) cùng lúc: mỗi cảnh trao trang đúng một lần, không chồng, không mất, tải lại không chiếu lại. 27 ảnh (lớn nhất 162.762 byte), báo cáo ở `docs/screenshots/p3a/`.
 - `pnpm test --maxWorkers=2`: **2157 pass, 1 skipped**; `pnpm typecheck`, `pnpm check:text` (431 file), `pnpm build` đạt. Bundle hub 2.774.688 byte (+1.161). Spec 03 mục 6, spec 04, spec 08 "Cảnh cao trào" đã cập nhật.
 - Chưa xác minh: tài khoản Supabase thật, thiết bị thật/Safari, chạm chỉ giả lập (màn 6 ở 360×800 chơi sau khi xoay ngang). **Mục "hướng dẫn focus và làm thử cho cả 12 màn" không có trong bản `TRANG-THAI.md` của nhánh này nên không sửa được; nếu nằm ở bản khác của bạn thì cần thêm lại.** Chưa sửa nút "?" màn 3.
+
+## P3b — nút "Tự hoàn thành" cho đủ 12 màn — đã xác minh bằng bản dev và test, CHƯA có Supabase thật (29/10/2026)
+
+- **Người code: Claude Code, đọc `CLAUDE.md`, tự commit và push khi 4 lệnh đạt.** Không triển khai "Hướng dẫn focus và làm thử" (P8, đã ghi ở bảng ưu tiên và mục P8 phía trên, chưa làm).
+- Nút chỉ cho giáo viên/admin và bản dev; học sinh/khách ở bản phát hành không có nút. Đủ 12 màn (bài học: thanh đầu trang; game: thẻ bắt đầu và hộp "?" giữa ván). Chỉ ghi cờ `auto` (cột `level_progress.auto_completed`, cookie dev `ac`) qua luồng lưu hiện có; không điểm, sao, huy chương, xu; không đổi thành tích thật; bấm lặp không tạo bản ghi trùng; chơi thật sau đó lưu bình thường.
+- **Quy tắc phần thưởng (chốt, không tự trao thêm):** cờ cho đi tiếp theo điều kiện mở màn hiện có; KHÔNG tính Trang Sổ Vàng và KHÔNG mở cao trào (cần hoàn thành thật). Thẻ "Em có biết?" coi như đủ khi bài học đã tự hoàn thành.
+- **Quyền do máy chủ quyết:** migration mới `0003_auto_complete.sql` (**chưa chạy, cần chủ dự án chạy TRƯỚC khi triển khai**): cột, trigger chỉ cho teacher/admin đặt cờ, `class_progress` trả `auto_completed`. Frontend không gửi cờ khi chưa được phép; chỉ gửi cột khi `true`. `pnpm rls:check` có thêm ca (3b), (9), chưa chạy được.
+- Trang giáo viên phân biệt "⏭ Tự hoàn thành" với hoàn thành thật (bảng, CSV, chi tiết, chú thích). Spec 02 (đồng bộ), 03 mục 6, 09 và `CLAUDE.md` đã cập nhật.
+- Kiểm DOM thật (`scripts/p3b-check.mjs`, 3 cỡ): **bản dev 222 kiểm đạt** (đủ 12 màn, bấm lặp, giữa ván, chơi thật sau, đủ 12 màn không trang/xu/cao trào, tải lại); **bản phát hành 42 kiểm đạt** (khách không thấy nút ở 12 màn, cookie giả bị bỏ qua). 30 ảnh (lớn nhất 162.266 byte) ở `docs/screenshots/p3b/`.
+- `pnpm test --maxWorkers=2`: **2185 pass, 1 skipped**; `pnpm typecheck`, `pnpm check:text` (432 file), `pnpm build` đạt. Bundle hub 2.781.350 byte (+6.662).
+- **Chưa xác minh:** tài khoản giáo viên thật và Supabase thật (migration, trigger, `rls:check`, trang giáo viên với dữ liệu thật); kiểm quyền chỉ bằng test; thiết bị thật/Safari.
 
 ## Việc dời từ mốc 3 (làm CUỐI mốc 4, theo thứ tự)
 

@@ -119,6 +119,21 @@ if (bInsErr || bGsErr || !bOwnLp?.length || !bOwnGs?.length) {
   );
 }
 
+// (3b) P3b, cần migration 0003_auto_complete.sql: học sinh KHÔNG đặt được cờ tự hoàn thành (cả khi thêm mới lẫn khi sửa), cờ vẫn false.
+{
+  const ins = await a.client.from('level_progress').insert({ user_id: a.id, level_id: 2, played: false, completed: false, auto_completed: true });
+  const upd = await b.client.from('level_progress').update({ auto_completed: true }).eq('user_id', b.id).eq('level_id', 1);
+  const { data: rows } = await b.client.from('level_progress').select('auto_completed').eq('user_id', b.id).eq('level_id', 1);
+  const { data: aRows } = await a.client.from('level_progress').select('auto_completed').eq('user_id', a.id).eq('level_id', 2);
+  const stillFalse = (rows ?? []).every((r) => r.auto_completed === false) && (aRows ?? []).length === 0;
+  const hasColumn = !/auto_completed/.test(ins.error?.message ?? '') || /Chỉ giáo viên/.test(ins.error?.message ?? '');
+  report(
+    hasColumn && !!ins.error && !!upd.error && stillFalse,
+    '(3b) Học sinh ghi level_progress.auto_completed = true (thêm mới hay sửa) thì bị lỗi, cờ vẫn false',
+    !hasColumn ? 'Chưa chạy migration 0003_auto_complete.sql?' : !ins.error || !upd.error ? 'Lệnh KHÔNG báo lỗi!' : stillFalse ? undefined : 'Cờ đã bị đổi!',
+  );
+}
+
 // ===== Phần giáo viên (bước 12) =====
 const tEnv = {
   aUser: (env.TEST_TEACHER_A_USER ?? '').trim(),
@@ -204,6 +219,15 @@ if (!tEnv.aUser || !tEnv.aPass || !tEnv.bUser || !tEnv.bPass) {
         '(8) Giáo viên A gọi class_progress thấy đúng học sinh vào lớp, class_quiz_stats thấy đúng câu trả lời',
         p.error?.message ?? q.error?.message ?? (!onlyHim ? `class_progress trả về ${ids.size} học sinh` : !quizOk ? 'class_quiz_stats không khớp' : undefined),
       );
+    }
+
+    // (9) P3b: giáo viên đặt được cờ tự hoàn thành cho chính mình; class_progress trả cột auto_completed (cần migration 0003).
+    {
+      const set = await tA.client.from('level_progress').upsert({ user_id: tA.id, level_id: 12, auto_completed: true }, { onConflict: 'user_id,level_id' });
+      const { data: back } = await tA.client.from('level_progress').select('played, completed, stars, best_score, auto_completed').eq('user_id', tA.id).eq('level_id', 12).maybeSingle();
+      const clean = back?.auto_completed === true && back.played === false && back.completed === false && back.best_score === 0 && Object.keys(back.stars ?? {}).length === 0;
+      report(!set.error && clean, '(9) Giáo viên đặt được cờ tự hoàn thành, và cờ không tạo điểm, sao hay hoàn thành thật', set.error?.message ?? (clean ? undefined : 'dữ liệu hàng không như mong đợi'));
+      await tA.client.from('level_progress').delete().eq('user_id', tA.id).eq('level_id', 12);
     }
   } catch (e) {
     if (e.message !== 'stop') report(false, '(giáo viên) Không chạy tiếp được', e.message);

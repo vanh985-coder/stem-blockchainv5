@@ -9,6 +9,11 @@ export interface UnlockInput {
    * Số màn nằm trong 1 đến 12.
    */
   doneLevels: readonly number[];
+  /**
+   * Các màn chỉ có cờ "tự hoàn thành" (P3b), chưa xong thật. Được tính là đã qua để MỞ màn kế trong làng (trạng thái 'done', kèm `auto`), nhưng KHÔNG dùng để trao Trang Sổ Vàng
+   * (trang chỉ tính từ `doneLevels` thật và số đã lưu), nên không tự trao phần thưởng nào. Chỉ truyền khi người dùng được phép (giáo viên/admin, bản dev).
+   */
+  autoLevels?: readonly number[];
   /** Số Trang Sổ Vàng đã lưu (golden_pages). Đã trao thì không bao giờ thu lại. */
   goldenPages?: number;
   /** Tài khoản giáo viên/admin: mở mọi màn (màn 'coming-soon' vẫn không vào được). */
@@ -22,6 +27,8 @@ export interface UnlockInput {
 export interface LevelUnlock {
   id: number;
   state: LevelState;
+  /** true khi state = 'done' chỉ nhờ cờ tự hoàn thành (chưa xong thật): không có điểm, sao hay phần thưởng */
+  auto?: boolean;
   /** Chỉ có khi state = 'locked': số màn cần hoàn thành để mở, hiện "Hoàn thành … để mở". */
   lockedBy?: number;
 }
@@ -46,7 +53,10 @@ export function computeUnlock(input: UnlockInput): UnlockResult {
   const levels = input.levels ?? LEVELS;
   const done = new Set(input.doneLevels);
   const statusOf = (l: LevelDef): LevelStatus => input.statuses?.[l.id] ?? l.status;
+  const autoSet = new Set((input.autoLevels ?? []).filter((id) => !done.has(id)));
+  // `isPassed`: đủ điều kiện nhận Trang Sổ Vàng (chỉ xong thật); `isOpened`: đủ điều kiện mở màn kế (xong thật hoặc tự hoàn thành)
   const isPassed = (l: LevelDef) => statusOf(l) === 'coming-soon' || done.has(l.id);
+  const isOpened = (l: LevelDef) => isPassed(l) || autoSet.has(l.id);
 
   const villages = VILLAGE_ORDER.map((id) => levels.filter((l) => l.lang === id));
 
@@ -64,10 +74,12 @@ export function computeUnlock(input: UnlockInput): UnlockResult {
         out.push({ id: l.id, state: 'coming-soon' });
       } else if (done.has(l.id)) {
         out.push({ id: l.id, state: 'done' });
+      } else if (autoSet.has(l.id)) {
+        out.push({ id: l.id, state: 'done', auto: true });
       } else if (input.isTeacher) {
         out.push({ id: l.id, state: 'open' });
       } else {
-        const blocker = list.slice(0, i).find((p) => !isPassed(p));
+        const blocker = list.slice(0, i).find((p) => !isOpened(p));
         out.push(blocker ? { id: l.id, state: 'locked', lockedBy: blocker.id } : { id: l.id, state: 'open' });
       }
     });

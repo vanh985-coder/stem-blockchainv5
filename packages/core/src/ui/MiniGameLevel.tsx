@@ -13,6 +13,7 @@ import { formatNumber } from '../lib/format';
 import { CLIMAX_LEVEL, climaxPending } from '../progress/climaxState';
 import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
+import { AutoCompleteButton, AutoCompletedPanel } from './AutoComplete';
 import { Button } from './Button';
 import { rich } from './rich';
 import { GuideDialog } from './GuideDialog';
@@ -70,7 +71,7 @@ export interface MiniGameLevelProps {
 }
 
 type ResultStage = { kind: 'result'; score: number; medal: Medal; newBest: boolean; coins: number; parts: readonly ScorePart[] };
-type Stage = { kind: 'card' } | { kind: 'play' } | ResultStage | { kind: 'finale'; result: ResultStage; replay: boolean };
+type Stage = { kind: 'card' } | { kind: 'play' } | { kind: 'auto' } | ResultStage | { kind: 'finale'; result: ResultStage; replay: boolean };
 
 /** Theo dõi tab có đang bị ẩn không (đọc lại khi đổi trạng thái). */
 function useTabHidden(): boolean {
@@ -183,6 +184,19 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
   const best = progress.levels[levelId]?.bestScore ?? 0;
   const moc = fmt(gameUi.cacMoc, { so: medals[0], so2: medals[1], so3: medals[2] });
 
+  // Tự hoàn thành (P3b): ván không còn chạy (khung game đã gỡ nên đồng hồ và vật lý dừng), không chấm điểm, không `record`, không trao thưởng
+  const toAuto = () => {
+    finished.current = true; // một lần `onFinish` trễ của ván cũ không được ghi điểm
+    closeHint();
+    setStage({ kind: 'auto' });
+  };
+  if (stage.kind === 'auto') {
+    return (
+      <div className="mx-auto w-full max-w-xl px-4 py-8">
+        <AutoCompletedPanel levelId={levelId} onPlayReal={start} onNext={next ? () => navigate(`/lang/${next.lang}/man/${next.id}`) : undefined} onLeave={leave} />
+      </div>
+    );
+  }
   if (stage.kind === 'play') {
     // Cầu nối đo kiểm: kết thúc ván với điểm cho trước (mặc định mốc Vàng) qua đúng đường onFinish của khung (ghi tiến độ, màn kết quả, cảnh cuối)
     if (PROBE) Object.assign(window, { __miniFinish: (score?: number) => onFinish(score ?? medals[2]) });
@@ -214,6 +228,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
                 <Button size="md" autoFocus className="min-h-11 whitespace-nowrap" onClick={closeHint}>
                   {gameHints.tiepTuc}
                 </Button>
+                <AutoCompleteButton levelId={levelId} onDone={toAuto} className="min-h-11 whitespace-nowrap" />
               </div>
             </Panel>
           </div>
@@ -343,6 +358,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
           <Button size="lg" variant="secondary" fullWidth className="sm:w-auto" onClick={() => setGuideOpen(true)}>
             {huongDan.nut}
           </Button>
+          <AutoCompleteButton levelId={levelId} onDone={toAuto} className="min-h-12 w-full sm:w-auto" />
           <Button size="lg" fullWidth className="sm:w-auto" onClick={start}>
             {gameUi.batDau}
           </Button>

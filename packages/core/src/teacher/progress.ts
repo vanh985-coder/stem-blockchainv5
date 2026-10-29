@@ -22,6 +22,8 @@ export interface ClassProgressRow {
   /** timestamptz dạng chuỗi ISO */
   updated_at: string | null;
   golden_pages: number | null;
+  /** Cờ tự hoàn thành (migration 0003, P3b); máy chủ cũ chưa có cột thì không có trường này */
+  auto_completed?: boolean | null;
 }
 
 export interface StudentLevel {
@@ -32,6 +34,8 @@ export interface StudentLevel {
   bestScore: number;
   /** mili giây từ 1970; 0 nếu không rõ */
   updatedAt: number;
+  /** Có cờ tự hoàn thành (không điểm, sao, xu): khác với hoàn thành thật */
+  auto: boolean;
 }
 
 export interface StudentRow {
@@ -101,6 +105,7 @@ export function buildProgressTable(rows: readonly ClassProgressRow[]): StudentRo
       stars: cleanStars(r.stars),
       bestScore: clampInt(r.best_score, 0, Number.MAX_SAFE_INTEGER),
       updatedAt: Number.isFinite(updatedAt) ? updatedAt : 0,
+      auto: Boolean(r.auto_completed),
     };
     s.levels[levelId] = level;
     if (level.played || level.completed) {
@@ -115,34 +120,43 @@ export function buildProgressTable(rows: readonly ClassProgressRow[]): StudentRo
 /** Nội dung một ô của bảng tiến độ. */
 export type CellView =
   | { kind: 'empty' }
-  /** Sao của trạm Dễ, Trung bình, Khó (0 đến 3) */
-  | { kind: 'lesson'; stars: [number, number, number] }
+  /** Chỉ có cờ tự hoàn thành, chưa xong thật (P3b): không có sao hay điểm */
+  | { kind: 'auto' }
+  /** Sao của trạm Dễ, Trung bình, Khó (0 đến 3); `auto`: còn có cờ tự hoàn thành dù chưa xong thật */
+  | { kind: 'lesson'; stars: [number, number, number]; auto?: boolean }
   /** medal: 0 chưa có mốc, 1 đồng, 2 bạc, 3 vàng */
-  | { kind: 'game'; medal: number };
+  | { kind: 'game'; medal: number; auto?: boolean };
 
 export function levelCell(def: LevelDef, lv: StudentLevel | undefined): CellView {
   if (!lv) return { kind: 'empty' };
+  // chỉ khi đã xong thật thì cờ tự hoàn thành không còn nghĩa (hoàn thành thật thắng)
+  const realDone = def.kind === 'lesson' ? lv.completed : lv.played || lv.completed;
+  const auto = lv.auto && !realDone ? { auto: true as const } : {};
   if (def.kind === 'lesson') {
     const [de, tb, kho] = STARS_LESSON.map((k) => lv.stars[k] ?? 0);
     const started = lv.played || lv.completed || de + tb + kho > 0;
-    return started ? { kind: 'lesson', stars: [de, tb, kho] } : { kind: 'empty' };
+    if (started) return { kind: 'lesson', stars: [de, tb, kho], ...auto };
+    return lv.auto ? { kind: 'auto' } : { kind: 'empty' };
   }
   const medal = lv.stars.game ?? 0;
-  return lv.played || lv.completed || medal > 0 ? { kind: 'game', medal } : { kind: 'empty' };
+  if (lv.played || lv.completed || medal > 0) return { kind: 'game', medal, ...auto };
+  return lv.auto ? { kind: 'auto' } : { kind: 'empty' };
 }
 
 /** Chữ trong ô, dùng cho cả bảng và file CSV. Ô trống thì trả chuỗi rỗng. */
 export function cellText(cell: CellView): string {
   if (cell.kind === 'empty') return '';
-  if (cell.kind === 'lesson') return cell.stars.map((n) => T.o.sao.replace('{so}', String(n))).join(' ');
+  if (cell.kind === 'auto') return T.o.tuHoanThanh;
+  const suffix = cell.auto ? T.o.kemTuHoanThanh : '';
+  if (cell.kind === 'lesson') return cell.stars.map((n) => T.o.sao.replace('{so}', String(n))).join(' ') + suffix;
   const moc = T.o.moc[cell.medal] ?? '';
-  return moc ? T.o.gameMoc.replace('{moc}', moc) : T.o.game;
+  return (moc ? T.o.gameMoc.replace('{moc}', moc) : T.o.game) + suffix;
 }
 
 /** Bài học xong khi `completed`; game xong khi đã chơi (thắng hay thua đều tính, như spec 03 mục 6). */
 function levelDone(def: LevelDef, lv: StudentLevel | undefined): boolean {
   if (!lv) return false;
-  return def.kind === 'lesson' ? lv.completed : lv.played || lv.completed;
+  return lv.auto || (def.kind === 'lesson' ? lv.completed : lv.played || lv.completed);
 }
 
 /**

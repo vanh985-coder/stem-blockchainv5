@@ -47,6 +47,7 @@ export function StudentDetail({ student, onClose }: { student: StudentRow; onClo
                   ) : (
                     <span className="block text-nau-go-dam">{T.chuaChoi}</span>
                   )}
+                  {lv?.auto && !lv.completed && <span className="block text-nau-go-dam">{T.tuHoanThanh}</span>}
                 </li>
               );
             })}
@@ -67,7 +68,7 @@ export function StudentDetail({ student, onClose }: { student: StudentRow; onClo
                 return (
                   <li key={l.id} className="rounded-[12px] bg-white/70 p-2">
                     <span className="font-semibold">{fmt(l.ten)}</span>:{' '}
-                    {lv && medal ? `${fill(T.diem, { diem: lv.bestScore })} · ${medal}` : T.chuaChoi}
+                    {lv && medal && !(lv.auto && !lv.played) ? `${fill(T.diem, { diem: lv.bestScore })} · ${medal}` : lv?.auto ? T.tuHoanThanh : T.chuaChoi}
                   </li>
                 );
               })}

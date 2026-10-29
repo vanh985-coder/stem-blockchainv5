@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router';
-import { AssetImage, Button, LEVELS, climaxUi, fmt, knowScrollUi, levelById, openLevel, ui, type LevelDef, type LevelState, type LevelUnlock, type Progress } from '@so-chung/core';
+import { AssetImage, Button, LEVELS, autoCompleteUi, climaxUi, fmt, knowScrollUi, levelById, openLevel, ui, type LevelDef, type LevelState, type LevelUnlock, type Progress } from '@so-chung/core';
 
 /** Chữ và hình cho từng trạng thái: phân biệt bằng hình và chữ, không chỉ bằng màu. */
 export const STATE_TEXT: Record<LevelState, string> = {
@@ -116,7 +116,14 @@ export function VillageDetails({
                   <span aria-hidden="true">{STATE_ICON[u.state]}</span>
                   {STATE_TEXT[u.state]}
                 </span>
-                {u.state === 'done' && (
+                {u.state === 'done' && u.auto && (
+                  // P3b: chỉ có cờ tự hoàn thành (giáo viên/bản dev): không có sao hay điểm
+                  <span className="inline-flex items-center gap-1 font-semibold" data-testid="tu-hoan-thanh">
+                    <span aria-hidden="true">⏭</span>
+                    {autoCompleteUi.trangThai}. {autoCompleteUi.khongCoDiem}
+                  </span>
+                )}
+                {u.state === 'done' && !u.auto && (
                   <span className="inline-flex items-center gap-1 font-semibold">
                     <AssetImage path="ui/icons/ngoi-sao" alt="" className="size-6 object-contain" />
                     {fmt(ui.banDo.soSao, stars)}

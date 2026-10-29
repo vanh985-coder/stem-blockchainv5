@@ -11,6 +11,8 @@ export interface LevelRow {
   stars: Stars;
   best_score: number;
   updated_at: string;
+  /** Cột thêm ở migration 0003 (P3b); bảng cũ chưa có thì không có trường này */
+  auto_completed?: boolean;
 }
 
 export interface GameRow {
@@ -33,6 +35,7 @@ export function levelFromRow(row: LevelRow): LevelProgress {
     stars: row.stars && typeof row.stars === 'object' ? row.stars : {},
     bestScore: Number(row.best_score) || 0,
     updatedAt: toMs(row.updated_at),
+    ...(row.auto_completed ? { auto: true as const } : {}),
   };
 }
 
@@ -45,6 +48,8 @@ export function levelToRow(userId: string, levelId: number, lv: LevelProgress) {
     stars: lv.stars,
     best_score: lv.bestScore,
     updated_at: new Date(lv.updatedAt || Date.now()).toISOString(),
+    // chỉ gửi khi true: bảng chưa có cột (chưa chạy migration 0003) và học sinh không bao giờ gửi cờ này; máy chủ chặn người không phải giáo viên/admin (trigger)
+    ...(lv.auto ? { auto_completed: true } : {}),
   };
 }
 
@@ -87,7 +92,7 @@ export const supabaseRemote: RemoteApi = {
   async fetchProgress(userId) {
     const sb = await client();
     const [lv, gs] = await Promise.all([
-      sb.from('level_progress').select('level_id, played, completed, stars, best_score, updated_at').eq('user_id', userId),
+      sb.from('level_progress').select('*').eq('user_id', userId),
       sb.from('game_state').select('golden_pages, coins, data, updated_at').eq('user_id', userId).maybeSingle(),
     ]);
     if (lv.error) throw lv.error;

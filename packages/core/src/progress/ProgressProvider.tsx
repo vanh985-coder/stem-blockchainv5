@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from 'react';
 import { useAuth } from '../auth/AuthProvider';
-import { canSeeTeacherPage } from '../auth/roles';
+import { IS_DEV_BUILD, canSeeTeacherPage, canUseAutoComplete } from '../auth/roles';
 import { ui } from '../content/ui';
 import { Button } from '../ui/Button';
 import { Panel } from '../ui/Panel';
@@ -21,6 +21,10 @@ export interface ProgressState {
   saving: boolean;
   /** Đã kéo xong tiến độ từ máy chủ (chỉ có nghĩa khi đã đăng nhập) */
   synced: boolean;
+  /** Được thấy nút "Tự hoàn thành" (giáo viên/admin, bản dev; P3b) */
+  canAutoComplete: boolean;
+  /** Ghi cờ tự hoàn thành cho một màn (chỉ khi `canAutoComplete`); trả true khi vừa ghi cờ mới. Không điểm, sao, xu hay Trang Sổ Vàng. */
+  autoComplete: (levelId: number) => boolean;
   /** Ghi kết quả một màn; trả số xu vừa nhận */
   record: (levelId: number, result: LevelResult) => { coinsEarned: number };
   /** Xong một màn: đẩy ngay, chờ xong mới cho rời trang */
@@ -65,8 +69,15 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   }, [loading, userId]);
 
   const isTeacher = canSeeTeacherPage(profile?.role);
-  const unlock = useMemo(() => progressManager.unlock(isTeacher), [snap.progress, isTeacher]);
+  const canAutoComplete = canUseAutoComplete(profile?.role, IS_DEV_BUILD);
+  // quyền dùng cờ tự hoàn thành đi theo vai trò hiện tại (đổi thì manager phát lại snapshot nên mở khóa bên dưới tính lại)
+  useEffect(() => {
+    progressManager.setAutoAllowed(canAutoComplete);
+  }, [canAutoComplete]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const unlock = useMemo(() => progressManager.unlock(isTeacher), [snap, isTeacher, canAutoComplete]);
 
+  const autoComplete = useCallback((levelId: number) => progressManager.autoComplete(levelId), []);
   const record = useCallback((levelId: number, result: LevelResult) => progressManager.record(levelId, result), []);
   const saveNow = useCallback(() => progressManager.saveNow(), []);
   const startGuest = useCallback(() => progressManager.startGuest(), []);
@@ -89,6 +100,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       coins: snap.progress.game.coins,
       goldenPages: unlock.goldenPages,
       unlock,
+      canAutoComplete,
+      autoComplete,
       saving: snap.saving,
       synced: snap.synced,
       record,
@@ -123,6 +136,8 @@ const FALLBACK: ProgressState = {
   coins: 0,
   goldenPages: 0,
   unlock: progressManager.unlock(),
+  canAutoComplete: false,
+  autoComplete: () => false,
   saving: false,
   synced: false,
   record: () => ({ coinsEarned: 0 }),

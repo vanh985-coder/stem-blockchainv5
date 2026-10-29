@@ -1,0 +1,338 @@
+[
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "màn 1: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "màn 2: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "màn 3: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "màn 4: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "màn 5: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "màn 6: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "màn 7: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "màn 8: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "màn 9: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "màn 10: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "màn 11: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "màn 12: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "cookie giả có cờ tự hoàn thành cả 12 màn: bị bỏ qua, màn 12 vẫn khóa theo thứ tự",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành",
+  "name": "/ban-do không hiện nhãn \"Tự hoàn thành\" cho khách",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "màn 1: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "màn 2: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "màn 3: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "màn 4: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "màn 5: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "màn 6: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "màn 7: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "màn 8: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "màn 9: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "màn 10: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "màn 11: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "màn 12: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "cookie giả có cờ tự hoàn thành cả 12 màn: bị bỏ qua, màn 12 vẫn khóa theo thứ tự",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành",
+  "name": "/ban-do không hiện nhãn \"Tự hoàn thành\" cho khách",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "màn 1: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "màn 2: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "màn 3: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "màn 4: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "màn 5: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "màn 6: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "màn 7: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "màn 8: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "màn 9: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "màn 10: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "màn 11: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "màn 12: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "cookie giả có cờ tự hoàn thành cả 12 màn: bị bỏ qua, màn 12 vẫn khóa theo thứ tự",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành",
+  "name": "/ban-do không hiện nhãn \"Tự hoàn thành\" cho khách",
+  "ok": true,
+  "detail": ""
+ }
+]

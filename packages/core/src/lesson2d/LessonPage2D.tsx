@@ -11,6 +11,7 @@ import { ui } from '../content/ui';
 import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
 import type { SaveStatus } from '../progress/manager';
+import { AutoCompleteButton, AutoCompletedPanel } from '../ui/AutoComplete';
 import { Button } from '../ui/Button';
 import { NenTrangTri } from '../ui/NenTrangTri';
 import { DialogueBox } from '../ui/DialogueBox';
@@ -67,7 +68,8 @@ type Stage =
   | { kind: 'saving' }
   | { kind: 'outro' }
   | { kind: 'complete' }
-  | { kind: 'award' };
+  | { kind: 'award' }
+  | { kind: 'auto' };
 
 const TEN_TRAM = ui.baiHoc.tram;
 
@@ -322,6 +324,9 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
         )}
       </>
     );
+  } else if (stage.kind === 'auto') {
+    // Tự hoàn thành (P3b): chỉ ghi cờ, không điểm, sao, xu hay Trang Sổ Vàng; muốn học thật thì bấm "Chơi thật"
+    body = <AutoCompletedPanel levelId={levelId} onPlayReal={restart} onNext={nextGame ? () => navigate(`/lang/${villageId}/man/${nextGame.id}`) : undefined} onLeave={goMap} />;
   } else {
     body = content.award ? <GoldenPageScene villageId={villageId} award={content.award} onLeave={goMap} leaveLabel={leaveLabel} /> : null;
   }
@@ -409,6 +414,12 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
                   {ui.baiHoc.emCoBiet}
                 </Button>
                 <IconButton label={ui.baiHoc.emCoBiet} icon="💡" onClick={() => setShowCards(true)} />
+              </>
+            )}
+            {stage.kind !== 'saving' && stage.kind !== 'award' && stage.kind !== 'auto' && stage.kind !== 'outro' && (
+              <>
+                <AutoCompleteButton levelId={levelId} className="max-[480px]:hidden" onDone={() => setStage({ kind: 'auto' })} />
+                <AutoCompleteButton levelId={levelId} variant="icon" className="hidden max-[480px]:grid" onDone={() => setStage({ kind: 'auto' })} />
               </>
             )}
             <Button variant="secondary" size="sm" className="max-[480px]:hidden" disabled={saving} onClick={goMap}>

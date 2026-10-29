@@ -27,7 +27,7 @@ const progressOf = (progress: Progress, mode: ProgressState['mode'] = 'guest'): 
   markGuideSeen: () => {},
   markStoryRead: () => {},
   markGameTipSeen: () => {},
-  markClimaxSeen: () => {},
+  markClimaxSeen: () => {}, canAutoComplete: false, autoComplete: () => false,
 });
 const read = (): Progress => {
   const p = decodeProgress(null);

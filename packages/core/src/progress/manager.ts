@@ -1,7 +1,7 @@
 import { decodePendingMap, decodeProgress, encodePendingMap, encodeProgress } from './compact';
 import { GUEST_COOKIE, PENDING_COOKIE } from './cookies';
 import { mergeProgress, sameGame, sameLevel } from './merge';
-import { recordLevelResult, unlockOf, withGoldenPages, type ProgressOptions } from './record';
+import { autoCompleteLevel, recordLevelResult, unlockOf, withGoldenPages, type ProgressOptions } from './record';
 import { emptyProgress, hasProgress, type GameState, type LevelProgress, type LevelResult, type Progress } from './types';
 import type { UnlockResult } from './unlock';
 import { hasSeenGuide, withGuideSeen } from './guideFlags';
@@ -94,6 +94,8 @@ export class ProgressManager {
   private pendingMerged = false;
   private saving = false;
   private guestPrompt = false;
+  /** Được dùng cờ "tự hoàn thành" (giáo viên/admin, bản dev): quyết định ở ProgressProvider. Chưa được thì cờ bị bỏ qua khi tính mở khóa và KHÔNG đẩy lên máy chủ. */
+  private autoAllowed = false;
   private timer: ReturnType<typeof setTimeout> | null = null;
   private chain: Promise<unknown> = Promise.resolve();
   private snap: Snapshot;
@@ -115,7 +117,33 @@ export class ProgressManager {
     return this.userId;
   }
   unlock(isTeacher = false): UnlockResult {
-    return unlockOf(this.progress, { ...this.opts, isTeacher });
+    return unlockOf(this.progress, { ...this.opts, isTeacher, honorAuto: this.autoAllowed });
+  }
+
+  /** Đặt quyền dùng cờ tự hoàn thành. Vừa được phép thì đẩy lên máy chủ phần cờ đang chờ. Quyền thật do máy chủ quyết (trigger ở migration 0003); đây chỉ để giao diện và việc đẩy dữ liệu. */
+  setAutoAllowed(allowed: boolean): void {
+    if (this.autoAllowed === allowed) return;
+    this.autoAllowed = allowed;
+    this.emit();
+    if (allowed) this.scheduleFlush();
+  }
+  isAutoAllowed(): boolean {
+    return this.autoAllowed;
+  }
+
+  /**
+   * Tự hoàn thành một màn (giáo viên/admin, bản dev): chỉ ghi cờ vào tiến độ qua luồng lưu hiện có (máy ngay, đẩy sau 2 giây). Không điểm, sao, huy chương, xu hay Trang Sổ Vàng.
+   * Không được phép, màn đã xong thật hay đã có cờ thì không làm gì (bấm lặp không tạo thêm). Trả true khi vừa ghi cờ mới.
+   */
+  autoComplete(levelId: number): boolean {
+    if (this.mode === 'loading' || !this.autoAllowed) return false;
+    const next = autoCompleteLevel(this.progress, levelId, this.now(), this.opts);
+    if (next === this.progress) return false;
+    this.progress = next;
+    this.persistLocal();
+    this.emit();
+    this.scheduleFlush();
+    return true;
   }
 
   private makeSnapshot(): Snapshot {
@@ -237,10 +265,14 @@ export class ProgressManager {
     const base = this.remoteCopy;
     if (this.mode !== 'user' || !userId || !this.pulled || !base) return false;
     const snapshot = this.progress;
+    const allowAuto = this.autoAllowed;
+    // Chưa được phép dùng cờ tự hoàn thành (học sinh): không bao giờ đẩy cờ lên máy chủ, và bỏ qua cờ khi so sánh
+    const outgoing = (lv: LevelProgress): LevelProgress => (allowAuto || !lv.auto ? lv : { ...lv, auto: undefined });
     const rows: Array<{ levelId: number; progress: LevelProgress }> = [];
     for (const [idStr, lv] of Object.entries(snapshot.levels)) {
       const id = Number(idStr);
-      if (!sameLevel(lv, base.levels[id])) rows.push({ levelId: id, progress: lv });
+      const out = outgoing(lv);
+      if (!sameLevel(out, allowAuto ? base.levels[id] : base.levels[id] && outgoing(base.levels[id]))) rows.push({ levelId: id, progress: out });
     }
     const gameChanged = !sameGame(snapshot.game, base.game);
     try {

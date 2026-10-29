@@ -20,6 +20,8 @@ export function mergeLevel(a: LevelProgress, b: LevelProgress): LevelProgress {
     stars: maxStars(a.stars, b.stars),
     bestScore: Math.max(a.bestScore, b.bestScore),
     updatedAt: Math.max(a.updatedAt, b.updatedAt),
+    // cờ tự hoàn thành: bên nào có thì có (thành tích thật vẫn lấy max như trên, không bị cờ ghi đè)
+    ...(a.auto || b.auto ? { auto: true as const } : {}),
   };
 }
 
@@ -57,7 +59,7 @@ export function mergeProgress(local: Progress, remote: Progress): Progress {
 /** So hai bản của một màn, bỏ qua updatedAt (dùng để biết có cần đẩy lên server không). */
 export function sameLevel(a: LevelProgress | undefined, b: LevelProgress | undefined): boolean {
   if (!a || !b) return a === b;
-  if (a.played !== b.played || a.completed !== b.completed || a.bestScore !== b.bestScore) return false;
+  if (a.played !== b.played || a.completed !== b.completed || a.bestScore !== b.bestScore || Boolean(a.auto) !== Boolean(b.auto)) return false;
   const keys = new Set([...Object.keys(a.stars), ...Object.keys(b.stars)]) as Set<StarKey>;
   for (const k of keys) if ((a.stars[k] ?? 0) !== (b.stars[k] ?? 0)) return false;
   return true;

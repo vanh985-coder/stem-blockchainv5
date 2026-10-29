@@ -40,6 +40,8 @@ interface CompactShape {
   kc?: number[];
   /** Số bit các game phụ đã nghe lời giới thiệu lần đầu (bước B4, bit số màn − 1, xem gameTips.ts) */
   gt?: number;
+  /** Số bit các màn đã tự hoàn thành (P3b, bit số màn − 1): chỉ giáo viên hay bản dev dùng */
+  ac?: number;
 }
 
 const b = (v: boolean) => (v ? 1 : 0);
@@ -67,7 +69,9 @@ function toShape(p: Progress, levels: readonly LevelDef[]): CompactShape {
   const st = storyMask(p.game.data);
   const kc = knowCardsMask(p.game.data);
   const gt = gameTipMask(p.game.data);
-  return { v: COMPACT_VERSION, lv, gp: p.game.goldenPages, c: p.game.coins, u, ...(vi ? { vi } : {}), ...(vs ? { vs } : {}), ...(gs ? { gs } : {}), ...(go ? { go } : {}), ...(ks ? { ks } : {}), ...(hd ? { hd } : {}), ...(st ? { st } : {}), ...(kc ? { kc } : {}), ...(gt ? { gt } : {}) };
+  let ac = 0;
+  for (const [idStr, l] of Object.entries(p.levels)) if (l.auto && Number(idStr) >= 1 && Number(idStr) <= 12) ac |= 1 << (Number(idStr) - 1);
+  return { v: COMPACT_VERSION, lv, gp: p.game.goldenPages, c: p.game.coins, u, ...(vi ? { vi } : {}), ...(vs ? { vs } : {}), ...(gs ? { gs } : {}), ...(go ? { go } : {}), ...(ks ? { ks } : {}), ...(hd ? { hd } : {}), ...(st ? { st } : {}), ...(kc ? { kc } : {}), ...(gt ? { gt } : {}), ...(ac ? { ac } : {}) };
 }
 
 function fromShape(s: CompactShape, levels: readonly LevelDef[]): Progress {
@@ -83,6 +87,11 @@ function fromShape(s: CompactShape, levels: readonly LevelDef[]): Progress {
       def.kind === 'lesson'
         ? { played, completed, stars: { de: int(arr[2], 3), tb: int(arr[3], 3), kho: int(arr[4], 3) }, bestScore: 0, updatedAt: u }
         : { played, completed, stars: { game: int(arr[2], 3) }, bestScore: int(arr[3]), updatedAt: u };
+  }
+  // cờ tự hoàn thành (P3b): thêm vào màn đã có, hoặc tạo hàng rỗng (không điểm, không sao) cho màn chỉ có cờ
+  for (const def of levels) {
+    if (!(int(s.ac, 0xfff) & (1 << (def.id - 1)))) continue;
+    p.levels[def.id] = { ...(p.levels[def.id] ?? { played: false, completed: false, stars: {}, bestScore: 0, updatedAt: u }), auto: true };
   }
   p.game = { goldenPages: int(s.gp, 4), coins: int(s.c), data: { ...introDataFromMask(s.vi), ...sceneDataFromMask(s.vs), ...goldenDataFromMask(s.gs), ...gateDataFromMask(s.go), ...knowDataFromMask(s.ks), ...guideDataFromMask(s.hd), ...storyDataFromMask(s.st), ...knowCardsDataFromMask(s.kc), ...gameTipDataFromMask(s.gt) }, updatedAt: u };
   return p;
@@ -106,7 +115,7 @@ function parseShape(raw: string | null | undefined): CompactShape | null {
     if (!s || typeof s !== 'object') return null;
     const o = s as Partial<CompactShape>;
     if (o.v !== COMPACT_VERSION || !o.lv || typeof o.lv !== 'object' || Array.isArray(o.lv)) return null;
-    return { v: o.v, lv: o.lv, gp: int(o.gp), c: int(o.c), u: int(o.u), o: typeof o.o === 'string' ? o.o : undefined, vi: int(o.vi, 15), vs: int(o.vs, 15), gs: int(o.gs, 15), go: int(o.go, 15), ks: int(o.ks, 15), hd: int(o.hd, 0x7fffffff), st: int(o.st, 1), kc: Array.isArray(o.kc) ? o.kc.slice(0, 8).map((x) => int(x, 0xffff)) : undefined, gt: int(o.gt, 0x1fff) };
+    return { v: o.v, lv: o.lv, gp: int(o.gp), c: int(o.c), u: int(o.u), o: typeof o.o === 'string' ? o.o : undefined, vi: int(o.vi, 15), vs: int(o.vs, 15), gs: int(o.gs, 15), go: int(o.go, 15), ks: int(o.ks, 15), hd: int(o.hd, 0x7fffffff), st: int(o.st, 1), kc: Array.isArray(o.kc) ? o.kc.slice(0, 8).map((x) => int(x, 0xffff)) : undefined, gt: int(o.gt, 0x1fff), ac: int(o.ac, 0xfff) };
   } catch {
     return null;
   }

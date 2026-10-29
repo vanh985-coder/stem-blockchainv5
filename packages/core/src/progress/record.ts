@@ -5,6 +5,7 @@ import {
   STARS_LESSON,
   STARS_PER_COIN_BATCH,
   emptyLevel,
+  isRealDone,
   type LevelResult,
   type Progress,
   type StarKey,
@@ -66,6 +67,8 @@ export function recordLevelResult(
     stars,
     bestScore: Math.max(old.bestScore, Math.max(0, Math.floor(result.score ?? 0))),
     updatedAt: now,
+    // chơi thật không xóa cờ tự hoàn thành đã có; thành tích thật luôn thắng khi hiển thị (xem isRealDone)
+    ...(old.auto ? { auto: true as const } : {}),
   };
 
   const coinsEarned = newStars * STARS_PER_COIN_BATCH;
@@ -80,6 +83,28 @@ export function recordLevelResult(
   return { progress: withGoldenPages(next, now, opts), coinsEarned };
 }
 
+/**
+ * Hàm thuần: ghi cờ "tự hoàn thành" cho một màn (P3b). Chỉ đặt cờ; KHÔNG tạo điểm, sao, huy chương hay xu, không đổi `played`/`completed`/`stars`/`bestScore`
+ * và không tính Trang Sổ Vàng. Màn đã xong thật hay đã có cờ thì trả nguyên tiến độ cũ (bấm lặp không tạo gì thêm). Màn không hợp lệ thì trả nguyên.
+ */
+export function autoCompleteLevel(progress: Progress, levelId: number, now: number, opts: ProgressOptions = {}): Progress {
+  const levels = opts.levels ?? LEVELS;
+  const kind = kindOf(levelId, levels);
+  if (!kind) return progress;
+  const old = progress.levels[levelId];
+  if (old?.auto || isRealDone(kind, old)) return progress;
+  return { ...progress, levels: { ...progress.levels, [levelId]: { ...(old ?? emptyLevel()), auto: true, updatedAt: now } } };
+}
+
+/** Các màn chỉ có cờ tự hoàn thành (chưa xong thật), để đưa vào computeUnlock. */
+export function autoLevels(progress: Progress, opts: ProgressOptions = {}): number[] {
+  const levels = opts.levels ?? LEVELS;
+  return Object.entries(progress.levels)
+    .filter(([id, lv]) => lv.auto === true && !isRealDone(kindOf(Number(id), levels), lv))
+    .map(([id]) => Number(id))
+    .sort((a, b) => a - b);
+}
+
 /** Các màn đã qua, để đưa vào computeUnlock: bài học khi đủ 3 trạm, game khi đã chơi. */
 export function doneLevels(progress: Progress, opts: ProgressOptions = {}): number[] {
   const levels = opts.levels ?? LEVELS;
@@ -90,9 +115,11 @@ export function doneLevels(progress: Progress, opts: ProgressOptions = {}): numb
 }
 
 /** Tính mở khóa từ tiến độ (kèm Trang Sổ Vàng đã lưu). */
-export function unlockOf(progress: Progress, opts: ProgressOptions & { isTeacher?: boolean } = {}): UnlockResult {
+export function unlockOf(progress: Progress, opts: ProgressOptions & { isTeacher?: boolean; honorAuto?: boolean } = {}): UnlockResult {
   return computeUnlock({
     doneLevels: doneLevels(progress, opts),
+    // cờ tự hoàn thành chỉ có hiệu lực với giáo viên/admin và bản dev (`honorAuto`); khách và học sinh ở bản phát hành bỏ qua cờ này
+    autoLevels: opts.honorAuto ? autoLevels(progress, opts) : [],
     goldenPages: progress.game.goldenPages,
     isTeacher: opts.isTeacher,
     statuses: opts.statuses,

@@ -298,6 +298,9 @@ Chưa kéo về xong thì không đẩy gì lên.
 | `golden_pages` | Lấy giá trị lớn hơn |
 | `coins` | Lấy giá trị lớn hơn (xu chỉ tăng, không có chỗ tiêu; nếu sau này có cửa hàng thì xem lại) |
 | `data` | Lấy bản có `updated_at` mới hơn |
+| `auto_completed` (cờ tự hoàn thành, P3b) | Bên nào có thì có (thành tích thật vẫn lấy theo các dòng trên, cờ không ghi đè) |
+
+**Cờ "tự hoàn thành" (P3b, `supabase/migrations/0003_auto_complete.sql`):** cột `level_progress.auto_completed boolean not null default false`; trigger `protect_auto_completed` chỉ cho vai trò `teacher`/`admin` (qua `my_role()`) đặt hay đổi cờ (`auth.uid()` rỗng, tức sửa từ SQL Editor, được phép như `protect_profile`): học sinh ghi cờ thì máy chủ báo lỗi. Cờ KHÔNG đổi `played`, `completed`, `stars`, `best_score`, không tạo xu hay `golden_pages`. Code: `progress/record.ts` (`autoCompleteLevel`, `autoLevels`), `ProgressManager.autoComplete` đi qua đúng luồng lưu trên (máy ngay, đẩy sau 2 giây); chưa được phép (học sinh/khách ở bản phát hành) thì manager không ghi, không đẩy cờ và bỏ qua cờ khi tính mở khóa. Chỉ gửi `auto_completed` khi `true` (bảng chưa chạy migration vẫn dùng được). Cookie `sc_guest` (chỉ bản dev dùng): trường `ac` là số bit (bit số màn − 1). `pnpm rls:check` có thêm ca (3b) và (9).
 
 **Chơi thử rồi mới đăng nhập:**
 - **Không tự gộp.** Nếu cookie `sc_guest` có tiến độ, hỏi: "Trên máy này có tiến độ chơi thử. Gộp vào tài khoản của em không? Nếu đây không phải tiến độ của em, chọn Không gộp."
