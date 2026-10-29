@@ -162,6 +162,14 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - `pnpm test --maxWorkers=2`: 2207 đạt, 4 bỏ qua (như trước); `pnpm typecheck`, `pnpm check:text`, `pnpm build` đạt. Bundle hub JS 2.787.254 byte sau hoàn thiện (P4b: 2.786.625, +629).
 - **Chưa kiểm:** điện thoại và máy tính bảng thật (kéo thả, chạm, xoay), Safari/iPhone; FPS GL phần mềm không dùng để kết luận hiệu năng thiết bị thật; độ khó thật với học sinh.
 
+## Lời thoại nhân vật xuất Excel — `docs/LOI-THOAI-NHAN-VAT.xlsx` (29/10/2026)
+
+- **Mục đích:** chủ dự án xem toàn bộ lời nhân vật và biết mỗi câu hiện ở làng nào, màn nào, tình huống nào. Rà theo chữ trong `content/` và nơi gọi thật trong mã (`WorldPage.tsx interact()`, `LessonPage2D`, `RebuildGame`, `ClimbGame`, `climaxFlow`, `VillageIntro`…), không chỉ theo spec. Không sửa lời thoại hay logic game.
+- **6 sheet:** `Lời thoại` (164 lượt, đúng 12 cột yêu cầu), `Nhân vật` (tên hiện tại lấy từ `characters.ts`, đổi tên phản diện chỉ sửa `phanDien`), `Biến` (giải thích {ten}, {phanDien}, {nd}… kèm STT dòng dùng), `Chưa dùng` (6), `Không rõ người nói` (6), `Phạm vi` (quy tắc tính, phạm vi chưa xác định, cách tạo lại). Có bộ lọc, cố định hàng tiêu đề, tự xuống dòng, không gộp ô. Câu dùng nhiều nơi có dòng riêng cho từng nơi và ghi "Câu này cũng xuất hiện ở" ở cột File nguồn.
+- **Số liệu:** 164 lượt thoại = 144 lượt của 9 nhân vật có lời (Bi 48, bác An 20, cụ Bình 19, chú Dũng 19, thầy Linh 16, Tí 9, bà cụ 6, chú nông dân 6, cô Chi 1) + 20 lượt "Lời dẫn truyện" (14 ảnh truyện, 4 cảnh mở đầu làng, 2 ảnh truyện ở cao trào). Học sinh và lái buôn không có lời.
+- **Phạm vi chưa xác định:** ảnh truyện 12–14 chỉ chiếu ở `/truyen` (chưa có cảnh kết thúc/hội làng riêng); Làng Bạc không có cảnh trao trang ở làng; lời Tí hiện trong bong bóng chân dung Bi (màn 3) và chú thích "thầy Linh trao Trang Sổ Vàng thứ tư" xếp vào sheet chính kèm ghi chú; các màn game 2, 5, 6, 8, 9, 11 không có lời nhân vật. Thẻ "Em có biết?" chỉ tính khi người dẫn đọc ở giới thiệu làng.
+- **Tạo lại:** `node scripts/export-loi-thoai.mjs` (vitest `scripts/export-loi-thoai.test.mjs` gom chữ từ `content/` ra JSON, rồi `scripts/export-loi-thoai.py` ghi Excel bằng openpyxl). Test bỏ qua khi không có biến `EXPORT_LOI_THOAI`, nên `pnpm test` không bị ảnh hưởng và không ghi file. Khi thêm lời mới cần cập nhật bảng siêu dữ liệu (điều kiện, màn, thứ tự) trong script.
+
 ## Việc dời từ mốc 3 (làm CUỐI mốc 4, theo thứ tự)
 
 1. **15b deploy bản gộp:** `git pull`, `VITE_MERGED=true` trong `deploy/.env`, dựng lại theo `DEPLOY.md` mục (j); kiểm hub 200, 4 địa chỉ làng cũ trả 302 giữ đường dẫn; thử trên điện thoại. Quay về: mục (j) cách 1 hoặc 2.
