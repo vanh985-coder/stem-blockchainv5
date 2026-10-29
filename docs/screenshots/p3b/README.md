@@ -43,7 +43,9 @@ Lưu ý đúng phạm vi: giáo viên/admin thấy mọi màn đã mở nên kh�
 
 **Lỗi tìm thấy và đã sửa khi kiểm:** (1) phản hồi thăm dò đến muộn có thể ghi đè trạng thái "có hỗ trợ" thành "chưa hỗ trợ" sau khi cờ đã lưu (nay chỉ ghi khi còn "chưa biết"; test mới trong `autoComplete.test.ts`); (2) thăm dò treo làm nút bấm treo theo (nay dùng chung một lần thăm dò và chờ tối đa 3 giây rồi cứ ghi, lần đẩy tự phân loại lỗi); (3) ghi chú của nút bị bóp thành cột chữ hẹp (360×800, ở thanh đầu bài học, và còn hiện lặp hai lần) và ở thẻ bắt đầu game 844×390 (nay hiện một chỗ, đủ rộng, dưới thanh đầu / xuống dòng riêng).
 
-Chạy lại sau sửa: `p3b-check.mjs --mode=dev --only=levels,double,mid` **207 kiểm đạt** (3 cỡ). Các kịch bản dev còn lại (`real`, `all12`) và bản phát hành cho khách (`--mode=prod`) không đổi logic và chưa chạy lại.
+Chạy lại sau sửa: `p3b-check.mjs --mode=dev --only=levels,double,mid` **207 kiểm đạt** (3 cỡ).
+
+**Kiểm hồi quy chốt (sau commit 445752a, mã cuối, 3 cỡ):** `--mode=dev --only=real,all12` **15 kiểm đạt** (chơi thật sau tự hoàn thành; đủ 12 màn không trang/xu/cao trào); `--mode=prod` (bản build phát hành, có `VITE_PROBE`, không phải dev) **42 kiểm đạt** (khách không thấy nút ở 12 màn; cookie giả có cờ cả 12 màn bị bỏ qua, màn 12 vẫn khóa, `/ban-do` không hiện "Tự hoàn thành"). Kết quả: `ket-qua-dev-hoi-quy.json`, `ket-qua-prod-hoi-quy.json` (ảnh `dev-*`, `prod-*` được chụp lại). Quyền Supabase thật vẫn CHƯA nghiệm thu.
 
 ## Chưa xác minh
 
