@@ -39,6 +39,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 
 Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mốc 3 và hội làng.
 
+
 ### P8 — Hướng dẫn focus và làm thử cho cả 12 màn (đã duyệt, chưa triển khai)
 
 - Làm tối phần còn lại của màn hình, làm nổi vùng cần chú ý, hiện lời nhắc ngắn.
@@ -48,6 +49,14 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - Hỗ trợ chuột/bàn phím và cảm ứng; "Giảm chuyển động" thì đứng yên.
 - Mọi chữ nằm trong `packages/core/src/content/`.
 - Làm thành bước riêng sau khi chốt thay đổi lối chơi màn 2, 3, 5 (P4, P7). **Không triển khai trong P3b.**
+## Bổ sung đã chốt — hướng dẫn focus và làm thử (29/10/2026)
+
+- Áp dụng cho cả 12 màn: làm tối phần còn lại, làm nổi vùng cần chú ý và hiện lời nhắc ngắn cạnh vùng đó; sau phần giới thiệu, học sinh thực hành một tình huống ngắn theo từng bước rồi mới vào lượt chơi chính thức.
+- Lần đầu chơi tự hiện; có nút "Bỏ qua" và mở lại qua "Hướng dẫn chơi". Bước thực hành chuyển tiếp khi học sinh thực hiện đúng thao tác được yêu cầu.
+- Lượt thử dùng dữ liệu riêng, không mất tim, không chạy đồng hồ lượt chính, không cộng điểm hoặc lưu hoàn thành màn; không làm thay đổi tiến độ thật.
+- Hướng dẫn phù hợp chuột/bàn phím hoặc cảm ứng; bật giảm chuyển động thì vùng làm nổi đứng yên. Mọi chữ nằm trong `packages/core/src/content/`.
+- Chưa triển khai. Là một bước riêng của mốc 4: dựng khung dùng chung rồi tích hợp lần lượt từng màn. Hướng dẫn phải khớp lối chơi cuối sau các thay đổi màn 2, 3 và 5; việc dời từ mốc 3 và hội làng vẫn để cuối mốc 4.
+
 
 ## P1a — đã xác minh (28/10/2026)
 
