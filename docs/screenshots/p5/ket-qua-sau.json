@@ -1,0 +1,475 @@
+{
+ "results": [
+  {
+   "size": "1366x768",
+   "area": "moi/lang-giay",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "1,2,3"
+  },
+  {
+   "size": "1366x768",
+   "area": "moi/lang-giay",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "locked,locked,locked / mong locked,locked,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "moi/lang-giay",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "moi/lang-det",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "4,5,6"
+  },
+  {
+   "size": "1366x768",
+   "area": "moi/lang-det",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "locked,locked,locked / mong locked,locked,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "moi/lang-det",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "moi/lang-khac-dau",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "7,8,9"
+  },
+  {
+   "size": "1366x768",
+   "area": "moi/lang-khac-dau",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "locked,locked,locked / mong locked,locked,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "moi/lang-khac-dau",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "moi/lang-bac",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "10,11,12"
+  },
+  {
+   "size": "1366x768",
+   "area": "moi/lang-bac",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "locked,locked,locked / mong locked,locked,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "moi/lang-bac",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "moi",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan/lang-giay",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "1,2,3"
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan/lang-giay",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,open,locked / mong done,open,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan/lang-giay",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan/lang-det",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "4,5,6"
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan/lang-det",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "open,locked,locked / mong open,locked,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan/lang-det",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan/lang-khac-dau",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "7,8,9"
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan/lang-khac-dau",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "locked,locked,locked / mong locked,locked,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan/lang-khac-dau",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan/lang-bac",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "10,11,12"
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan/lang-bac",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "locked,locked,locked / mong locked,locked,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan/lang-bac",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "mot-phan",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-giay",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "1,2,3"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-giay",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,done,done / mong done,done,done"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-giay",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-det",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "4,5,6"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-det",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,done,done / mong done,done,done"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-det",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-khac-dau",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "7,8,9"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-khac-dau",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,done,done / mong done,done,done"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-khac-dau",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-bac",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "10,11,12"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-bac",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,done,done / mong done,done,done"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh/lang-bac",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "1366x768",
+   "area": "hoan-thanh",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-giay/2",
+   "name": "lời nhắc ghi đúng tên màn \"Đuổi theo\"",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-giay/2",
+   "name": "phím E vào được màn 2",
+   "ok": true,
+   "detail": "http://localhost:5192/lang/lang-giay/man/2"
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-giay/1",
+   "name": "lời nhắc ghi đúng tên màn \"Học cùng bác An\"",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-giay/1",
+   "name": "phím E vào được màn 1",
+   "ok": true,
+   "detail": "http://localhost:5192/lang/lang-giay/man/1"
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-giay/3",
+   "name": "lời nhắc ghi đúng tên màn \"Ghép lại cuốn sổ\"",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-giay/3",
+   "name": "màn khóa báo đúng lý do (/Hoàn thành màn 2/)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-det/4",
+   "name": "lời nhắc ghi đúng tên màn \"Học cùng cụ Bình\"",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-det/4",
+   "name": "phím E vào được màn 4",
+   "ok": true,
+   "detail": "http://localhost:5192/lang/lang-det/man/4"
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-det/6",
+   "name": "lời nhắc ghi đúng tên màn \"Diều đưa sổ\"",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-det/6",
+   "name": "màn khóa báo đúng lý do (/Hoàn thành màn 5/)",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-khac-dau/7",
+   "name": "lời nhắc ghi đúng tên màn \"Học cùng chú Dũng\"",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-khac-dau/7",
+   "name": "màn khóa báo đúng lý do (/tìm đủ thẻ/)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-bac/12",
+   "name": "lời nhắc ghi đúng tên màn \"Leo cây tìm lá giả\"",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tương tác lang-bac/12",
+   "name": "màn khóa báo đúng lý do (/tìm đủ thẻ/)",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "chuyển động thường",
+   "name": "vật nổi của màn đang mở chuyển động",
+   "ok": true,
+   "detail": "[[23.73598000000017,2.9610746062861004],[24.691689999999664,2.7530134757545346]]"
+  },
+  {
+   "size": "1366x768",
+   "area": "giảm chuyển động",
+   "name": "vật nổi và cột sáng đứng yên",
+   "ok": true,
+   "detail": "[[0,2.85],[0,2.85]]"
+  },
+  {
+   "size": "1366x768",
+   "area": "giảm chuyển động",
+   "name": "vẫn thấy đủ 3 cột (dáng khác nhau)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lỗi chạy",
+   "name": "Attempted to use detached Frame 'E7154DC2029D5CDBC4EEBEA600AA754C'.",
+   "ok": false,
+   "detail": ""
+  }
+ ],
+ "shots": [
+  {
+   "file": "sau-moi-lang-giay-1366x768.jpg",
+   "bytes": 135675
+  },
+  {
+   "file": "sau-moi-lang-det-1366x768.jpg",
+   "bytes": 106914
+  },
+  {
+   "file": "sau-moi-lang-khac-dau-1366x768.jpg",
+   "bytes": 96645
+  },
+  {
+   "file": "sau-moi-lang-bac-1366x768.jpg",
+   "bytes": 124007
+  },
+  {
+   "file": "sau-mot-phan-lang-giay-1366x768.jpg",
+   "bytes": 135819
+  },
+  {
+   "file": "sau-mot-phan-lang-det-1366x768.jpg",
+   "bytes": 106850
+  },
+  {
+   "file": "sau-mot-phan-lang-khac-dau-1366x768.jpg",
+   "bytes": 96530
+  },
+  {
+   "file": "sau-mot-phan-lang-bac-1366x768.jpg",
+   "bytes": 124348
+  },
+  {
+   "file": "sau-hoan-thanh-lang-giay-1366x768.jpg",
+   "bytes": 137545
+  },
+  {
+   "file": "sau-hoan-thanh-lang-det-1366x768.jpg",
+   "bytes": 108609
+  },
+  {
+   "file": "sau-hoan-thanh-lang-khac-dau-1366x768.jpg",
+   "bytes": 98098
+  },
+  {
+   "file": "sau-hoan-thanh-lang-bac-1366x768.jpg",
+   "bytes": 125747
+  },
+  {
+   "file": "sau-khoa-bao-ly-do-1366x768.jpg",
+   "bytes": 95655
+  },
+  {
+   "file": "sau-giam-chuyen-dong-lang-giay-1366x768.jpg",
+   "bytes": 136091
+  }
+ ],
+ "metrics": [
+  {
+   "size": "1366x768",
+   "lang": "lang-giay",
+   "fps": 2.4,
+   "p95ms": 916.6,
+   "maxMs": 916.6,
+   "heapMB": 68,
+   "geometries": 82,
+   "textures": 35,
+   "calls": 101,
+   "triangles": 105626
+  }
+ ]
+}

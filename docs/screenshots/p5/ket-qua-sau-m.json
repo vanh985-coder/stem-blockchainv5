@@ -1,0 +1,196 @@
+{
+ "results": [
+  {
+   "size": "360x800",
+   "area": "mot-phan/lang-giay",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "1,2,3"
+  },
+  {
+   "size": "360x800",
+   "area": "mot-phan/lang-giay",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,open,locked / mong done,open,locked"
+  },
+  {
+   "size": "360x800",
+   "area": "mot-phan/lang-giay",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "360x800",
+   "area": "mot-phan/lang-det",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "4,5,6"
+  },
+  {
+   "size": "360x800",
+   "area": "mot-phan/lang-det",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "open,locked,locked / mong open,locked,locked"
+  },
+  {
+   "size": "360x800",
+   "area": "mot-phan/lang-det",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "360x800",
+   "area": "mot-phan",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "chuyển động thường",
+   "name": "vật nổi của màn đang mở chuyển động",
+   "ok": true,
+   "detail": "[[21.448179999999336,2.848018866469735],[22.60386999999984,2.7865749279584477]]"
+  },
+  {
+   "size": "360x800",
+   "area": "giảm chuyển động",
+   "name": "vật nổi và cột sáng đứng yên",
+   "ok": true,
+   "detail": "[[0,2.85],[0,2.85]]"
+  },
+  {
+   "size": "360x800",
+   "area": "giảm chuyển động",
+   "name": "vẫn thấy đủ 3 cột (dáng khác nhau)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "mot-phan/lang-giay",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "1,2,3"
+  },
+  {
+   "size": "844x390",
+   "area": "mot-phan/lang-giay",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "done,open,locked / mong done,open,locked"
+  },
+  {
+   "size": "844x390",
+   "area": "mot-phan/lang-giay",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "844x390",
+   "area": "mot-phan/lang-det",
+   "name": "đủ 3 biển, đúng 3 màn của làng",
+   "ok": true,
+   "detail": "4,5,6"
+  },
+  {
+   "size": "844x390",
+   "area": "mot-phan/lang-det",
+   "name": "dáng cột đúng trạng thái màn",
+   "ok": true,
+   "detail": "open,locked,locked / mong open,locked,locked"
+  },
+  {
+   "size": "844x390",
+   "area": "mot-phan/lang-det",
+   "name": "mỗi biển có cột sáng và vật nổi trong cảnh",
+   "ok": true,
+   "detail": "2,2,2"
+  },
+  {
+   "size": "844x390",
+   "area": "mot-phan",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "chuyển động thường",
+   "name": "vật nổi của màn đang mở chuyển động",
+   "ok": true,
+   "detail": "[[23.23369000000052,2.939574507212483],[24.322600000000023,2.835524352754069]]"
+  },
+  {
+   "size": "844x390",
+   "area": "giảm chuyển động",
+   "name": "vật nổi và cột sáng đứng yên",
+   "ok": true,
+   "detail": "[[0,2.85],[0,2.85]]"
+  },
+  {
+   "size": "844x390",
+   "area": "giảm chuyển động",
+   "name": "vẫn thấy đủ 3 cột (dáng khác nhau)",
+   "ok": true,
+   "detail": ""
+  }
+ ],
+ "shots": [
+  {
+   "file": "sau-m-mot-phan-lang-giay-360x800.jpg",
+   "bytes": 52092
+  },
+  {
+   "file": "sau-m-mot-phan-lang-det-360x800.jpg",
+   "bytes": 34483
+  },
+  {
+   "file": "sau-m-giam-chuyen-dong-lang-giay-360x800.jpg",
+   "bytes": 52093
+  },
+  {
+   "file": "sau-m-mot-phan-lang-giay-844x390.jpg",
+   "bytes": 47652
+  },
+  {
+   "file": "sau-m-mot-phan-lang-det-844x390.jpg",
+   "bytes": 40813
+  },
+  {
+   "file": "sau-m-giam-chuyen-dong-lang-giay-844x390.jpg",
+   "bytes": 47569
+  }
+ ],
+ "metrics": [
+  {
+   "size": "360x800",
+   "lang": "lang-giay",
+   "fps": 5.9,
+   "p95ms": 333.3,
+   "maxMs": 333.3,
+   "heapMB": 68,
+   "geometries": 49,
+   "textures": 56,
+   "calls": 56,
+   "triangles": 67074
+  },
+  {
+   "size": "844x390",
+   "lang": "lang-giay",
+   "fps": 5.7,
+   "p95ms": 200,
+   "maxMs": 233.4,
+   "heapMB": 68.5,
+   "geometries": 85,
+   "textures": 60,
+   "calls": 105,
+   "triangles": 106558
+  }
+ ]
+}

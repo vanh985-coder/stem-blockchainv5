@@ -1,16 +1,34 @@
-import { useEffect, useMemo } from 'react';
-import { BoxGeometry, CanvasTexture, CylinderGeometry, MeshStandardMaterial, PlaneGeometry, SRGBColorSpace } from 'three';
+import { useFrame } from '@react-three/fiber';
+import { useEffect, useMemo, useRef } from 'react';
+import {
+  AdditiveBlending,
+  BoxGeometry,
+  CanvasTexture,
+  CircleGeometry,
+  CylinderGeometry,
+  DoubleSide,
+  MeshBasicMaterial,
+  MeshStandardMaterial,
+  PlaneGeometry,
+  SRGBColorSpace,
+  type BufferGeometry,
+  type Group,
+  type Material,
+} from 'three';
 import { asset } from '../../assets/store';
 import { ui } from '../../content/ui';
+import { PROBE } from '../../lib/dev';
 import type { LevelState } from '../../progress/unlock';
+import { createEmblemGeometry } from './boardEmblems';
+import { EMBLEM_SCALE, EMBLEM_Y, PILLAR, PILLAR_DISC_RADIUS, PILLAR_RADIUS_BASE, PILLAR_RADIUS_TOP, emblemMotion, pillarKindOf, type PillarKind } from './boardPillar';
 import { BOARD_HEIGHT, type VillageBoardDef } from './villageLayout';
 import { boardBadge, type BoardBadge } from './villageQuest';
 
 const W = 512;
 const H = 256;
 
-function badgeText(b: BoardBadge): string | null {
-  return b === 'xong' ? ui.langScene.bienDaXong : b === 'khoa' ? ui.langScene.bienKhoa : b === 'sap' ? ui.langScene.bienSapRaMat2 : null;
+function badgeText(b: BoardBadge | 'mo'): string | null {
+  return b === 'xong' ? ui.langScene.bienDaXong : b === 'khoa' ? ui.langScene.bienKhoa : b === 'sap' ? ui.langScene.bienSapRaMat2 : b === 'mo' ? ui.langScene.bienMo : null;
 }
 
 /** Vẽ mặt trước biển gỗ: nền ván, icon bên trái, chữ (từ content/) bên phải, dải trạng thái; biển khóa hay sắp ra mắt thì tối đi. */
@@ -61,14 +79,14 @@ function paint(c: HTMLCanvasElement, label: string, icon: HTMLImageElement | nul
   const lh = size * 1.1;
   lines.forEach((l, i) => g.fillText(l, 176, H / 2 - ((lines.length - 1) * lh) / 2 + i * lh));
   // dải trạng thái
-  const badge = badgeText(boardBadge(state));
-  const kind = boardBadge(state);
+  const kind: BoardBadge | 'mo' = state === 'open' ? 'mo' : boardBadge(state);
+  const badge = badgeText(kind);
   if (kind === 'khoa' || kind === 'sap') {
     g.fillStyle = 'rgba(40,28,20,0.55)';
     g.fillRect(0, 0, W, H);
   }
   if (badge) {
-    g.fillStyle = kind === 'xong' ? '#3FA34D' : kind === 'khoa' ? '#7A7A7A' : '#C0463A';
+    g.fillStyle = kind === 'xong' ? '#3FA34D' : kind === 'khoa' ? '#7A7A7A' : kind === 'mo' ? '#8A6508' : '#C0463A';
     g.beginPath();
     g.roundRect(W - 190, H - 70, 170, 50, 14);
     g.fill();
@@ -86,12 +104,47 @@ export interface VillageBoardsProps {
   /** Đường dẫn icon (không đuôi, trong manifest) từng màn */
   icons: Readonly<Record<number, string>>;
   states: Readonly<Record<number, LevelState | undefined>>;
+  /** false (Giảm chuyển động) thì vật nổi và cột sáng đứng yên */
+  animate?: boolean;
+}
+
+const KINDS: readonly PillarKind[] = ['open', 'done', 'locked'];
+
+/** Hình học và vật liệu của cột sáng, dùng chung cho mọi biển (cũng dùng để biên dịch trước shader, xem `ZonePrewarm`): mỗi dáng (mở, xong, khóa) một cột, một vầng sáng, một vật nổi. */
+export function createBoardPillarResources() {
+  const beam = {} as Record<PillarKind, BufferGeometry>;
+  const emblem = {} as Record<PillarKind, BufferGeometry>;
+  const beamMat = {} as Record<PillarKind, MeshBasicMaterial>;
+  const discMat = {} as Record<PillarKind, MeshBasicMaterial>;
+  const emblemMat = {} as Record<PillarKind, MeshStandardMaterial>;
+  for (const k of KINDS) {
+    const d = PILLAR[k];
+    beam[k] = new CylinderGeometry(PILLAR_RADIUS_TOP, PILLAR_RADIUS_BASE, d.height, 14, 1, true);
+    emblem[k] = createEmblemGeometry(k);
+    beamMat[k] = new MeshBasicMaterial({ color: d.glow, transparent: true, opacity: d.beam, blending: AdditiveBlending, depthWrite: false, side: DoubleSide, fog: false });
+    discMat[k] = new MeshBasicMaterial({ color: d.glow, transparent: true, opacity: d.disc, blending: AdditiveBlending, depthWrite: false, fog: false });
+    emblemMat[k] = new MeshStandardMaterial({ color: '#FFFFFF', vertexColors: true, emissive: d.emissive, emissiveIntensity: d.emissiveIntensity, roughness: 0.7 });
+  }
+  return { beam, emblem, disc: new CircleGeometry(PILLAR_DISC_RADIUS, 24), beamMat, discMat, emblemMat };
+}
+
+export function disposeBoardPillarResources(r: ReturnType<typeof createBoardPillarResources>): void {
+  r.disc.dispose();
+  for (const k of KINDS) {
+    r.beam[k].dispose();
+    r.emblem[k].dispose();
+    r.beamMat[k].dispose();
+    r.discMat[k].dispose();
+    r.emblemMat[k].dispose();
+  }
 }
 
 /**
- * 3 biển gỗ của làng, do code dựng (spec 03 mục 6): hai cột gỗ và tấm biển có icon, chữ và dải trạng thái (đã xong, khóa, sắp ra mắt) vẽ bằng canvas. Dùng chung cho mọi làng. Rời cảnh thì giải phóng.
+ * 3 biển chọn màn của làng, do code dựng (spec 03 mục 6): tấm biển có icon, chữ tên màn và dải trạng thái (Đã mở, Đã xong, Khóa, Sắp ra mắt) vẽ bằng canvas, dưới một CỘT SÁNG như cuộn "Em có biết?"
+ * (cột mảnh cộng sáng, vầng sáng dưới chân, vật nổi, không bóng đổ, không đèn thật). Dáng khác nhau theo trạng thái, không chỉ khác màu: mở = cuộn giấy vàng trên cột cao 20; xong = vòng tích xanh
+ * trên cột cao 8; khóa hay sắp ra mắt = ổ khóa xám trên cột thấp 2,8 (không che tầm nhìn). Vị trí, vật cản và vùng tương tác của biển giữ nguyên. Dùng chung cho mọi làng. Rời cảnh thì giải phóng.
  */
-export function VillageBoards({ boards, labels, icons, states }: VillageBoardsProps) {
+export function VillageBoards({ boards, labels, icons, states, animate = true }: VillageBoardsProps) {
   const res = useMemo(
     () => ({
       post: new CylinderGeometry(0.09, 0.11, BOARD_HEIGHT, 10),
@@ -102,6 +155,7 @@ export function VillageBoards({ boards, labels, icons, states }: VillageBoardsPr
     }),
     [],
   );
+  const pillar = useMemo(createBoardPillarResources, []);
   const faces = useMemo(
     () =>
       boards.map((b) => {
@@ -121,6 +175,7 @@ export function VillageBoards({ boards, labels, icons, states }: VillageBoardsPr
     },
     [res],
   );
+  useEffect(() => () => disposeBoardPillarResources(pillar), [pillar]);
   useEffect(
     () => () => {
       for (const f of faces) {
@@ -157,16 +212,61 @@ export function VillageBoards({ boards, labels, icons, states }: VillageBoardsPr
     }
   }, [faces, labels, states]);
 
+  const kinds = useMemo(() => boards.map((b) => pillarKindOf(states[b.level])), [boards, states]);
+  useEffect(() => {
+    if (!PROBE) return;
+    const w = window as unknown as { __boardKinds?: Record<number, PillarKind> };
+    w.__boardKinds = { ...(w.__boardKinds ?? {}), ...Object.fromEntries(boards.map((b, i) => [b.level, kinds[i]])) };
+  }, [boards, kinds]);
+
+  // vật nổi chuyển động theo dáng; "Giảm chuyển động" thì đứng yên, hướng thẳng ra phía trước biển
+  const emblems = useRef<(Group | null)[]>([]);
+  const clock = useMemo(() => ({ t: 0 }), []);
+  useEffect(() => {
+    if (animate) return;
+    for (const g of emblems.current) {
+      if (!g) continue;
+      g.rotation.y = 0;
+      g.position.y = EMBLEM_Y;
+    }
+  }, [animate, kinds]);
+  useFrame((_, dt) => {
+    if (!animate) return;
+    clock.t += dt;
+    for (let i = 0; i < kinds.length; i++) {
+      const g = emblems.current[i];
+      if (!g) continue;
+      const m = emblemMotion(kinds[i], clock.t, i);
+      g.rotation.y = m.yaw;
+      g.position.y = EMBLEM_Y + m.bob;
+    }
+    pillar.beamMat.open.opacity = PILLAR.open.beam - 0.01 + Math.sin(clock.t * 1.6) * 0.03;
+  });
+
   return (
     <>
-      {boards.map((b, i) => (
-        <group key={b.level} position={[b.x, 0, b.z]} rotation={[0, b.yaw, 0]}>
-          <mesh geometry={res.post} material={res.wood} position={[-0.7, BOARD_HEIGHT / 2, -0.17]} castShadow />
-          <mesh geometry={res.post} material={res.wood} position={[0.7, BOARD_HEIGHT / 2, -0.17]} castShadow />
-          <mesh geometry={res.plank} material={res.plankMat} position={[0, 1.4, 0]} castShadow />
-          <mesh geometry={res.face} material={faces[i].mat} position={[0, 1.4, 0.065]} />
-        </group>
-      ))}
+      {boards.map((b, i) => {
+        const kind = kinds[i];
+        return (
+          <group key={b.level} position={[b.x, 0, b.z]} rotation={[0, b.yaw, 0]} name={`bien-${b.level}`}>
+            <mesh geometry={res.post} material={res.wood} position={[-0.7, BOARD_HEIGHT / 2, -0.17]} castShadow />
+            <mesh geometry={res.post} material={res.wood} position={[0.7, BOARD_HEIGHT / 2, -0.17]} castShadow />
+            <mesh geometry={res.plank} material={res.plankMat} position={[0, 1.4, 0]} castShadow />
+            <mesh geometry={res.face} material={faces[i].mat} position={[0, 1.4, 0.065]} />
+            <mesh geometry={pillar.disc} material={pillar.discMat[kind] as Material} rotation-x={-Math.PI / 2} position={[0, 0.06, 0]} renderOrder={2} />
+            <mesh geometry={pillar.beam[kind]} material={pillar.beamMat[kind] as Material} position={[0, PILLAR[kind].height / 2, -0.1]} renderOrder={3} />
+            <group
+              ref={(g) => {
+                emblems.current[i] = g;
+              }}
+              position={[0, EMBLEM_Y, -0.1]}
+              scale={EMBLEM_SCALE}
+            >
+              <mesh geometry={pillar.emblem[kind]} material={pillar.emblemMat[kind] as Material} />
+            </group>
+          </group>
+        );
+      })}
     </>
   );
 }

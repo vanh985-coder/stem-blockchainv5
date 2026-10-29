@@ -151,7 +151,7 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
   return (
     <group>
       {stage >= 1 && <MarketProps layout={layout} level={level} cull={{ cell: SCATTER_CELL, maxDistance: PROPS_MAX_DISTANCE[level] }} />}
-      {stage >= 2 && <VillageBoards boards={layout.boards} labels={labels} icons={icons} states={states} />}
+      {stage >= 2 && <VillageBoards boards={layout.boards} labels={labels} icons={icons} states={states} animate={animate} />}
       {stage >= 3 && layout.scrolls && layout.scrolls.length > 0 && <KnowScrolls scrolls={layout.scrolls} collected={collected} animate={animate} />}
       {featureStage > 0 && stage >= 4 && <VillageFeatures props={featureProps} animate={animate} maxDistance={PROPS_MAX_DISTANCE[level]} level={level} />}
       {layout.scatter && scatterKinds.map((k, j) => (stage >= 4 + featureStage + j ? <ScatterProps key={k} scatter={layout.scatter ?? []} level={level} only={k} animate={animate} /> : null))}

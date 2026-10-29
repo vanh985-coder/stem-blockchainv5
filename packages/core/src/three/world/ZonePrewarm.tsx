@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { CHARACTERS } from '../../content/characters';
 import { CRAFT_KINDS, acquireCraftGeometry, craftMaterial, releaseCraftGeometry } from '../cho/MarketProcedural';
 import { createScrollResources } from '../village/KnowScrolls';
+import { createBoardPillarResources } from '../village/VillageBoards';
 import { scatterMaterial, stoneHillMaterial } from '../village/ScatterProps';
 import { acquireTagAtlas, createGear, gearMaterial, readyTagAtlas, releaseTagAtlas, tagDigitMaterial } from '../village/VillageFeatures';
 import { SCATTER_KINDS } from '../village/scatter';
@@ -132,6 +133,11 @@ export function ZonePrewarm({ village, level, onDone }: ZonePrewarmProps) {
       if ((village.layout.scrolls ?? []).length > 0) {
         scrollRes = createScrollResources();
         extras.push({ geometry: scrollRes.scroll, material: scrollRes.scrollMat, plain: true }, { geometry: scrollRes.beam, material: scrollRes.beamMat, plain: true }, { geometry: scrollRes.disc, material: scrollRes.discMat, plain: true });
+      }
+      // cột sáng của biển chọn màn (P5): vật nổi màu theo đỉnh, cột và vầng sáng cộng sáng, mỗi dáng (mở, xong, khóa) một vật liệu; cùng chương trình shader với cuộn Em có biết
+      const pillar = createBoardPillarResources();
+      for (const k of ['open', 'done', 'locked'] as const) {
+        extras.push({ geometry: pillar.emblem[k], material: pillar.emblemMat[k], plain: true }, { geometry: pillar.beam[k], material: pillar.beamMat[k], plain: true }, { geometry: pillar.disc, material: pillar.discMat[k], plain: true });
       }
       await compileAhead(gl, camera, scene, [...crafts, ...extras, ...materialsOf([...loaded.values()].map((d) => d.scene))], isCancelled);
       if (cancelled) return;
