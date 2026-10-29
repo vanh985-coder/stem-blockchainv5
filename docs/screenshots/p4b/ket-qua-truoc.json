@@ -1,0 +1,146 @@
+[
+ {
+  "label": "truoc",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "thẻ giới thiệu giữ sổ hiện khi vào đoạn giữ sổ, đồng hồ chưa chạy",
+  "ok": true,
+  "detail": "Vòng 3: Giữ sổ\n\nTí sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt 90 giây. Em soi công thức, b"
+ },
+ {
+  "label": "truoc",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "đồng hồ lớn (P1a): chữ ≥ 24px, cao ≥ 44px, không đè các thẻ của chuỗi (trang bìa và ô), khay, rổ hay nút \"Soi công thức\"",
+  "ok": true,
+  "detail": "{\"font\":35.4985,\"w\":103.671875,\"h\":44,\"boxes\":[{\"s\":\"[data-testid=\\\"trang-bia\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"o-chuoi-the\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"khay\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"ro-trang-gia\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"nut-soi\\\"]\",\"overlap\":false}],\"text\":\"1:30\"}"
+ },
+ {
+  "label": "truoc",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "hết giờ: bảng \"Hết giờ giữ sổ\" hiện, còn 3 tim, ván xong cả 3 vòng",
+  "ok": true,
+  "detail": "Hết giờ! Em sửa được 11 ô, còn lệch 0 ô. Vòng 3 được 275 điểm. Xem kết quả"
+ },
+ {
+  "label": "truoc",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "chuyển từ ghép sổ sang giữ sổ đúng MỘT lần",
+  "ok": true,
+  "detail": "[[\"play\",0,\"-\",3],[\"roundDone\",0,\"-\",3],[\"villain\",1,\"-\",3],[\"play\",1,\"-\",3],[\"roundDone\",1,\"-\",3],[\"keep\",2,\"idle\",3],[\"keep\",2,\"run\",3],[\"roundDone\",2,\"idle\",3],[\"over\",2,\"idle\",3]]"
+ },
+ {
+  "label": "truoc",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "bản cũ có vòng 3 riêng: chỉ số vòng lớn nhất là 2",
+  "ok": true,
+  "detail": "2"
+ },
+ {
+  "label": "truoc",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "truoc",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "thẻ giới thiệu giữ sổ hiện khi vào đoạn giữ sổ, đồng hồ chưa chạy",
+  "ok": true,
+  "detail": "Vòng 3: Giữ sổ\n\nTí sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt 90 giây. Em soi công thức, b"
+ },
+ {
+  "label": "truoc",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "đồng hồ lớn (P1a): chữ ≥ 24px, cao ≥ 44px, không đè các thẻ của chuỗi (trang bìa và ô), khay, rổ hay nút \"Soi công thức\"",
+  "ok": true,
+  "detail": "{\"font\":24,\"w\":79.828125,\"h\":44,\"boxes\":[{\"s\":\"[data-testid=\\\"trang-bia\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"o-chuoi-the\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"khay\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"ro-trang-gia\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"nut-soi\\\"]\",\"overlap\":false}],\"text\":\"1:30\"}"
+ },
+ {
+  "label": "truoc",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "hết giờ: bảng \"Hết giờ giữ sổ\" hiện, còn 3 tim, ván xong cả 3 vòng",
+  "ok": true,
+  "detail": "Hết giờ! Em sửa được 11 ô, còn lệch 0 ô. Vòng 3 được 275 điểm. Xem kết quả"
+ },
+ {
+  "label": "truoc",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "chuyển từ ghép sổ sang giữ sổ đúng MỘT lần",
+  "ok": true,
+  "detail": "[[\"play\",0,\"-\",3],[\"roundDone\",0,\"-\",3],[\"villain\",1,\"-\",3],[\"play\",1,\"-\",3],[\"roundDone\",1,\"-\",3],[\"keep\",2,\"idle\",3],[\"keep\",2,\"run\",3],[\"roundDone\",2,\"idle\",3],[\"over\",2,\"idle\",3]]"
+ },
+ {
+  "label": "truoc",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "bản cũ có vòng 3 riêng: chỉ số vòng lớn nhất là 2",
+  "ok": true,
+  "detail": "2"
+ },
+ {
+  "label": "truoc",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "truoc",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "thẻ giới thiệu giữ sổ hiện khi vào đoạn giữ sổ, đồng hồ chưa chạy",
+  "ok": true,
+  "detail": "Vòng 3: Giữ sổ\n\nTí sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt 90 giây. Em soi công thức, b"
+ },
+ {
+  "label": "truoc",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "đồng hồ lớn (P1a): chữ ≥ 24px, cao ≥ 44px, không đè các thẻ của chuỗi (trang bìa và ô), khay, rổ hay nút \"Soi công thức\"",
+  "ok": true,
+  "detail": "{\"font\":24,\"w\":79.828125,\"h\":44,\"boxes\":[{\"s\":\"[data-testid=\\\"trang-bia\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"o-chuoi-the\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"khay\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"ro-trang-gia\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"nut-soi\\\"]\",\"overlap\":false}],\"text\":\"1:30\"}"
+ },
+ {
+  "label": "truoc",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "hết giờ: bảng \"Hết giờ giữ sổ\" hiện, còn 3 tim, ván xong cả 3 vòng",
+  "ok": true,
+  "detail": "Hết giờ! Em sửa được 11 ô, còn lệch 0 ô. Vòng 3 được 275 điểm. Xem kết quả"
+ },
+ {
+  "label": "truoc",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "chuyển từ ghép sổ sang giữ sổ đúng MỘT lần",
+  "ok": true,
+  "detail": "[[\"play\",0,\"-\",3],[\"roundDone\",0,\"-\",3],[\"villain\",1,\"-\",3],[\"play\",1,\"-\",3],[\"roundDone\",1,\"-\",3],[\"keep\",2,\"idle\",3],[\"keep\",2,\"run\",3],[\"roundDone\",2,\"idle\",3],[\"over\",2,\"idle\",3]]"
+ },
+ {
+  "label": "truoc",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "bản cũ có vòng 3 riêng: chỉ số vòng lớn nhất là 2",
+  "ok": true,
+  "detail": "2"
+ },
+ {
+  "label": "truoc",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ }
+]

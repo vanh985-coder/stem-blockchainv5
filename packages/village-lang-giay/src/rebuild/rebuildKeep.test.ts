@@ -4,14 +4,17 @@ import { REBUILD_KEEP as K, REBUILD_SPEC as SPEC } from './rebuildConfig';
 import {
   advance,
   beginKeep,
+  binCard,
   binFromSlot,
   binFromTable,
   checkPlacement,
   createRebuild,
   formulaHolds,
+  insertFake,
   keepChainStatus,
   keepHalf,
   keepUnfixed,
+  placeCard,
   placeInSlot,
   rebuildScore,
   scoreParts,
@@ -22,31 +25,47 @@ import {
   type RebuildState,
 } from './rebuildLogic';
 
-/** Ván đã ở vòng 3 (qua hai vòng đầu bằng cách đặt thẳng trạng thái), đồng hồ chưa chạy. */
+/**
+ * Ván đã ở đoạn giữ sổ (cuối vòng 2, P4b), đi đúng đường chính thức: ghép hoàn hảo vòng 1, rồi vòng 2 (trang giả bỏ vào rổ, ghép đủ chuỗi 7 trang) thì tự vào đoạn giữ sổ.
+ * Điểm ghép của hai vòng (100 và 130) đã nằm trong `parts`; đồng hồ giữ sổ chưa chạy.
+ */
 function atKeep(seed: number): RebuildState {
   const s = createRebuild(seed);
-  s.round = 2;
-  s.hearts = SPEC.hearts;
-  // dùng đường chính thức của vòng: advance từ vòng 2 sang 3
-  s.round = 1;
-  s.phase = 'roundDone';
+  const place = (): void => {
+    while (s.phase === 'play') {
+      const c = s.tray.find((x) => checkPlacement(s.chain.length > 0 ? s.chain[s.chain.length - 1].code : s.deal.genesis, x) === 'ok')!;
+      placeCard(s, c.id);
+    }
+  };
+  place();
   advance(s);
+  insertFake(s);
+  binCard(s, s.tray.find((c) => !formulaHolds(c))!.id);
+  place();
   return s;
 }
+
+/** Điểm ghép của hai vòng khi chơi hoàn hảo: 100 + (100 + 30). */
+const GHEP = 230;
+/** Điểm tối đa của đoạn giữ sổ: mỗi lần tráo sửa nhanh được 20 + 5. */
+const KEEP_MAX = swapSchedule().length * (K.fixPoints + K.fastBonus);
+/** Số ô của chuỗi cần giữ: chuỗi vừa ghép ở vòng 2. */
+const SLOTS = SPEC.rounds[1].pages;
 
 function swaps(events: readonly KeepEvent[]): Extract<KeepEvent, { kind: 'swap' }>[] {
   return events.filter((e): e is Extract<KeepEvent, { kind: 'swap' }> => e.kind === 'swap');
 }
 
-describe('lịch tráo: khoảng cách giảm từ 9 giây xuống 6 giây', () => {
-  it('khoảng cách tại giây 0 là 9, giữa vòng 7, hết vòng 6; luôn nằm trong [6, 9] và không tăng', () => {
+describe('lịch tráo: khoảng cách giảm từ 9 giây xuống 6 giây (đoạn giữ sổ 45 giây)', () => {
+  it('khoảng cách tại giây 0 là 9, giữa đoạn 7,5, hết đoạn 6; luôn nằm trong [6, 9] và không tăng', () => {
+    expect(K.seconds).toBe(45);
     expect(swapIntervalAt(0)).toBe(9);
-    expect(swapIntervalAt(45)).toBeCloseTo(7.5, 10);
-    expect(swapIntervalAt(90)).toBe(6);
+    expect(swapIntervalAt(22.5)).toBeCloseTo(7.5, 10);
+    expect(swapIntervalAt(45)).toBe(6);
     expect(swapIntervalAt(-5)).toBe(9);
     expect(swapIntervalAt(500)).toBe(6);
     let prev = Infinity;
-    for (let t = 0; t <= 90; t += 0.5) {
+    for (let t = 0; t <= 45; t += 0.5) {
       const v = swapIntervalAt(t);
       expect(v).toBeGreaterThanOrEqual(6);
       expect(v).toBeLessThanOrEqual(9);
@@ -58,8 +77,8 @@ describe('lịch tráo: khoảng cách giảm từ 9 giây xuống 6 giây', () 
   it('lịch tráo: bắt đầu ở giây 6, các khoảng giảm dần và nằm trong [6, 9], không tráo trong 6 giây cuối', () => {
     const times = swapSchedule();
     expect(times[0]).toBe(6);
-    expect(times.length).toBe(11);
-    expect(times.map((t) => Math.round(t * 10) / 10)).toEqual([6, 14.8, 23.3, 31.5, 39.5, 47.2, 54.6, 61.8, 68.7, 75.4, 81.9]);
+    expect(times.length).toBe(5); // P4b: 5 lần tráo (trước đó, vòng 3 dài 90 giây: 11 lần)
+    expect(times.map((t) => Math.round(t * 10) / 10)).toEqual([6, 14.6, 22.6, 30.1, 37.1]);
     const gaps = times.slice(1).map((t, i) => t - times[i]);
     for (let i = 0; i < gaps.length; i++) {
       expect(gaps[i]).toBeGreaterThanOrEqual(6);
@@ -67,7 +86,7 @@ describe('lịch tráo: khoảng cách giảm từ 9 giây xuống 6 giây', () 
       if (i > 0) expect(gaps[i]).toBeLessThan(gaps[i - 1]);
     }
     expect(gaps[0]).toBeGreaterThan(8);
-    expect(gaps[gaps.length - 1]).toBeLessThan(6.6);
+    expect(gaps[gaps.length - 1]).toBeLessThan(7.2);
     expect(gaps[gaps.length - 1]).toBeGreaterThan(6);
     expect(times[times.length - 1]).toBeLessThanOrEqual(K.seconds - K.noSwapLast);
   });
@@ -103,14 +122,17 @@ describe('lịch tráo: khoảng cách giảm từ 9 giây xuống 6 giây', () 
   });
 });
 
-describe('vòng 3: chuỗi và trang tráo', () => {
-  it('bắt đầu: chuỗi 6 trang thật khớp công thức và mã trước, mã khác nhau; mặt bàn trống; đồng hồ chưa chạy', () => {
+describe('đoạn giữ sổ: chuỗi và trang tráo', () => {
+  it('bắt đầu: chuỗi 7 trang vừa ghép (khớp công thức và mã trước, mã khác nhau); mặt bàn trống; đồng hồ chưa chạy; được hồi đủ tim', () => {
     const s = atKeep(3);
     const k = s.keep!;
     expect(s.phase).toBe('keep');
     expect(k.running).toBe(false);
-    expect(k.slots).toHaveLength(6);
-    expect(new Set([s.deal.genesis, ...k.slots.map((c) => c!.code)]).size).toBe(7);
+    expect(k.slots).toHaveLength(SLOTS);
+    expect(k.slots.map((c) => c!.id)).toEqual(s.chain.map((c) => c.id)); // đúng chuỗi vừa ghép
+    expect(s.hearts).toBe(SPEC.hearts);
+    expect(s.parts).toEqual([{ round: 0, errors: 0, fakeBinned: false, points: 100 }, { round: 1, errors: 0, fakeBinned: true, points: 130 }]);
+    expect(new Set([s.deal.genesis, ...k.slots.map((c) => c!.code)]).size).toBe(SLOTS + 1);
     let tail = s.deal.genesis;
     for (const c of k.slots) {
       expect(checkPlacement(tail, c!)).toBe('ok');
@@ -141,7 +163,7 @@ describe('vòng 3: chuỗi và trang tráo', () => {
         expect(formulaHolds(e.decoy)).toBe(true);
         const codes = [s.deal.genesis, ...real.map((c) => c!.code)];
         expect(codes).not.toContain(e.decoy.prev);
-        for (let i = 0; i < 6; i++) expect(checkPlacement(s.deal.real[i].prev, e.decoy)).toBe('badPrev');
+        for (let i = 0; i < SLOTS; i++) expect(checkPlacement(s.deal.real[i].prev, e.decoy)).toBe('badPrev');
       }
     }
   });
@@ -162,7 +184,7 @@ describe('vòng 3: chuỗi và trang tráo', () => {
     }
   });
 
-  it('đã đủ 3 ô chưa sửa mà đến lượt tráo: không tráo, mất 1 tim; hết 3 tim thì hết ván (vòng 3 vẫn tính điểm các ô đã sửa)', () => {
+  it('đã đủ 3 ô chưa sửa mà đến lượt tráo: không tráo, mất 1 tim (đoạn 45 giây chỉ có 2 lần như vậy nên riêng việc đầy ô không làm hết tim)', () => {
     const s = atKeep(5);
     beginKeep(s);
     const times = swapSchedule();
@@ -177,13 +199,12 @@ describe('vòng 3: chuỗi và trang tráo', () => {
     expect(s.hearts).toBe(2);
     expect(keepUnfixed(s.keep!)).toBe(3);
     expect(noHint(stepKeep(s, times[4] - times[3]))).toEqual([{ kind: 'overflow', at: times[4], heartsLeft: 1 }]);
-    const last = noHint(stepKeep(s, times[5] - times[4]));
-    expect(last).toEqual([{ kind: 'overflow', at: times[5], heartsLeft: 0 }]);
-    expect(s.phase).toBe('over');
-    expect(s.over).toBe('hearts');
-    expect(s.parts.find((p) => p.round === 2)).toMatchObject({ points: 0, keep: { fixed: 0, fast: 0, left: 0 } }); // bước X2b: vẫn có phần vòng 3, 0 điểm, không trừ ô chưa sửa
-    expect(stepKeep(s, 10)).toHaveLength(0);
-    expect(rebuildScore(s)).toBe(0);
+    expect(s.phase).toBe('keep');
+    // hết giờ với 3 ô chưa sửa: −10 mỗi ô, còn 1 tim
+    stepKeep(s, 100);
+    expect(s.phase).toBe('roundDone');
+    expect(s.hearts).toBe(1);
+    expect(s.parts.find((p) => p.keep)).toMatchObject({ round: 1, points: -30, keep: { fixed: 0, fast: 0, left: 3 } });
   });
 
   it('sửa một ô rồi thì tráo tiếp được: sau khi sửa không còn đầy, không mất tim', () => {
@@ -200,7 +221,7 @@ describe('vòng 3: chuỗi và trang tráo', () => {
   });
 });
 
-describe('vòng 3: sửa một ô', () => {
+describe('đoạn giữ sổ: sửa một ô', () => {
   function prepared(seed = 7): { s: RebuildState; e: Extract<KeepEvent, { kind: 'swap' }> } {
     const s = atKeep(seed);
     beginKeep(s);
@@ -282,7 +303,7 @@ describe('vòng 3: sửa một ô', () => {
   });
 });
 
-describe('vòng 3: gợi ý của Bi', () => {
+describe('đoạn giữ sổ: gợi ý của Bi', () => {
   it('quá 10 giây chưa sửa thì Bi gợi ý nửa trái hay nửa phải (đúng nửa chứa ô), chỉ một lần mỗi ô, không chỉ đúng ô', () => {
     const s = atKeep(10);
     beginKeep(s);
@@ -290,12 +311,12 @@ describe('vòng 3: gợi ý của Bi', () => {
     expect(stepKeep(s, 9.9).filter((x) => x.kind === 'hint')).toHaveLength(0); // 9,9 giây sau khi bị tráo
     const hints = stepKeep(s, 0.2).filter((x) => x.kind === 'hint'); // 10,1 giây sau khi bị tráo
     expect(hints).toHaveLength(1);
-    expect(hints[0]).toMatchObject({ kind: 'hint', half: e.slot < 3 ? 'left' : 'right' });
+    expect(hints[0]).toMatchObject({ kind: 'hint', half: e.slot < SLOTS / 2 ? 'left' : 'right' });
     expect(stepKeep(s, 1).filter((x) => x.kind === 'hint')).toHaveLength(0);
     expect(Object.keys(hints[0]).sort()).toEqual(['at', 'half', 'kind']); // không có số ô
   });
 
-  it('sửa trước 10 giây thì không có gợi ý; nửa chuỗi: ô 0 đến 2 trái, 3 đến 5 phải', () => {
+  it('sửa trước 10 giây thì không có gợi ý; nửa chuỗi 7 ô: ô 0 đến 3 trái, 4 đến 6 phải', () => {
     const s = atKeep(11);
     beginKeep(s);
     const e = swaps(stepKeep(s, 6))[0];
@@ -303,11 +324,12 @@ describe('vòng 3: gợi ý của Bi', () => {
     binFromSlot(s, e.slot);
     placeInSlot(s, e.real.id, e.slot);
     expect(stepKeep(s, 5).filter((x) => x.kind === 'hint')).toHaveLength(0);
+    expect([0, 1, 2, 3, 4, 5, 6].map((i) => keepHalf(i, 7))).toEqual(['left', 'left', 'left', 'left', 'right', 'right', 'right']);
     expect([0, 1, 2, 3, 4, 5].map((i) => keepHalf(i, 6))).toEqual(['left', 'left', 'left', 'right', 'right', 'right']);
   });
 });
 
-describe('vòng 3: điểm và hết giờ', () => {
+describe('đoạn giữ sổ: điểm và hết giờ', () => {
   /** Chơi vòng 3: sửa ngay mọi lần tráo, trừ `skip` lần tráo cuối (bỏ mặc). */
   function playLeaving(s: RebuildState, skip: number): void {
     const total = swapSchedule().length;
@@ -323,17 +345,18 @@ describe('vòng 3: điểm và hết giờ', () => {
     }
   }
 
-  it('hết 90 giây: mỗi ô còn lệch −10; điểm vòng = 20 × sửa + 5 × nhanh − 10 × còn lệch; sau đó advance kết thúc ván', () => {
+  it('hết 45 giây: mỗi ô còn lệch −10; điểm đoạn = 20 × sửa + 5 × nhanh − 10 × còn lệch; sau đó advance kết thúc ván', () => {
     const s = atKeep(12);
     const total = swapSchedule().length;
     playLeaving(s, 2);
     expect(s.phase).toBe('roundDone');
-    expect(s.keep!.elapsed).toBe(90);
+    expect(s.keep!.elapsed).toBe(K.seconds);
     expect(s.hearts).toBe(3);
-    const part = s.parts.find((p) => p.round === 2)!;
+    const part = s.parts.find((p) => p.keep)!;
+    expect(part.round).toBe(1);
     expect(part.keep).toEqual({ fixed: total - 2, fast: total - 2, left: 2 });
     expect(part.points).toBe((total - 2) * 25 - 2 * 10);
-    expect(rebuildScore(s)).toBe(205);
+    expect(rebuildScore(s)).toBe(GHEP + (total - 2) * 25 - 20);
     advance(s);
     expect(s.phase).toBe('over');
     expect(s.over).toBe('done');
@@ -352,10 +375,18 @@ describe('vòng 3: điểm và hết giờ', () => {
         if (e.kind === 'timeout') timeout = e;
       }
     }
-    expect(timeout).toEqual({ kind: 'timeout', left: 0, points: 275 });
+    expect(timeout).toEqual({ kind: 'timeout', left: 0, points: KEEP_MAX });
+    expect(KEEP_MAX).toBe(125);
+    expect(rebuildScore(s)).toBe(GHEP + KEEP_MAX); // 355: điểm tối đa của ván
   });
 
-  it('hết tim giữa vòng 3 (bước X2b): ván kết thúc nhưng vẫn tính +20/+5 các ô đã sửa, không trừ −10 cho ô chưa sửa', () => {
+  /** Làm hết tim bằng cách kéo trang thật trên bàn vào rổ (mỗi lần mất 1 tim); cần bàn đang có trang. */
+  function loseAllHearts(s: RebuildState): void {
+    const id = s.tray[0].id;
+    for (let i = 0; i < 3; i++) binFromTable(s, id);
+  }
+
+  it('hết tim giữa đoạn giữ sổ (bước X2b): ván kết thúc nhưng vẫn tính +20/+5 các ô đã sửa, không trừ −10 cho ô chưa sửa', () => {
     const s = atKeep(13);
     beginKeep(s);
     const times = swapSchedule();
@@ -366,33 +397,35 @@ describe('vòng 3: điểm và hết giờ', () => {
     stepKeep(s, 8); // ô thứ hai sửa chậm: +20
     binFromSlot(s, second.slot);
     placeInSlot(s, second.real.id, second.slot);
-    stepKeep(s, 300); // bỏ mặc: đầy 3 ô rồi mất hết tim, còn 3 ô chưa sửa
+    swaps(stepKeep(s, times[2] - times[1] - 8)); // lần tráo thứ ba: bàn có trang, ô chưa sửa
+    expect(keepUnfixed(s.keep!)).toBe(1);
+    loseAllHearts(s); // kéo nhầm trang thật vào rổ ba lần
     expect(s.over).toBe('hearts');
     expect(s.phase).toBe('over');
-    expect(keepUnfixed(s.keep!)).toBe(3);
-    const part = s.parts.find((p) => p.round === 2)!;
+    const part = s.parts.find((p) => p.keep)!;
     expect(part.keep).toEqual({ fixed: 2, fast: 1, left: 0 });
     expect(part.points).toBe(45);
-    expect(rebuildScore(s)).toBe(45);
-    expect(scoreParts(s)).toEqual([
-      { key: 'sua', round: 2, count: 2, points: 40 },
-      { key: 'nhanh', round: 2, count: 1, points: 5 },
+    expect(rebuildScore(s)).toBe(GHEP + 45);
+    expect(scoreParts(s).slice(-2)).toEqual([
+      { key: 'sua', round: 1, count: 2, points: 40 },
+      { key: 'nhanh', round: 1, count: 1, points: 5 },
     ]);
   });
 
-  it('hết tim ở vòng 3 chỉ bị tính một lần: các thao tác sau đó không thêm phần điểm', () => {
+  it('hết tim ở đoạn giữ sổ chỉ bị tính một lần: các thao tác sau đó không thêm phần điểm', () => {
     const s = atKeep(16);
     beginKeep(s);
-    stepKeep(s, 300);
+    stepKeep(s, 6);
+    loseAllHearts(s);
     expect(s.over).toBe('hearts');
-    expect(s.parts.filter((p) => p.round === 2)).toHaveLength(1);
+    expect(s.parts.filter((p) => p.keep)).toHaveLength(1);
     expect(binFromTable(s, 'khong-co')).toEqual({ kind: 'ignored' });
     expect(stepKeep(s, 10)).toHaveLength(0);
-    expect(s.parts.filter((p) => p.round === 2)).toHaveLength(1);
-    expect(s.parts.find((p) => p.round === 2)!.points).toBe(0);
+    expect(s.parts.filter((p) => p.keep)).toHaveLength(1);
+    expect(s.parts.find((p) => p.keep)!.points).toBe(0);
   });
 
-  it('hết tim do kéo nhầm trang thật vào rổ (không phải do đầy ô) cũng tính điểm các ô đã sửa', () => {
+  it('hết tim do kéo nhầm trang thật từ chuỗi vào rổ cũng tính điểm các ô đã sửa', () => {
     const s = atKeep(17);
     beginKeep(s);
     const e = swaps(stepKeep(s, 6))[0];
@@ -401,22 +434,21 @@ describe('vòng 3: điểm và hết giờ', () => {
     const real = s.keep!.slots.findIndex((c) => c);
     for (let i = 0; i < 3; i++) binFromSlot(s, real);
     expect(s.over).toBe('hearts');
-    expect(s.parts.find((p) => p.round === 2)!.points).toBe(25);
+    expect(s.parts.find((p) => p.keep)!.points).toBe(25);
   });
 
-  it('các phần điểm cho màn kết quả cộng đúng bằng điểm ván: dòng sửa, nhanh, còn lệch cùng các vòng 1, 2', () => {
+  it('các phần điểm cho màn kết quả cộng đúng bằng điểm ván: dòng sửa, nhanh, còn lệch cùng các vòng ghép 1, 2', () => {
     const s = atKeep(14);
-    s.parts.push({ round: 0, errors: 0, fakeBinned: false, points: 100 }, { round: 1, errors: 0, fakeBinned: true, points: 130 });
     playLeaving(s, 2);
     const rows = scoreParts(s);
     expect(rows.map((r) => r.key)).toEqual(['vong', 'vong', 'trangGia', 'sua', 'nhanh', 'conLech']);
     expect(rows.slice(3)).toEqual([
-      { key: 'sua', round: 2, count: 9, points: 180 },
-      { key: 'nhanh', round: 2, count: 9, points: 45 },
-      { key: 'conLech', round: 2, count: 2, points: -20 },
+      { key: 'sua', round: 1, count: 3, points: 60 },
+      { key: 'nhanh', round: 1, count: 3, points: 15 },
+      { key: 'conLech', round: 1, count: 2, points: -20 },
     ]);
     expect(rows.reduce((a, r) => a + r.points, 0)).toBe(rebuildScore(s));
-    expect(rebuildScore(s)).toBe(100 + 130 + 205);
+    expect(rebuildScore(s)).toBe(100 + 130 + 55);
   });
 
   it('tất định: cùng seed và cùng thao tác thì cùng các sự kiện, điểm và tim; khác seed thì khác', () => {
@@ -424,7 +456,7 @@ describe('vòng 3: điểm và hết giờ', () => {
       const s = atKeep(seed);
       beginKeep(s);
       const log: string[] = [];
-      for (let i = 0; i < 920 && s.phase === 'keep'; i++) {
+      for (let i = 0; i < 500 && s.phase === 'keep'; i++) {
         for (const e of stepKeep(s, 0.1)) {
           log.push(e.kind === 'swap' ? `swap ${e.slot} ${e.fake.content} ${e.decoy.prev} ${e.decoy.content}` : JSON.stringify(e));
           if (e.kind === 'swap' && e.slot % 2 === 0) {

@@ -14,12 +14,12 @@ import { REBUILD_CODE_MAX, REBUILD_KEEP as KEEP, REBUILD_SPEC as SPEC } from './
 
 /** Kết quả một vòng đã xong, để liệt kê ở màn kết quả; tổng điểm các vòng bằng `rebuildScore`. */
 export interface RoundPart {
-  /** Chỉ số vòng, 0 đến 2 */
+  /** Chỉ số vòng, 0 đến 1 */
   round: number;
   errors: number;
   fakeBinned: boolean;
   points: number;
-  /** Chỉ vòng giữ sổ (vòng 3): số ô sửa xong, số ô sửa nhanh (trong 5 giây), số ô còn chưa sửa khi hết giờ */
+  /** Chỉ đoạn giữ sổ (cuối vòng 2): số ô sửa xong, số ô sửa nhanh (trong 5 giây), số ô còn chưa sửa khi hết giờ */
   keep?: { fixed: number; fast: number; left: number };
 }
 
@@ -40,12 +40,12 @@ export interface Deal {
 }
 
 /**
- * villain: {phanDien} sắp nhét trang giả (vòng 2), chờ `insertFake`; play: đang ghép (vòng 1, 2); keep: vòng giữ sổ 90 giây (vòng 3, chạy bằng `stepKeep`);
- * roundDone: vòng đã xong, chờ `advance`; over: hết ván.
+ * villain: {phanDien} sắp nhét trang giả (vòng 2), chờ `insertFake`; play: đang ghép (vòng 1, 2); keep: đoạn giữ sổ 45 giây ở cuối vòng 2 (chạy bằng `stepKeep`, sau khi chuỗi 7 trang đã ghép xong);
+ * roundDone: vòng (hay đoạn giữ sổ) đã xong, chờ `advance`; over: hết ván.
  */
 export type RebuildPhase = 'villain' | 'play' | 'keep' | 'roundDone' | 'over';
 
-/** Trạng thái riêng của vòng giữ sổ. Mọi chỉ số ô (0 đến 5) tính từ trái sang phải; thời gian tính bằng giây. */
+/** Trạng thái riêng của đoạn giữ sổ. Mọi chỉ số ô (0 đến 6) tính từ trái sang phải; thời gian tính bằng giây. */
 export interface KeepState {
   /** Chưa `beginKeep` thì đồng hồ đứng yên */
   running: boolean;
@@ -68,11 +68,11 @@ export interface KeepState {
 export interface RebuildState {
   seed: number;
   rng: () => number;
-  /** Chỉ số vòng, 0 đến 2 */
+  /** Chỉ số vòng, 0 đến 1 */
   round: number;
   hearts: number;
   phase: RebuildPhase;
-  /** Lý do hết ván: hết tim, hay đã ghép xong cả 3 vòng */
+  /** Lý do hết ván: hết tim, hay đã xong cả 2 vòng (kể cả đoạn giữ sổ) */
   over: null | 'hearts' | 'done';
   deal: Deal;
   /** Các trang đã ghép đúng, theo thứ tự */
@@ -84,7 +84,7 @@ export interface RebuildState {
   fakeBinned: boolean;
   /** Kết quả từng vòng đã xong (vòng đang dở, hoặc dở dang vì hết tim, không được tính điểm) */
   parts: RoundPart[];
-  /** Có ở vòng giữ sổ (vòng 3); lúc đó `tray` là mặt bàn (trang thật bị ném ra và trang mồi) */
+  /** Có ở đoạn giữ sổ (cuối vòng 2); lúc đó `tray` là mặt bàn (trang thật bị ném ra và trang mồi) */
   keep: KeepState | null;
 }
 
@@ -204,15 +204,19 @@ function startRound(s: RebuildState): void {
   s.errors = 0;
   s.fakeBinned = false;
   s.keep = null;
-  if (r.keep) {
-    // vòng giữ sổ: chuỗi có đủ 6 trang đúng ngay từ đầu, mặt bàn trống; vào vòng 3 được hồi đủ tim (bước X3)
-    s.hearts = SPEC.hearts;
-    s.tray = [];
-    s.keep = newKeep(s.deal);
-    s.phase = 'keep';
-    return;
-  }
   s.phase = r.fake ? 'villain' : 'play';
+}
+
+/**
+ * Vào đoạn giữ sổ (P4b): chuỗi vừa ghép xong ở vòng 2 (7 trang đúng) trở thành chuỗi cần giữ, mặt bàn trống, được hồi đủ tim (bước X3); đồng hồ chưa chạy tới `beginKeep`.
+ * Điểm ghép của vòng 2 đã được ghi trước đó và không đổi.
+ */
+function enterKeep(s: RebuildState): void {
+  s.hearts = SPEC.hearts;
+  s.errors = 0;
+  s.tray = [];
+  s.keep = newKeep(s.deal);
+  s.phase = 'keep';
 }
 
 export function createRebuild(seed: number): RebuildState {
@@ -278,8 +282,8 @@ function addError(s: RebuildState): void {
 }
 
 export type PlaceResult =
-  /** Thẻ khớp, vào chuỗi; `roundDone` khi chuỗi đã đủ */
-  | { kind: 'ok'; roundDone: boolean }
+  /** Thẻ khớp, vào chuỗi; `roundDone` khi chuỗi đã đủ; `keep` khi chuỗi đủ rồi thì vào đoạn giữ sổ (cuối vòng 2) thay vì dừng ở bảng "vòng xong" */
+  | { kind: 'ok'; roundDone: boolean; keep?: true }
   /** Mã trang trước không khớp: thẻ bật về chỗ cũ, mất 1 tim */
   | { kind: 'badPrev'; heartsLeft: number }
   /** Trang giả: Bi báo "Trang giả của {phanDien}!", thẻ bật ra, mất 1 tim */
@@ -299,8 +303,12 @@ export function placeCard(s: RebuildState, cardId: string): PlaceResult {
     s.chain.push(card);
     const roundDone = s.chain.length === s.deal.real.length;
     if (roundDone) {
-      s.phase = 'roundDone';
       s.parts.push({ round: s.round, errors: s.errors, fakeBinned: s.fakeBinned, points: roundScore(s.errors, s.fakeBinned) });
+      if (SPEC.rounds[s.round].keep) {
+        enterKeep(s);
+        return { kind: 'ok', roundDone, keep: true };
+      }
+      s.phase = 'roundDone';
     }
     return { kind: 'ok', roundDone };
   }
@@ -330,7 +338,7 @@ export function binCard(s: RebuildState, cardId: string): BinResult {
   return { kind: 'binned', bonus: SPEC.fakeBonus };
 }
 
-/** Sang vòng kế tiếp (hoặc kết thúc ván sau vòng 3). Chỉ có tác dụng khi `phase` là 'roundDone'. */
+/** Sang vòng kế tiếp (hoặc kết thúc ván sau vòng 2 và đoạn giữ sổ). Chỉ có tác dụng khi `phase` là 'roundDone'. */
 export function advance(s: RebuildState): void {
   if (s.phase !== 'roundDone') return;
   if (s.round >= SPEC.rounds.length - 1) {
@@ -359,9 +367,9 @@ export function inspectionLine(card: Pick<Card, 'prev' | 'content' | 'code'>): I
  * Vòng dở dang (hết tim) không có dòng nào.
  */
 export interface ScorePartRow {
-  /** vong, trangGia: vòng 1 và 2; sua, nhanh, conLech: vòng giữ sổ (vòng 3) */
+  /** vong, trangGia: ghép sổ (vòng 1 và 2); sua, nhanh, conLech: đoạn giữ sổ (cuối vòng 2) */
   key: 'vong' | 'trangGia' | 'sua' | 'nhanh' | 'conLech';
-  /** Chỉ số vòng, 0 đến 2 */
+  /** Chỉ số vòng, 0 đến 1 */
   round: number;
   /** vong: số lần sai; trangGia: 1; sua: số ô sửa xong; nhanh: số ô sửa nhanh; conLech: số ô còn lệch khi hết giờ */
   count: number;
@@ -384,19 +392,19 @@ export function scoreParts(s: Pick<RebuildState, 'parts'>): ScorePartRow[] {
 }
 
 // ---------------------------------------------------------------------------
-// Vòng 3: giữ sổ 90 giây (bước X2)
+// Đoạn giữ sổ (bước X2 là vòng 3 dài 90 giây; P4b: cuối vòng 2, 45 giây)
 //
-// Chuỗi 6 trang đúng. {phanDien} liên tục chạy vào tráo một trang thật thành trang giả (trang thật bị ném ra bàn, kèm 1 trang mồi); khoảng cách giữa hai lần tráo giảm dần
+// Chuỗi 7 trang đúng vừa ghép xong ở vòng 2. {phanDien} liên tục chạy vào tráo một trang thật thành trang giả (trang thật bị ném ra bàn, kèm 1 trang mồi); khoảng cách giữa hai lần tráo giảm dần
 // từ 9 xuống 6 giây. Trang giả GIỮ NGUYÊN mã trang và mã trang trước của trang thật (nên các mối nối vẫn khớp, không lộ ô nào bị tráo) nhưng đổi nội dung, mà mã trang
 // là hàm một-một của nội dung khi đã biết mã trước, nên trang giả luôn sai công thức. Học sinh sửa một ô = kéo trang giả vào rổ + kéo đúng trang thật vào ô trống đó.
 
-/** Khoảng cách giữa hai lần tráo tại thời điểm `t` (giây): 9 ở giây 0, giảm tuyến tính tới 6 ở hết vòng, không ra ngoài [6, 9]. */
+/** Khoảng cách giữa hai lần tráo tại thời điểm `t` (giây): 9 ở giây 0, giảm tuyến tính tới 6 ở hết đoạn giữ sổ, không ra ngoài [6, 9]. */
 export function swapIntervalAt(t: number): number {
   const k = Math.min(1, Math.max(0, t / KEEP.seconds));
   return KEEP.intervalStart + (KEEP.intervalEnd - KEEP.intervalStart) * k;
 }
 
-/** Các thời điểm tráo của một vòng, nếu không bị chặn (lần đầu ở `firstSwapAt`, rồi cộng khoảng cách tại thời điểm đó), bỏ những lần rơi vào `noSwapLast` giây cuối. */
+/** Các thời điểm tráo của đoạn giữ sổ, nếu không bị chặn (lần đầu ở `firstSwapAt`, rồi cộng khoảng cách tại thời điểm đó), bỏ những lần rơi vào `noSwapLast` giây cuối. */
 export function swapSchedule(): number[] {
   const times: number[] = [];
   for (let t: number = KEEP.firstSwapAt; t <= KEEP.seconds - KEEP.noSwapLast; t += swapIntervalAt(t)) times.push(t);
@@ -419,7 +427,7 @@ function newKeep(deal: Deal): KeepState {
   };
 }
 
-/** Bắt đầu chạy đồng hồ 90 giây (gọi khi thẻ "Vòng 3" đã đóng). */
+/** Bắt đầu chạy đồng hồ đoạn giữ sổ (gọi khi thẻ giới thiệu "Giữ sổ" đã đóng). */
 export function beginKeep(s: RebuildState): void {
   if (s.phase === 'keep' && s.keep) s.keep.running = true;
 }
@@ -431,17 +439,17 @@ export function keepUnfixed(k: Pick<KeepState, 'swappedAt'>): number {
   return n;
 }
 
-/** Thanh trạng thái của chuỗi: "đúng" khi cả 6 ô đều là trang thật, ngược lại "lệch". Không chỉ ra ô nào lệch. */
+/** Thanh trạng thái của chuỗi: "đúng" khi mọi ô đều là trang thật, ngược lại "lệch". Không chỉ ra ô nào lệch. */
 export function keepChainStatus(k: Pick<KeepState, 'swappedAt'>): 'dung' | 'lech' {
   return keepUnfixed(k) === 0 ? 'dung' : 'lech';
 }
 
-/** Số giây còn lại của vòng (không âm). */
+/** Số giây còn lại của đoạn giữ sổ (không âm). */
 export function keepTimeLeft(k: Pick<KeepState, 'elapsed'>): number {
   return Math.max(0, KEEP.seconds - k.elapsed);
 }
 
-/** Nửa của chuỗi chứa ô `slot`: 3 ô đầu là nửa trái, 3 ô sau là nửa phải. */
+/** Nửa của chuỗi chứa ô `slot`: nửa đầu (slot < pages / 2: 4 ô đầu khi có 7 trang) là nửa trái, còn lại là nửa phải. */
 export function keepHalf(slot: number, pages: number): 'left' | 'right' {
   return slot < pages / 2 ? 'left' : 'right';
 }
@@ -468,7 +476,7 @@ export type KeepEvent =
   | { kind: 'overflow'; at: number; heartsLeft: number }
   /** Một ô để quá 10 giây chưa sửa: Bi gợi ý nửa trái hay phải của chuỗi */
   | { kind: 'hint'; half: 'left' | 'right'; at: number }
-  /** Hết 90 giây */
+  /** Hết giờ của đoạn giữ sổ */
   | { kind: 'timeout'; left: number; points: number };
 
 const NO_EVENTS: readonly KeepEvent[] = [];
@@ -488,7 +496,7 @@ function finishKeep(s: RebuildState, k: KeepState): KeepEvent {
 }
 
 /**
- * Chạy đồng hồ vòng giữ sổ thêm `dt` giây: tráo khi đến giờ (xử lý đúng thứ tự thời gian, dù `dt` lớn), gợi ý khi có ô để quá 10 giây, và kết thúc vòng ở giây 90.
+ * Chạy đồng hồ đoạn giữ sổ thêm `dt` giây: tráo khi đến giờ (xử lý đúng thứ tự thời gian, dù `dt` lớn), gợi ý khi có ô để quá 10 giây, và kết thúc đoạn giữ sổ khi hết giờ (`KEEP.seconds`).
  * Trả về các sự kiện xảy ra trong bước này (mảng rỗng dùng chung nếu không có gì, để màn chơi không tạo object mới mỗi khung hình).
  */
 export function stepKeep(s: RebuildState, dt: number): readonly KeepEvent[] {
@@ -518,8 +526,8 @@ export function stepKeep(s: RebuildState, dt: number): readonly KeepEvent[] {
     const slot = candidates[randInt(0, candidates.length - 1, s.rng)];
     const real = k.slots[slot] as Card;
     k.swapCount++;
-    const fake = makeFakeOf(real, s.rng, `r3-fake-${k.swapCount}`);
-    const decoy = makeDecoy(s.deal, s.rng, `r3-decoy-${k.swapCount}`);
+    const fake = makeFakeOf(real, s.rng, `keep-fake-${k.swapCount}`);
+    const decoy = makeDecoy(s.deal, s.rng, `keep-decoy-${k.swapCount}`);
     k.slots[slot] = fake;
     k.swappedAt[slot] = at;
     k.hinted[slot] = false;

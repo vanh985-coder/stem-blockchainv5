@@ -7,6 +7,7 @@ import {
   beginKeep,
   binCard,
   binFromSlot,
+  binFromTable,
   inspectionLine,
   checkPlacement,
   createRebuild,
@@ -49,13 +50,13 @@ function playPerfectKeep(s: RebuildState): void {
   }
 }
 
-/** Chơi hoàn hảo một vòng bất kỳ (vòng 3 là vòng giữ sổ). */
+/** Chơi hoàn hảo một vòng; ghép xong vòng 2 thì tự vào đoạn giữ sổ (P4b) và chơi hoàn hảo đoạn đó. */
 function playPerfectAny(s: RebuildState): void {
+  playPerfectRound(s);
   if (s.phase === 'keep') playPerfectKeep(s);
-  else playPerfectRound(s);
 }
 
-/** Điểm hoàn hảo của vòng 3: mỗi lần tráo được 20 + 5. */
+/** Điểm hoàn hảo của đoạn giữ sổ: mỗi lần tráo được 20 + 5. */
 const PERFECT_KEEP = swapSchedule().length * (REBUILD_KEEP.fixPoints + REBUILD_KEEP.fastBonus);
 
 describe('bảng test của spec 05, Màn 3 (giữ nguyên số thứ tự)', () => {
@@ -82,7 +83,7 @@ describe('bảng test của spec 05, Màn 3 (giữ nguyên số thứ tự)', ()
   it('ca 5: sinh 500 đề → mã trang thật không trùng; trang giả luôn sai công thức', () => {
     const rng = createMulberry32(5);
     for (let i = 0; i < 500; i++) {
-      const r = SPEC.rounds[i % 3];
+      const r = SPEC.rounds[i % 2];
       const d = generateDeal(rng, r.pages, r.fake);
       const codes = d.real.map((c) => c.code);
       expect(new Set(codes).size).toBe(codes.length);
@@ -101,7 +102,7 @@ describe('tạo đề', () => {
   it('1000 đề ngẫu nhiên đều giải được: mỗi bước đúng một thẻ vừa khớp mã trước vừa đúng công thức, và là thẻ kế tiếp của chuỗi', () => {
     const rng = createMulberry32(20260301);
     for (let i = 0; i < 1000; i++) {
-      const r = SPEC.rounds[i % 3];
+      const r = SPEC.rounds[i % 2];
       const d = generateDeal(rng, r.pages, r.fake);
       const pool = d.fake ? [...d.real, d.fake] : [...d.real];
       let tail = d.genesis;
@@ -116,7 +117,7 @@ describe('tạo đề', () => {
   it('1000 đề: trang giả luôn phát hiện được bằng công thức, có mã trước của trang thật không phải trang cuối, và mã khác mọi mã thật', () => {
     const rng = createMulberry32(777);
     for (let i = 0; i < 1000; i++) {
-      const r = SPEC.rounds[1 + (i % 2)];
+      const r = SPEC.rounds[1];
       const d = generateDeal(rng, r.pages, true);
       const f = d.fake!;
       expect(formulaHolds(f)).toBe(false);
@@ -205,6 +206,8 @@ describe('vòng, tim, điểm', () => {
     expect(s.tray).toHaveLength(7);
     for (const c of s.deal.real) placeCard(s, c.id);
     expect(s.parts[1]).toEqual({ round: 1, errors: 0, fakeBinned: true, points: 130 });
+    expect(s.phase).toBe('keep'); // P4b: ghép xong vòng 2 thì vào đoạn giữ sổ, không có bảng "vòng xong" và không có vòng 3
+    expect(s.round).toBe(1);
   });
 
   it('đặt trang giả vào chuỗi: mất 1 tim, thẻ bật ra (vẫn ở khay); ghép xong mà không bỏ rổ thì không có +30', () => {
@@ -218,7 +221,7 @@ describe('vòng, tim, điểm', () => {
     expect(placeCard(s, fake.id)).toEqual({ kind: 'fake', heartsLeft: 2 });
     expect(s.tray).toContain(fake);
     for (const c of s.deal.real.slice(s.chain.length)) placeCard(s, c.id);
-    expect(s.phase).toBe('roundDone');
+    expect(s.phase).toBe('keep');
     expect(s.parts[1]).toEqual({ round: 1, errors: 1, fakeBinned: false, points: 90 });
   });
 
@@ -247,25 +250,30 @@ describe('vòng, tim, điểm', () => {
     expect(rebuildMedal(100)).toBe(0);
   });
 
-  it('chơi hoàn hảo cả 3 vòng: 100 + 130 + vòng giữ sổ (11 lần tráo × 25), Vàng, over = done', () => {
+  it('chơi hoàn hảo hai vòng (vòng 2 kèm đoạn giữ sổ): 100 + 130 + 5 lần tráo × 25 = 355, Vàng, over = done; không có vòng 3', () => {
     const s = createRebuild(8);
-    for (let r = 0; r < 3; r++) {
-      playPerfectAny(s);
-      expect(s.phase).toBe('roundDone');
-      advance(s);
-    }
+    expect(SPEC.rounds).toHaveLength(2);
+    playPerfectAny(s);
+    expect(s.phase).toBe('roundDone');
+    advance(s);
+    expect(s.round).toBe(1);
+    playPerfectAny(s);
+    expect(s.phase).toBe('roundDone');
+    advance(s);
     expect(s.phase).toBe('over');
     expect(s.over).toBe('done');
+    expect(s.round).toBe(1);
     expect(s.hearts).toBe(3);
-    expect(s.deal.real).toHaveLength(6);
-    expect(PERFECT_KEEP).toBe(275);
+    expect(s.deal.real).toHaveLength(7);
+    expect(PERFECT_KEEP).toBe(125);
     expect(rebuildScore(s)).toBe(100 + 130 + PERFECT_KEEP);
     expect(rebuildMedal(rebuildScore(s))).toBe(3);
   });
 
-  it('mốc điểm (bước X3): 200 Đồng, 400 Bạc, 475 Vàng (tối đa 505, dư 30)', () => {
-    expect(SPEC.medals).toEqual([200, 400, 475]);
-    expect([0, 199, 200, 399, 400, 474, 475, 600].map(rebuildMedal)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
+  it('mốc điểm (P4b, theo phân vị bot): 290 Đồng, 320 Bạc, 355 Vàng (355 = điểm tối đa)', () => {
+    expect(SPEC.medals).toEqual([290, 320, 355]);
+    expect([0, 289, 290, 319, 320, 354, 355, 600].map(rebuildMedal)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
+    expect(SPEC.medals[2]).toBe(100 + 130 + PERFECT_KEEP);
   });
 
   it('roundScore không âm và đúng công thức', () => {
@@ -274,25 +282,27 @@ describe('vòng, tim, điểm', () => {
     expect(roundScore(11, false)).toBe(0);
   });
 
-  it('sai 2 lần ở vòng 1 (còn 1 tim) rồi chơi hoàn hảo hai vòng sau: 100 − 20 + 130 + vòng giữ sổ = 485, vẫn Vàng (475); vào vòng 3 được hồi đủ tim', () => {
+  it('sai 2 lần ở vòng 1 (còn 1 tim) rồi chơi hoàn hảo: 100 − 20 + 130 + 125 = 335, Bạc; vào đoạn giữ sổ được hồi đủ tim', () => {
     const s = createRebuild(9);
     placeCard(s, s.tray.find((c) => c.prev !== tailCode(s))!.id);
     placeCard(s, s.tray.find((c) => c.prev !== tailCode(s))!.id);
-    for (let r = 0; r < 3; r++) {
+    expect(s.hearts).toBe(1);
+    for (let r = 0; r < 2; r++) {
       playPerfectAny(s);
+      if (r === 0) expect(s.hearts).toBe(1); // vòng 1 xong vẫn còn 1 tim
       advance(s);
     }
     expect(s.over).toBe('done');
-    expect(s.hearts).toBe(SPEC.hearts); // bước X3: vào vòng 3 được hồi đủ tim
+    expect(s.hearts).toBe(SPEC.hearts); // bước X3: vào đoạn giữ sổ được hồi đủ tim
     expect(rebuildScore(s)).toBe(80 + 130 + PERFECT_KEEP);
-    expect(rebuildScore(s)).toBe(485);
-    expect(rebuildMedal(rebuildScore(s))).toBe(3);
+    expect(rebuildScore(s)).toBe(335);
+    expect(rebuildMedal(rebuildScore(s))).toBe(2);
   });
 
   it('tất định: cùng seed và cùng thao tác thì cùng kết quả', () => {
     const run = (): number => {
       const s = createRebuild(31);
-      for (let r = 0; r < 3; r++) {
+      for (let r = 0; r < 2; r++) {
         playPerfectAny(s);
         advance(s);
       }
@@ -318,7 +328,7 @@ describe('dòng "Soi công thức" hiện sẵn phép tính và kết quả', ()
   it('mọi thẻ thật của 300 đề đều khớp và mọi trang giả đều lệch', () => {
     const rng = createMulberry32(4242);
     for (let i = 0; i < 300; i++) {
-      const r = SPEC.rounds[i % 3];
+      const r = SPEC.rounds[i % 2];
       const d = generateDeal(rng, r.pages, r.fake);
       for (const c of d.real) expect(inspectionLine(c).kind).toBe('khop');
       if (d.fake) expect(inspectionLine(d.fake).kind).toBe('lech');
@@ -332,17 +342,18 @@ describe('các phần điểm cho màn kết quả', () => {
     placeCard(s, s.tray.find((c) => c.prev !== tailCode(s))!.id); // 1 lỗi ở vòng 1
     playPerfectRound(s);
     advance(s);
-    playPerfectRound(s); // vòng 2 có trang giả bỏ đúng
-    advance(s); // sang vòng giữ sổ
+    playPerfectRound(s); // vòng 2 có trang giả bỏ đúng; ghép xong thì vào đoạn giữ sổ
+    expect(s.phase).toBe('keep');
     beginKeep(s);
-    stepKeep(s, 300); // bỏ mặc: đầy ô rồi hết tim, vòng 3 dở dang
+    stepKeep(s, 6); // lần tráo đầu: bàn có trang
+    for (let i = 0; i < 3; i++) binFromTable(s, s.tray[0].id); // kéo nhầm trang thật vào rổ: hết tim, đoạn giữ sổ dở dang
     expect(s.over).toBe('hearts');
     const rows = scoreParts(s);
     expect(rows).toEqual([
       { key: 'vong', round: 0, count: 1, points: 90 },
       { key: 'vong', round: 1, count: 0, points: 100 },
       { key: 'trangGia', round: 1, count: 1, points: 30 },
-      { key: 'sua', round: 2, count: 0, points: 0 }, // hết tim ở vòng 3 chưa sửa ô nào: vẫn có dòng, 0 điểm, không có dòng trừ điểm
+      { key: 'sua', round: 1, count: 0, points: 0 }, // hết tim ở đoạn giữ sổ chưa sửa ô nào: vẫn có dòng, 0 điểm, không có dòng trừ điểm
     ]);
     expect(rows.reduce((a, r) => a + r.points, 0)).toBe(rebuildScore(s));
   });

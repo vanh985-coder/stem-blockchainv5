@@ -1,9 +1,9 @@
 /**
- * Bot mô phỏng cả ván màn 3 (3 vòng) để kiểm tra cân bằng mốc điểm (bước X2). Chỉ dùng trong test và công cụ, không vào bản chạy.
+ * Bot mô phỏng cả ván màn 3 (2 vòng, vòng 2 có đoạn cuối giữ sổ; P4b) để kiểm tra cân bằng mốc điểm (bước X2). Chỉ dùng trong test và công cụ, không vào bản chạy.
  *
  * Bot chỉ dùng thao tác của học sinh (đặt thẻ, kéo vào rổ) và chỉ đọc những gì học sinh nhìn thấy (công thức trên thẻ, mã trước của ô), không đọc cờ `isFake`.
  * Vòng 1 và 2: bot giỏi chơi hoàn hảo; bot trung bình (`AVERAGE_BOT`, từ bước X3 là bot chính) mỗi lần đặt thẻ có xác suất đặt nhầm một thẻ sai mã trước, và ở vòng 2 có xác suất đặt thẳng trang giả vào chuỗi trước khi bỏ vào rổ; `AVERAGE_BOT_CLEAN` chơi hoàn hảo vòng 1, 2 để so sánh.
- * Vòng 3: mỗi lần {phanDien} tráo, bot phát hiện và sửa sau một độ trễ ngẫu nhiên trong `fixDelay`; có xác suất `misbin` kéo nhầm một trang thật vào rổ trước khi sửa.
+ * Đoạn giữ sổ (cuối vòng 2): mỗi lần {phanDien} tráo, bot phát hiện và sửa sau một độ trễ ngẫu nhiên trong `fixDelay`; có xác suất `misbin` kéo nhầm một trang thật vào rổ trước khi sửa.
  */
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { medalOf } from '@so-chung/core';
@@ -31,7 +31,7 @@ export interface RebuildBotProfile {
   name: string;
   /** Độ trễ từ lúc bị tráo đến lúc sửa xong, giây: [nhỏ nhất, lớn nhất] */
   fixDelay: readonly [number, number];
-  /** Xác suất kéo nhầm một trang thật vào rổ trước khi sửa (vòng 3) */
+  /** Xác suất kéo nhầm một trang thật vào rổ trước khi sửa (đoạn giữ sổ) */
   misbin: number;
   /** Xác suất mỗi lần đặt thẻ ở vòng 1, 2 bị đặt nhầm một thẻ sai mã trước */
   slip: number;
@@ -41,7 +41,7 @@ export interface RebuildBotProfile {
 
 /** Bot giỏi: soi công thức và sửa trong 3 đến 4 giây, không kéo nhầm. */
 export const GOOD_BOT: RebuildBotProfile = { name: 'good', fixDelay: [3, 4], misbin: 0, slip: 0, fakeMiss: 0 };
-/** Bot trung bình: vòng 3 sửa trong 6 đến 9 giây, 15% kéo nhầm một trang thật vào rổ. */
+/** Bot trung bình: đoạn giữ sổ sửa trong 6 đến 9 giây, 15% kéo nhầm một trang thật vào rổ. */
 export const AVERAGE_BOT: RebuildBotProfile = { name: 'average', fixDelay: [6, 9], misbin: 0.15, slip: 0.08, fakeMiss: 0.15 };
 /** Như bot trung bình nhưng vòng 1, 2 chơi hoàn hảo (bước X2b gọi đây là bot trung bình): để so sánh. */
 export const AVERAGE_BOT_CLEAN: RebuildBotProfile = { ...AVERAGE_BOT, name: 'average-clean', slip: 0, fakeMiss: 0 };
@@ -50,9 +50,9 @@ export interface RebuildSimResult {
   score: number;
   hearts: number;
   over: 'hearts' | 'done';
-  /** Có tới được vòng 3 hay không */
+  /** Có tới được đoạn giữ sổ hay không */
   reachedKeep: boolean;
-  /** Điểm riêng vòng 3 (0 nếu không tới hoặc dở dang) */
+  /** Điểm riêng đoạn giữ sổ (0 nếu không tới hoặc dở dang) */
   keepPoints: number;
 }
 
@@ -124,11 +124,11 @@ export function simulateRebuild(seed: number, p: RebuildBotProfile): RebuildSimR
   const rnd = createMulberry32((seed * 2654435761) >>> 0);
   let reachedKeep = false;
   for (let r = 0; r < REBUILD_SPEC.rounds.length && s.phase !== 'over'; r++) {
-    if (REBUILD_SPEC.rounds[r].keep) {
+    playRound12(s, p, rnd);
+    // P4b: ghép xong chuỗi ở vòng 2 thì vào đoạn giữ sổ ngay (cuối vòng 2)
+    if (phaseOf(s) === 'keep') {
       reachedKeep = true;
       playKeep(s, p, rnd);
-    } else {
-      playRound12(s, p, rnd);
     }
     advance(s);
   }

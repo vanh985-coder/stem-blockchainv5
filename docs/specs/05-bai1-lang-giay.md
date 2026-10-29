@@ -250,7 +250,9 @@ Logic đặt trong `rebuildLogic.ts` (hàm thuần, có test).
   - Kéo nó vào **"Rổ trang giả"**: +30 điểm.
 - **Nút "Soi công thức":** hiện phép tính của thẻ đang chọn, ví dụ "(31 × 2 + 7) mod 100 = 69 → khớp".
 
-**3 vòng:**
+> **Đã thay ở P4b (29/10/2026): màn 3 chỉ còn HAI vòng.** Vòng 1 (5 trang) và vòng 2 (7 trang, 1 trang giả) giữ nguyên; cơ chế "giữ sổ" của vòng 3 cũ nằm ở ĐOẠN CUỐI vòng 2 (45 giây, 5 lần tráo) ngay sau khi ghép xong chuỗi 7 trang. Mọi chỗ dưới đây nói "vòng 3" là lịch sử (bước X2, X3); số hiện hành ở mục "P4b" cuối phần Màn 3.
+
+**3 vòng (trước P4b):**
 
 | Vòng | Số trang | Trang giả |
 |---|---|---|
@@ -268,7 +270,7 @@ Logic đặt trong `rebuildLogic.ts` (hàm thuần, có test).
 
 Trước vòng 2, {phanDien} lẻn tới nhét trang giả vào xấp giấy, cười khúc khích.
 
-**Vòng 3 — giữ sổ 90 giây (bước X2):**
+**Vòng 3 — giữ sổ 90 giây (bước X2; từ P4b là đoạn giữ sổ 45 giây ở cuối vòng 2, xem mục "P4b"):**
 - Đầu vòng: chuỗi 6 trang **đúng** (tạo bằng `buildChain`, mã trang không trùng nhau). Mặt bàn trống. Thẻ giới thiệu "Vòng 3: Giữ sổ" nằm sẵn, bấm "Bắt đầu giữ sổ" thì đồng hồ 90 giây mới chạy.
 - **Lịch tráo:** lần đầu ở giây 6; sau mỗi lần tráo ở giây `t`, lần kế tiếp cách `9 − 3 × t/90` giây (khoảng cách giảm tuyến tính từ 9 giây xuống **6 giây** theo giờ chơi; bước X2: xuống 4 giây, bước X2b: 5 giây, **bước X3 nâng lên 6** vì vòng vẫn quá dồn). Không tráo trong 6 giây cuối (để trang nào bị tráo cũng còn thời gian sửa). Lịch đủ **11 lần**, ở giây 6; 14,8; 23,3; 31,5; 39,5; 47,2; 54,6; 61,8; 68,7; 75,4; 81,9.
 - **Một lần tráo:** {phanDien} chạy vào (1 giây), cười và ném trang thật ra bàn (1,5 giây là đúng lúc tráo), chạy ra (xong lúc 2,9 giây, ngắn hơn khoảng cách nhỏ nhất 6 giây nên hai lần không chồng nhau). Một **trang thật** bất kỳ trong chuỗi (không bao giờ chọn ô đã là trang giả hay đang trống) thành **trang giả**; trang thật bị ném ra bàn, đi kèm **1 trang mồi**.
@@ -351,6 +353,44 @@ Trước vòng 2, {phanDien} lẻn tới nhét trang giả vào xấp giấy, c�
 4. **Chống khựng lần đầu:** `KeepWarm` trong `RebuildGame.tsx` dựng sẵn (mờ 1%, góc dưới phải) đồng hồ đỏ, hai thanh trạng thái chuỗi, bong bóng lời Bi, ô trống nhấp nháy và nháy đỏ, thẻ mới/rung/đang chọn, bảng hết giờ; trạng thái chuỗi chuyển vào thanh trên (hết đè lên nút "Soi công thức" ở điện thoại). Tiếng không cần nạp trước: `AudioContext` đã có từ lần bấm nút đầu, mỗi tiếng chỉ tạo vài nút âm. Số đo ở báo cáo bước X2b.
 
 - **Mở khóa:** màn 3 sẵn sàng nên Trang Sổ Vàng 1 chỉ được trao khi chơi xong màn 3 (người đã có trang từ trước vẫn giữ); biển "Ghép lại cuốn sổ" mở sau khi chơi màn 2.
+
+### P4b — Màn 3 còn hai vòng, đoạn giữ sổ ở cuối vòng 2 (29/10/2026)
+
+**Thiết kế (đã chốt):** vòng 1 và vòng 2 (ghép sổ) giữ nguyên luật và test. Không còn vòng 3 riêng. Ghép xong chuỗi 7 trang ở vòng 2 (đã bỏ trang giả vào rổ hoặc không) thì KHÔNG hiện bảng "Vòng 2 xong" mà vào ngay **đoạn giữ sổ**: chuỗi vừa ghép (7 trang đúng) trở thành chuỗi cần giữ, mặt bàn trống, thẻ giới thiệu "Giữ sổ" (Bác An hồi đủ 3 tim, như bước X3), bấm "Bắt đầu giữ sổ" thì đồng hồ mới chạy. Cơ chế tráo, trang mồi, sửa ô, phạt, gợi ý của Bi, công thức mã trang và cách phát hiện sửa lén **giữ nguyên** (dùng lại `stepKeep`, `placeInSlot`, `binFromSlot`, `binFromTable`, `checkPlacement`, `formulaHolds`). Hết giờ giữ sổ (hay hết tim) thì ván xong, "Xem kết quả".
+
+**Thay đổi so với vòng 3 cũ:** đồng hồ 90 → **45 giây**; chuỗi 6 → **7 ô** (đúng chuỗi vừa ghép, nửa trái là 4 ô đầu, nửa phải là 3 ô sau khi Bi gợi ý); số lần tráo 11 → **5** (giây 6; 14,6; 22,6; 30,1; 37,1; khoảng cách vẫn giảm tuyến tính từ 9 xuống 6 giây theo giờ của đoạn, không tráo trong 6 giây cuối). `REBUILD_SPEC.rounds` còn 2 phần tử (vòng 2 có `keep: true`), chỉ số vòng lớn nhất là 1, nhãn "Vòng 1/2", "Vòng 2/2". Phần điểm giữ sổ ở màn kết quả ghi "Giữ sổ: …" (không có "vòng 3"). Điểm ghép hai vòng ghi ngay lúc ghép xong (230 khi hoàn hảo); điểm giữ sổ ghi riêng khi hết giờ hay hết tim, nên hết tim giữa đoạn giữ sổ vẫn giữ điểm ghép và các ô đã sửa. Không còn "vòng giữ sổ dở dang" làm mất điểm vòng ghép.
+
+**Vì sao 45 giây và 5 lần tráo (ngắn hơn, vẫn đủ thực hành):** mục tiêu là giảm thời lượng chứ không chỉ đổi nhãn. Lịch tráo theo độ dài đoạn: 30 giây = 3 lần (tối đa 305 điểm), 40 giây = 4 lần (330), **45 giây = 5 lần (355)**, 60 giây = 7 lần (405), 90 giây cũ = 11 lần (505). Mỗi lần tráo là một chu trình đủ ba kỹ năng của bài (soi công thức để PHÁT HIỆN trang giả, bỏ nó vào rổ, đặt lại đúng trang thật), nên cần ít nhất 4 lần để luyện lặp; 45 giây cho 5 lần, đủ một lần thử, hai lần làm quen, hai lần thành thạo, và còn chỗ cho một ô sửa chậm quá 10 giây để Bi gợi ý. 30 và 40 giây chỉ còn 3 đến 4 lần, bot trung bình (sửa 6 đến 9 giây) gần như không bao giờ có hai ô chưa sửa cùng lúc nên không còn tình huống "đầy ô". 45 giây còn có 2 lần đủ gần nhau (khoảng 7 đến 8 giây) để có lúc hai ô chưa sửa cùng lúc. Tối đa 3 ô chưa sửa giữ nguyên; vì chỉ có 5 lần tráo nên "đầy ô" làm mất tối đa 2 tim, riêng nó không thể làm hết 3 tim (hết tim ở đoạn này chỉ do kéo nhầm trang thật vào rổ hay đặt sai ô).
+
+**Thời lượng trước/sau, CÙNG kịch bản** (`scripts/p4b-check.mjs`, bản build `VITE_PROBE`, Chrome headless, một người chơi giỏi bằng thao tác thật, cùng thời gian chờ giữa các thao tác; thời gian thật gồm cả nạp màn và 3 giây chạy thử chuyển động ban đầu, GL phần mềm nên chỉ so sánh trước/sau trong cùng môi trường):
+
+| Cỡ | Trước: cả ván (3 vòng) | Sau: cả ván (2 vòng) | Giảm | Đoạn giữ sổ trước → sau | Ghép sổ trước khi giữ sổ |
+|---|---|---|---|---|---|
+| 1366×768 (chuột kéo thả) | 158,7 giây | 103,3 giây | −35% | 127,1 → 70,1 giây | 25,4 → 26,6 giây |
+| 360×800 (chạm, chơi ngang) | 116,8 giây | 70,6 giây | −40% | 92,1 → 45,9 giây | 20,1 → 20,0 giây |
+| 844×390 (chạm) | 118,7 giây | 70,8 giây | −40% | 93,2 → 46,4 giây | 20,9 → 20,0 giây |
+
+Thời gian danh nghĩa của giữ sổ: 90 giây → 45 giây (hết nửa); còn bỏ thêm bước "Vòng 3" riêng (thẻ giới thiệu vòng 3 và bảng "Vòng 2 xong" trước đó). Số lần tráo phải xử lý 11 → 5. Ván ngắn 35 đến 40% (phần ghép sổ gần như không đổi; toàn bộ mức giảm nằm ở đoạn giữ sổ, 90 → 45 giây danh nghĩa).
+
+**Bot trước/sau** (`rebuildBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300):
+
+| Bot | | Trước (3 vòng; mốc 200 / 400 / 475; tối đa 505) | Sau (2 vòng; mốc 290 / 320 / 355; tối đa 355) |
+|---|---|---|---|
+| Giỏi | điểm trung bình; Vàng; hết tim | 505; 100%; 0 | 355; 100%; 0 |
+| Trung bình chính (sai ở vòng 1, 2; giữ sổ sửa 6 đến 9 giây, 15% kéo nhầm) | điểm trung bình (p25; p75) | 392,2 | 292,0 (290; 320) |
+| | chưa / Đồng / Bạc / Vàng | 7,7 / 15,7 / 76,7 / 0% | 13,7 / 44,3 / 42,0 / 0% |
+| | hết tim | 89 ván (29,7%) | 29 ván (9,7%) |
+| Trung bình chơi hoàn hảo vòng 1, 2 | điểm trung bình; hết tim | 425,4; 69 ván (23,0%) | 316,5; 6 ván (2,0%) |
+
+**Mốc điểm (quy tắc phân vị đã chốt): Đồng 290, Bạc 320, Vàng 355** = p25 bot trung bình, p75 bot trung bình, p10 bot giỏi (test `rebuildBalance.test.ts` kiểm đúng ba số này từ 300 ván). Trước P4b: 200 / 400 / 475. **Lưu ý cần chủ dự án quyết:** bot giỏi luôn đạt đúng 355 (điểm tối đa) nên p10 bot giỏi cũng là 355: **Vàng bằng điểm tối đa**, không còn chỗ sai (ở bước X3 Vàng được để dư 30 điểm; ở đây áp dụng đúng quy tắc, không chừa dư). Vàng đòi hỏi ghép hoàn hảo cả hai vòng, bỏ đúng trang giả và sửa nhanh (≤ 5 giây) cả 5 lần tráo. Nếu muốn chừa dư, đặt Vàng 330 (dư 25 điểm = một lần sửa chậm cả 5 lần): bot giỏi vẫn 100% Vàng nhưng bot trung bình sẽ đạt Vàng 16,7% (50 ván có điểm 330), cao hơn "hầu như không Vàng"; vì vậy áp dụng đúng quy tắc (Vàng 355) và để chủ dự án quyết. Mốc tạm, chỉnh khi học sinh chơi thật.
+
+**Điểm cao nhất cũ so với thang mới (không đặt lại tiến độ, không xóa thành tích):** `record.ts` giữ `bestScore = max(cũ, mới)` và huy chương `stars.game` = mốc cao nhất đã đạt; P4b không đụng vào hai số đó. Hệ quả: (1) học sinh đã chơi màn 3 trước P4b có thể có điểm cao nhất cũ tới 505 (cao hơn mọi điểm có thể đạt ở thang mới, tối đa 355), nên thẻ bắt đầu vẫn hiện "Điểm cao nhất" theo thang cũ và ván mới thường không phá được kỷ lục ("Kỷ lục mới!" không hiện); (2) huy chương đã có (Đồng, Bạc, Vàng theo mốc cũ) GIỮ NGUYÊN, không bị hạ, không bị tính lại theo mốc mới; (3) chơi lại vẫn có thể nâng huy chương lên cao hơn mốc đang có (huy chương mới tính theo mốc mới); (4) Trang Sổ Vàng và mở màn tính từ cờ hoàn thành, không phụ thuộc điểm nên không đổi. Không có cột hay cờ nào để đánh dấu thang điểm cũ/mới (không thêm tính năng ngoài lời giao).
+
+**Kiểm bản build** (`scripts/p4b-check.mjs`, chuột kéo thả ở 1366×768, chạm giả lập chạm-chọn-rồi-chạm-đặt ở 360×800 và 844×390; ảnh và số đo ở `docs/screenshots/p4b/`): chơi trọn hai vòng đến màn kết quả; chuyển từ ghép sổ sang giữ sổ đúng một lần (chuỗi phase: play, roundDone, villain, play, keep, roundDone); không còn vòng 3 (chỉ số vòng lớn nhất là 1; thẻ giới thiệu, bảng hết giờ, màn kết quả, hướng dẫn và câu nhắc của "?" không nhắc "vòng 3"); đồng hồ lớn của P1a vẫn rõ (35,5 px ở 1366×768, 24 px ở hai cỡ còn lại, cao 44 px) và không đè chuỗi, khay, rổ hay nút "Soi công thức"; tạm dừng bằng "?" làm đồng hồ giữ sổ đứng yên và chạy tiếp từ chỗ cũ; hết giờ với ô chưa sửa: −10 mỗi ô, có dòng "Giữ sổ: ô còn lệch"; hết tim (kéo nhầm trang thật vào rổ ba lần): bảng "Hết tim rồi!", điểm 230; chơi lại: ván mới từ vòng 1, đủ 3 tim, không còn đồng hồ cũ.
+
+**Lỗi tìm thấy khi kiểm xoay màn hình và đã sửa (liên quan trực tiếp đoạn giữ sổ):** màn 3 không dùng `onModeChange` của `Scene25D` nên khi điện thoại xoay dọc (hiện nhắc "Xoay ngang để chơi") đồng hồ giữ sổ vẫn chạy và {phanDien} vẫn tráo trang sau lớp nhắc (đo được: 2,4 → 5,2 giây trong 3 giây ở khung dọc, kèm một lần tráo) trong khi em không chơi được; có từ bước X2, không phải do P4b nhưng đoạn giữ sổ ngắn nên mất 3 giây là đáng kể. Nay màn 3 dừng như màn 6 (đo lại: 2,15 → 2,15 giây; xoay ngang lại thì chạy tiếp từ chỗ cũ). Nút "?" đè chữ "Soi công thức" ở màn 3 (mục "Ghi nhận" ở TRANG-THAI) KHÔNG sửa trong bước này, theo lời giao.
+
+**Chưa kiểm:** điện thoại và máy tính bảng thật (kéo thả, chạm, xoay), Safari/iPhone; FPS của GL phần mềm không dùng để kết luận hiệu năng thiết bị thật; cảm nhận độ khó thật của học sinh (mốc tạm).
 
 ## Kết thúc làng
 

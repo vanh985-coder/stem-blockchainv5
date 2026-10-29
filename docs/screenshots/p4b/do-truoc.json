@@ -1,0 +1,224 @@
+[
+ {
+  "size": "1366x768",
+  "label": "truoc",
+  "tongThoiGianThat": 158.7,
+  "doanGiuSoThat": 127.1,
+  "soLanTraoXuLy": 11,
+  "ghepTruocGiuSo": 25.4,
+  "giayMoPhongDoanGiuSo": 90,
+  "gameplayPhases": [
+   [
+    0,
+    "play",
+    0,
+    "-",
+    3
+   ],
+   [
+    6778,
+    "roundDone",
+    0,
+    "-",
+    3
+   ],
+   [
+    7676,
+    "villain",
+    1,
+    "-",
+    3
+   ],
+   [
+    11562,
+    "play",
+    1,
+    "-",
+    3
+   ],
+   [
+    23611,
+    "roundDone",
+    1,
+    "-",
+    3
+   ],
+   [
+    23750,
+    "keep",
+    2,
+    "idle",
+    3
+   ],
+   [
+    25415,
+    "keep",
+    2,
+    "run",
+    3
+   ],
+   [
+    152311,
+    "roundDone",
+    2,
+    "idle",
+    3
+   ],
+   [
+    153474,
+    "over",
+    2,
+    "idle",
+    3
+   ]
+  ]
+ },
+ {
+  "size": "360x800",
+  "label": "truoc",
+  "tongThoiGianThat": 116.8,
+  "doanGiuSoThat": 92.1,
+  "soLanTraoXuLy": 11,
+  "ghepTruocGiuSo": 20.1,
+  "giayMoPhongDoanGiuSo": 90,
+  "gameplayPhases": [
+   [
+    0,
+    "play",
+    0,
+    "-",
+    3
+   ],
+   [
+    5881,
+    "roundDone",
+    0,
+    "-",
+    3
+   ],
+   [
+    6476,
+    "villain",
+    1,
+    "-",
+    3
+   ],
+   [
+    10238,
+    "play",
+    1,
+    "-",
+    3
+   ],
+   [
+    18580,
+    "roundDone",
+    1,
+    "-",
+    3
+   ],
+   [
+    18747,
+    "keep",
+    2,
+    "idle",
+    3
+   ],
+   [
+    20097,
+    "keep",
+    2,
+    "run",
+    3
+   ],
+   [
+    111837,
+    "roundDone",
+    2,
+    "idle",
+    3
+   ],
+   [
+    112657,
+    "over",
+    2,
+    "idle",
+    3
+   ]
+  ]
+ },
+ {
+  "size": "844x390",
+  "label": "truoc",
+  "tongThoiGianThat": 118.7,
+  "doanGiuSoThat": 93.2,
+  "soLanTraoXuLy": 11,
+  "ghepTruocGiuSo": 20.9,
+  "giayMoPhongDoanGiuSo": 90,
+  "gameplayPhases": [
+   [
+    0,
+    "play",
+    0,
+    "-",
+    3
+   ],
+   [
+    6179,
+    "roundDone",
+    0,
+    "-",
+    3
+   ],
+   [
+    6812,
+    "villain",
+    1,
+    "-",
+    3
+   ],
+   [
+    10661,
+    "play",
+    1,
+    "-",
+    3
+   ],
+   [
+    19244,
+    "roundDone",
+    1,
+    "-",
+    3
+   ],
+   [
+    19509,
+    "keep",
+    2,
+    "idle",
+    3
+   ],
+   [
+    20883,
+    "keep",
+    2,
+    "run",
+    3
+   ],
+   [
+    113778,
+    "roundDone",
+    2,
+    "idle",
+    3
+   ],
+   [
+    114455,
+    "over",
+    2,
+    "idle",
+    3
+   ]
+  ]
+ }
+]

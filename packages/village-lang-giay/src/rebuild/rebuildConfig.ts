@@ -1,33 +1,33 @@
 /**
- * Số liệu của màn 3 "Ghép lại cuốn sổ" (spec 05, mục "Màn 3"). Vòng 1 và 2 là số liệu gốc của spec; vòng 3 là "vòng giữ sổ 90 giây" (bước X2), số liệu ở `REBUILD_KEEP`.
+ * Số liệu của màn 3 "Ghép lại cuốn sổ" (spec 05, mục "Màn 3"). P4b: HAI vòng. Vòng 1 và vòng 2 (ghép sổ) là số liệu gốc của spec; vòng 2 có thêm đoạn cuối "giữ sổ"
+ * (`keep: true`): ngay sau khi ghép xong chuỗi 7 trang, {phanDien} quay lại tráo trang trong chuỗi đó và em sửa (cơ chế của vòng 3 cũ, bước X2), số liệu ở `REBUILD_KEEP`.
  */
 export const REBUILD_SPEC = {
-  /** Ba vòng: số trang thật của chuỗi, có trang giả nhét vào khay hay không (vòng 1, 2), và có phải vòng giữ sổ (vòng 3) hay không */
+  /** Hai vòng: số trang thật của chuỗi, có trang giả nhét vào khay hay không, và có đoạn cuối giữ sổ hay không */
   rounds: [
     { pages: 5, fake: false, keep: false },
-    { pages: 7, fake: true, keep: false },
-    { pages: 6, fake: false, keep: true },
+    { pages: 7, fake: true, keep: true },
   ] as const,
-  /** 3 tim cho cả ván */
+  /** 3 tim cho cả ván (vào đoạn giữ sổ được hồi đủ 3 tim, bước X3) */
   hearts: 3,
-  /** Điểm mỗi vòng (1 và 2) = 100 − 10 × số lỗi, cộng 30 nếu bỏ đúng trang giả vào rổ */
+  /** Điểm mỗi vòng ghép = 100 − 10 × số lỗi, cộng 30 nếu bỏ đúng trang giả vào rổ */
   roundBase: 100,
   perError: 10,
   fakeBonus: 30,
-  /** Đồng, Bạc, Vàng (tổng điểm cả ván; chỉnh ở bước X2 theo mô phỏng 300 ván mỗi bot, Vàng hạ 520 → 500 ở bước X3, rồi 500 → 475 vì khoảng tráo 6 giây làm điểm tối đa còn 505; xem spec 05) */
-  medals: [200, 400, 475] as const,
+  /** Đồng, Bạc, Vàng (tổng điểm cả ván). P4b: đặt lại theo quy tắc phân vị bot (Đồng = p25 bot trung bình, Bạc = p75 bot trung bình, Vàng = p10 bot giỏi; 300 ván mỗi bot): 290 / 320 / 355; Vàng bằng điểm tối đa (355), xem spec 05 mục "P4b". Trước P4b (3 vòng): 200 / 400 / 475 */
+  medals: [290, 320, 355] as const,
 } as const;
 
 /**
- * Vòng 3, "giữ sổ": {phanDien} liên tục tráo một trang thật trong chuỗi thành trang giả; học sinh sửa liên tục.
+ * Đoạn "giữ sổ" (cuối vòng 2, từ P4b; trước đó là vòng 3 dài 90 giây): {phanDien} liên tục tráo một trang thật trong chuỗi thành trang giả; học sinh sửa liên tục.
  * Đơn vị thời gian: giây.
  */
 export const REBUILD_KEEP = {
-  /** Cả vòng kéo dài 90 giây */
-  seconds: 90,
+  /** P4b: cả đoạn kéo dài 45 giây (trước đó 90 giây): đủ 5 lần tráo để thực hành phát hiện, bỏ trang giả vào rổ và đặt lại trang thật */
+  seconds: 45,
   /** Lần tráo đầu tiên */
   firstSwapAt: 6,
-  /** Khoảng cách giữa hai lần tráo giảm tuyến tính theo giờ chơi, từ 9 giây (lúc 0) xuống 6 giây (lúc hết vòng); bước X2b: xuống 5 (trước đó 4), bước X3: xuống 6 */
+  /** Khoảng cách giữa hai lần tráo giảm tuyến tính theo giờ chơi, từ 9 giây (lúc 0) xuống 6 giây (lúc hết đoạn); bước X2b: xuống 5 (trước đó 4), bước X3: xuống 6 */
   intervalStart: 9,
   intervalEnd: 6,
   /** Không tráo trong những giây cuối, để trang nào bị tráo cũng còn thời gian sửa */

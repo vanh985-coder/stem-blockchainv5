@@ -1,0 +1,602 @@
+[
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "thẻ giới thiệu giữ sổ hiện khi vào đoạn giữ sổ (ngay sau khi ghép xong vòng 2), đồng hồ chưa chạy",
+  "ok": true,
+  "detail": "Giữ sổ\n\nChuỗi em vừa ghép xong chưa yên đâu! Tí sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "thẻ giới thiệu KHÔNG nhắc \"vòng 3\" và nêu 45 giây",
+  "ok": true,
+  "detail": "Giữ sổ\n\nChuỗi em vừa ghép xong chưa yên đâu! Tí sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt 45 giây. Em soi công thức, bỏ trang giả vào rổ, rồi đặt đúng trang thật vào chỗ"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "vẫn ở vòng 2 (chỉ số vòng 1), chuỗi 7 trang đã ghép nằm sẵn, được hồi đủ 3 tim",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "đồng hồ lớn (P1a): chữ ≥ 24px, cao ≥ 44px, không đè các thẻ của chuỗi (trang bìa và ô), khay, rổ hay nút \"Soi công thức\"",
+  "ok": true,
+  "detail": "{\"font\":35.4985,\"w\":103.671875,\"h\":44,\"boxes\":[{\"s\":\"[data-testid=\\\"trang-bia\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"o-chuoi-the\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"khay\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"ro-trang-gia\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"nut-soi\\\"]\",\"overlap\":false}],\"text\":\"0:45\"}"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "hết giờ: bảng \"Hết giờ giữ sổ\" hiện, còn 3 tim, ván xong cả 2 vòng",
+  "ok": true,
+  "detail": "Hết giờ giữ sổ! Em sửa được 5 ô, còn lệch 0 ô. Đoạn giữ sổ được 125 điểm. Xem kết quả"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "bảng hết giờ không nhắc \"vòng 3\"",
+  "ok": true,
+  "detail": "Hết giờ giữ sổ! Em sửa được 5 ô, còn lệch 0 ô. Đoạn giữ sổ được 125 điểm.\n\nXem kết quả"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "màn kết quả: điểm, các dòng điểm (ghép vòng 1, 2, trang giả, giữ sổ), không nhắc \"vòng 3\"",
+  "ok": true,
+  "detail": "[\"Vòng 1 (số lần sai): 0 → 100 điểm\",\"Vòng 2 (số lần sai): 0 → 100 điểm\",\"Vòng 2: bỏ đúng trang giả vào rổ: 1 → 30 điểm\",\"Giữ sổ: ô đã sửa xong (+20 mỗi ô): 5 → 100 điểm\",\"Giữ sổ: sửa trong 5 giây (thêm +5 mỗi ô): 5 → 25 điểm\"]"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "điểm tối đa của ván hoàn hảo là 355 (100 + 130 + 5 × 25) và bot-người này đạt Vàng nếu sửa nhanh cả 5 lần",
+  "ok": true,
+  "detail": "Điểm: 355"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "chuyển từ ghép sổ sang giữ sổ đúng MỘT lần",
+  "ok": true,
+  "detail": "[[\"play\",0,\"-\",3],[\"roundDone\",0,\"-\",3],[\"villain\",1,\"-\",3],[\"play\",1,\"-\",3],[\"keep\",1,\"idle\",3],[\"keep\",1,\"run\",3],[\"roundDone\",1,\"idle\",3],[\"over\",1,\"idle\",3]]"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "không có vòng 3: chỉ số vòng lớn nhất là 1",
+  "ok": true,
+  "detail": "1"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "trọn ván",
+  "name": "chơi lại: ván mới từ vòng 1, 3 tim, chuỗi trống, không còn đồng hồ giữ sổ, không còn trạng thái cũ",
+  "ok": true,
+  "detail": "{\"phase\":\"play\",\"round\":0,\"hearts\":3,\"chain\":0,\"trayN\":5,\"keep\":null,\"parts\":0}"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tạm dừng",
+  "name": "đang giữ sổ: hộp \"?\" mở thì đồng hồ đứng yên (giờ chạy không đổi), không tráo thêm",
+  "ok": true,
+  "detail": "{\"a\":{\"running\":true,\"elapsed\":1.587099999999624,\"swaps\":0,\"fixed\":0,\"fast\":0,\"unfixed\":0},\"b\":{\"running\":true,\"elapsed\":1.587099999999624,\"swaps\":0,\"fixed\":0,\"fast\":0,\"unfixed\":0}}"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tạm dừng",
+  "name": "câu nhắc của \"?\" ở đoạn giữ sổ không nhắc \"vòng 3\"",
+  "ok": true,
+  "detail": "Việc của em lúc này: Tí đang tráo trang trong chuỗi. Soi công thức, kéo trang giả vào rổ rồi đặt trang thật vào chỗ trống."
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tạm dừng",
+  "name": "đóng hộp: đồng hồ chạy tiếp từ chỗ cũ (không nhảy vọt: tăng ≤ 4 giây sau 2,5 giây thật)",
+  "ok": true,
+  "detail": "{\"b\":1.587099999999624,\"c\":3.4372999999992517}"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "tạm dừng",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "hết giờ",
+  "name": "hết 45 giây với 1 ô chưa sửa: bảng hết giờ báo còn lệch 1 ô, điểm đoạn −10",
+  "ok": true,
+  "detail": "Hết giờ giữ sổ! Em sửa được 0 ô, còn lệch 1 ô. Đoạn giữ sổ được -10 điểm. Xem kết quả"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "hết giờ",
+  "name": "kết quả có dòng \"Giữ sổ: ô còn lệch khi hết giờ (−10 mỗi ô)\"",
+  "ok": true,
+  "detail": "[\"Vòng 1 (số lần sai): 0 → 100 điểm\",\"Vòng 2 (số lần sai): 0 → 100 điểm\",\"Vòng 2: bỏ đúng trang giả vào rổ: 1 → 30 điểm\",\"Giữ sổ: ô đã sửa xong (+20 mỗi ô): 0 → 0 điểm\",\"Giữ sổ: ô còn lệch khi hết giờ (−10 mỗi ô): 1 → -10 điểm\"]"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "hết giờ",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "hết tim",
+  "name": "kéo nhầm trang thật vào rổ 3 lần: hết tim, bảng \"Hết tim rồi!\", ván kết thúc",
+  "ok": true,
+  "detail": "Hết tim rồi! Xem kết quả"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "hết tim",
+  "name": "kết quả hết tim: tính điểm ghép hai vòng (230) và không có điểm giữ sổ",
+  "ok": true,
+  "detail": "Điểm: 230"
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "hết tim",
+  "name": "chơi lại sau khi hết tim: ván mới đủ 3 tim",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "1366x768",
+  "area": "hết tim",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "thẻ giới thiệu giữ sổ hiện khi vào đoạn giữ sổ (ngay sau khi ghép xong vòng 2), đồng hồ chưa chạy",
+  "ok": true,
+  "detail": "Giữ sổ\n\nChuỗi em vừa ghép xong chưa yên đâu! Tí sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "thẻ giới thiệu KHÔNG nhắc \"vòng 3\" và nêu 45 giây",
+  "ok": true,
+  "detail": "Giữ sổ\n\nChuỗi em vừa ghép xong chưa yên đâu! Tí sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt 45 giây. Em soi công thức, bỏ trang giả vào rổ, rồi đặt đúng trang thật vào chỗ"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "vẫn ở vòng 2 (chỉ số vòng 1), chuỗi 7 trang đã ghép nằm sẵn, được hồi đủ 3 tim",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "đồng hồ lớn (P1a): chữ ≥ 24px, cao ≥ 44px, không đè các thẻ của chuỗi (trang bìa và ô), khay, rổ hay nút \"Soi công thức\"",
+  "ok": true,
+  "detail": "{\"font\":24,\"w\":79.828125,\"h\":44,\"boxes\":[{\"s\":\"[data-testid=\\\"trang-bia\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"o-chuoi-the\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"khay\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"ro-trang-gia\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"nut-soi\\\"]\",\"overlap\":false}],\"text\":\"0:45\"}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "hết giờ: bảng \"Hết giờ giữ sổ\" hiện, còn 3 tim, ván xong cả 2 vòng",
+  "ok": true,
+  "detail": "Hết giờ giữ sổ! Em sửa được 5 ô, còn lệch 0 ô. Đoạn giữ sổ được 125 điểm. Xem kết quả"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "bảng hết giờ không nhắc \"vòng 3\"",
+  "ok": true,
+  "detail": "Hết giờ giữ sổ! Em sửa được 5 ô, còn lệch 0 ô. Đoạn giữ sổ được 125 điểm.\n\nXem kết quả"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "màn kết quả: điểm, các dòng điểm (ghép vòng 1, 2, trang giả, giữ sổ), không nhắc \"vòng 3\"",
+  "ok": true,
+  "detail": "[\"Vòng 1 (số lần sai): 0 → 100 điểm\",\"Vòng 2 (số lần sai): 0 → 100 điểm\",\"Vòng 2: bỏ đúng trang giả vào rổ: 1 → 30 điểm\",\"Giữ sổ: ô đã sửa xong (+20 mỗi ô): 5 → 100 điểm\",\"Giữ sổ: sửa trong 5 giây (thêm +5 mỗi ô): 5 → 25 điểm\"]"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "điểm tối đa của ván hoàn hảo là 355 (100 + 130 + 5 × 25) và bot-người này đạt Vàng nếu sửa nhanh cả 5 lần",
+  "ok": true,
+  "detail": "Điểm: 355"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "chuyển từ ghép sổ sang giữ sổ đúng MỘT lần",
+  "ok": true,
+  "detail": "[[\"play\",0,\"-\",3],[\"roundDone\",0,\"-\",3],[\"villain\",1,\"-\",3],[\"play\",1,\"-\",3],[\"keep\",1,\"idle\",3],[\"keep\",1,\"run\",3],[\"roundDone\",1,\"idle\",3],[\"over\",1,\"idle\",3]]"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "không có vòng 3: chỉ số vòng lớn nhất là 1",
+  "ok": true,
+  "detail": "1"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "trọn ván",
+  "name": "chơi lại: ván mới từ vòng 1, 3 tim, chuỗi trống, không còn đồng hồ giữ sổ, không còn trạng thái cũ",
+  "ok": true,
+  "detail": "{\"phase\":\"play\",\"round\":0,\"hearts\":3,\"chain\":0,\"trayN\":5,\"keep\":null,\"parts\":0}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tạm dừng",
+  "name": "đang giữ sổ: hộp \"?\" mở thì đồng hồ đứng yên (giờ chạy không đổi), không tráo thêm",
+  "ok": true,
+  "detail": "{\"a\":{\"running\":true,\"elapsed\":1.783100000000003,\"swaps\":0,\"fixed\":0,\"fast\":0,\"unfixed\":0},\"b\":{\"running\":true,\"elapsed\":1.783100000000003,\"swaps\":0,\"fixed\":0,\"fast\":0,\"unfixed\":0}}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tạm dừng",
+  "name": "câu nhắc của \"?\" ở đoạn giữ sổ không nhắc \"vòng 3\"",
+  "ok": true,
+  "detail": "Việc của em lúc này: Tí đang tráo trang trong chuỗi. Soi công thức, kéo trang giả vào rổ rồi đặt trang thật vào chỗ trống."
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tạm dừng",
+  "name": "đóng hộp: đồng hồ chạy tiếp từ chỗ cũ (không nhảy vọt: tăng ≤ 4 giây sau 2,5 giây thật)",
+  "ok": true,
+  "detail": "{\"b\":1.783100000000003,\"c\":4.260700000000001}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "tạm dừng",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "hết giờ",
+  "name": "hết 45 giây với 1 ô chưa sửa: bảng hết giờ báo còn lệch 1 ô, điểm đoạn −10",
+  "ok": true,
+  "detail": "Hết giờ giữ sổ! Em sửa được 0 ô, còn lệch 1 ô. Đoạn giữ sổ được -10 điểm. Xem kết quả"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "hết giờ",
+  "name": "kết quả có dòng \"Giữ sổ: ô còn lệch khi hết giờ (−10 mỗi ô)\"",
+  "ok": true,
+  "detail": "[\"Vòng 1 (số lần sai): 0 → 100 điểm\",\"Vòng 2 (số lần sai): 0 → 100 điểm\",\"Vòng 2: bỏ đúng trang giả vào rổ: 1 → 30 điểm\",\"Giữ sổ: ô đã sửa xong (+20 mỗi ô): 0 → 0 điểm\",\"Giữ sổ: ô còn lệch khi hết giờ (−10 mỗi ô): 1 → -10 điểm\"]"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "hết giờ",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "hết tim",
+  "name": "kéo nhầm trang thật vào rổ 3 lần: hết tim, bảng \"Hết tim rồi!\", ván kết thúc",
+  "ok": true,
+  "detail": "Hết tim rồi! Xem kết quả"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "hết tim",
+  "name": "kết quả hết tim: tính điểm ghép hai vòng (230) và không có điểm giữ sổ",
+  "ok": true,
+  "detail": "Điểm: 230"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "hết tim",
+  "name": "chơi lại sau khi hết tim: ván mới đủ 3 tim",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "hết tim",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "xoay ngang",
+  "name": "khung dọc: nhắc \"Xoay ngang để chơi\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "xoay ngang",
+  "name": "xoay ngang rồi chơi: ghép hai vòng và vào giữ sổ bình thường",
+  "ok": true,
+  "detail": "{\"phase\":\"keep\",\"round\":1,\"hearts\":3,\"chain\":7,\"trayN\":0,\"keep\":{\"running\":true,\"elapsed\":2.083200000000001,\"swaps\":0,\"fixed\":0,\"fast\":0,\"unfixed\":0},\"parts\":2}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "xoay ngang",
+  "name": "xoay dọc giữa đoạn giữ sổ: nhắc xoay ngang hiện và đồng hồ giữ sổ ĐỨNG YÊN (2.15 → 2.15 giây sau 3 giây thật), không tráo thêm",
+  "ok": true,
+  "detail": "{\"s0\":{\"running\":true,\"elapsed\":2.1497999999999995,\"swaps\":0,\"fixed\":0,\"fast\":0,\"unfixed\":0},\"s1\":{\"running\":true,\"elapsed\":2.1497999999999995,\"swaps\":0,\"fixed\":0,\"fast\":0,\"unfixed\":0}}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "xoay ngang",
+  "name": "xoay ngang lại: ván tiếp tục từ chỗ cũ (đồng hồ chạy tiếp, ≤ 3 giây trong 1,5 giây thật), vẫn ở giữ sổ",
+  "ok": true,
+  "detail": "{\"t1\":2.1497999999999995,\"after\":{\"running\":true,\"elapsed\":3.771499999999439,\"swaps\":0,\"fixed\":0,\"fast\":0,\"unfixed\":0}}"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "xoay ngang",
+  "name": "qua các lần xoay vẫn chỉ vào giữ sổ đúng một lần",
+  "ok": true,
+  "detail": "[[\"play\",0],[\"roundDone\",0],[\"villain\",1],[\"play\",1],[\"keep\",1],[\"keep\",1]]"
+ },
+ {
+  "label": "sau",
+  "size": "360x800",
+  "area": "xoay ngang",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "thẻ giới thiệu giữ sổ hiện khi vào đoạn giữ sổ (ngay sau khi ghép xong vòng 2), đồng hồ chưa chạy",
+  "ok": true,
+  "detail": "Giữ sổ\n\nChuỗi em vừa ghép xong chưa yên đâu! Tí sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "thẻ giới thiệu KHÔNG nhắc \"vòng 3\" và nêu 45 giây",
+  "ok": true,
+  "detail": "Giữ sổ\n\nChuỗi em vừa ghép xong chưa yên đâu! Tí sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt 45 giây. Em soi công thức, bỏ trang giả vào rổ, rồi đặt đúng trang thật vào chỗ"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "vẫn ở vòng 2 (chỉ số vòng 1), chuỗi 7 trang đã ghép nằm sẵn, được hồi đủ 3 tim",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "đồng hồ lớn (P1a): chữ ≥ 24px, cao ≥ 44px, không đè các thẻ của chuỗi (trang bìa và ô), khay, rổ hay nút \"Soi công thức\"",
+  "ok": true,
+  "detail": "{\"font\":24,\"w\":79.828125,\"h\":44,\"boxes\":[{\"s\":\"[data-testid=\\\"trang-bia\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"o-chuoi-the\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"khay\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"ro-trang-gia\\\"]\",\"overlap\":false},{\"s\":\"[data-testid=\\\"nut-soi\\\"]\",\"overlap\":false}],\"text\":\"0:45\"}"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "hết giờ: bảng \"Hết giờ giữ sổ\" hiện, còn 3 tim, ván xong cả 2 vòng",
+  "ok": true,
+  "detail": "Hết giờ giữ sổ! Em sửa được 5 ô, còn lệch 0 ô. Đoạn giữ sổ được 125 điểm. Xem kết quả"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "bảng hết giờ không nhắc \"vòng 3\"",
+  "ok": true,
+  "detail": "Hết giờ giữ sổ! Em sửa được 5 ô, còn lệch 0 ô. Đoạn giữ sổ được 125 điểm.\n\nXem kết quả"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "màn kết quả: điểm, các dòng điểm (ghép vòng 1, 2, trang giả, giữ sổ), không nhắc \"vòng 3\"",
+  "ok": true,
+  "detail": "[\"Vòng 1 (số lần sai): 0 → 100 điểm\",\"Vòng 2 (số lần sai): 0 → 100 điểm\",\"Vòng 2: bỏ đúng trang giả vào rổ: 1 → 30 điểm\",\"Giữ sổ: ô đã sửa xong (+20 mỗi ô): 5 → 100 điểm\",\"Giữ sổ: sửa trong 5 giây (thêm +5 mỗi ô): 5 → 25 điểm\"]"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "điểm tối đa của ván hoàn hảo là 355 (100 + 130 + 5 × 25) và bot-người này đạt Vàng nếu sửa nhanh cả 5 lần",
+  "ok": true,
+  "detail": "Điểm: 355"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "chuyển từ ghép sổ sang giữ sổ đúng MỘT lần",
+  "ok": true,
+  "detail": "[[\"play\",0,\"-\",3],[\"roundDone\",0,\"-\",3],[\"villain\",1,\"-\",3],[\"play\",1,\"-\",3],[\"keep\",1,\"idle\",3],[\"keep\",1,\"run\",3],[\"roundDone\",1,\"idle\",3],[\"over\",1,\"idle\",3]]"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "không có vòng 3: chỉ số vòng lớn nhất là 1",
+  "ok": true,
+  "detail": "1"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "trọn ván",
+  "name": "chơi lại: ván mới từ vòng 1, 3 tim, chuỗi trống, không còn đồng hồ giữ sổ, không còn trạng thái cũ",
+  "ok": true,
+  "detail": "{\"phase\":\"play\",\"round\":0,\"hearts\":3,\"chain\":0,\"trayN\":5,\"keep\":null,\"parts\":0}"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tạm dừng",
+  "name": "đang giữ sổ: hộp \"?\" mở thì đồng hồ đứng yên (giờ chạy không đổi), không tráo thêm",
+  "ok": true,
+  "detail": "{\"a\":{\"running\":true,\"elapsed\":1.8665999999999987,\"swaps\":0,\"fixed\":0,\"fast\":0,\"unfixed\":0},\"b\":{\"running\":true,\"elapsed\":1.8665999999999987,\"swaps\":0,\"fixed\":0,\"fast\":0,\"unfixed\":0}}"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tạm dừng",
+  "name": "câu nhắc của \"?\" ở đoạn giữ sổ không nhắc \"vòng 3\"",
+  "ok": true,
+  "detail": "Việc của em lúc này: Tí đang tráo trang trong chuỗi. Soi công thức, kéo trang giả vào rổ rồi đặt trang thật vào chỗ trống."
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tạm dừng",
+  "name": "đóng hộp: đồng hồ chạy tiếp từ chỗ cũ (không nhảy vọt: tăng ≤ 4 giây sau 2,5 giây thật)",
+  "ok": true,
+  "detail": "{\"b\":1.8665999999999987,\"c\":4.315699999999997}"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "tạm dừng",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "hết giờ",
+  "name": "hết 45 giây với 1 ô chưa sửa: bảng hết giờ báo còn lệch 1 ô, điểm đoạn −10",
+  "ok": true,
+  "detail": "Hết giờ giữ sổ! Em sửa được 0 ô, còn lệch 1 ô. Đoạn giữ sổ được -10 điểm. Xem kết quả"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "hết giờ",
+  "name": "kết quả có dòng \"Giữ sổ: ô còn lệch khi hết giờ (−10 mỗi ô)\"",
+  "ok": true,
+  "detail": "[\"Vòng 1 (số lần sai): 0 → 100 điểm\",\"Vòng 2 (số lần sai): 0 → 100 điểm\",\"Vòng 2: bỏ đúng trang giả vào rổ: 1 → 30 điểm\",\"Giữ sổ: ô đã sửa xong (+20 mỗi ô): 0 → 0 điểm\",\"Giữ sổ: ô còn lệch khi hết giờ (−10 mỗi ô): 1 → -10 điểm\"]"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "hết giờ",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "hết tim",
+  "name": "kéo nhầm trang thật vào rổ 3 lần: hết tim, bảng \"Hết tim rồi!\", ván kết thúc",
+  "ok": true,
+  "detail": "Hết tim rồi! Xem kết quả"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "hết tim",
+  "name": "kết quả hết tim: tính điểm ghép hai vòng (230) và không có điểm giữ sổ",
+  "ok": true,
+  "detail": "Điểm: 230"
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "hết tim",
+  "name": "chơi lại sau khi hết tim: ván mới đủ 3 tim",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "label": "sau",
+  "size": "844x390",
+  "area": "hết tim",
+  "name": "không lỗi trang",
+  "ok": true,
+  "detail": ""
+ }
+]
