@@ -351,6 +351,29 @@ describe('tương thích khi máy chủ chưa chạy migration 0003 (P3b hoàn t
   });
   afterEach(() => vi.useRealTimers());
 
+  it('phản hồi thăm dò đến muộn (báo thiếu cột) không hoàn lại cờ đã lưu thành công', async () => {
+    let release: (v: boolean) => void = () => {};
+    // lần thăm dò (lúc kéo tiến độ) bị kẹt rồi trả lời muộn; bấm nút dùng chung lần thăm dò đó, không gửi thêm
+    let calls = 0;
+    remote.supportsAutoComplete = () => { calls++; return new Promise<boolean>((r) => { release = r; }); };
+    const m = make();
+    m.setAutoAllowed(true);
+    await m.setUser('teacher');
+    await vi.advanceTimersByTimeAsync(10);
+    expect(m.getSnapshot().autoStatus).toBe('unknown');
+    const pressed = m.requestAutoComplete(7);
+    await vi.advanceTimersByTimeAsync(3100); // thăm dò treo: bấm không chờ mãi
+    expect(await pressed).toBe('done'); // đường cờ lưu được -> máy chủ chắc chắn có cột
+    expect(m.getSnapshot().autoStatus).toBe('yes');
+    release(false); // phản hồi cũ, đến sau
+    await vi.advanceTimersByTimeAsync(10);
+    expect(m.getSnapshot().autoStatus).toBe('yes');
+    expect(m.getSnapshot().progress.levels[7]?.auto).toBe(true);
+    expect(remote.account.levels[7]?.auto).toBe(true);
+    expect(remote.pushes.filter((p) => p.levelId === 7)).toHaveLength(1);
+    expect(calls).toBe(1);
+  });
+
   it('máy chủ chưa hỗ trợ (thăm dò báo thiếu cột): nút vô hiệu (autoStatus no), bấm không ghi gì, KHÔNG báo đã lưu; tiến độ chơi thật vẫn lưu và đồng bộ', async () => {
     remote.mode = 'no-column';
     const m = make();

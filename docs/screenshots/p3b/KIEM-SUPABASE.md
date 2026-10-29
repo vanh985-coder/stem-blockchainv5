@@ -24,7 +24,9 @@ P3B_ROWS_JSON=/tmp/p3b_class_progress.json P3B_ERR_FILE=/tmp/p3b_err_missing_col
 
 ## CHƯA nghiệm thu (điều kiện còn thiếu)
 
-Lượt trên chỉ chứng minh SQL của migration, trigger và RLS. Chưa kiểm được: PostgREST (cách `upsert`/`select('*')` đi qua API thật), GoTrue và JWT thật (`auth.uid()` ở đây là giả), tài khoản giáo viên thật, trang giáo viên và CSV với dữ liệu từ API thật. `pnpm rls:check` thoát mã 2: "Thiếu VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY hoặc VITE_USERNAME_EMAIL_DOMAIN trong .env.local" (không có `.env.local` hay dự án Supabase TEST trên máy này). **Phần quyền máy chủ chưa được ghi là đã nghiệm thu.**
+Lượt trên chỉ chứng minh SQL của migration, trigger và RLS. Chưa kiểm được: PostgREST (cách `upsert`/`select('*')` đi qua API thật), GoTrue và JWT thật (`auth.uid()` ở đây là giả), tài khoản giáo viên thật, trang giáo viên và CSV với dữ liệu từ API thật. `pnpm rls:check` thoát mã 2: "Thiếu VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY hoặc VITE_USERNAME_EMAIL_DOMAIN trong .env.local" (không có `.env.local` hay dự án Supabase TEST trên máy này). **Phần quyền máy chủ chưa được ghi là đã nghiệm thu.** Kiểm DOM với máy chủ giả (README cùng thư mục) chỉ kiểm giao diện, không thay thế bước này.
+
+**Điều kiện phải hoàn tất TRƯỚC khi triển khai chức năng cho giáo viên:** (1) có dự án Supabase TEST và `.env.local` như trên; (2) áp `0003` ở đó; (3) `pnpm rls:check` đạt các ca (3b) và (9); (4) một giáo viên thật bấm "Tự hoàn thành" trên bản build trỏ vào dự án TEST, rồi một học sinh thật thử mà bị từ chối; (5) chỉ sau đó mới áp `0003` ở production (chủ dự án tự làm).
 
 Để nghiệm thu: tạo dự án Supabase TEST (không dùng production), áp `0001`, `0002`, `0003` ở SQL Editor, tạo hai tài khoản giáo viên rồi đặt `.env.local` (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_USERNAME_EMAIL_DOMAIN, TEST_TEACHER_A_USER/_PASS, TEST_TEACHER_B_USER/_PASS), chạy `pnpm rls:check`; ca (3b) phải báo học sinh bị chặn, ca (9) giáo viên đặt được. Ghi kết quả vào `TRANG-THAI.md`.
 

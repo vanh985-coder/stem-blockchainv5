@@ -23,6 +23,28 @@
 
 Mới: `progress/autoComplete.test.ts` (23 ca: đủ 12 màn chỉ ghi cờ, bấm lặp, không ghi đè thành tích thật, mở màn kế, KHÔNG trao trang/cao trào, bỏ qua khi chưa được phép, chơi thật sau, mã hóa cookie, hàng Supabase, gộp, manager: không đẩy cờ của học sinh, đẩy một bản ghi của giáo viên, tải lại, quyền thấy nút, trang giáo viên), `apps/hub/src/autoComplete.test.tsx` (nút, khung, bảng làng). `pnpm test --maxWorkers=2`: **2185 pass, 1 skipped** (199 file); `pnpm typecheck` đạt; `pnpm check:text` sạch (432 file); `pnpm build` đạt. Bundle hub: tổng JS **2.781.350 byte** (gzip 863.024), trước P3b 2.774.688 (+6.662).
 
+## Kiểm DOM bản phát hành với máy chủ GIẢ (sau commit 477e195, 29/10/2026)
+
+**Đây KHÔNG phải kiểm quyền Supabase thật.** `node scripts/p3b-api-check.mjs` mở bản BUILD phát hành (không phải dev; khóa trong bản build là chuỗi giả `mock-anon-key-not-real`) đăng nhập là giáo viên, nói chuyện với `scripts/lib/mock-supabase.mjs` (máy chủ giả bắt chước tối thiểu PostgREST/GoTrue; không RLS, trigger hay JWT thật). Mã lỗi giả (42703 thiếu cột, P0001 từ chối) lấy từ PostgreSQL thật qua `scripts/db-test-p3b.sh`. Cách chạy ở đầu file script.
+
+**156 kiểm đạt** (52 mỗi cỡ: 1366×768, 360×800, 844×390; 45 ảnh `api-*.jpg`, lớn nhất 157.958 byte; chi tiết `ket-qua-api-gia.json`, `anh-api-gia.json`). Tiến độ chơi thật được mô phỏng bằng bản ghi bài 4 "đã chơi dở" chờ đẩy trên máy (không chơi game thật).
+
+| Tình huống | Kết quả xác minh |
+|---|---|
+| Máy chủ chưa có cột (thăm dò 42703) | Nút vô hiệu, ghi rõ "máy chủ chưa hỗ trợ… tiến độ chơi thật vẫn lưu"; bấm không hiện khung "Đã tự hoàn thành", máy chủ không nhận bản ghi cờ nào; bài 4 chờ đẩy vẫn lên máy chủ (không mang cờ); tải lại: `/ban-do` không màn nào ghi "Tự hoàn thành"; nút vẫn vô hiệu |
+| Thăm dò báo có cột nhưng lúc ghi báo 42703 | Thông báo chưa hỗ trợ, nút vô hiệu, không khung thành công; tiến độ thật cùng lượt đẩy vẫn lên; cờ bị gỡ khỏi máy (đúng 1 lần thử); tải lại không còn cờ |
+| Có cột, máy chủ từ chối quyền ghi (P0001) | Thông báo "máy chủ không cho tài khoản này dùng" (khác với chưa hỗ trợ và mất mạng), nút vô hiệu, không báo đã lưu; tiến độ thật cùng lượt vẫn lên; cờ không còn sau tải lại và không có hiệu lực ở `/ban-do`; bấm lại sau tải lại vẫn bị từ chối, không cờ nào lên |
+| Mất mạng tạm thời (mọi yêu cầu đứt) | Khung hiện kèm "Chưa lưu được lên máy chủ (có thể mất mạng)", KHÔNG nói thiếu migration hay bị từ chối; sang màn 2 nút vẫn dùng được (không khóa vĩnh viễn); có mạng lại: cờ tự lên đúng 1 lần, thêm hai lần sự kiện `online` vẫn 1 lần; hàng chỉ có cờ (không điểm/sao/xu/trang); xóa dữ liệu máy rồi tải lại: cờ lấy từ máy chủ |
+| Thăm dò lỗi mạng rồi đường ghi cờ lỗi tạm thời | Trạng thái "chưa biết": nút không khóa; nói rõ chưa lưu; hết lỗi: lưu đúng 1 lần, không ghi trùng |
+| Lưu thành công | Khung không kèm cảnh báo; bấm 3 lần liên tiếp: 1 lần ghi, 1 hàng; hàng chỉ có cờ; xu 0, trang 0; tải lại: màn 1 hết nút, `/ban-do` ghi "Tự hoàn thành" từ máy chủ; không ghi thêm |
+| Phản hồi thăm dò cũ (báo thiếu cột) đến muộn 14 giây sau khi cờ đã lưu thành công | Khung thành công còn nguyên, không thông báo chưa hỗ trợ, nút ở màn sau vẫn dùng được, cờ ở máy chủ và máy còn nguyên, chỉ 1 lần ghi |
+
+Lưu ý đúng phạm vi: giáo viên/admin thấy mọi màn đã mở nên không quan sát được "màn kế mở" ở DOM; hiệu lực của cờ được kiểm bằng nhãn "Tự hoàn thành" ở `/ban-do` (và bằng test `computeUnlock`).
+
+**Lỗi tìm thấy và đã sửa khi kiểm:** (1) phản hồi thăm dò đến muộn có thể ghi đè trạng thái "có hỗ trợ" thành "chưa hỗ trợ" sau khi cờ đã lưu (nay chỉ ghi khi còn "chưa biết"; test mới trong `autoComplete.test.ts`); (2) thăm dò treo làm nút bấm treo theo (nay dùng chung một lần thăm dò và chờ tối đa 3 giây rồi cứ ghi, lần đẩy tự phân loại lỗi); (3) ghi chú của nút bị bóp thành cột chữ hẹp (360×800, ở thanh đầu bài học, và còn hiện lặp hai lần) và ở thẻ bắt đầu game 844×390 (nay hiện một chỗ, đủ rộng, dưới thanh đầu / xuống dòng riêng).
+
+Chạy lại sau sửa: `p3b-check.mjs --mode=dev --only=levels,double,mid` **207 kiểm đạt** (3 cỡ). Các kịch bản dev còn lại (`real`, `all12`) và bản phát hành cho khách (`--mode=prod`) không đổi logic và chưa chạy lại.
+
 ## Chưa xác minh
 
 - **Bổ sung (tương thích và kiểm quyền):** cờ đi đường đẩy riêng, nút vô hiệu khi máy chủ chưa chạy 0003; migration 0003 kiểm trên PostgreSQL biệt lập 51/51 đạt (không phải Supabase thật), xem `KIEM-SUPABASE.md` (cách chạy, điều kiện còn thiếu, `pnpm rls:check` thoát mã 2 vì thiếu `.env.local`).

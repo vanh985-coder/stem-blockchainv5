@@ -72,6 +72,9 @@ export type AutoResult = 'done' | 'pending' | 'unsupported' | 'rejected' | 'unav
 
 export type SaveStatus = 'saved' | 'pending';
 
+/** Chờ tối đa bấy nhiêu mili giây cho lần thăm dò hỗ trợ cờ trước khi ghi cờ. */
+const AUTO_PROBE_WAIT_MS = 3000;
+
 const withTimeout = <T>(p: Promise<T>, ms: number): Promise<T | 'timeout'> =>
   new Promise((resolve) => {
     const t = setTimeout(() => resolve('timeout'), ms);
@@ -107,6 +110,7 @@ export class ProgressManager {
   private autoAllowed = false;
   private autoSupport: 'unknown' | 'yes' | 'no' = 'unknown';
   private autoRejected = false;
+  private probing: Promise<void> | null = null;
   private timer: ReturnType<typeof setTimeout> | null = null;
   private chain: Promise<unknown> = Promise.resolve();
   private snap: Snapshot;
@@ -146,8 +150,16 @@ export class ProgressManager {
   }
 
   /** Hỏi máy chủ đã hỗ trợ cờ chưa (một lần mỗi phiên; chỉ khi đã đăng nhập, đã kéo xong và được phép). Mất mạng thì để 'unknown', lần đẩy đầu tiên sẽ tự phân loại lỗi. */
-  private async ensureAutoSupport(): Promise<void> {
-    if (this.mode !== 'user' || !this.pulled || !this.autoAllowed || this.autoSupport !== 'unknown') return;
+  private ensureAutoSupport(): Promise<void> {
+    if (this.mode !== 'user' || !this.pulled || !this.autoAllowed || this.autoSupport !== 'unknown') return Promise.resolve();
+    // một lần thăm dò chạy tại một thời điểm: bấm nút lúc đang thăm dò thì dùng chung, không gửi thêm
+    this.probing ??= this.probeAutoSupport().finally(() => {
+      this.probing = null;
+    });
+    return this.probing;
+  }
+
+  private async probeAutoSupport(): Promise<void> {
     const probe = this.deps.remote.supportsAutoComplete;
     const userId = this.userId;
     if (!probe) {
@@ -157,7 +169,8 @@ export class ProgressManager {
     }
     try {
       const ok = await probe.call(this.deps.remote);
-      if (this.userId !== userId) return;
+      // phản hồi đến muộn không được ghi đè kết luận chắc chắn hơn (ví dụ cờ đã lưu thành công trong lúc chờ)
+      if (this.userId !== userId || this.autoSupport !== 'unknown') return;
       this.autoSupport = ok ? 'yes' : 'no';
       this.emit();
     } catch {
@@ -173,7 +186,8 @@ export class ProgressManager {
   async requestAutoComplete(levelId: number): Promise<AutoResult> {
     if (this.mode === 'loading' || !this.autoAllowed) return 'unavailable';
     if (this.mode === 'user') {
-      await this.ensureAutoSupport();
+      // thăm dò treo (máy chủ chậm) không được giữ nút mãi: quá hạn thì cứ ghi, lần đẩy sẽ tự phân loại lỗi
+      await withTimeout(this.ensureAutoSupport(), AUTO_PROBE_WAIT_MS);
       if (this.autoRejected) return 'rejected';
       if (this.autoSupport === 'no') return 'unsupported';
     }
@@ -222,6 +236,7 @@ export class ProgressManager {
     this.saving = false;
     this.autoSupport = 'unknown';
     this.autoRejected = false;
+    this.probing = null;
     this.userId = userId;
 
     if (userId === null) {

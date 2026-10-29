@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { autoCompleteUi } from '../content/autoComplete';
 import { fmt } from '../content/characters';
 import { gameUi } from '../content/games';
@@ -13,14 +13,20 @@ import { Panel } from './Panel';
  * Bấm: ghi cờ qua luồng lưu tiến độ hiện có (một lần; bấm lặp không tạo gì thêm), chờ lưu xong rồi gọi `onDone` để trang rời ván (đồng hồ và vật lý dừng vì ván không còn chạy,
  * không chấm điểm, không trao thưởng). `variant="icon"`: nút tròn 44 px cho màn hẹp.
  */
-export function AutoCompleteButton({ levelId, onDone, variant = 'text', className = '' }: { levelId: number; onDone: (note?: string) => void; variant?: 'text' | 'icon'; className?: string }) {
+export function AutoCompleteButton({ levelId, onDone, variant = 'text', className = '', onNote }: { levelId: number; onDone: (note?: string) => void; variant?: 'text' | 'icon' | 'responsive'; className?: string; /** Có thì dòng ghi chú KHÔNG hiện cạnh nút mà được báo cho trang tự đặt chỗ (thanh đầu bài học quá hẹp để chứa nó) */ onNote?: (note: string | null) => void }) {
   const { canAutoComplete, autoComplete, autoStatus, unlock } = useProgress();
   const [msg, setMsg] = useState<string | null>(null);
   const state = unlock.levels.find((l) => l.id === levelId)?.state;
-  if (!canAutoComplete || state === 'done' || state === 'coming-soon') return null;
+  const shown = canAutoComplete && state !== 'done' && state !== 'coming-soon';
   // Máy chủ chưa hỗ trợ (migration 0003 chưa chạy) hay từ chối: vô hiệu nút và nói rõ; không ghi gì, không ảnh hưởng việc lưu tiến độ chơi thật
   const blocked = autoStatus === 'no' ? autoCompleteUi.chuaHoTro : autoStatus === 'rejected' ? autoCompleteUi.biTuChoi : null;
-  const note = blocked ?? msg;
+  const note = shown ? (blocked ?? msg) : null;
+  useEffect(() => {
+    if (!onNote) return undefined;
+    onNote(note);
+    return () => onNote(null);
+  }, [note, onNote]);
+  if (!shown) return null;
   const press = async () => {
     const r = await autoComplete(levelId);
     if (r === 'done' || r === 'noop') onDone();
@@ -28,28 +34,37 @@ export function AutoCompleteButton({ levelId, onDone, variant = 'text', classNam
     else setMsg(r === 'unsupported' ? autoCompleteUi.chuaHoTro : r === 'rejected' ? autoCompleteUi.biTuChoi : autoCompleteUi.khongDung);
   };
   const common = { 'data-testid': 'nut-tu-hoan-thanh', 'aria-describedby': note ? `tu-hoan-thanh-ghi-chu-${levelId}` : undefined } as const;
-  const button =
-    variant === 'icon' ? (
-      <button
-        type="button"
-        aria-label={autoCompleteUi.nut}
-        title={autoCompleteUi.ghiChu}
-        disabled={blocked !== null}
-        onClick={() => void press()}
-        {...common}
-        className={`size-11 min-h-11 min-w-11 cursor-pointer place-items-center rounded-nut border-2 border-muc-tim bg-giay text-xl disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim ${className}`}
-      >
-        <span aria-hidden="true">⏭</span>
-      </button>
-    ) : (
-      <Button variant="secondary" size="sm" title={autoCompleteUi.ghiChu} disabled={blocked !== null} className={className} onClick={() => void press()} {...common}>
-        {autoCompleteUi.nut}
-      </Button>
-    );
+  const textButton = (
+    <Button variant="secondary" size="sm" title={autoCompleteUi.ghiChu} disabled={blocked !== null} className={variant === 'responsive' ? `max-[480px]:hidden ${className}` : className} onClick={() => void press()} {...common}>
+      {autoCompleteUi.nut}
+    </Button>
+  );
+  const iconButton = (
+    <button
+      type="button"
+      aria-label={autoCompleteUi.nut}
+      title={autoCompleteUi.ghiChu}
+      disabled={blocked !== null}
+      onClick={() => void press()}
+      {...common}
+      className={`size-11 min-h-11 min-w-11 cursor-pointer place-items-center rounded-nut border-2 border-muc-tim bg-giay text-xl disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim ${variant === 'responsive' ? 'hidden max-[480px]:grid' : ''} ${className}`}
+    >
+      <span aria-hidden="true">⏭</span>
+    </button>
+  );
   return (
     <>
-      {button}
-      {note && (
+      {variant === 'responsive' ? (
+        <>
+          {textButton}
+          {iconButton}
+        </>
+      ) : variant === 'icon' ? (
+        iconButton
+      ) : (
+        textButton
+      )}
+      {note && !onNote && (
         <p role="status" id={`tu-hoan-thanh-ghi-chu-${levelId}`} data-testid="tu-hoan-thanh-ghi-chu" className="basis-full text-sm font-semibold text-muc-tim-dam">
           {note}
         </p>

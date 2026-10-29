@@ -356,7 +356,7 @@ export function MiniGameLevel({ levelId, medals, renderGame, onLeave, finale }: 
         </p>
         <p className="text-sm">{moc}</p>
         </div>
-        <div className="flex shrink-0 flex-col justify-center gap-2 sm:flex-row sm:justify-end sm:gap-3" data-testid="nut-the-bat-dau">
+        <div className="flex shrink-0 flex-col justify-center gap-2 sm:flex-row sm:flex-wrap sm:justify-end sm:gap-3" data-testid="nut-the-bat-dau">
           <Button size="lg" variant="secondary" fullWidth className="sm:w-auto" onClick={() => setGuideOpen(true)}>
             {huongDan.nut}
           </Button>

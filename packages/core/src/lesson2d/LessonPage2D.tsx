@@ -98,6 +98,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
 
   // Vào lại màn: bắt đầu ở trạm đầu tiên chưa có sao (đã xong cả 3 thì ở trạm Dễ).
   const [stage, setStage] = useState<Stage>(() => ({ kind: 'dialogue', idx: startStationIndex(progress.levels[levelId]?.stars ?? {}) }));
+  const [autoNote, setAutoNote] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [showCards, setShowCards] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
@@ -417,10 +418,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
               </>
             )}
             {stage.kind !== 'saving' && stage.kind !== 'award' && stage.kind !== 'auto' && stage.kind !== 'outro' && (
-              <>
-                <AutoCompleteButton levelId={levelId} className="max-[480px]:hidden" onDone={(note) => setStage({ kind: 'auto', note })} />
-                <AutoCompleteButton levelId={levelId} variant="icon" className="hidden max-[480px]:grid" onDone={(note) => setStage({ kind: 'auto', note })} />
-              </>
+              <AutoCompleteButton levelId={levelId} variant="responsive" onNote={setAutoNote} onDone={(note) => setStage({ kind: 'auto', note })} />
             )}
             <Button variant="secondary" size="sm" className="max-[480px]:hidden" disabled={saving} onClick={goMap}>
               {leaveLabel}
@@ -428,6 +426,11 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
             <IconButton label={leaveLabel} icon="🏡" disabled={saving} onClick={goMap} />
           </div>
         </header>
+        {autoNote && (
+          <p role="status" data-testid="tu-hoan-thanh-ghi-chu" className="mx-auto w-full max-w-3xl rounded-2xl border-2 border-muc-tim bg-white/90 p-3 text-sm font-semibold text-muc-tim-dam">
+            {autoNote}
+          </p>
+        )}
 
         <main className={`mx-auto w-full ${boardMax} px-1 pb-10 pt-2 sm:px-3`}>
           {body}
