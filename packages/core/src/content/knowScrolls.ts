@@ -48,7 +48,7 @@ export const knowScrollUi = {
   /** Khung giới thiệu làng trên bản đồ: đọc đủ thẻ mới vào được bài */
   /** Nhãn mỗi thẻ ở khung giới thiệu làng */
   banDoThe: 'Em có biết? · Thẻ {n}/{tong}',
-  banDoCan: 'Em đọc đủ {tong} thẻ Em có biết của làng này thì mới vào được bài ({n}/{tong}).',
+  banDoCan: 'Em nhặt đủ {tong} thẻ Em có biết trong làng này (trả lời câu hỏi rồi cất vào sổ) thì mới vào được bài ({n}/{tong}). Ở đây em chỉ đọc được thẻ.',
   banDoDoc: 'Đọc thẻ Em có biết',
-  banDoXong: 'Em đã đọc đủ thẻ Em có biết của làng này.',
+  banDoXong: 'Em đã nhặt đủ thẻ Em có biết của làng này.',
 } as const;

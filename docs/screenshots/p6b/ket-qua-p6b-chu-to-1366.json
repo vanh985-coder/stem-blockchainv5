@@ -1,0 +1,105 @@
+{
+ "results": [
+  {
+   "size": "1366x768",
+   "area": "chữ to/thuong",
+   "name": "mở được cuộn thẻ 4 (nội dung dài nhất)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/thuong",
+   "name": "không có hoạt ảnh trong hộp (hợp Giảm chuyển động)",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/thuong",
+   "name": "cuộn tới nút Kiểm tra, nằm trọn trong khung nhìn và đủ lớn (≥ 40px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/thuong",
+   "name": "Tab đưa tiêu điểm vào trong hộp (không rơi ra cảnh)",
+   "ok": true,
+   "detail": "{\"tag\":\"BUTTON\",\"inDialog\":true}"
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/thuong",
+   "name": "sau khi nộp: phản hồi và nút Cất vào sổ cuộn tới được",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/thuong",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/chu-to",
+   "name": "mở được cuộn thẻ 4 (nội dung dài nhất)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/chu-to",
+   "name": "không có hoạt ảnh trong hộp (hợp Giảm chuyển động)",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/chu-to",
+   "name": "cuộn tới nút Kiểm tra, nằm trọn trong khung nhìn và đủ lớn (≥ 40px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/chu-to",
+   "name": "Tab đưa tiêu điểm vào trong hộp (không rơi ra cảnh)",
+   "ok": true,
+   "detail": "{\"tag\":\"BUTTON\",\"inDialog\":true}"
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/chu-to",
+   "name": "sau khi nộp: phản hồi và nút Cất vào sổ cuộn tới được",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/chu-to",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to",
+   "name": "Chữ to làm tiêu đề thẻ to hơn (24px → 27.6px)",
+   "ok": true,
+   "detail": "[24,27.6]"
+  }
+ ],
+ "shots": [
+  {
+   "file": "p6b-chu-to-1366-thuong-phan-hoi-1366x768.jpg",
+   "bytes": 139466
+  },
+  {
+   "file": "p6b-chu-to-1366-chu-to-phan-hoi-1366x768.jpg",
+   "bytes": 135669
+  }
+ ]
+}

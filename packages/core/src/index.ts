@@ -32,6 +32,12 @@ export { GuideDialog, GuideFigureView, detectGuideDevice } from './ui/GuideDialo
 export type { GuideDialogProps } from './ui/GuideDialog';
 export { GuideArt } from './ui/GuideArt';
 export { EmCoBietDialog } from './ui/EmCoBietDialog';
+export { KnowQuizDialog } from './ui/KnowQuizDialog';
+export type { KnowQuizDialogProps } from './ui/KnowQuizDialog';
+export { KNOW_QUIZ, knowQuizUi } from './content/knowQuiz';
+export type { KnowQuiz, KnowQuizAbcd, KnowQuizNumber } from './content/knowQuiz';
+export { knowQuizOf, knowCollectibleTotal, parseNumberAnswer, initialQuizState, chooseOption, typeAnswer, submitQuiz, canCollect } from './lib/knowQuiz';
+export type { NumberParse, QuizState, QuizReminder } from './lib/knowQuiz';
 export type { EmCoBietDialogProps } from './ui/EmCoBietDialog';
 export { SettingsProvider, useSettings } from './settings/SettingsProvider';
 export { SETTINGS_KEY } from './settings/settings';

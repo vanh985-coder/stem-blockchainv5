@@ -17,12 +17,12 @@ import {
   canWatchClimax,
   hasSeenClimax,
   openClimax,
-  knowScrollUi,
   countKnowCards,
   levelsOfVillage,
   shouldShowIntro,
   ui,
   villageKnowCards,
+  knowCollectibleTotal,
   useAuth,
   useManifest,
   useProgress,
@@ -105,7 +105,7 @@ export default function BanDoPage() {
   const manifest = useManifest();
   const { profile } = useAuth();
   const navigate = useNavigate();
-  const { unlock, progress, goldenPages, mode, synced, markVillageIntroSeen, markAllKnowCards } = useProgress();
+  const { unlock, progress, goldenPages, mode, synced, markVillageIntroSeen } = useProgress();
   const [selected, setSelected] = useState<VillageId | null>(null);
   const [intro, setIntro] = useState<VillageId | null>(null);
   const [reading, setReading] = useState<VillageId | null>(null);
@@ -134,7 +134,7 @@ export default function BanDoPage() {
 
   // thẻ "Em có biết?" của làng (bước X3): đã đọc (hoặc nhặt trong làng 3D) đủ chưa; người đã xong màn 1 hay đã xem hộp cũ coi như đủ
   const maskOf = (id: VillageId) => {
-    const total = villageKnowCards(id).length;
+    const total = knowCollectibleTotal(id);
     const first = levelsOfVillage(id)[0]?.id;
     const firstState = unlock.levels.find((u) => u.id === first);
     // tự hoàn thành (P3b) không phải đã xong bài học thật: không làm đủ thẻ
@@ -142,7 +142,7 @@ export default function BanDoPage() {
     return effectiveKnowMask({ data: progress.game.data, village: id, total, lessonDone, seenOld: hasSeenKnow(progress.game.data, id) });
   };
   const knowOf = (id: VillageId) => {
-    const total = villageKnowCards(id).length;
+    const total = knowCollectibleTotal(id);
     return { got: countKnowCards(maskOf(id), total), total };
   };
   const details = selected && (
@@ -277,15 +277,13 @@ export default function BanDoPage() {
 
       {intro && (
         <Suspense fallback={null}>
-          <VillageIntro village={intro} unlockLevels={unlock.levels} onDone={endIntro} onCardsRead={() => markAllKnowCards(intro, villageKnowCards(intro).length)} />
+          <VillageIntro village={intro} unlockLevels={unlock.levels} onDone={endIntro} />
         </Suspense>
       )}
       {reading && (
         <EmCoBietDialog
           cards={villageKnowCards(reading)}
           onClose={() => setReading(null)}
-          onFinish={() => markAllKnowCards(reading, villageKnowCards(reading).length)}
-          finishLabel={knowScrollUi.catVaoSo}
         />
       )}
     </div>

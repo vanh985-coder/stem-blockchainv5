@@ -73,22 +73,22 @@ export const bai2Lesson: LessonContent = {
     {
       title: 'Node là ai?',
       text: 'Node là một máy tính trong mạng blockchain, giống một người giữ sổ. Mỗi node giữ một bản sao đầy đủ của cuốn sổ, và các bản sao giống hệt nhau.',
-      example: 'Trong mạng Sổ Chung, 4 người là em, {cuBinh}, {coChi} và {phanDien} mỗi người giữ một cuốn sổ y hệt nhau.',
+      example: 'Trong mạng Sổ Chung có 4 node: em, {cuBinh}, {coChi} và {phanDien}. Mỗi người giữ một cuốn sổ đầy đủ, y hệt nhau.',
     },
     {
       title: 'Node làm gì khi có trang mới?',
       text: 'Node tự kiểm tra 2 điều: mã trang trước ghi trong trang mới có khớp với trang cuối trong sổ của mình không, và mã trang mới có được tính đúng không.',
-      example: 'Sổ em: trang cuối mã 57. Trang mới: mã trước 57, nội dung 36, mã 50 → (57 × 2 + 36) mod 100 = 50 ✓.',
+      example: 'Sổ em có trang cuối mã 57. Trang mới ghi: mã trước 57, nội dung 36, mã 50. Điều 1: mã trước 57 khớp trang cuối. Điều 2: (57 × 2 + 36) mod 100 = 50, khớp. Em Đồng ý.',
     },
     {
       title: 'Đa số đồng ý mới được ghi.',
       text: 'Chỉ khi phần lớn các node đồng ý, trang mới được ghi vào sổ của tất cả mọi người. Cách các node thống nhất với nhau gọi là cơ chế đồng thuận.',
-      example: 'Có 4 người giữ sổ: khi có ít nhất 2 người khác đồng ý (cùng với người tạo là đa số), trang mới được ghi vào sổ chung.',
+      example: 'Có 4 node. Một node tạo trang, 3 node còn lại bỏ phiếu: có từ 2 phiếu Đồng ý trở lên thì trang được ghi (cùng người tạo là ít nhất 3 trong 4 node, hơn một nửa).',
     },
     {
       title: 'Vì sao an toàn hơn?',
       text: 'Sổ không nằm trong tay một người. Muốn sửa lén, kẻ gian phải sửa sổ của phần lớn các node cùng lúc, điều này cực kỳ khó.',
-      example: 'Nếu kẻ gian sửa lén sổ của riêng mình, các node khác sẽ phát hiện ngay vì mã trang không khớp với sổ của số đông.',
+      example: '{phanDien} sửa lén sổ của riêng mình, kể cả sửa và tính lại mã cho cả chuỗi khớp nhau. Sổ của em, {cuBinh} và {coChi} vẫn giữ nguyên, nên bản sổ đã sửa khác với số đông.',
     },
   ],
 

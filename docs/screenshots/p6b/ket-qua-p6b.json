@@ -1,0 +1,5133 @@
+{
+ "results": [
+  {
+   "size": "1366x768",
+   "area": "lang-giay",
+   "name": "khách mới: đủ 4 cuộn chưa nhặt; 3 biển khóa (chưa đủ thẻ)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay",
+   "name": "khách mới: bản đồ nhỏ có đủ 16 ký hiệu thẻ chưa nhặt",
+   "ok": true,
+   "detail": "16"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "đúng thẻ \"Blockchain là một cuốn sổ.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Blockchain là một cuốn sổ.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "mở hộp thì điều khiển tạm dừng (giữ W 1,5 giây, người chơi đứng yên)",
+   "ok": true,
+   "detail": "[[55.65,159],[55.65,159]]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "trả lời đúng (keyboard): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: A. Một chuỗi gồm 8 khối\",\"giaiThich\":\"Giải thích: Mỗi trang là một khối, các trang nối tiếp nhau tạo thành chuỗi, nên 8 "
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Một chuỗi gồm 8 khối"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[0,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "true,false,false,false"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "Enter lặp liền sau cú nộp KHÔNG cất thẻ và không chuyển bước (hộp còn mở, cờ chưa ghi)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "đóng trước khi cất (Esc): hộp đóng, thẻ chưa nhặt (cuộn còn, cờ chưa ghi)",
+   "ok": true,
+   "detail": "[0,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "mở lại cuộn: hỏi lại từ đầu (không nhớ đáp án đã nộp)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "lượt mở lại ở trạng thái chưa trả lời",
+   "ok": true,
+   "detail": "{\"phase\":\"ask\",\"fb\":false,\"checked\":false,\"val\":\"\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "trả lời đúng (keyboard): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: A. Một chuỗi gồm 8 khối\",\"giaiThich\":\"Giải thích: Mỗi trang là một khối, các trang nối tiếp nhau tạo thành chuỗi, nên 8 "
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Một chuỗi gồm 8 khối"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "sau khi nộp tiêu điểm nằm ở nút Cất vào sổ (bàn phím)",
+   "ok": true,
+   "detail": "nut-cat-vao-so"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#0",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[1,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#1",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#1",
+   "name": "đúng thẻ \"Mỗi trang có 2 phần.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Mỗi trang có 2 phần.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#1",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#1",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#1",
+   "name": "trả lời sai (mouse): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: B. Vì Mã trang là \\\"dấu vân tay\\\" của trang: nội dung đã khác mà mã vẫn là 43 nên không còn khớp\",\"giaiThich\":\"Giải thí"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#1",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: B. Vì Mã trang là \"dấu vân tay\" của trang: nội dung đã khác mà mã v"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#1",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[1,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#1",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#1",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,true,false"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#1",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[3,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#1",
+   "name": "xem lại thẻ đã nhặt (menu Em có biết?): có ví dụ, câu hỏi, đáp án, giải thích; không bắt trả lời lại",
+   "ok": true,
+   "detail": "{\"mode\":\"review\",\"phase\":\"review\",\"ex\":true,\"ans\":\"Đáp án đúng: A. Một chuỗi gồm 8 khối\",\"exp\":\"Giải thích: Mỗi trang là một khối, các trang nối tiếp nhau tạo thành chuỗi, nên 8 trang là một chuỗi gồm"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#1",
+   "name": "xem lại không làm mất thẻ (cờ giữ nguyên)",
+   "ok": true,
+   "detail": "[3,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "đúng thẻ \"Cách tính mã trang.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Cách tính mã trang.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "bấm Kiểm tra khi để trống: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy nhập một số trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "gõ sai định dạng (04a): hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em chỉ nhập chữ số, viết liền và không bắt đầu bằng số 0 (ví dụ: 44).\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "ô điền số là văn bản với bàn phím số (không type=number), xóa được",
+   "ok": true,
+   "detail": "{\"type\":\"text\",\"mode\":\"numeric\",\"val\":\"\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "trả lời đúng (keyboard): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: 44\",\"giaiThich\":\"Giải thích: 43 × 2 + 58 = 144, rồi chỉ giữ 2 chữ số cuối nên mã trang là 44. Nếu em ra 144 là em quên b"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: 44"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[3,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "Enter lặp liền sau cú nộp KHÔNG cất thẻ và không chuyển bước (hộp còn mở, cờ chưa ghi)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "sau khi nộp tiêu điểm nằm ở nút Cất vào sổ (bàn phím)",
+   "ok": true,
+   "detail": "nut-cat-vao-so"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#2",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[7,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#3",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#3",
+   "name": "đúng thẻ \"Vì sao khó sửa lén?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Vì sao khó sửa lén?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#3",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#3",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#3",
+   "name": "trả lời sai (mouse): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: C. Kiểm tra lần lượt từ trang 3: mỗi trang tính lại từ mã mới của trang trước, cho tới khi hết chuỗi hoặc gặp trang tín"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#3",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. Kiểm tra lần lượt từ trang 3: mỗi trang tính lại từ mã mới của t"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#3",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[7,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#3",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#3",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,false,true"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay#3",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay",
+   "name": "cất đủ 4 thẻ (có cả đúng và sai): bài học của làng mở (open), hai màn sau vẫn khóa theo thứ tự",
+   "ok": true,
+   "detail": "open,locked,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay",
+   "name": "không còn cuộn nào trong làng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay",
+   "name": "không phát sinh điểm, xu, Trang Sổ Vàng",
+   "ok": true,
+   "detail": "{\"c\":0,\"gp\":0,\"lv\":{}}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-giay",
+   "name": "cờ chỉ là mặt nạ bit knowCards (không có trường lưu đáp án)",
+   "ok": true,
+   "detail": "{\"v\":1,\"lv\":{},\"gp\":0,\"c\":0,\"u\":1793326696564,\"vs\":1,\"hd\":4095,\"st\":1,\"kc\":[15,0,0,0],\"gt\":8191}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det",
+   "name": "khách mới: đủ 4 cuộn chưa nhặt; 3 biển khóa (chưa đủ thẻ)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "đúng thẻ \"Node là ai?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Node là ai?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "mở hộp thì điều khiển tạm dừng (giữ W 1,5 giây, người chơi đứng yên)",
+   "ok": true,
+   "detail": "[[-64.35,-136.5],[-64.35,-136.5]]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "trả lời sai (keyboard): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau\",\"giaiThich\":\"Giải thích: Trong mạng của bài, trang đã được gh"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "true,false,false,false"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "Enter lặp liền sau cú nộp KHÔNG cất thẻ và không chuyển bước (hộp còn mở, cờ chưa ghi)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "đóng trước khi cất (Esc): hộp đóng, thẻ chưa nhặt (cuộn còn, cờ chưa ghi)",
+   "ok": true,
+   "detail": "[15,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "mở lại cuộn: hỏi lại từ đầu (không nhớ đáp án đã nộp)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "lượt mở lại ở trạng thái chưa trả lời",
+   "ok": true,
+   "detail": "{\"phase\":\"ask\",\"fb\":false,\"checked\":false,\"val\":\"\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "trả lời sai (keyboard): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau\",\"giaiThich\":\"Giải thích: Trong mạng của bài, trang đã được gh"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "sau khi nộp tiêu điểm nằm ở nút Cất vào sổ (bàn phím)",
+   "ok": true,
+   "detail": "nut-cat-vao-so"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#0",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,1,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#1",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#1",
+   "name": "đúng thẻ \"Node làm gì khi có trang mới?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Node làm gì khi có trang mới?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#1",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#1",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#1",
+   "name": "trả lời đúng (mouse): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: A. Từ chối: mã trước 62 không khớp trang cuối trong sổ của em (mã 40), dù phép tính trong trang đó đúng\",\"giaiThich\":\"Gi"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#1",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Từ chối: mã trước 62 không khớp trang cuối trong sổ của em (mã 4"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#1",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,1,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#1",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#1",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "true,false,false,false"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#1",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,3,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#1",
+   "name": "xem lại thẻ đã nhặt (menu Em có biết?): có ví dụ, câu hỏi, đáp án, giải thích; không bắt trả lời lại",
+   "ok": true,
+   "detail": "{\"mode\":\"review\",\"phase\":\"review\",\"ex\":true,\"ans\":\"Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau\",\"exp\":\"Giải thích: Trong mạng của bài, trang đã được ghi thì ghi vào sổ của tấ"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#1",
+   "name": "xem lại không làm mất thẻ (cờ giữ nguyên)",
+   "ok": true,
+   "detail": "[15,3,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#2",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#2",
+   "name": "đúng thẻ \"Đa số đồng ý mới được ghi.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Đa số đồng ý mới được ghi.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#2",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#2",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#2",
+   "name": "trả lời sai (keyboard): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: C. Không được ghi, vì chưa đủ đa số (cần ít nhất 2 phiếu Đồng ý trong 3 phiếu)\",\"giaiThich\":\"Giải thích: Đa số nghĩa là"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#2",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. Không được ghi, vì chưa đủ đa số (cần ít nhất 2 phiếu Đồng ý tro"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#2",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,3,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#2",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#2",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,false,true"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#2",
+   "name": "Enter lặp liền sau cú nộp KHÔNG cất thẻ và không chuyển bước (hộp còn mở, cờ chưa ghi)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#2",
+   "name": "sau khi nộp tiêu điểm nằm ở nút Cất vào sổ (bàn phím)",
+   "ok": true,
+   "detail": "nut-cat-vao-so"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#2",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,7,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#3",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#3",
+   "name": "đúng thẻ \"Vì sao an toàn hơn?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Vì sao an toàn hơn?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#3",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#3",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#3",
+   "name": "trả lời đúng (mouse): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: B. Bản đã sửa khác với 3 bản còn lại nên bị phát hiện và không được ghi vào sổ chung\",\"giaiThich\":\"Giải thích: Dù Tí đã "
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#3",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: B. Bản đã sửa khác với 3 bản còn lại nên bị phát hiện và không được"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#3",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,7,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#3",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#3",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,true,false,false"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det#3",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det",
+   "name": "cất đủ 4 thẻ (có cả đúng và sai): bài học của làng mở (open), hai màn sau vẫn khóa theo thứ tự",
+   "ok": true,
+   "detail": "open,locked,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det",
+   "name": "không còn cuộn nào trong làng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det",
+   "name": "không phát sinh điểm, xu, Trang Sổ Vàng",
+   "ok": true,
+   "detail": "{\"c\":0,\"gp\":0,\"lv\":{}}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-det",
+   "name": "cờ chỉ là mặt nạ bit knowCards (không có trường lưu đáp án)",
+   "ok": true,
+   "detail": "{\"v\":1,\"lv\":{},\"gp\":0,\"c\":0,\"u\":1793326797640,\"vs\":3,\"hd\":4095,\"st\":1,\"kc\":[15,15,0,0],\"gt\":8191}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau",
+   "name": "khách mới: đủ 4 cuộn chưa nhặt; 3 biển khóa (chưa đủ thẻ)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "đúng thẻ \"Chữ ký trên giấy vs Chữ ký số\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Chữ ký trên giấy vs Chữ ký số\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "mở hộp thì điều khiển tạm dừng (giữ W 1,5 giây, người chơi đứng yên)",
+   "ok": true,
+   "detail": "[[139.65,-65.99999999999999],[139.65,-65.99999999999999]]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "trả lời đúng (keyboard): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối\",\"giaiThich\":\"Giải thích: Chữ ký số được tính từ cả "
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "true,false,false,false"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "Enter lặp liền sau cú nộp KHÔNG cất thẻ và không chuyển bước (hộp còn mở, cờ chưa ghi)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "đóng trước khi cất (Esc): hộp đóng, thẻ chưa nhặt (cuộn còn, cờ chưa ghi)",
+   "ok": true,
+   "detail": "[15,15,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "mở lại cuộn: hỏi lại từ đầu (không nhớ đáp án đã nộp)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "lượt mở lại ở trạng thái chưa trả lời",
+   "ok": true,
+   "detail": "{\"phase\":\"ask\",\"fb\":false,\"checked\":false,\"val\":\"\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "trả lời đúng (keyboard): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối\",\"giaiThich\":\"Giải thích: Chữ ký số được tính từ cả "
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "sau khi nộp tiêu điểm nằm ở nút Cất vào sổ (bàn phím)",
+   "ok": true,
+   "detail": "nut-cat-vao-so"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#0",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,1,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "đúng thẻ \"Phép toán một chiều\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Phép toán một chiều\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "bấm Kiểm tra khi để trống: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy nhập một số trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "gõ sai định dạng (04a): hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em chỉ nhập chữ số, viết liền và không bắt đầu bằng số 0 (ví dụ: 44).\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "ô điền số là văn bản với bàn phím số (không type=number), xóa được",
+   "ok": true,
+   "detail": "{\"type\":\"text\",\"mode\":\"numeric\",\"val\":\"\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "trả lời sai (mouse): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: 19\",\"giaiThich\":\"Giải thích: Tính xuôi bằng cách nhân dần và lấy phần dư khi chia cho 23: 5^15 mod 23 = 19. Ngược lại, "
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: 19"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,1,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,3,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "xem lại thẻ đã nhặt (menu Em có biết?): có ví dụ, câu hỏi, đáp án, giải thích; không bắt trả lời lại",
+   "ok": true,
+   "detail": "{\"mode\":\"review\",\"phase\":\"review\",\"ex\":true,\"ans\":\"Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối\",\"exp\":\"Giải thích: Chữ ký số được tính từ cả khóa riêng của em và c"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#1",
+   "name": "xem lại không làm mất thẻ (cờ giữ nguyên)",
+   "ok": true,
+   "detail": "[15,15,3,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#2",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#2",
+   "name": "đúng thẻ \"Cặp khóa trong Bitcoin\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Cặp khóa trong Bitcoin\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#2",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#2",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#2",
+   "name": "trả lời đúng (keyboard): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: B. Vì số khóa khả dĩ quá lớn: với tốc độ giả định 10^18 khóa mỗi giây, thời gian giả định để duyệt hết cỡ 3,7 × 10^51 nă"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#2",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: B. Vì số khóa khả dĩ quá lớn: với tốc độ giả định 10^18 khóa mỗi gi"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#2",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,3,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#2",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#2",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,true,false,false"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#2",
+   "name": "Enter lặp liền sau cú nộp KHÔNG cất thẻ và không chuyển bước (hộp còn mở, cờ chưa ghi)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#2",
+   "name": "sau khi nộp tiêu điểm nằm ở nút Cất vào sổ (bàn phím)",
+   "ok": true,
+   "detail": "nut-cat-vao-so"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#2",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,7,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#3",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#3",
+   "name": "đúng thẻ \"Mất khóa riêng là mất vĩnh viễn\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Mất khóa riêng là mất vĩnh viễn\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#3",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#3",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#3",
+   "name": "trả lời sai (mouse): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: C. Không ai, kể cả mạng blockchain, khôi phục được khóa riêng thay Hoa; Hoa không còn ký được giao dịch từ ví đó\",\"giai"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#3",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. Không ai, kể cả mạng blockchain, khôi phục được khóa riêng thay "
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#3",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,7,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#3",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#3",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,false,true"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau#3",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau",
+   "name": "cất đủ 4 thẻ (có cả đúng và sai): bài học của làng mở (open), hai màn sau vẫn khóa theo thứ tự",
+   "ok": true,
+   "detail": "open,locked,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau",
+   "name": "không còn cuộn nào trong làng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau",
+   "name": "không phát sinh điểm, xu, Trang Sổ Vàng",
+   "ok": true,
+   "detail": "{\"c\":0,\"gp\":0,\"lv\":{}}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-khac-dau",
+   "name": "cờ chỉ là mặt nạ bit knowCards (không có trường lưu đáp án)",
+   "ok": true,
+   "detail": "{\"v\":1,\"lv\":{},\"gp\":0,\"c\":0,\"u\":1793326902182,\"vs\":7,\"hd\":4095,\"st\":1,\"kc\":[15,15,15,0],\"gt\":8191}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac",
+   "name": "khách mới: đủ 4 cuộn chưa nhặt; 3 biển khóa (chưa đủ thẻ)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "đúng thẻ \"Một khối chứa rất nhiều giao dịch.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Một khối chứa rất nhiều giao dịch.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "mở hộp thì điều khiển tạm dừng (giữ W 1,5 giây, người chơi đứng yên)",
+   "ok": true,
+   "detail": "[[-152.45,59.10000000000001],[-152.45,59.10000000000001]]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "trả lời sai (keyboard): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số\",\"giaiThich\":\"Giải thích: Gốc Merkle tóm tắt cả trang, nên chỉ cần so "
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,15,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,false,true"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "Enter lặp liền sau cú nộp KHÔNG cất thẻ và không chuyển bước (hộp còn mở, cờ chưa ghi)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "đóng trước khi cất (Esc): hộp đóng, thẻ chưa nhặt (cuộn còn, cờ chưa ghi)",
+   "ok": true,
+   "detail": "[15,15,15,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "mở lại cuộn: hỏi lại từ đầu (không nhớ đáp án đã nộp)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "lượt mở lại ở trạng thái chưa trả lời",
+   "ok": true,
+   "detail": "{\"phase\":\"ask\",\"fb\":false,\"checked\":false,\"val\":\"\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "trả lời sai (keyboard): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số\",\"giaiThich\":\"Giải thích: Gốc Merkle tóm tắt cả trang, nên chỉ cần so "
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "sau khi nộp tiêu điểm nằm ở nút Cất vào sổ (bàn phím)",
+   "ok": true,
+   "detail": "nut-cat-vao-so"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#0",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,1]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "đúng thẻ \"Cách tạo cây.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Cách tạo cây.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "bấm Kiểm tra khi để trống: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy nhập một số trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "gõ sai định dạng (04a): hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em chỉ nhập chữ số, viết liền và không bắt đầu bằng số 0 (ví dụ: 44).\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "ô điền số là văn bản với bàn phím số (không type=number), xóa được",
+   "ok": true,
+   "detail": "{\"type\":\"text\",\"mode\":\"numeric\",\"val\":\"\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "trả lời đúng (mouse): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: 288\",\"giaiThich\":\"Giải thích: Ghép cặp từ trái sang phải: 2 và 5 thành 2 × 10 + 5 = 25; 3 và 8 thành 3 × 10 + 8 = 38. Rồ"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: 288"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,15,1]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,3]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "xem lại thẻ đã nhặt (menu Em có biết?): có ví dụ, câu hỏi, đáp án, giải thích; không bắt trả lời lại",
+   "ok": true,
+   "detail": "{\"mode\":\"review\",\"phase\":\"review\",\"ex\":true,\"ans\":\"Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số\",\"exp\":\"Giải thích: Gốc Merkle tóm tắt cả trang, nên chỉ cần so hai con số (sau khi mỗi"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#1",
+   "name": "xem lại không làm mất thẻ (cờ giữ nguyên)",
+   "ok": true,
+   "detail": "[15,15,15,3]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#2",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#2",
+   "name": "đúng thẻ \"Giống bảng đấu loại trực tiếp.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Giống bảng đấu loại trực tiếp.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#2",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#2",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#2",
+   "name": "trả lời sai (keyboard): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: A. 15\",\"giaiThich\":\"Giải thích: Tầng đầu ghép 16 lá thành 8 giá trị (8 phép), rồi 8 thành 4 (4 phép), 4 thành 2 (2 phép"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#2",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. 15"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#2",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,15,3]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#2",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#2",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,true,false,false"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#2",
+   "name": "Enter lặp liền sau cú nộp KHÔNG cất thẻ và không chuyển bước (hộp còn mở, cờ chưa ghi)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#2",
+   "name": "sau khi nộp tiêu điểm nằm ở nút Cất vào sổ (bàn phím)",
+   "ok": true,
+   "detail": "nut-cat-vao-so"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#2",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,7]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#3",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#3",
+   "name": "đúng thẻ \"Để làm gì?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Để làm gì?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#3",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#3",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#3",
+   "name": "trả lời đúng (mouse): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: D. Hai bản có ít nhất một giao dịch khác nhau, nhưng chưa biết là giao dịch nào\",\"giaiThich\":\"Giải thích: Hai gốc tính c"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#3",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: D. Hai bản có ít nhất một giao dịch khác nhau, nhưng chưa biết là g"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#3",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,15,7]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#3",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#3",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,false,true"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac#3",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,15]"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac",
+   "name": "cất đủ 4 thẻ (có cả đúng và sai): bài học của làng mở (open), hai màn sau vẫn khóa theo thứ tự",
+   "ok": true,
+   "detail": "open,locked,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac",
+   "name": "không còn cuộn nào trong làng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac",
+   "name": "không phát sinh điểm, xu, Trang Sổ Vàng",
+   "ok": true,
+   "detail": "{\"c\":0,\"gp\":0,\"lv\":{}}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lang-bac",
+   "name": "cờ chỉ là mặt nạ bit knowCards (không có trường lưu đáp án)",
+   "ok": true,
+   "detail": "{\"v\":1,\"lv\":{},\"gp\":0,\"c\":0,\"u\":1793327011825,\"vs\":15,\"hd\":4095,\"st\":1,\"kc\":[15,15,15,15],\"gt\":8191}"
+  },
+  {
+   "size": "1366x768",
+   "area": "tổng",
+   "name": "đã trả lời và cất thật 16/16 thẻ",
+   "ok": true,
+   "detail": "16"
+  },
+  {
+   "size": "1366x768",
+   "area": "tải lại",
+   "name": "tải lại trang sau khi cất: Làng Giấy không còn cuộn, bài học vẫn mở",
+   "ok": true,
+   "detail": "{\"scrolls\":0,\"kinds\":[\"open\",\"locked\",\"locked\"]}"
+  },
+  {
+   "size": "1366x768",
+   "area": "tải lại",
+   "name": "bản đồ nhỏ chỉ còn ký hiệu thẻ chưa nhặt (0, mong 0)",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "size": "1366x768",
+   "area": "lỗi trang",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "/ban-do",
+   "name": "giới thiệu làng đọc hết không có câu hỏi nào",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "/ban-do",
+   "name": "đọc hết giới thiệu làng KHÔNG đánh dấu nhặt thẻ (kc vẫn 0)",
+   "ok": true,
+   "detail": "[0,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "/ban-do",
+   "name": "bảng làng nói rõ phải nhặt đủ 4 thẻ trong làng (0/4), ở đây chỉ đọc",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "/ban-do",
+   "name": "nút Đọc thẻ mở hộp đọc đủ 5 thẻ của Làng Khắc Dấu (chỉ đọc, không câu hỏi)",
+   "ok": true,
+   "detail": "5"
+  },
+  {
+   "size": "1366x768",
+   "area": "/ban-do",
+   "name": "đọc đủ các thẻ ở /ban-do KHÔNG đánh dấu nhặt thẻ (kc vẫn 0, bài học vẫn bị chặn)",
+   "ok": true,
+   "detail": "[0,0,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "tiến độ cũ",
+   "name": "Làng Dệt có sẵn 2 thẻ (bit 0, 1): chỉ còn cuộn 2 và 3",
+   "ok": true,
+   "detail": "[2,3]"
+  },
+  {
+   "size": "1366x768",
+   "area": "tiến độ cũ",
+   "name": "cờ cũ giữ nguyên sau khi vào làng",
+   "ok": true,
+   "detail": "[0,3,0,0]"
+  },
+  {
+   "size": "1366x768",
+   "area": "tiến độ cũ",
+   "name": "đã xong bài học 1 từ trước: coi như đủ thẻ, không còn cuộn, bài học vẫn mở",
+   "ok": true,
+   "detail": "done,open,locked"
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/thuong",
+   "name": "mở được cuộn thẻ 4 (nội dung dài nhất)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/thuong",
+   "name": "không có hoạt ảnh trong hộp (hợp Giảm chuyển động)",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/thuong",
+   "name": "cuộn tới nút Kiểm tra, nằm trọn trong khung nhìn và đủ lớn (≥ 40px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "chữ to/thuong",
+   "name": "Tab đưa tiêu điểm vào trong hộp (không rơi ra cảnh)",
+   "ok": true,
+   "detail": "{\"tag\":\"BUTTON\",\"inDialog\":true}"
+  },
+  {
+   "size": "1366x768",
+   "area": "lỗi chạy",
+   "name": "Waiting for selector `[data-testid=\"ket-qua\"]` failed",
+   "ok": false,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay",
+   "name": "khách mới: đủ 4 cuộn chưa nhặt; 3 biển khóa (chưa đủ thẻ)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay",
+   "name": "khách mới: bản đồ nhỏ có đủ 16 ký hiệu thẻ chưa nhặt",
+   "ok": true,
+   "detail": "16"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "đúng thẻ \"Blockchain là một cuốn sổ.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Blockchain là một cuốn sổ.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: A. Một chuỗi gồm 8 khối\",\"giaiThich\":\"Giải thích: Mỗi trang là một khối, các trang nối tiếp nhau tạo thành chuỗi, nên 8"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Một chuỗi gồm 8 khối"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[0,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,true,false,false"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "đóng trước khi cất (chạm nền): hộp đóng, thẻ chưa nhặt (cuộn còn, cờ chưa ghi)",
+   "ok": true,
+   "detail": "[0,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "mở lại cuộn: hỏi lại từ đầu (không nhớ đáp án đã nộp)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "lượt mở lại ở trạng thái chưa trả lời",
+   "ok": true,
+   "detail": "{\"phase\":\"ask\",\"fb\":false,\"checked\":false,\"val\":\"\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: A. Một chuỗi gồm 8 khối\",\"giaiThich\":\"Giải thích: Mỗi trang là một khối, các trang nối tiếp nhau tạo thành chuỗi, nên 8"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Một chuỗi gồm 8 khối"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#0",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[1,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#1",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#1",
+   "name": "đúng thẻ \"Mỗi trang có 2 phần.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Mỗi trang có 2 phần.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#1",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#1",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#1",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: B. Vì Mã trang là \\\"dấu vân tay\\\" của trang: nội dung đã khác mà mã vẫn là 43 nên không còn khớp\",\"giaiThich\":\"Giải thíc"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#1",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: B. Vì Mã trang là \"dấu vân tay\" của trang: nội dung đã khác mà mã v"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#1",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[1,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#1",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#1",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,true,false,false"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#1",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[3,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#1",
+   "name": "xem lại thẻ đã nhặt (menu Em có biết?): có ví dụ, câu hỏi, đáp án, giải thích; không bắt trả lời lại",
+   "ok": true,
+   "detail": "{\"mode\":\"review\",\"phase\":\"review\",\"ex\":true,\"ans\":\"Đáp án đúng: A. Một chuỗi gồm 8 khối\",\"exp\":\"Giải thích: Mỗi trang là một khối, các trang nối tiếp nhau tạo thành chuỗi, nên 8 trang là một chuỗi gồm"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#1",
+   "name": "xem lại không làm mất thẻ (cờ giữ nguyên)",
+   "ok": true,
+   "detail": "[3,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#2",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#2",
+   "name": "đúng thẻ \"Cách tính mã trang.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Cách tính mã trang.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#2",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#2",
+   "name": "bấm Kiểm tra khi để trống: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy nhập một số trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#2",
+   "name": "gõ sai định dạng (04a): hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em chỉ nhập chữ số, viết liền và không bắt đầu bằng số 0 (ví dụ: 44).\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#2",
+   "name": "ô điền số là văn bản với bàn phím số (không type=number), xóa được",
+   "ok": true,
+   "detail": "{\"type\":\"text\",\"mode\":\"numeric\",\"val\":\"\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#2",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: 44\",\"giaiThich\":\"Giải thích: 43 × 2 + 58 = 144, rồi chỉ giữ 2 chữ số cuối nên mã trang là 44. Nếu em ra 144 là em quên "
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#2",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: 44"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#2",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[3,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#2",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#2",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[7,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#3",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#3",
+   "name": "đúng thẻ \"Vì sao khó sửa lén?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Vì sao khó sửa lén?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#3",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#3",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#3",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: C. Kiểm tra lần lượt từ trang 3: mỗi trang tính lại từ mã mới của trang trước, cho tới khi hết chuỗi hoặc gặp trang tính"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#3",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. Kiểm tra lần lượt từ trang 3: mỗi trang tính lại từ mã mới của t"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#3",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[7,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#3",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#3",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,true,false"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay#3",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay",
+   "name": "cất đủ 4 thẻ (có cả đúng và sai): bài học của làng mở (open), hai màn sau vẫn khóa theo thứ tự",
+   "ok": true,
+   "detail": "open,locked,locked"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay",
+   "name": "không còn cuộn nào trong làng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay",
+   "name": "không phát sinh điểm, xu, Trang Sổ Vàng",
+   "ok": true,
+   "detail": "{\"c\":0,\"gp\":0,\"lv\":{}}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-giay",
+   "name": "cờ chỉ là mặt nạ bit knowCards (không có trường lưu đáp án)",
+   "ok": true,
+   "detail": "{\"v\":1,\"lv\":{},\"gp\":0,\"c\":0,\"u\":1793327270338,\"vs\":1,\"hd\":4095,\"st\":1,\"kc\":[15,0,0,0],\"gt\":8191}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det",
+   "name": "khách mới: đủ 4 cuộn chưa nhặt; 3 biển khóa (chưa đủ thẻ)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "đúng thẻ \"Node là ai?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Node là ai?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau\",\"giaiThich\":\"Giải thích: Trong mạng của bài, trang đã được ghi"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,false,true"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "đóng trước khi cất (chạm nền): hộp đóng, thẻ chưa nhặt (cuộn còn, cờ chưa ghi)",
+   "ok": true,
+   "detail": "[15,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "mở lại cuộn: hỏi lại từ đầu (không nhớ đáp án đã nộp)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "lượt mở lại ở trạng thái chưa trả lời",
+   "ok": true,
+   "detail": "{\"phase\":\"ask\",\"fb\":false,\"checked\":false,\"val\":\"\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau\",\"giaiThich\":\"Giải thích: Trong mạng của bài, trang đã được ghi"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#0",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,1,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#1",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#1",
+   "name": "đúng thẻ \"Node làm gì khi có trang mới?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Node làm gì khi có trang mới?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#1",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#1",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#1",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: A. Từ chối: mã trước 62 không khớp trang cuối trong sổ của em (mã 40), dù phép tính trong trang đó đúng\",\"giaiThich\":\"G"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#1",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Từ chối: mã trước 62 không khớp trang cuối trong sổ của em (mã 4"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#1",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,1,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#1",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#1",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,true,false,false"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#1",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,3,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#1",
+   "name": "xem lại thẻ đã nhặt (menu Em có biết?): có ví dụ, câu hỏi, đáp án, giải thích; không bắt trả lời lại",
+   "ok": true,
+   "detail": "{\"mode\":\"review\",\"phase\":\"review\",\"ex\":true,\"ans\":\"Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau\",\"exp\":\"Giải thích: Trong mạng của bài, trang đã được ghi thì ghi vào sổ của tấ"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#1",
+   "name": "xem lại không làm mất thẻ (cờ giữ nguyên)",
+   "ok": true,
+   "detail": "[15,3,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#2",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#2",
+   "name": "đúng thẻ \"Đa số đồng ý mới được ghi.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Đa số đồng ý mới được ghi.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#2",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#2",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#2",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: C. Không được ghi, vì chưa đủ đa số (cần ít nhất 2 phiếu Đồng ý trong 3 phiếu)\",\"giaiThich\":\"Giải thích: Đa số nghĩa là "
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#2",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. Không được ghi, vì chưa đủ đa số (cần ít nhất 2 phiếu Đồng ý tro"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#2",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,3,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#2",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#2",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,true,false"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#2",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,7,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#3",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#3",
+   "name": "đúng thẻ \"Vì sao an toàn hơn?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Vì sao an toàn hơn?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#3",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#3",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#3",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: B. Bản đã sửa khác với 3 bản còn lại nên bị phát hiện và không được ghi vào sổ chung\",\"giaiThich\":\"Giải thích: Dù Tí đã"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#3",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: B. Bản đã sửa khác với 3 bản còn lại nên bị phát hiện và không được"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#3",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,7,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#3",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#3",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,true,false"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det#3",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det",
+   "name": "cất đủ 4 thẻ (có cả đúng và sai): bài học của làng mở (open), hai màn sau vẫn khóa theo thứ tự",
+   "ok": true,
+   "detail": "open,locked,locked"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det",
+   "name": "không còn cuộn nào trong làng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det",
+   "name": "không phát sinh điểm, xu, Trang Sổ Vàng",
+   "ok": true,
+   "detail": "{\"c\":0,\"gp\":0,\"lv\":{}}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-det",
+   "name": "cờ chỉ là mặt nạ bit knowCards (không có trường lưu đáp án)",
+   "ok": true,
+   "detail": "{\"v\":1,\"lv\":{},\"gp\":0,\"c\":0,\"u\":1793327351033,\"vs\":3,\"hd\":4095,\"st\":1,\"kc\":[15,15,0,0],\"gt\":8191}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau",
+   "name": "khách mới: đủ 4 cuộn chưa nhặt; 3 biển khóa (chưa đủ thẻ)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "đúng thẻ \"Chữ ký trên giấy vs Chữ ký số\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Chữ ký trên giấy vs Chữ ký số\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối\",\"giaiThich\":\"Giải thích: Chữ ký số được tính từ cả"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,true,false,false"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "đóng trước khi cất (chạm nền): hộp đóng, thẻ chưa nhặt (cuộn còn, cờ chưa ghi)",
+   "ok": true,
+   "detail": "[15,15,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "mở lại cuộn: hỏi lại từ đầu (không nhớ đáp án đã nộp)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "lượt mở lại ở trạng thái chưa trả lời",
+   "ok": true,
+   "detail": "{\"phase\":\"ask\",\"fb\":false,\"checked\":false,\"val\":\"\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối\",\"giaiThich\":\"Giải thích: Chữ ký số được tính từ cả"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#0",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,1,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "đúng thẻ \"Phép toán một chiều\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Phép toán một chiều\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "bấm Kiểm tra khi để trống: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy nhập một số trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "gõ sai định dạng (04a): hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em chỉ nhập chữ số, viết liền và không bắt đầu bằng số 0 (ví dụ: 44).\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "ô điền số là văn bản với bàn phím số (không type=number), xóa được",
+   "ok": true,
+   "detail": "{\"type\":\"text\",\"mode\":\"numeric\",\"val\":\"\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: 19\",\"giaiThich\":\"Giải thích: Tính xuôi bằng cách nhân dần và lấy phần dư khi chia cho 23: 5^15 mod 23 = 19. Ngược lại, n"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: 19"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,1,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,3,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "xem lại thẻ đã nhặt (menu Em có biết?): có ví dụ, câu hỏi, đáp án, giải thích; không bắt trả lời lại",
+   "ok": true,
+   "detail": "{\"mode\":\"review\",\"phase\":\"review\",\"ex\":true,\"ans\":\"Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối\",\"exp\":\"Giải thích: Chữ ký số được tính từ cả khóa riêng của em và c"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#1",
+   "name": "xem lại không làm mất thẻ (cờ giữ nguyên)",
+   "ok": true,
+   "detail": "[15,15,3,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#2",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#2",
+   "name": "đúng thẻ \"Cặp khóa trong Bitcoin\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Cặp khóa trong Bitcoin\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#2",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#2",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#2",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: B. Vì số khóa khả dĩ quá lớn: với tốc độ giả định 10^18 khóa mỗi giây, thời gian giả định để duyệt hết cỡ 3,7 × 10^51 n"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#2",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: B. Vì số khóa khả dĩ quá lớn: với tốc độ giả định 10^18 khóa mỗi gi"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#2",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,3,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#2",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#2",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,true,false"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#2",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,7,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#3",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#3",
+   "name": "đúng thẻ \"Mất khóa riêng là mất vĩnh viễn\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Mất khóa riêng là mất vĩnh viễn\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#3",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#3",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#3",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: C. Không ai, kể cả mạng blockchain, khôi phục được khóa riêng thay Hoa; Hoa không còn ký được giao dịch từ ví đó\",\"giaiT"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#3",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. Không ai, kể cả mạng blockchain, khôi phục được khóa riêng thay "
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#3",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,7,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#3",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#3",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,true,false"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau#3",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau",
+   "name": "cất đủ 4 thẻ (có cả đúng và sai): bài học của làng mở (open), hai màn sau vẫn khóa theo thứ tự",
+   "ok": true,
+   "detail": "open,locked,locked"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau",
+   "name": "không còn cuộn nào trong làng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau",
+   "name": "không phát sinh điểm, xu, Trang Sổ Vàng",
+   "ok": true,
+   "detail": "{\"c\":0,\"gp\":0,\"lv\":{}}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-khac-dau",
+   "name": "cờ chỉ là mặt nạ bit knowCards (không có trường lưu đáp án)",
+   "ok": true,
+   "detail": "{\"v\":1,\"lv\":{},\"gp\":0,\"c\":0,\"u\":1793327435013,\"vs\":7,\"hd\":4095,\"st\":1,\"kc\":[15,15,15,0],\"gt\":8191}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac",
+   "name": "khách mới: đủ 4 cuộn chưa nhặt; 3 biển khóa (chưa đủ thẻ)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "đúng thẻ \"Một khối chứa rất nhiều giao dịch.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Một khối chứa rất nhiều giao dịch.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số\",\"giaiThich\":\"Giải thích: Gốc Merkle tóm tắt cả trang, nên chỉ cần so h"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,15,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,true,false"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "đóng trước khi cất (chạm nền): hộp đóng, thẻ chưa nhặt (cuộn còn, cờ chưa ghi)",
+   "ok": true,
+   "detail": "[15,15,15,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "mở lại cuộn: hỏi lại từ đầu (không nhớ đáp án đã nộp)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "lượt mở lại ở trạng thái chưa trả lời",
+   "ok": true,
+   "detail": "{\"phase\":\"ask\",\"fb\":false,\"checked\":false,\"val\":\"\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số\",\"giaiThich\":\"Giải thích: Gốc Merkle tóm tắt cả trang, nên chỉ cần so h"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#0",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,1]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "đúng thẻ \"Cách tạo cây.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Cách tạo cây.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "bấm Kiểm tra khi để trống: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy nhập một số trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "gõ sai định dạng (04a): hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em chỉ nhập chữ số, viết liền và không bắt đầu bằng số 0 (ví dụ: 44).\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "ô điền số là văn bản với bàn phím số (không type=number), xóa được",
+   "ok": true,
+   "detail": "{\"type\":\"text\",\"mode\":\"numeric\",\"val\":\"\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: 288\",\"giaiThich\":\"Giải thích: Ghép cặp từ trái sang phải: 2 và 5 thành 2 × 10 + 5 = 25; 3 và 8 thành 3 × 10 + 8 = 38. R"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: 288"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,15,1]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,3]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "xem lại thẻ đã nhặt (menu Em có biết?): có ví dụ, câu hỏi, đáp án, giải thích; không bắt trả lời lại",
+   "ok": true,
+   "detail": "{\"mode\":\"review\",\"phase\":\"review\",\"ex\":true,\"ans\":\"Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số\",\"exp\":\"Giải thích: Gốc Merkle tóm tắt cả trang, nên chỉ cần so hai con số (sau khi mỗi"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#1",
+   "name": "xem lại không làm mất thẻ (cờ giữ nguyên)",
+   "ok": true,
+   "detail": "[15,15,15,3]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#2",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#2",
+   "name": "đúng thẻ \"Giống bảng đấu loại trực tiếp.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Giống bảng đấu loại trực tiếp.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#2",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#2",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#2",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: A. 15\",\"giaiThich\":\"Giải thích: Tầng đầu ghép 16 lá thành 8 giá trị (8 phép), rồi 8 thành 4 (4 phép), 4 thành 2 (2 phép)"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#2",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. 15"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#2",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,15,3]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#2",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#2",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "true,false,false,false"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#2",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,7]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#3",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#3",
+   "name": "đúng thẻ \"Để làm gì?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Để làm gì?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#3",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#3",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#3",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: D. Hai bản có ít nhất một giao dịch khác nhau, nhưng chưa biết là giao dịch nào\",\"giaiThich\":\"Giải thích: Hai gốc tính "
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#3",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: D. Hai bản có ít nhất một giao dịch khác nhau, nhưng chưa biết là g"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#3",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,15,7]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#3",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#3",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "true,false,false,false"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac#3",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,15]"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac",
+   "name": "cất đủ 4 thẻ (có cả đúng và sai): bài học của làng mở (open), hai màn sau vẫn khóa theo thứ tự",
+   "ok": true,
+   "detail": "open,locked,locked"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac",
+   "name": "không còn cuộn nào trong làng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac",
+   "name": "không phát sinh điểm, xu, Trang Sổ Vàng",
+   "ok": true,
+   "detail": "{\"c\":0,\"gp\":0,\"lv\":{}}"
+  },
+  {
+   "size": "360x800",
+   "area": "lang-bac",
+   "name": "cờ chỉ là mặt nạ bit knowCards (không có trường lưu đáp án)",
+   "ok": true,
+   "detail": "{\"v\":1,\"lv\":{},\"gp\":0,\"c\":0,\"u\":1793327525571,\"vs\":15,\"hd\":4095,\"st\":1,\"kc\":[15,15,15,15],\"gt\":8191}"
+  },
+  {
+   "size": "360x800",
+   "area": "tổng",
+   "name": "đã trả lời và cất thật 16/16 thẻ",
+   "ok": true,
+   "detail": "16"
+  },
+  {
+   "size": "360x800",
+   "area": "tải lại",
+   "name": "tải lại trang sau khi cất: Làng Giấy không còn cuộn, bài học vẫn mở",
+   "ok": true,
+   "detail": "{\"scrolls\":0,\"kinds\":[\"open\",\"locked\",\"locked\"]}"
+  },
+  {
+   "size": "360x800",
+   "area": "tải lại",
+   "name": "bản đồ nhỏ chỉ còn ký hiệu thẻ chưa nhặt (0, mong 0)",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "size": "360x800",
+   "area": "lỗi trang",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "/ban-do",
+   "name": "giới thiệu làng đọc hết không có câu hỏi nào",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "/ban-do",
+   "name": "đọc hết giới thiệu làng KHÔNG đánh dấu nhặt thẻ (kc vẫn 0)",
+   "ok": true,
+   "detail": "[0,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "/ban-do",
+   "name": "bảng làng nói rõ phải nhặt đủ 4 thẻ trong làng (0/4), ở đây chỉ đọc",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "/ban-do",
+   "name": "nút Đọc thẻ mở hộp đọc đủ 5 thẻ của Làng Khắc Dấu (chỉ đọc, không câu hỏi)",
+   "ok": true,
+   "detail": "5"
+  },
+  {
+   "size": "360x800",
+   "area": "/ban-do",
+   "name": "đọc đủ các thẻ ở /ban-do KHÔNG đánh dấu nhặt thẻ (kc vẫn 0, bài học vẫn bị chặn)",
+   "ok": true,
+   "detail": "[0,0,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "tiến độ cũ",
+   "name": "Làng Dệt có sẵn 2 thẻ (bit 0, 1): chỉ còn cuộn 2 và 3",
+   "ok": true,
+   "detail": "[2,3]"
+  },
+  {
+   "size": "360x800",
+   "area": "tiến độ cũ",
+   "name": "cờ cũ giữ nguyên sau khi vào làng",
+   "ok": true,
+   "detail": "[0,3,0,0]"
+  },
+  {
+   "size": "360x800",
+   "area": "tiến độ cũ",
+   "name": "đã xong bài học 1 từ trước: coi như đủ thẻ, không còn cuộn, bài học vẫn mở",
+   "ok": true,
+   "detail": "done,open,locked"
+  },
+  {
+   "size": "360x800",
+   "area": "chữ to/thuong",
+   "name": "mở được cuộn thẻ 4 (nội dung dài nhất)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "chữ to/thuong",
+   "name": "không có hoạt ảnh trong hộp (hợp Giảm chuyển động)",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "size": "360x800",
+   "area": "chữ to/thuong",
+   "name": "cuộn tới nút Kiểm tra, nằm trọn trong khung nhìn và đủ lớn (≥ 40px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "chữ to/thuong",
+   "name": "sau khi nộp: phản hồi và nút Cất vào sổ cuộn tới được",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "chữ to/thuong",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "chữ to/chu-to",
+   "name": "mở được cuộn thẻ 4 (nội dung dài nhất)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "chữ to/chu-to",
+   "name": "không có hoạt ảnh trong hộp (hợp Giảm chuyển động)",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "size": "360x800",
+   "area": "chữ to/chu-to",
+   "name": "cuộn tới nút Kiểm tra, nằm trọn trong khung nhìn và đủ lớn (≥ 40px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "chữ to/chu-to",
+   "name": "sau khi nộp: phản hồi và nút Cất vào sổ cuộn tới được",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "chữ to/chu-to",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "chữ to",
+   "name": "Chữ to làm tiêu đề thẻ to hơn (24px → 27.6px)",
+   "ok": true,
+   "detail": "[24,27.6]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay",
+   "name": "khách mới: đủ 4 cuộn chưa nhặt; 3 biển khóa (chưa đủ thẻ)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay",
+   "name": "khách mới: bản đồ nhỏ có đủ 16 ký hiệu thẻ chưa nhặt",
+   "ok": true,
+   "detail": "16"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "đúng thẻ \"Blockchain là một cuốn sổ.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Blockchain là một cuốn sổ.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: A. Một chuỗi gồm 8 khối\",\"giaiThich\":\"Giải thích: Mỗi trang là một khối, các trang nối tiếp nhau tạo thành chuỗi, nên 8 "
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Một chuỗi gồm 8 khối"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[0,0,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "true,false,false,false"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "đóng trước khi cất (chạm nền): hộp đóng, thẻ chưa nhặt (cuộn còn, cờ chưa ghi)",
+   "ok": true,
+   "detail": "[0,0,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "mở lại cuộn: hỏi lại từ đầu (không nhớ đáp án đã nộp)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "lượt mở lại ở trạng thái chưa trả lời",
+   "ok": true,
+   "detail": "{\"phase\":\"ask\",\"fb\":false,\"checked\":false,\"val\":\"\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: A. Một chuỗi gồm 8 khối\",\"giaiThich\":\"Giải thích: Mỗi trang là một khối, các trang nối tiếp nhau tạo thành chuỗi, nên 8 "
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Một chuỗi gồm 8 khối"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#0",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[1,0,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#1",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#1",
+   "name": "đúng thẻ \"Mỗi trang có 2 phần.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Mỗi trang có 2 phần.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#1",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#1",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#1",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: B. Vì Mã trang là \\\"dấu vân tay\\\" của trang: nội dung đã khác mà mã vẫn là 43 nên không còn khớp\",\"giaiThich\":\"Giải thíc"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#1",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: B. Vì Mã trang là \"dấu vân tay\" của trang: nội dung đã khác mà mã v"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#1",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[1,0,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#1",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#1",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,true,false,false"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#1",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[3,0,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#1",
+   "name": "xem lại thẻ đã nhặt (menu Em có biết?): có ví dụ, câu hỏi, đáp án, giải thích; không bắt trả lời lại",
+   "ok": true,
+   "detail": "{\"mode\":\"review\",\"phase\":\"review\",\"ex\":true,\"ans\":\"Đáp án đúng: A. Một chuỗi gồm 8 khối\",\"exp\":\"Giải thích: Mỗi trang là một khối, các trang nối tiếp nhau tạo thành chuỗi, nên 8 trang là một chuỗi gồm"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#1",
+   "name": "xem lại không làm mất thẻ (cờ giữ nguyên)",
+   "ok": true,
+   "detail": "[3,0,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#2",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#2",
+   "name": "đúng thẻ \"Cách tính mã trang.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Cách tính mã trang.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#2",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#2",
+   "name": "bấm Kiểm tra khi để trống: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy nhập một số trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#2",
+   "name": "gõ sai định dạng (04a): hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em chỉ nhập chữ số, viết liền và không bắt đầu bằng số 0 (ví dụ: 44).\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#2",
+   "name": "ô điền số là văn bản với bàn phím số (không type=number), xóa được",
+   "ok": true,
+   "detail": "{\"type\":\"text\",\"mode\":\"numeric\",\"val\":\"\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#2",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: 44\",\"giaiThich\":\"Giải thích: 43 × 2 + 58 = 144, rồi chỉ giữ 2 chữ số cuối nên mã trang là 44. Nếu em ra 144 là em quên b"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#2",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: 44"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#2",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[3,0,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#2",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#2",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[7,0,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#3",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#3",
+   "name": "đúng thẻ \"Vì sao khó sửa lén?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Vì sao khó sửa lén?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#3",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#3",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#3",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: C. Kiểm tra lần lượt từ trang 3: mỗi trang tính lại từ mã mới của trang trước, cho tới khi hết chuỗi hoặc gặp trang tín"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#3",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. Kiểm tra lần lượt từ trang 3: mỗi trang tính lại từ mã mới của t"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#3",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[7,0,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#3",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#3",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,false,true"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay#3",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,0,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay",
+   "name": "cất đủ 4 thẻ (có cả đúng và sai): bài học của làng mở (open), hai màn sau vẫn khóa theo thứ tự",
+   "ok": true,
+   "detail": "open,locked,locked"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay",
+   "name": "không còn cuộn nào trong làng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay",
+   "name": "không phát sinh điểm, xu, Trang Sổ Vàng",
+   "ok": true,
+   "detail": "{\"c\":0,\"gp\":0,\"lv\":{}}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-giay",
+   "name": "cờ chỉ là mặt nạ bit knowCards (không có trường lưu đáp án)",
+   "ok": true,
+   "detail": "{\"v\":1,\"lv\":{},\"gp\":0,\"c\":0,\"u\":1793327794695,\"vs\":1,\"hd\":4095,\"st\":1,\"kc\":[15,0,0,0],\"gt\":8191}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det",
+   "name": "khách mới: đủ 4 cuộn chưa nhặt; 3 biển khóa (chưa đủ thẻ)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "đúng thẻ \"Node là ai?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Node là ai?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau\",\"giaiThich\":\"Giải thích: Trong mạng của bài, trang đã được ghi"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,0,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,false,true"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "đóng trước khi cất (chạm nền): hộp đóng, thẻ chưa nhặt (cuộn còn, cờ chưa ghi)",
+   "ok": true,
+   "detail": "[15,0,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "mở lại cuộn: hỏi lại từ đầu (không nhớ đáp án đã nộp)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "lượt mở lại ở trạng thái chưa trả lời",
+   "ok": true,
+   "detail": "{\"phase\":\"ask\",\"fb\":false,\"checked\":false,\"val\":\"\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau\",\"giaiThich\":\"Giải thích: Trong mạng của bài, trang đã được ghi"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#0",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,1,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#1",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#1",
+   "name": "đúng thẻ \"Node làm gì khi có trang mới?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Node làm gì khi có trang mới?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#1",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#1",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#1",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: A. Từ chối: mã trước 62 không khớp trang cuối trong sổ của em (mã 40), dù phép tính trong trang đó đúng\",\"giaiThich\":\"Gi"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#1",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Từ chối: mã trước 62 không khớp trang cuối trong sổ của em (mã 4"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#1",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,1,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#1",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#1",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "true,false,false,false"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#1",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,3,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#1",
+   "name": "xem lại thẻ đã nhặt (menu Em có biết?): có ví dụ, câu hỏi, đáp án, giải thích; không bắt trả lời lại",
+   "ok": true,
+   "detail": "{\"mode\":\"review\",\"phase\":\"review\",\"ex\":true,\"ans\":\"Đáp án đúng: D. Cả 4 node đều có trang mới và 4 bản sổ giống hệt nhau\",\"exp\":\"Giải thích: Trong mạng của bài, trang đã được ghi thì ghi vào sổ của tấ"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#1",
+   "name": "xem lại không làm mất thẻ (cờ giữ nguyên)",
+   "ok": true,
+   "detail": "[15,3,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#2",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#2",
+   "name": "đúng thẻ \"Đa số đồng ý mới được ghi.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Đa số đồng ý mới được ghi.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#2",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#2",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#2",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: C. Không được ghi, vì chưa đủ đa số (cần ít nhất 2 phiếu Đồng ý trong 3 phiếu)\",\"giaiThich\":\"Giải thích: Đa số nghĩa là"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#2",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. Không được ghi, vì chưa đủ đa số (cần ít nhất 2 phiếu Đồng ý tro"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#2",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,3,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#2",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#2",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,false,true"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#2",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,7,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#3",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#3",
+   "name": "đúng thẻ \"Vì sao an toàn hơn?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Vì sao an toàn hơn?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#3",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#3",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#3",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: B. Bản đã sửa khác với 3 bản còn lại nên bị phát hiện và không được ghi vào sổ chung\",\"giaiThich\":\"Giải thích: Dù Tí đã "
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#3",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: B. Bản đã sửa khác với 3 bản còn lại nên bị phát hiện và không được"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#3",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,7,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#3",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#3",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,true,false,false"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det#3",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det",
+   "name": "cất đủ 4 thẻ (có cả đúng và sai): bài học của làng mở (open), hai màn sau vẫn khóa theo thứ tự",
+   "ok": true,
+   "detail": "open,locked,locked"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det",
+   "name": "không còn cuộn nào trong làng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det",
+   "name": "không phát sinh điểm, xu, Trang Sổ Vàng",
+   "ok": true,
+   "detail": "{\"c\":0,\"gp\":0,\"lv\":{}}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-det",
+   "name": "cờ chỉ là mặt nạ bit knowCards (không có trường lưu đáp án)",
+   "ok": true,
+   "detail": "{\"v\":1,\"lv\":{},\"gp\":0,\"c\":0,\"u\":1793327879573,\"vs\":3,\"hd\":4095,\"st\":1,\"kc\":[15,15,0,0],\"gt\":8191}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau",
+   "name": "khách mới: đủ 4 cuộn chưa nhặt; 3 biển khóa (chưa đủ thẻ)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "đúng thẻ \"Chữ ký trên giấy vs Chữ ký số\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Chữ ký trên giấy vs Chữ ký số\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối\",\"giaiThich\":\"Giải thích: Chữ ký số được tính từ cả "
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "true,false,false,false"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "đóng trước khi cất (chạm nền): hộp đóng, thẻ chưa nhặt (cuộn còn, cờ chưa ghi)",
+   "ok": true,
+   "detail": "[15,15,0,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "mở lại cuộn: hỏi lại từ đầu (không nhớ đáp án đã nộp)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "lượt mở lại ở trạng thái chưa trả lời",
+   "ok": true,
+   "detail": "{\"phase\":\"ask\",\"fb\":false,\"checked\":false,\"val\":\"\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối\",\"giaiThich\":\"Giải thích: Chữ ký số được tính từ cả "
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#0",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,1,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "đúng thẻ \"Phép toán một chiều\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Phép toán một chiều\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "bấm Kiểm tra khi để trống: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy nhập một số trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "gõ sai định dạng (04a): hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em chỉ nhập chữ số, viết liền và không bắt đầu bằng số 0 (ví dụ: 44).\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "ô điền số là văn bản với bàn phím số (không type=number), xóa được",
+   "ok": true,
+   "detail": "{\"type\":\"text\",\"mode\":\"numeric\",\"val\":\"\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: 19\",\"giaiThich\":\"Giải thích: Tính xuôi bằng cách nhân dần và lấy phần dư khi chia cho 23: 5^15 mod 23 = 19. Ngược lại, "
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: 19"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,1,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,3,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "xem lại thẻ đã nhặt (menu Em có biết?): có ví dụ, câu hỏi, đáp án, giải thích; không bắt trả lời lại",
+   "ok": true,
+   "detail": "{\"mode\":\"review\",\"phase\":\"review\",\"ex\":true,\"ans\":\"Đáp án đúng: A. Chữ ký không còn khớp với nội dung mới, nên giao dịch bị từ chối\",\"exp\":\"Giải thích: Chữ ký số được tính từ cả khóa riêng của em và c"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#1",
+   "name": "xem lại không làm mất thẻ (cờ giữ nguyên)",
+   "ok": true,
+   "detail": "[15,15,3,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#2",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#2",
+   "name": "đúng thẻ \"Cặp khóa trong Bitcoin\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Cặp khóa trong Bitcoin\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#2",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#2",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#2",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: B. Vì số khóa khả dĩ quá lớn: với tốc độ giả định 10^18 khóa mỗi giây, thời gian giả định để duyệt hết cỡ 3,7 × 10^51 nă"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#2",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: B. Vì số khóa khả dĩ quá lớn: với tốc độ giả định 10^18 khóa mỗi gi"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#2",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,3,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#2",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#2",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,true,false,false"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#2",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,7,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#3",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#3",
+   "name": "đúng thẻ \"Mất khóa riêng là mất vĩnh viễn\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Mất khóa riêng là mất vĩnh viễn\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#3",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#3",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#3",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: C. Không ai, kể cả mạng blockchain, khôi phục được khóa riêng thay Hoa; Hoa không còn ký được giao dịch từ ví đó\",\"giaiT"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#3",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. Không ai, kể cả mạng blockchain, khôi phục được khóa riêng thay "
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#3",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,7,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#3",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#3",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,true,false"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau#3",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau",
+   "name": "cất đủ 4 thẻ (có cả đúng và sai): bài học của làng mở (open), hai màn sau vẫn khóa theo thứ tự",
+   "ok": true,
+   "detail": "open,locked,locked"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau",
+   "name": "không còn cuộn nào trong làng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau",
+   "name": "không phát sinh điểm, xu, Trang Sổ Vàng",
+   "ok": true,
+   "detail": "{\"c\":0,\"gp\":0,\"lv\":{}}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-khac-dau",
+   "name": "cờ chỉ là mặt nạ bit knowCards (không có trường lưu đáp án)",
+   "ok": true,
+   "detail": "{\"v\":1,\"lv\":{},\"gp\":0,\"c\":0,\"u\":1793327969576,\"vs\":7,\"hd\":4095,\"st\":1,\"kc\":[15,15,15,0],\"gt\":8191}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac",
+   "name": "khách mới: đủ 4 cuộn chưa nhặt; 3 biển khóa (chưa đủ thẻ)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "đúng thẻ \"Một khối chứa rất nhiều giao dịch.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Một khối chứa rất nhiều giao dịch.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số\",\"giaiThich\":\"Giải thích: Gốc Merkle tóm tắt cả trang, nên chỉ cần so "
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,15,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,false,true"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "đóng trước khi cất (chạm nền): hộp đóng, thẻ chưa nhặt (cuộn còn, cờ chưa ghi)",
+   "ok": true,
+   "detail": "[15,15,15,0]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "mở lại cuộn: hỏi lại từ đầu (không nhớ đáp án đã nộp)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "lượt mở lại ở trạng thái chưa trả lời",
+   "ok": true,
+   "detail": "{\"phase\":\"ask\",\"fb\":false,\"checked\":false,\"val\":\"\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "trả lời sai (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"false\",\"dapAn\":\"Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số\",\"giaiThich\":\"Giải thích: Gốc Merkle tóm tắt cả trang, nên chỉ cần so "
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#0",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,1]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "đúng thẻ \"Cách tạo cây.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Cách tạo cây.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "bấm Kiểm tra khi để trống: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy nhập một số trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "gõ sai định dạng (04a): hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em chỉ nhập chữ số, viết liền và không bắt đầu bằng số 0 (ví dụ: 44).\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "ô điền số là văn bản với bàn phím số (không type=number), xóa được",
+   "ok": true,
+   "detail": "{\"type\":\"text\",\"mode\":\"numeric\",\"val\":\"\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: 288\",\"giaiThich\":\"Giải thích: Ghép cặp từ trái sang phải: 2 và 5 thành 2 × 10 + 5 = 25; 3 và 8 thành 3 × 10 + 8 = 38. Rồ"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: 288"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,15,1]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,3]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "xem lại thẻ đã nhặt (menu Em có biết?): có ví dụ, câu hỏi, đáp án, giải thích; không bắt trả lời lại",
+   "ok": true,
+   "detail": "{\"mode\":\"review\",\"phase\":\"review\",\"ex\":true,\"ans\":\"Đáp án đúng: C. So hai gốc đã tính, mỗi bên chỉ là một con số\",\"exp\":\"Giải thích: Gốc Merkle tóm tắt cả trang, nên chỉ cần so hai con số (sau khi mỗi"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#1",
+   "name": "xem lại không làm mất thẻ (cờ giữ nguyên)",
+   "ok": true,
+   "detail": "[15,15,15,3]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#2",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#2",
+   "name": "đúng thẻ \"Giống bảng đấu loại trực tiếp.\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Giống bảng đấu loại trực tiếp.\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#2",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#2",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#2",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: A. 15\",\"giaiThich\":\"Giải thích: Tầng đầu ghép 16 lá thành 8 giá trị (8 phép), rồi 8 thành 4 (4 phép), 4 thành 2 (2 phép)"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#2",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: A. 15"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#2",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,15,3]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#2",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#2",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "true,false,false,false"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#2",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,7]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#3",
+   "name": "nhặt cuộn bằng E/chạm mở hộp thẻ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#3",
+   "name": "đúng thẻ \"Để làm gì?\", có nội dung, ví dụ, câu hỏi; chưa có đáp án và nút Cất vào sổ",
+   "ok": true,
+   "detail": "{\"title\":\"Để làm gì?\",\"hasText\":true,\"hasExample\":true,\"phase\":\"ask\",\"hasQuestion\":true,\"feedback\":false,\"save\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#3",
+   "name": "vừa mở hộp (chạm/E): không có cú bấm ma (chưa chọn gì, không lời nhắc, hộp còn mở, chưa trả lời)",
+   "ok": true,
+   "detail": "{\"open\":true,\"phase\":\"ask\",\"picked\":false,\"nhac\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#3",
+   "name": "bấm Kiểm tra khi chưa chọn: hiện lời nhắc, chưa tính là trả lời",
+   "ok": true,
+   "detail": "{\"nhac\":\"Em hãy chọn một đáp án trước khi kiểm tra.\",\"phase\":\"ask\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#3",
+   "name": "trả lời đúng (touch): kết quả đúng/sai hiện đúng",
+   "ok": true,
+   "detail": "{\"correct\":\"true\",\"dapAn\":\"Đáp án đúng: D. Hai bản có ít nhất một giao dịch khác nhau, nhưng chưa biết là giao dịch nào\",\"giaiThich\":\"Giải thích: Hai gốc tính c"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#3",
+   "name": "đáp án đúng và giải thích hiện (cả khi sai)",
+   "ok": true,
+   "detail": "Đáp án đúng: D. Hai bản có ít nhất một giao dịch khác nhau, nhưng chưa biết là g"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#3",
+   "name": "đã trả lời nhưng CHƯA cất: cờ knowCards chưa ghi",
+   "ok": true,
+   "detail": "[15,15,15,7]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#3",
+   "name": "sau khi nộp: lựa chọn/ô gõ bị khóa, không còn nút Kiểm tra",
+   "ok": true,
+   "detail": "{\"radios\":true,\"numRo\":true,\"kiemTra\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#3",
+   "name": "bấm đổi đáp án sau khi nộp không có tác dụng",
+   "ok": true,
+   "detail": "false,false,false,true"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac#3",
+   "name": "cất vào sổ: hộp đóng, ghi ĐÚNG bit thẻ này (không lệch chỉ số), cuộn biến mất",
+   "ok": true,
+   "detail": "[15,15,15,15]"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac",
+   "name": "cất đủ 4 thẻ (có cả đúng và sai): bài học của làng mở (open), hai màn sau vẫn khóa theo thứ tự",
+   "ok": true,
+   "detail": "open,locked,locked"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac",
+   "name": "không còn cuộn nào trong làng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac",
+   "name": "không phát sinh điểm, xu, Trang Sổ Vàng",
+   "ok": true,
+   "detail": "{\"c\":0,\"gp\":0,\"lv\":{}}"
+  },
+  {
+   "size": "844x390",
+   "area": "lang-bac",
+   "name": "cờ chỉ là mặt nạ bit knowCards (không có trường lưu đáp án)",
+   "ok": true,
+   "detail": "{\"v\":1,\"lv\":{},\"gp\":0,\"c\":0,\"u\":1793328059116,\"vs\":15,\"hd\":4095,\"st\":1,\"kc\":[15,15,15,15],\"gt\":8191}"
+  },
+  {
+   "size": "844x390",
+   "area": "tổng",
+   "name": "đã trả lời và cất thật 16/16 thẻ",
+   "ok": true,
+   "detail": "16"
+  },
+  {
+   "size": "844x390",
+   "area": "tải lại",
+   "name": "tải lại trang sau khi cất: Làng Giấy không còn cuộn, bài học vẫn mở",
+   "ok": true,
+   "detail": "{\"scrolls\":0,\"kinds\":[\"open\",\"locked\",\"locked\"]}"
+  },
+  {
+   "size": "844x390",
+   "area": "tải lại",
+   "name": "bản đồ nhỏ chỉ còn ký hiệu thẻ chưa nhặt (0, mong 0)",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "size": "844x390",
+   "area": "lỗi trang",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to/thuong",
+   "name": "mở được cuộn thẻ 4 (nội dung dài nhất)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to/thuong",
+   "name": "không có hoạt ảnh trong hộp (hợp Giảm chuyển động)",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to/thuong",
+   "name": "màn thấp: hộp cuộn được (nội dung dài hơn khung nhìn)",
+   "ok": true,
+   "detail": "{\"font\":24,\"scrollable\":true,\"ch\":390,\"sh\":943,\"anims\":0}"
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to/thuong",
+   "name": "cuộn tới nút Kiểm tra, nằm trọn trong khung nhìn và đủ lớn (≥ 40px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to/thuong",
+   "name": "sau khi nộp: phản hồi và nút Cất vào sổ cuộn tới được",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to/thuong",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to/chu-to",
+   "name": "mở được cuộn thẻ 4 (nội dung dài nhất)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to/chu-to",
+   "name": "không có hoạt ảnh trong hộp (hợp Giảm chuyển động)",
+   "ok": true,
+   "detail": "0"
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to/chu-to",
+   "name": "màn thấp: hộp cuộn được (nội dung dài hơn khung nhìn)",
+   "ok": true,
+   "detail": "{\"font\":27.6,\"scrollable\":true,\"ch\":390,\"sh\":1080,\"anims\":0}"
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to/chu-to",
+   "name": "cuộn tới nút Kiểm tra, nằm trọn trong khung nhìn và đủ lớn (≥ 40px)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to/chu-to",
+   "name": "sau khi nộp: phản hồi và nút Cất vào sổ cuộn tới được",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to/chu-to",
+   "name": "không lỗi trang",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "chữ to",
+   "name": "Chữ to làm tiêu đề thẻ to hơn (24px → 27.6px)",
+   "ok": true,
+   "detail": "[24,27.6]"
+  }
+ ],
+ "shots": [
+  {
+   "file": "p6b-hop-the-hoi-lang-giay-1366x768.jpg",
+   "bytes": 121208
+  },
+  {
+   "file": "p6b-hop-the-sai-lang-giay-1366x768.jpg",
+   "bytes": 121843
+  },
+  {
+   "file": "p6b-xem-lai-lang-giay-1366x768.jpg",
+   "bytes": 120919
+  },
+  {
+   "file": "p6b-hop-the-hoi-lang-det-1366x768.jpg",
+   "bytes": 118102
+  },
+  {
+   "file": "p6b-hop-the-dung-lang-det-1366x768.jpg",
+   "bytes": 125271
+  },
+  {
+   "file": "p6b-hop-the-hoi-lang-khac-dau-1366x768.jpg",
+   "bytes": 138431
+  },
+  {
+   "file": "p6b-hop-the-sai-lang-khac-dau-1366x768.jpg",
+   "bytes": 112077
+  },
+  {
+   "file": "p6b-hop-the-hoi-lang-bac-1366x768.jpg",
+   "bytes": 133680
+  },
+  {
+   "file": "p6b-hop-the-dung-lang-bac-1366x768.jpg",
+   "bytes": 120665
+  },
+  {
+   "file": "p6b-ban-do-bang-lang-1366x768.jpg",
+   "bytes": 165839
+  },
+  {
+   "file": "p6b-ban-do-doc-the-1366x768.jpg",
+   "bytes": 135946
+  },
+  {
+   "file": "p6b-hop-the-hoi-lang-giay-360x800.jpg",
+   "bytes": 50334
+  },
+  {
+   "file": "p6b-hop-the-dung-lang-giay-360x800.jpg",
+   "bytes": 52217
+  },
+  {
+   "file": "p6b-xem-lai-lang-giay-360x800.jpg",
+   "bytes": 49079
+  },
+  {
+   "file": "p6b-hop-the-hoi-lang-det-360x800.jpg",
+   "bytes": 52848
+  },
+  {
+   "file": "p6b-hop-the-sai-lang-det-360x800.jpg",
+   "bytes": 48504
+  },
+  {
+   "file": "p6b-hop-the-hoi-lang-khac-dau-360x800.jpg",
+   "bytes": 56730
+  },
+  {
+   "file": "p6b-hop-the-dung-lang-khac-dau-360x800.jpg",
+   "bytes": 49247
+  },
+  {
+   "file": "p6b-hop-the-hoi-lang-bac-360x800.jpg",
+   "bytes": 56605
+  },
+  {
+   "file": "p6b-hop-the-sai-lang-bac-360x800.jpg",
+   "bytes": 49191
+  },
+  {
+   "file": "p6b-ban-do-bang-lang-360x800.jpg",
+   "bytes": 33163
+  },
+  {
+   "file": "p6b-thuong-phan-hoi-360x800.jpg",
+   "bytes": 55982
+  },
+  {
+   "file": "p6b-chu-to-phan-hoi-360x800.jpg",
+   "bytes": 50416
+  },
+  {
+   "file": "p6b-hop-the-hoi-lang-giay-844x390.jpg",
+   "bytes": 50893
+  },
+  {
+   "file": "p6b-hop-the-dung-lang-giay-844x390.jpg",
+   "bytes": 48887
+  },
+  {
+   "file": "p6b-xem-lai-lang-giay-844x390.jpg",
+   "bytes": 45348
+  },
+  {
+   "file": "p6b-hop-the-hoi-lang-det-844x390.jpg",
+   "bytes": 52180
+  },
+  {
+   "file": "p6b-hop-the-dung-lang-det-844x390.jpg",
+   "bytes": 51328
+  },
+  {
+   "file": "p6b-hop-the-hoi-lang-khac-dau-844x390.jpg",
+   "bytes": 56553
+  },
+  {
+   "file": "p6b-hop-the-sai-lang-khac-dau-844x390.jpg",
+   "bytes": 48756
+  },
+  {
+   "file": "p6b-hop-the-hoi-lang-bac-844x390.jpg",
+   "bytes": 54476
+  },
+  {
+   "file": "p6b-hop-the-dung-lang-bac-844x390.jpg",
+   "bytes": 47611
+  },
+  {
+   "file": "p6b-thuong-phan-hoi-844x390.jpg",
+   "bytes": 52660
+  },
+  {
+   "file": "p6b-chu-to-phan-hoi-844x390.jpg",
+   "bytes": 48927
+  }
+ ]
+}

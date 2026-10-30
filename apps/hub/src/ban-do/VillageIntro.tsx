@@ -45,9 +45,9 @@ function TaskList({ village, unlockLevels }: { village: VillageId; unlockLevels:
 
 /**
  * Giới thiệu làng kiểu visual novel (lần đầu bấm vào làng trên /ban-do): chân dung lớn của người dẫn,
- * nền là ảnh scenes/bai-hoc-<làng> làm mờ; lượt cuối có danh sách 3 màn. Xong hoặc bỏ qua đều gọi onDone.
+ * nền là ảnh scenes/bai-hoc-<làng> làm mờ; lượt cuối có danh sách 3 màn. Xong hoặc bỏ qua đều gọi onDone. Chỉ là phần ĐỌC (P6b): không bắt trả lời câu hỏi và không đánh dấu đã nhặt thẻ (thẻ chỉ được nhặt trong làng 3D).
  */
-export default function VillageIntro({ village, unlockLevels, onDone, onCardsRead }: { village: VillageId; unlockLevels: readonly LevelUnlock[]; onDone: () => void; /** Đọc hết các lượt (bấm nút ở lượt cuối, không phải "Bỏ qua"): đã đọc đủ các thẻ Em có biết của làng */ onCardsRead?: () => void }) {
+export default function VillageIntro({ village, unlockLevels, onDone }: { village: VillageId; unlockLevels: readonly LevelUnlock[]; onDone: () => void }) {
   const turns = useMemo<VnTurn[]>(() => {
     const { guide, turns: lines } = VILLAGE_INTRO[village];
     const base = { speaker: speakerLabel(guide), portrait: CHARACTERS[guide].portrait };
@@ -68,10 +68,7 @@ export default function VillageIntro({ village, unlockLevels, onDone, onCardsRea
   return (
     <VnDialog
       turns={turns}
-      onFinish={() => {
-        onCardsRead?.();
-        onDone();
-      }}
+      onFinish={onDone}
       onSkip={onDone}
       finishLabel={T.ketThuc}
       background={`scenes/bai-hoc-${village}`}

@@ -22,6 +22,8 @@ import { climaxPending } from '../../progress/climaxState';
 import { climaxUi } from '../../content/climax';
 import { useSettings } from '../../settings/SettingsProvider';
 import { EmCoBietDialog } from '../../ui/EmCoBietDialog';
+import { KnowQuizDialog } from '../../ui/KnowQuizDialog';
+import { knowQuizOf } from '../../lib/knowQuiz';
 import { KnowCollectionDialog } from '../../ui/KnowCollectionDialog';
 import { GuideDialog } from '../../ui/GuideDialog';
 import { VnDialog, type VnTurn } from '../../ui/VnDialog';
@@ -438,19 +440,31 @@ export function WorldPage() {
   }, [api]);
   const knowRef = useRef(know);
   knowRef.current = know;
-  const closeKnow = useCallback(() => {
-    const k = knowRef.current;
-    setKnow(null);
-    if (k && k.scroll !== undefined) {
-      // đọc xong thẻ nhặt được: cất vào sổ, cột sáng tắt, báo số thẻ
+  /** Cất thẻ nhặt được vào sổ: cột sáng tắt, báo số thẻ. Chỗ DUY NHẤT ghi cờ `knowCards` của luồng nhặt thẻ. */
+  const stashKnowCard = useCallback(
+    (k: { village: VillageId; scroll: number }) => {
       const total = live.current.scrollsOf(k.village).length;
       const mask = live.current.knowMasks[k.village] | (1 << k.scroll);
       progress.markKnowCard(k.village, k.scroll);
       const n = countKnowCards(mask, total);
       setToast(fmt(n >= total ? knowScrollUi.nhatDu : knowScrollUi.nhatXong, { n, tong: total }));
-    }
+    },
+    [progress],
+  );
+  /** Đóng hộp thẻ (Esc, bấm ra ngoài, nút Đóng). Thẻ có câu hỏi: đóng trước khi "Cất vào sổ" thì CHƯA nhặt (P6b). Thẻ không có câu hỏi (không còn thẻ nào như vậy trong 16 thẻ): đọc xong là cất như cũ. */
+  const closeKnow = useCallback(() => {
+    const k = knowRef.current;
+    setKnow(null);
+    if (k && k.scroll !== undefined && !knowQuizOf(k.village, k.scroll)) stashKnowCard({ village: k.village, scroll: k.scroll });
     session.dialogClosed();
-  }, [session, progress]);
+  }, [session, stashKnowCard]);
+  /** Bấm "Cất vào sổ" sau khi đã trả lời một lần (đúng hay sai đều được cất). */
+  const collectKnow = useCallback(() => {
+    const k = knowRef.current;
+    setKnow(null);
+    if (k && k.scroll !== undefined) stashKnowCard({ village: k.village, scroll: k.scroll });
+    session.dialogClosed();
+  }, [session, stashKnowCard]);
   const closeCollection = useCallback(() => {
     setCollection(null);
     session.dialogClosed();
@@ -524,6 +538,7 @@ export function WorldPage() {
 
   const allKnowCards = know ? villageKnowCards(know.village) : [];
   const knowCards = know && know.scroll !== undefined ? allKnowCards.slice(know.scroll, know.scroll + 1) : allKnowCards;
+  const knowQuizHere = know && know.scroll !== undefined && allKnowCards[know.scroll] ? knowQuizOf(know.village, know.scroll) : undefined;
   const menuKnow = inside && villageKnowCards(inside).length > 0 && VILLAGE_SCENE[inside] ? [{ label: ui.baiHoc.emCoBiet, onClick: openKnow }] : [];
 
   return (
@@ -632,8 +647,12 @@ export function WorldPage() {
         </div>
       )}
 
-      {know && <EmCoBietDialog cards={knowCards} onClose={closeKnow} finishLabel={know.scroll !== undefined ? knowScrollUi.catVaoSo : know.auto ? ui.baiHoc.vaoLang : undefined} />}
-      {collection && <KnowCollectionDialog cards={villageKnowCards(collection)} mask={knowMasks[collection]} total={scrollTotals[collection]} onClose={closeCollection} />}
+      {know && knowQuizHere && know.scroll !== undefined ? (
+        <KnowQuizDialog mode="collect" card={allKnowCards[know.scroll]} quiz={knowQuizHere} index={know.scroll} total={scrollTotals[know.village]} onCollect={collectKnow} onClose={closeKnow} />
+      ) : (
+        know && <EmCoBietDialog cards={knowCards} onClose={closeKnow} finishLabel={know.scroll !== undefined ? knowScrollUi.catVaoSo : know.auto ? ui.baiHoc.vaoLang : undefined} />
+      )}
+      {collection && <KnowCollectionDialog cards={villageKnowCards(collection)} mask={knowMasks[collection]} total={scrollTotals[collection]} quizOf={(i) => knowQuizOf(collection, i)} onClose={closeCollection} />}
       {toast && (
         <div data-hud className="pointer-events-none fixed inset-x-0 top-24 z-40 flex justify-center px-3">
           <span role="status" data-testid="thong-bao-the" className="rounded-nut border-2 border-vang bg-black/75 px-4 py-2 text-center font-display text-lg font-extrabold text-white">

@@ -57,23 +57,23 @@ export const bai4Lesson: LessonContent = {
   emCoBiet: [
     {
       title: 'Một khối chứa rất nhiều giao dịch.',
-      text: 'Cây Merkle là cách "gói" tất cả giao dịch thành một con số duy nhất ở đỉnh, gọi là gốc Merkle (Merkle root).',
-      example: 'Dù một trang sổ chứa hàng trăm hay hàng ngàn giao dịch, chỉ cần một con số Gốc Merkle là đại diện được cho tất cả!',
+      text: 'Cây Merkle là cách "gói" tất cả giao dịch thành một con số duy nhất ở đỉnh, gọi là gốc Merkle (Merkle root). Muốn so gốc của hai bản thì hai bên phải tính gốc theo cùng quy tắc ghép và cùng thứ tự giao dịch. Trong bài, công thức ghép chỉ để học; cây Merkle thật dùng hàm băm.',
+      example: 'Một trang sổ có 1.000 giao dịch. Hai node đã tính gốc theo cùng quy tắc và cùng thứ tự; thay vì đọc cả 1.000 giao dịch để so sánh, họ so con số gốc Merkle của hai bản.',
     },
     {
       title: 'Cách tạo cây.',
       text: 'Ghép từng cặp giao dịch thành một giá trị mới, rồi lại ghép từng cặp giá trị mới, cho tới khi chỉ còn 1 giá trị. Giá trị đó là gốc. Trong bài, công thức ghép là T_ab = T_a × 10 + T_b, và thứ tự quan trọng (T_12 khác T_21).',
-      example: 'T12 = 3 × 10 + 7 = 37. Nhưng T21 = 7 × 10 + 3 = 73! Thứ tự trước sau quyết định kết quả.',
+      example: 'Hai lá 3 và 7: T12 = 3 × 10 + 7 = 37, nhưng đảo thứ tự thì 7 × 10 + 3 = 73. Với 4 lá 4, 2, 6, 1: ghép được 42 và 61, rồi 42 × 10 + 61 = 481.',
     },
     {
       title: 'Giống bảng đấu loại trực tiếp.',
       text: '8 đội đá 4 trận tứ kết, rồi 2 trận bán kết, rồi 1 trận chung kết. Mỗi cặp gộp thành 1, cho tới khi chỉ còn nhà vô địch ở đỉnh.',
-      example: 'Chiếc cúp vô địch ở đỉnh chính là Gốc Merkle, kết tinh từ toàn bộ nhánh đấu bên dưới!',
+      example: 'Cây Merkle 8 lá có 4 + 2 + 1 = 7 phép ghép (4 ở tầng đầu, 2 ở tầng giữa, 1 ở tầng gốc), giống 7 trận để tìm ra nhà vô địch của 8 đội.',
     },
     {
       title: 'Để làm gì?',
-      text: 'Chỉ cần sửa 1 giao dịch là gốc đổi ngay. Gốc được ghi vào khối (trang sổ), nên node chỉ cần so 1 con số thay vì so từng giao dịch, và phát hiện sửa đổi rất nhanh.',
-      example: 'Mỗi khi kiểm tra sổ, các máy tính chỉ cần so khớp 1 con số Gốc Merkle là biết ngay tính toàn vẹn của cả trang.',
+      text: 'Chỉ cần sửa 1 giao dịch là gốc đổi (khi tính theo cùng quy tắc và cùng thứ tự). Gốc được ghi vào khối (trang sổ), nên node chỉ cần so 1 con số thay vì so từng giao dịch, và phát hiện sửa đổi rất nhanh. Gốc khác nhau thì chắc chắn có khác biệt; gốc giống nhau thì, với hàm băm thật, coi như dữ liệu giống nhau (công thức ghép số của bài chỉ để học, có thể trùng).',
+      example: 'Trang có 4 giao dịch 3, 7, 5, 2 cho gốc 422. {phanDien} đổi giao dịch thứ 3 từ 5 thành 9: ghép được 37 và 92, nên gốc mới là 37 × 10 + 92 = 462, khác 422.',
     },
   ],
 };

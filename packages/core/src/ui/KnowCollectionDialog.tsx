@@ -5,7 +5,9 @@ import { ui } from '../content/ui';
 import { countKnowCards, hasKnowCard } from '../progress/knowCards';
 import type { StoryCard } from '../lessons/types';
 import { Button } from './Button';
+import type { KnowQuiz } from '../content/knowQuiz';
 import { EmCoBietDialog } from './EmCoBietDialog';
+import { KnowQuizDialog } from './KnowQuizDialog';
 import { Panel } from './Panel';
 
 export interface KnowCollectionDialogProps {
@@ -15,6 +17,8 @@ export interface KnowCollectionDialogProps {
   mask: number;
   /** Số thẻ rải trong làng (có thể ít hơn số thẻ của bài học) */
   total: number;
+  /** Câu hỏi của thẻ thứ i (P6b); có thì xem lại hiện cả câu hỏi, đáp án và giải thích (không bắt trả lời lại) */
+  quizOf?: (index: number) => KnowQuiz | undefined;
   onClose: () => void;
 }
 
@@ -22,7 +26,7 @@ export interface KnowCollectionDialogProps {
  * Menu "Em có biết?" của làng (bước X3): lưới các thẻ trong sổ. Thẻ đã nhặt hiện số và tiêu đề, bấm để đọc lại; thẻ chưa nhặt hiện dấu "?" và không đọc được. Nội dung thẻ lấy từ `villageKnowCards`
  * (không viết lại). Dùng chung cho 4 làng. Esc hoặc bấm ra ngoài để đóng.
  */
-export function KnowCollectionDialog({ cards, mask, total, onClose }: KnowCollectionDialogProps) {
+export function KnowCollectionDialog({ cards, mask, total, quizOf, onClose }: KnowCollectionDialogProps) {
   const [open, setOpen] = useState<number | null>(null);
   useEffect(() => {
     if (open !== null) return;
@@ -32,7 +36,11 @@ export function KnowCollectionDialog({ cards, mask, total, onClose }: KnowCollec
   }, [onClose, open]);
   const shown = cards.slice(0, total);
   const got = countKnowCards(mask, total);
-  if (open !== null && cards[open]) return <EmCoBietDialog cards={[cards[open]]} onClose={() => setOpen(null)} />;
+  if (open !== null && cards[open]) {
+    const quiz = quizOf?.(open);
+    if (quiz) return <KnowQuizDialog mode="review" card={cards[open]} quiz={quiz} index={open} total={total} onClose={() => setOpen(null)} />;
+    return <EmCoBietDialog cards={[cards[open]]} onClose={() => setOpen(null)} />;
+  }
   return (
     <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-chu/40 p-4" onClick={onClose} data-walk-ui data-testid="bo-suu-tap-the">
       <Panel role="dialog" aria-modal="true" aria-label={ui.baiHoc.emCoBiet} className="w-full max-w-lg space-y-3" onClick={(e) => e.stopPropagation()}>
