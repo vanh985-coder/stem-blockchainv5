@@ -112,6 +112,25 @@ describe('TutorialSpotlight (P8a - Cơ chế focus & làm thử dùng chung)', (
     expect(html).toContain('border-do-son/60');
     expect(html).toContain('Thử lại');
   });
+
+  it('cấu trúc tooltip có layout flex-col: header shrink-0, body overflow-y-auto, footer shrink-0 bảo vệ nút bấm', () => {
+    const html = renderToStaticMarkup(
+      <TutorialSpotlight
+        isOpen={true}
+        steps={dummySteps}
+        currentStepIndex={0}
+        onSkip={() => {}}
+      />
+    );
+    // Tooltip container flex-col
+    expect(html).toContain('flex flex-col');
+    // Header shrink-0
+    expect(html).toContain('shrink-0 mb-2 flex items-center justify-between');
+    // Body overflow-y-auto min-h-0
+    expect(html).toContain('overflow-y-auto flex-1 min-h-0');
+    // Footer shrink-0 bảo vệ nút bấm luôn nhìn thấy
+    expect(html).toContain('shrink-0 mt-2.5 pt-2 border-t');
+  });
 });
 
 describe('Dữ liệu và Logic mẫu Màn 1 Trạm Dễ (P8a)', () => {

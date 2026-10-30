@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from './Button';
 import { useSettings } from '../settings/SettingsProvider';
 import { tutorialTexts } from '../content/tutorial';
@@ -52,6 +53,24 @@ interface RectState {
   bottom: number;
 }
 
+export type TooltipPlacement = 'bottom' | 'top' | 'right' | 'left';
+
+interface TooltipPosition {
+  top: number;
+  left: number;
+  placement: TooltipPlacement;
+  maxAvailableHeight: number;
+}
+
+function getViewportDimensions() {
+  const vv = typeof window !== 'undefined' ? window.visualViewport : null;
+  const width = vv ? vv.width : typeof window !== 'undefined' ? window.innerWidth : 1024;
+  const height = vv ? vv.height : typeof window !== 'undefined' ? window.innerHeight : 768;
+  const offsetLeft = vv ? vv.offsetLeft : 0;
+  const offsetTop = vv ? vv.offsetTop : 0;
+  return { width, height, offsetLeft, offsetTop };
+}
+
 export function TutorialSpotlight({
   isOpen,
   steps,
@@ -68,10 +87,11 @@ export function TutorialSpotlight({
   const { settings } = useSettings();
   const reducedMotion = settings.reducedMotion;
   const [targetRect, setTargetRect] = useState<RectState | null>(null);
-  const [tooltipPos, setTooltipPos] = useState<{ top: number; left: number; placement: 'top' | 'bottom' }>({
+  const [tooltipPos, setTooltipPos] = useState<TooltipPosition>({
     top: 0,
     left: 0,
     placement: 'bottom',
+    maxAvailableHeight: 320,
   });
 
   const step = steps[currentStepIndex];
@@ -146,8 +166,10 @@ export function TutorialSpotlight({
       const el = document.querySelector(step.targetSelector!) as HTMLElement | null;
       if (el) {
         const r = el.getBoundingClientRect();
-        const isInView = r.top >= 0 && r.bottom <= window.innerHeight;
-        if (!isInView) {
+        const vp = getViewportDimensions();
+        // Kiểm tra xem target có nằm trọn vẹn trong vùng an toàn của viewport không
+        const isInSafeView = r.top >= 48 && r.bottom <= vp.height - 48;
+        if (!isInSafeView) {
           el.scrollIntoView({
             behavior: reducedMotion ? 'auto' : 'smooth',
             block: 'center',
@@ -167,7 +189,7 @@ export function TutorialSpotlight({
     };
   }, [isOpen, step?.targetSelector, reducedMotion, updateRect]);
 
-  // Lắng nghe scroll, resize để cập nhật spotlight bám sát target
+  // Lắng nghe scroll, resize, visualViewport để cập nhật spotlight bám sát target
   useEffect(() => {
     if (!isOpen) return;
 
@@ -175,17 +197,27 @@ export function TutorialSpotlight({
     window.addEventListener('resize', updateRect, { passive: true });
     window.addEventListener('scroll', updateRect, { passive: true, capture: true });
 
-    // Dùng interval nhẹ hỗ trợ animation trượt/đổi kích thước nếu có
-    const interval = setInterval(updateRect, 100);
+    const vv = window.visualViewport;
+    if (vv) {
+      vv.addEventListener('resize', updateRect, { passive: true });
+      vv.addEventListener('scroll', updateRect, { passive: true });
+    }
+
+    // Polling nhẹ hỗ trợ animation trượt/đổi kích thước nếu có
+    const interval = setInterval(updateRect, 80);
 
     return () => {
       window.removeEventListener('resize', updateRect);
       window.removeEventListener('scroll', updateRect, { capture: true });
+      if (vv) {
+        vv.removeEventListener('resize', updateRect);
+        vv.removeEventListener('scroll', updateRect);
+      }
       clearInterval(interval);
     };
   }, [isOpen, updateRect]);
 
-  // Tính toán vị trí hiển thị Tooltip thông minh không che target và không tràn màn hình
+  // Tính toán vị trí hiển thị Tooltip thông minh: 4 hướng (bottom, top, right, left), không che target và không tràn màn hình
   useLayoutEffect(() => {
     if (!isOpen) return;
 
@@ -193,44 +225,93 @@ export function TutorialSpotlight({
     const ttHeight = tooltipEl ? tooltipEl.offsetHeight : 180;
     const ttWidth = tooltipEl ? tooltipEl.offsetWidth : 360;
 
-    const winW = window.innerWidth;
-    const winH = window.innerHeight;
+    const vp = getViewportDimensions();
+    const margin = 12;
+    const gap = 12;
 
     if (!targetRect) {
-      // Khi không có target, đặt tooltip ở trung tâm màn hình
+      // Khi không có target, đặt tooltip ở trung tâm màn hình, giới hạn maxAvailableHeight
+      const maxAvailableHeight = Math.min(420, vp.height - margin * 2);
       setTooltipPos({
-        top: Math.max(16, (winH - ttHeight) / 2),
-        left: Math.max(16, (winW - ttWidth) / 2),
+        top: vp.offsetTop + Math.max(margin, (vp.height - ttHeight) / 2),
+        left: vp.offsetLeft + Math.max(margin, (vp.width - ttWidth) / 2),
         placement: 'bottom',
+        maxAvailableHeight,
       });
       return;
     }
 
     const pad = padding;
-    const spaceBelow = winH - (targetRect.bottom + pad);
-    const spaceAbove = targetRect.top - pad;
+    const x1 = targetRect.left - pad;
+    const y1 = targetRect.top - pad;
+    const x2 = targetRect.right + pad;
+    const y2 = targetRect.bottom + pad;
 
-    let placement: 'top' | 'bottom' = 'bottom';
-    // Nếu bên dưới chật mà bên trên rộng hơn thì đặt ở trên
-    if (spaceBelow < ttHeight + 20 && spaceAbove > spaceBelow) {
-      placement = 'top';
+    // Khoảng trống ở 4 phía
+    const spaceBelow = vp.height - y2 - gap - margin;
+    const spaceAbove = y1 - gap - margin;
+    const spaceRight = vp.width - x2 - gap - margin;
+    const spaceLeft = x1 - gap - margin;
+
+    let placement: TooltipPlacement = 'bottom';
+    let maxAvailableHeight = 320;
+
+    // 1. Nếu màn hình ngang rất thấp (chiều cao <= 450px)
+    if (vp.height <= 450) {
+      if (spaceRight >= 240 && spaceRight >= spaceLeft) {
+        placement = 'right';
+      } else if (spaceLeft >= 240) {
+        placement = 'left';
+      } else if (spaceBelow >= spaceAbove) {
+        placement = 'bottom';
+      } else {
+        placement = 'top';
+      }
+    } else {
+      // 2. Màn hình bình thường: ưu tiên bottom nếu đủ chỗ
+      if (spaceBelow >= ttHeight + 8) {
+        placement = 'bottom';
+      } else if (spaceAbove >= ttHeight + 8) {
+        placement = 'top';
+      } else if (spaceRight >= 260 && spaceRight >= spaceLeft) {
+        placement = 'right';
+      } else if (spaceLeft >= 260) {
+        placement = 'left';
+      } else if (spaceBelow >= spaceAbove) {
+        placement = 'bottom';
+      } else {
+        placement = 'top';
+      }
     }
 
     let top = 0;
+    let left = 0;
+
     if (placement === 'bottom') {
-      top = targetRect.bottom + pad + 12;
+      top = y2 + gap + vp.offsetTop;
+      left = targetRect.left + (targetRect.width - ttWidth) / 2 + vp.offsetLeft;
+      maxAvailableHeight = Math.min(380, Math.max(140, vp.height - (y2 + gap) - margin));
+    } else if (placement === 'top') {
+      top = y1 - gap - ttHeight + vp.offsetTop;
+      left = targetRect.left + (targetRect.width - ttWidth) / 2 + vp.offsetLeft;
+      maxAvailableHeight = Math.min(380, Math.max(140, y1 - gap - margin));
+    } else if (placement === 'right') {
+      left = x2 + gap + vp.offsetLeft;
+      top = targetRect.top + (targetRect.height - ttHeight) / 2 + vp.offsetTop;
+      maxAvailableHeight = Math.min(380, vp.height - margin * 2);
     } else {
-      top = targetRect.top - pad - ttHeight - 12;
+      // placement === 'left'
+      left = x1 - gap - ttWidth + vp.offsetLeft;
+      top = targetRect.top + (targetRect.height - ttHeight) / 2 + vp.offsetTop;
+      maxAvailableHeight = Math.min(380, vp.height - margin * 2);
     }
 
-    // Đảm bảo không tràn trên/dưới
-    top = Math.max(12, Math.min(winH - ttHeight - 12, top));
+    // Đảm bảo không tràn viewport theo cả 2 trục
+    const effectiveHeight = Math.min(ttHeight, maxAvailableHeight);
+    top = Math.max(margin + vp.offsetTop, Math.min(vp.offsetTop + vp.height - effectiveHeight - margin, top));
+    left = Math.max(margin + vp.offsetLeft, Math.min(vp.offsetLeft + vp.width - ttWidth - margin, left));
 
-    // Căn ngang theo tâm target, đảm bảo cách viền tối thiểu 12px
-    let left = targetRect.left + targetRect.width / 2 - ttWidth / 2;
-    left = Math.max(12, Math.min(winW - ttWidth - 12, left));
-
-    setTooltipPos({ top, left, placement });
+    setTooltipPos({ top, left, placement, maxAvailableHeight });
   }, [isOpen, targetRect, padding, step, feedbackMessage]);
 
   // Focus trap và xử lý phím bấm (Escape, Tab)
@@ -287,15 +368,16 @@ export function TutorialSpotlight({
 
   if (!isOpen) return null;
 
+  const vp = getViewportDimensions();
   const pad = padding;
   const x1 = targetRect ? Math.max(0, targetRect.left - pad) : 0;
   const y1 = targetRect ? Math.max(0, targetRect.top - pad) : 0;
-  const x2 = targetRect ? Math.min(window.innerWidth, targetRect.right + pad) : 0;
-  const y2 = targetRect ? Math.min(window.innerHeight, targetRect.bottom + pad) : 0;
+  const x2 = targetRect ? Math.min(vp.width, targetRect.right + pad) : 0;
+  const y2 = targetRect ? Math.min(vp.height, targetRect.bottom + pad) : 0;
   const cutW = Math.max(0, x2 - x1);
   const cutH = Math.max(0, y2 - y1);
 
-  return (
+  const spotlightContent = (
     <div className="tutorial-spotlight-root" data-testid="tutorial-spotlight">
       {/* 4 khối che phủ tối xung quanh vùng target khoét sáng */}
       {targetRect && cutW > 0 && cutH > 0 ? (
@@ -328,7 +410,7 @@ export function TutorialSpotlight({
           {/* Viền sáng bao quanh vùng target */}
           <div
             className={`fixed z-40 pointer-events-none rounded-xl border-2 border-yellow-400 ring-2 ring-yellow-400/50 shadow-[0_0_15px_rgba(250,204,21,0.6)] ${
-              reducedMotion ? '' : 'transition-all duration-200'
+              reducedMotion ? '' : 'transition-all duration-150'
             }`}
             style={{
               top: y1,
@@ -365,19 +447,20 @@ export function TutorialSpotlight({
         aria-modal="true"
         aria-labelledby="tutorial-step-title"
         data-testid="tutorial-tooltip"
-        className={`fixed z-50 w-full max-w-[min(440px,calc(100vw-24px))] rounded-2xl border-2 border-nau-go/80 bg-giay/98 p-4 text-chu shadow-2xl ${
-          reducedMotion ? '' : 'transition-all duration-200'
+        className={`fixed z-50 flex flex-col w-full max-w-[min(440px,calc(100vw-24px))] rounded-2xl border-2 border-nau-go/80 bg-giay/98 p-3.5 sm:p-4 text-chu shadow-2xl ${
+          reducedMotion ? '' : 'transition-all duration-150'
         }`}
         style={{
           top: tooltipPos.top,
           left: tooltipPos.left,
+          maxHeight: tooltipPos.maxAvailableHeight ? `${tooltipPos.maxAvailableHeight}px` : 'calc(100vh - 24px)',
         }}
       >
-        {/* Header tooltip: Huy hiệu bước + Nút Bỏ qua */}
-        <div className="mb-2.5 flex items-center justify-between gap-2 border-b border-nau-go/30 pb-2">
+        {/* Header tooltip: Huy hiệu bước + Nút Bỏ qua (shrink-0) */}
+        <div className="shrink-0 mb-2 flex items-center justify-between gap-2 border-b border-nau-go/30 pb-1.5">
           <span
             id="tutorial-step-title"
-            className="font-display text-sm font-extrabold uppercase tracking-wide text-muc-tim-dam"
+            className="font-display text-xs sm:text-sm font-extrabold uppercase tracking-wide text-muc-tim-dam truncate"
           >
             {step?.title ||
               tutorialTexts.chung.buoc
@@ -389,33 +472,34 @@ export function TutorialSpotlight({
             ref={skipBtnRef}
             type="button"
             onClick={onSkip}
-            className="text-xs font-semibold text-chu/70 underline-offset-2 hover:text-chu hover:underline focus-visible:outline-2 focus-visible:outline-muc-tim"
+            className="shrink-0 text-xs font-semibold text-chu/70 underline-offset-2 hover:text-chu hover:underline focus-visible:outline-2 focus-visible:outline-muc-tim"
           >
             {tutorialTexts.chung.boQua}
           </button>
         </div>
 
-        {/* Nội dung chỉ dẫn */}
-        <p className="text-base font-medium leading-relaxed sm:text-lg text-chu-dam">{step?.content}</p>
+        {/* Nội dung chỉ dẫn và thông báo: cuộn được nếu màn hình hẹp hoặc nội dung dài */}
+        <div className="overflow-y-auto flex-1 min-h-0 pr-1 space-y-2">
+          <p className="text-sm sm:text-base font-medium leading-relaxed text-chu-dam">{step?.content}</p>
 
-        {/* Thông báo phản hồi đúng/sai nếu có */}
-        {feedbackMessage && (
-          <div
-            role="status"
-            className={`mt-3 rounded-xl border p-2.5 text-sm font-semibold leading-snug ${
-              feedbackType === 'success'
-                ? 'border-xanh-la-dam/60 bg-xanh-la/15 text-xanh-la-dam'
-                : feedbackType === 'error'
-                  ? 'border-do-son/60 bg-do-son/15 text-do-son'
-                  : 'border-muc-tim/40 bg-muc-tim/10 text-muc-tim-dam'
-            }`}
-          >
-            {feedbackMessage}
-          </div>
-        )}
+          {feedbackMessage && (
+            <div
+              role="status"
+              className={`rounded-xl border p-2 text-xs sm:text-sm font-semibold leading-snug ${
+                feedbackType === 'success'
+                  ? 'border-xanh-la-dam/60 bg-xanh-la/15 text-xanh-la-dam'
+                  : feedbackType === 'error'
+                    ? 'border-do-son/60 bg-do-son/15 text-do-son'
+                    : 'border-muc-tim/40 bg-muc-tim/10 text-muc-tim-dam'
+              }`}
+            >
+              {feedbackMessage}
+            </div>
+          )}
+        </div>
 
-        {/* Nút hành động ở chân Tooltip */}
-        <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+        {/* Nút hành động ở chân Tooltip (shrink-0): luôn cố định ở footer tooltip, không bao giờ bị tràn */}
+        <div className="shrink-0 mt-2.5 pt-2 border-t border-nau-go/20 flex flex-wrap items-center justify-end gap-2">
           {onPrev && currentStepIndex > 0 && !actionButton && (
             <Button size="sm" variant="secondary" onClick={onPrev}>
               {tutorialTexts.chung.quayLai}
@@ -444,4 +528,12 @@ export function TutorialSpotlight({
       {children}
     </div>
   );
+
+  // Khi có document.body (chạy trên trình duyệt), mount ra trực tiếp document.body qua createPortal
+  // để cách ly 100% khỏi CSS zoom hoặc transform của container mẹ. Khi SSR / không có DOM, trả về trực tiếp.
+  if (typeof document !== 'undefined' && document.body) {
+    return createPortal(spotlightContent, document.body);
+  }
+
+  return spotlightContent;
 }

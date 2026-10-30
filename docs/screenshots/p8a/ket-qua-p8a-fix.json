@@ -1,0 +1,758 @@
+{
+  "timestamp": "2026-10-30T16:48:17.236Z",
+  "viewports": {
+    "1366x768": {
+      "checks": [
+        {
+          "desc": "Nút ở Bước 0 (intro)",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 136,
+            "bottom": 152,
+            "left": 763,
+            "right": 870,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 1366,
+            "height": 768
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Nút ở Bước 1 (numbers)",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 138,
+            "bottom": 154,
+            "left": 763,
+            "right": 870,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 1366,
+            "height": 768
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Nút ở Bước 2 (formula)",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 434,
+            "bottom": 450,
+            "left": 512,
+            "right": 619,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 1366,
+            "height": 768
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Ô nhập mã trang",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 462,
+            "bottom": 505,
+            "left": 565,
+            "right": 680,
+            "width": 115,
+            "height": 43
+          },
+          "win": {
+            "width": 1366,
+            "height": 768
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Tooltip ở Bước 3",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 525,
+            "bottom": 715,
+            "left": 402,
+            "right": 842,
+            "width": 440,
+            "height": 190
+          },
+          "win": {
+            "width": 1366,
+            "height": 768
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Nút Thử lại khi sai",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 207,
+            "bottom": 223,
+            "left": 717,
+            "right": 824,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 1366,
+            "height": 768
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Nút Bắt đầu chơi thật khi đúng",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 591,
+            "bottom": 607,
+            "left": 763,
+            "right": 870,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 1366,
+            "height": 768
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Vào bài thật sạch sẽ",
+          "inRealGame": {
+            "spotClosed": true,
+            "hasGuideBtn": true
+          },
+          "pass": true
+        },
+        {
+          "desc": "Tooltip khi mở lại giữa bài",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 571,
+            "bottom": 756,
+            "left": 448,
+            "right": 888,
+            "width": 440,
+            "height": 185
+          },
+          "win": {
+            "width": 1366,
+            "height": 768
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Tooltip khi đã cuộn trang",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 571,
+            "bottom": 756,
+            "left": 448,
+            "right": 888,
+            "width": 440,
+            "height": 185
+          },
+          "win": {
+            "width": 1366,
+            "height": 768
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Tooltip sau khi resize",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 542,
+            "bottom": 716,
+            "left": 418,
+            "right": 858,
+            "width": 440,
+            "height": 174
+          },
+          "win": {
+            "width": 1306,
+            "height": 728
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        }
+      ],
+      "stepResults": {}
+    },
+    "360x800": {
+      "checks": [
+        {
+          "desc": "Nút ở Bước 0 (intro)",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 610,
+            "bottom": 626,
+            "left": 225,
+            "right": 332,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 360,
+            "height": 800
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Nút ở Bước 1 (numbers)",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 608,
+            "bottom": 624,
+            "left": 225,
+            "right": 332,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 360,
+            "height": 800
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Nút ở Bước 2 (formula)",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 410,
+            "bottom": 426,
+            "left": 225,
+            "right": 332,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 360,
+            "height": 800
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Ô nhập mã trang",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 495,
+            "bottom": 535,
+            "left": 145,
+            "right": 235,
+            "width": 90,
+            "height": 40
+          },
+          "win": {
+            "width": 360,
+            "height": 800
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Tooltip ở Bước 3",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 555,
+            "bottom": 731,
+            "left": 12,
+            "right": 348,
+            "width": 336,
+            "height": 176
+          },
+          "win": {
+            "width": 360,
+            "height": 800
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Nút Thử lại khi sai",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 256,
+            "bottom": 272,
+            "left": 225,
+            "right": 332,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 360,
+            "height": 800
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Nút Bắt đầu chơi thật khi đúng",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 28,
+            "bottom": 44,
+            "left": 225,
+            "right": 332,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 360,
+            "height": 800
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Vào bài thật sạch sẽ",
+          "inRealGame": {
+            "spotClosed": true,
+            "hasGuideBtn": true
+          },
+          "pass": true
+        },
+        {
+          "desc": "Tooltip khi mở lại giữa bài",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 594,
+            "bottom": 770,
+            "left": 12,
+            "right": 348,
+            "width": 336,
+            "height": 176
+          },
+          "win": {
+            "width": 360,
+            "height": 800
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Tooltip khi đã cuộn trang",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 594,
+            "bottom": 770,
+            "left": 12,
+            "right": 348,
+            "width": 336,
+            "height": 176
+          },
+          "win": {
+            "width": 360,
+            "height": 800
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Tooltip sau khi resize",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 63,
+            "bottom": 239,
+            "left": 12,
+            "right": 348,
+            "width": 336,
+            "height": 176
+          },
+          "win": {
+            "width": 360,
+            "height": 760
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        }
+      ],
+      "stepResults": {}
+    },
+    "844x390": {
+      "checks": [
+        {
+          "desc": "Nút ở Bước 0 (intro)",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 32,
+            "bottom": 48,
+            "left": 517,
+            "right": 624,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 844,
+            "height": 390
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Nút ở Bước 1 (numbers)",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 32,
+            "bottom": 48,
+            "left": 517,
+            "right": 624,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 844,
+            "height": 390
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Nút ở Bước 2 (formula)",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 190,
+            "bottom": 206,
+            "left": 707,
+            "right": 814,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 844,
+            "height": 390
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Ô nhập mã trang",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 105,
+            "bottom": 145,
+            "left": 353,
+            "right": 459,
+            "width": 106,
+            "height": 40
+          },
+          "win": {
+            "width": 844,
+            "height": 390
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Tooltip ở Bước 3",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 30,
+            "bottom": 220,
+            "left": 392,
+            "right": 832,
+            "width": 440,
+            "height": 190
+          },
+          "win": {
+            "width": 844,
+            "height": 390
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Nút Thử lại khi sai",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 32,
+            "bottom": 48,
+            "left": 707,
+            "right": 814,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 844,
+            "height": 390
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Nút Bắt đầu chơi thật khi đúng",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 32,
+            "bottom": 48,
+            "left": 517,
+            "right": 624,
+            "width": 107,
+            "height": 16
+          },
+          "win": {
+            "width": 844,
+            "height": 390
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Vào bài thật sạch sẽ",
+          "inRealGame": {
+            "spotClosed": true,
+            "hasGuideBtn": true
+          },
+          "pass": true
+        },
+        {
+          "desc": "Tooltip khi mở lại giữa bài",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 12,
+            "bottom": 152,
+            "left": 202,
+            "right": 642,
+            "width": 440,
+            "height": 140
+          },
+          "win": {
+            "width": 844,
+            "height": 390
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Tooltip khi đã cuộn trang",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 12,
+            "bottom": 152,
+            "left": 202,
+            "right": 642,
+            "width": 440,
+            "height": 140
+          },
+          "win": {
+            "width": 844,
+            "height": 390
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        },
+        {
+          "desc": "Tooltip sau khi resize",
+          "exists": true,
+          "inView": true,
+          "rect": {
+            "top": 12,
+            "bottom": 152,
+            "left": 172,
+            "right": 612,
+            "width": 440,
+            "height": 140
+          },
+          "win": {
+            "width": 784,
+            "height": 350
+          },
+          "fits": {
+            "fitsTop": true,
+            "fitsBottom": true,
+            "fitsLeft": true,
+            "fitsRight": true
+          }
+        }
+      ],
+      "stepResults": {}
+    }
+  },
+  "allPassed": true,
+  "screenshots": [
+    "docs/screenshots/p8a/p8a-fix-1366x768-step0-intro.png",
+    "docs/screenshots/p8a/p8a-fix-1366x768-step1-numbers.png",
+    "docs/screenshots/p8a/p8a-fix-1366x768-step2-formula.png",
+    "docs/screenshots/p8a/p8a-fix-1366x768-step3-input.png",
+    "docs/screenshots/p8a/p8a-fix-1366x768-step-wrong.png",
+    "docs/screenshots/p8a/p8a-fix-1366x768-step-correct.png",
+    "docs/screenshots/p8a/p8a-fix-1366x768-real-game.png",
+    "docs/screenshots/p8a/p8a-fix-360x800-step0-intro.png",
+    "docs/screenshots/p8a/p8a-fix-360x800-step1-numbers.png",
+    "docs/screenshots/p8a/p8a-fix-360x800-step2-formula.png",
+    "docs/screenshots/p8a/p8a-fix-360x800-step3-input.png",
+    "docs/screenshots/p8a/p8a-fix-360x800-step-wrong.png",
+    "docs/screenshots/p8a/p8a-fix-360x800-step-correct.png",
+    "docs/screenshots/p8a/p8a-fix-360x800-real-game.png",
+    "docs/screenshots/p8a/p8a-fix-844x390-step0-intro.png",
+    "docs/screenshots/p8a/p8a-fix-844x390-step1-numbers.png",
+    "docs/screenshots/p8a/p8a-fix-844x390-step2-formula.png",
+    "docs/screenshots/p8a/p8a-fix-844x390-step3-input.png",
+    "docs/screenshots/p8a/p8a-fix-844x390-step-wrong.png",
+    "docs/screenshots/p8a/p8a-fix-844x390-step-correct.png",
+    "docs/screenshots/p8a/p8a-fix-844x390-real-game.png"
+  ]
+}

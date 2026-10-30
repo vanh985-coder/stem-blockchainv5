@@ -365,7 +365,12 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 
 - **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, commit và push nhánh `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này.
 - **Đã làm:**
-  - Cơ chế dùng chung `TutorialSpotlight` (`packages/core/src/ui/TutorialSpotlight.tsx`): 4 khối che backdrop chuẩn xác bao quanh vùng target, viền sáng highlight, định vị tooltip thông minh (tự động đảo vị trí `top`/`bottom` không che mục tiêu và không tràn màn hình), focus trap bàn phím Tab, bám sát target khi cuộn và đổi kích thước.
+  - Cơ chế dùng chung `TutorialSpotlight` (`packages/core/src/ui/TutorialSpotlight.tsx`): 4 khối che backdrop chuẩn xác bao quanh vùng target, viền sáng highlight, định vị tooltip thông minh 4 hướng (`bottom`, `top`, `right`, `left`), focus trap bàn phím Tab, bám sát target khi cuộn và đổi kích thước.
+  - Sửa triệt để lỗi khung hướng dẫn focus bị trôi xuống đáy màn hình:
+    - Sử dụng React Portal (`createPortal(..., document.body)`) đưa toàn bộ backdrop và Tooltip ra trực tiếp `document.body`, hoàn toàn cách ly khỏi CSS `zoom: 1.35` của `.lesson-zoom` trên màn hình Desktop (≥ 1280px). Tọa độ `position: fixed` neo chính xác 100% theo viewport trình duyệt.
+    - Cấu trúc Tooltip chống tràn: Container flex-col `max-h-[calc(100vh-24px)]`, Header `shrink-0`, Thân chỉ dẫn `overflow-y-auto flex-1 min-h-0` (nội dung dài tự cuộn bên trong), Footer chứa các nút bấm `shrink-0 mt-2.5 pt-2 border-t` luôn luôn hiển thị và tiếp cận được 100%.
+    - Màn hình ngang thấp (844×390): Thuật toán tự động chuyển sang đặt bên cạnh (`right` hoặc `left`), không che ô nhập hay nút kiểm tra, không tràn mép dưới.
+    - Bắt sự kiện `resize`, `scroll` (capture phase) và `window.visualViewport` để cập nhật vị trí tức thì khi cuộn trang hay đổi kích thước cửa sổ.
   - Xử lý chu kỳ phím Enter chống kích hoạt đúp: nộp bài bằng Enter tại ô nhập không tự ý kích hoạt chuyển tiếp hoặc bắt đầu bài thật; bắt buộc thả phím `keyup` rồi nhấn Enter chu kỳ mới mới tiếp tục.
   - Tích hợp mẫu tại Màn 1 trạm Dễ (`packages/village-lang-giay/src/bai-1/Easy.tsx`) qua 6 bước: Giới thiệu mục tiêu ngắn -> Focus vùng số 12 và 5 -> Focus công thức gợi ý -> Focus ô nhập và cho học sinh tự gõ -> Focus nút Kiểm tra -> Phản hồi kết quả (đúng: xác nhận mã 29 và hiện nút "Bắt đầu chơi thật"; sai: báo lỗi, giải thích công thức và hiện nút "Thử lại").
   - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: dữ liệu mẫu cố định 12 & 5, không gọi `record()`, không tính giờ/xu/sao/tiến độ/Trang Sổ Vàng. Bắt đầu bài thật bấm giờ sạch từ đầu.
@@ -374,9 +379,9 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - **Kiểm tra đã đạt:**
   - `pnpm check:text`: sạch (438 files).
   - `pnpm typecheck`: 10 package biên dịch thành công 100%.
-  - `pnpm test --maxWorkers=2`: 209 test files passed, 2294 tests passed, 5 skipped (thêm test `TutorialSpotlight.test.tsx` và `man1EasyTutorial.test.tsx`).
+  - `pnpm test --maxWorkers=2`: 209 test files passed, 2295 tests passed, 5 skipped (thêm test layout flex-col và footer shrink-0 trong `tutorialSpotlight.test.tsx`).
   - `pnpm build`: Đạt toàn bộ 5 ứng dụng.
-  - Đo lường và kiểm tra Puppeteer `scripts/p8a-check.mjs`: Đạt cả 3 kích thước 1366×768, 360×800, 844×390 (21 ảnh chụp minh chứng lưu tại `docs/screenshots/p8a/` và `BAO-CAO-P8A.md`). Xác minh tiến độ không đổi (`progressUnchangedAfterPractice = true`), Enter không kích hoạt đúp (`enterHoldSafe = true`), bài thật hoàn thành bình thường sau hướng dẫn (`realStationDoneNormally = true`).
+  - Đo lường và kiểm tra Puppeteer trên bản build production preview (`scripts/p8a-viewport-fix-check.mjs`): Đạt 100% (`allPassed = true`) tại cả 3 kích thước 1366×768, 360×800, 844×390. Xác minh bounding rect của Tooltip và các nút bấm luôn nằm trọn trong viewport `[0, innerHeight]`, không trôi, không tràn đáy, mở lại giữa bài và cuộn trang đều bám sát chuẩn xác.
 
 ## Việc để sau / cần theo dõi
 

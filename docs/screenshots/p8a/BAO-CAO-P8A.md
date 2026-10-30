@@ -56,9 +56,9 @@
 
 ---
 
-## 5. Kết quả kiểm tra tự động Puppeteer (`scripts/p8a-check.mjs` & `scripts/p8a-preview-check.mjs`)
+## 5. Kết quả kiểm tra tự động Puppeteer (`scripts/p8a-check.mjs`, `scripts/p8a-preview-check.mjs`, `scripts/p8a-viewport-fix-check.mjs`)
 
-Đã tiến hành hai đợt kiểm tra độc lập để đảm bảo chất lượng:
+Đã tiến hành ba đợt kiểm tra độc lập để đảm bảo chất lượng:
 
 ### Đợt 1: Kiểm tra toàn diện trên Vite Dev Server (cổng 5173)
 Đo lường trên cả 3 độ phân giải chuẩn của dự án:
@@ -82,14 +82,34 @@ Chạy trực tiếp trên mã nguồn đã build production (`apps/hub/dist`, `
 - **Xem lại giữa bài:** Mở lại và đóng hướng dẫn hoạt động trơn tru (`reviewToggle = true`).
 - Bằng chứng lưu tại: `docs/screenshots/p8a/ket-qua-p8a-build-preview.json` và các ảnh `p8a-build-*.png`.
 
+### Đợt 3: Đo lường sửa triệt để lỗi trôi khung hướng dẫn (`scripts/p8a-viewport-fix-check.mjs`)
+- **Nguyên nhân gốc rễ đã xác minh:**
+  1. Ở độ phân giải Desktop (≥ 1280px, ví dụ 1366×768), `.lesson-zoom` trong `theme.css` áp dụng `zoom: 1.35`. Trước khi sửa, `TutorialSpotlight` được render bên trong component `Easy`, tức là con cháu của `.lesson-zoom`. Do đó, tọa độ CSS px lấy từ `getBoundingClientRect()` (tọa độ viewport) khi đặt vào style `fixed` con bị trình duyệt nhân thêm 1,35 lần (`top * 1.35`), đẩy Tooltip và các nút bấm trôi tuột xuống đáy màn hình (`top > 768px`).
+  2. Ở màn hình ngang thấp (844×390), chiều cao viewport chỉ có 390px. Thuật toán cũ chỉ có hai hướng trên/dưới dẫn tới đè lên target hoặc đẩy nút bấm tràn đáy.
+- **Giải pháp triệt để đã triển khai:**
+  1. Sử dụng React Portal (`createPortal(..., document.body)`): Đưa toàn bộ 4 khối backdrop và Tooltip ra trực tiếp `document.body`, hoàn toàn cách ly khỏi CSS `zoom: 1.35` và transform của `.lesson-zoom`. Tọa độ `position: fixed` neo 100% chính xác theo viewport của trình duyệt.
+  2. Thuật toán định vị thông minh 4 hướng (`bottom`, `top`, `right`, `left`):
+     - Màn hình ngang thấp (chiều cao ≤ 450px): tự động chuyển sang đặt bên cạnh (`right` hoặc `left`), không che ô nhập, không che nút kiểm tra và tận dụng chiều ngang rộng.
+     - Cấu trúc Tooltip chống tràn: Container `flex flex-col max-h-[calc(100vh-24px)]`, Header `shrink-0`, Thân chỉ dẫn `overflow-y-auto flex-1 min-h-0` (nội dung dài cuộn được bên trong), Footer chứa nút bấm `shrink-0 mt-2.5 pt-2 border-t` luôn luôn cố định và tiếp cận được 100% trong khung nhìn.
+     - Lắng nghe sự kiện `resize`, `scroll` (capture phase) và `window.visualViewport` để cập nhật tọa độ liên tục khi cuộn trang, đổi kích thước, hoặc khi bàn phím ảo xuất hiện.
+- **Số liệu đo lường thực tế trên bản build production preview (`ket-qua-p8a-fix.json`):**
+
+| Độ phân giải | Vị trí ô nhập trong VP | Vị trí Tooltip trong VP | Nút thao tác trong VP | Đã cuộn trang (250px) | Sau khi Resize | Kết luận |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **1366×768 (Desktop)** | `[462, 505]` (**ĐẠT**) | `[525, 715]` (**ĐẠT**) | `[591, 607]` (**ĐẠT**) | Tooltip `[571, 756]` (**ĐẠT**) | Tooltip `[542, 716]` (**ĐẠT**) | **100% trong viewport, không trôi** |
+| **360×800 (Mobile dọc)** | `[495, 535]` (**ĐẠT**) | `[555, 731]` (**ĐẠT**) | `[28, 44]` (**ĐẠT**) | Tooltip `[594, 770]` (**ĐẠT**) | Tooltip `[63, 239]` (**ĐẠT**) | **100% trong viewport, tiếp cận tốt** |
+| **844×390 (Mobile ngang)**| `[105, 145]` (**ĐẠT**) | `[30, 220]` (**ĐẠT**) | `[32, 48]` (**ĐẠT**) | Tooltip `[12, 152]` (**ĐẠT**) | Tooltip `[12, 152]` (**ĐẠT**) | **Tự chuyển sang bên phải, không che target** |
+
+- **Giới hạn chưa xác minh:** Đã kiểm tra mô phỏng bàn phím và chạm giả lập qua Puppeteer; chưa kiểm tra với bàn phím ảo trên điện thoại thật có thanh URL động (Safari iOS).
+
 ---
 
 ## 6. Kết quả 4 lệnh kiểm tra bắt buộc
 
 1. `pnpm check:text`: Sạch 100% (**438 file**).
 2. `pnpm typecheck`: Biên dịch thành công 100% (**10 packages**).
-3. `pnpm test --maxWorkers=2`: **209 test files passed**, **2294 tests passed**, 5 skipped (thêm test mới `TutorialSpotlight.test.tsx` và `man1EasyTutorial.test.tsx`).
-4. `pnpm build`: Toàn bộ **5 ứng dụng** build production thành công.
+3. `pnpm test --maxWorkers=2`: **209 test files passed**, **2295 tests passed**, 5 skipped (thêm test mới layout flex-col và footer shrink-0 trong `tutorialSpotlight.test.tsx`).
+4. `pnpm build`: Toàn bộ **5 ứng dụng** (`hub`, `lang-bac`, `lang-giay`, `lang-det`, `lang-khac-dau`) build production thành công.
 
 ---
 
