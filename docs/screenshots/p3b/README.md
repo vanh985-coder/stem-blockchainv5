@@ -61,7 +61,7 @@ Chạy lại sau sửa: `p3b-check.mjs --mode=dev --only=levels,double,mid` **20
 - **Truy cập ở mọi trạm bài học:** 4 bài học (Màn 1, 4, 7, 10) có nút ở thanh đầu trang (`header`), truy cập được tại mọi trạm (Dễ, Trung bình, Khó).
 - **Truy cập ở mọi vòng game:** 8 game (Màn 2, 3, 5, 6, 8, 9, 11, 12) có nút ở thẻ bắt đầu (`the-bat-dau`) và trong hộp "?" (`hop-goi-y`) khi đang chơi. Nút "?" được nâng lên lớp `z-[35]` trong `MiniGameLevel.tsx` để luôn nổi trên các overlay giữa ván (như câu hỏi trắc nghiệm `z-30` của Màn 2), đảm bảo mở được hộp gợi ý ở mọi vòng. Hộp "?" mở rộng `max-w-lg` và `sm:flex-wrap` tránh tràn nút ở màn ngang (844×390).
 - **Chặn bấm lặp tức thời:** Bổ sung cờ `busy` vào `AutoCompleteButton` (`disabled={blocked !== null || busy}`) vô hiệu hóa nút ngay trong mili-giây đầu tiên khi bấm, phối hợp cùng cơ chế guard `'noop'` ở manager.
-- **Dừng mô phỏng khi tự hoàn thành giữa ván:** Khi bấm tự hoàn thành trong hộp "?", component game được gỡ khỏi cây DOM, đồng hồ và mô phỏng dừng ngay lập tức; không gọi `onFinish`, không chấm điểm hay phát sinh thưởng.
+- **Dừng ván khi tự hoàn thành giữa ván:** Khi bấm tự hoàn thành trong hộp "?", component game được gỡ khỏi cây DOM (unmount hoàn toàn), hiển thị khung "Đã tự hoàn thành"; không gọi `onFinish`, không chấm điểm hay phát sinh thưởng.
 
 ### 2. Bảng tổng hợp 12 màn chuẩn xác theo Content và Config thực tế
 | Màn | Tên màn | Loại | Các độ khó / trạm / vòng | Vị trí truy cập nút |
@@ -91,11 +91,11 @@ Chạy lại sau sửa: `p3b-check.mjs --mode=dev --only=levels,double,mid` **20
   - Khách ở bản phát hành KHÔNG thấy nút ở bất kỳ màn nào trong 12 màn và 12 trạm bài học.
   - Cookie giả mạo mang cờ tự hoàn thành bị bỏ qua, màn 12 vẫn khóa theo đúng tiến độ thật.
 
-### 4. Bổ sung mức độ bao phủ kiểm tra các vòng game (`scripts/p-game-rounds-check.mjs`)
-Bộ kiểm thử tự động `node scripts/p-game-rounds-check.mjs` chạy 16 ca bao phủ toàn bộ 8 game (2 ca mỗi game: vòng đầu/trạng thái bình thường và vòng cuối/trạng thái overlay đặc biệt):
+### 4. Bổ sung mức độ bao phủ kiểm tra các trạng thái đại diện của game (`scripts/p-game-rounds-check.mjs`)
+Bộ kiểm thử tự động `node scripts/p-game-rounds-check.mjs` chạy 16 ca kiểm tra các trạng thái đại diện bao phủ cả 8 game (2 ca mỗi game: vòng đầu/trạng thái bình thường và vòng cuối/trạng thái overlay đặc biệt, không phải lái riêng từng vòng):
 - **Thao tác thật tại tọa độ:** Không chỉ dựa vào sự tồn tại của DOM hay `z-index`, script mô phỏng `touchscreen.tap` / `mouse.click` trực tiếp vào tọa độ trung tâm của nút `[data-testid="nut-goi-y"]`.
 - **Hộp "?" nổi phía trên lớp active:** Xác nhận hộp `[data-testid="hop-goi-y"]` mở đè lên các overlay câu hỏi giữa ván (`QuizOverlay` `z-30` ở Màn 2), câu hỏi cổng làng (Màn 6), trạng thái trùm (Màn 5), giữ sổ 45s (Màn 3), nạp đạn (Màn 9), vòng cuối tráo thẻ (Màn 8), cây 3 (Màn 11), depth 6 (Màn 12).
-- **Dừng ván ngay lập tức:** Bấm nút `[data-testid="nut-tu-hoan-thanh"]` bên trong hộp "?"; xác minh khung chơi và nút "?" bị gỡ hoàn toàn khỏi DOM, hiển thị khung `[data-testid="da-tu-hoan-thanh"]`.
+- **Gỡ bỏ khung chơi và hiển thị hoàn thành:** Bấm nút `[data-testid="nut-tu-hoan-thanh"]` bên trong hộp "?"; xác minh khung chơi và nút "?" được unmount hoàn toàn khỏi DOM, hiển thị khung `[data-testid="da-tu-hoan-thanh"]`.
 - **Kết quả:** **64/64 kiểm đạt** (4 tiêu chí × 16 ca; chi tiết tại `docs/screenshots/p3b/ket-qua-vong-game.json`).
 
 ### 5. Giới hạn chưa xác minh

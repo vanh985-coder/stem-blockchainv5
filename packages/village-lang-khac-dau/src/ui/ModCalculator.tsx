@@ -42,7 +42,7 @@ export function ModCalculator({ open, onOpenChange, className = '', style, inlin
           role={inline ? 'group' : 'dialog'}
           aria-label={modCalcUi.tieuDe}
           data-testid="may-tinh-mod"
-          className={`${inline ? 'w-full space-y-1 p-2' : 'mt-2 w-[min(18rem,100%)] space-y-2 p-3'} rounded-2xl border-[3px] border-nau-go bg-giay`}
+          className={`${inline ? 'w-full space-y-1.5 p-2 sm:p-2.5' : 'mt-2 w-[min(18rem,100%)] space-y-2 p-3'} rounded-2xl border-[3px] border-nau-go bg-giay`}
           onFocusCapture={() => { if (inline) onOpenChange(true); }}
           onBlurCapture={(e) => { if (inline && !e.currentTarget.contains(e.relatedTarget)) onOpenChange(false); }}
           onKeyDown={(e) => {
@@ -53,8 +53,8 @@ export function ModCalculator({ open, onOpenChange, className = '', style, inlin
             }
           }}
         >
-          {inline && <p className="font-display font-extrabold">{modCalcUi.nut}</p>}
-          <label className={`block ${inline ? 'text-sm' : ''} font-bold`} htmlFor={`${id}-x`}>
+          {inline && <p className="font-display text-base font-extrabold sm:text-lg">{modCalcUi.nut}</p>}
+          <label className="block text-base font-bold" htmlFor={`${id}-x`}>
             {modCalcUi.nhap}
           </label>
           <input
@@ -66,16 +66,16 @@ export function ModCalculator({ open, onOpenChange, className = '', style, inlin
             maxLength={2}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className={`w-full rounded-xl border-2 border-nau-go bg-white px-3 ${inline ? 'min-h-11 py-1' : 'py-2'} font-display text-xl font-extrabold`}
+            className="w-full min-h-11 h-11 rounded-xl border-2 border-nau-go bg-white px-3 text-center font-display text-xl font-extrabold"
             data-testid="o-nhap-x"
           />
-          <p role="status" aria-live="polite" className={`min-h-[1.5em] font-display ${inline ? 'text-base leading-5' : 'text-lg'} font-extrabold`} data-testid="ket-qua-mod">
+          <p role="status" aria-live="polite" className="min-h-[1.5em] font-display text-base font-extrabold leading-snug" data-testid="ket-qua-mod">
             {x !== null ? (
               <>
                 <span className="sr-only">{plainPower(fmt(modCalcUi.ketQua, { x, y: publicKey(x) }))}</span>
                 <span aria-hidden="true">{rich(modCalcUi.ketQua, { x, y: publicKey(x) })}</span>
               </>
-            ) : text.trim() !== '' ? <span className={`${inline ? 'text-sm' : 'text-base'} font-bold text-do-son-dam`}>{modCalcUi.loi}</span> : null}
+            ) : text.trim() !== '' ? <span className="text-base font-bold text-do-son-dam">{modCalcUi.loi}</span> : null}
           </p>
           {!inline && (
             <Button size="sm" variant="secondary" className="min-h-11" onClick={() => onOpenChange(false)}>

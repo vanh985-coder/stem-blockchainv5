@@ -20,7 +20,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 |---|---|
 | 0–2 | ✅ Xong (mốc 2 chưa deploy) |
 | 3. Nhân rộng | ✅ **Chốt.** Đủ 12 màn, cả 4 làng dựng to, **đã gộp web** (≈2086 test xanh). Việc còn dở dời xuống **cuối mốc 4** |
-| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt (P3b chưa có Supabase thật); P5 đã chốt phần kiểm local; P6a đã duyệt và P6b (tích hợp 16 thẻ) đã xong; Hoàn thiện nút Tự hoàn thành cả màn ở mọi vòng/trạm và Bố cục đối chiếu trái–phải (Màn 4) ĐÃ XONG (30/10/2026)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
+| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt (P3b chưa có Supabase thật); P5 đã chốt phần kiểm local; P6a đã duyệt và P6b (tích hợp 16 thẻ) đã xong; Hoàn thiện nút Tự hoàn thành cả màn ở mọi vòng/trạm, Bố cục đối chiếu trái–phải (Màn 4) và Phóng to máy tính Màn 8 ĐÃ XONG (30/10/2026)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
 
 **⚠️ 15b vẫn chưa làm:** server có thể đang 530, mốc 2 và toàn bộ mốc 3 (≈60 commit, mới nhất `2bd76bf`) chưa push, chưa chạy trên máy thật. Cách làm: khôi phục `cloudflared` + Docker, deploy theo `DEPLOY.md` (h), Cache Rule (i), thử trên điện thoại.
 
@@ -204,7 +204,7 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - **Làm gì:** Hoàn thiện khả năng truy cập nút "Tự hoàn thành cả màn" ở mọi trạm của 4 bài học (Màn 1, 4, 7, 10; nút ở thanh đầu trang `header`) và mọi vòng của 8 game (Màn 2, 3, 5, 6, 8, 9, 11, 12; nút ở thẻ bắt đầu và trong hộp "?" lúc đang chơi).
 - **Phạm vi hiển thị rõ ràng:** Đổi nhãn nút thành `"Tự hoàn thành cả màn"` (`content/autoComplete.ts`), ghi rõ phạm vi: tự hoàn thành toàn bộ màn này, mở màn kế tiếp theo luật, không nhận sao, xu hay Trang Sổ Vàng.
 - **Hộp "?" mở được ở mọi vòng:** Nút "?" được nâng lên lớp `z-[35]` trong `MiniGameLevel.tsx` để luôn nổi trên các overlay giữa ván (như câu hỏi trắc nghiệm `z-30` của Màn 2), hộp "?" mở rộng `max-w-lg` và `sm:flex-wrap` tránh tràn nút ở màn ngang (844×390).
-- **Chặn bấm lặp và dừng ván:** Bổ sung cờ `busy` chặn ngay mili-giây đầu tiên khi bấm; khi tự hoàn thành giữa ván, khung chơi game được gỡ khỏi DOM lập tức, vòng lặp game loop, đồng hồ và mô phỏng dừng ngay, không gọi `onFinish` hay chấm điểm.
+- **Chặn bấm lặp và gỡ ván:** Bổ sung cờ `busy` chặn ngay mili-giây đầu tiên khi bấm; khi tự hoàn thành giữa ván, khung chơi game được unmount khỏi DOM lập tức, không gọi `onFinish` hay chấm điểm.
 - **Bảng 12 màn chuẩn xác theo Content/Config:**
   - Màn 1: "Trang nối trang" (Bài 1) | Bài học 2D | 3 trạm: Dễ (Nối trang), Trung bình (Sửa lén), Khó (Đổi thứ tự).
   - Màn 2: "Đuổi theo {phanDien}" | Game chạy 3D (Runner 3D) | 4 vòng (25s/vòng, giữa các vòng có QuizOverlay z-30).
@@ -218,7 +218,7 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   - Màn 10: "Cây gộp sổ" (Bài 4) | Bài học 2D | 3 trạm: Dễ (Gộp cặp tính gốc Merkle), Trung bình (Tìm lá bị sửa lén), Khó (Bằng chứng Merkle đường dẫn).
   - Màn 11: "Ghép lá cây sổ" | Game ghép 3 (Match-3) 2D | 3 cây Merkle (Cây 1: 4 ô lá - 12 lượt; Cây 2: 8 ô lá - 15 lượt; Cây 3: 8 ô lá - 15 lượt).
   - Màn 12: "Leo cây tìm lá giả" | Game leo cây 2.5D | 4 vòng / 4 chặng leo (8/16/32/64 lá, depth 3/4/5/6).
-- **Kiểm tra bao phủ các vòng game (`scripts/p-game-rounds-check.mjs`):** **64/64 đạt** trên 16 ca (2 ca/game cho cả 8 game: vòng đầu và vòng cuối/overlay đặc biệt). Thao tác thật tại tọa độ nút "?", mở hộp "?" đè lên lớp active, bấm nút tự hoàn thành và dừng ván lập tức.
+- **Kiểm tra bao phủ các trạng thái đại diện của game (`scripts/p-game-rounds-check.mjs`):** **64/64 đạt** trên 16 ca (2 ca/game cho cả 8 game: vòng đầu và vòng cuối/overlay đặc biệt, không ghi là đã lái riêng từng vòng). Thao tác thật tại tọa độ nút "?", mở hộp "?" đè lên lớp active, bấm nút tự hoàn thành và unmount khung chơi ngay lập tức.
 - **Bản Dev và Prod:** `scripts/p3b-check.mjs` đạt 324/324 (dev, 3 cỡ) và 78/78 (prod, 3 cỡ).
 
 ## Bố cục đối chiếu trái–phải (Màn 4 — Bài 2 Làng Dệt) — ĐÃ XONG (30/10/2026)
@@ -232,6 +232,21 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   - Giữ nguyên công thức, luật, đề, điểm, tiến độ và máy tính mã trang.
 - **Kiểm tra DOM tự động (`scripts/p-layout-check.mjs`):** **42/42 đạt** trên 3 kích thước: 1366×768 (chuột, 2 cột), 360×800 (chạm dọc, 1 cột), 844×390 (chạm ngang, 2 cột). Nhập số máy tính, tính toán chính xác, bấm biểu quyết mở `FeedbackSheet` giải thích và đóng tiếp tục bình thường.
 - **Minh chứng ảnh:** 12 ảnh chụp màn hình toàn diện tại `docs/screenshots/doi-chieu/` (dung lượng 26 KB – 85 KB, < 300 KB).
+
+## Phóng to máy tính mod Màn 8 — Lật thẻ tìm cặp khóa (Làng Khắc Dấu) — ĐÃ XONG (30/10/2026)
+
+- **Làm gì:** Phóng to toàn diện máy tính mod hiện sẵn trên màn hình chơi của Màn 8 (`ModCalculator.tsx` và `MemoryGame.tsx`):
+  - Khung, nhãn, công thức, kết quả và ô nhập lớn, rõ ràng, đạt chuẩn hiển thị thực tế sau scale.
+  - **Nguyên nhân kích thước nhỏ đã làm rõ:** Khung 16:9 của Scene25D co lại theo chiều cao màn hình hẹp ngang (844×390 rộng 693.3px); container cũ `width: 19.5%` bóp chiều rộng máy tính còn 135.2px; `fontSize` bị giới hạn ở 14px; class `text-sm` (14px) khóa cứng font size nhãn và thông báo lỗi.
+  - **Sửa đổi:** Bỏ `text-sm`, đặt nhãn `<label>` và thông báo lỗi là `text-base font-bold` ($\ge 16\text{ CSS px}$); tiêu đề `text-base font-extrabold sm:text-lg`; kết quả `text-base font-extrabold`; ô nhập `<input>` có `min-h-11 h-11` ($\ge 44\text{ CSS px}$) và `text-center font-display text-xl font-extrabold` (20px).
+  - **Bố trí:** Landscape (1366×768 & 844×390) tăng width lên `21.5%`, mép phải 22.3%, cách thẻ ngoài cùng bàn chơi $\ge 4.8\text{px}$ (vòng 1/2) và $\ge 13.3\text{px}$ (vòng 3 16 thẻ), đỉnh máy tính cách đáy dòng kết quả HUD $> 118\text{px}$. Portrait (360×800) đặt ở dải dưới bàn thẻ `width: 74%`, `fontSize: 16px`, cách đáy bàn thẻ $> 30\text{px}$, cách {phanDien} góc phải $> 21\text{px}$.
+  - **Giữ nguyên:** Công thức toán $5^x \bmod 23$, miền giá trị $x \in [1, 22]$, kết quả tính, luật chơi, điểm, tiến độ; cơ chế dừng đồng hồ tráo khi focus ô nhập; phím gõ không kích hoạt lật thẻ game; hộp gợi ý "?" đối diện mở/đóng bình thường.
+- **Kiểm tra DOM tự động (`scripts/p-man8-calc-check.mjs`):** **66/66 đạt (100%)** trên 3 kích thước:
+  - 1366×768 (chuột + phím): nhãn 16px, tiêu đề 18px, kết quả 16px, ô nhập cao 44.0px / font 20px, máy tính $293.5 \times 164.0\text{ px}$. Không che thẻ ở cả 3 vòng (kể cả vòng 3 16 thẻ), không che HUD/thông báo/nút "?", nhập $x = 3 \to 10$, nhập 99 báo lỗi, dừng tráo khi focus ô nhập.
+  - 360×800 (chạm dọc): nhãn 16px, tiêu đề 16px, kết quả 16px, ô nhập cao 44.0px, máy tính $266.4 \times 156.0\text{ px}$, không che thẻ 3 vòng hay {phanDien}, dừng tráo khi focus.
+  - 844×390 (chạm ngang): nhãn 16px, tiêu đề 18px, kết quả 16px, ô nhập cao 44.0px / rộng 123.1px, máy tính $149.1 \times 212.0\text{ px}$, không che thẻ 3 vòng, dừng tráo khi focus.
+- **Minh chứng ảnh & số đo:** 9 ảnh chụp màn hình từng vòng và file số đo chi tiết tại `docs/screenshots/may-tinh-man8/` (dung lượng 34 KB – 216 KB, đều $< 300\text{ KB}$).
+- **Giới hạn chưa xác minh:** Thiết bị di động thật (bàn phím ảo Android/iOS), Safari/iPhone.
 
 ## P6a — nội dung thẻ "Em có biết?" tương tác — ĐÃ RÀ (30/10/2026), CÒN CHỜ CHỦ DỰ ÁN DUYỆT
 

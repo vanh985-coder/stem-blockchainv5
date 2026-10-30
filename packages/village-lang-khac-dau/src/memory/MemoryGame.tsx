@@ -335,8 +335,8 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
             </div>
 
             <ModCalculator inline open={calcOpen} onOpenChange={setCalcOpen} className="absolute z-10" style={portrait
-              ? { left: '2%', bottom: '1%', width: '70%', fontSize: '14px' }
-              : { left: '0.8%', bottom: '2%', width: '19.5%', fontSize: 'clamp(14px, 1.5cqw, 18px)' }} />
+              ? { left: '2%', bottom: '1.5%', width: '74%', fontSize: '16px' }
+              : { left: '0.8%', bottom: '2%', width: '21.5%', fontSize: 'clamp(16px, 1.8cqw, 20px)' }} />
 
             <div role="group" aria-label={memoryUi.luoi} onKeyDown={onGridKey} className="absolute" style={{ left: `${areaTL.left}%`, top: `${areaTL.top}%`, width: `${areaBR.left - areaTL.left}%`, height: `${areaBR.top - areaTL.top}%` }}>
               {shown.map((id, slot) => {

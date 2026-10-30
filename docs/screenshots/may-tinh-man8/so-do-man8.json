@@ -1,0 +1,454 @@
+{
+  "timestamp": "2026-10-30T06:50:17.208Z",
+  "measurements": [
+    {
+      "size": "1366x768",
+      "calcW": 293.5,
+      "calcH": 164,
+      "inputH": 44,
+      "inputW": 267.5,
+      "inputFontSize": 20,
+      "labelFontSize": 16,
+      "titleFontSize": 18,
+      "resultFontSize": 16,
+      "overlapsCards": false,
+      "overlapsHud": false,
+      "overlapsLine": false,
+      "overlapsHint": false,
+      "hasHScroll": false
+    },
+    {
+      "size": "360x800",
+      "calcW": 266.4,
+      "calcH": 156,
+      "inputH": 44,
+      "inputW": 244.4,
+      "inputFontSize": 20,
+      "labelFontSize": 16,
+      "titleFontSize": 16,
+      "resultFontSize": 16,
+      "overlapsCards": false,
+      "overlapsHud": false,
+      "overlapsLine": false,
+      "overlapsHint": false,
+      "hasHScroll": false
+    },
+    {
+      "size": "844x390",
+      "calcW": 149.1,
+      "calcH": 212,
+      "inputH": 44,
+      "inputW": 123.1,
+      "inputFontSize": 20,
+      "labelFontSize": 16,
+      "titleFontSize": 18,
+      "resultFontSize": 16,
+      "overlapsCards": false,
+      "overlapsHud": false,
+      "overlapsLine": false,
+      "overlapsHint": false,
+      "hasHScroll": false
+    }
+  ],
+  "totalChecks": 66,
+  "passedChecks": 66,
+  "failedChecks": 0,
+  "results": [
+    {
+      "tag": "1366x768",
+      "name": "Thẻ bắt đầu game hiện rõ",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "Máy tính mod hiện sẵn trên màn hình",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "Ô nhập x hiện sẵn",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "Cỡ chữ nhãn >= 16px",
+      "ok": true,
+      "detail": "16px"
+    },
+    {
+      "tag": "1366x768",
+      "name": "Cỡ chữ tiêu đề >= 16px",
+      "ok": true,
+      "detail": "18px"
+    },
+    {
+      "tag": "1366x768",
+      "name": "Cỡ chữ kết quả >= 16px",
+      "ok": true,
+      "detail": "16px"
+    },
+    {
+      "tag": "1366x768",
+      "name": "Chiều cao ô nhập thực tế >= 44px",
+      "ok": true,
+      "detail": "44px"
+    },
+    {
+      "tag": "1366x768",
+      "name": "Không đè lên bất kỳ thẻ nào ở Vòng 1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "Không đè lên HUD",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "Không đè lên dòng kết quả",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "Không đè lên nút gợi ý \"?\"",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "Không gây cuộn ngang toàn trang",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "Nhập x = 3 cho kết quả 5³ mod 23 = 10",
+      "ok": true,
+      "detail": "5^3 mod 23 = 1053 mod 23 = 10"
+    },
+    {
+      "tag": "1366x768",
+      "name": "Nhập 99 hiện lỗi hợp lệ",
+      "ok": true,
+      "detail": "Em nhập một số nguyên từ 1 đến 22 nhé."
+    },
+    {
+      "tag": "1366x768",
+      "name": "Cỡ chữ thông báo lỗi >= 16px",
+      "ok": true,
+      "detail": "16px"
+    },
+    {
+      "tag": "1366x768",
+      "name": "Mở hộp gợi ý \"?\" thành công",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "Sau khi đóng gợi ý, máy tính giữ nguyên giá trị",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "Vòng 2 có 12 thẻ",
+      "ok": true,
+      "detail": "12 thẻ"
+    },
+    {
+      "tag": "1366x768",
+      "name": "Vòng 2 (12 thẻ): máy tính không che thẻ nào",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "Vòng 3 có đúng 16 thẻ",
+      "ok": true,
+      "detail": "16 thẻ"
+    },
+    {
+      "tag": "1366x768",
+      "name": "Vòng 3 (16 thẻ): máy tính không che bất kỳ thẻ nào",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "Khi focus ô nhập, đồng hồ tráo tạm dừng",
+      "ok": true,
+      "detail": "timer: 1749.8999999999942ms"
+    },
+    {
+      "tag": "360x800",
+      "name": "Thẻ bắt đầu game hiện rõ",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "Máy tính mod hiện sẵn trên màn hình",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "Ô nhập x hiện sẵn",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "Cỡ chữ nhãn >= 16px",
+      "ok": true,
+      "detail": "16px"
+    },
+    {
+      "tag": "360x800",
+      "name": "Cỡ chữ tiêu đề >= 16px",
+      "ok": true,
+      "detail": "16px"
+    },
+    {
+      "tag": "360x800",
+      "name": "Cỡ chữ kết quả >= 16px",
+      "ok": true,
+      "detail": "16px"
+    },
+    {
+      "tag": "360x800",
+      "name": "Chiều cao ô nhập thực tế >= 44px",
+      "ok": true,
+      "detail": "44px"
+    },
+    {
+      "tag": "360x800",
+      "name": "Không đè lên bất kỳ thẻ nào ở Vòng 1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "Không đè lên HUD",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "Không đè lên dòng kết quả",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "Không đè lên nút gợi ý \"?\"",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "Không gây cuộn ngang toàn trang",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "Nhập x = 3 cho kết quả 5³ mod 23 = 10",
+      "ok": true,
+      "detail": "5^3 mod 23 = 1053 mod 23 = 10"
+    },
+    {
+      "tag": "360x800",
+      "name": "Nhập 99 hiện lỗi hợp lệ",
+      "ok": true,
+      "detail": "Em nhập một số nguyên từ 1 đến 22 nhé."
+    },
+    {
+      "tag": "360x800",
+      "name": "Cỡ chữ thông báo lỗi >= 16px",
+      "ok": true,
+      "detail": "16px"
+    },
+    {
+      "tag": "360x800",
+      "name": "Mở hộp gợi ý \"?\" thành công",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "Sau khi đóng gợi ý, máy tính giữ nguyên giá trị",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "Vòng 2 có 12 thẻ",
+      "ok": true,
+      "detail": "12 thẻ"
+    },
+    {
+      "tag": "360x800",
+      "name": "Vòng 2 (12 thẻ): máy tính không che thẻ nào",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "Vòng 3 có đúng 16 thẻ",
+      "ok": true,
+      "detail": "16 thẻ"
+    },
+    {
+      "tag": "360x800",
+      "name": "Vòng 3 (16 thẻ): máy tính không che bất kỳ thẻ nào",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "Khi focus ô nhập, đồng hồ tráo tạm dừng",
+      "ok": true,
+      "detail": "timer: 950ms"
+    },
+    {
+      "tag": "844x390",
+      "name": "Thẻ bắt đầu game hiện rõ",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "844x390",
+      "name": "Máy tính mod hiện sẵn trên màn hình",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "844x390",
+      "name": "Ô nhập x hiện sẵn",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "844x390",
+      "name": "Cỡ chữ nhãn >= 16px",
+      "ok": true,
+      "detail": "16px"
+    },
+    {
+      "tag": "844x390",
+      "name": "Cỡ chữ tiêu đề >= 16px",
+      "ok": true,
+      "detail": "18px"
+    },
+    {
+      "tag": "844x390",
+      "name": "Cỡ chữ kết quả >= 16px",
+      "ok": true,
+      "detail": "16px"
+    },
+    {
+      "tag": "844x390",
+      "name": "Chiều cao ô nhập thực tế >= 44px",
+      "ok": true,
+      "detail": "44px"
+    },
+    {
+      "tag": "844x390",
+      "name": "Không đè lên bất kỳ thẻ nào ở Vòng 1",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "844x390",
+      "name": "Không đè lên HUD",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "844x390",
+      "name": "Không đè lên dòng kết quả",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "844x390",
+      "name": "Không đè lên nút gợi ý \"?\"",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "844x390",
+      "name": "Không gây cuộn ngang toàn trang",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "844x390",
+      "name": "Nhập x = 3 cho kết quả 5³ mod 23 = 10",
+      "ok": true,
+      "detail": "5^3 mod 23 = 1053 mod 23 = 10"
+    },
+    {
+      "tag": "844x390",
+      "name": "Nhập 99 hiện lỗi hợp lệ",
+      "ok": true,
+      "detail": "Em nhập một số nguyên từ 1 đến 22 nhé."
+    },
+    {
+      "tag": "844x390",
+      "name": "Cỡ chữ thông báo lỗi >= 16px",
+      "ok": true,
+      "detail": "16px"
+    },
+    {
+      "tag": "844x390",
+      "name": "Mở hộp gợi ý \"?\" thành công",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "844x390",
+      "name": "Sau khi đóng gợi ý, máy tính giữ nguyên giá trị",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "844x390",
+      "name": "Vòng 2 có 12 thẻ",
+      "ok": true,
+      "detail": "12 thẻ"
+    },
+    {
+      "tag": "844x390",
+      "name": "Vòng 2 (12 thẻ): máy tính không che thẻ nào",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "844x390",
+      "name": "Vòng 3 có đúng 16 thẻ",
+      "ok": true,
+      "detail": "16 thẻ"
+    },
+    {
+      "tag": "844x390",
+      "name": "Vòng 3 (16 thẻ): máy tính không che bất kỳ thẻ nào",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "844x390",
+      "name": "Khi focus ô nhập, đồng hồ tráo tạm dừng",
+      "ok": true,
+      "detail": "timer: 983.2999999999993ms"
+    }
+  ]
+}
