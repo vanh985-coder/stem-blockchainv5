@@ -26,10 +26,9 @@ function toQuiz(s: WhackState): void {
   stepWhack(s, WHACK_SPEC.boss.runSeconds + 0.1);
 }
 
-describe('P7a: Logic và cơ chế Màn 5 2D Đập chuột và Chuột câu hỏi', () => {
+describe('P7b: Hoàn thiện và kiểm logic lối chơi Màn 5 2D', () => {
   it('phân biệt rõ ràng giữa chuột thường và chuột câu hỏi', () => {
     const s = createWhackGame(42);
-    // Sinh các loại chuột thường
     const mThuong = spawnMouse(s, 'thuong', 0, 7.0);
     const mNhanh = spawnMouse(s, 'nhanh', 1, 7.0);
     const mDoiLan = spawnMouse(s, 'doiLan', 2, 7.0);
@@ -41,18 +40,16 @@ describe('P7a: Logic và cơ chế Màn 5 2D Đập chuột và Chuột câu h�
     expect(mTo.kind).toBe('to');
     expect(mTo.hits).toBe(2);
 
-    // Chuột câu hỏi (boss) xuất hiện theo lịch trùm, không nằm trong mice thường
     expect(s.boss).toBeNull();
-    // Gọi trùm xuất hiện ở giây 12
     callBoss(s);
     expect(s.boss).not.toBeNull();
     expect(s.boss?.index).toBe(0);
     expect(s.phase).toBe('bossRun');
   });
 
-  it('đập chuột thường chỉ tính 1 lần, chuột to cần 2 cú đập', () => {
+  it('đập chuột thường chỉ tính 1 lần, chuột to cần 2 cú đập riêng biệt', () => {
     const s = createWhackGame(100);
-    const mThuong = spawnMouse(s, 'thuong', 0, 7.5); // Nằm trong vùng đập [6.5, 9.0]
+    const mThuong = spawnMouse(s, 'thuong', 0, 7.5);
     expect(inZone(mThuong)).toBe(true);
 
     // Cú đập 1: trúng và hạ chuột thường
@@ -69,7 +66,7 @@ describe('P7a: Logic và cơ chế Màn 5 2D Đập chuột và Chuột câu h�
     const hitTo1 = hitLane(s, 1);
     expect(hitTo1[0].type).toBe('hit');
     if (hitTo1[0].type === 'hit') {
-      expect(hitTo1[0].killed).toBe(false); // Chưa chết sau hit 1
+      expect(hitTo1[0].killed).toBe(false);
       expect(mTo.hits).toBe(1);
       expect(mTo.freeze).toBeGreaterThan(0);
     }
@@ -96,25 +93,56 @@ describe('P7a: Logic và cơ chế Màn 5 2D Đập chuột và Chuột câu h�
     if (res[0].type === 'hit') {
       expect(res[0].mouse.id).toBe(mThap.id);
     }
-    // Con cao hơn vẫn còn
     expect(s.mice.some((m) => m.id === mCao.id)).toBe(true);
+  });
+
+  it('chuột vừa ra khỏi vùng đập (pos > 9.0) thì đập bị hụt, lọt tới sổ bị phạt mực', () => {
+    const s = createWhackGame(250);
+    const mQua = spawnMouse(s, 'thuong', 1, 9.2); // Đã vượt qua zoneEnd 9.0
+    expect(inZone(mQua)).toBe(false);
+
+    // Đập làn 1: không có chuột trong vùng đập -> miss
+    const res = hitLane(s, 1);
+    expect(res[0].type).toBe('miss');
+    expect(s.mice.find((m) => m.id === mQua.id)).toBeDefined();
+
+    // Chuột trôi tiếp tới pos >= 10 -> leak (+1 mực)
+    const initialInk = s.ink;
+    stepWhack(s, 0.5);
+    expect(s.ink).toBe(initialInk + 1);
+    expect(s.mice.find((m) => m.id === mQua.id)).toBeUndefined();
+  });
+
+  it('chuột đổi làn nhảy sang làn kề ở pos = 5.0 và vào vùng đập của làn mới', () => {
+    const s = createWhackGame(280);
+    const mDoi = spawnMouse(s, 'doiLan', 0, 4.8);
+    expect(mDoi.lane).toBe(0);
+
+    // Di chuyển qua mốc 5.0
+    stepWhack(s, 0.1);
+    expect(mDoi.lane).toBe(1); // Đã đổi sang làn 1
+    expect(mDoi.changed).toBe(true);
+
+    // Khi vào vùng đập làn 1, đập làn 1 trúng
+    mDoi.pos = 7.5;
+    const res = hitLane(s, 1);
+    expect(res[0].type).toBe('hit');
+    if (res[0].type === 'hit') {
+      expect(res[0].killed).toBe(true);
+    }
   });
 
   it('chuột câu hỏi kích hoạt quiz, trả lời đúng xóa 2 vết mực và tính điểm theo giây', () => {
     const s = createWhackGame(300);
-    s.ink = 3; // Giả lập đang có 3 vết mực
+    s.ink = 3;
 
-    // Tiến tới lúc trùm vào vùng quiz
     toQuiz(s);
     expect(s.phase).toBe('quiz');
 
-    // Trả lời đúng khi còn 8 giây
     const events = answerBoss(s, 'correct', 8);
     expect(events.some((e) => e.type === 'bossAnswer')).toBe(true);
-    // Xóa 2 vết mực: 3 - 2 = 1
-    expect(s.ink).toBe(1);
+    expect(s.ink).toBe(1); // 3 - 2 = 1
     expect(s.stats.bossCorrect).toBe(1);
-    // Điểm thưởng: 100 + 5 * 8 = 140
     expect(s.score).toBe(bossPoints(8));
     expect(s.phase).toBe('play');
     expect(s.bossesDone).toBe(1);
@@ -127,25 +155,41 @@ describe('P7a: Logic và cơ chế Màn 5 2D Đập chuột và Chuột câu h�
     toQuiz(s);
     expect(s.phase).toBe('quiz');
 
-    // Trả lời sai
     answerBoss(s, 'wrong', 0);
-    expect(s.ink).toBe(3); // 2 + 1 = 3
+    expect(s.ink).toBe(3);
     expect(s.stats.bossCorrect).toBe(0);
     expect(s.phase).toBe('play');
   });
 
-  it('tạm dừng (khi mở hộp ?): chuột và đồng hồ đứng yên hoàn toàn', () => {
-    const s = createWhackGame(500);
-    spawnMouse(s, 'thuong', 0, 3.0);
+  it('chuột câu hỏi hết giờ (timeout) bị phạt 1 vết mực như trả lời sai', () => {
+    const s = createWhackGame(450);
+    s.ink = 1;
 
-    const initialPos = s.mice[0].pos;
+    toQuiz(s);
+    expect(s.phase).toBe('quiz');
+
+    answerBoss(s, 'timeout', 0);
+    expect(s.ink).toBe(2);
+    expect(s.phase).toBe('play');
+  });
+
+  it('đo trực tiếp: khi tạm dừng, vị trí chuột và đồng hồ đứng yên tuyệt đối; unpause chạy tiếp không nhảy thời gian', () => {
+    const s = createWhackGame(500);
+    const m = spawnMouse(s, 'thuong', 0, 3.0);
+
+    const initialPos = m.pos;
     const initialClock = s.clock;
 
-    // Tick khi paused = true (mở hộp ?)
-    const events = tickWhack(s, 2.0, true);
+    // Đo trong lúc paused = true
+    const events = tickWhack(s, 1.5, true);
     expect(events).toHaveLength(0);
-    expect(s.mice[0].pos).toBe(initialPos); // Chuột không di chuyển
-    expect(s.clock).toBe(initialClock); // Đồng hồ không tăng
+    expect(m.pos).toBe(initialPos); // Đứng yên 100%
+    expect(s.clock).toBe(initialClock);
+
+    // Unpause: chạy tiếp 0.1s
+    tickWhack(s, 0.1, false);
+    expect(m.pos).toBeGreaterThan(initialPos);
+    expect(s.clock).toBeCloseTo(initialClock + 0.1, 2);
   });
 
   it('nhặt tiền đồng cộng điểm và cộng xu', () => {
@@ -165,7 +209,6 @@ describe('P7a: Logic và cơ chế Màn 5 2D Đập chuột và Chuột câu h�
   it('kết thúc ván khi dính đủ 8 vết mực (ink)', () => {
     const s = createWhackGame(700);
     s.ink = 7;
-    // Cho 1 chuột lọt qua đáy làn (pos = 10)
     spawnMouse(s, 'thuong', 0, 9.99);
     const events = stepWhack(s, 0.1);
 
@@ -173,5 +216,20 @@ describe('P7a: Logic và cơ chế Màn 5 2D Đập chuột và Chuột câu h�
     expect(s.phase).toBe('ended');
     expect(s.ended).toBe('ink');
     expect(events.some((e) => e.type === 'end' && e.reason === 'ink')).toBe(true);
+  });
+
+  it('hoàn thành trọn ván khi vượt qua đủ 10 lượt trùm (complete)', () => {
+    const s = createWhackGame(800);
+    s.bossesDone = 9; // Đang ở trùm cuối (thứ 10)
+
+    toQuiz(s);
+    expect(s.phase).toBe('quiz');
+
+    // Trả lời câu thứ 10
+    const events = answerBoss(s, 'correct', 5);
+    expect(s.bossesDone).toBe(10);
+    expect(s.phase).toBe('ended');
+    expect(s.ended).toBe('complete');
+    expect(events.some((e) => e.type === 'end' && e.reason === 'complete')).toBe(true);
   });
 });

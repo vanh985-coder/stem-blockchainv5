@@ -90,9 +90,19 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
    - 4 lệnh kiểm tra bắt buộc đều đạt: `check:text` sạch 437 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2275 tests pass (bổ sung test mới `whack2d.test.ts` đạt 8/8 tests), `pnpm build` đạt (chunk Màn 5 giảm từ 91 kB Three.js xuống **20.75 kB**).
    - Kiểm tra Puppeteer trên 1366×768, 360×800, 844×390 đạt đầy đủ, 27 ảnh chụp minh chứng lưu tại `docs/screenshots/p7a/BAO-CAO-P7A.md`.
 
+7. **P7b — hoàn thiện và kiểm lối chơi Đập Chuột 2D Màn 5 (30/10/2026):**
+   - Thống nhất quy tắc điều khiển giữa mọi phương thức thao tác (chạm chuột trên làn, nút chân làn, phím D/F/J/K hoặc 1/2/3/4): toàn bộ đều tuân thủ chặt chẽ vùng đập $[6.5, 9.0]$. Đập ngoài vùng đập bị trượt gió (`sound.playWhoosh()`), chuột không bị mất, hiển thị nhắc nhở.
+   - Chuột thường tính 1 lần; chuột to yêu cầu 2 lần kích hoạt riêng biệt (cooldown 140ms, chặn repeat/giữ phím). Nhiều chuột cùng làn ưu tiên đập con thấp nhất trong vùng đập (`lowestInZone`); chuột đổi làn nhận đòn chính xác tại làn mới (sau khi qua pos 5.0).
+   - Chống click ma triệt để bằng `onClickCapture` ở capture phase trên overlay modal câu hỏi: chạm giữ chuột câu hỏi > 600ms nhấc tay không bị chọn nhầm đáp án ở cả 3 kích thước 1366×768, 360×800, 844×390; bàn phím Space/Enter vẫn hoạt động trơn tru.
+   - Xử lý Enter giữ/lặp: gắn event listener `keydown`/`keyup` cho Enter trong modal; giữ Enter > 1s không tự "Chơi tiếp", bắt buộc thả phím rồi nhấn lại mới tiếp tục.
+   - Đo trực tiếp dừng thời gian và đối tượng đứng yên 100% khi mở "?" hoặc mở câu hỏi ($t_0 = t_1$), tiếp tục ván chạy mượt mà không nhảy cóc thời gian (reset mốc `lastTickTime`).
+   - Kiểm trọn ván thực tế: Thua vì đầy 8 vết mực (`reason: 'ink'`) -> bấm "Chơi lại" reset sạch ván mới (`score=0, ink=0`); Thắng qua đủ 10 lượt trùm (`reason: 'complete'`) -> nhận đủ 4 phần điểm tổng kết, ghi nhận hoàn thành màn; Tự hoàn thành giữa ván trên bản dev dừng ván tức thì.
+   - Cân bằng giữ nguyên: bot 300 ván seed 1-300 (`whackBalance.test.ts`) đạt 9/9 tests, giữ nguyên mốc điểm 1650 / 2650 / 3100.
+   - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 437 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2279 tests pass (`whack2d.test.ts` 12/12 pass), `pnpm build` đạt (chunk `Man5` 22.27 kB).
+   - Kiểm tra Puppeteer `scripts/p7b-check.mjs` trên 1366×768, 360×800, 844×390 đạt toàn bộ, 28 ảnh minh chứng lưu tại `docs/screenshots/p7b/BAO-CAO-P7B.md`.
+
 ## 6. Việc để sau (không làm trước khi chủ dự án giao)
 
-- **P7b:** trau chuốt đồ họa và cân bằng nhịp sinh chuột màn 5 sau khi chủ dự án duyệt bản chơi được P7a.
 - **P8:** hướng dẫn focus và làm thử cho **cả 12 màn** (đã duyệt, chưa triển khai, làm thành bước riêng sau khi chốt lối chơi màn 2, 3, 5). Mục P8 của `TRANG-THAI.md` phải được giữ nguyên.
 - **Việc dời từ mốc 3 và hội làng làm CUỐI mốc 4**, theo thứ tự ở mục "Việc dời từ mốc 3" của `TRANG-THAI.md`: deploy bản gộp (15b), kiểm tra toàn bộ (G2), thử với 5–10 học sinh, hội làng (`FESTIVAL_LAUNCHED` hiện `false`).
 - Chưa làm theo lời giao trước đó: sửa nút "?" ở màn 3, HUD che tên biển trong một số góc nhìn (ví dụ dòng nhiệm vụ che biển trái ở Làng Bạc), vòng tích che số cây đa đã được thu nhỏ ở P5.

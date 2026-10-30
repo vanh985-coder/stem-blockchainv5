@@ -184,23 +184,26 @@ Chỉ có logic (chưa có cảnh; màn 5 vẫn `coming-soon`). Đơn vị thờ
 - **Mốc mới 1650 / 2650 / 3100 (tạm, chỉnh khi học sinh chơi thật):** Đồng = p25 bot trung bình 1675 → 1650; Bạc = p75 bot trung bình 2675 → 2650; Vàng = p10 bot giỏi 3120 → 3100. Đồng < Bạc < Vàng. Với mốc này bot trung bình: 23,3% chưa đạt, 48,0% Đồng, 28,7% Bạc, không Vàng.
 - **Điểm tối đa lý thuyết ước tính khoảng 3580:** trùm 5 × (100 + 5 × 15) + 5 × (100 + 5 × 10) = 1625; khoảng 143 chuột (khoảng 1880 điểm); khoảng 14,5 đồng (khoảng 73 điểm).
 
-### Cảnh màn 5 (mốc 3, bước B7; nâng cấp P7a giao diện 2D thuần túy; code ở `packages/village-lang-det/src/whack/`)
+### Cảnh màn 5 (mốc 3, bước B7; nâng cấp P7a giao diện 2D thuần túy; P7b hoàn thiện điều khiển và kiểm lối chơi; code ở `packages/village-lang-det/src/whack/`)
 
 `Man5.tsx` bọc `WhackGame` trong `MiniGameLevel` (`medals={WHACK_SPEC.medals}`); route `man/5` ở `village-lang-det/src/index.ts`; `levels.ts` đặt màn 5 `ready` (màn 6 còn `coming-soon`). Logic gọi lại `whackLogic.ts` (không viết lại luật); `WhackGame` nối thao tác, hoạt cảnh 2D, âm thanh vào luật.
 
-**Thiết kế P7a (Giao diện 2D các làn dọc):**
+**Thiết kế P7a & P7b (Giao diện 2D các làn dọc):**
 - **Lối chơi:** 4 làn dọc đặt cạnh nhau tương tự các dải lụa trên khung cửi dệt truyền thống. Đối tượng di chuyển từ trên xuống dưới dọc theo các làn.
 - **Phân loại chuột:**
   - *Chuột thường:* Gồm 4 biến thể kế thừa logic hiện có (thường +10, đổi làn +15, nhanh +15, to +30 đập 2 lần). Hình dáng chuột giấy thủ công dân gian; chuột to có 2 vạch máu, chuột nhanh có vệt gió, chuột đổi làn có ký hiệu rẽ.
   - *Chuột câu hỏi:* Chuột mang biểu tượng câu hỏi ❓ (dấu hỏi vàng lớn, nhãn nhận diện rõ ràng, phân biệt bằng hình dạng và ký hiệu tiếp cận accessibility, không chỉ bằng màu sắc). Xuất hiện 10 lần theo lịch trùm. Bấm/chạm trúng chuột câu hỏi hoặc khi chuột vào vùng đập sẽ kích hoạt mở hộp câu hỏi ôn tập Bài 1–2.
-- **Vùng đập và điều khiển:**
+- **Vùng đập và điều khiển (P7b hoàn thiện thống nhất):**
   - Vùng đập nằm ở đoạn gần chân các làn (vị trí 6,5 tới 9,0), có viền vệt sáng báo hiệu rõ ràng.
-  - Đáy mỗi làn có nút đập lớn mang ký hiệu phím (D, F, J, K / 1, 2, 3, 4).
-  - Người chơi có thể chạm trực tiếp vào chuột trên làn, hoặc bấm nút chân làn, hoặc nhấn phím D, F, J, K.
-  - Thao tác đập chuột chỉ tính 1 lần cho mỗi đối tượng (chống kích hoạt trùng lặp khi chạm giữ).
-- **Tạm dừng và chống click ma:**
-  - Mở câu hỏi hoặc mở hộp "?" giữa ván lập tức tạm dừng đồng hồ, đóng băng chuyển động của mọi chuột khác theo `tickWhack(state, dt, paused)`.
-  - Cú chạm kích hoạt chuột câu hỏi hoặc mở modal được chặn lan truyền (`stopPropagation`) và áp dụng chuỗi `pointerdown` nội bộ để tuyệt đối không chọn nhầm đáp án trong hộp thoại vừa mở.
+  - Mọi thao tác: chạm trực tiếp vào chuột trên làn, bấm nút đập chân làn, hoặc nhấn phím (D, F, J, K / 1, 2, 3, 4) đều bắt buộc chuột phải nằm trong vùng đập [6,5; 9,0]. Chuột ngoài vùng đập bị đập hụt (phát âm thanh gió trượt ai, hiện thông báo nhắc nhở).
+  - Chuột thường chỉ tính tối đa 1 lần đập.
+  - Chuột to: yêu cầu đúng 2 cú đập riêng biệt. Có cooldown 140ms và theo dõi phím giữ/lặp (`keysPressed`), không bị đòn đúp tự động.
+  - Nhiều chuột cùng làn: luôn ưu tiên đập con thấp nhất trong vùng đập (`lowestInZone`).
+  - Chuột đổi làn: chuyển làn ở mốc pos = 5,0 và nhận đòn tại làn mới.
+- **Tạm dừng, chống click ma và phím Enter giữ/lặp (P7b):**
+  - Mở câu hỏi hoặc mở hộp "?" giữa ván lập tức tạm dừng đồng hồ, đóng băng chuyển động của mọi chuột khác theo `tickWhack(state, dt, paused)`. Đo đạc thực tế: $t_0 = t_1$ và vị trí $pos$ đứng yên 100%. Khi tiếp tục ván, reset mốc thời gian mượt mà không nhảy cóc.
+  - Chống click ma: Overlay modal câu hỏi sử dụng `onClickCapture` ở capture phase. Ngăn chặn ngay lập tức nếu cú chạm không xuất phát từ bên trong dialog (`pointerDownInside`), loại bỏ hoàn toàn việc chọn nhầm đáp án khi nhấc tay sau cú chạm giữ chuột câu hỏi > 600ms trên mobile dọc/ngang.
+  - Enter giữ/lặp: Bắt sự kiện keydown/keyup cho Enter trong modal; giữ Enter > 1s không tự bấm "Chơi tiếp", bắt buộc phải thả phím rồi nhấn lại mới tiếp tục ván.
 - **Cuốn Sổ Chung và vết mực:**
   - Đáy sân chơi đặt cuốn Sổ Chung với 8 chấm tròn vết mực. Chuột không bị đập lọt xuống cuối làn sẽ loang 1 vết mực lên sổ (+1 mực, âm thanh wrong). Trả lời đúng chuột câu hỏi xoá 2 vết mực. Đầy 8 vết mực thì kết thúc ván (thua).
 - **Bố cục đa kích thước:**
@@ -208,7 +211,7 @@ Chỉ có logic (chưa có cảnh; màn 5 vẫn `coming-soon`). Đơn vị thờ
   - 360×800 (Điện thoại dọc): 4 làn phủ rộng màn hình, nút đập đáy lớn dễ thao tác ngón tay cái, không ép người chơi phải xoay ngang.
   - 844×390 (Điện thoại ngang): 4 làn đặt giữa, HUD dời sang 2 bên sườn gọn gàng.
   - Hỗ trợ Giảm chuyển động (tắt rung lắc màn hình) và Chữ to.
-- **Tự hoàn thành:** Tích hợp nút tự hoàn thành ở thẻ bắt đầu và trong hộp "?" (chỉ tài khoản giáo viên/admin hoặc bản dev). Không cộng điểm, sao, xu hay Trang Sổ Vàng.
+- **Tự hoàn thành:** Tích hợp nút tự hoàn thành ở thẻ bắt đầu và trong hộp "?" (chỉ tài khoản giáo viên/admin hoặc bản dev). Không cộng điểm, sao, xu hay Trang Sổ Vàng. Dừng ván chơi ngay lập tức.
 
 - **Làn:** `man05Lanes.ts` (`MAN05_LANES`: 4 đoạn thẳng theo tọa độ chuẩn hóa của ảnh `scenes/man-05-san-det` 1376 × 768, khớp 4 dải vải; `LANE_SCALE` 0,45 ở đầu làn tới 1 ở sổ theo phối cảnh; `BOOK_POINT`; hàm thuần `lanePose`, `laneHeading`, `laneAt`, `imageToWorld`). Sửa sau B7: đầu dưới làn 2 (u 0,538) và làn 4 (u 0,77) dời cho nằm giữa dải vải (đo lại bằng màu trên ảnh; làn 4 trước lệch xuống mép dưới dải xanh lá chừng 50 điểm ảnh). Thêm `MAN05_CLOTH` (mép trái, phải của từng dải vải, đo bằng màu ở hai hàng ảnh) và `laneQuad`: hình thang bám dải vải của một đoạn làn (hai cạnh ngang nghiêng nhẹ theo `CLOTH_TILT`), dùng vẽ vệt sáng vùng đập và dựng hộp kiểm bố cục. **Chỉnh làn:** chạy `pnpm dev:lang-det` rồi mở `http://localhost:5175/dev/man-05-lanes` (chỉ khi chạy dev): chọn đầu làn hay cuối làn, bấm lên ảnh (hoặc kéo), ô dưới ảnh xuất khối mã `MAN05_LANES` để chép đè vào `man05Lanes.ts`. Nét dày trên mỗi làn là vùng đập (pos 6,5 đến 9), chấm mỗi đơn vị pos; hình thang trắng mờ là vệt sáng như trong game (theo `MAN05_CLOTH`, không đổi khi kéo làn).
 - **Dựng cảnh (`WhackStage.tsx`, Scene25D, chỉ khung ngang):** chuột giấy (`sprites/man-05-dap-ti/*`) chạy dọc làn, xoay đầu xuống sổ, nhỏ dần lên trên; vệt sáng vùng đập vẽ RIÊNG cho từng làn, là hình thang bám hai mép dải vải (thu vào 5% mỗi bên nên không loang sang làn bên), viền sáng rõ ở mép trên và mép dưới, phần trong mờ nhẹ (nhấp nhô nhẹ, sáng lên khi đập vào làn); chuột to chớp sáng lúc khựng; chuột đổi làn nhảy rồi trượt về chỗ mới trong khoảng 0,1 giây; vết mực (`vet-muc`) hiện trên sổ theo số vết (nảy lên khi vừa loang); tiền đồng (`ui/icons/tien-dong`) nhấp nháy khi sắp biến mất. Chuột, đồng và vệt sáng vẽ ĐÈ lên nhân vật nếu giao nhau (tắt kiểm tra độ sâu, `renderOrder` sau nhân vật). **Dùng pool, không tạo object mới trong `useFrame`:** 20 chuột, 8 vết mực, 1 đồng, 4 vệt sáng (mesh, hình học và vật liệu tạo một lần, ẩn/hiện, đổi vị trí và cỡ; ô pool giữ theo id chuột). Khung dọc của điện thoại: Scene25D hiện nhắc "Xoay ngang để chơi" và game DỪNG (như màn 3).

@@ -26,6 +26,9 @@ const KEY_LANE: Readonly<Record<string, number>> = {
 
 const LANE_KEYS = ['D', 'F', 'J', 'K'] as const;
 
+/** Khoảng thời gian tối thiểu (ms) giữa 2 cú đập trên cùng 1 làn để chống double fire / touch jitter */
+const HIT_COOLDOWN_MS = 140;
+
 interface QuizUi {
   index: number;
   total: number;
@@ -76,12 +79,20 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   const shownLeft = useRef(0);
   const nextEffectId = useRef(1);
 
-  // Bảo vệ click ma khi mở câu hỏi: cử chỉ chạm phải xuất phát từ bên trong container câu hỏi
+  // Thời điểm đập gần nhất của từng làn để chống kích hoạt trùng đúp
+  const lastHitTime = useRef<number[]>([0, 0, 0, 0]);
+  // Theo dõi phím đang nhấn giữ để chống key repeat tự động tính 2 đòn
+  const keysPressed = useRef<Set<string>>(new Set());
+
+  // Bảo vệ click ma khi mở câu hỏi: cử chỉ con trỏ/chạm phải có pointerdown bên trong dialog
   const quizPointerDownInside = useRef(false);
+  // Bảo vệ Enter giữ/lặp trong dialog câu hỏi
+  const enterReleasedAfterAnswer = useRef(false);
 
   // Dừng vòng lặp khi pause hoặc khi quiz đang mở hoặc kết thúc
   const holdRef = useRef(paused);
   holdRef.current = paused;
+  const lastTickTime = useRef(performance.now());
 
   useGameHint(setHint, 5, () => hintFor(state));
 
@@ -94,7 +105,15 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     setEnding(null);
     setEffects([]);
     setLaneFlashes([0, 0, 0, 0]);
+    lastHitTime.current = [0, 0, 0, 0];
+    keysPressed.current.clear();
+    lastTickTime.current = performance.now();
   }, [state]);
+
+  // Cập nhật lastTickTime khi pause thay đổi để tránh nhảy thời gian khi unpause
+  useEffect(() => {
+    lastTickTime.current = performance.now();
+  }, [paused]);
 
   // Thêm hiệu ứng điểm nổi
   const addEffect = useCallback((lane: number, pos: number, text: string, kind: HitEffect['kind']) => {
@@ -127,6 +146,8 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
           case 'bossQuiz': {
             quizLeft.current = e.boss.answerSeconds;
             shownLeft.current = e.boss.answerSeconds;
+            quizPointerDownInside.current = false;
+            enterReleasedAfterAnswer.current = false;
             setQuiz({ index: e.boss.index, total: e.boss.answerSeconds, left: e.boss.answerSeconds, answered: null });
             break;
           }
@@ -151,12 +172,12 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   // Vòng lặp thời gian requestAnimationFrame
   useEffect(() => {
     let raf = 0;
-    let last = performance.now();
+    lastTickTime.current = performance.now();
 
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
-      const dt = Math.min(0.1, (now - last) / 1000);
-      last = now;
+      const dt = Math.min(0.1, (now - lastTickTime.current) / 1000);
+      lastTickTime.current = now;
 
       // Đứng yên hoàn toàn khi paused từ ngoài (MiniGameLevel) hoặc khi hết ván
       if (holdRef.current || state.phase === 'ended') return;
@@ -188,24 +209,41 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     return () => cancelAnimationFrame(raf);
   }, [state, handleEvents]);
 
-  // Thao tác đập một làn
+  // Thao tác đập một làn: dùng chung thống nhất cho cả phím, nút đập và chạm làn/chuột
   const hit = useCallback(
     (lane: number) => {
       if (holdRef.current || state.phase === 'quiz' || state.phase === 'ended') return;
+
+      const now = performance.now();
+      // Chống kích hoạt đúp (double-tap/touch jitter) trên cùng một làn
+      if (now - lastHitTime.current[lane] < HIT_COOLDOWN_MS) return;
+      lastHitTime.current[lane] = now;
+
       triggerLaneFlash(lane);
 
-      // Nếu có chuột câu hỏi (boss) đang chạy trên làn này và vào vùng đập: kích hoạt quiz
-      if (state.phase === 'bossRun' && state.boss && state.boss.lane === lane && state.boss.pos >= WHACK_SPEC.zoneStart) {
-        state.phase = 'quiz';
-        state.boss.pos = (WHACK_SPEC.zoneStart + WHACK_SPEC.zoneEnd) / 2;
-        quizLeft.current = state.boss.answerSeconds;
-        shownLeft.current = state.boss.answerSeconds;
-        setQuiz({ index: state.boss.index, total: state.boss.answerSeconds, left: state.boss.answerSeconds, answered: null });
-        sound.playClick();
-        bump();
-        return;
+      // Thống nhất quy tắc vùng đập: Chuột câu hỏi (boss) cũng phải vào vùng đập mới được kích hoạt
+      if (state.phase === 'bossRun' && state.boss && state.boss.lane === lane) {
+        if (state.boss.pos >= WHACK_SPEC.zoneStart && state.boss.pos <= WHACK_SPEC.zoneEnd) {
+          state.phase = 'quiz';
+          state.boss.pos = (WHACK_SPEC.zoneStart + WHACK_SPEC.zoneEnd) / 2;
+          quizLeft.current = state.boss.answerSeconds;
+          shownLeft.current = state.boss.answerSeconds;
+          quizPointerDownInside.current = false;
+          enterReleasedAfterAnswer.current = false;
+          setQuiz({ index: state.boss.index, total: state.boss.answerSeconds, left: state.boss.answerSeconds, answered: null });
+          sound.playClick();
+          bump();
+          return;
+        } else if (state.boss.pos < WHACK_SPEC.zoneStart) {
+          // Chuột câu hỏi chưa vào vùng đập: hụt
+          sound.playWhoosh();
+          addEffect(lane, state.boss.pos, whackUi.nhacVungDap, 'miss');
+          bump();
+          return;
+        }
       }
 
+      // Đập chuột thường theo logic thuần hitLane
       const events = hitLane(state, lane);
       const e = events[0];
       if (!e || e.type === 'blocked') return;
@@ -230,6 +268,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   const takeCoin = useCallback(
     (e: React.PointerEvent) => {
       e.stopPropagation();
+      e.preventDefault();
       if (holdRef.current || state.phase === 'quiz' || state.phase === 'ended') return;
       if (state.coin) {
         addEffect(state.coin.lane, state.coin.pos, `+${WHACK_SPEC.coin.points} (+1 xu)`, 'coin');
@@ -240,35 +279,44 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     [state, handleEvents, addEffect],
   );
 
-  // Bấm trực tiếp vào chuột câu hỏi
+  // Bấm trực tiếp vào chuột câu hỏi: áp dụng đúng quy tắc vùng đập như phím và nút làn
   const hitBossMouse = useCallback(
     (e: React.PointerEvent) => {
       e.stopPropagation();
-      if (holdRef.current || state.phase === 'quiz' || state.phase === 'ended' || !state.boss) return;
-      state.phase = 'quiz';
-      state.boss.pos = (WHACK_SPEC.zoneStart + WHACK_SPEC.zoneEnd) / 2;
-      quizLeft.current = state.boss.answerSeconds;
-      shownLeft.current = state.boss.answerSeconds;
-      setQuiz({ index: state.boss.index, total: state.boss.answerSeconds, left: state.boss.answerSeconds, answered: null });
-      sound.playClick();
-      bump();
+      e.preventDefault();
+      if (!state.boss) return;
+      hit(state.boss.lane);
     },
-    [state],
+    [state, hit],
   );
 
-  // Điều khiển bằng bàn phím
+  // Điều khiển bằng bàn phím: chống key repeat và chặn nhấn giữ
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
+    const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
       const lane = KEY_LANE[e.code];
       if (lane === undefined) return;
       const t = e.target as HTMLElement | null;
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+
+      // Không tự tính thành 2 đòn khi đang giữ phím
+      if (keysPressed.current.has(e.code)) return;
+      keysPressed.current.add(e.code);
+
       e.preventDefault();
       hit(lane);
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+
+    const onKeyUp = (e: KeyboardEvent) => {
+      keysPressed.current.delete(e.code);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+    };
   }, [hit]);
 
   // Trả lời câu hỏi
@@ -278,6 +326,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     if (pending.current) return;
     const left = quizLeft.current;
     pending.current = { result: correct ? 'correct' : 'wrong', left };
+    enterReleasedAfterAnswer.current = false;
     setQuiz((q) => (q ? { ...q, answered: correct } : q));
   }, []);
 
@@ -287,8 +336,37 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     pending.current = null;
     quizLeft.current = 0;
     setQuiz(null);
+    lastTickTime.current = performance.now();
     handleEvents(answerBoss(state, p.result, p.left));
   }, [state, handleEvents]);
+
+  // Enter giữ/lặp trong dialog câu hỏi: chỉ cho phép "Chơi tiếp" khi đã thả Enter trước đó
+  useEffect(() => {
+    if (!quiz || quiz.answered === null) return;
+
+    const onKeyDownDialog = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' || e.repeat) return;
+      // Nếu chưa nhả Enter sau khi nộp đáp án thì không cho phép tự "Chơi tiếp"
+      if (!enterReleasedAfterAnswer.current) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+    };
+
+    const onKeyUpDialog = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        enterReleasedAfterAnswer.current = true;
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDownDialog, true);
+    window.addEventListener('keyup', onKeyUpDialog, true);
+    return () => {
+      window.removeEventListener('keydown', onKeyDownDialog, true);
+      window.removeEventListener('keyup', onKeyUpDialog, true);
+    };
+  }, [quiz]);
 
   // Kết thúc ván
   const finish = useCallback(() => {
@@ -363,6 +441,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
           const miceInLane = state.mice.filter((m) => m.lane === lane);
           const hasInZone = miceInLane.some(inZone);
           const isBossInLane = state.boss && state.boss.lane === lane;
+          const isBossInZone = isBossInLane && state.boss && inZone(state.boss as unknown as Mouse);
 
           return (
             <div
@@ -371,7 +450,10 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
                 lane === 0 ? 'bg-[#fcf7ea]/10' : lane === 1 ? 'bg-[#e0f2fe]/10' : lane === 2 ? 'bg-[#ecfdf5]/10' : 'bg-[#fff1f2]/10'
               } ${isFlashed ? 'ring-4 ring-amber-300/80 bg-amber-200/25' : ''}`}
               data-testid={`lan-${lane}`}
-              onPointerDown={() => hit(lane)}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                hit(lane);
+              }}
             >
               {/* Hoa văn dệt lụa chạy dọc làn */}
               <div className="pointer-events-none absolute inset-0 opacity-15 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:12px_12px]" />
@@ -379,7 +461,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
               {/* VÙNG ĐẬP (HIT ZONE) TỪ 65% ĐẾN 90% */}
               <div
                 className={`pointer-events-none absolute inset-x-0 bottom-[10%] top-[65%] border-y-2 transition-all duration-150 ${
-                  hasInZone
+                  hasInZone || isBossInZone
                     ? 'border-amber-400 bg-amber-400/20 shadow-[0_0_15px_rgba(251,191,36,0.4)]'
                     : 'border-amber-500/30 bg-amber-500/5'
                 }`}
@@ -409,6 +491,11 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
                     data-testid={`chuot-${m.kind}`}
                     data-in-zone={inHitZone ? '1' : '0'}
                     aria-label={KIND_NAMES[m.kind]}
+                    onPointerDown={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      hit(lane);
+                    }}
                   >
                     {/* HÌNH DẠNG 2D CHUỘT GIẤY DÂN GIAN */}
                     <div
@@ -445,13 +532,16 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
               {/* CHUỘT CÂU HỎI (TRÙM CÓ BIỂU TƯỢNG ❓ NỔI BẬT) */}
               {isBossInLane && state.boss && (
                 <div
-                  className="absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-105 active:scale-95"
+                  className={`absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-105 active:scale-95 ${
+                    state.boss.pos >= WHACK_SPEC.zoneStart && state.boss.pos <= WHACK_SPEC.zoneEnd ? 'ring-4 ring-yellow-400 scale-105' : ''
+                  }`}
                   style={{
                     top: `${(state.boss.pos / WHACK_SPEC.laneLength) * 100}%`,
                     width: '85%',
                     maxWidth: '82px',
                   }}
                   data-testid="chuot-cau-hoi"
+                  data-in-zone={state.boss.pos >= WHACK_SPEC.zoneStart && state.boss.pos <= WHACK_SPEC.zoneEnd ? '1' : '0'}
                   role="button"
                   aria-label={whackUi.chuotCauHoi}
                   onPointerDown={hitBossMouse}
@@ -552,6 +642,18 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
           onPointerDown={(e) => {
             e.stopPropagation();
             quizPointerDownInside.current = true;
+          }}
+          onClickCapture={(e) => {
+            // Chặn click ma ở Capture phase trước khi tới button của QuizCard
+            // Nếu cử chỉ con trỏ/chạm bắt đầu từ trước khi dialog mở (chưa có pointerdown bên trong dialog):
+            if (!quizPointerDownInside.current) {
+              const native = e.nativeEvent as MouseEvent;
+              // Bàn phím có detail === 0 và clientX/Y === 0; chỉ chặn các click ma từ pointer/touch thật
+              if (native.detail > 0 || (native.clientX !== 0 && native.clientY !== 0)) {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }
           }}
         >
           <div className="flex max-h-[92vh] w-full max-w-lg flex-col gap-2 overflow-y-auto rounded-2xl border-4 border-amber-500 bg-[#2b1810] p-4 text-giay shadow-2xl">
