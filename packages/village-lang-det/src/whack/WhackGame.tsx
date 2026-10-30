@@ -389,6 +389,9 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
       __whackQuestions: questions,
       __whackUi: { ready: true, quiz, ending },
       __whackHit: hit,
+      __whackSetQuizLeft: (secs: number) => {
+        quizLeft.current = secs;
+      },
     });
   }
 

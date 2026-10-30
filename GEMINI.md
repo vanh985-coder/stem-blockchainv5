@@ -96,10 +96,13 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
    - Chống click ma triệt để bằng `onClickCapture` ở capture phase trên overlay modal câu hỏi: chạm giữ chuột câu hỏi > 600ms nhấc tay không bị chọn nhầm đáp án ở cả 3 kích thước 1366×768, 360×800, 844×390; bàn phím Space/Enter vẫn hoạt động trơn tru.
    - Xử lý Enter giữ/lặp: gắn event listener `keydown`/`keyup` cho Enter trong modal; giữ Enter > 1s không tự "Chơi tiếp", bắt buộc thả phím rồi nhấn lại mới tiếp tục.
    - Đo trực tiếp dừng thời gian và đối tượng đứng yên 100% khi mở "?" hoặc mở câu hỏi ($t_0 = t_1$), tiếp tục ván chạy mượt mà không nhảy cóc thời gian (reset mốc `lastTickTime`).
-   - Kiểm trọn ván thực tế: Thua vì đầy 8 vết mực (`reason: 'ink'`) -> bấm "Chơi lại" reset sạch ván mới (`score=0, ink=0`); Thắng qua đủ 10 lượt trùm (`reason: 'complete'`) -> nhận đủ 4 phần điểm tổng kết, ghi nhận hoàn thành màn; Tự hoàn thành giữa ván trên bản dev dừng ván tức thì.
-   - Cân bằng giữ nguyên: bot 300 ván seed 1-300 (`whackBalance.test.ts`) đạt 9/9 tests, giữ nguyên mốc điểm 1650 / 2650 / 3100.
-   - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 437 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2279 tests pass (`whack2d.test.ts` 12/12 pass), `pnpm build` đạt (chunk `Man5` 22.27 kB).
-   - Kiểm tra Puppeteer `scripts/p7b-check.mjs` trên 1366×768, 360×800, 844×390 đạt toàn bộ, 28 ảnh minh chứng lưu tại `docs/screenshots/p7b/BAO-CAO-P7B.md`.
+   - Rà soát luật: Không có kết thúc ván do hết giờ (`EndReason = 'complete' | 'ink'`), chỉ kết thúc khi đầy 8 vết mực hoặc xong 10 trùm; đồng hồ lịch chạy qua 118s ván vẫn tiếp tục nếu chưa đầy mực.
+   - Kiểm tra các ca câu hỏi: Trả lời sai (cộng 1 vết mực, không cộng điểm trùm, Tí né chạy xuống sổ); Hết giờ câu hỏi (timeout đếm ngược về 0s, hiện cảnh báo "Hết giờ rồi!", đáp án đúng, cộng 1 vết mực).
+   - Kiểm tra chuyển trạng thái kết thúc ván có probe hỗ trợ (probe-assisted): Đặt trạng thái gần kết thúc rồi thao tác qua giao diện thật để chuyển sang màn kết quả thua (đầy 8 mực) và thắng (xong 10 trùm); bấm "Chơi lại" reset sạch ván mới.
+   - Kiểm tra tự hoàn thành: Xác minh trong cookie `sc_guest` chỉ ghi nhận cờ `ac = 16`, bản ghi Màn 5 là `[0, 0, 0, 0]`, xu và Trang Sổ Vàng không thay đổi.
+   - Cân bằng bot: bot 300 ván seed 1-300 (`whackBalance.test.ts`) đạt 9/9 tests, giữ nguyên mốc điểm 1650 / 2650 / 3100 (ghi rõ giới hạn: bot chạy logic thuần `tapGap = 0.15s`, chưa đo lường độ khó thao tác cơ học của cooldown 140ms trên component UI).
+   - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 437 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2282 tests pass (`whack2d.test.ts` 15/15 pass), `pnpm build` đạt (toàn bộ 5 apps build thành công; chunk `Man5` 22.17 kB). Bỏ khẳng định võ đoán 60 FPS / rò bộ nhớ khi chưa đo chuyên sâu.
+   - Kiểm tra Puppeteer `scripts/p7b-check.mjs` và `scripts/p7b-extra-check.mjs`: 31 ảnh minh chứng lưu tại `docs/screenshots/p7b/BAO-CAO-P7B.md`.
 
 ## 6. Việc để sau (không làm trước khi chủ dự án giao)
 

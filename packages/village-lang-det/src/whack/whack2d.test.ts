@@ -232,4 +232,58 @@ describe('P7b: Hoàn thiện và kiểm logic lối chơi Màn 5 2D', () => {
     expect(s.ended).toBe('complete');
     expect(events.some((e) => e.type === 'end' && e.reason === 'complete')).toBe(true);
   });
+
+  it('trả lời sai ở vết mực thứ 7 làm đầy 8 vết mực dẫn tới kết thúc ván (thua vì ink)', () => {
+    const s = createWhackGame(850);
+    s.ink = 7;
+    toQuiz(s);
+    expect(s.phase).toBe('quiz');
+
+    const events = answerBoss(s, 'wrong', 0);
+    expect(s.ink).toBe(8);
+    expect(s.phase).toBe('ended');
+    expect(s.ended).toBe('ink');
+    expect(events.some((e) => e.type === 'end' && e.reason === 'ink')).toBe(true);
+  });
+
+  it('trả lời sai ở lượt trùm thứ 10 nhưng chưa đầy 8 vết mực: vẫn hoàn thành ván (complete) nhưng không có điểm trùm', () => {
+    const s = createWhackGame(900);
+    s.ink = 3;
+    s.bossesDone = 9;
+    toQuiz(s);
+    expect(s.phase).toBe('quiz');
+
+    const prevScore = s.score;
+    const events = answerBoss(s, 'wrong', 0);
+    expect(s.ink).toBe(4);
+    expect(s.bossesDone).toBe(10);
+    expect(s.score).toBe(prevScore); // Không có điểm trùm
+    expect(s.phase).toBe('ended');
+    expect(s.ended).toBe('complete');
+    expect(events.some((e) => e.type === 'end' && e.reason === 'complete')).toBe(true);
+  });
+
+  it('luật màn 5 không có kết thúc do hết giờ ván: ván chỉ kết thúc khi đầy 8 vết mực hoặc hoàn thành 10 lượt trùm', () => {
+    const s = createWhackGame(950);
+    // Vượt qua 9 lượt trùm đầu tiên (tại các giây 12, 24, 36... 108)
+    for (let i = 0; i < 9; i++) {
+      toQuiz(s);
+      answerBoss(s, 'correct', 8);
+    }
+    expect(s.bossesDone).toBe(9);
+    expect(s.ink).toBe(0);
+    expect(s.phase).toBe('play');
+    expect(s.ended).toBeNull();
+
+    // Đồng hồ lịch tiếp tục chạy tới giây 119 (dọn chuột để không bị mực đầy cản trở)
+    const targetTicks = Math.round(119 / WHACK_SPEC.tick);
+    while (s.ticks < targetTicks && s.phase === 'play') {
+      s.mice = []; // Không để chuột lọt
+      stepWhack(s, 1.0);
+    }
+    expect(s.clock).toBeGreaterThan(118);
+    // Ván vẫn tiếp tục ở phase play, không có cơ chế timeout hết giờ ván
+    expect(s.phase).toBe('play');
+    expect(s.ended).toBeNull();
+  });
 });

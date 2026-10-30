@@ -325,20 +325,22 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 ## P7b — Hoàn thiện và kiểm lối chơi Đập Chuột 2D Màn 5 (30/10/2026)
 
 - **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, commit và push nhánh `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này.
-- **Đã làm:**
+- **Đã làm và bổ sung bằng chứng:**
   - Thống nhất điều khiển: chạm trực tiếp trên làn, nút chân làn, phím D/F/J/K hoặc 1/2/3/4 đều tuân thủ cùng quy tắc vùng đập `[6.5, 9.0]`. Chuột ngoài vùng đập bị đập hụt (phát âm thanh gió trượt `sound.playWhoosh()`, nổi thông báo nhắc nhở).
-  - Chuột thường chỉ tính 1 lần đập; chuột to yêu cầu 2 lần kích hoạt riêng biệt (cooldown 140ms, chặn repeat/giữ phím).
-  - Nhiều chuột cùng làn luôn đập con thấp nhất trong vùng đập (`lowestInZone`); chuột đổi làn nhận đòn chính xác tại làn mới (sau khi qua pos 5,0).
+  - Chuột thường chỉ tính 1 lần đập; chuột to yêu cầu 2 lần kích hoạt riêng biệt (cooldown 140ms, chặn repeat/giữ phím). Nhiều chuột cùng làn luôn đập con thấp nhất trong vùng đập (`lowestInZone`); chuột đổi làn nhận đòn chính xác tại làn mới (sau khi qua pos 5,0).
   - Xử lý click ma triệt để bằng `onClickCapture` ở capture phase trên overlay modal câu hỏi: chạm giữ chuột câu hỏi > 600ms nhấc tay không bị chọn nhầm đáp án ở mọi kích thước màn hình; bàn phím Enter/Space vẫn hoạt động trơn tru.
   - Xử lý Enter giữ/lặp: gắn keydown/keyup cho Enter trong modal; giữ Enter > 1s không tự bấm "Chơi tiếp", bắt buộc thả phím rồi nhấn lại mới tiếp tục ván.
   - Đo trực tiếp dừng thời gian và đối tượng đứng yên 100% khi mở "?" hoặc mở câu hỏi ($t_0 = t_1$), tiếp tục ván chạy mượt mà không nhảy cóc thời gian (reset mốc `lastTickTime`).
-  - Kiểm trọn ván thực tế: Thua vì đầy 8 vết mực (`reason: 'ink'`) -> bấm "Chơi lại" reset sạch ván mới; Thắng qua đủ 10 lượt trùm (`reason: 'complete'`) -> nhận đủ 4 phần điểm tổng kết, ghi nhận hoàn thành màn; Tự hoàn thành giữa ván trên bản dev dừng ván tức thì.
+  - Rà soát luật: Không có kết thúc ván do hết giờ (`EndReason = 'complete' | 'ink'`), chỉ kết thúc khi đầy 8 vết mực hoặc xong 10 trùm; đồng hồ lịch chạy qua 118s ván vẫn tiếp tục nếu chưa đầy mực.
+  - Kiểm tra các ca câu hỏi: Trả lời sai (cộng 1 vết mực, không cộng điểm trùm, Tí né chạy xuống sổ); Hết giờ câu hỏi (timeout đếm ngược về 0s, hiện cảnh báo "Hết giờ rồi!", đáp án đúng, cộng 1 vết mực).
+  - Kiểm tra chuyển trạng thái kết thúc ván có probe hỗ trợ (probe-assisted): Đặt trạng thái gần kết thúc rồi thao tác qua giao diện thật để chuyển sang màn kết quả thua (đầy 8 mực) và thắng (xong 10 trùm); bấm "Chơi lại" reset sạch ván mới.
+  - Kiểm tra tự hoàn thành: Xác minh trong cookie `sc_guest` chỉ ghi nhận cờ `ac = 16`, bản ghi Màn 5 là `[0, 0, 0, 0]`, xu và Trang Sổ Vàng không thay đổi.
 - **Kiểm tra đã đạt:**
   - `pnpm check:text`: sạch (437 files).
   - `pnpm typecheck`: 10 package biên dịch TypeScript thành công.
-  - `pnpm test --maxWorkers=2`: 206 test files passed, 2279 tests passed, 5 skipped. Bộ test `whack2d.test.ts` đạt 12/12 tests chuyên sâu. Bot cân bằng `whackBalance.test.ts` (300 ván seed 1-300) đạt 9/9 tests, giữ nguyên mốc điểm 1650 / 2650 / 3100.
-  - `pnpm build`: Đạt. Chunk `Man5` là **22.27 kB** (gzip **7.79 kB**).
-  - Kiểm tra Puppeteer `scripts/p7b-check.mjs` trên 1366×768, 360×800, 844×390: đạt toàn bộ các ca kiểm tra, 28 ảnh minh chứng lưu tại `docs/screenshots/p7b/BAO-CAO-P7B.md`.
+  - `pnpm test --maxWorkers=2`: 206 test files passed, 2282 tests passed, 5 skipped. Bộ test `whack2d.test.ts` đạt 15/15 tests chuyên sâu. Bot cân bằng `whackBalance.test.ts` (300 ván seed 1-300) đạt 9/9 tests, giữ nguyên mốc điểm 1650 / 2650 / 3100 (ghi rõ giới hạn: bot chạy logic thuần `tapGap = 0.15s`, chưa đo lường độ khó thao tác cơ học của cooldown 140ms trên component UI).
+  - `pnpm build`: Đạt toàn bộ 5 ứng dụng (`hub`, `lang-bac`, `lang-det`, `lang-giay`, `lang-khac-dau`). Chunk `Man5` là **22.17 kB** (gzip **7.74 kB**). Bỏ khẳng định võ đoán về 60 FPS / rò bộ nhớ khi chưa có công cụ đo chuyên sâu.
+  - Kiểm tra Puppeteer `scripts/p7b-check.mjs` và `scripts/p7b-extra-check.mjs`: 31 ảnh minh chứng lưu tại `docs/screenshots/p7b/BAO-CAO-P7B.md`.
 
 ## Việc để sau / cần theo dõi
 
