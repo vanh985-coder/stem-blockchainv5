@@ -115,10 +115,19 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
    - Đo lường và kiểm tra Puppeteer `scripts/p7c-check.mjs` và `scripts/p7c-user-preview.mjs`: Lưu ảnh chụp màn hình minh chứng tại `docs/screenshots/p7c/BAO-CAO-P7C.md` và `docs/screenshots/p7c/man5-preview-*.png`.
    - Đã xử lý hoàn thiện chế độ Giảm chuyển động (`reducedMotion`: tắt bounce ❓, pulse ⚡ và vùng đập), xác minh container fixed không che các lớp phủ modal/result, và bản chạy riêng Làng Dệt (5175) tải ảnh WebP đầy đủ.
    - **Nghiệm thu:** Chủ dự án đã xem và duyệt đồ họa Màn 5 (30/10/2026). Sẵn sàng bắt đầu P8a.
+9. **P8a — cơ chế hướng dẫn focus và làm thử dùng chung, tích hợp mẫu Màn 1 trạm Dễ (30/10/2026):**
+   - Xây dựng cơ chế dùng chung `TutorialSpotlight` (`packages/core/src/ui/TutorialSpotlight.tsx`): 4 khối che backdrop chuẩn xác bao quanh vùng target, viền sáng highlight, định vị tooltip thông minh (tự động đảo vị trí `top`/`bottom` không che mục tiêu và không tràn màn hình), focus trap bàn phím Tab, bám sát target khi cuộn và đổi kích thước.
+   - Xử lý chu kỳ phím Enter chống kích hoạt đúp: nộp bài bằng Enter tại ô nhập không tự ý kích hoạt chuyển tiếp hoặc bắt đầu bài thật; bắt buộc thả phím `keyup` rồi nhấn Enter chu kỳ mới mới tiếp tục.
+   - Tích hợp mẫu tại Màn 1 trạm Dễ (`packages/village-lang-giay/src/bai-1/Easy.tsx`) qua 6 bước: Giới thiệu mục tiêu ngắn -> Focus vùng số 12 và 5 -> Focus công thức gợi ý -> Focus ô nhập và cho học sinh tự gõ -> Focus nút Kiểm tra -> Phản hồi kết quả (đúng: xác nhận mã 29 và hiện nút "Bắt đầu chơi thật"; sai: báo lỗi, giải thích công thức và hiện nút "Thử lại").
+   - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: dữ liệu mẫu cố định 12 & 5, không gọi `record()`, không tính giờ/xu/sao/tiến độ/Trang Sổ Vàng. Bắt đầu bài thật bấm giờ sạch từ đầu.
+   - Nút "💡 Hướng dẫn" trên giao diện cho phép xem lại giữa bài; khi đóng quay lại đúng trạng thái bài đang làm dở.
+   - Toàn bộ nội dung hiển thị nằm trong `packages/core/src/content/tutorial.ts`, xưng "em", định dạng biến qua `fmt()`.
+   - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2294 tests pass (thêm test mới `TutorialSpotlight.test.tsx` và `man1EasyTutorial.test.tsx`), `pnpm build` đạt (toàn bộ 5 apps build thành công).
+   - Đo lường và kiểm tra Puppeteer `scripts/p8a-check.mjs`: Đạt cả 3 kích thước 1366×768, 360×800, 844×390 (21 ảnh chụp minh chứng lưu tại `docs/screenshots/p8a/` và `BAO-CAO-P8A.md`). Xác minh tiến độ không đổi (`progressUnchangedAfterPractice = true`), Enter không kích hoạt đúp (`enterHoldSafe = true`), bài thật hoàn thành bình thường sau hướng dẫn (`realStationDoneNormally = true`).
 
 ## 6. Việc để sau (không làm trước khi chủ dự án giao)
 
-- **P8:** hướng dẫn focus và làm thử cho **cả 12 màn** (đã duyệt, chưa triển khai, làm thành bước riêng sau khi chốt lối chơi màn 2, 3, 5). Mục P8 của `TRANG-THAI.md` phải được giữ nguyên.
+- **P8b:** nhân rộng hướng dẫn focus & làm thử cho các trạm và màn còn lại sau khi chủ dự án đánh giá và duyệt mẫu Màn 1 trạm Dễ.
 - **Việc dời từ mốc 3 và hội làng làm CUỐI mốc 4**, theo thứ tự ở mục "Việc dời từ mốc 3" của `TRANG-THAI.md`: deploy bản gộp (15b), kiểm tra toàn bộ (G2), thử với 5–10 học sinh, hội làng (`FESTIVAL_LAUNCHED` hiện `false`).
 - Chưa làm theo lời giao trước đó: sửa nút "?" ở màn 3, HUD che tên biển trong một số góc nhìn (ví dụ dòng nhiệm vụ che biển trái ở Làng Bạc), vòng tích che số cây đa đã được thu nhỏ ở P5.
 

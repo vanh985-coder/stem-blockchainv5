@@ -35,7 +35,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | P5 | **ĐÃ XONG (29/10/2026, mục "P5" bên dưới):** (1) Biển chọn màn trong làng làm thành cột sáng giống cuộn "Em có biết?" (mỗi màn một cột, dáng và chữ theo trạng thái, giữ chữ tên màn) | 1 |
 | P6 | (3) Sau khi đọc thẻ "Em có biết?": 1 ví dụ ngắn + 1 câu hỏi ABCD (hoặc điền số). Mặc định: trả lời sai vẫn nhận thẻ, hiện giải thích. **P6a (nội dung 16 câu) đã duyệt; P6b (tích hợp) ĐÃ XONG (30/10/2026, mục "P6b" bên dưới)** | 1–2 |
 | P7 | **P7a ĐÃ XONG (30/10/2026, mục "P7a" bên dưới):** Bản chơi được Màn 5 "Đập {phanDien}" bằng 2D 4 làn dọc (Talking Tom), 2 loại chuột (thường và câu hỏi ❓), chống click ma, dừng khi mở câu hỏi/?, tự hoàn thành. **P7b:** trau chuốt đồ họa và cân bằng nhịp sinh. | 3–4 |
-| P8 | **Hướng dẫn focus và làm thử cho cả 12 màn** (yêu cầu đã được chủ dự án duyệt, CHƯA triển khai, xem mục ngay dưới). Làm thành bước riêng SAU KHI chốt thay đổi lối chơi màn 2, 3, 5 (P4, P7) | 2–3 |
+| P8 | **P8a ĐÃ XONG (30/10/2026, mục "P8a" bên dưới):** Cơ chế dùng chung `TutorialSpotlight` và tích hợp mẫu tại Màn 1 trạm Dễ (6 bước, dữ liệu ví dụ 12 & 5, tách làm thử khỏi tiến độ thật, chống Enter kích hoạt đúp, xem lại giữa bài). P8b: nhân rộng các màn tiếp theo sau khi duyệt mẫu. | 2–3 |
 
 Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mốc 3 và hội làng.
 
@@ -360,6 +360,23 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   - `pnpm test --maxWorkers=2`: 206 test files passed, 2282 tests passed, 5 skipped.
   - `pnpm build`: Đạt toàn bộ 5 ứng dụng. Chunk `Man5` là **26.49 kB** (gzip **8.76 kB**).
   - Đo lường và kiểm tra Puppeteer `scripts/p7c-check.mjs` và `scripts/p7c-user-preview.mjs`: Lưu ảnh chụp minh chứng tại `docs/screenshots/p7c/BAO-CAO-P7C.md` và `docs/screenshots/p7c/man5-preview-*.png`.
+
+## P8a — Cơ chế hướng dẫn focus và làm thử dùng chung, tích hợp mẫu Màn 1 trạm Dễ (30/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, commit và push nhánh `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này.
+- **Đã làm:**
+  - Cơ chế dùng chung `TutorialSpotlight` (`packages/core/src/ui/TutorialSpotlight.tsx`): 4 khối che backdrop chuẩn xác bao quanh vùng target, viền sáng highlight, định vị tooltip thông minh (tự động đảo vị trí `top`/`bottom` không che mục tiêu và không tràn màn hình), focus trap bàn phím Tab, bám sát target khi cuộn và đổi kích thước.
+  - Xử lý chu kỳ phím Enter chống kích hoạt đúp: nộp bài bằng Enter tại ô nhập không tự ý kích hoạt chuyển tiếp hoặc bắt đầu bài thật; bắt buộc thả phím `keyup` rồi nhấn Enter chu kỳ mới mới tiếp tục.
+  - Tích hợp mẫu tại Màn 1 trạm Dễ (`packages/village-lang-giay/src/bai-1/Easy.tsx`) qua 6 bước: Giới thiệu mục tiêu ngắn -> Focus vùng số 12 và 5 -> Focus công thức gợi ý -> Focus ô nhập và cho học sinh tự gõ -> Focus nút Kiểm tra -> Phản hồi kết quả (đúng: xác nhận mã 29 và hiện nút "Bắt đầu chơi thật"; sai: báo lỗi, giải thích công thức và hiện nút "Thử lại").
+  - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: dữ liệu mẫu cố định 12 & 5, không gọi `record()`, không tính giờ/xu/sao/tiến độ/Trang Sổ Vàng. Bắt đầu bài thật bấm giờ sạch từ đầu.
+  - Nút "💡 Hướng dẫn" trên giao diện cho phép xem lại giữa bài; khi đóng quay lại đúng trạng thái bài đang làm dở.
+  - Toàn bộ nội dung hiển thị nằm trong `packages/core/src/content/tutorial.ts`, xưng "em", định dạng biến qua `fmt()`.
+- **Kiểm tra đã đạt:**
+  - `pnpm check:text`: sạch (438 files).
+  - `pnpm typecheck`: 10 package biên dịch thành công 100%.
+  - `pnpm test --maxWorkers=2`: 209 test files passed, 2294 tests passed, 5 skipped (thêm test `TutorialSpotlight.test.tsx` và `man1EasyTutorial.test.tsx`).
+  - `pnpm build`: Đạt toàn bộ 5 ứng dụng.
+  - Đo lường và kiểm tra Puppeteer `scripts/p8a-check.mjs`: Đạt cả 3 kích thước 1366×768, 360×800, 844×390 (21 ảnh chụp minh chứng lưu tại `docs/screenshots/p8a/` và `BAO-CAO-P8A.md`). Xác minh tiến độ không đổi (`progressUnchangedAfterPractice = true`), Enter không kích hoạt đúp (`enterHoldSafe = true`), bài thật hoàn thành bình thường sau hướng dẫn (`realStationDoneNormally = true`).
 
 ## Việc để sau / cần theo dõi
 
