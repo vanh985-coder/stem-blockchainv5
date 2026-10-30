@@ -11,6 +11,7 @@ import {
   type StationResult,
 } from '@so-chung/core';
 import { bai2Texts } from '@so-chung/core/content/lessons/bai-2';
+import { formatNumber } from '@so-chung/core/lib/format';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { explainCheck, generateMedium, type MediumPage, type MediumRound } from '@so-chung/core/lessons/bai-2/logic';
 import { Chan, tenGiua } from './nguoi';
@@ -118,8 +119,8 @@ export function Medium({ onComplete, onFail }: { onComplete: (r: StationResult) 
   const basePageNum = myLedger.length - myLast3.length + 1;
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
-      {/* Vòng và tim */}
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+      {/* Vòng và tim - luôn ở trên cùng trải rộng hai cột */}
       <div className="flex items-center justify-between gap-2 rounded-bang border-2 border-nau-go/50 bg-white/60 p-3">
         <div className="flex min-w-0 flex-wrap items-center gap-x-2">
           <span className="rounded-nut bg-muc-tim/15 px-3 py-1 font-display text-base font-extrabold text-muc-tim-dam">
@@ -130,69 +131,26 @@ export function Medium({ onComplete, onFail }: { onComplete: (r: StationResult) 
         <Hearts current={hearts} max={3} />
       </div>
 
-      {/* Hàng 1: sổ của em (3 trang cuối + ô trống cho trang mới) */}
-      <div className="rounded-bang border-2 border-nau-go/50 bg-white/60 p-3 sm:p-4">
-        <h2 className="mb-2 flex items-center gap-2 border-b-2 border-nau-go/30 pb-2 text-lg">
-          <span aria-hidden="true">📖</span> {T.tb.soCuaEm3}
-        </h2>
-        <div ref={row1} onScroll={() => syncScroll(row1.current, row2.current)} className="w-full overflow-x-auto py-3 sm:overflow-x-visible">
-          <div className="grid w-full min-w-[620px] grid-cols-4 gap-4 sm:gap-6 lg:min-w-0">
-            {myLast3.map((page, idx) => (
-              <div key={idx} className="relative flex w-full items-center justify-center">
-                {idx > 0 && (
-                  <div className={CHAIN_SLOT}>
-                    <MatXich size="sm" status={answered ? 'valid' : 'neutral'} />
-                  </div>
-                )}
-                <TrangSo
-                  size="xs"
-                  pageNumber={basePageNum + idx}
-                  prevCode={page.prevCode}
-                  content={page.content}
-                  pageCode={page.code}
-                  isConfirmed={answered}
-                />
-              </div>
-            ))}
-            <div className="relative flex w-full items-center justify-center">
-              <div className="flex min-h-[245px] w-[148px] select-none flex-col items-center justify-center rounded-2xl border-2 border-dashed border-nau-go bg-giay/60 p-3 text-center sm:w-[176px]">
-                <div className="mb-2 grid size-9 place-items-center rounded-full border-2 border-dashed border-nau-go text-base font-bold text-nau-go-dam" aria-hidden="true">
-                  +
-                </div>
-                <span className="text-sm font-semibold italic leading-tight text-nau-go-dam">{T.tb.trangMoiSeODay}</span>
-              </div>
+      {/* Bố cục đối chiếu 2 cột trên màn hình rộng: trái là sổ của em, phải là sổ đề xuất + hướng dẫn + máy tính + nút */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+        {/* Cột trái: Sổ của em (dữ liệu đối chiếu: 3 trang cuối + ô trang mới) */}
+        <div className="rounded-bang border-2 border-nau-go/50 bg-white/60 p-3 sm:p-4 flex flex-col gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-nau-go/30 pb-2">
+            <h2 className="flex items-center gap-2 text-lg font-bold">
+              <span aria-hidden="true">📖</span> {T.tb.soCuaEm3}
+            </h2>
+            <div className="inline-flex items-center gap-1.5 rounded-nut border-2 border-muc-tim/40 bg-muc-tim/10 px-3 py-1 text-sm font-bold text-muc-tim-dam">
+              <span>{T.kho.maCuoi}</span>
+              <span className="font-display text-base font-extrabold underline">{formatNumber(myLastCode)}</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Hàng 2: sổ của người gửi (3 trang + trang mới đề xuất) */}
-      <div className="rounded-bang border-2 border-muc-tim/40 bg-white/70 p-3 sm:p-4">
-        <div className="mb-2 flex items-center justify-between gap-2 border-b-2 border-nau-go/30 pb-2">
-          <div className="flex min-w-0 items-center gap-2">
-            <Chan id={currentRound.sender} size={40} />
-            <h2 className="text-lg">{fmt(T.tb.soCua, { nguoi: senderName })}</h2>
-          </div>
-          {answered && (
-            <span
-              className={`whitespace-nowrap rounded-nut px-2 py-0.5 text-sm font-bold ${
-                currentRound.isValid ? 'bg-xanh-la/15 text-xanh-la-dam' : 'bg-do-son/15 text-do-son-dam'
-              }`}
-            >
-              {currentRound.isValid ? T.chung.hopLe : T.chung.khongHopLe}
-            </span>
-          )}
-        </div>
-        <div ref={row2} onScroll={() => syncScroll(row2.current, row1.current)} className="w-full overflow-x-auto py-3 sm:overflow-x-visible">
-          <div className="grid w-full min-w-[620px] grid-cols-4 gap-4 sm:gap-6 lg:min-w-0">
-            {currentRound.senderPages.map((page, idx) => {
-              const isTampered = answered && currentRound.kind === 'tampered' && currentRound.tamperedIndex === idx;
-              const isRecalc = answered && currentRound.kind === 'tampered' && Boolean(currentRound.recalcIndices?.includes(idx));
-              return (
-                <div key={idx} className="relative flex w-full items-center justify-center">
+          <div ref={row1} onScroll={() => syncScroll(row1.current, row2.current)} className="w-full overflow-x-auto py-3">
+            <div className="flex w-max items-center gap-3 sm:gap-4">
+              {myLast3.map((page, idx) => (
+                <div key={idx} className="relative flex items-center justify-center">
                   {idx > 0 && (
                     <div className={CHAIN_SLOT}>
-                      <MatXich size="sm" status={answered ? (isTampered || isRecalc ? 'broken' : 'valid') : 'neutral'} />
+                      <MatXich size="sm" status={answered ? 'valid' : 'neutral'} />
                     </div>
                   )}
                   <TrangSo
@@ -201,65 +159,120 @@ export function Medium({ onComplete, onFail }: { onComplete: (r: StationResult) 
                     prevCode={page.prevCode}
                     content={page.content}
                     pageCode={page.code}
-                    isConfirmed={answered && !isTampered && !isRecalc}
-                    isInvalid={isTampered || isRecalc}
-                    struckContent={isTampered ? currentRound.oldContent : undefined}
-                    invalidBadgeText={isTampered ? T.tb.nhanSuaLen : isRecalc ? T.tb.nhanMaLech : undefined}
+                    isConfirmed={answered}
                   />
                 </div>
-              );
-            })}
-
-            {/* Trang mới được đề xuất */}
-            <div className="relative flex w-full items-center justify-center">
-              <div className={CHAIN_SLOT}>
-                <MatXich size="sm" status={answered ? (currentRound.isValid ? 'valid' : 'broken') : 'neutral'} />
-              </div>
-              <div className="relative flex justify-center">
-                <div
-                  className={`absolute -top-2.5 z-30 whitespace-nowrap rounded-nut px-2.5 py-0.5 text-xs font-extrabold text-white ${
-                    answered ? (currentRound.isValid ? 'bg-xanh-la-dam' : 'bg-do-son-dam') : 'bg-muc-tim'
-                  }`}
-                >
-                  {T.chung.trangMoi}
-                </div>
-                <div
-                  className={`rounded-2xl ring-2 ${answered ? (currentRound.isValid ? 'ring-xanh-la-dam' : 'ring-do-son-dam') : 'ring-muc-tim'}`}
-                >
-                  <TrangSo
-                    size="xs"
-                    pageNumber={myLedger.length + 1}
-                    prevCode={currentRound.proposal.prevCode}
-                    content={currentRound.proposal.content}
-                    pageCode={currentRound.proposal.code}
-                    isConfirmed={answered && currentRound.isValid}
-                    isInvalid={answered && !currentRound.isValid}
-                    invalidBadgeText={
-                      answered ? (currentRound.kind === 'wrong-code' ? T.tb.nhanMaSai : currentRound.kind === 'tampered' ? T.tb.nhanNoiSaiSo : undefined) : undefined
-                    }
-                  />
+              ))}
+              <div className="relative flex items-center justify-center">
+                <div className="flex min-h-[245px] w-[148px] select-none flex-col items-center justify-center rounded-2xl border-2 border-dashed border-nau-go bg-giay/60 p-3 text-center sm:w-[176px]">
+                  <div className="mb-2 grid size-9 place-items-center rounded-full border-2 border-dashed border-nau-go text-base font-bold text-nau-go-dam" aria-hidden="true">
+                    +
+                  </div>
+                  <span className="text-sm font-semibold italic leading-tight text-nau-go-dam">{T.tb.trangMoiSeODay}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Câu hỏi và nút biểu quyết */}
-      <PageCodeCalculator />
-      <div className="flex flex-col items-center justify-between gap-4 rounded-bang border-2 border-nau-go/50 bg-white/60 p-4 sm:flex-row">
-        <p className="text-center text-base sm:text-left">
-          <strong>{T.tb.emHayKiemTra}</strong> {fmt(T.tb.cauHoiKiemTra, { nguoi: senderName })}
-        </p>
-        <div className="flex w-full shrink-0 items-center gap-3 sm:w-auto">
-          <Button size="md" fullWidth className="px-3! whitespace-nowrap sm:w-40" onClick={() => handleDecision(true)} disabled={feedback.isOpen}>
-            <span aria-hidden="true">✓ </span>
-            {T.chung.dongY}
-          </Button>
-          <Button variant="danger" size="md" fullWidth className="px-3! whitespace-nowrap sm:w-40" onClick={() => handleDecision(false)} disabled={feedback.isOpen}>
-            <span aria-hidden="true">✗ </span>
-            {T.chung.tuChoi}
-          </Button>
+        {/* Cột phải: Sổ của người gửi (sổ đề xuất) + Hướng dẫn + Máy tính + Nút biểu quyết */}
+        <div className="flex flex-col gap-4">
+          {/* Hàng sổ của người gửi */}
+          <div className="rounded-bang border-2 border-muc-tim/40 bg-white/70 p-3 sm:p-4">
+            <div className="mb-2 flex items-center justify-between gap-2 border-b-2 border-nau-go/30 pb-2">
+              <div className="flex min-w-0 items-center gap-2">
+                <Chan id={currentRound.sender} size={40} />
+                <h2 className="text-lg font-bold">{fmt(T.tb.soCua, { nguoi: senderName })}</h2>
+              </div>
+              {answered && (
+                <span
+                  className={`whitespace-nowrap rounded-nut px-2 py-0.5 text-sm font-bold ${
+                    currentRound.isValid ? 'bg-xanh-la/15 text-xanh-la-dam' : 'bg-do-son/15 text-do-son-dam'
+                  }`}
+                >
+                  {currentRound.isValid ? T.chung.hopLe : T.chung.khongHopLe}
+                </span>
+              )}
+            </div>
+            <div ref={row2} onScroll={() => syncScroll(row2.current, row1.current)} className="w-full overflow-x-auto py-3">
+              <div className="flex w-max items-center gap-3 sm:gap-4">
+                {currentRound.senderPages.map((page, idx) => {
+                  const isTampered = answered && currentRound.kind === 'tampered' && currentRound.tamperedIndex === idx;
+                  const isRecalc = answered && currentRound.kind === 'tampered' && Boolean(currentRound.recalcIndices?.includes(idx));
+                  return (
+                    <div key={idx} className="relative flex items-center justify-center">
+                      {idx > 0 && (
+                        <div className={CHAIN_SLOT}>
+                          <MatXich size="sm" status={answered ? (isTampered || isRecalc ? 'broken' : 'valid') : 'neutral'} />
+                        </div>
+                      )}
+                      <TrangSo
+                        size="xs"
+                        pageNumber={basePageNum + idx}
+                        prevCode={page.prevCode}
+                        content={page.content}
+                        pageCode={page.code}
+                        isConfirmed={answered && !isTampered && !isRecalc}
+                        isInvalid={isTampered || isRecalc}
+                        struckContent={isTampered ? currentRound.oldContent : undefined}
+                        invalidBadgeText={isTampered ? T.tb.nhanSuaLen : isRecalc ? T.tb.nhanMaLech : undefined}
+                      />
+                    </div>
+                  );
+                })}
+
+                {/* Trang mới được đề xuất */}
+                <div className="relative flex items-center justify-center">
+                  <div className={CHAIN_SLOT}>
+                    <MatXich size="sm" status={answered ? (currentRound.isValid ? 'valid' : 'broken') : 'neutral'} />
+                  </div>
+                  <div className="relative flex justify-center">
+                    <div
+                      className={`absolute -top-2.5 z-30 whitespace-nowrap rounded-nut px-2.5 py-0.5 text-xs font-extrabold text-white ${
+                        answered ? (currentRound.isValid ? 'bg-xanh-la-dam' : 'bg-do-son-dam') : 'bg-muc-tim'
+                      }`}
+                    >
+                      {T.chung.trangMoi}
+                    </div>
+                    <div
+                      className={`rounded-2xl ring-2 ${answered ? (currentRound.isValid ? 'ring-xanh-la-dam' : 'ring-do-son-dam') : 'ring-muc-tim'}`}
+                    >
+                      <TrangSo
+                        size="xs"
+                        pageNumber={myLedger.length + 1}
+                        prevCode={currentRound.proposal.prevCode}
+                        content={currentRound.proposal.content}
+                        pageCode={currentRound.proposal.code}
+                        isConfirmed={answered && currentRound.isValid}
+                        isInvalid={answered && !currentRound.isValid}
+                        invalidBadgeText={
+                          answered ? (currentRound.kind === 'wrong-code' ? T.tb.nhanMaSai : currentRound.kind === 'tampered' ? T.tb.nhanNoiSaiSo : undefined) : undefined
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Hướng dẫn & Máy tính & Nút biểu quyết */}
+          <div className="rounded-bang border-2 border-nau-go/50 bg-white/60 p-4 space-y-4">
+            <p className="text-base font-semibold leading-relaxed">
+              <strong>{T.tb.emHayKiemTra}</strong> {fmt(T.tb.cauHoiKiemTra, { nguoi: senderName })}
+            </p>
+            <PageCodeCalculator />
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <Button size="md" className="px-3! whitespace-nowrap" onClick={() => handleDecision(true)} disabled={feedback.isOpen}>
+                <span aria-hidden="true">✓ </span>
+                {T.chung.dongY}
+              </Button>
+              <Button variant="danger" size="md" className="px-3! whitespace-nowrap" onClick={() => handleDecision(false)} disabled={feedback.isOpen}>
+                <span aria-hidden="true">✗ </span>
+                {T.chung.tuChoi}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -1,0 +1,386 @@
+[
+  {
+    "tag": "Màn 2 (QuizOverlay giữa ván)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 2 (QuizOverlay giữa ván)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 2 (QuizOverlay giữa ván)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 2 (QuizOverlay giữa ván)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 2 (Vòng cuối - Vòng 4)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 2 (Vòng cuối - Vòng 4)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 2 (Vòng cuối - Vòng 4)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 2 (Vòng cuối - Vòng 4)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 3 (Vòng 1 ghép 5 trang)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 3 (Vòng 1 ghép 5 trang)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 3 (Vòng 1 ghép 5 trang)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 3 (Vòng 1 ghép 5 trang)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 3 (Vòng 2 đoạn giữ sổ 45s)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 3 (Vòng 2 đoạn giữ sổ 45s)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 3 (Vòng 2 đoạn giữ sổ 45s)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 3 (Vòng 2 đoạn giữ sổ 45s)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 5 (Lúc chơi đập chuột 4 làn)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 5 (Lúc chơi đập chuột 4 làn)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 5 (Lúc chơi đập chuột 4 làn)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 5 (Lúc chơi đập chuột 4 làn)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 5 (Lượt trùm chặn câu hỏi)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 5 (Lượt trùm chặn câu hỏi)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 5 (Lượt trùm chặn câu hỏi)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 5 (Lượt trùm chặn câu hỏi)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 6 (Lúc đang bay qua khe gió)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 6 (Lúc đang bay qua khe gió)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 6 (Lúc đang bay qua khe gió)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 6 (Lúc đang bay qua khe gió)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 6 (Câu hỏi trắc nghiệm ở cổng làng)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 6 (Câu hỏi trắc nghiệm ở cổng làng)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 6 (Câu hỏi trắc nghiệm ở cổng làng)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 6 (Câu hỏi trắc nghiệm ở cổng làng)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 8 (Vòng 1 - 4 cặp thẻ)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 8 (Vòng 1 - 4 cặp thẻ)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 8 (Vòng 1 - 4 cặp thẻ)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 8 (Vòng 1 - 4 cặp thẻ)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 8 (Vòng 3 vòng cuối 8 cặp và tráo thẻ)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 8 (Vòng 3 vòng cuối 8 cặp và tráo thẻ)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 8 (Vòng 3 vòng cuối 8 cặp và tráo thẻ)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 8 (Vòng 3 vòng cuối 8 cặp và tráo thẻ)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 9 (Giai đoạn nạp đạn thuốc)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 9 (Giai đoạn nạp đạn thuốc)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 9 (Giai đoạn nạp đạn thuốc)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 9 (Giai đoạn nạp đạn thuốc)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 9 (Đợt 3 có gà trùm cuối đường)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 9 (Đợt 3 có gà trùm cuối đường)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 9 (Đợt 3 có gà trùm cuối đường)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 9 (Đợt 3 có gà trùm cuối đường)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 11 (Cây 1 - 4 ô lá)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 11 (Cây 1 - 4 ô lá)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 11 (Cây 1 - 4 ô lá)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 11 (Cây 1 - 4 ô lá)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 11 (Cây 3 - vòng cuối 8 ô lá 15 lượt)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 11 (Cây 3 - vòng cuối 8 ô lá 15 lượt)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 11 (Cây 3 - vòng cuối 8 ô lá 15 lượt)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 11 (Cây 3 - vòng cuối 8 ô lá 15 lượt)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 12 (Vòng 1 - 8 lá depth 3)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 12 (Vòng 1 - 8 lá depth 3)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 12 (Vòng 1 - 8 lá depth 3)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 12 (Vòng 1 - 8 lá depth 3)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 12 (Vòng 4 - vòng cuối 64 lá depth 6)",
+    "name": "Nút \"?\" xuất hiện trên màn hình",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 12 (Vòng 4 - vòng cuối 64 lá depth 6)",
+    "name": "Hộp gợi ý \"?\" mở ra đè lên trên lớp đang hoạt động",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 12 (Vòng 4 - vòng cuối 64 lá depth 6)",
+    "name": "Hộp \"?\" có nút \"Tự hoàn thành cả màn\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Màn 12 (Vòng 4 - vòng cuối 64 lá depth 6)",
+    "name": "Ván dừng ngay lập tức, gỡ khung chơi và hiển thị khung \"Đã tự hoàn thành\"",
+    "ok": true,
+    "detail": ""
+  }
+]

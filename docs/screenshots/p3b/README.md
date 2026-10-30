@@ -63,21 +63,21 @@ Chạy lại sau sửa: `p3b-check.mjs --mode=dev --only=levels,double,mid` **20
 - **Chặn bấm lặp tức thời:** Bổ sung cờ `busy` vào `AutoCompleteButton` (`disabled={blocked !== null || busy}`) vô hiệu hóa nút ngay trong mili-giây đầu tiên khi bấm, phối hợp cùng cơ chế guard `'noop'` ở manager.
 - **Dừng mô phỏng khi tự hoàn thành giữa ván:** Khi bấm tự hoàn thành trong hộp "?", component game được gỡ khỏi cây DOM, đồng hồ và mô phỏng dừng ngay lập tức; không gọi `onFinish`, không chấm điểm hay phát sinh thưởng.
 
-### 2. Bảng tổng hợp 12 màn, trạm/vòng và vị trí nút
+### 2. Bảng tổng hợp 12 màn chuẩn xác theo Content và Config thực tế
 | Màn | Tên màn | Loại | Các độ khó / trạm / vòng | Vị trí truy cập nút |
 |---|---|---|---|---|
-| Màn 1 | Bài 1: Sổ cái tập trung | Bài học 2D | 3 trạm: Dễ, Trung bình, Khó | Thanh đầu trang (`header`), hiện ở mọi trạm |
-| Màn 2 | Thu thập trang sổ | Game Runner 3D | 3 vòng (tăng tốc dần) | Thẻ bắt đầu + Hộp "?" giữa ván (`z-[35]`, mở được mọi vòng) |
-| Màn 3 | Khôi phục trang rách | Game Ghép 2D | 2 vòng (soi mã + giữ sổ) | Thẻ bắt đầu + Hộp "?" giữa ván (mọi vòng) |
-| Màn 4 | Bài 2: Sổ cái phân tán | Bài học 2D | 3 trạm: Dễ, Trung bình, Khó | Thanh đầu trang (`header`), hiện ở mọi trạm |
-| Màn 5 | Bắt bọ sổ cái | Game Đập chuột 2D | 3 vòng độ khó | Thẻ bắt đầu + Hộp "?" giữa ván (mọi vòng) |
-| Màn 6 | Thả diều truyền tin | Game Diều 2.5D | 4 cổng / 24 khe | Thẻ bắt đầu + Hộp "?" giữa ván (mọi lúc) |
-| Màn 7 | Bài 3: Chữ ký điện tử | Bài học 2D | 3 trạm: Dễ, Trung bình, Khó | Thanh đầu trang (`header`), hiện ở mọi trạm |
-| Màn 8 | Lật thẻ tìm cặp | Game Memory 2D | 3 vòng (cặp khóa, mã hóa, ký) | Thẻ bắt đầu + Hộp "?" giữa ván (mọi vòng) |
-| Màn 9 | Chữa gà bị bẫy | Game Chạy 3 làn 2D | 3 vòng độ khó | Thẻ bắt đầu + Hộp "?" giữa ván (mọi vòng) |
-| Màn 10 | Bài 4: Cây Merkle | Bài học 2D | 3 trạm: Dễ, Trung bình, Khó | Thanh đầu trang (`header`), hiện ở mọi trạm |
-| Màn 11 | Ghép lá Merkle | Game Match-3 2D | 3 cây Merkle (12/15/15 lượt) | Thẻ bắt đầu + Hộp "?" giữa ván (mọi cây) |
-| Màn 12 | Leo cây Merkle | Game Leo cây 2.5D | 4 vòng / 4 chặng | Thẻ bắt đầu + Hộp "?" giữa ván (mọi vòng) |
+| Màn 1 | "Trang nối trang" (Bài 1) | Bài học 2D | 3 trạm: Dễ (Nối trang), Trung bình (Sửa lén), Khó (Đổi thứ tự) | Thanh đầu trang (`header`), hiện ở mọi trạm |
+| Màn 2 | "Đuổi theo {phanDien}" | Game chạy 3D (Runner 3D) | 4 vòng (25s/vòng, tốc độ 12 -> 21.6; giữa các vòng có câu hỏi trắc nghiệm dừng màn hình QuizOverlay `z-30`) | Thẻ bắt đầu + Hộp "?" giữa ván (`z-[35]`, mở được ở mọi vòng và cả khi câu hỏi dừng màn hình mở) |
+| Màn 3 | "Ghép lại cuốn sổ" | Game ghép trang 2D | 2 vòng: Vòng 1 (ghép 5 trang thật), Vòng 2 (ghép 7 trang + đoạn giữ sổ 45s phát hiện tráo trang) | Thẻ bắt đầu + Hộp "?" giữa ván (mọi vòng và cả đoạn giữ sổ) |
+| Màn 4 | "Cả làng cùng giữ sổ" (Bài 2) | Bài học 2D | 3 trạm: Dễ (Đa số thắng), Trung bình (So sổ trước khi duyệt), Khó (Đặt cọc ghi sổ) | Thanh đầu trang (`header`), hiện ở mọi trạm |
+| Màn 5 | "Đập {phanDien}" | Game 4 làn 3D (bảo vệ cuốn sổ, gõ chuột theo làn, chặn trùm bằng câu hỏi; P7 2D chưa làm) | 1 ván sinh chuột liên tục (0-120s) kèm các lượt trùm trắc nghiệm; sổ chịu tối đa 8 vết mực | Thẻ bắt đầu + Hộp "?" giữa ván (mọi lúc và cả lúc lượt trùm xuất hiện) |
+| Màn 6 | "Diều đưa sổ" | Game bay 2.5D | 4 cổng làng (sau khe 6, 12, 18, 24 của tổng 24 khe; mỗi cổng có câu hỏi trắc nghiệm 20s; 5 tim) | Thẻ bắt đầu + Hộp "?" giữa ván (mọi lúc bay và cả khi dừng ở cổng trả lời) |
+| Màn 7 | "Khuôn riêng, mẫu chung" (Bài 3) | Bài học 2D | 3 trạm: Dễ (Khuôn và mẫu), Trung bình (Soi dấu giả), Khó (Ký phân tán) | Thanh đầu trang (`header`), hiện ở mọi trạm |
+| Màn 8 | "Lật thẻ tìm cặp khóa" | Game lật thẻ 2D (Memory) | 3 vòng: Vòng 1 (4 cặp), Vòng 2 (6 cặp), Vòng 3 (8 cặp + tráo thẻ mỗi 20s) | Thẻ bắt đầu + Hộp "?" giữa ván (mọi vòng) |
+| Màn 9 | "Chữa đàn gà" | Game chạy 3 làn 2D | 3 đợt/vòng (trước mỗi đợt có nạp thuốc, đợt 3 có gà trùm cuối đường) | Thẻ bắt đầu + Hộp "?" giữa ván (cả giai đoạn nạp thuốc và lúc chạy đập gà trùm) |
+| Màn 10 | "Cây gộp sổ" (Bài 4) | Bài học 2D | 3 trạm: Dễ (Gộp cặp tính gốc Merkle), Trung bình (Tìm lá bị sửa lén), Khó (Bằng chứng Merkle đường dẫn) | Thanh đầu trang (`header`), hiện ở mọi trạm |
+| Màn 11 | "Ghép lá cây sổ" | Game ghép 3 (Match-3) 2D | 3 cây Merkle (Cây 1: 4 ô lá - 12 lượt; Cây 2: 8 ô lá - 15 lượt; Cây 3: 8 ô lá - 15 lượt) | Thẻ bắt đầu + Hộp "?" giữa ván (mọi cây Merkle) |
+| Màn 12 | "Leo cây tìm lá giả" | Game leo cây 2.5D | 4 vòng / 4 chặng leo (8/16/32/64 lá, depth 3/4/5/6) | Thẻ bắt đầu + Hộp "?" giữa ván (mọi chặng leo) |
 
 ### 3. Kết quả kiểm tra DOM (local Chrome headless)
 - **Bản Dev (`scripts/p3b-check.mjs --mode=dev --size=0,1,2`):** **324/324 kiểm đạt** (108 mỗi cỡ: 1366×768, 360×800, 844×390):
@@ -90,13 +90,13 @@ Chạy lại sau sửa: `p3b-check.mjs --mode=dev --only=levels,double,mid` **20
 - **Bản Phát hành (`scripts/p3b-check.mjs --mode=prod --size=0,1,2 --url=http://localhost:5190`):** **78/78 kiểm đạt** (26 mỗi cỡ):
   - Khách ở bản phát hành KHÔNG thấy nút ở bất kỳ màn nào trong 12 màn và 12 trạm bài học.
   - Cookie giả mạo mang cờ tự hoàn thành bị bỏ qua, màn 12 vẫn khóa theo đúng tiến độ thật.
-- **Kiểm tra bắt buộc:**
-  - `pnpm test --maxWorkers=2`: **2267 đạt, 5 bỏ qua**.
-  - `pnpm typecheck`: **10/10 gói đạt**.
-  - `pnpm check:text`: **437 file sạch**.
-  - `pnpm build`: **5 app build thành công**.
 
-### 4. Giới hạn chưa xác minh
+### 4. Bổ sung mức độ bao phủ kiểm tra các vòng game (`scripts/p-game-rounds-check.mjs`)
+Bộ kiểm thử tự động `node scripts/p-game-rounds-check.mjs` chạy 16 ca bao phủ toàn bộ 8 game (2 ca mỗi game: vòng đầu/trạng thái bình thường và vòng cuối/trạng thái overlay đặc biệt):
+- **Thao tác thật tại tọa độ:** Không chỉ dựa vào sự tồn tại của DOM hay `z-index`, script mô phỏng `touchscreen.tap` / `mouse.click` trực tiếp vào tọa độ trung tâm của nút `[data-testid="nut-goi-y"]`.
+- **Hộp "?" nổi phía trên lớp active:** Xác nhận hộp `[data-testid="hop-goi-y"]` mở đè lên các overlay câu hỏi giữa ván (`QuizOverlay` `z-30` ở Màn 2), câu hỏi cổng làng (Màn 6), trạng thái trùm (Màn 5), giữ sổ 45s (Màn 3), nạp đạn (Màn 9), vòng cuối tráo thẻ (Màn 8), cây 3 (Màn 11), depth 6 (Màn 12).
+- **Dừng ván ngay lập tức:** Bấm nút `[data-testid="nut-tu-hoan-thanh"]` bên trong hộp "?"; xác minh khung chơi và nút "?" bị gỡ hoàn toàn khỏi DOM, hiển thị khung `[data-testid="da-tu-hoan-thanh"]`.
+- **Kết quả:** **64/64 kiểm đạt** (4 tiêu chí × 16 ca; chi tiết tại `docs/screenshots/p3b/ket-qua-vong-game.json`).
+
+### 5. Giới hạn chưa xác minh
 - Tài khoản Supabase production thật và migration 0003 trên server thật (vẫn giữ nguyên trạng thái chưa nghiệm thu Supabase thật; không tự áp migration production).
-- Thiết bị di động thật (iOS/Safari, bàn phím số ảo, cảm ứng vuốt thật).
-

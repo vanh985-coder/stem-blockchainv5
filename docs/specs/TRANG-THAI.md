@@ -20,7 +20,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 |---|---|
 | 0–2 | ✅ Xong (mốc 2 chưa deploy) |
 | 3. Nhân rộng | ✅ **Chốt.** Đủ 12 màn, cả 4 làng dựng to, **đã gộp web** (≈2086 test xanh). Việc còn dở dời xuống **cuối mốc 4** |
-| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt (P3b chưa có Supabase thật); P5 đã chốt phần kiểm local** (bản build, GL phần mềm; thiết bị thật, phím "E:" với chuột khóa thật và quyền giáo viên bằng trình duyệt CHƯA kiểm, xem mục P5); **P6a đã duyệt và P6b (tích hợp 16 thẻ có ví dụ và câu hỏi) đã làm (30/10/2026), kiểm DOM bản build bằng khách thật đạt; Supabase thật và thiết bị thật CHƯA kiểm** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
+| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt (P3b chưa có Supabase thật); P5 đã chốt phần kiểm local; P6a đã duyệt và P6b (tích hợp 16 thẻ) đã xong; Hoàn thiện nút Tự hoàn thành cả màn ở mọi vòng/trạm và Bố cục đối chiếu trái–phải (Màn 4) ĐÃ XONG (30/10/2026)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
 
 **⚠️ 15b vẫn chưa làm:** server có thể đang 530, mốc 2 và toàn bộ mốc 3 (≈60 commit, mới nhất `2bd76bf`) chưa push, chưa chạy trên máy thật. Cách làm: khôi phục `cloudflared` + Docker, deploy theo `DEPLOY.md` (h), Cache Rule (i), thử trên điện thoại.
 
@@ -198,6 +198,40 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - **Kiểm:** `pnpm test --maxWorkers=2`: 2266 đạt, 5 bỏ qua; `pnpm typecheck`, `pnpm check:text`, `pnpm build` đạt. DOM bản build bằng **khách thật** (cookie, không Supabase, không API giả): đủ 16 thẻ trả lời và cất thật ở 1366×768 (chuột và bàn phím), 360×800 và 844×390 (chạm giả lập), gồm đúng và sai, đóng trước khi cất, Enter lặp, xem lại, tải lại (bản đồ nhỏ còn đúng ký hiệu thẻ chưa nhặt), `/ban-do`, tiến độ cũ, Chữ to và Giảm chuyển động ở màn thấp; tự hoàn thành trên bản dev. Báo cáo và ảnh (dưới 300 KB) ở `docs/screenshots/p6b/` (`BAO-CAO.md`, `scripts/p6b-check.mjs`). Bundle hub JS +28.204 byte (+1,0%, bản có `VITE_PROBE`).
 - **Chưa xác minh:** Supabase thật và tài khoản đăng nhập; điện thoại và máy tính bảng thật (bàn phím số ảo, Safari/iPhone, trình đọc màn hình); khóa chuột thật (dòng nhắc "E:" ở máy tính); quyền giáo viên bằng trình duyệt. Không chạy lại bộ đo 3D GL phần mềm (không đổi hình học hay vật liệu).
 - **Chưa làm (theo lời giao):** P7, P8 (hướng dẫn focus và làm thử; mục P8 giữ nguyên), sửa nút "?" màn 3, HUD che biển.
+
+## Hoàn thiện nút "Tự hoàn thành cả màn" và kiểm tra bao phủ các vòng game — ĐÃ XONG (30/10/2026)
+
+- **Làm gì:** Hoàn thiện khả năng truy cập nút "Tự hoàn thành cả màn" ở mọi trạm của 4 bài học (Màn 1, 4, 7, 10; nút ở thanh đầu trang `header`) và mọi vòng của 8 game (Màn 2, 3, 5, 6, 8, 9, 11, 12; nút ở thẻ bắt đầu và trong hộp "?" lúc đang chơi).
+- **Phạm vi hiển thị rõ ràng:** Đổi nhãn nút thành `"Tự hoàn thành cả màn"` (`content/autoComplete.ts`), ghi rõ phạm vi: tự hoàn thành toàn bộ màn này, mở màn kế tiếp theo luật, không nhận sao, xu hay Trang Sổ Vàng.
+- **Hộp "?" mở được ở mọi vòng:** Nút "?" được nâng lên lớp `z-[35]` trong `MiniGameLevel.tsx` để luôn nổi trên các overlay giữa ván (như câu hỏi trắc nghiệm `z-30` của Màn 2), hộp "?" mở rộng `max-w-lg` và `sm:flex-wrap` tránh tràn nút ở màn ngang (844×390).
+- **Chặn bấm lặp và dừng ván:** Bổ sung cờ `busy` chặn ngay mili-giây đầu tiên khi bấm; khi tự hoàn thành giữa ván, khung chơi game được gỡ khỏi DOM lập tức, vòng lặp game loop, đồng hồ và mô phỏng dừng ngay, không gọi `onFinish` hay chấm điểm.
+- **Bảng 12 màn chuẩn xác theo Content/Config:**
+  - Màn 1: "Trang nối trang" (Bài 1) | Bài học 2D | 3 trạm: Dễ (Nối trang), Trung bình (Sửa lén), Khó (Đổi thứ tự).
+  - Màn 2: "Đuổi theo {phanDien}" | Game chạy 3D (Runner 3D) | 4 vòng (25s/vòng, giữa các vòng có QuizOverlay z-30).
+  - Màn 3: "Ghép lại cuốn sổ" | Game ghép trang 2D | 2 vòng: Vòng 1 (ghép 5 trang), Vòng 2 (ghép 7 trang + giữ sổ 45s).
+  - Màn 4: "Cả làng cùng giữ sổ" (Bài 2) | Bài học 2D | 3 trạm: Dễ (Đa số thắng), Trung bình (So sổ trước khi duyệt), Khó (Đặt cọc ghi sổ).
+  - Màn 5: "Đập {phanDien}" | Game 4 làn 3D (bảo vệ cuốn sổ, gõ chuột theo làn, chặn trùm bằng câu hỏi; P7 2D chưa làm) | 1 ván sinh chuột liên tục (0-120s) kèm các lượt trùm.
+  - Màn 6: "Diều đưa sổ" | Game bay 2.5D | 4 cổng làng (sau khe 6, 12, 18, 24 của tổng 24 khe; mỗi cổng có câu hỏi trắc nghiệm 20s; 5 tim).
+  - Màn 7: "Khuôn riêng, mẫu chung" (Bài 3) | Bài học 2D | 3 trạm: Dễ (Khuôn và mẫu), Trung bình (Soi dấu giả), Khó (Ký phân tán).
+  - Màn 8: "Lật thẻ tìm cặp khóa" | Game lật thẻ 2D (Memory) | 3 vòng: Vòng 1 (4 cặp), Vòng 2 (6 cặp), Vòng 3 (8 cặp + tráo thẻ).
+  - Màn 9: "Chữa đàn gà" | Game chạy 3 làn 2D | 3 đợt/vòng (trước mỗi đợt có nạp thuốc, đợt 3 có gà trùm cuối đường).
+  - Màn 10: "Cây gộp sổ" (Bài 4) | Bài học 2D | 3 trạm: Dễ (Gộp cặp tính gốc Merkle), Trung bình (Tìm lá bị sửa lén), Khó (Bằng chứng Merkle đường dẫn).
+  - Màn 11: "Ghép lá cây sổ" | Game ghép 3 (Match-3) 2D | 3 cây Merkle (Cây 1: 4 ô lá - 12 lượt; Cây 2: 8 ô lá - 15 lượt; Cây 3: 8 ô lá - 15 lượt).
+  - Màn 12: "Leo cây tìm lá giả" | Game leo cây 2.5D | 4 vòng / 4 chặng leo (8/16/32/64 lá, depth 3/4/5/6).
+- **Kiểm tra bao phủ các vòng game (`scripts/p-game-rounds-check.mjs`):** **64/64 đạt** trên 16 ca (2 ca/game cho cả 8 game: vòng đầu và vòng cuối/overlay đặc biệt). Thao tác thật tại tọa độ nút "?", mở hộp "?" đè lên lớp active, bấm nút tự hoàn thành và dừng ván lập tức.
+- **Bản Dev và Prod:** `scripts/p3b-check.mjs` đạt 324/324 (dev, 3 cỡ) và 78/78 (prod, 3 cỡ).
+
+## Bố cục đối chiếu trái–phải (Màn 4 — Bài 2 Làng Dệt) — ĐÃ XONG (30/10/2026)
+
+- **Làm gì:** Chuyển đổi giao diện đối chiếu tại Trạm Dễ (`Easy.tsx`) và Trạm Trung bình (`Medium.tsx`) của Bài 2 (Màn 4):
+  - Màn hình rộng (≥ 768px): bên trái là Sổ của em (dữ liệu đối chiếu), bên phải là Trang/Sổ đề xuất của người gửi, hướng dẫn kiểm tra, máy tính mã trang `PageCodeCalculator`, 2 nút biểu quyết Đồng ý / Từ chối.
+  - Thanh vòng/tim đặt trải rộng phía trên cả hai cột.
+  - Tận dụng chiều ngang màn hình, giảm cuộn dọc, không co nhỏ giao diện ép vừa.
+  - Màn hình hẹp / di động dọc (< 768px): tự động xếp 1 cột, không tràn ngang, chữ to rõ ràng.
+  - Trạm Khó: giữ nguyên cấu trúc đặt cọc và biểu quyết 4 người chơi (không ép sang 2 cột).
+  - Giữ nguyên công thức, luật, đề, điểm, tiến độ và máy tính mã trang.
+- **Kiểm tra DOM tự động (`scripts/p-layout-check.mjs`):** **42/42 đạt** trên 3 kích thước: 1366×768 (chuột, 2 cột), 360×800 (chạm dọc, 1 cột), 844×390 (chạm ngang, 2 cột). Nhập số máy tính, tính toán chính xác, bấm biểu quyết mở `FeedbackSheet` giải thích và đóng tiếp tục bình thường.
+- **Minh chứng ảnh:** 12 ảnh chụp màn hình toàn diện tại `docs/screenshots/doi-chieu/` (dung lượng 26 KB – 85 KB, < 300 KB).
 
 ## P6a — nội dung thẻ "Em có biết?" tương tác — ĐÃ RÀ (30/10/2026), CÒN CHỜ CHỦ DỰ ÁN DUYỆT
 

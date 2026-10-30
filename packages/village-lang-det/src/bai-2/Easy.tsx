@@ -99,8 +99,8 @@ export function Easy({ onComplete, onFail }: { onComplete: (r: StationResult) =>
   const visiblePages = myLedger.slice(-2);
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
-      {/* Vòng chơi và tim */}
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
+      {/* Vòng chơi và tim - luôn ở trên cùng trải rộng */}
       <div className="flex items-center justify-between gap-2 rounded-bang border-2 border-nau-go/50 bg-white/60 p-3">
         <div className="flex min-w-0 flex-wrap items-center gap-x-2">
           <span className="rounded-nut bg-muc-tim/15 px-3 py-1 font-display text-base font-extrabold text-muc-tim-dam">
@@ -111,58 +111,62 @@ export function Easy({ onComplete, onFail }: { onComplete: (r: StationResult) =>
         <Hearts current={hearts} max={3} />
       </div>
 
-      {/* "Sổ của em": 2 trang cuối, làm nổi mã trang cuối X */}
-      <div className="rounded-bang border-2 border-nau-go/50 bg-white/60 p-3 sm:p-4">
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="flex items-center gap-2 text-lg">
-            <span aria-hidden="true">📖</span> {T.chung.soCuaEm}
-          </h2>
-          <div className="inline-flex items-center gap-1.5 rounded-nut border-2 border-muc-tim/40 bg-muc-tim/10 px-3 py-1 text-sm font-bold text-muc-tim-dam">
-            <span>{T.de.maCuoiX}</span>
-            <span className="font-display text-base font-extrabold underline">{formatNumber(lastCodeX)}</span>
+      {/* Bố cục đối chiếu 2 cột trên màn hình rộng: trái là sổ của em, phải là trang đề xuất + hướng dẫn + máy tính + nút */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+        {/* Cột trái: "Sổ của em" (2 trang cuối, làm nổi mã trang cuối X) */}
+        <div className="rounded-bang border-2 border-nau-go/50 bg-white/60 p-3 sm:p-4 flex flex-col gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b-2 border-nau-go/30 pb-2">
+            <h2 className="flex items-center gap-2 text-lg font-bold">
+              <span aria-hidden="true">📖</span> {T.chung.soCuaEm}
+            </h2>
+            <div className="inline-flex items-center gap-1.5 rounded-nut border-2 border-muc-tim/40 bg-muc-tim/10 px-3 py-1 text-sm font-bold text-muc-tim-dam">
+              <span>{T.de.maCuoiX}</span>
+              <span className="font-display text-base font-extrabold underline">{formatNumber(lastCodeX)}</span>
+            </div>
           </div>
-        </div>
-        <div ref={ledgerRef} className="overflow-x-auto py-2">
-          <div className="mx-auto flex w-max items-center gap-2">
-            {visiblePages.map((page, idx) => {
-              const pageNum = myLedger.length - visiblePages.length + idx + 1;
-              const isLast = idx === visiblePages.length - 1;
-              return (
-                <Fragment key={pageNum}>
-                  {idx > 0 && <MatXich size="sm" status="valid" />}
-                  <div className={isLast ? 'rounded-2xl ring-2 ring-muc-tim' : ''}>
-                    <TrangSo size="xs" pageNumber={pageNum} prevCode={page.prevCode} content={page.content} pageCode={page.code} isConfirmed />
-                  </div>
-                </Fragment>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Trang mới do người trong làng gửi */}
-      <div className="rounded-bang border-2 border-muc-tim/40 bg-white/70 p-3 sm:p-4">
-        <div className="mb-3 flex items-center gap-3 border-b-2 border-nau-go/30 pb-3">
-          <Chan id={currentRound.sender} size={56} />
-          <div className="min-w-0">
-            <div className="text-sm text-nau-go-dam">{T.de.nguoiGui}</div>
-            <div className="font-display text-base font-extrabold">
-              {tenNhan(currentRound.sender)} {T.de.guiTrang}
+          <p className="text-sm text-nau-go-dam">{T.de.phu}</p>
+          <div ref={ledgerRef} className="overflow-x-auto py-2">
+            <div className="mx-auto flex w-max items-center justify-center gap-2">
+              {visiblePages.map((page, idx) => {
+                const pageNum = myLedger.length - visiblePages.length + idx + 1;
+                const isLast = idx === visiblePages.length - 1;
+                return (
+                  <Fragment key={pageNum}>
+                    {idx > 0 && <MatXich size="sm" status="valid" />}
+                    <div className={isLast ? 'rounded-2xl ring-2 ring-muc-tim' : ''}>
+                      <TrangSo size="xs" pageNumber={pageNum} prevCode={page.prevCode} content={page.content} pageCode={page.code} isConfirmed />
+                    </div>
+                  </Fragment>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
-          <TrangSo
-            size="sm"
-            pageNumber={myLedger.length + 1}
-            prevCode={currentProposal.prevCode}
-            content={currentProposal.content}
-            pageCode={currentProposal.code}
-            isConfirmed={false}
-          />
-          <div className="flex w-full max-w-sm flex-col gap-3">
-            <div className="rounded-2xl border-2 border-nau-go/40 bg-giay p-3 text-base leading-relaxed">
+        {/* Cột phải: Trang mới do người trong làng gửi */}
+        <div className="rounded-bang border-2 border-muc-tim/40 bg-white/70 p-3 sm:p-4 flex flex-col gap-4">
+          <div className="flex items-center gap-3 border-b-2 border-nau-go/30 pb-3">
+            <Chan id={currentRound.sender} size={48} />
+            <div className="min-w-0">
+              <div className="text-sm text-nau-go-dam">{T.de.nguoiGui}</div>
+              <div className="font-display text-base font-extrabold">
+                {tenNhan(currentRound.sender)} {T.de.guiTrang}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:items-start sm:gap-4">
+            <div className="shrink-0">
+              <TrangSo
+                size="xs"
+                pageNumber={myLedger.length + 1}
+                prevCode={currentProposal.prevCode}
+                content={currentProposal.content}
+                pageCode={currentProposal.code}
+                isConfirmed={false}
+              />
+            </div>
+            <div className="w-full space-y-2 rounded-2xl border-2 border-nau-go/40 bg-giay p-3 text-sm sm:text-base leading-relaxed">
               <div className="mb-1 font-bold text-muc-tim-dam">
                 <span aria-hidden="true">🔍 </span>
                 {T.de.cachKiemTra}
@@ -171,17 +175,19 @@ export function Easy({ onComplete, onFail }: { onComplete: (r: StationResult) =>
               <div className="mt-1">{fmt(T.de.buoc2, { x: lastCodeX, nd: currentRound.content })}</div>
               <div className="mt-1">{fmt(T.de.buoc3, { ma: currentRound.code })}</div>
             </div>
-            <PageCodeCalculator />
-            <div className="grid grid-cols-2 gap-3 pt-1">
-              <Button size="md" className="px-3! whitespace-nowrap" onClick={() => handleDecision(true)} disabled={feedback.isOpen}>
-                <span aria-hidden="true">✓ </span>
-                {T.chung.dongY}
-              </Button>
-              <Button variant="danger" size="md" className="px-3! whitespace-nowrap" onClick={() => handleDecision(false)} disabled={feedback.isOpen}>
-                <span aria-hidden="true">✗ </span>
-                {T.chung.tuChoi}
-              </Button>
-            </div>
+          </div>
+
+          <PageCodeCalculator />
+
+          <div className="grid grid-cols-2 gap-3 pt-1">
+            <Button size="md" className="px-3! whitespace-nowrap" onClick={() => handleDecision(true)} disabled={feedback.isOpen}>
+              <span aria-hidden="true">✓ </span>
+              {T.chung.dongY}
+            </Button>
+            <Button variant="danger" size="md" className="px-3! whitespace-nowrap" onClick={() => handleDecision(false)} disabled={feedback.isOpen}>
+              <span aria-hidden="true">✗ </span>
+              {T.chung.tuChoi}
+            </Button>
           </div>
         </div>
       </div>

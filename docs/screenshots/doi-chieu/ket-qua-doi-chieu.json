@@ -1,0 +1,254 @@
+[
+  {
+    "tag": "Easy 1366x768",
+    "name": "Thanh vòng/tim nằm trên cùng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 1366x768",
+    "name": "Có bố cục đối chiếu 2 cột khi rộng (grid-cols-1 md:grid-cols-2)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 1366x768",
+    "name": "Máy tính PageCodeCalculator hiển thị",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 1366x768",
+    "name": "Đủ 2 nút biểu quyết (Đồng ý / Từ chối)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 1366x768",
+    "name": "Máy tính tính đúng công thức (10 × 2 + 24) mod 100 = 44",
+    "ok": true,
+    "detail": "(10 × 2 + 24) mod 100 = 44"
+  },
+  {
+    "tag": "Easy 1366x768",
+    "name": "Bấm biểu quyết mở FeedbackSheet giải thích",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 1366x768",
+    "name": "Đóng FeedbackSheet tiếp tục vòng chơi bình thường",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 1366x768",
+    "name": "Thanh vòng/tim nằm trên cùng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 1366x768",
+    "name": "Có bố cục đối chiếu 2 cột khi rộng (grid-cols-1 md:grid-cols-2)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 1366x768",
+    "name": "Máy tính PageCodeCalculator hiển thị",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 1366x768",
+    "name": "Đủ 2 nút biểu quyết (Đồng ý / Từ chối)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 1366x768",
+    "name": "Máy tính tính đúng công thức (15 × 2 + 30) mod 100 = 60",
+    "ok": true,
+    "detail": "(15 × 2 + 30) mod 100 = 60"
+  },
+  {
+    "tag": "Medium 1366x768",
+    "name": "Bấm biểu quyết mở FeedbackSheet giải thích",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 1366x768",
+    "name": "Đóng FeedbackSheet tiếp tục vòng chơi bình thường",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 360x800",
+    "name": "Thanh vòng/tim nằm trên cùng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 360x800",
+    "name": "Có bố cục đối chiếu 2 cột khi rộng (grid-cols-1 md:grid-cols-2)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 360x800",
+    "name": "Máy tính PageCodeCalculator hiển thị",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 360x800",
+    "name": "Đủ 2 nút biểu quyết (Đồng ý / Từ chối)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 360x800",
+    "name": "Máy tính tính đúng công thức (10 × 2 + 24) mod 100 = 44",
+    "ok": true,
+    "detail": "(10 × 2 + 24) mod 100 = 44"
+  },
+  {
+    "tag": "Easy 360x800",
+    "name": "Bấm biểu quyết mở FeedbackSheet giải thích",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 360x800",
+    "name": "Đóng FeedbackSheet tiếp tục vòng chơi bình thường",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 360x800",
+    "name": "Thanh vòng/tim nằm trên cùng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 360x800",
+    "name": "Có bố cục đối chiếu 2 cột khi rộng (grid-cols-1 md:grid-cols-2)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 360x800",
+    "name": "Máy tính PageCodeCalculator hiển thị",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 360x800",
+    "name": "Đủ 2 nút biểu quyết (Đồng ý / Từ chối)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 360x800",
+    "name": "Máy tính tính đúng công thức (15 × 2 + 30) mod 100 = 60",
+    "ok": true,
+    "detail": "(15 × 2 + 30) mod 100 = 60"
+  },
+  {
+    "tag": "Medium 360x800",
+    "name": "Bấm biểu quyết mở FeedbackSheet giải thích",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 360x800",
+    "name": "Đóng FeedbackSheet tiếp tục vòng chơi bình thường",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 844x390",
+    "name": "Thanh vòng/tim nằm trên cùng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 844x390",
+    "name": "Có bố cục đối chiếu 2 cột khi rộng (grid-cols-1 md:grid-cols-2)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 844x390",
+    "name": "Máy tính PageCodeCalculator hiển thị",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 844x390",
+    "name": "Đủ 2 nút biểu quyết (Đồng ý / Từ chối)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 844x390",
+    "name": "Máy tính tính đúng công thức (10 × 2 + 24) mod 100 = 44",
+    "ok": true,
+    "detail": "(10 × 2 + 24) mod 100 = 44"
+  },
+  {
+    "tag": "Easy 844x390",
+    "name": "Bấm biểu quyết mở FeedbackSheet giải thích",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Easy 844x390",
+    "name": "Đóng FeedbackSheet tiếp tục vòng chơi bình thường",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 844x390",
+    "name": "Thanh vòng/tim nằm trên cùng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 844x390",
+    "name": "Có bố cục đối chiếu 2 cột khi rộng (grid-cols-1 md:grid-cols-2)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 844x390",
+    "name": "Máy tính PageCodeCalculator hiển thị",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 844x390",
+    "name": "Đủ 2 nút biểu quyết (Đồng ý / Từ chối)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 844x390",
+    "name": "Máy tính tính đúng công thức (15 × 2 + 30) mod 100 = 60",
+    "ok": true,
+    "detail": "(15 × 2 + 30) mod 100 = 60"
+  },
+  {
+    "tag": "Medium 844x390",
+    "name": "Bấm biểu quyết mở FeedbackSheet giải thích",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "tag": "Medium 844x390",
+    "name": "Đóng FeedbackSheet tiếp tục vòng chơi bình thường",
+    "ok": true,
+    "detail": ""
+  }
+]
