@@ -352,12 +352,14 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   - Dựng cấu trúc từng lớp độc lập: Nền phô mai vàng `background-pc`, hai cột gỗ sồi đinh tán `wood-border` (cột phải lật gương `scale-x-[-1]`), 4 làn hoa văn sao (`lane-blue`, `lane-yellow`, `lane-red`, `lane-green`), Hero cầm búa (`hero-idle` / `hero-hit` chung điểm neo căn đáy, vung búa 180ms), cuốn Sổ Chung `book` với 8 chấm mực dàn đều trên 2 trang sách mở (`px-10` đến `px-24`), 4 nút đập chân làn D F J K màu ăn khớp làn (cao 46–56px).
   - 5 Sprite Chuột hoạt hình 2D sinh động: Chuột thường, chuột nhanh (⚡), chuột đổi làn (⇄), chuột to (2 vạch máu), chuột câu hỏi (biểu tượng ❓ vàng lớn nhấp nháy).
   - Bảo toàn toàn vẹn cơ chế P7b: Vùng đập [6.5, 9.0], cooldown 140ms, tạm dừng 100% thời gian khi mở câu hỏi/?, chống click ma ở capture phase, chống Enter lặp, tự hoàn thành không trao thưởng gian lận.
+  - Hoàn thiện chế độ Giảm chuyển động (`reducedMotion`): tắt animation bounce của dấu hỏi ❓, tắt pulse tia chớp và vùng đập. Xác minh container fixed không che nút "?", hộp thoại tự hoàn thành hay màn kết quả. Bản chạy riêng Làng Dệt nạp ảnh đầy đủ 200 OK.
+  - **Nghiệm thu:** Chủ dự án đã xem và duyệt đồ họa Màn 5 trên bản chạy thực tế (30/10/2026).
 - **Kiểm tra đã đạt:**
   - `pnpm check:text`: sạch (437 files).
   - `pnpm typecheck`: 10 package biên dịch thành công 100%.
   - `pnpm test --maxWorkers=2`: 206 test files passed, 2282 tests passed, 5 skipped.
   - `pnpm build`: Đạt toàn bộ 5 ứng dụng. Chunk `Man5` là **26.49 kB** (gzip **8.76 kB**).
-  - Đo lường và kiểm tra Puppeteer `scripts/p7c-check.mjs`: Lưu 21 ảnh chụp màn hình minh chứng tại `docs/screenshots/p7c/BAO-CAO-P7C.md`.
+  - Đo lường và kiểm tra Puppeteer `scripts/p7c-check.mjs` và `scripts/p7c-user-preview.mjs`: Lưu ảnh chụp minh chứng tại `docs/screenshots/p7c/BAO-CAO-P7C.md` và `docs/screenshots/p7c/man5-preview-*.png`.
 
 ## Việc để sau / cần theo dõi
 

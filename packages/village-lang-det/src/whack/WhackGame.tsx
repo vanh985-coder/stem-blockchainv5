@@ -485,6 +485,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
         state.boss = { index, lane, pos, t: 1.0, answerSeconds: 15 };
         bump();
       },
+      __whackBump: () => bump(),
     });
   }
 
@@ -628,7 +629,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
                   <div
                     className={`pointer-events-none absolute left-0 right-0 z-10 transition-all ${
                       hasMouseInZone || (isBossInLane && state.boss && state.boss.pos >= WHACK_SPEC.zoneStart)
-                        ? 'bg-white/25 ring-2 ring-yellow-300/80 animate-pulse'
+                        ? `bg-white/25 ring-2 ring-yellow-300/80 ${reduced ? '' : 'animate-pulse'}`
                         : 'bg-white/10'
                     }`}
                     style={{
@@ -656,7 +657,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
                           key={m.id}
                           className={`absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform ${
                             inZ ? 'scale-105' : 'scale-95'
-                          } ${m.flash ? 'brightness-150 animate-bounce' : ''}`}
+                          } ${m.flash ? `brightness-150 ${reduced ? '' : 'animate-bounce'}` : ''}`}
                           style={{
                             top: `${(m.pos / WHACK_SPEC.laneLength) * 100}%`,
                             width: m.kind === 'to' ? '92%' : '82%',
@@ -686,7 +687,11 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
 
                             {/* Chỉ báo đặc biệt: Chuột nhanh có tia chớp ⚡ */}
                             {m.kind === 'nhanh' && (
-                              <span className="absolute -top-1 -right-1 text-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] animate-pulse">
+                              <span
+                                className={`absolute -top-1 -right-1 text-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] ${
+                                  reduced ? '' : 'animate-pulse'
+                                }`}
+                              >
                                 ⚡
                               </span>
                             )}
@@ -739,8 +744,12 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
                           fallback={<span className="text-3xl">👑</span>}
                         />
 
-                        {/* Dấu hỏi vàng lớn nhấp nháy trên đầu */}
-                        <span className="absolute -top-2 -right-1 text-2xl font-black text-yellow-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] animate-bounce">
+                        {/* Dấu hỏi vàng lớn trên đầu (tắt nhấp nháy khi giảm chuyển động) */}
+                        <span
+                          className={`absolute -top-2 -right-1 text-2xl font-black text-yellow-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] ${
+                            reduced ? '' : 'animate-bounce'
+                          }`}
+                        >
                           ❓
                         </span>
 
@@ -783,7 +792,9 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
                     .map((eff) => (
                       <div
                         key={eff.id}
-                        className="pointer-events-none absolute left-1/2 z-30 -translate-x-1/2 font-black text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] animate-out fade-out slide-out-to-top duration-700"
+                        className={`pointer-events-none absolute left-1/2 z-30 -translate-x-1/2 font-black text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] ${
+                          reduced ? 'animate-out fade-out duration-500' : 'animate-out fade-out slide-out-to-top duration-700'
+                        }`}
                         style={{
                           top: `${(eff.pos / WHACK_SPEC.laneLength) * 100}%`,
                           color: eff.kind === 'score' ? '#fde047' : eff.kind === 'coin' ? '#4ade80' : '#f87171',

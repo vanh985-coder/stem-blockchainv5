@@ -112,7 +112,9 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
    - 5 Sprite Chuột hoạt hình 2D sinh động: Chuột thường, chuột nhanh (⚡), chuột đổi làn (⇄), chuột to (2 vạch máu), chuột câu hỏi (biểu tượng ❓ vàng lớn nhấp nháy).
    - Bảo toàn toàn vẹn cơ chế P7b: Vùng đập [6.5, 9.0], cooldown 140ms, tạm dừng 100% thời gian khi mở câu hỏi/?, chống click ma ở capture phase, chống Enter lặp, tự hoàn thành không trao thưởng gian lận.
    - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 437 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2282 tests pass, `pnpm build` đạt (toàn bộ 5 apps build thành công; chunk `Man5` 26.49 kB).
-   - Đo lường và kiểm tra Puppeteer `scripts/p7c-check.mjs`: Lưu 21 ảnh chụp màn hình minh chứng tại `docs/screenshots/p7c/BAO-CAO-P7C.md`.
+   - Đo lường và kiểm tra Puppeteer `scripts/p7c-check.mjs` và `scripts/p7c-user-preview.mjs`: Lưu ảnh chụp màn hình minh chứng tại `docs/screenshots/p7c/BAO-CAO-P7C.md` và `docs/screenshots/p7c/man5-preview-*.png`.
+   - Đã xử lý hoàn thiện chế độ Giảm chuyển động (`reducedMotion`: tắt bounce ❓, pulse ⚡ và vùng đập), xác minh container fixed không che các lớp phủ modal/result, và bản chạy riêng Làng Dệt (5175) tải ảnh WebP đầy đủ.
+   - **Nghiệm thu:** Chủ dự án đã xem và duyệt đồ họa Màn 5 (30/10/2026). Sẵn sàng bắt đầu P8a.
 
 ## 6. Việc để sau (không làm trước khi chủ dự án giao)
 
