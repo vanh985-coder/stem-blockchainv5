@@ -81,10 +81,18 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
    - Chạy 4 lệnh bắt buộc: `pnpm test --maxWorkers=2` (2267 pass, 5 skipped), `pnpm typecheck` (10 app/pkg pass), `pnpm check:text` (437 files clean), `pnpm build` (toàn bộ apps build thành công).
    - Kiểm tra hồi quy Puppeteer `scripts/p6b-regression-check.mjs` đạt 14/14 tests.
    - Merge vào nhánh `main` theo sự cho phép của chủ dự án.
+6. **P7a — hoàn thành bản chơi được Màn 5 "Đập {phanDien}" bằng 2D (30/10/2026):**
+   - Xây dựng 4 làn dọc 2D lấy cảm hứng Talking Tom, phong cách dải lụa truyền thống Làng Dệt.
+   - Phân biệt 2 loại chuột: Chuột thường (4 biến thể: thường, đổi làn, nhanh, to) và Chuột câu hỏi mang biểu tượng **DẤU HỎI VÀNG LỚN ❓**, hào quang sáng rực, nhãn accessibility nổi bật.
+   - Vùng đập [6.5, 9.0] có viền sáng, 4 nút đập chân làn D F J K (chiều cao ≥ 48px), bàn Sổ Chung ở đáy với 8 chấm tròn vết mực. Chuột lọt +1 mực, chuột câu hỏi đúng xoá 2 mực.
+   - Cơ chế tạm dừng: dừng mọi chuyển động và đồng hồ khi mở câu hỏi hoặc mở hộp "?". Chống click ma (`pointerDownInside`, `stopPropagation`), đập chuột không bị kích hoạt đúp khi chạm giữ.
+   - Giữ nguyên nút Tự hoàn thành (ẩn với khách release, hiện và hoạt động trên bản dev/teacher, dừng ván và không cộng điểm/sao/xu/sổ vàng).
+   - 4 lệnh kiểm tra bắt buộc đều đạt: `check:text` sạch 437 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2275 tests pass (bổ sung test mới `whack2d.test.ts` đạt 8/8 tests), `pnpm build` đạt (chunk Màn 5 giảm từ 91 kB Three.js xuống **20.75 kB**).
+   - Kiểm tra Puppeteer trên 1366×768, 360×800, 844×390 đạt đầy đủ, 27 ảnh chụp minh chứng lưu tại `docs/screenshots/p7a/BAO-CAO-P7A.md`.
 
 ## 6. Việc để sau (không làm trước khi chủ dự án giao)
 
-- **P7:** làm lại màn 5 (Làng Dệt) thành game đập chuột 2D kiểu Whack-a-Mole; cần ảnh mẫu của chủ dự án. Chi tiết ở bảng ưu tiên của `TRANG-THAI.md`.
+- **P7b:** trau chuốt đồ họa và cân bằng nhịp sinh chuột màn 5 sau khi chủ dự án duyệt bản chơi được P7a.
 - **P8:** hướng dẫn focus và làm thử cho **cả 12 màn** (đã duyệt, chưa triển khai, làm thành bước riêng sau khi chốt lối chơi màn 2, 3, 5). Mục P8 của `TRANG-THAI.md` phải được giữ nguyên.
 - **Việc dời từ mốc 3 và hội làng làm CUỐI mốc 4**, theo thứ tự ở mục "Việc dời từ mốc 3" của `TRANG-THAI.md`: deploy bản gộp (15b), kiểm tra toàn bộ (G2), thử với 5–10 học sinh, hội làng (`FESTIVAL_LAUNCHED` hiện `false`).
 - Chưa làm theo lời giao trước đó: sửa nút "?" ở màn 3, HUD che tên biển trong một số góc nhìn (ví dụ dòng nhiệm vụ che biển trái ở Làng Bạc), vòng tích che số cây đa đã được thu nhỏ ở P5.

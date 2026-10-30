@@ -255,6 +255,20 @@ export const whackUi = {
   phanDong: 'Tiền đồng nhặt được',
   phanTrum: 'Lượt trùm trả lời đúng',
   phanMuc: 'Vết mực trên sổ',
+  /** Nhãn giao diện 2D */
+  chuotCauHoi: 'Chuột câu hỏi',
+  chuotThuong: 'Chuột thường',
+  chuotDoiLan: 'Chuột đổi làn',
+  chuotNhanh: 'Chuột nhanh',
+  chuotTo: 'Chuột to',
+  nhanThuong: 'Giấy',
+  nhanDoiLan: 'Đổi',
+  nhanNhanh: 'Nhanh',
+  nhanTo: 'To',
+  tenSo: 'Sổ Chung Làng Dệt',
+  lanNhan: 'Làn {so}',
+  nutDap: 'Đập làn {so}',
+  nhacVungDap: 'Vùng đập',
 } as const;
 
 /** Chữ trong màn 6 "Diều đưa sổ" (spec 06 mục Màn 6). Mọi câu đi qua fmt() ({phanDien}, {so}…). */

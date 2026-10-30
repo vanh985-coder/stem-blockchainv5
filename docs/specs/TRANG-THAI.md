@@ -34,7 +34,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | P4 | **P4a ĐÃ XONG (29/10/2026, mục "P4a" bên dưới): (7) Màn 2 nhanh hơn: +20% tốc độ mọi vòng (12 / 0,36 / 21,6), mốc đặt lại 216 / 499 / 638 theo phân vị bot.** **P4b ĐÃ XONG (29/10/2026, mục "P4b" bên dưới): (8b) Màn 3 bỏ vòng 3, còn 2 vòng (đoạn giữ sổ 45 giây ở cuối vòng 2), mốc 290 / 320 / 330.** (Yêu cầu gốc: vòng "giữ sổ" (Tí tráo trang) đang ở vòng 3 → mặc định chuyển cơ chế tráo trang vào cuối vòng 2 để không mất bài học phát hiện sửa lén; đặt lại mốc) | 1 |
 | P5 | **ĐÃ XONG (29/10/2026, mục "P5" bên dưới):** (1) Biển chọn màn trong làng làm thành cột sáng giống cuộn "Em có biết?" (mỗi màn một cột, dáng và chữ theo trạng thái, giữ chữ tên màn) | 1 |
 | P6 | (3) Sau khi đọc thẻ "Em có biết?": 1 ví dụ ngắn + 1 câu hỏi ABCD (hoặc điền số). Mặc định: trả lời sai vẫn nhận thẻ, hiện giải thích. **P6a (nội dung 16 câu) đã duyệt; P6b (tích hợp) ĐÃ XONG (30/10/2026, mục "P6b" bên dưới)** | 1–2 |
-| P7 | (11) Làm lại màn 5 thành game đập chuột 2D kiểu Whack-a-Mole (My Talking Tom): lưới hang, chuột thường và chuột câu hỏi (đập trúng thì hiện câu hỏi). Cần ảnh mẫu của chủ dự án. Logic + bot + cảnh + hướng dẫn mới | 3–4 |
+| P7 | **P7a ĐÃ XONG (30/10/2026, mục "P7a" bên dưới):** Bản chơi được Màn 5 "Đập {phanDien}" bằng 2D 4 làn dọc (Talking Tom), 2 loại chuột (thường và câu hỏi ❓), chống click ma, dừng khi mở câu hỏi/?, tự hoàn thành. **P7b:** trau chuốt đồ họa và cân bằng nhịp sinh. | 3–4 |
 | P8 | **Hướng dẫn focus và làm thử cho cả 12 màn** (yêu cầu đã được chủ dự án duyệt, CHƯA triển khai, xem mục ngay dưới). Làm thành bước riêng SAU KHI chốt thay đổi lối chơi màn 2, 3, 5 (P4, P7) | 2–3 |
 
 Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mốc 3 và hội làng.
@@ -210,7 +210,7 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   - Màn 2: "Đuổi theo {phanDien}" | Game chạy 3D (Runner 3D) | 4 vòng (25s/vòng, giữa các vòng có QuizOverlay z-30).
   - Màn 3: "Ghép lại cuốn sổ" | Game ghép trang 2D | 2 vòng: Vòng 1 (ghép 5 trang), Vòng 2 (ghép 7 trang + giữ sổ 45s).
   - Màn 4: "Cả làng cùng giữ sổ" (Bài 2) | Bài học 2D | 3 trạm: Dễ (Đa số thắng), Trung bình (So sổ trước khi duyệt), Khó (Đặt cọc ghi sổ).
-  - Màn 5: "Đập {phanDien}" | Game 4 làn 3D (bảo vệ cuốn sổ, gõ chuột theo làn, chặn trùm bằng câu hỏi; P7 2D chưa làm) | 1 ván sinh chuột liên tục (0-120s) kèm các lượt trùm.
+  - Màn 5: "Đập {phanDien}" | Game 4 làn dọc 2D phong cách Làng Dệt (bảo vệ cuốn sổ, gõ chuột theo làn, chặn trùm chuột câu hỏi ❓ bằng câu hỏi ôn tập; P7a 2D đã xong) | 1 ván sinh chuột liên tục (0-120s) kèm 10 lượt trùm câu hỏi.
   - Màn 6: "Diều đưa sổ" | Game bay 2.5D | 4 cổng làng (sau khe 6, 12, 18, 24 của tổng 24 khe; mỗi cổng có câu hỏi trắc nghiệm 20s; 5 tim).
   - Màn 7: "Khuôn riêng, mẫu chung" (Bài 3) | Bài học 2D | 3 trạm: Dễ (Khuôn và mẫu), Trung bình (Soi dấu giả), Khó (Ký phân tán).
   - Màn 8: "Lật thẻ tìm cặp khóa" | Game lật thẻ 2D (Memory) | 3 vòng: Vòng 1 (4 cặp), Vòng 2 (6 cặp), Vòng 3 (8 cặp + tráo thẻ).
@@ -305,6 +305,22 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - **Bài học về khựng (L4, L6):** không thêm chương trình shader mới, không dùng envMap; vẽ texture chữ/hình và biên dịch shader ở **bước chuẩn bị làng**, không làm trong khung dựng vùng.
 
 **Ngân sách đã đo** (Thấp / Vừa / Cao, tam giác xấu nhất): Dệt 222k / 936k / 1,12M; Khắc Dấu ≈ 204k / 813k / 1,02M; Bạc 211k / 959k / 1,14M. Vùng làng thêm 3–6 MB. Bộ nhớ vào ra làng đứng yên. **Mức Vừa chỉ vẽ nhà, lều, tre ở xa trong tầm 260** (sương đã phủ kín từ ~300).
+
+## P7a — Bản chơi được Màn 5 "Đập {phanDien}" bằng 2D (30/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, tự commit và push nhánh làm việc `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này (chờ chủ dự án xem xét bản chơi được).
+- **Đã làm:**
+  - Chuyển đổi Màn 5 từ Scene25D Three.js sang giao diện 2D thuần túy, phong cách các dải lụa Làng Dệt (4 làn dọc đặt cạnh nhau lấy cảm hứng Talking Tom).
+  - Phân biệt 2 loại chuột rõ ràng: Chuột thường (4 biến thể: thường +10, đổi làn +15, nhanh +15, to +30 đập 2 lần) và Chuột câu hỏi mang biểu tượng **DẤU HỎI VÀNG LỚN ❓**, hào quang sáng rực, nhãn "Chuột câu hỏi" nổi bật tiếp cận accessibility.
+  - Vùng đập [6.5, 9.0] có vệt sáng viền báo hiệu; 4 nút đập chân làn (D, F, J, K) to rõ (≥ 48px trên điện thoại); bàn Sổ Chung ở đáy với 8 chấm tròn vết mực. Chuột lọt tới sổ +1 vết mực, chuột câu hỏi đúng xoá 2 vết mực.
+  - Tạm dừng chuyển động và đồng hồ khi mở câu hỏi hoặc mở hộp "?". Chống click ma (`pointerDownInside`, `stopPropagation`) không kích hoạt nhầm đáp án. Đập chuột không bị kích hoạt đúp khi chạm giữ.
+  - Giữ nguyên nút "Tự hoàn thành" cả màn (thẻ bắt đầu và hộp "?", chỉ dev và giáo viên/admin, không trao điểm/sao/xu/sổ vàng).
+- **Kiểm tra đã đạt:**
+  - `pnpm check:text`: sạch (437 file). Toàn bộ chữ nằm trong `content/games.ts` (`whackUi`).
+  - `pnpm typecheck`: 10 package đạt 100%.
+  - `pnpm test --maxWorkers=2`: 206 test files passed, 2275 passed, 5 skipped (thêm test mới `whack2d.test.ts` đạt 8/8 tests).
+  - `pnpm build`: Đạt. Chunk `Man5` giảm từ 91 kB Three.js xuống **20.75 kB** (gzip 7.34 kB).
+  - Kiểm tra DOM Puppeteer `scripts/p7a-check.mjs` và `scripts/p7a-dev-check.mjs` trên 1366×768, 360×800, 844×390: đập chuột, chuột câu hỏi, mở câu hỏi, trả lời, hộp "?", nút tự hoàn thành (ẩn với khách release, hiện và chạy chuẩn trên dev). 27 ảnh và báo cáo lưu tại `docs/screenshots/p7a/BAO-CAO-P7A.md`.
 
 ## Việc để sau / cần theo dõi
 
