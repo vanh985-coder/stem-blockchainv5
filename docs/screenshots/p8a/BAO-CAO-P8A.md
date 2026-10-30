@@ -56,8 +56,11 @@
 
 ---
 
-## 5. Kết quả kiểm tra tự động Puppeteer (`scripts/p8a-check.mjs`)
+## 5. Kết quả kiểm tra tự động Puppeteer (`scripts/p8a-check.mjs` & `scripts/p8a-preview-check.mjs`)
 
+Đã tiến hành hai đợt kiểm tra độc lập để đảm bảo chất lượng:
+
+### Đợt 1: Kiểm tra toàn diện trên Vite Dev Server (cổng 5173)
 Đo lường trên cả 3 độ phân giải chuẩn của dự án:
 
 | Độ phân giải | Bước 0 (intro) | Nhập sai & Thử lại | Nhập đúng & Chúc mừng | Bài thật sạch sẽ | Xem lại giữa bài |
@@ -69,6 +72,15 @@
 - **Xác minh tiến độ:** Cookie `sc_guest` trước và sau khi làm thử hoàn toàn giữ nguyên: `progressUnchangedAfterPractice = true`.
 - **Xác minh bàn phím:** Giữ phím Enter khi nộp bài không tự ý nhảy cóc sang bài thật: `enterHoldSafe = true`.
 - **Xác minh bài thật:** Sau hướng dẫn, bài thật hoàn thành 5 trang và nhận sao trạm Dễ bình thường: `realStationDoneNormally = true`.
+
+### Đợt 2: Kiểm tra luồng chính trên Bản Build Production Preview (cổng 5193)
+Chạy trực tiếp trên mã nguồn đã build production (`apps/hub/dist`, `VITE_MERGED=true`):
+- **Bước 0 (intro):** Lớp phủ `TutorialSpotlight` và Tooltip tự động mở chuẩn xác (`step0Opened = true`).
+- **Thực hành nhập sai (15):** Tooltip hiển thị giải thích từng bước và nút "Thử lại" (`wrongHandled = true`).
+- **Thực hành nhập đúng (29):** Đóng dấu xác nhận mã trang và hiện nút "Bắt đầu chơi thật" (`correctHandled = true`).
+- **Chuyển sang bài thật:** Spotlight đóng hoàn toàn, hiển thị bài thật với nút "💡 Hướng dẫn" (`realGameClean = true`).
+- **Xem lại giữa bài:** Mở lại và đóng hướng dẫn hoạt động trơn tru (`reviewToggle = true`).
+- Bằng chứng lưu tại: `docs/screenshots/p8a/ket-qua-p8a-build-preview.json` và các ảnh `p8a-build-*.png`.
 
 ---
 
