@@ -184,9 +184,16 @@ Chỉ có logic (chưa có cảnh; màn 5 vẫn `coming-soon`). Đơn vị thờ
 - **Mốc mới 1650 / 2650 / 3100 (tạm, chỉnh khi học sinh chơi thật):** Đồng = p25 bot trung bình 1675 → 1650; Bạc = p75 bot trung bình 2675 → 2650; Vàng = p10 bot giỏi 3120 → 3100. Đồng < Bạc < Vàng. Với mốc này bot trung bình: 23,3% chưa đạt, 48,0% Đồng, 28,7% Bạc, không Vàng.
 - **Điểm tối đa lý thuyết ước tính khoảng 3580:** trùm 5 × (100 + 5 × 15) + 5 × (100 + 5 × 10) = 1625; khoảng 143 chuột (khoảng 1880 điểm); khoảng 14,5 đồng (khoảng 73 điểm).
 
-### Cảnh màn 5 (mốc 3, bước B7; nâng cấp P7a giao diện 2D thuần túy; P7b hoàn thiện điều khiển và kiểm lối chơi; code ở `packages/village-lang-det/src/whack/`)
+### Cảnh màn 5 (mốc 3, bước B7; nâng cấp P7a giao diện 2D thuần túy; P7b hoàn thiện điều khiển và kiểm lối chơi; P7c làm lại đồ họa hoạt hình bám sát ảnh mẫu bằng bộ 15 ảnh 2D; code ở `packages/village-lang-det/src/whack/`)
 
 `Man5.tsx` bọc `WhackGame` trong `MiniGameLevel` (`medals={WHACK_SPEC.medals}`); route `man/5` ở `village-lang-det/src/index.ts`; `levels.ts` đặt màn 5 `ready` (màn 6 còn `coming-soon`). Logic gọi lại `whackLogic.ts` (không viết lại luật); `WhackGame` nối thao tác, hoạt cảnh 2D, âm thanh vào luật.
+
+**Nâng cấp đồ họa P7c (Bộ 15 ảnh hoạt hình 2D theo ảnh mẫu tham chiếu):**
+- **15 Asset WebP chuẩn hóa (`assets-build/man5-2d/`):** Nền `background-pc`, 2 cột biên gỗ `wood-border` (cột phải lật gương `scale-x-[-1]`), 4 làn texture `lane-blue`, `lane-yellow`, `lane-red`, `lane-green`, Hero cầm búa `hero-idle` và `hero-hit`, cuốn Sổ Chung `book`, đồng xu `coin`, 5 sprite chuột hoạt hình (`mouse-normal`, `mouse-fast`, `mouse-switch`, `mouse-big`, `mouse-question`). Tổng dung lượng 15 ảnh WebP chỉ **596.7 kB** (giảm hơn 25 lần so với 15.2 MB gốc).
+- **Tối ưu trải nghiệm PC:** Khung game dùng `fixed inset-0 z-20` phủ kín màn hình trình duyệt, xóa bỏ hoàn toàn hiện tượng game bị co ở nửa trên và khoảng trống nền kem vô dụng bên dưới. Tỉ lệ chiếm chiều cao sân chơi đạt **> 91%** trên mọi độ phân giải PC (1366×768, 1536×864, 1920×1080), không phát sinh thanh cuộn thừa (`docScrollHeight === windowHeight`).
+- **Sân chơi cân đối:** Khung 4 làn mở rộng (`md:max-w-[560px] lg:max-w-[640px] xl:max-w-[700px]`), mỗi làn rộng 120–150px, các sprite chuột hiển thị to rõ nét, biểu cảm sinh động. 8 chấm tròn vết mực dàn đều trên 2 trang sách mở của cuốn sổ `book.webp` (`px-10 sm:px-14 md:px-20 lg:px-24`).
+- **Hero vung búa:** Chuyển đổi mượt mà giữa `hero-idle` và `hero-hit` khi người chơi gõ phím D/F/J/K hoặc chạm chân làn (thời gian vung 180ms), chung điểm neo căn đáy không giật rung.
+- **Kích thước chunk JavaScript:** Chunk `Man5` chỉ **26.49 kB** (gzip: 8.76 kB), hoàn toàn tách rời Three.js, tải trang siêu tốc.
 
 **Thiết kế P7a & P7b (Giao diện 2D các làn dọc):**
 - **Lối chơi:** 4 làn dọc đặt cạnh nhau tương tự các dải lụa trên khung cửi dệt truyền thống. Đối tượng di chuyển từ trên xuống dưới dọc theo các làn.

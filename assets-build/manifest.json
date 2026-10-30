@@ -1,4 +1,94 @@
 {
+  "man5-2d/background-pc": {
+    "file": "man5-2d/background-pc.82a018ad.webp",
+    "bytes": 34022,
+    "width": 1672,
+    "height": 941
+  },
+  "man5-2d/book": {
+    "file": "man5-2d/book.d9225022.webp",
+    "bytes": 55398,
+    "width": 1024,
+    "height": 512
+  },
+  "man5-2d/coin": {
+    "file": "man5-2d/coin.3428abbf.webp",
+    "bytes": 23052,
+    "width": 384,
+    "height": 384
+  },
+  "man5-2d/hero-hit": {
+    "file": "man5-2d/hero-hit.0e898d5e.webp",
+    "bytes": 60812,
+    "width": 768,
+    "height": 768
+  },
+  "man5-2d/hero-idle": {
+    "file": "man5-2d/hero-idle.c982865a.webp",
+    "bytes": 63262,
+    "width": 768,
+    "height": 768
+  },
+  "man5-2d/lane-blue": {
+    "file": "man5-2d/lane-blue.53dfc606.webp",
+    "bytes": 44086,
+    "width": 724,
+    "height": 2172
+  },
+  "man5-2d/lane-green": {
+    "file": "man5-2d/lane-green.682f6394.webp",
+    "bytes": 44384,
+    "width": 724,
+    "height": 2172
+  },
+  "man5-2d/lane-red": {
+    "file": "man5-2d/lane-red.9cbc3cda.webp",
+    "bytes": 53880,
+    "width": 724,
+    "height": 2172
+  },
+  "man5-2d/lane-yellow": {
+    "file": "man5-2d/lane-yellow.c479dccd.webp",
+    "bytes": 35328,
+    "width": 724,
+    "height": 2172
+  },
+  "man5-2d/mouse-big": {
+    "file": "man5-2d/mouse-big.d4f6f1bf.webp",
+    "bytes": 29474,
+    "width": 512,
+    "height": 512
+  },
+  "man5-2d/mouse-fast": {
+    "file": "man5-2d/mouse-fast.e4253eca.webp",
+    "bytes": 22938,
+    "width": 512,
+    "height": 512
+  },
+  "man5-2d/mouse-normal": {
+    "file": "man5-2d/mouse-normal.646d42d7.webp",
+    "bytes": 23436,
+    "width": 512,
+    "height": 512
+  },
+  "man5-2d/mouse-question": {
+    "file": "man5-2d/mouse-question.1cd2fb1d.webp",
+    "bytes": 26370,
+    "width": 512,
+    "height": 512
+  },
+  "man5-2d/mouse-switch": {
+    "file": "man5-2d/mouse-switch.8c18e968.webp",
+    "bytes": 26570,
+    "width": 512,
+    "height": 512
+  },
+  "man5-2d/wood-border": {
+    "file": "man5-2d/wood-border.3c945149.webp",
+    "bytes": 53082,
+    "width": 724,
+    "height": 2172
+  },
   "models/characters/bac-an": {
     "file": "models/characters/bac-an.e9a09cbd.glb",
     "bytes": 1797384,

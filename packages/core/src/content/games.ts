@@ -269,6 +269,11 @@ export const whackUi = {
   lanNhan: 'Làn {so}',
   nutDap: 'Đập làn {so}',
   nhacVungDap: 'Vùng đập',
+  nhanVat: 'Học sinh nam',
+  soChung: 'Sổ Chung',
+  tienDong: 'Tiền đồng',
+  sanChoi: 'Sân chơi 4 làn',
+  nenPc: 'Bối cảnh Làng Dệt',
 } as const;
 
 /** Chữ trong màn 6 "Diều đưa sổ" (spec 06 mục Màn 6). Mọi câu đi qua fmt() ({phanDien}, {so}…). */

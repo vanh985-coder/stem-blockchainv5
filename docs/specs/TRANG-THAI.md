@@ -342,6 +342,23 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   - `pnpm build`: Đạt toàn bộ 5 ứng dụng (`hub`, `lang-bac`, `lang-det`, `lang-giay`, `lang-khac-dau`). Chunk `Man5` là **22.17 kB** (gzip **7.74 kB**). Bỏ khẳng định võ đoán về 60 FPS / rò bộ nhớ khi chưa có công cụ đo chuyên sâu.
   - Kiểm tra Puppeteer `scripts/p7b-check.mjs` và `scripts/p7b-extra-check.mjs`: 31 ảnh minh chứng lưu tại `docs/screenshots/p7b/BAO-CAO-P7B.md`.
 
+## P7c — Làm lại đồ họa 2D Màn 5 bằng bộ 15 ảnh hoạt hình (30/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, commit và push nhánh `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này.
+- **Đã làm:**
+  - Tích hợp bộ 15 ảnh hoạt hình chuẩn trong `assets/man5-2d/` bám sát ảnh mẫu tham khảo `assets/references/man5-whack-reference.png` qua quy trình assets build (`scripts/assets-build.mjs`). Nén thành công 15 ảnh sang WebP trong `assets-build/man5-2d/` (tổng 596.7 kB, giảm hơn 25 lần so với 15.2 MB ảnh PNG gốc).
+  - Tái cấu trúc khung game: sử dụng `fixed inset-0 z-20` bao trùm toàn màn hình trình duyệt, xóa bỏ hoàn toàn hiện tượng game bị co ở nửa trên trang và khoảng nền kem trống lớn phía dưới.
+  - Sân chơi lớn, cân đối, tận dụng tối đa chiều cao PC: tỉ lệ chiếm chiều cao sân chơi đạt **> 91%** trên mọi độ phân giải PC (91.1% ở 1366×768, 92.1% ở 1536×864, 93.7% ở 1920×1080), không phát sinh thanh cuộn thừa.
+  - Dựng cấu trúc từng lớp độc lập: Nền phô mai vàng `background-pc`, hai cột gỗ sồi đinh tán `wood-border` (cột phải lật gương `scale-x-[-1]`), 4 làn hoa văn sao (`lane-blue`, `lane-yellow`, `lane-red`, `lane-green`), Hero cầm búa (`hero-idle` / `hero-hit` chung điểm neo căn đáy, vung búa 180ms), cuốn Sổ Chung `book` với 8 chấm mực dàn đều trên 2 trang sách mở (`px-10` đến `px-24`), 4 nút đập chân làn D F J K màu ăn khớp làn (cao 46–56px).
+  - 5 Sprite Chuột hoạt hình 2D sinh động: Chuột thường, chuột nhanh (⚡), chuột đổi làn (⇄), chuột to (2 vạch máu), chuột câu hỏi (biểu tượng ❓ vàng lớn nhấp nháy).
+  - Bảo toàn toàn vẹn cơ chế P7b: Vùng đập [6.5, 9.0], cooldown 140ms, tạm dừng 100% thời gian khi mở câu hỏi/?, chống click ma ở capture phase, chống Enter lặp, tự hoàn thành không trao thưởng gian lận.
+- **Kiểm tra đã đạt:**
+  - `pnpm check:text`: sạch (437 files).
+  - `pnpm typecheck`: 10 package biên dịch thành công 100%.
+  - `pnpm test --maxWorkers=2`: 206 test files passed, 2282 tests passed, 5 skipped.
+  - `pnpm build`: Đạt toàn bộ 5 ứng dụng. Chunk `Man5` là **26.49 kB** (gzip **8.76 kB**).
+  - Đo lường và kiểm tra Puppeteer `scripts/p7c-check.mjs`: Lưu 21 ảnh chụp màn hình minh chứng tại `docs/screenshots/p7c/BAO-CAO-P7C.md`.
+
 ## Việc để sau / cần theo dõi
 
 - **Màn 3:** nút “?” đè chữ “Soi công thức”; ghi nhận để sửa riêng, không sửa trong P2a.

@@ -35,6 +35,28 @@ function classify(key) {
   if (/^(scenes|story)\//.test(key) || key === 'ui/ban-do' || key === 'ui/man-hinh-tai') {
     return { kind: 'nen', maxWidth: 1920, quality: 82, warnBig: true };
   }
+  // Màn 5 2D: bộ 15 ảnh đồ họa hoạt hình 2D
+  if (key.startsWith('man5-2d/')) {
+    if (key === 'man5-2d/background-pc') {
+      return { kind: 'nen', maxWidth: 1920, quality: 82, noSparkle: true };
+    }
+    if (key.startsWith('man5-2d/lane-') || key === 'man5-2d/wood-border') {
+      return { kind: 'hinh-roi', maxWidth: 724, quality: 85, noSparkle: true };
+    }
+    if (key === 'man5-2d/book') {
+      return { kind: 'hinh-roi', maxWidth: 1024, quality: 85, noSparkle: true };
+    }
+    if (key.startsWith('man5-2d/hero-')) {
+      return { kind: 'hinh-roi', box: 768, quality: 85, noSparkle: true };
+    }
+    if (key.startsWith('man5-2d/mouse-')) {
+      return { kind: 'hinh-roi', box: 512, quality: 85, noSparkle: true };
+    }
+    if (key === 'man5-2d/coin') {
+      return { kind: 'hinh-roi', box: 384, quality: 85, noSparkle: true };
+    }
+    return { kind: 'hinh-roi', box: 1024, quality: 85, noSparkle: true };
+  }
   // Hình rời (sprites): ảnh do AI tạo hay in sẵn nền ô vuông hoặc nền một màu vào ảnh; tự tách nền (scripts/lib/cutout.mjs), ảnh đã trong suốt thật thì để nguyên.
   // Lá trong ui/tiles (la-*) cũng in sẵn nền trắng vào ảnh và được dùng như hình rời (màn 12: lá giả trên ngọn cây, lá ở tầng trên cùng): tách nền như sprites. Ô đặc biệt của màn 11 (o-hoa hoa sen, o-gio gió xoáy) vẽ phủ lên lá nên cũng cần nền trong suốt: tách nền như la-*.
   if (key.startsWith('sprites/') || /^ui\/tiles\/(la|o)-/.test(key)) return { kind: 'hinh-roi', box: 1024, quality: 85, autoCutout: true };

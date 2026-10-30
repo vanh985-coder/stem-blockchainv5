@@ -1,9 +1,25 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { Button, Panel, ProgressBar, QuizCard, fmt, pickQuestions, sound, useGameHint, useSettings, whackUi, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import {
+  ASSETS_URL,
+  Button,
+  Panel,
+  ProgressBar,
+  QuizCard,
+  fmt,
+  lookupAsset,
+  pickQuestions,
+  sound,
+  useGameHint,
+  useManifest,
+  useSettings,
+  whackUi,
+  type MiniGameRenderProps,
+  type ScorePart,
+} from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { WHACK_SPEC, type MouseKind } from './whackConfig';
 import { hintFor } from './whackHint';
-import { answerBoss, bossPoints, collectCoin, createWhackGame, hitLane, inZone, tickWhack, type BossResult, type Mouse, type WhackEvent } from './whackLogic';
+import { answerBoss, bossPoints, collectCoin, createWhackGame, hitLane, inZone, tickWhack, type BossResult, type WhackEvent } from './whackLogic';
 
 const LEVEL_ID = 5;
 const newSeed = (): number => (Math.random() * 2 ** 31) >>> 0;
@@ -25,6 +41,17 @@ const KEY_LANE: Readonly<Record<string, number>> = {
 };
 
 const LANE_KEYS = ['D', 'F', 'J', 'K'] as const;
+
+/** Danh sách asset ảnh của 4 làn theo đúng thứ tự ảnh mẫu: Xanh lam, Vàng, Đỏ, Xanh lá */
+const LANE_ASSETS = ['lane-blue', 'lane-yellow', 'lane-red', 'lane-green'] as const;
+
+/** Màu phong cách của 4 nút đập chân làn ăn khớp với màu làn */
+const LANE_BTN_STYLES = [
+  'bg-gradient-to-b from-[#2b7fe3] to-[#1452a8] border-[#7cb4f8] shadow-[#0c3b7a]/60 active:bg-[#1452a8]',
+  'bg-gradient-to-b from-[#e5a50a] to-[#a37100] border-[#fed367] shadow-[#634500]/60 active:bg-[#a37100]',
+  'bg-gradient-to-b from-[#e01b24] to-[#990a12] border-[#f66151] shadow-[#660007]/60 active:bg-[#990a12]',
+  'bg-gradient-to-b from-[#2ec27e] to-[#1a7a4c] border-[#8ff0a4] shadow-[#0e4d2e]/60 active:bg-[#1a7a4c]',
+] as const;
 
 /** Khoảng thời gian tối thiểu (ms) giữa 2 cú đập trên cùng 1 làn để chống double fire / touch jitter */
 const HIT_COOLDOWN_MS = 140;
@@ -52,12 +79,52 @@ const KIND_NAMES: Record<MouseKind, string> = {
   to: whackUi.chuotTo,
 };
 
-const KIND_SHORT: Record<MouseKind, string> = {
-  thuong: whackUi.nhanThuong,
-  doiLan: whackUi.nhanDoiLan,
-  nhanh: whackUi.nhanNhanh,
-  to: whackUi.nhanTo,
+/** Ánh xạ loại chuột sang tên file asset trong man5-2d */
+const MOUSE_ASSET_KEYS: Record<MouseKind, string> = {
+  thuong: 'mouse-normal',
+  doiLan: 'mouse-switch',
+  nhanh: 'mouse-fast',
+  to: 'mouse-big',
 };
+
+/**
+ * Component hiển thị ảnh theo asset manifest của dự án, có fallback an toàn
+ */
+function Man5Sprite({
+  name,
+  alt,
+  className = '',
+  style,
+  fallback,
+  dataTestId,
+}: {
+  name: string;
+  alt: string;
+  className?: string;
+  style?: React.CSSProperties;
+  fallback?: React.ReactNode;
+  dataTestId?: string;
+}) {
+  const manifest = useManifest();
+  const [failed, setFailed] = useState(false);
+  const src = failed ? null : lookupAsset(manifest, ASSETS_URL, `man5-2d/${name}`);
+
+  if (!src) {
+    return fallback ? <>{fallback}</> : <div role="img" aria-label={alt} data-testid={dataTestId} className={className} style={style} />;
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      data-testid={dataTestId}
+      className={className}
+      style={style}
+      draggable={false}
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRenderProps) {
   const { settings } = useSettings();
@@ -72,6 +139,10 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   const [ending, setEnding] = useState<null | 'ink' | 'complete'>(null);
   const [effects, setEffects] = useState<HitEffect[]>([]);
   const [laneFlashes, setLaneFlashes] = useState<number[]>([0, 0, 0, 0]);
+
+  // Trạng thái tư thế nhân vật vung búa khi đập
+  const [isHitting, setIsHitting] = useState(false);
+  const hittingTimer = useRef<number | null>(null);
 
   const finished = useRef(false);
   const pending = useRef<{ result: BossResult; left: number } | null>(null);
@@ -105,6 +176,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     setEnding(null);
     setEffects([]);
     setLaneFlashes([0, 0, 0, 0]);
+    setIsHitting(false);
     lastHitTime.current = [0, 0, 0, 0];
     keysPressed.current.clear();
     lastTickTime.current = performance.now();
@@ -209,19 +281,32 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     return () => cancelAnimationFrame(raf);
   }, [state, handleEvents]);
 
+  // Kích hoạt tư thế đập búa của nhân vật
+  const triggerHeroHit = useCallback(() => {
+    setIsHitting(true);
+    if (hittingTimer.current !== null) {
+      window.clearTimeout(hittingTimer.current);
+    }
+    hittingTimer.current = window.setTimeout(() => {
+      setIsHitting(false);
+      hittingTimer.current = null;
+    }, 180);
+  }, []);
+
   // Thao tác đập một làn: dùng chung thống nhất cho cả phím, nút đập và chạm làn/chuột
   const hit = useCallback(
     (lane: number) => {
       if (holdRef.current || state.phase === 'quiz' || state.phase === 'ended') return;
 
       const now = performance.now();
-      // Chống kích hoạt đúp (double-tap/touch jitter) trên cùng một làn
+      // Chống kích hoạt đúp trên cùng một làn
       if (now - lastHitTime.current[lane] < HIT_COOLDOWN_MS) return;
       lastHitTime.current[lane] = now;
 
+      triggerHeroHit();
       triggerLaneFlash(lane);
 
-      // Thống nhất quy tắc vùng đập: Chuột câu hỏi (boss) cũng phải vào vùng đập mới được kích hoạt
+      // Thống nhất quy tắc vùng đập: Chuột câu hỏi cũng phải vào vùng đập mới được kích hoạt
       if (state.phase === 'bossRun' && state.boss && state.boss.lane === lane) {
         if (state.boss.pos >= WHACK_SPEC.zoneStart && state.boss.pos <= WHACK_SPEC.zoneEnd) {
           state.phase = 'quiz';
@@ -261,7 +346,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
       }
       bump();
     },
-    [state, triggerLaneFlash, addEffect],
+    [state, triggerHeroHit, triggerLaneFlash, addEffect],
   );
 
   // Nhặt tiền đồng
@@ -346,7 +431,6 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
 
     const onKeyDownDialog = (e: KeyboardEvent) => {
       if (e.key !== 'Enter' || e.repeat) return;
-      // Nếu chưa nhả Enter sau khi nộp đáp án thì không cho phép tự "Chơi tiếp"
       if (!enterReleasedAfterAnswer.current) {
         e.preventDefault();
         e.stopPropagation();
@@ -392,251 +476,401 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
       __whackSetQuizLeft: (secs: number) => {
         quizLeft.current = secs;
       },
+      __whackTriggerEnd: (reason: 'ink' | 'complete') => {
+        state.phase = 'ended';
+        setEnding(reason);
+      },
+      __whackSetBoss: (lane: number, pos: number, index = 0) => {
+        state.phase = 'bossRun';
+        state.boss = { index, lane, pos, t: 1.0, answerSeconds: 15 };
+        bump();
+      },
     });
   }
 
   const fill = Math.min(1, state.ink / WHACK_SPEC.inkMax);
 
   return (
-    <div className="relative flex h-full w-full select-none flex-col items-center justify-between overflow-hidden bg-gradient-to-b from-[#2d1b0d] via-[#1a0f08] to-[#120a05] p-2 text-giay font-display" data-testid="man5">
-      {/* 1. THANH TRÊN: HUD Thông tin (Điểm, Xu, Trùm, Vết mực) */}
-      <header className="z-10 flex w-full max-w-2xl shrink-0 flex-wrap items-center justify-between gap-2 rounded-2xl border-2 border-nau-go bg-[#2b1810]/95 px-3 py-1.5 shadow-md" data-testid="hud">
+    <div
+      className="fixed inset-0 z-20 flex flex-col items-center justify-between overflow-hidden select-none font-display text-giay"
+      data-testid="man5"
+    >
+      {/* 1. LỚP NỀN: background-pc.png bao trùm toàn bộ không gian PC */}
+      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+        <Man5Sprite
+          name="background-pc"
+          alt={whackUi.nenPc}
+          className="h-full w-full object-cover object-center"
+          fallback={<div className="h-full w-full bg-gradient-to-b from-[#2d1b0d] via-[#1a0f08] to-[#120a05]" />}
+        />
+        {/* Lớp phủ tối nhẹ để tăng độ tương phản cho 4 làn màu */}
+        <div className="absolute inset-0 bg-black/20" />
+      </div>
+
+      {/* 2. THANH TRÊN: HUD Thông tin (Điểm, Xu, Vết mực, Trùm) */}
+      <header
+        className="z-30 mt-2 flex w-full max-w-3xl shrink-0 items-center justify-between gap-2 rounded-2xl border-2 border-[#8b5a36]/80 bg-[#2b1810]/90 px-3 py-1.5 shadow-xl backdrop-blur-sm sm:px-4"
+        data-testid="hud"
+      >
+        {/* Điểm số */}
+        <div className="flex items-center gap-1.5 font-black text-amber-300 text-sm sm:text-base">
+          <span className="text-base sm:text-lg">🏆</span>
+          <span data-testid="diem">{fmt(whackUi.diem, { so: state.score })}</span>
+        </div>
+
+        {/* Tiền xu */}
+        <div className="flex items-center gap-1 font-bold text-yellow-300 text-xs sm:text-sm">
+          <span>🪙</span>
+          <span>{fmt(whackUi.xu, { so: state.coins })}</span>
+        </div>
+
         {/* Vết mực trên sổ */}
-        <div className="flex items-center gap-1.5" role="img" aria-label={fmt(whackUi.muc, { so: state.ink, max: WHACK_SPEC.inkMax })} data-testid="cham-muc">
-          <span className="text-xs font-bold text-giay/80">{fmt(whackUi.phanMuc)}:</span>
-          <div className="flex items-center gap-1">
+        <div
+          className="flex items-center gap-1.5"
+          role="img"
+          aria-label={fmt(whackUi.muc, { so: state.ink, max: WHACK_SPEC.inkMax })}
+          data-testid="cham-muc"
+        >
+          <span className="hidden text-xs font-semibold text-giay/80 sm:inline">{fmt(whackUi.phanMuc)}:</span>
+          <div className="flex items-center gap-0.5 sm:gap-1">
             {Array.from({ length: WHACK_SPEC.inkMax }, (_, i) => {
               const on = i < state.ink;
-              const red = on ? `hsl(${Math.round(35 - 35 * fill)} 85% ${Math.round(52 - 12 * fill)}%)` : '#3a2215';
-              return <span key={i} className={`block size-3 rounded-full border border-nau-go/70 sm:size-3.5 transition-colors ${on ? 'ring-1 ring-red-400' : ''}`} style={{ background: red }} data-on={on ? '1' : '0'} />;
+              const red = on ? `hsl(${Math.round(35 - 35 * fill)} 90% ${Math.round(52 - 12 * fill)}%)` : '#3a2215';
+              return (
+                <span
+                  key={i}
+                  className={`block size-2.5 rounded-full border border-black/40 sm:size-3 transition-colors ${
+                    on ? 'ring-1 ring-red-400' : ''
+                  }`}
+                  style={{ background: red }}
+                  data-on={on ? '1' : '0'}
+                />
+              );
             })}
           </div>
-          <span className="text-xs font-mono font-extrabold text-amber-300">
+          <span className="font-mono text-xs font-extrabold text-amber-300">
             {state.ink}/{WHACK_SPEC.inkMax}
           </span>
         </div>
 
-        {/* Điểm - Xu - Trùm */}
-        <div className="flex items-center gap-3 text-sm font-extrabold sm:gap-4">
-          <span className="text-amber-400" data-testid="diem">
-            {fmt(whackUi.diem, { so: state.score })}
-          </span>
-          <span className="text-yellow-300" data-testid="xu">
-            {fmt(whackUi.xu, { so: state.coins })}
-          </span>
-          <span className="text-emerald-400" data-testid="trum">
-            {fmt(whackUi.trum, { so: state.bossesDone, max: WHACK_SPEC.boss.count })}
-          </span>
+        {/* Lượt trùm */}
+        <div className="flex items-center gap-1 font-bold text-amber-200 text-xs sm:text-sm">
+          <span>{fmt(whackUi.trum, { so: state.bossesDone, max: WHACK_SPEC.boss.count })}</span>
         </div>
       </header>
 
-      {/* 2. KHU VỰC CHƠI CHÍNH: 4 LÀN DỌC KIỂU DẢI LỤA LÀNG DỆT */}
-      <main
-        className="relative my-auto flex h-[58vh] max-h-[560px] min-h-[300px] w-full max-w-xl flex-1 touch-none items-stretch justify-center gap-1.5 sm:gap-2.5"
-        role="application"
-        aria-label={whackUi.khung}
-        data-testid="man5-khung"
-        data-phase={state.phase}
-      >
-        {/* 4 LÀN DỌC */}
-        {[0, 1, 2, 3].map((lane) => {
-          const isFlashed = Date.now() - laneFlashes[lane] < 150;
-          const miceInLane = state.mice.filter((m) => m.lane === lane);
-          const hasInZone = miceInLane.some(inZone);
-          const isBossInLane = state.boss && state.boss.lane === lane;
-          const isBossInZone = isBossInLane && state.boss && inZone(state.boss as unknown as Mouse);
+      {/* 3. KHU VỰC TRUNG TÂM: NHÂN VẬT + SÂN 4 LÀN DỌC + CUỐN SỔ + NÚT ĐẬP */}
+      <div className="relative flex flex-1 w-full flex-col items-center justify-center min-h-0 py-1 sm:py-2">
+        {/* NHÂN VẬT HỌC SINH NAM (Hero Idle / Hit) ĐỨNG TRÊN ĐỈNH SÂN CHƠI */}
+        <div
+          className="relative z-20 flex justify-center -mb-4 sm:-mb-6 md:-mb-8 pointer-events-none"
+          data-testid="hero-figure"
+        >
+          <div className="relative w-28 h-24 sm:w-36 sm:h-32 md:w-44 md:h-36 lg:w-52 lg:h-40 flex items-end justify-center">
+            {/* Tư thế vung búa đập (hero-hit) hoặc tư thế chờ (hero-idle) */}
+            <Man5Sprite
+              name={isHitting ? 'hero-hit' : 'hero-idle'}
+              alt={whackUi.nhanVat}
+              dataTestId="hero-img"
+              className="max-h-full max-w-full object-contain object-bottom drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)] transition-transform duration-75"
+              fallback={<span className="text-4xl">🧑‍🎓</span>}
+            />
+          </div>
+        </div>
 
-          return (
-            <div
-              key={lane}
-              className={`relative flex flex-1 flex-col overflow-hidden rounded-xl border-2 border-[#5a3825] shadow-inner transition-colors duration-100 ${
-                lane === 0 ? 'bg-[#fcf7ea]/10' : lane === 1 ? 'bg-[#e0f2fe]/10' : lane === 2 ? 'bg-[#ecfdf5]/10' : 'bg-[#fff1f2]/10'
-              } ${isFlashed ? 'ring-4 ring-amber-300/80 bg-amber-200/25' : ''}`}
-              data-testid={`lan-${lane}`}
-              onPointerDown={(e) => {
-                e.preventDefault();
-                hit(lane);
-              }}
-            >
-              {/* Hoa văn dệt lụa chạy dọc làn */}
-              <div className="pointer-events-none absolute inset-0 opacity-15 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:12px_12px]" />
+        {/* KHUNG SÂN 4 LÀN CHÍNH (Được kẹp bởi 2 thanh viền gỗ) */}
+        <div className="relative flex flex-1 w-full max-w-[340px] sm:max-w-[460px] md:max-w-[560px] lg:max-w-[640px] xl:max-w-[700px] min-h-0 items-stretch justify-center">
+          {/* CỘT VIỀN GỖ BÊN TRÁI */}
+          <div className="relative w-6 sm:w-8 md:w-10 lg:w-12 shrink-0 overflow-hidden z-20 select-none">
+            <Man5Sprite
+              name="wood-border"
+              alt=""
+              className="h-full w-full object-cover object-center"
+              fallback={<div className="h-full w-full bg-[#5a3319] border-r-2 border-[#8b5a36]" />}
+            />
+          </div>
 
-              {/* VÙNG ĐẬP (HIT ZONE) TỪ 65% ĐẾN 90% */}
-              <div
-                className={`pointer-events-none absolute inset-x-0 bottom-[10%] top-[65%] border-y-2 transition-all duration-150 ${
-                  hasInZone || isBossInZone
-                    ? 'border-amber-400 bg-amber-400/20 shadow-[0_0_15px_rgba(251,191,36,0.4)]'
-                    : 'border-amber-500/30 bg-amber-500/5'
-                }`}
-                data-testid={`vung-dap-${lane}`}
-              >
-                <div className="absolute inset-x-0 bottom-1 flex justify-center text-[10px] font-bold uppercase tracking-wider text-amber-200/50">
-                  {whackUi.nhacVungDap}
-                </div>
-              </div>
+          {/* SÂN 4 LÀN CHÍNH */}
+          <main
+            role="application"
+            aria-label={whackUi.khung}
+            className="relative flex flex-1 h-full select-none overflow-hidden"
+            data-testid="man5-lanes"
+          >
+            {[0, 1, 2, 3].map((lane) => {
+              const isBossInLane = state.phase === 'bossRun' && state.boss && state.boss.lane === lane;
+              const hasMouseInZone = state.mice.some((m) => m.lane === lane && inZone(m));
+              const flashOn = Date.now() - laneFlashes[lane] < 140;
 
-              {/* HIỂN THỊ CHUỘT THƯỜNG TRÊN LÀN */}
-              {miceInLane.map((m: Mouse) => {
-                const inHitZone = inZone(m);
-                const topPct = (m.pos / WHACK_SPEC.laneLength) * 100;
+              return (
+                <div
+                  key={lane}
+                  data-lane={lane}
+                  className={`relative flex-1 h-full cursor-pointer overflow-hidden transition-colors ${
+                    flashOn ? 'brightness-125' : ''
+                  }`}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    hit(lane);
+                  }}
+                >
+                  {/* Ảnh nền texture của làn (Xanh lam, Vàng, Đỏ, Xanh lá) */}
+                  <div className="absolute inset-0 pointer-events-none select-none">
+                    <Man5Sprite
+                      name={LANE_ASSETS[lane]}
+                      alt={fmt(whackUi.lanNhan, { so: lane + 1 })}
+                      className="h-full w-full object-cover object-center"
+                      fallback={<div className={`h-full w-full ${lane === 0 ? 'bg-blue-600' : lane === 1 ? 'bg-amber-500' : lane === 2 ? 'bg-red-600' : 'bg-emerald-600'}`} />}
+                    />
+                  </div>
 
-                return (
+                  {/* VÙNG ĐẬP (Hit Zone: 65% tới 90% chiều cao làn) */}
                   <div
-                    key={m.id}
-                    className={`absolute left-1/2 -translate-x-1/2 -translate-y-1/2 transition-transform ${
-                      reduced ? '' : 'animate-bounce'
-                    } ${m.flash ? 'brightness-150 scale-110' : ''}`}
+                    className={`pointer-events-none absolute left-0 right-0 z-10 transition-all ${
+                      hasMouseInZone || (isBossInLane && state.boss && state.boss.pos >= WHACK_SPEC.zoneStart)
+                        ? 'bg-white/25 ring-2 ring-yellow-300/80 animate-pulse'
+                        : 'bg-white/10'
+                    }`}
                     style={{
-                      top: `${topPct}%`,
-                      width: m.kind === 'to' ? '80%' : '70%',
-                      maxWidth: m.kind === 'to' ? '76px' : '62px',
+                      top: `${(WHACK_SPEC.zoneStart / WHACK_SPEC.laneLength) * 100}%`,
+                      height: `${((WHACK_SPEC.zoneEnd - WHACK_SPEC.zoneStart) / WHACK_SPEC.laneLength) * 100}%`,
+                      borderTop: '2px solid rgba(255, 255, 255, 0.4)',
+                      borderBottom: '2px solid rgba(255, 255, 255, 0.6)',
                     }}
-                    data-testid={`chuot-${m.kind}`}
-                    data-in-zone={inHitZone ? '1' : '0'}
-                    aria-label={KIND_NAMES[m.kind]}
-                    onPointerDown={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      hit(lane);
-                    }}
+                    data-testid={`vung-dap-${lane}`}
                   >
-                    {/* HÌNH DẠNG 2D CHUỘT GIẤY DÂN GIAN */}
-                    <div
-                      className={`relative flex flex-col items-center justify-center rounded-2xl border-2 p-1.5 shadow-md ${
-                        m.kind === 'to'
-                          ? 'border-amber-800 bg-[#7c4d30] text-giay'
-                          : m.kind === 'nhanh'
-                            ? 'border-sky-500 bg-[#3b82f6] text-white'
-                            : m.kind === 'doiLan'
-                              ? 'border-purple-600 bg-[#8b5cf6] text-white'
-                              : 'border-nau-go bg-[#d97706] text-giay'
-                      }`}
-                    >
-                      {/* Vạch máu chuột to */}
-                      {m.kind === 'to' && (
-                        <div className="absolute -top-2 flex gap-1">
-                          <span className={`size-2.5 rounded-full border border-black ${m.hits >= 1 ? 'bg-red-500' : 'bg-gray-400'}`} />
-                          <span className={`size-2.5 rounded-full border border-black ${m.hits >= 2 ? 'bg-red-500' : 'bg-gray-400'}`} />
-                        </div>
-                      )}
-
-                      {/* Icon & hình dạng đặc trưng */}
-                      <span className="text-xl leading-none">
-                        {m.kind === 'to' ? '🐀' : m.kind === 'nhanh' ? '⚡' : m.kind === 'doiLan' ? '⇄' : '🐁'}
-                      </span>
-                      <span className="text-[10px] font-bold leading-tight tracking-tight">
-                        {KIND_SHORT[m.kind]}
+                    <div className="flex h-full w-full items-end justify-center pb-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-white/50 drop-shadow">
+                        {whackUi.nhacVungDap}
                       </span>
                     </div>
                   </div>
+
+                  {/* CÁC CHUỘT TRÊN LÀN NÀY */}
+                  {state.mice
+                    .filter((m) => m.lane === lane)
+                    .map((m) => {
+                      const inZ = inZone(m);
+                      return (
+                        <div
+                          key={m.id}
+                          className={`absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform ${
+                            inZ ? 'scale-105' : 'scale-95'
+                          } ${m.flash ? 'brightness-150 animate-bounce' : ''}`}
+                          style={{
+                            top: `${(m.pos / WHACK_SPEC.laneLength) * 100}%`,
+                            width: m.kind === 'to' ? '92%' : '82%',
+                            maxWidth: m.kind === 'to' ? '98px' : '84px',
+                            aspectRatio: '1 / 1',
+                          }}
+                          data-testid="chuot"
+                          data-mouse-id={m.id}
+                          data-kind={m.kind}
+                          data-in-zone={inZ ? '1' : '0'}
+                          role="button"
+                          aria-label={KIND_NAMES[m.kind]}
+                          onPointerDown={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            hit(lane);
+                          }}
+                        >
+                          <div className="relative flex size-full items-center justify-center">
+                            {/* Sprite chuột hoạt hình 2D tương ứng */}
+                            <Man5Sprite
+                              name={MOUSE_ASSET_KEYS[m.kind]}
+                              alt={KIND_NAMES[m.kind]}
+                              className="size-full object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]"
+                              fallback={<span className="text-2xl">{m.kind === 'to' ? '🐀' : '🐁'}</span>}
+                            />
+
+                            {/* Chỉ báo đặc biệt: Chuột nhanh có tia chớp ⚡ */}
+                            {m.kind === 'nhanh' && (
+                              <span className="absolute -top-1 -right-1 text-sm drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] animate-pulse">
+                                ⚡
+                              </span>
+                            )}
+
+                            {/* Chỉ báo đặc biệt: Chuột đổi làn có mũi tên ⇄ */}
+                            {m.kind === 'doiLan' && (
+                              <span className="absolute -top-1 -right-1 rounded-full bg-blue-900/80 px-1 text-[11px] font-black text-cyan-300 drop-shadow">
+                                ⇄
+                              </span>
+                            )}
+
+                            {/* Chỉ báo đặc biệt: Chuột to có 2 vạch máu */}
+                            {m.kind === 'to' && (
+                              <div className="absolute -top-2 left-1/2 -translate-x-1/2 flex gap-1 rounded bg-black/70 px-1 py-0.5">
+                                <span className={`size-2 rounded-sm ${m.hits >= 1 ? 'bg-red-500' : 'bg-gray-600'}`} />
+                                <span className={`size-2 rounded-sm ${m.hits >= 2 ? 'bg-red-500' : 'bg-gray-600'}`} />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                  {/* CHUỘT CÂU HỎI (TRÙM TÍ VỚI BIỂU TƯỢNG ❓ VÀNG LỚN) */}
+                  {isBossInLane && state.boss && (
+                    <div
+                      className={`absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform ${
+                        state.boss.pos >= WHACK_SPEC.zoneStart && state.boss.pos <= WHACK_SPEC.zoneEnd
+                          ? 'ring-4 ring-yellow-400 scale-110 drop-shadow-[0_0_16px_rgba(250,204,21,0.9)]'
+                          : 'scale-100'
+                      }`}
+                      style={{
+                        top: `${(state.boss.pos / WHACK_SPEC.laneLength) * 100}%`,
+                        width: '95%',
+                        maxWidth: '104px',
+                        aspectRatio: '1 / 1',
+                      }}
+                      data-testid="chuot-cau-hoi"
+                      data-in-zone={state.boss.pos >= WHACK_SPEC.zoneStart && state.boss.pos <= WHACK_SPEC.zoneEnd ? '1' : '0'}
+                      role="button"
+                      aria-label={whackUi.chuotCauHoi}
+                      onPointerDown={hitBossMouse}
+                    >
+                      <div className="relative flex size-full items-center justify-center">
+                        {/* Sprite chuột câu hỏi */}
+                        <Man5Sprite
+                          name="mouse-question"
+                          alt={whackUi.chuotCauHoi}
+                          className="size-full object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)]"
+                          fallback={<span className="text-3xl">👑</span>}
+                        />
+
+                        {/* Dấu hỏi vàng lớn nhấp nháy trên đầu */}
+                        <span className="absolute -top-2 -right-1 text-2xl font-black text-yellow-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] animate-bounce">
+                          ❓
+                        </span>
+
+                        {/* Nhãn tiếp cận accessibility */}
+                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/80 px-1.5 py-0.2 text-[9px] font-black uppercase text-yellow-300">
+                          {whackUi.chuotCauHoi}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ĐỒNG TIỀN XU (coin.png) */}
+                  {state.coin && state.coin.lane === lane && (
+                    <div
+                      className={`absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 cursor-pointer ${
+                        reduced ? '' : 'animate-bounce'
+                      }`}
+                      style={{
+                        top: `${(state.coin.pos / WHACK_SPEC.laneLength) * 100}%`,
+                        width: '44px',
+                        height: '44px',
+                      }}
+                      data-testid="dong-tien"
+                      role="button"
+                      aria-label={whackUi.phanDong}
+                      onPointerDown={takeCoin}
+                    >
+                      <Man5Sprite
+                        name="coin"
+                        alt={whackUi.tienDong}
+                        className="size-full object-contain drop-shadow-[0_0_12px_rgba(250,204,21,0.8)]"
+                        fallback={<span className="text-2xl">🪙</span>}
+                      />
+                    </div>
+                  )}
+
+                  {/* HIỆU ỨNG ĐIỂM NỔ / TIA SÁNG TẠM THỜI TRÊN LÀN */}
+                  {effects
+                    .filter((eff) => eff.lane === lane)
+                    .map((eff) => (
+                      <div
+                        key={eff.id}
+                        className="pointer-events-none absolute left-1/2 z-30 -translate-x-1/2 font-black text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] animate-out fade-out slide-out-to-top duration-700"
+                        style={{
+                          top: `${(eff.pos / WHACK_SPEC.laneLength) * 100}%`,
+                          color: eff.kind === 'score' ? '#fde047' : eff.kind === 'coin' ? '#4ade80' : '#f87171',
+                        }}
+                      >
+                        {eff.text}
+                      </div>
+                    ))}
+                </div>
+              );
+            })}
+          </main>
+
+          {/* CỘT VIỀN GỖ BÊN PHẢI (Lật gương scale-x-[-1]) */}
+          <div className="relative w-6 sm:w-8 md:w-10 lg:w-12 shrink-0 overflow-hidden z-20 select-none">
+            <Man5Sprite
+              name="wood-border"
+              alt=""
+              className="h-full w-full object-cover object-center scale-x-[-1]"
+              fallback={<div className="h-full w-full bg-[#5a3319] border-l-2 border-[#8b5a36]" />}
+            />
+          </div>
+        </div>
+
+        {/* 4. CUỐN SỔ CHUNG Ở ĐÁY CÁC LÀN (book.png) & CÁC CHẤM MỰC */}
+        <div
+          className="relative z-20 w-full max-w-[340px] sm:max-w-[460px] md:max-w-[560px] lg:max-w-[640px] xl:max-w-[700px] flex flex-col items-center -mt-1 sm:-mt-2"
+          data-testid="so-chung-day"
+        >
+          <div className="relative w-full flex items-center justify-center">
+            {/* Ảnh cuốn Sổ Chung */}
+            <Man5Sprite
+              name="book"
+              alt={whackUi.soChung}
+              className="w-full max-h-16 sm:max-h-20 md:max-h-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]"
+              fallback={
+                <div className="h-12 w-full rounded-xl border border-nau-go/60 bg-[#1e1008] px-3 py-1.5 flex items-center justify-between" />
+              }
+            />
+
+            {/* Các vết mực trên bề mặt cuốn sổ */}
+            <div className="absolute inset-0 flex items-center justify-center gap-1.5 sm:gap-2.5 md:gap-3 px-10 sm:px-14 md:px-20 lg:px-24">
+              {Array.from({ length: WHACK_SPEC.inkMax }, (_, i) => {
+                const on = i < state.ink;
+                return (
+                  <span
+                    key={i}
+                    className={`block size-3 sm:size-3.5 md:size-4 rounded-full border border-black/60 transition-transform ${
+                      on
+                        ? 'bg-gradient-to-br from-red-600 via-purple-900 to-black scale-110 ring-2 ring-red-500 shadow-md'
+                        : 'bg-[#2b1810]/70 border-nau-go/50'
+                    }`}
+                  />
                 );
               })}
-
-              {/* CHUỘT CÂU HỎI (TRÙM CÓ BIỂU TƯỢNG ❓ NỔI BẬT) */}
-              {isBossInLane && state.boss && (
-                <div
-                  className={`absolute left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-105 active:scale-95 ${
-                    state.boss.pos >= WHACK_SPEC.zoneStart && state.boss.pos <= WHACK_SPEC.zoneEnd ? 'ring-4 ring-yellow-400 scale-105' : ''
-                  }`}
-                  style={{
-                    top: `${(state.boss.pos / WHACK_SPEC.laneLength) * 100}%`,
-                    width: '85%',
-                    maxWidth: '82px',
-                  }}
-                  data-testid="chuot-cau-hoi"
-                  data-in-zone={state.boss.pos >= WHACK_SPEC.zoneStart && state.boss.pos <= WHACK_SPEC.zoneEnd ? '1' : '0'}
-                  role="button"
-                  aria-label={whackUi.chuotCauHoi}
-                  onPointerDown={hitBossMouse}
-                >
-                  <div className="relative flex flex-col items-center justify-center rounded-2xl border-4 border-yellow-300 bg-gradient-to-b from-amber-500 via-orange-600 to-red-700 p-2 text-white shadow-[0_0_20px_rgba(250,204,21,0.8)]">
-                    {/* Dấu hỏi vàng to lớn nhận diện tức thì */}
-                    <span className="text-2xl font-black text-yellow-200 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] animate-pulse">
-                      ❓
-                    </span>
-                    <span className="rounded-full bg-black/60 px-1.5 py-0.5 text-[9px] font-extrabold uppercase text-yellow-300">
-                      {whackUi.chuotCauHoi}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* ĐỒNG TIỀN XU */}
-              {state.coin && state.coin.lane === lane && (
-                <div
-                  className="absolute left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer animate-spin"
-                  style={{
-                    top: `${(state.coin.pos / WHACK_SPEC.laneLength) * 100}%`,
-                    width: '42px',
-                    height: '42px',
-                    animationDuration: '3s',
-                  }}
-                  data-testid="dong-tien"
-                  role="button"
-                  aria-label={whackUi.phanDong}
-                  onPointerDown={takeCoin}
-                >
-                  <div className="flex size-full items-center justify-center rounded-full border-2 border-yellow-200 bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-600 font-extrabold text-[#5c3a00] shadow-lg">
-                    <span className="text-xs">🪙</span>
-                  </div>
-                </div>
-              )}
-
-              {/* HIỆU ỨNG NỔ ĐIỂM / TIA SÁNG TẠM THỜI TRÊN LÀN */}
-              {effects
-                .filter((eff) => eff.lane === lane)
-                .map((eff) => (
-                  <div
-                    key={eff.id}
-                    className="pointer-events-none absolute left-1/2 z-30 -translate-x-1/2 font-extrabold text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] animate-out fade-out slide-out-to-top duration-700"
-                    style={{
-                      top: `${(eff.pos / WHACK_SPEC.laneLength) * 100}%`,
-                      color: eff.kind === 'score' ? '#fbbf24' : eff.kind === 'coin' ? '#fde047' : '#f87171',
-                    }}
-                  >
-                    {eff.text}
-                  </div>
-                ))}
             </div>
-          );
-        })}
-      </main>
-
-      {/* 3. ĐÁY LÀN: CÁC NÚT ĐẬP D F J K VÀ CUỐN SỔ CHUNG */}
-      <footer className="z-10 mt-2 flex w-full max-w-xl flex-col items-center gap-2">
-        {/* HÀNG 4 NÚT ĐẬP TƯƠNG ỨNG 4 LÀN */}
-        <div className="grid w-full grid-cols-4 gap-1.5 sm:gap-2.5">
-          {[0, 1, 2, 3].map((lane) => (
-            <button
-              key={lane}
-              type="button"
-              className="flex min-h-[48px] sm:min-h-[56px] flex-col items-center justify-center rounded-xl border-2 border-[#8b5a36] bg-gradient-to-b from-[#6e4125] to-[#452412] px-1 py-1 text-giay shadow-lg active:scale-95 active:brightness-125 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              data-testid={`nut-dap-${lane}`}
-              aria-label={fmt(whackUi.nutDap, { so: lane + 1 })}
-              onPointerDown={(e) => {
-                e.preventDefault();
-                hit(lane);
-              }}
-            >
-              <span className="text-base font-black text-amber-300 sm:text-lg">{LANE_KEYS[lane]}</span>
-              <span className="text-[10px] font-semibold text-giay/80">{fmt(whackUi.lanNhan, { so: lane + 1 })}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* BÀN ĐẶT CUỐN SỔ CHUNG */}
-        <div className="flex w-full items-center justify-between rounded-xl border border-nau-go/60 bg-[#1e1008] px-3 py-1.5 text-xs text-giay/90 shadow-md">
-          <div className="flex items-center gap-2">
-            <span className="text-sm">📖</span>
-            <span className="font-bold text-amber-200">{whackUi.tenSo}</span>
-          </div>
-          <div className="text-[11px] text-giay/70 sm:text-xs">
-            {fmt(whackUi.muc, { so: state.ink, max: WHACK_SPEC.inkMax })}
           </div>
         </div>
-      </footer>
 
-      {/* 4. MODAL BẢNG CÂU HỎI TRÙM */}
+        {/* 5. CÁC NÚT ĐẬP D F J K CHÂN LÀN */}
+        <footer className="z-20 mt-1 sm:mt-2 w-full max-w-[340px] sm:max-w-[460px] md:max-w-[560px] lg:max-w-[640px] xl:max-w-[700px] px-1">
+          <div className="grid w-full grid-cols-4 gap-1.5 sm:gap-2 md:gap-3">
+            {[0, 1, 2, 3].map((lane) => (
+              <button
+                key={lane}
+                type="button"
+                className={`flex h-11 sm:h-12 md:h-14 min-h-[46px] flex-col items-center justify-center rounded-xl border-2 text-white shadow-md active:scale-95 focus:outline-none focus:ring-2 focus:ring-amber-300 ${LANE_BTN_STYLES[lane]}`}
+                data-testid={`nut-dap-${lane}`}
+                aria-label={fmt(whackUi.nutDap, { so: lane + 1 })}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  hit(lane);
+                }}
+              >
+                <span className="text-lg sm:text-xl md:text-2xl font-black drop-shadow-[0_2px_3px_rgba(0,0,0,0.9)]">
+                  {LANE_KEYS[lane]}
+                </span>
+                <span className="text-[9px] sm:text-[10px] font-extrabold text-white/80 uppercase tracking-tighter">
+                  {fmt(whackUi.lanNhan, { so: lane + 1 })}
+                </span>
+              </button>
+            ))}
+          </div>
+        </footer>
+      </div>
+
+      {/* 6. MODAL BẢNG CÂU HỎI TRÙM */}
       {quiz && question && (
         <div
           data-whack-ui
@@ -648,10 +882,8 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
           }}
           onClickCapture={(e) => {
             // Chặn click ma ở Capture phase trước khi tới button của QuizCard
-            // Nếu cử chỉ con trỏ/chạm bắt đầu từ trước khi dialog mở (chưa có pointerdown bên trong dialog):
             if (!quizPointerDownInside.current) {
               const native = e.nativeEvent as MouseEvent;
-              // Bàn phím có detail === 0 và clientX/Y === 0; chỉ chặn các click ma từ pointer/touch thật
               if (native.detail > 0 || (native.clientX !== 0 && native.clientY !== 0)) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -708,7 +940,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
         </div>
       )}
 
-      {/* 5. MODAL HẾT VÁN (THẮNG HOẶC ĐẦY MỰC) */}
+      {/* 7. MODAL HẾT VÁN (THẮNG HOẶC ĐẦY MỰC) */}
       {ending && (
         <div
           data-whack-ui
