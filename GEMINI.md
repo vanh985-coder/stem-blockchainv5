@@ -38,14 +38,13 @@ Thứ tự đọc: `CLAUDE.md` → `docs/specs/TRANG-THAI.md` → `docs/specs/00
 
 Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn lệnh trên đạt; message tiếng Việt dạng `<gói>: <việc đã làm>`; chỉ push nhánh đang làm; KHÔNG force-push, KHÔNG sửa lịch sử đã push, không commit `.env*`, `assets/`, `dist-*`. Merge vào `main` chỉ khi chủ dự án đã cho phép (xem mục 5, bước cuối).
 
-## 3. Git hiện tại (lúc bàn giao)
+## 3. Git hiện tại (cập nhật sau khi merge, 30/10/2026)
 
-- **Nhánh làm việc:** `claude/wonderful-dijkstra-x092dj` (đã push, cùng `origin/claude/wonderful-dijkstra-x092dj`).
-- **Commit gần nhất của việc trước khi thêm tài liệu này:** `e86123b` "core: P6b tích hợp ví dụ và câu hỏi cho 16 thẻ Em có biết …". Commit chứa `GEMINI.md` nằm ngay sau đó trên cùng nhánh (xem `git log`).
-- **`origin/main`:** `73268de` (commit "a" của chủ dự án, nằm sau merge của PR #2 `c0b921b`). Nhánh làm việc **hơn `main` đúng 3 commit** (`79a372a` P6a bản nháp, `49168dc` P6a bản rà, `e86123b` P6b), **không tụt sau `main`**.
-- **CHƯA merge vào `main`.** PR #1 và PR #2 (P4, P5, Excel lời thoại) đã merge trước đó; ba commit trên chưa có PR. Chưa deploy gì.
-- **Working tree:** sạch (không có thay đổi chưa commit của người dùng) tại thời điểm đọc, trước khi thêm tài liệu này.
-- Công cụ GitHub của phiên Claude là các công cụ MCP (không có `gh`); các lần merge trước làm bằng tạo PR rồi gộp bằng công cụ đó.
+- **Đã merge vào `main`:** pull request #3 (https://github.com/vanh985-coder/stem-blockchainv5/pull/3), commit merge `3973d46`, theo yêu cầu của chủ dự án. `main` nay gồm P4, P5 (PR #1, #2), P6a, P6b và `GEMINI.md` (commit `d14458e` là commit cuối của nhánh trước khi merge; P6b là `e86123b`). Các kiểm bắt buộc đã chạy trên mã P6b trước khi merge, **không chạy lại sau khi merge**.
+- **Nhánh làm việc:** `claude/wonderful-dijkstra-x092dj`, đã đặt lại theo `main` sau merge (mọi commit của nhánh đã nằm trong `main`); việc mới thì làm tiếp trên nhánh này hoặc nhánh mới từ `main`, rồi tạo pull request như trước.
+- **Chưa deploy gì.** Việc merge `main` không có nghĩa là đã triển khai lên máy chủ.
+- **Working tree:** sạch tại thời điểm cập nhật (không có thay đổi chưa commit của người dùng).
+- Công cụ GitHub của phiên Claude là các công cụ MCP (không có `gh`); các lần merge đều làm bằng tạo PR rồi gộp bằng công cụ đó.
 
 ## 4. P6b — đã triển khai gì (chi tiết: `docs/screenshots/p6b/BAO-CAO.md`, mục "P6b" của `TRANG-THAI.md`, spec 03 mục 3.9 "Thẻ có ví dụ và câu hỏi")
 
@@ -67,7 +66,7 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
 2. **Rà Enter giữ/lặp và click ma của `KnowQuizDialog`.** Hiện dùng hai khoảng chặn theo thời gian (450 ms đầu bỏ qua mọi cú bấm; 400 ms đầu sau khi nộp thì nút "Cất vào sổ" bỏ qua cú bấm; so theo `event.timeStamp`). Đây chỉ là biện pháp thực dụng, **không coi là bằng chứng đã xử lý đầy đủ**: cần rà các trường hợp giữ phím Enter (`event.repeat`, keydown/keyup), nhấn Enter khi tiêu điểm vừa chuyển sang nút khác, chạm trên thiết bị thật (cú click ma sau `pointerdown` của nút bàn tay trong `WalkControls`), bàn phím ảo, và đề xuất cách chắc hơn (ví dụ gắn theo chuỗi sự kiện con trỏ thay vì thời gian). Kiểm bằng thiết bị thật nếu có.
 3. **Đọc đối chiếu nguồn Bitcoin** do chủ dự án cung cấp: https://developer.bitcoin.org/devguide/wallets.html và https://bips.dev/340/. Người code trước **chưa đọc lại nội dung hai trang** (chỉ ghi nguồn vào `content/knowQuiz.ts` và tài liệu P6). Hãy kiểm từng khẳng định trong thẻ Làng Khắc Dấu số 3: "gần 2^256 khả năng, xấp xỉ 1,16 × 10^77" (lưu ý số khóa riêng hợp lệ hơi nhỏ hơn 2^256), "ECDSA và Schnorr", 3,7 × 10^51 năm là thời gian giả định để duyệt hết ở tốc độ giả định 10^18 khóa mỗi giây; sửa chữ nếu nguồn không khớp.
 4. **Tổng hợp lượt kiểm lỗi và lượt chạy lại của P6b cho rõ.** Báo cáo hiện gộp nhiều lượt: lượt đầu phát hiện lỗi thật (click ma khi chạm, chặn Enter lặp theo hẹn giờ, tổng thẻ `/ban-do` của Làng Khắc Dấu) và nhiều lỗi của bộ đo (Bi đứng gần cuộn nên phím E mở lời Bi, bấm quá sớm trước khi hộp hết chặn, chữ in hoa của `innerText`, số lần bấm hộp giới thiệu). `docs/screenshots/p6b/ket-qua-p6b.json` còn đúng 1 mục lỗi ở 1366×768 (bộ đo bấm quá sớm trong phần Chữ to); phần đó chạy lại riêng, đạt 13/13 ở `ket-qua-p6b-chu-to-1366.json`; bản dev ở `ket-qua-p6b-dev-tu-hoan-thanh.json` (5 đạt). Hãy dựng một bảng rõ: lượt nào, lỗi gì (lỗi mã hay lỗi bộ đo), sửa gì, lượt chạy lại nào đạt, thay vì ghép nhiều tệp.
-5. **Chạy kiểm phù hợp trên mã cuối, rồi hoàn tất merge `main`** theo ủy quyền của chủ dự án: sau các bước 1–4, chạy `pnpm test --maxWorkers=2`, `pnpm typecheck`, `pnpm check:text`, `pnpm build` và lượt kiểm DOM liên quan trên bản build mã cuối; cập nhật `TRANG-THAI.md`; chỉ merge vào `main` khi chủ dự án xác nhận bằng lời (như hai lần trước, qua pull request). **Không ghi "đã merge" nếu chưa merge.**
+5. **Chạy kiểm phù hợp trên mã cuối, rồi merge `main`** cho phần thay đổi mới: sau các bước 1–4, chạy `pnpm test --maxWorkers=2`, `pnpm typecheck`, `pnpm check:text`, `pnpm build` và lượt kiểm DOM liên quan trên bản build mã cuối; cập nhật `TRANG-THAI.md`; chỉ merge vào `main` khi chủ dự án xác nhận bằng lời (qua pull request). P6b và các commit trước đó **đã** nằm trong `main` (mục 3); không ghi "đã merge" cho thay đổi mới nếu chưa merge.
 
 ## 6. Việc để sau (không làm trước khi chủ dự án giao)
 
