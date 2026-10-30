@@ -71,18 +71,22 @@ export const bai1Lesson: LessonContent = {
     {
       title: 'Blockchain là một cuốn sổ.',
       text: 'Mỗi trang sổ là một khối (block). Các trang được ghi nối tiếp nhau thành một chuỗi (chain), vì vậy mới gọi là "chuỗi khối".',
+      example: 'Sổ Làng Giấy ghi: trang 1 "Giang trả Hoa 5 xu", trang 2 "Hoa trả Khang 3 xu", trang 3 "Khang trả Minh 2 xu". Ba trang nối tiếp nhau là một chuỗi gồm ba khối.',
     },
     {
       title: 'Mỗi trang có 2 phần.',
       text: 'Nội dung là điều được ghi lại (ở đây là một con số). Mã trang giống như "dấu vân tay" của trang.',
+      example: 'Trang bìa có mã 10. Trang 1 ghi Nội dung 23 và Mã trang 43 (mã 43 được tính ra từ nội dung 23, em sẽ thấy cách tính ở thẻ tiếp theo).',
     },
     {
       title: 'Cách tính mã trang.',
       text: 'Mã trang = (Mã trang trước × 2 + Nội dung) mod 100, trong đó "mod 100" nghĩa là chỉ giữ 2 chữ số cuối. Ví dụ: trang bìa có mã 10, nội dung là 23, ta có 10 × 2 + 23 = 43, vậy mã trang là 43.',
+      example: 'Mã trước 57, nội dung 36: 57 × 2 + 36 = 150, giữ 2 chữ số cuối là 50, nên mã trang là 50.',
     },
     {
       title: 'Vì sao khó sửa lén?',
-      text: 'Mã trang sau được tính từ mã trang trước, nên sửa một trang sẽ kéo theo phải sửa mọi trang phía sau. Blockchain thật dùng "hàm băm" (như SHA-256) phức tạp hơn nhiều, nhưng ý tưởng giống hệt.',
+      text: 'Mã trang sau được tính từ mã trang trước, nên sửa một trang thì phải kiểm tra và tính lại mã của các trang đứng sau nó. Blockchain thật dùng "hàm băm" (như SHA-256) phức tạp hơn nhiều, nhưng ý tưởng giống nhau.',
+      example: 'Trang 1 có mã 10. Các trang 2, 3, 4 có nội dung 10, 0, 0 nên mã là 30, 60, 20. {phanDien} sửa nội dung trang 2 từ 10 thành 35: mã trang 2 thành 55, tính tiếp ra mã trang 3 là 10 (khác 60) và mã trang 4 là 20. Mã trang 4 lần này trùng với mã cũ vì phép "giữ 2 chữ số cuối", nhưng chỉ tính xong mới biết điều đó.',
     },
   ],
 };

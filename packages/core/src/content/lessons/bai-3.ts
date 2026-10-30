@@ -72,28 +72,28 @@ export const bai3Lesson: LessonContent = {
   emCoBiet: [
     {
       title: 'Chữ ký trên giấy vs Chữ ký số',
-      text: 'Chữ ký trên giấy rất dễ bị tập đồ lại hoặc sao chép. Chữ ký số gắn chặt với từng nội dung cụ thể: đổi dù chỉ 1 đồng trong giao dịch, chữ ký sẽ lập tức vô hiệu!',
-      example: 'Kẻ gian không thể cắt chữ ký từ giấy này dán sang giấy khác, vì chữ ký số được tính từ chính nội dung chuyển tiền.',
+      text: 'Mỗi người có một cặp khóa: khóa riêng (bí mật, chỉ mình em biết, dùng để ký) và khóa công khai (ai cũng xem được, dùng để kiểm chữ ký). Chữ ký trên giấy rất dễ bị tập đồ lại hoặc sao chép. Chữ ký số được tính từ khóa riêng và chính nội dung giao dịch: ai cũng kiểm được bằng khóa công khai mà không cần biết khóa riêng, và nếu nội dung bị đổi dù chỉ một chữ số thì chữ ký cũ không còn khớp.',
+      example: 'Em ký giao dịch "Chuyển 3 xu cho An". Nếu {phanDien} sửa thành "Chuyển 300 xu cho An" mà giữ nguyên chữ ký, người kiểm bằng khóa công khai của em sẽ thấy chữ ký không khớp với nội dung mới.',
     },
     {
       title: 'Phép toán một chiều',
-      text: 'Dễ đi xuôi, bất khả thi đi ngược. Ví dụ đời thực: thả một giọt mực vào cốc nước rất dễ, nhưng tách giọt mực trở lại thì không thể. Trong toán: tính 5^x mod 23 thì nhanh, nhưng biết kết quả tìm lại x thì cực khó.',
-      example: '5^12 mod 23 = 18 tính rất nhanh. Nhưng biết 18 và bảo tìm lại 12 thì phải thử từng số một!',
+      text: 'Khóa công khai được tạo từ khóa riêng bằng một phép toán một chiều. Trong bài này: khóa công khai = 5^x mod 23, với x là khóa riêng (g = 5, p = 23). Tính xuôi thì nhanh. Nhưng chỉ biết kết quả mà muốn tìm lại x thì không có công thức trực tiếp đơn giản: phải thử, và với số rất lớn thì số lần thử là quá nhiều. Ví dụ đời thực: thả một giọt mực vào cốc nước rất dễ, nhưng tách giọt mực trở lại thì rất khó.',
+      example: 'Khóa riêng x = 12 cho khóa công khai 5^12 mod 23 = 18, tính rất nhanh. Nếu chỉ biết 18 và thử tuần tự x = 1, 2, 3, … thì phải tới x = 12 mới ra 18. Với số nhỏ như 23 thì thử được; với số rất lớn thì số lần thử quá nhiều.',
     },
     {
-      title: 'Cặp khóa trong Bitcoin (ECDSA)',
-      text: 'Bitcoin dùng đường cong elip secp256k1. Khóa riêng là một số 256-bit (khoảng 77 chữ số thập phân). Số khả năng lớn hơn cả số nguyên tử trong toàn bộ vũ trụ quan sát được (~10^80)!',
-      example: '115.792.089.237.316.195.423.570.985.008.687.907.853.269.984.665.640.564.039.457.584.007.913.129.639.936 khả năng!',
+      title: 'Cặp khóa trong Bitcoin',
+      text: 'Bitcoin dùng mật mã đường cong elip (đường cong secp256k1) cho cặp khóa. Khóa riêng là một số 256-bit: có gần 2^256 khả năng, xấp xỉ 1,16 × 10^77 (khoảng 77 chữ số thập phân), nên không thể đoán bằng cách thử lần lượt từng khóa. Chữ ký trong Bitcoin có hai kiểu: ECDSA và Schnorr.',
+      example: 'Có gần 2^256 ≈ 1,16 × 10^77 khóa riêng khả dĩ. Giả sử một máy thử 10^18 khóa mỗi giây: thời gian giả định để duyệt hết cả không gian khóa cỡ 3,7 × 10^51 năm, trong khi vũ trụ khoảng 13,8 tỷ năm tuổi.',
     },
     {
       title: 'Mất khóa riêng là mất vĩnh viễn',
-      text: 'Không có ngân hàng nào để "quên mật khẩu", không có tổng đài hỗ trợ. Ước tính khoảng 3–4 triệu Bitcoin (trị giá hàng trăm tỷ USD) đã bị "chết vĩnh viễn" vì chủ nhân làm mất khóa riêng.',
-      example: 'Hãy ghi khóa riêng ra giấy và cất vào nơi an toàn nhất, tuyệt đối không gửi lên mạng.',
+      text: 'Với ví tự quản (chính em giữ khóa riêng) thì không có ngân hàng để "quên mật khẩu" và không có tổng đài hỗ trợ. Nếu em mất mọi bản sao của khóa riêng (và cụm từ khôi phục, nếu có) và không còn cơ chế khôi phục nào khác thì không còn cách ký giao dịch, nên số tiền trong ví không chi tiêu được nữa. Ví do sàn giữ hộ hay còn bản sao lưu thì khác. Vì vậy hãy sao lưu khóa riêng cẩn thận và không gửi lên mạng.',
+      example: 'Em có ví tự quản chứa Bitcoin và nhớ rõ địa chỉ ví, nhưng đánh mất mọi bản sao khóa riêng và cụm từ khôi phục. Em vẫn thấy số dư của địa chỉ đó, nhưng không còn cách nào ký giao dịch để chuyển số tiền đi.',
     },
     {
-      title: 'Địa chỉ ví chính là khóa công khai',
-      text: 'Khi ai đó xin "địa chỉ ví" để gửi tiền cho em, họ đang xin một dạng rút gọn của khóa công khai. Cho người khác biết địa chỉ ví hoàn toàn an toàn — họ chỉ có thể gửi tiền vào, không thể rút tiền ra.',
-      example: 'Khóa công khai giống số tài khoản ngân hàng, còn khóa riêng là mật khẩu rút tiền.',
+      title: 'Địa chỉ ví được tạo từ khóa công khai',
+      text: 'Địa chỉ ví thường được tạo ra từ khóa công khai (qua các bước biến đổi cho gọn); nó không đồng nhất với khóa công khai. Biết địa chỉ ví không cho quyền chi tiêu: muốn chuyển tiền đi cần chữ ký tạo bằng khóa riêng. Nhưng địa chỉ được ghi công khai trên sổ chung, nên ai biết địa chỉ có thể xem các giao dịch của địa chỉ đó; công khai hoặc dùng lại một địa chỉ có thể ảnh hưởng đến riêng tư.',
+      example: 'Địa chỉ ví giống số tài khoản ngân hàng ở chỗ ai cũng có thể chuyển tiền vào; còn khóa riêng giống quyền ký lệnh chuyển tiền, chỉ em có. Khác ngân hàng ở chỗ, trên blockchain công khai, các giao dịch của một địa chỉ ai cũng xem được.',
     },
   ],
 };

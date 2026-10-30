@@ -1,0 +1,40 @@
+{
+ "results": [
+  {
+   "size": "1366x768",
+   "area": "tự hoàn thành/lang-giay",
+   "name": "cả 3 biển hiện xong nhưng đủ 4 cuộn thẻ VẪN chưa nhặt",
+   "ok": true,
+   "detail": "4 cuộn, done,done,done"
+  },
+  {
+   "size": "1366x768",
+   "area": "tự hoàn thành/lang-det",
+   "name": "cả 3 biển hiện xong nhưng đủ 4 cuộn thẻ VẪN chưa nhặt",
+   "ok": true,
+   "detail": "4 cuộn, done,done,done"
+  },
+  {
+   "size": "1366x768",
+   "area": "tự hoàn thành/lang-khac-dau",
+   "name": "cả 3 biển hiện xong nhưng đủ 4 cuộn thẻ VẪN chưa nhặt",
+   "ok": true,
+   "detail": "4 cuộn, done,done,done"
+  },
+  {
+   "size": "1366x768",
+   "area": "tự hoàn thành/lang-bac",
+   "name": "cả 3 biển hiện xong nhưng đủ 4 cuộn thẻ VẪN chưa nhặt",
+   "ok": true,
+   "detail": "4 cuộn, done,done,done"
+  },
+  {
+   "size": "1366x768",
+   "area": "tự hoàn thành",
+   "name": "cờ knowCards không đổi (kc vẫn 0)",
+   "ok": true,
+   "detail": "[0,0,0,0]"
+  }
+ ],
+ "shots": []
+}

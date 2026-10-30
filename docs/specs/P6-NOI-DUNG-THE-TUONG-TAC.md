@@ -1,6 +1,12 @@
-# P6a — Nội dung thẻ "Em có biết?" tương tác (BẢN NHÁP CHỜ CHỦ DỰ ÁN DUYỆT)
+# P6 — Nội dung thẻ "Em có biết?" tương tác (P6a duyệt, P6b đã tích hợp)
 
-Trạng thái: **bản nháp nội dung, chưa tích hợp vào game** (không sửa thẻ gốc, không sửa mã). Bước P6b (tích hợp) chỉ làm sau khi chủ dự án duyệt tài liệu này.
+Trạng thái: **P6a (nội dung) đã duyệt; P6b (tích hợp) đã làm** (30/10/2026): chữ nằm ở `packages/core/src/content/knowQuiz.ts` và thẻ gốc đã sửa trong `content/lessons/bai-1.ts` … `bai-4.ts`; hộp `ui/KnowQuizDialog.tsx`; mô tả luồng và quy tắc ở spec 03 mục 3.9 ("Thẻ có ví dụ và câu hỏi"). Các thay đổi so với bản nháp 49168dc khi tích hợp:
+- **Thẻ Bitcoin** theo lời chủ dự án: "có gần 2^256 khả năng, xấp xỉ 1,16 × 10^77"; 3,7 × 10^51 năm là thời gian giả định để duyệt hết không gian khóa (tốc độ giả định 10^18 khóa mỗi giây). Nguồn: https://developer.bitcoin.org/devguide/wallets.html (khóa riêng 256-bit) và https://bips.dev/340/ (chữ ký Schnorr); câu "chữ ký có hai kiểu ECDSA và Schnorr" dựa trên hai nguồn này.
+- **Thẻ 1 và 2 Làng Khắc Dấu** chứa kiến thức cặp khóa, khóa công khai tạo từ khóa riêng (5^x mod 23), ký và kiểm; thẻ 5 chỉ đọc.
+- **Cách chọn khi tài liệu để ngỏ:** Làng Giấy thẻ 4 dùng "ý tưởng giống nhau" (không "giống hệt"); mọi ví dụ trong bản nháp thay ví dụ gốc.
+- **`/ban-do` không còn đánh dấu nhặt thẻ** (xem spec 03 mục 3.9): trước P6b đọc đủ thẻ ở `/ban-do` ghi đủ bit `knowCards`, trái với quy tắc "không tự đánh dấu nhặt thẻ" nên đã bỏ; bảng làng vẫn chặn bài học tới khi nhặt đủ ở làng 3D.
+
+Phần còn lại của tài liệu giữ nguyên làm bản duyệt (các mục "đề xuất"/"dự kiến" nay là chính thức trừ chỗ ghi trên).
 
 Mỗi thẻ gốc ở `packages/core/src/content/lessons/bai-N.ts` (`emCoBiet`) được bổ sung: một ví dụ ngắn, một câu hỏi (ABCD hoặc điền số), đáp án đúng và lời giải thích. Chữ viết tiếng Việt có dấu, xưng "em". Tên nhân vật viết bằng chỗ giữ tên (`{phanDien}`, `{cuBinh}`, `{coChi}`, `{bacAn}`), không viết thẳng tên phản diện.
 
