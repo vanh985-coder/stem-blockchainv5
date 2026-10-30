@@ -1,98 +1,122 @@
 [
  {
   "file": "dev-nut-man-5-1366x768.jpg",
-  "bytes": 70444
+  "bytes": 70605
  },
  {
   "file": "dev-da-tu-hoan-thanh-man-5-1366x768.jpg",
-  "bytes": 31037
+  "bytes": 34831
  },
  {
   "file": "dev-ban-do-tu-hoan-thanh-1366x768.jpg",
-  "bytes": 162266
+  "bytes": 162067
  },
  {
   "file": "dev-nut-man-10-1366x768.jpg",
-  "bytes": 90118
+  "bytes": 84169
  },
  {
   "file": "dev-da-tu-hoan-thanh-man-12-1366x768.jpg",
-  "bytes": 30527
+  "bytes": 34493
+ },
+ {
+  "file": "dev-giua-van-man-2-hop-goi-y-1366x768.jpg",
+  "bytes": 70651
+ },
+ {
+  "file": "dev-giua-van-man-5-hop-goi-y-1366x768.jpg",
+  "bytes": 68492
  },
  {
   "file": "dev-giua-van-man-12-hop-goi-y-1366x768.jpg",
-  "bytes": 40245
+  "bytes": 67853
  },
  {
   "file": "dev-choi-that-sau-tu-hoan-thanh-1366x768.jpg",
-  "bytes": 51664
+  "bytes": 52498
  },
  {
   "file": "dev-du-12-man-ban-do-bac-1366x768.jpg",
-  "bytes": 161437
+  "bytes": 160829
  },
  {
   "file": "dev-nut-man-5-360x800.jpg",
-  "bytes": 46816
+  "bytes": 47165
  },
  {
   "file": "dev-da-tu-hoan-thanh-man-5-360x800.jpg",
-  "bytes": 25044
+  "bytes": 28396
  },
  {
   "file": "dev-ban-do-tu-hoan-thanh-360x800.jpg",
-  "bytes": 28388
+  "bytes": 34273
  },
  {
   "file": "dev-nut-man-10-360x800.jpg",
-  "bytes": 29053
+  "bytes": 27639
  },
  {
   "file": "dev-da-tu-hoan-thanh-man-12-360x800.jpg",
-  "bytes": 23273
+  "bytes": 26981
+ },
+ {
+  "file": "dev-giua-van-man-2-hop-goi-y-360x800.jpg",
+  "bytes": 34454
+ },
+ {
+  "file": "dev-giua-van-man-5-hop-goi-y-360x800.jpg",
+  "bytes": 22135
  },
  {
   "file": "dev-giua-van-man-12-hop-goi-y-360x800.jpg",
-  "bytes": 24862
+  "bytes": 26694
  },
  {
   "file": "dev-choi-that-sau-tu-hoan-thanh-360x800.jpg",
-  "bytes": 28070
+  "bytes": 28380
  },
  {
   "file": "dev-du-12-man-ban-do-bac-360x800.jpg",
-  "bytes": 26966
+  "bytes": 33039
  },
  {
   "file": "dev-nut-man-5-844x390.jpg",
-  "bytes": 39840
+  "bytes": 35436
  },
  {
   "file": "dev-da-tu-hoan-thanh-man-5-844x390.jpg",
-  "bytes": 25662
+  "bytes": 29080
  },
  {
   "file": "dev-ban-do-tu-hoan-thanh-844x390.jpg",
-  "bytes": 48688
+  "bytes": 48891
  },
  {
   "file": "dev-nut-man-10-844x390.jpg",
-  "bytes": 38622
+  "bytes": 37355
  },
  {
   "file": "dev-da-tu-hoan-thanh-man-12-844x390.jpg",
-  "bytes": 25161
+  "bytes": 28771
+ },
+ {
+  "file": "dev-giua-van-man-2-hop-goi-y-844x390.jpg",
+  "bytes": 36021
+ },
+ {
+  "file": "dev-giua-van-man-5-hop-goi-y-844x390.jpg",
+  "bytes": 33743
  },
  {
   "file": "dev-giua-van-man-12-hop-goi-y-844x390.jpg",
-  "bytes": 25550
+  "bytes": 33208
  },
  {
   "file": "dev-choi-that-sau-tu-hoan-thanh-844x390.jpg",
-  "bytes": 29028
+  "bytes": 29205
  },
  {
   "file": "dev-du-12-man-ban-do-bac-844x390.jpg",
-  "bytes": 47467
+  "bytes": 47437
  }
 ]

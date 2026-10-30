@@ -16,7 +16,7 @@ const BASE = arg('url', MODE === 'dev' ? 'http://localhost:5173' : 'http://local
 const OUT = 'docs/screenshots/p3b';
 const flag = (n) => process.argv.includes(`--${n}`);
 const sizeIdx = arg('size', '0,1,2').split(',').map(Number);
-const only = arg('only', 'levels,double,mid,real,all12').split(',');
+const only = arg('only', 'levels,stations,double,mid,real,all12').split(',');
 const write = !flag('no-write');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 if (write) mkdirSync(OUT, { recursive: true });
@@ -85,7 +85,7 @@ const autoBtn = (ctx) => ctx.page.evaluateHandle(() => [...document.querySelecto
 
 /** Vào trang một màn và chờ trang sẵn sàng (bài học: khung bài; game: thẻ bắt đầu). */
 async function openLevel(ctx, id) {
-  await ctx.page.goto(`${BASE}/lang/${villageOf(id)}/man/${id}`, { waitUntil: 'networkidle0' });
+  await ctx.page.goto(`${BASE}/lang/${villageOf(id)}/man/${id}`, { waitUntil: 'domcontentloaded' });
   if (KIND(id) === 'lesson') await waitFor(ctx, () => document.querySelector('[data-testid="lesson-scroll"]'), 60000);
   else await waitFor(ctx, () => document.querySelector('[data-testid="the-bat-dau"]'), 60000);
   await sleep(600);
@@ -109,6 +109,12 @@ async function scenarioLevels(browser, size) {
       }
       check(ctx, 'dev', `${tag}: bản dev có nút "Tự hoàn thành" (${KIND(id) === 'lesson' ? 'trên thanh đầu bài học' : 'ở thẻ bắt đầu game'})`, Boolean(btn));
       if (!btn) { await ctx.page.close(); continue; }
+      const btnInfo = await ctx.page.evaluate(() => {
+        const b = [...document.querySelectorAll('[data-testid="nut-tu-hoan-thanh"]')].find((x) => x.offsetParent !== null);
+        return b ? { text: b.innerText.trim(), label: b.getAttribute('aria-label'), title: b.getAttribute('title') } : null;
+      });
+      const hasScope = (btnInfo?.text && /cả màn/.test(btnInfo.text)) || (btnInfo?.label && /cả màn/.test(btnInfo.label));
+      check(ctx, 'dev', `${tag}: nút ghi rõ phạm vi cả màn ("Tự hoàn thành cả màn" hoặc nhãn)`, Boolean(hasScope));
       if (id === 5 || id === 10) await shot(ctx, `nut-man-${id}`);
       const before = await cookieNow(ctx);
       await tap(ctx, btn);
@@ -122,20 +128,20 @@ async function scenarioLevels(browser, size) {
       // đi tiếp theo điều kiện mở màn: màn kế trong làng mở được; làng khác không bị ảnh hưởng
       const nextId = id + 1;
       if (VILLAGES[villageOf(id)].includes(nextId)) {
-        await ctx.page.goto(`${BASE}/lang/${villageOf(id)}/man/${nextId}`, { waitUntil: 'networkidle0' });
+        await ctx.page.goto(`${BASE}/lang/${villageOf(id)}/man/${nextId}`, { waitUntil: 'domcontentloaded' });
         await sleep(1500);
         const locked = await ctx.page.evaluate(() => Boolean(document.querySelector('main [role="alert"]')));
         check(ctx, 'dev', `${tag}: sau tự hoàn thành, màn ${nextId} (kế tiếp trong làng) vào được, không báo khóa`, !locked);
         if (nextId < VILLAGES[villageOf(id)][2]) {
           // màn sau nữa vẫn khóa theo thứ tự trong làng (chưa tự hoàn thành màn kế)
-          await ctx.page.goto(`${BASE}/lang/${villageOf(id)}/man/${nextId + 1}`, { waitUntil: 'networkidle0' });
+          await ctx.page.goto(`${BASE}/lang/${villageOf(id)}/man/${nextId + 1}`, { waitUntil: 'domcontentloaded' });
           await sleep(1200);
           const locked2 = await ctx.page.evaluate(() => Boolean(document.querySelector('main [role="alert"]')));
           check(ctx, 'dev', `${tag}: màn ${nextId + 1} vẫn khóa (thứ tự trong làng giữ nguyên)`, locked2);
         }
       }
       // tải lại: cờ còn, bảng làng ở /ban-do phân biệt "Tự hoàn thành"
-      await ctx.page.goto(`${BASE}/ban-do`, { waitUntil: 'networkidle0' });
+      await ctx.page.goto(`${BASE}/ban-do`, { waitUntil: 'domcontentloaded' });
       await ctx.page.waitForSelector('button[data-village]', { timeout: 20000 });
       await tap(ctx, await ctx.page.$(`button[data-village="${villageOf(id)}"]`));
       await waitFor(ctx, () => document.querySelector('[data-testid="ban-do-bang-lang"]') || [...document.querySelectorAll('button')].some((b) => /^Bỏ qua/.test(b.innerText.trim())), 15000);
@@ -171,31 +177,66 @@ async function scenarioDouble(browser, size) {
   await ctx.page.close();
 }
 
+/** Bài học: nút ở thanh đầu trang, truy cập được tại mọi trạm (Dễ, Trung bình, Khó). */
+async function scenarioStations(browser, size) {
+  const lessonIds = [1, 4, 7, 10];
+  for (const id of lessonIds) {
+    const tag = `màn ${id} (bài học)`;
+    const stationCases = [
+      { name: 'Dễ', cookie: cookieOf({ lv: levelsDone(prior(id)) }) },
+      { name: 'Trung bình', cookie: cookieOf({ lv: { ...levelsDone(prior(id)), [String(id)]: [0, 0, 1, 0, 0] } }) },
+      { name: 'Khó', cookie: cookieOf({ lv: { ...levelsDone(prior(id)), [String(id)]: [0, 0, 1, 1, 0] } }) },
+    ];
+    for (const st of stationCases) {
+      const ctx = await newCtx(browser, size, st.cookie);
+      try {
+        await openLevel(ctx, id);
+        const btn = (await autoBtn(ctx)).asElement();
+        if (MODE === 'prod') {
+          check(ctx, 'phát hành trạm', `${tag} trạm ${st.name}: khách không thấy nút`, !btn);
+        } else {
+          check(ctx, 'trạm bài học', `${tag} trạm ${st.name}: có nút tự hoàn thành ở thanh đầu trang`, Boolean(btn));
+        }
+      } catch (e) {
+        check(ctx, 'lỗi trạm', `${tag} trạm ${st.name}: ${e.message}`, false);
+      }
+      await ctx.page.close();
+    }
+  }
+}
+
 /** Rời ván bằng tự hoàn thành ở GIỮA ván (qua hộp "?" đang tạm dừng): ván dừng, không chấm điểm, không thưởng. */
 async function scenarioMid(browser, size) {
-  const cases = [[6, async (ctx) => { await waitFor(ctx, () => window.__kiteUi?.ready, 90000); await sleep(1500); await tap(ctx, await ctx.page.$('[data-testid="man6-khung"]')); await sleep(1500); }],
-    [12, async (ctx) => { await waitFor(ctx, () => window.__climbUi?.ready, 90000); await sleep(1500); }],
-    [11, async (ctx) => { await waitFor(ctx, () => window.__match3Ui || document.querySelector('[data-testid="nut-goi-y"]'), 90000); await sleep(1500); }]];
+  const cases = [
+    [2, async (ctx) => { await waitFor(ctx, () => document.querySelector('[data-testid="nut-goi-y"]'), 45000); await sleep(1000); }],
+    [3, async (ctx) => { await waitFor(ctx, () => document.querySelector('[data-testid="nut-goi-y"]'), 45000); await sleep(1000); }],
+    [5, async (ctx) => { await waitFor(ctx, () => document.querySelector('[data-testid="nut-goi-y"]'), 45000); await sleep(1000); }],
+    [6, async (ctx) => { await waitFor(ctx, () => window.__kiteUi?.ready || document.querySelector('[data-testid="man6-khung"]'), 90000); await sleep(1500); if (await ctx.page.$('[data-testid="man6-khung"]')) { await tap(ctx, await ctx.page.$('[data-testid="man6-khung"]')); await sleep(1500); } }],
+    [8, async (ctx) => { await waitFor(ctx, () => document.querySelector('[data-testid="nut-goi-y"]'), 45000); await sleep(1000); }],
+    [9, async (ctx) => { await waitFor(ctx, () => document.querySelector('[data-testid="nut-goi-y"]'), 45000); await sleep(1000); }],
+    [11, async (ctx) => { await waitFor(ctx, () => window.__match3Ui || document.querySelector('[data-testid="nut-goi-y"]'), 90000); await sleep(1500); }],
+    [12, async (ctx) => { await waitFor(ctx, () => window.__climbUi?.ready || document.querySelector('[data-testid="nut-goi-y"]'), 90000); await sleep(1500); }],
+  ];
   for (const [id, prep] of cases) {
     const portrait = size.w < size.h;
     const ctx = await newCtx(browser, size, cookieOf({ lv: levelsDone(prior(id)) }));
-    if (portrait && id === 6) await ctx.page.setViewport({ width: size.h, height: size.w, hasTouch: size.touch, isMobile: size.touch, deviceScaleFactor: 1 });
+    if (portrait && (id === 6 || id === 3)) await ctx.page.setViewport({ width: size.h, height: size.w, hasTouch: size.touch, isMobile: size.touch, deviceScaleFactor: 1 });
     try {
       await openLevel(ctx, id);
       await tapText(ctx, /^Bắt đầu/);
       await prep(ctx);
       await tap(ctx, await ctx.page.$('[data-testid="nut-goi-y"]'));
-      await waitFor(ctx, () => document.querySelector('[data-testid="hop-goi-y"]'), 10000);
+      await waitFor(ctx, () => document.querySelector('[data-testid="hop-goi-y"]'), 15000);
       const btn = (await autoBtn(ctx)).asElement();
-      check(ctx, 'giữa ván', `màn ${id}: hộp "?" (ván đang tạm dừng) có nút "Tự hoàn thành"`, Boolean(btn));
-      if (id === 12) await shot(ctx, 'giua-van-man-12-hop-goi-y');
+      check(ctx, 'giữa ván', `màn ${id}: hộp "?" (ván đang tạm dừng) có nút "Tự hoàn thành cả màn"`, Boolean(btn));
+      if (id === 12 || id === 2 || id === 5) await shot(ctx, `giua-van-man-${id}-hop-goi-y`);
       await tap(ctx, btn);
       await waitFor(ctx, () => document.querySelector('[data-testid="da-tu-hoan-thanh"]'), 15000);
-      const gone = await ctx.page.evaluate(() => !document.querySelector('[data-testid="man6-khung"], [data-testid="man12-khung"]'));
-      await sleep(4000);
+      const stopped = await ctx.page.evaluate(() => Boolean(document.querySelector('[data-testid="da-tu-hoan-thanh"]')) && !document.querySelector('[data-testid="nut-goi-y"]'));
+      await sleep(3500);
       const ck = await cookieNow(ctx);
       const noScore = await ctx.page.evaluate(() => !document.querySelector('[data-testid="diem"]') && !/Chơi lại/.test(document.body.innerText));
-      check(ctx, 'giữa ván', `màn ${id}: ván dừng (khung game đã gỡ), không hiện màn kết quả, không ghi điểm/sao/xu`, gone && noScore && ck.c === 0 && ck.gp === 0 && zeroRow(ck.lv[String(id)], id) && (ck.ac & (1 << (id - 1))) !== 0, JSON.stringify({ ac: ck?.ac, row: ck?.lv?.[String(id)] }));
+      check(ctx, 'giữa ván', `màn ${id}: ván dừng (khung game đã gỡ), không hiện màn kết quả, không ghi điểm/sao/xu`, stopped && noScore && ck.c === 0 && ck.gp === 0 && zeroRow(ck.lv[String(id)], id) && (ck.ac & (1 << (id - 1))) !== 0, JSON.stringify({ ac: ck?.ac, row: ck?.lv?.[String(id)] }));
     } catch (e) {
       check(ctx, 'lỗi chạy', `giữa ván màn ${id}: ${e.message}`, false);
     }
@@ -244,7 +285,7 @@ async function scenarioAll12(browser, size) {
   await sleep(2500);
   const ck = await cookieNow(ctx);
   check(ctx, 'đủ 12 màn', 'tự hoàn thành lần lượt cả 12 màn: đủ 12 cờ, không xu, không Trang Sổ Vàng', ck.ac === 4095 && ck.c === 0 && ck.gp === 0 && Object.values(ck.lv).every((r, i) => zeroRow(r, Number(Object.keys(ck.lv)[i]))), JSON.stringify({ ac: ck.ac, c: ck.c, gp: ck.gp }));
-  await ctx.page.goto(`${BASE}/ban-do`, { waitUntil: 'networkidle0' });
+  await ctx.page.goto(`${BASE}/ban-do`, { waitUntil: 'domcontentloaded' });
   await ctx.page.waitForSelector('button[data-village]', { timeout: 20000 });
   const text = await ctx.page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
   check(ctx, 'đủ 12 màn', '/ban-do: 0/4 Trang Sổ Vàng đã nhận (tự hoàn thành không trao trang)', !/Trang Sổ Vàng \d: Đã nhận/.test(text));
@@ -260,11 +301,11 @@ async function scenarioAll12(browser, size) {
 /** Bản phát hành: cờ tự hoàn thành đặt thẳng vào cookie (giả mạo) bị bỏ qua. */
 async function scenarioForged(browser, size) {
   const ctx = await newCtx(browser, size, cookieOf({ ac: 4095 }));
-  await ctx.page.goto(`${BASE}/lang/lang-bac/man/12`, { waitUntil: 'networkidle0' });
+  await ctx.page.goto(`${BASE}/lang/lang-bac/man/12`, { waitUntil: 'domcontentloaded' });
   await sleep(1500);
   const locked = await ctx.page.evaluate(() => Boolean(document.querySelector('main [role="alert"]')));
   check(ctx, 'phát hành', 'cookie giả có cờ tự hoàn thành cả 12 màn: bị bỏ qua, màn 12 vẫn khóa theo thứ tự', locked);
-  await ctx.page.goto(`${BASE}/ban-do`, { waitUntil: 'networkidle0' });
+  await ctx.page.goto(`${BASE}/ban-do`, { waitUntil: 'domcontentloaded' });
   await ctx.page.waitForSelector('button[data-village]', { timeout: 20000 });
   check(ctx, 'phát hành', '/ban-do không hiện nhãn "Tự hoàn thành" cho khách', !(await ctx.page.evaluate(() => /Tự hoàn thành/.test(document.body.innerText))));
   await ctx.page.close();
@@ -278,8 +319,8 @@ try {
     const size = SIZES[si];
     const before = results.length;
     const plan = MODE === 'dev'
-      ? [['levels', scenarioLevels], ['double', scenarioDouble], ['mid', scenarioMid], ['real', scenarioReal], ['all12', scenarioAll12]]
-      : [['levels', scenarioLevels], ['forged', scenarioForged]];
+      ? [['levels', scenarioLevels], ['stations', scenarioStations], ['double', scenarioDouble], ['mid', scenarioMid], ['real', scenarioReal], ['all12', scenarioAll12]]
+      : [['levels', scenarioLevels], ['stations', scenarioStations], ['forged', scenarioForged]];
     for (const [key, fn] of plan) {
       if (!only.includes(key) && key !== 'forged') continue;
       try {

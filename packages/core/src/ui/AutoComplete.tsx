@@ -16,6 +16,7 @@ import { Panel } from './Panel';
 export function AutoCompleteButton({ levelId, onDone, variant = 'text', className = '', onNote }: { levelId: number; onDone: (note?: string) => void; variant?: 'text' | 'icon' | 'responsive'; className?: string; /** Có thì dòng ghi chú KHÔNG hiện cạnh nút mà được báo cho trang tự đặt chỗ (thanh đầu bài học quá hẹp để chứa nó) */ onNote?: (note: string | null) => void }) {
   const { canAutoComplete, autoComplete, autoStatus, unlock } = useProgress();
   const [msg, setMsg] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
   const state = unlock.levels.find((l) => l.id === levelId)?.state;
   const shown = canAutoComplete && state !== 'done' && state !== 'coming-soon';
   // Máy chủ chưa hỗ trợ (migration 0003 chưa chạy) hay từ chối: vô hiệu nút và nói rõ; không ghi gì, không ảnh hưởng việc lưu tiến độ chơi thật
@@ -28,14 +29,20 @@ export function AutoCompleteButton({ levelId, onDone, variant = 'text', classNam
   }, [note, onNote]);
   if (!shown) return null;
   const press = async () => {
-    const r = await autoComplete(levelId);
-    if (r === 'done' || r === 'noop') onDone();
-    else if (r === 'pending') onDone(autoCompleteUi.chuaLuu); // đã ghi ở máy: vào khung nhưng nói rõ CHƯA lưu lên máy chủ
-    else setMsg(r === 'unsupported' ? autoCompleteUi.chuaHoTro : r === 'rejected' ? autoCompleteUi.biTuChoi : autoCompleteUi.khongDung);
+    if (busy) return;
+    setBusy(true);
+    try {
+      const r = await autoComplete(levelId);
+      if (r === 'done' || r === 'noop') onDone();
+      else if (r === 'pending') onDone(autoCompleteUi.chuaLuu); // đã ghi ở máy: vào khung nhưng nói rõ CHƯA lưu lên máy chủ
+      else setMsg(r === 'unsupported' ? autoCompleteUi.chuaHoTro : r === 'rejected' ? autoCompleteUi.biTuChoi : autoCompleteUi.khongDung);
+    } finally {
+      setBusy(false);
+    }
   };
   const common = { 'data-testid': 'nut-tu-hoan-thanh', 'aria-describedby': note ? `tu-hoan-thanh-ghi-chu-${levelId}` : undefined } as const;
   const textButton = (
-    <Button variant="secondary" size="sm" title={autoCompleteUi.ghiChu} disabled={blocked !== null} className={variant === 'responsive' ? `max-[480px]:hidden ${className}` : className} onClick={() => void press()} {...common}>
+    <Button variant="secondary" size="sm" title={autoCompleteUi.ghiChu} disabled={blocked !== null || busy} className={variant === 'responsive' ? `max-[480px]:hidden ${className}` : className} onClick={() => void press()} {...common}>
       {autoCompleteUi.nut}
     </Button>
   );
@@ -44,7 +51,7 @@ export function AutoCompleteButton({ levelId, onDone, variant = 'text', classNam
       type="button"
       aria-label={autoCompleteUi.nut}
       title={autoCompleteUi.ghiChu}
-      disabled={blocked !== null}
+      disabled={blocked !== null || busy}
       onClick={() => void press()}
       {...common}
       className={`size-11 min-h-11 min-w-11 cursor-pointer place-items-center rounded-nut border-2 border-muc-tim bg-giay text-xl disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim ${variant === 'responsive' ? 'hidden max-[480px]:grid' : ''} ${className}`}

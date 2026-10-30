@@ -98,6 +98,102 @@
  {
   "mode": "prod",
   "size": "1366x768",
+  "area": "phát hành trạm",
+  "name": "màn 1 (bài học) trạm Dễ: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành trạm",
+  "name": "màn 1 (bài học) trạm Trung bình: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành trạm",
+  "name": "màn 1 (bài học) trạm Khó: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành trạm",
+  "name": "màn 4 (bài học) trạm Dễ: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành trạm",
+  "name": "màn 4 (bài học) trạm Trung bình: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành trạm",
+  "name": "màn 4 (bài học) trạm Khó: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành trạm",
+  "name": "màn 7 (bài học) trạm Dễ: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành trạm",
+  "name": "màn 7 (bài học) trạm Trung bình: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành trạm",
+  "name": "màn 7 (bài học) trạm Khó: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành trạm",
+  "name": "màn 10 (bài học) trạm Dễ: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành trạm",
+  "name": "màn 10 (bài học) trạm Trung bình: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
+  "area": "phát hành trạm",
+  "name": "màn 10 (bài học) trạm Khó: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "1366x768",
   "area": "phát hành",
   "name": "cookie giả có cờ tự hoàn thành cả 12 màn: bị bỏ qua, màn 12 vẫn khóa theo thứ tự",
   "ok": true,
@@ -210,6 +306,102 @@
  {
   "mode": "prod",
   "size": "360x800",
+  "area": "phát hành trạm",
+  "name": "màn 1 (bài học) trạm Dễ: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành trạm",
+  "name": "màn 1 (bài học) trạm Trung bình: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành trạm",
+  "name": "màn 1 (bài học) trạm Khó: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành trạm",
+  "name": "màn 4 (bài học) trạm Dễ: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành trạm",
+  "name": "màn 4 (bài học) trạm Trung bình: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành trạm",
+  "name": "màn 4 (bài học) trạm Khó: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành trạm",
+  "name": "màn 7 (bài học) trạm Dễ: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành trạm",
+  "name": "màn 7 (bài học) trạm Trung bình: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành trạm",
+  "name": "màn 7 (bài học) trạm Khó: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành trạm",
+  "name": "màn 10 (bài học) trạm Dễ: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành trạm",
+  "name": "màn 10 (bài học) trạm Trung bình: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
+  "area": "phát hành trạm",
+  "name": "màn 10 (bài học) trạm Khó: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "360x800",
   "area": "phát hành",
   "name": "cookie giả có cờ tự hoàn thành cả 12 màn: bị bỏ qua, màn 12 vẫn khóa theo thứ tự",
   "ok": true,
@@ -316,6 +508,102 @@
   "size": "844x390",
   "area": "phát hành",
   "name": "màn 12: khách ở bản phát hành KHÔNG thấy nút \"Tự hoàn thành\"",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành trạm",
+  "name": "màn 1 (bài học) trạm Dễ: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành trạm",
+  "name": "màn 1 (bài học) trạm Trung bình: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành trạm",
+  "name": "màn 1 (bài học) trạm Khó: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành trạm",
+  "name": "màn 4 (bài học) trạm Dễ: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành trạm",
+  "name": "màn 4 (bài học) trạm Trung bình: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành trạm",
+  "name": "màn 4 (bài học) trạm Khó: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành trạm",
+  "name": "màn 7 (bài học) trạm Dễ: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành trạm",
+  "name": "màn 7 (bài học) trạm Trung bình: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành trạm",
+  "name": "màn 7 (bài học) trạm Khó: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành trạm",
+  "name": "màn 10 (bài học) trạm Dễ: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành trạm",
+  "name": "màn 10 (bài học) trạm Trung bình: khách không thấy nút",
+  "ok": true,
+  "detail": ""
+ },
+ {
+  "mode": "prod",
+  "size": "844x390",
+  "area": "phát hành trạm",
+  "name": "màn 10 (bài học) trạm Khó: khách không thấy nút",
   "ok": true,
   "detail": ""
  },

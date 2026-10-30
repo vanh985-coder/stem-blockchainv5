@@ -53,3 +53,50 @@ Chạy lại sau sửa: `p3b-check.mjs --mode=dev --only=levels,double,mid` **20
 - **Tài khoản giáo viên thật và Supabase:** không có môi trường nên chưa kiểm ở trình duyệt với tài khoản giáo viên, chưa chạy migration 0003 và `pnpm rls:check`. Đã kiểm bằng test: quyền thấy nút (`canUseAutoComplete`), manager không đẩy cờ khi chưa được phép và đẩy đúng một bản ghi khi được phép, hàng Supabase, trang giáo viên; nút giáo viên được kiểm gián tiếp bằng bản dev. **Chạy migration 0003 TRƯỚC khi triển khai bản này**: học sinh không bị ảnh hưởng (không bao giờ gửi cột mới), nhưng nếu giáo viên bấm nút khi cột chưa có thì lần đẩy tiến độ chứa cờ đó lỗi (cột không tồn tại) và tiến độ của chính tài khoản giáo viên đó chưa đồng bộ được cho tới khi chạy migration.
 - Học sinh vẫn có thể tự sửa `completed`/`played` của chính mình qua API (đã vậy từ trước, spec 02 mục 4 ghi chú); migration chỉ chặn cờ tự hoàn thành, không đổi điều đó.
 - Thiết bị thật, Safari/iPhone; chạm giả lập bằng Chrome; màn 6 ở 360×800 chơi sau khi xoay ngang.
+
+## Hoàn thiện truy cập nút "Tự hoàn thành cả màn" ở mọi trạm và mọi vòng (30/10/2026)
+
+### 1. Nội dung đã làm
+- **Phạm vi hiển thị rõ ràng trên giao diện:** Đổi nhãn nút thành `"Tự hoàn thành cả màn"` (`content/autoComplete.ts`), cập nhật ghi chú giải thích rõ phạm vi: hoàn thành toàn bộ màn này (không phải riêng câu, trạm hay vòng hiện tại); màn kế tiếp sẽ mở theo luật, không nhận sao/xu/Trang Sổ Vàng.
+- **Truy cập ở mọi trạm bài học:** 4 bài học (Màn 1, 4, 7, 10) có nút ở thanh đầu trang (`header`), truy cập được tại mọi trạm (Dễ, Trung bình, Khó).
+- **Truy cập ở mọi vòng game:** 8 game (Màn 2, 3, 5, 6, 8, 9, 11, 12) có nút ở thẻ bắt đầu (`the-bat-dau`) và trong hộp "?" (`hop-goi-y`) khi đang chơi. Nút "?" được nâng lên lớp `z-[35]` trong `MiniGameLevel.tsx` để luôn nổi trên các overlay giữa ván (như câu hỏi trắc nghiệm `z-30` của Màn 2), đảm bảo mở được hộp gợi ý ở mọi vòng. Hộp "?" mở rộng `max-w-lg` và `sm:flex-wrap` tránh tràn nút ở màn ngang (844×390).
+- **Chặn bấm lặp tức thời:** Bổ sung cờ `busy` vào `AutoCompleteButton` (`disabled={blocked !== null || busy}`) vô hiệu hóa nút ngay trong mili-giây đầu tiên khi bấm, phối hợp cùng cơ chế guard `'noop'` ở manager.
+- **Dừng mô phỏng khi tự hoàn thành giữa ván:** Khi bấm tự hoàn thành trong hộp "?", component game được gỡ khỏi cây DOM, đồng hồ và mô phỏng dừng ngay lập tức; không gọi `onFinish`, không chấm điểm hay phát sinh thưởng.
+
+### 2. Bảng tổng hợp 12 màn, trạm/vòng và vị trí nút
+| Màn | Tên màn | Loại | Các độ khó / trạm / vòng | Vị trí truy cập nút |
+|---|---|---|---|---|
+| Màn 1 | Bài 1: Sổ cái tập trung | Bài học 2D | 3 trạm: Dễ, Trung bình, Khó | Thanh đầu trang (`header`), hiện ở mọi trạm |
+| Màn 2 | Thu thập trang sổ | Game Runner 3D | 3 vòng (tăng tốc dần) | Thẻ bắt đầu + Hộp "?" giữa ván (`z-[35]`, mở được mọi vòng) |
+| Màn 3 | Khôi phục trang rách | Game Ghép 2D | 2 vòng (soi mã + giữ sổ) | Thẻ bắt đầu + Hộp "?" giữa ván (mọi vòng) |
+| Màn 4 | Bài 2: Sổ cái phân tán | Bài học 2D | 3 trạm: Dễ, Trung bình, Khó | Thanh đầu trang (`header`), hiện ở mọi trạm |
+| Màn 5 | Bắt bọ sổ cái | Game Đập chuột 2D | 3 vòng độ khó | Thẻ bắt đầu + Hộp "?" giữa ván (mọi vòng) |
+| Màn 6 | Thả diều truyền tin | Game Diều 2.5D | 4 cổng / 24 khe | Thẻ bắt đầu + Hộp "?" giữa ván (mọi lúc) |
+| Màn 7 | Bài 3: Chữ ký điện tử | Bài học 2D | 3 trạm: Dễ, Trung bình, Khó | Thanh đầu trang (`header`), hiện ở mọi trạm |
+| Màn 8 | Lật thẻ tìm cặp | Game Memory 2D | 3 vòng (cặp khóa, mã hóa, ký) | Thẻ bắt đầu + Hộp "?" giữa ván (mọi vòng) |
+| Màn 9 | Chữa gà bị bẫy | Game Chạy 3 làn 2D | 3 vòng độ khó | Thẻ bắt đầu + Hộp "?" giữa ván (mọi vòng) |
+| Màn 10 | Bài 4: Cây Merkle | Bài học 2D | 3 trạm: Dễ, Trung bình, Khó | Thanh đầu trang (`header`), hiện ở mọi trạm |
+| Màn 11 | Ghép lá Merkle | Game Match-3 2D | 3 cây Merkle (12/15/15 lượt) | Thẻ bắt đầu + Hộp "?" giữa ván (mọi cây) |
+| Màn 12 | Leo cây Merkle | Game Leo cây 2.5D | 4 vòng / 4 chặng | Thẻ bắt đầu + Hộp "?" giữa ván (mọi vòng) |
+
+### 3. Kết quả kiểm tra DOM (local Chrome headless)
+- **Bản Dev (`scripts/p3b-check.mjs --mode=dev --size=0,1,2`):** **324/324 kiểm đạt** (108 mỗi cỡ: 1366×768, 360×800, 844×390):
+  - Đủ 12 màn có nút: 4 bài học ở thanh đầu trang, 8 game ở thẻ bắt đầu.
+  - Cả 12 trạm của 4 bài học (mỗi bài 3 trạm Dễ, Trung bình, Khó) đều có nút truy cập được.
+  - Cả 8 game đều mở được hộp "?" giữa ván và có nút tự hoàn thành dừng ván ngay.
+  - Bấm lặp 3 lần liên tiếp: chỉ ghi 1 cờ, không tạo bản ghi trùng.
+  - Chơi thật sau tự hoàn thành: thành tích thật được ghi nhận bình thường.
+  - Chuỗi tự hoàn thành cả 12 màn: không nhận nhầm Trang Sổ Vàng, xu hay cao trào.
+- **Bản Phát hành (`scripts/p3b-check.mjs --mode=prod --size=0,1,2 --url=http://localhost:5190`):** **78/78 kiểm đạt** (26 mỗi cỡ):
+  - Khách ở bản phát hành KHÔNG thấy nút ở bất kỳ màn nào trong 12 màn và 12 trạm bài học.
+  - Cookie giả mạo mang cờ tự hoàn thành bị bỏ qua, màn 12 vẫn khóa theo đúng tiến độ thật.
+- **Kiểm tra bắt buộc:**
+  - `pnpm test --maxWorkers=2`: **2267 đạt, 5 bỏ qua**.
+  - `pnpm typecheck`: **10/10 gói đạt**.
+  - `pnpm check:text`: **437 file sạch**.
+  - `pnpm build`: **5 app build thành công**.
+
+### 4. Giới hạn chưa xác minh
+- Tài khoản Supabase production thật và migration 0003 trên server thật (vẫn giữ nguyên trạng thái chưa nghiệm thu Supabase thật; không tự áp migration production).
+- Thiết bị di động thật (iOS/Safari, bàn phím số ảo, cảm ứng vuốt thật).
+

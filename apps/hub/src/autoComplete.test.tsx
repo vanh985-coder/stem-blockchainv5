@@ -51,7 +51,7 @@ describe('nút "Tự hoàn thành" (P3b)', () => {
     expect(wrap(t, <AutoCompleteButton levelId={5} onDone={() => {}} />)).toContain('data-testid="nut-tu-hoan-thanh"');
     const html = wrap(t, <MiniGameLevel levelId={2} medals={[200, 380, 520]} renderGame={() => <div />} />);
     expect(html).toContain('data-testid="nut-tu-hoan-thanh"');
-    expect(html).toContain('>Tự hoàn thành<');
+    expect(html).toContain(`>${autoCompleteUi.nut}<`);
   });
 
   it('màn đã xong (thật hay tự hoàn thành) thì không còn nút', () => {
@@ -65,8 +65,15 @@ describe('nút "Tự hoàn thành" (P3b)', () => {
     const html = wrap(stateOf({ canAutoComplete: true }), <AutoCompletedPanel levelId={1} onPlayReal={() => {}} onNext={() => {}} onLeave={() => {}} />).replace(/&amp;/g, '&');
     expect(html).toContain(autoCompleteUi.tieuDe);
     expect(html).toContain('Không có điểm, sao, huy chương hay xu');
+    expect(html).toContain('Toàn bộ màn này');
     expect(html).toContain(autoCompleteUi.choiThat);
     expect(html).toContain('data-testid="tu-hoan-thanh-choi-tiep"');
+  });
+
+  it('phạm vi hiển thị rõ ràng trên giao diện: nút ghi "Tự hoàn thành cả màn", ghi chú giải thích rõ toàn bộ màn (không riêng trạm hay vòng)', () => {
+    expect(autoCompleteUi.nut).toBe('Tự hoàn thành cả màn');
+    expect(autoCompleteUi.ghiChu).toContain('toàn bộ màn này (không phải riêng câu, trạm hay vòng hiện tại)');
+    expect(autoCompleteUi.loi).toContain('Toàn bộ màn này (không phải riêng câu hay vòng)');
   });
 
   it('máy chủ chưa hỗ trợ (chưa chạy migration 0003): nút bị vô hiệu kèm thông báo rõ; từ chối thì thông báo riêng; hỗ trợ thì nút dùng được', () => {

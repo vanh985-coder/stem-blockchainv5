@@ -148,6 +148,13 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - **Kiểm hồi quy chốt P3b (sau 445752a):** dev `real`+`all12` 15 kiểm đạt; bản phát hành `--mode=prod` 42 kiểm đạt (3 cỡ). Cùng với 207 (dev levels/double/mid) và 156 (máy chủ giả) là đủ bộ kịch bản P3b. Vẫn CHƯA nghiệm thu Supabase thật; không áp migration production.
 - **Cần xử lý trước khi dùng thật (có từ trước, chưa sửa):** học sinh tự sửa được `completed`/`played`/`stars`/`best_score`/`coins`/`golden_pages` của mình qua API.
 - **Chưa xác minh:** tài khoản giáo viên thật và Supabase thật (migration, trigger, `rls:check`, trang giáo viên với dữ liệu thật); kiểm quyền chỉ bằng test; thiết bị thật/Safari.
+- **Hoàn thiện truy cập nút "Tự hoàn thành cả màn" ở mọi trạm và mọi vòng (30/10/2026):**
+  - Đổi nhãn nút thành "Tự hoàn thành cả màn" (`content/autoComplete.ts`), ghi rõ phạm vi: hoàn thành toàn bộ màn này (không phải riêng câu, trạm hay vòng hiện tại); màn kế tiếp sẽ mở theo luật, không nhận sao/xu/Trang Sổ Vàng.
+  - Truy cập đủ 12 màn: 4 bài học có nút ở thanh đầu trang tại cả 3 trạm (12 trạm Dễ/Trung bình/Khó); 8 game có nút ở thẻ bắt đầu và trong hộp "?" giữa ván ở mọi vòng. Nâng nút "?" lên `z-[35]` trong `MiniGameLevel.tsx` không bị overlay giữa ván che khuất; hộp "?" mở rộng `max-w-lg` và `sm:flex-wrap` tránh tràn nút ở màn ngang (844×390).
+  - Thêm cờ `busy` chặn bấm lặp tức thời ở UI (`AutoCompleteButton`); tự hoàn thành giữa ván dừng đồng hồ và mô phỏng ngay; không cộng điểm/sao/xu/trang hay mở cao trào.
+  - Kiểm DOM (`scripts/p3b-check.mjs`): bản dev 324/324 kiểm đạt (108 mỗi cỡ × 3 cỡ 1366×768, 360×800, 844×390); bản phát hành 78/78 kiểm đạt (26 mỗi cỡ, khách không thấy nút ở bất kỳ màn nào trong 12 màn và 12 trạm bài học, cookie giả bị bỏ qua).
+  - `pnpm test --maxWorkers=2`: 2267 đạt, 5 bỏ qua; `pnpm typecheck`, `pnpm check:text` (437 file), `pnpm build` đạt. Báo cáo chi tiết và ảnh ở `docs/screenshots/p3b/README.md`.
+
 
 ## P4a — Màn 2 nhanh hơn (+20% tốc độ mọi vòng) — đã kiểm bằng bản build, FPS thiết bị thật CHƯA kiểm (29/10/2026)
 

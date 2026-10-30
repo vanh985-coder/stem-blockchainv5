@@ -215,18 +215,18 @@ export function MiniGameLevel({ levelId, medals, maxScore, renderGame, onLeave, 
             aria-label={gameHints.nut}
             aria-haspopup="dialog"
             data-testid="nut-goi-y"
-            className="fixed right-2 top-2 z-30 grid size-11 min-h-11 min-w-11 cursor-pointer place-items-center rounded-full border-[3px] border-nau-go bg-giay font-display text-xl font-extrabold text-chu focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim"
+            className="fixed right-2 top-2 z-[35] grid size-11 min-h-11 min-w-11 cursor-pointer place-items-center rounded-full border-[3px] border-nau-go bg-giay font-display text-xl font-extrabold text-chu focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim"
           >
             {gameHints.kyHieu}
           </button>
         )}
         {hint !== null && !tabPaused && (
           <div role="dialog" aria-modal="true" aria-label={gameHints.tieuDe} data-testid="hop-goi-y" className="fixed inset-0 z-40 grid place-items-center bg-black/50 p-4">
-            <Panel className="w-full max-w-md space-y-4 text-center [@media(max-height:500px)]:space-y-2 [@media(max-height:500px)]:p-3">
+            <Panel className="w-full max-w-lg space-y-4 text-center [@media(max-height:500px)]:space-y-2 [@media(max-height:500px)]:p-3">
               <p className="text-lg font-semibold leading-relaxed [@media(max-height:500px)]:text-base" data-testid="viec-cua-em">
                 {rich(hint)}
               </p>
-              <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-center">
                 <Button size="md" variant="secondary" className="min-h-11 whitespace-nowrap" onClick={() => setPlayGuide(true)}>
                   {gameHints.xemDayDu}
                 </Button>
