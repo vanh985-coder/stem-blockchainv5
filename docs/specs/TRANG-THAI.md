@@ -20,7 +20,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 |---|---|
 | 0–2 | ✅ Xong (mốc 2 chưa deploy) |
 | 3. Nhân rộng | ✅ **Chốt.** Đủ 12 màn, cả 4 làng dựng to, **đã gộp web** (≈2086 test xanh). Việc còn dở dời xuống **cuối mốc 4** |
-| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt (P3b chưa có Supabase thật); P5 đã chốt phần kiểm local; P6a đã duyệt và P6b (tích hợp 16 thẻ) đã xong; Hoàn thiện nút Tự hoàn thành cả màn ở mọi vòng/trạm, Bố cục đối chiếu trái–phải (Màn 4) và Phóng to máy tính Màn 8 ĐÃ XONG (30/10/2026)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
+| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt (P3b chưa có Supabase thật); P5 đã chốt phần kiểm local; P6a đã duyệt và P6b (tích hợp 16 thẻ, rà Enter giữ/lặp, click ma, đối chiếu nguồn Bitcoin) đã hoàn thiện kiểm đạt 100%; Hoàn thiện nút Tự hoàn thành cả màn ở mọi vòng/trạm, Bố cục đối chiếu trái–phải (Màn 4) và Phóng to máy tính Màn 8 ĐÃ XONG (30/10/2026)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
 
 **⚠️ 15b vẫn chưa làm:** server có thể đang 530, mốc 2 và toàn bộ mốc 3 (≈60 commit, mới nhất `2bd76bf`) chưa push, chưa chạy trên máy thật. Cách làm: khôi phục `cloudflared` + Docker, deploy theo `DEPLOY.md` (h), Cache Rule (i), thử trên điện thoại.
 

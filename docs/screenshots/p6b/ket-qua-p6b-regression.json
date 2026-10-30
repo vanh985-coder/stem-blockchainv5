@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Mở làng thành công, tìm thấy cuộn thẻ",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Mở hộp thẻ #0 bằng phím E thành công",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Đã chọn đáp án A trước khi nộp",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Tại 500ms (vượt SAVE_GUARD_MS 400ms): hộp vẫn mở, feedback, cờ kc[0] === 0 (chưa cất)",
+    "ok": true,
+    "detail": "open=true, phase=feedback, kc[0]=0"
+  },
+  {
+    "name": "Tại 1200ms (> 1s): hộp vẫn mở, cờ kc[0] === 0 tuyệt đối không tự cất",
+    "ok": true,
+    "detail": "open=true, kc[0]=0"
+  },
+  {
+    "name": "Sau khi nhả phím: hộp vẫn mở chờ lệnh, cờ chưa ghi",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Nhấn Enter chu kỳ mới: cất thẻ thành công (hộp đóng, kc[0] = 1)",
+    "ok": true,
+    "detail": "closed=true, kc[0]=1"
+  },
+  {
+    "name": "Mở hộp thẻ bằng cử chỉ chạm giữ 650ms trên nút ✋",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Sau cú chạm giữ 650ms trên nút ✋: hộp mở sạch sẽ (chưa chọn gì, không nhắc nhở, phase ask)",
+    "ok": true,
+    "detail": "{\"anyChecked\":false,\"hasReminder\":false,\"phase\":\"ask\"}"
+  },
+  {
+    "name": "Chạm thật bên trong dialog: nhận đáp án ngay tức thì không bị chặn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Đóng hộp thành công, thẻ chưa cất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Mở hộp thẻ trên 844x390 thành công bằng chạm",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Nộp bài trên 844x390 thành công, hiện giải thích",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "Cất thẻ thành công trên 844x390 bằng chạm",
+    "ok": true,
+    "detail": "closed=true, kc[0]=1"
+  }
+]

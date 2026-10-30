@@ -3,7 +3,17 @@ import type { VillageId } from '../village';
 /**
  * Câu hỏi của 16 thẻ "Em có biết?" nhặt được trong làng (P6b; nội dung đã duyệt ở docs/specs/P6-NOI-DUNG-THE-TUONG-TAC.md, bản rà commit 49168dc). Mỗi làng 4 câu, thứ tự đúng chỉ số cuộn
  * (`VillageScroll.index`, bit của `knowCards`). Mọi câu đi qua fmt() khi hiện ({phanDien}, {cuBinh}, {coChi}). Thẻ thứ 5 của Làng Khắc Dấu không có cuộn và không có câu hỏi (chỉ đọc).
- * Nguồn cho thẻ Bitcoin: https://developer.bitcoin.org/devguide/wallets.html (khóa riêng 256-bit) và https://bips.dev/340/ (chữ ký Schnorr).
+ *
+ * Đối chiếu nguồn chính thức Bitcoin cho Thẻ 3 Làng Khắc Dấu ("Cặp khóa trong Bitcoin"):
+ * 1. Khóa riêng 256-bit & không gian khóa:
+ *    - Nguồn: Bitcoin Developer Guide, Wallets ("Key Formats" / "Private Key", https://developer.bitcoin.org/devguide/wallets.html).
+ *    - Khẳng định: Khóa riêng là một số nguyên 256-bit trong khoảng [1, n-1] trên đường cong elip secp256k1, với bậc n ≈ 1,15792 × 10^77 (gần 2^256 khả năng, xấp xỉ 1,16 × 10^77).
+ * 2. Hai chuẩn chữ ký số ECDSA và Schnorr:
+ *    - Nguồn: BIP 340 ("Schnorr Signatures for secp256k1", https://bips.dev/340/), chuẩn hóa trong nâng cấp Taproot (kích hoạt năm 2021) song hành cùng chuẩn ECDSA truyền thống.
+ *    - Khẳng định: Bitcoin hỗ trợ cả hai kiểu chữ ký ECDSA và Schnorr trên cùng đường cong secp256k1.
+ * 3. Ước tính thời gian duyệt hết:
+ *    - Tính toán: (1,1579 × 10^77) / (10^18 thử/giây × 3,15576 × 10^7 giây/năm) ≈ 3,67 × 10^51 ≈ 3,7 × 10^51 năm (so với tuổi vũ trụ ≈ 13,8 tỷ năm).
+ *    - Khẳng định: Đây là ví dụ giả định trực quan cho học sinh THPT về độ lớn khổng lồ của không gian khóa 256-bit, phân biệt hoàn toàn với mô hình đồ chơi thu nhỏ 5^x mod 23 của bài học.
  */
 export interface KnowQuizAbcd {
   kind: 'abcd';

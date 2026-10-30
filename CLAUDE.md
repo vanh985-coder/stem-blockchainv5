@@ -1,7 +1,7 @@
 # Giấc mơ Sổ Chung — hướng dẫn cho AI code
 
 Game phiêu lưu 3D trên web dạy blockchain cho học sinh THPT: 12 màn ở 4 làng, có đăng nhập Supabase và trang giáo viên.
-Dự án chỉ dùng Claude Code; `GEMINI.md` đã bỏ, file này là hướng dẫn duy nhất cho AI code.
+Tài liệu này là hướng dẫn quy tắc đầy đủ nhất cho AI code; `AGENTS.md` là bản tóm tắt, `GEMINI.md` là hướng dẫn bàn giao.
 
 ## 1. Đọc trước khi làm
 - `docs/specs/00-HUONG-DAN-DU-AN.md`, rồi đúng file spec của việc được giao. Spec 03 là nền tảng cho mọi màn. Làm đúng spec; không tự thêm tính năng ngoài spec.

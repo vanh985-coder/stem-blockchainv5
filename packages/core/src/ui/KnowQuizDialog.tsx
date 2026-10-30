@@ -47,21 +47,58 @@ export function KnowQuizDialog({ card, quiz, index, total, mode, onCollect, onCl
   const qid = useId();
   const showAnswer = review || s.phase === 'feedback';
 
+  // Chu kỳ phím Enter & Space: chống giữ Enter/Space lặp (key repeat).
+  // Khi nộp bài bằng Enter, enterDown là true -> enterReleasedAfterFeedback là false.
+  // Bắt buộc phải có sự kiện keyUp nhả phím rồi nhấn mới thì nút "Cất vào sổ" mới nhận.
+  const enterDown = useRef(false);
+  const spaceDown = useRef(false);
+  const enterReleasedAfterFeedback = useRef(true);
+  const spaceReleasedAfterFeedback = useRef(true);
+
+  // Chuỗi sự kiện con trỏ/chạm: chống click ma khi mở thẻ.
+  // Chỉ nhận click chuột/chạm nếu cử chỉ có pointerdown diễn ra bên trong dialog kể từ khi mở.
+  const pointerDownInside = useRef(false);
+
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'Enter') enterDown.current = true;
+      if (e.key === ' ') spaceDown.current = true;
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        enterDown.current = false;
+        enterReleasedAfterFeedback.current = true;
+      }
+      if (e.key === ' ') {
+        spaceDown.current = false;
+        spaceReleasedAfterFeedback.current = true;
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+    };
   }, [onClose]);
 
   // vừa mở: đưa tiêu điểm vào hộp để bàn phím (Tab, Esc) dùng được ngay
   useEffect(() => {
     root.current?.focus();
   }, []);
-  // chặn cú click ma của cú chạm mở hộp (và mọi cú bấm quá sớm)
+
+  // Chặn cú click ma của cú chạm mở hộp (cử chỉ chạm bắt đầu trước khi hộp mount)
   const swallowEarlyClick = (e: MouseEvent) => {
-    if (e.timeStamp - openedAt.current >= OPEN_GUARD_MS) return;
-    e.preventDefault();
-    e.stopPropagation();
+    if (e.detail > 0 && !pointerDownInside.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    if (e.timeStamp - openedAt.current < OPEN_GUARD_MS && !pointerDownInside.current) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   };
 
   // báo kết quả bằng cơ chế phản hồi chung của game (âm đúng/sai, theo cài đặt âm thanh; phát tín hiệu onAnswer như mọi chỗ em trả lời): một lần cho mỗi lượt trả lời
@@ -76,6 +113,9 @@ export function KnowQuizDialog({ card, quiz, index, total, mode, onCollect, onCl
   useEffect(() => {
     if (s.phase !== 'feedback' || review) return;
     feedbackAt.current = performance.now();
+    // Nếu tại thời điểm chuyển phase, phím Enter/Space đang bị đè xuống, đánh dấu chưa nhả
+    enterReleasedAfterFeedback.current = !enterDown.current;
+    spaceReleasedAfterFeedback.current = !spaceDown.current;
     feedback.current?.scrollIntoView({ block: 'nearest' });
     saveBtn.current?.focus();
   }, [s.phase, review]);
@@ -87,6 +127,11 @@ export function KnowQuizDialog({ card, quiz, index, total, mode, onCollect, onCl
   };
 
   const collect = (e: MouseEvent) => {
+    // Nếu kích hoạt bằng bàn phím (detail === 0), bắt buộc phím Enter/Space phải được thả sau khi nộp
+    const isKeyboard = e.detail === 0;
+    if (isKeyboard && !enterReleasedAfterFeedback.current && !spaceReleasedAfterFeedback.current) {
+      return;
+    }
     if (review || collected.current || !canCollect(s) || e.timeStamp - feedbackAt.current < SAVE_GUARD_MS) return;
     collected.current = true;
     onCollect?.();
@@ -97,7 +142,17 @@ export function KnowQuizDialog({ card, quiz, index, total, mode, onCollect, onCl
   const chosen = s.result && quiz.kind === 'abcd' ? Number(s.result.given) : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex overflow-y-auto bg-chu/40 p-4" onClickCapture={swallowEarlyClick} onClick={onClose} data-walk-ui data-testid="the-co-cau-hoi" data-mode={mode}>
+    <div
+      className="fixed inset-0 z-50 flex overflow-y-auto bg-chu/40 p-4"
+      onPointerDownCapture={() => {
+        pointerDownInside.current = true;
+      }}
+      onClickCapture={swallowEarlyClick}
+      onClick={onClose}
+      data-walk-ui
+      data-testid="the-co-cau-hoi"
+      data-mode={mode}
+    >
       <Panel role="dialog" aria-modal="true" aria-label={fmt(knowQuizUi.hopThe, { so: index + 1 })} className="m-auto w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
         <div ref={root} tabIndex={-1} className="space-y-3 outline-none">
           <p className="text-sm font-bold uppercase tracking-wider text-nau-go-dam">
@@ -233,7 +288,23 @@ export function KnowQuizDialog({ card, quiz, index, total, mode, onCollect, onCl
                 {ui.baiHoc.dong}
               </Button>
               {!review && (
-                <Button type="button" size="sm" ref={saveBtn} onClick={collect} data-testid="nut-cat-vao-so">
+                <Button
+                  type="button"
+                  size="sm"
+                  ref={saveBtn}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && (e.repeat || !enterReleasedAfterFeedback.current)) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }
+                    if (e.key === ' ' && (e.repeat || !spaceReleasedAfterFeedback.current)) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }
+                  }}
+                  onClick={collect}
+                  data-testid="nut-cat-vao-so"
+                >
                   {knowScrollUi.catVaoSo}
                 </Button>
               )}

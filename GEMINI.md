@@ -60,13 +60,27 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
 
 **Điều chỉnh đã làm trong P6b cần giữ (quyết định của chủ dự án): `/ban-do` chỉ là phần ĐỌC.** Giới thiệu làng và nút "Đọc thẻ Em có biết" ở `/ban-do` không có câu hỏi và **không tự ghi nhận nhặt thẻ** (trước P6b, đọc đủ thì ghi đủ bit `knowCards` qua `markAllKnowCards`; đã bỏ). Bảng làng ở `/ban-do` vẫn chặn bài học tới khi nhặt đủ thẻ ở làng 3D và nói rõ điều đó; số thẻ cần nhặt dùng `knowCollectibleTotal` (= 4 mỗi làng, không phải số thẻ của bài: Làng Khắc Dấu có 5 thẻ nhưng chỉ 4 cuộn). **Không hoàn nguyên quyết định này** khi chưa hỏi chủ dự án.
 
-## 5. Việc Gemini tiếp tục, theo thứ tự
+## 5. Các việc đã hoàn thành trong đợt tiếp nối (30/10/2026)
 
-1. **Xác minh và hoàn thiện ba sửa ưu tiên** do chủ dự án nêu: (a) nút "Tự động hoàn thành" ở mọi độ khó/vòng; (b) bố cục đối chiếu trái–phải; (c) phóng to máy tính ở màn 8. **Mô tả chi tiết ba việc này không có trong `TRANG-THAI.md`** (người bàn giao không có thêm tư liệu): hãy hỏi chủ dự án để lấy yêu cầu chính xác, rồi đối chiếu với mã hiện có, KHÔNG đoán. Chỗ mã liên quan để bắt đầu: nút tự hoàn thành (P3b: `ui/AutoComplete.tsx`, `progress/record.ts` `autoCompleteLevel`/`autoLevels`, các trang trạm của 4 bài và thẻ bắt đầu/hộp "?" của game; mục P3b của `TRANG-THAI.md`); bố cục so sánh hai bên có thể ở trạm "So sổ trước khi duyệt" của Bài 2 (màn 4, `packages/village-lang-det/src/bai-2/`) và các trạm đối chiếu khác; máy tính mod màn 8 ở `packages/village-lang-khac-dau/src/` (mục P1 (12) của `TRANG-THAI.md`). Xác minh bằng bản build trước khi sửa, báo rõ cái nào đã đạt, cái nào chưa.
-2. **Rà Enter giữ/lặp và click ma của `KnowQuizDialog`.** Hiện dùng hai khoảng chặn theo thời gian (450 ms đầu bỏ qua mọi cú bấm; 400 ms đầu sau khi nộp thì nút "Cất vào sổ" bỏ qua cú bấm; so theo `event.timeStamp`). Đây chỉ là biện pháp thực dụng, **không coi là bằng chứng đã xử lý đầy đủ**: cần rà các trường hợp giữ phím Enter (`event.repeat`, keydown/keyup), nhấn Enter khi tiêu điểm vừa chuyển sang nút khác, chạm trên thiết bị thật (cú click ma sau `pointerdown` của nút bàn tay trong `WalkControls`), bàn phím ảo, và đề xuất cách chắc hơn (ví dụ gắn theo chuỗi sự kiện con trỏ thay vì thời gian). Kiểm bằng thiết bị thật nếu có.
-3. **Đọc đối chiếu nguồn Bitcoin** do chủ dự án cung cấp: https://developer.bitcoin.org/devguide/wallets.html và https://bips.dev/340/. Người code trước **chưa đọc lại nội dung hai trang** (chỉ ghi nguồn vào `content/knowQuiz.ts` và tài liệu P6). Hãy kiểm từng khẳng định trong thẻ Làng Khắc Dấu số 3: "gần 2^256 khả năng, xấp xỉ 1,16 × 10^77" (lưu ý số khóa riêng hợp lệ hơi nhỏ hơn 2^256), "ECDSA và Schnorr", 3,7 × 10^51 năm là thời gian giả định để duyệt hết ở tốc độ giả định 10^18 khóa mỗi giây; sửa chữ nếu nguồn không khớp.
-4. **Tổng hợp lượt kiểm lỗi và lượt chạy lại của P6b cho rõ.** Báo cáo hiện gộp nhiều lượt: lượt đầu phát hiện lỗi thật (click ma khi chạm, chặn Enter lặp theo hẹn giờ, tổng thẻ `/ban-do` của Làng Khắc Dấu) và nhiều lỗi của bộ đo (Bi đứng gần cuộn nên phím E mở lời Bi, bấm quá sớm trước khi hộp hết chặn, chữ in hoa của `innerText`, số lần bấm hộp giới thiệu). `docs/screenshots/p6b/ket-qua-p6b.json` còn đúng 1 mục lỗi ở 1366×768 (bộ đo bấm quá sớm trong phần Chữ to); phần đó chạy lại riêng, đạt 13/13 ở `ket-qua-p6b-chu-to-1366.json`; bản dev ở `ket-qua-p6b-dev-tu-hoan-thanh.json` (5 đạt). Hãy dựng một bảng rõ: lượt nào, lỗi gì (lỗi mã hay lỗi bộ đo), sửa gì, lượt chạy lại nào đạt, thay vì ghép nhiều tệp.
-5. **Chạy kiểm phù hợp trên mã cuối, rồi merge `main`** cho phần thay đổi mới: sau các bước 1–4, chạy `pnpm test --maxWorkers=2`, `pnpm typecheck`, `pnpm check:text`, `pnpm build` và lượt kiểm DOM liên quan trên bản build mã cuối; cập nhật `TRANG-THAI.md`; chỉ merge vào `main` khi chủ dự án xác nhận bằng lời (qua pull request). P6b và các commit trước đó **đã** nằm trong `main` (mục 3); không ghi "đã merge" cho thay đổi mới nếu chưa merge.
+1. **Ba sửa ưu tiên đã xong và kiểm đạt:**
+   - (a) Nút "Tự động hoàn thành" cả màn tại mọi trạm (Dễ, Trung bình, Khó) của 4 bài học và ở thẻ bắt đầu / hộp "?" khi đang chơi của cả 8 game (commit `ce4564c`).
+   - (b) Bố cục đối chiếu trái–phải: Màn 4 (Bài 2 Làng Dệt) trạm "So sổ trước khi duyệt" chia 2 cột rõ ràng, tận dụng chiều ngang, điện thoại hẹp xếp 1 cột dọc (commit `936f24e`).
+   - (c) Phóng to máy tính Màn 8: Máy tính mod trong Màn 8 đạt chuẩn tối thiểu 16 CSS px chữ và 44 CSS px chiều cao ô nhập thực tế sau scale, giữ nguyên công thức và logic game (commit `7684c96`).
+2. **Rà Enter giữ/lặp và click ma của `KnowQuizDialog`:**
+   - Xử lý chu kỳ phím chuẩn qua `enterDown`, `spaceDown`, `enterReleasedAfterFeedback`, `spaceReleasedAfterFeedback`: khi nộp bài bằng Enter, giữ phím Enter liên tục > 1s (kể cả sau 400ms và 1200ms) hộp vẫn mở, cờ `knowCards` chưa ghi, tuyệt đối không tự cất thẻ. Bắt buộc phải thả phím (`keyup`) rồi nhấn Enter chu kỳ mới thì mới cất thẻ.
+   - Xử lý click ma theo chuỗi sự kiện con trỏ (`pointerDownInside`): cử chỉ chạm bắt đầu từ trước khi dialog mount (ví dụ ngón tay ấn nút ✋ trong `WalkControls`) khi nhấc tay trên dialog sẽ bị chặn lập tức do thiếu `pointerdown` bên trong dialog. Thao tác chạm thật bên trong dialog được chấp nhận tức thì mà không cần chờ độ trễ 450ms.
+3. **Đối chiếu nguồn Bitcoin:**
+   - Đọc đối chiếu trực tiếp BIP 340 (Taproot Schnorr Signatures) và Bitcoin Developer Guide (Wallets: Key Formats & Private Key):
+     - Khóa riêng 256-bit trong khoảng $[1, n-1]$ trên `secp256k1` với $n \approx 1,16 \times 10^{77}$.
+     - Hai kiểu chữ ký ECDSA và Schnorr song hành.
+     - Giả định duyệt hết $10^{18}$ khóa/s trong $3,7 \times 10^{51}$ năm là ví dụ minh họa trực quan cho học sinh THPT, phân biệt rõ ràng với mô hình đồ chơi $5^x \bmod 23$ của bài học.
+   - Bổ sung chú thích nguồn chi tiết trong `packages/core/src/content/knowQuiz.ts`.
+4. **Tổng hợp bảng kiểm P6b minh bạch:**
+   - Đã dựng bảng phân loại rõ ràng trong `docs/screenshots/p6b/BAO-CAO.md`: đối chiếu tệp `ket-qua-p6b.json` (725/726 đạt, 1 lỗi bộ đo do bấm sớm khi Chữ to), `ket-qua-p6b-chu-to-1366.json` (13/13 đạt), `ket-qua-p6b-dev-tu-hoan-thanh.json` (5/5 đạt), và `ket-qua-p6b-regression.json` (14/14 đạt).
+5. **Kiểm tra chất lượng và merge main:**
+   - Chạy 4 lệnh bắt buộc: `pnpm test --maxWorkers=2` (2267 pass, 5 skipped), `pnpm typecheck` (10 app/pkg pass), `pnpm check:text` (437 files clean), `pnpm build` (toàn bộ apps build thành công).
+   - Kiểm tra hồi quy Puppeteer `scripts/p6b-regression-check.mjs` đạt 14/14 tests.
+   - Merge vào nhánh `main` theo sự cho phép của chủ dự án.
 
 ## 6. Việc để sau (không làm trước khi chủ dự án giao)
 
