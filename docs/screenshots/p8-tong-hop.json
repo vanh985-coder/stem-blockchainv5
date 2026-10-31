@@ -1,0 +1,55 @@
+{
+  "totalTests": 325,
+  "totalPassed": 325,
+  "totalScreenshots": 248,
+  "summaryRows": [
+    {
+      "group": "Màn 1: Bài 1 Làng Giấy (Dễ, Trung bình, Khó)",
+      "tests": "33/33",
+      "passRate": "100.0%",
+      "screenshots": 66
+    },
+    {
+      "group": "Màn 2 & Màn 3: Runner & Ghép Sổ (Làng Giấy)",
+      "tests": "48/48",
+      "passRate": "100.0%",
+      "screenshots": 26
+    },
+    {
+      "group": "Màn 4: Bài 2 Làng Dệt (Dễ, Trung bình, Khó)",
+      "tests": "22/22",
+      "passRate": "100.0%",
+      "screenshots": 22
+    },
+    {
+      "group": "Màn 5 & Màn 6: Đập Chuột 2D & Diều Đưa Sổ (Làng Dệt)",
+      "tests": "45/45",
+      "passRate": "100.0%",
+      "screenshots": 33
+    },
+    {
+      "group": "Màn 7: Bài 3 Làng Khắc Dấu (Dễ, Trung bình, Khó)",
+      "tests": "30/30",
+      "passRate": "100.0%",
+      "screenshots": 18
+    },
+    {
+      "group": "Màn 8 & Màn 9: Lật Thẻ Ghép Khóa & Chữa Gà (Làng Khắc Dấu)",
+      "tests": "42/42",
+      "passRate": "100.0%",
+      "screenshots": 30
+    },
+    {
+      "group": "Màn 10: Bài 4 Làng Bạc (Dễ, Trung bình, Khó)",
+      "tests": "63/63",
+      "passRate": "100.0%",
+      "screenshots": 23
+    },
+    {
+      "group": "Màn 11 & Màn 12: Ghép Lá Merkle & Leo Cây Lá Giả (Làng Bạc)",
+      "tests": "42/42",
+      "passRate": "100.0%",
+      "screenshots": 30
+    }
+  ]
+}

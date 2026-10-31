@@ -140,9 +140,27 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
     - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2306 tests pass (thêm 6 unit tests mới `man4Tutorial.test.tsx`), `pnpm build` đạt toàn bộ 5 apps.
     - Kiểm tra E2E Puppeteer `scripts/p8c-e2e-check.mjs`: **Đạt 100% (22/22 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390). Lưu đầy đủ 22 ảnh chụp minh chứng tại `docs/screenshots/p8c/` và `BAO-CAO-P8C.md`.
 
+12. **P8d — hoàn thành hướng dẫn focus và làm thử cho TOÀN BỘ 12 MÀN (31/10/2026):**
+    - Hoàn tất tuần tự qua tất cả 6 nhóm theo chỉ đạo:
+      - Nhóm 1: Màn 7 Làng Khắc Dấu (Dễ, Trung bình, Khó) -> Commit `0bae0ad`.
+      - Nhóm 2: Màn 10 Làng Bạc (Dễ, Trung bình, Khó) -> Commit `e7d314a`.
+      - Nhóm 3: Mini-game Màn 2 & 3 Làng Giấy (Runner né cản, Rebuild ghép sổ chuỗi) -> Commit `cabfb2a`.
+      - Nhóm 4: Mini-game Màn 5 & 6 Làng Dệt (Whack 2D Talking Tom, Kite diều đưa sổ 2.5D) -> Commit `f8c7cea`.
+      - Nhóm 5: Mini-game Màn 8 & 9 Làng Khắc Dấu (Memory ghép cặp khóa, Chicken bắn thuốc giải mã) -> Commit `6c84597`.
+      - Nhóm 6: Mini-game Màn 11 & 12 Làng Bạc (Match-3 ghép lá Merkle, Climb leo cây tìm lá giả) -> Commit `4440bdc`.
+    - Thao tác làm thử tương tác thực tế ở cả 12 màn: người chơi phải tự gõ số, bấm nút hoặc nhấn phím; hệ thống kiểm tra logic trước khi mở nút "Bắt đầu chơi thật".
+    - Tách biệt 100% làm thử khỏi ván thật: không tính giờ, không trừ tim, không cộng điểm/xu/sao/tiến độ/Trang Sổ Vàng. Hoàn thành hoặc bỏ qua thì ván thật bấm giờ sạch từ đầu.
+    - Nút "💡 Hướng dẫn" luôn hiện diện trên HUD của cả 12 màn: mở lại dừng toàn bộ đồng hồ và animation; đóng lại khôi phục đúng trạng thái bài dở.
+    - Chống click ma và Enter lặp chuẩn xác bằng capture phase và cycle keydown/keyup.
+    - **Tổng hợp nghiệm thu:**
+      - **325 / 325 E2E tests ĐẠT (100.0%)** trên 3 độ phân giải (1366×768, 360×800, 844×390).
+      - **248 ảnh PNG minh chứng** lưu tại `docs/screenshots/p8*` và `docs/screenshots/*-tutorial/`.
+      - **28 / 28 unit tests tutorial ĐẠT (100%)** qua 9 test files; Vitest tổng **2321 / 2321 tests passed**.
+      - 4 lệnh bắt buộc đạt sạch: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2321 pass, `pnpm build` cả 5 apps thành công.
+    - Báo cáo tổng hợp chi tiết lưu tại `C:\Users\Acer\.gemini\antigravity\brain\1e39ed0d-2120-4c6a-a44c-3cf2d34b3087\BAO-CAO-P8-TONG-HOP.md`.
+
 ## 6. Việc để sau (không làm trước khi chủ dự án giao)
 
-- **P8d:** nhân rộng hướng dẫn focus & làm thử cho các màn tiếp theo (Màn 7, 10 và các mini-game) sau khi chủ dự án đánh giá và duyệt Màn 1 và Màn 4.
 - **Việc dời từ mốc 3 và hội làng làm CUỐI mốc 4**, theo thứ tự ở mục "Việc dời từ mốc 3" của `TRANG-THAI.md`: deploy bản gộp (15b), kiểm tra toàn bộ (G2), thử với 5–10 học sinh, hội làng (`FESTIVAL_LAUNCHED` hiện `false`).
 - Chưa làm theo lời giao trước đó: sửa nút "?" ở màn 3, HUD che tên biển trong một số góc nhìn (ví dụ dòng nhiệm vụ che biển trái ở Làng Bạc), vòng tích che số cây đa đã được thu nhỏ ở P5.
 

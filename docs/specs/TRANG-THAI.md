@@ -20,7 +20,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 |---|---|
 | 0–2 | ✅ Xong (mốc 2 chưa deploy) |
 | 3. Nhân rộng | ✅ **Chốt.** Đủ 12 màn, cả 4 làng dựng to, **đã gộp web** (≈2086 test xanh). Việc còn dở dời xuống **cuối mốc 4** |
-| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt (P3b chưa có Supabase thật); P5 đã chốt phần kiểm local; P6a đã duyệt và P6b (tích hợp 16 thẻ, rà Enter giữ/lặp, click ma, đối chiếu nguồn Bitcoin) đã hoàn thiện kiểm đạt 100%; Hoàn thiện nút Tự hoàn thành cả màn ở mọi vòng/trạm, Bố cục đối chiếu trái–phải (Màn 4) và Phóng to máy tính Màn 8 ĐÃ XONG (30/10/2026)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
+| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt; P5 đã chốt; P6a, P6b đã xong; P7a, P7b, P7c đã nghiệm thu; P8 ĐÃ HOÀN THÀNH TOÀN DIỆN ĐỦ 12 MÀN (31/10/2026, 325/325 E2E tests đạt, 248 ảnh minh chứng, 28/28 unit tests đạt)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
 
 **⚠️ 15b vẫn chưa làm:** server có thể đang 530, mốc 2 và toàn bộ mốc 3 (≈60 commit, mới nhất `2bd76bf`) chưa push, chưa chạy trên máy thật. Cách làm: khôi phục `cloudflared` + Docker, deploy theo `DEPLOY.md` (h), Cache Rule (i), thử trên điện thoại.
 
@@ -35,20 +35,24 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | P5 | **ĐÃ XONG (29/10/2026, mục "P5" bên dưới):** (1) Biển chọn màn trong làng làm thành cột sáng giống cuộn "Em có biết?" (mỗi màn một cột, dáng và chữ theo trạng thái, giữ chữ tên màn) | 1 |
 | P6 | (3) Sau khi đọc thẻ "Em có biết?": 1 ví dụ ngắn + 1 câu hỏi ABCD (hoặc điền số). Mặc định: trả lời sai vẫn nhận thẻ, hiện giải thích. **P6a (nội dung 16 câu) đã duyệt; P6b (tích hợp) ĐÃ XONG (30/10/2026, mục "P6b" bên dưới)** | 1–2 |
 | P7 | **P7a ĐÃ XONG (30/10/2026, mục "P7a" bên dưới):** Bản chơi được Màn 5 "Đập {phanDien}" bằng 2D 4 làn dọc (Talking Tom), 2 loại chuột (thường và câu hỏi ❓), chống click ma, dừng khi mở câu hỏi/?, tự hoàn thành. **P7b:** trau chuốt đồ họa và cân bằng nhịp sinh. | 3–4 |
-| P8 | **P8a ĐÃ XONG (30/10/2026, mục "P8a" bên dưới):** Cơ chế dùng chung `TutorialSpotlight` và tích hợp mẫu tại Màn 1 trạm Dễ. **P8b ĐÃ XONG (31/10/2026, mục "P8b" bên dưới):** Triển khai hướng dẫn focus và làm thử cho Màn 1 trạm Trung bình và Khó. **P8c ĐÃ XONG (31/10/2026, mục "P8c" bên dưới):** Triển khai hướng dẫn focus và làm thử cho Màn 4 Làng Dệt đủ 3 trạm (Dễ, Trung bình, Khó), kiểm E2E đạt 22/22 test. | 2–3 |
+| P8 | **P8 ĐÃ HOÀN THÀNH TOÀN DIỆN ĐỦ 12 MÀN (31/10/2026, mục "P8" bên dưới):** Cơ chế dùng chung `TutorialSpotlight` và làm thử tương tác cho cả 12 màn (4 bài học × 3 trạm + 8 mini-game). Kiểm tra E2E Puppeteer đạt **325/325 tests (100%)**, 248 ảnh minh chứng, 28/28 unit tests, 4 lệnh bắt buộc xanh 100%. | 2–3 |
 
 Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mốc 3 và hội làng.
 
 
-### P8 — Hướng dẫn focus và làm thử cho cả 12 màn (đã duyệt, chưa triển khai)
+### P8 — Hướng dẫn focus và làm thử cho cả 12 màn (ĐÃ HOÀN THÀNH TOÀN DIỆN, 31/10/2026)
 
-- Làm tối phần còn lại của màn hình, làm nổi vùng cần chú ý, hiện lời nhắc ngắn.
-- Cho học sinh thực hành một tình huống ngắn theo từng bước.
-- Lần đầu vào màn tự hiện; có nút "Bỏ qua"; mở lại được qua "Hướng dẫn chơi".
-- Lượt thử dùng dữ liệu riêng: không mất tim, không chạy giờ của lượt chính, không cộng điểm, không ghi hoàn thành.
-- Hỗ trợ chuột/bàn phím và cảm ứng; "Giảm chuyển động" thì đứng yên.
-- Mọi chữ nằm trong `packages/core/src/content/`.
-- Làm thành bước riêng sau khi chốt thay đổi lối chơi màn 2, 3, 5 (P4, P7). **Không triển khai trong P3b.**
+- **Cơ chế dùng chung `TutorialSpotlight`:** khoét sáng chính xác vùng target qua `#tutorial-*`, viền sáng vàng hào quang, tooltip thông minh 4 hướng không che target, focus trap Tab, chống click ma ở capture phase (`detail === 0` khi chưa arm sau 400ms), chống kích hoạt lặp khi giữ phím Enter (`keydown`/`keyup` cycle).
+- **Phủ kín toàn bộ 12 màn:**
+  - **4 Bài học (12 trạm):** Màn 1 (Làng Giấy - Dễ, TB, Khó), Màn 4 (Làng Dệt - Dễ, TB, Khó), Màn 7 (Làng Khắc Dấu - Dễ, TB, Khó), Màn 10 (Làng Bạc - Dễ, TB, Khó).
+  - **8 Mini-game:** Màn 2 (Runner), Màn 3 (Rebuild ghép sổ), Màn 5 (Whack đập chuột 2D), Màn 6 (Kite diều đưa sổ 2.5D), Màn 8 (Memory lật thẻ tìm khóa), Màn 9 (Chicken chữa đàn gà), Màn 11 (Match-3 ghép lá Merkle), Màn 12 (Climb leo cây tìm lá giả).
+- **Làm thử tương tác:** Mỗi màn có tình huống làm thử riêng biệt, yêu cầu thao tác thật (nhập số, bấm nút, nhảy bám, bắn thuốc, tráo lá). Tách biệt 100% khỏi ván thật (không cộng điểm/xu/sao/tiến độ/Trang Sổ Vàng).
+- **Nút "💡 Hướng dẫn":** Mở lại bất kỳ lúc nào giữa ván; khi mở dừng toàn bộ chuyển động/đồng hồ; khi đóng tiếp tục ván sạch.
+- **Kiểm thử nghiệm thu:**
+  - E2E Puppeteer: **325 / 325 tests ĐẠT (100.0%)** trên cả 3 kích thước: 1366×768, 360×800 và 844×390.
+  - Ảnh minh chứng: **248 ảnh PNG** lưu tại `docs/screenshots/p8*` và `docs/screenshots/*-tutorial/`.
+  - Unit tests: **28 / 28 tests tutorial ĐẠT (100%)** qua 9 test files; Vitest tổng **2321 / 2321 tests passed**.
+  - `pnpm check:text` sạch 438 files; `pnpm typecheck` 10 packages đạt; `pnpm build` toàn bộ 5 apps thành công.
 ## Bổ sung đã chốt — hướng dẫn focus và làm thử (29/10/2026)
 
 - Áp dụng cho cả 12 màn: làm tối phần còn lại, làm nổi vùng cần chú ý và hiện lời nhắc ngắn cạnh vùng đó; sau phần giới thiệu, học sinh thực hành một tình huống ngắn theo từng bước rồi mới vào lượt chơi chính thức.
