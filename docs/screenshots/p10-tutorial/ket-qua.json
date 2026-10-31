@@ -1,0 +1,254 @@
+[
+  {
+    "name": "[Dễ - 1366x768] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 1366x768] Bước 1 Bảng tra cứu",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 1366x768] Bước 2 Cặp thẻ ghép",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 1366x768] Bước 3 Ô nhập",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 1366x768] Nhập sai có phản hồi lỗi",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 1366x768] Nhập đúng hiện nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 1366x768] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 1366x768] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[TB - 1366x768] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[TB - 1366x768] Bước 1 Cây Merkle",
+    "pass": true
+  },
+  {
+    "name": "[TB - 1366x768] Bước 2 Phép tính",
+    "pass": true
+  },
+  {
+    "name": "[TB - 1366x768] Bước 3 Điều khiển",
+    "pass": true
+  },
+  {
+    "name": "[TB - 1366x768] Bước 4 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[TB - 1366x768] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 1366x768] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 1366x768] Bước 1 Bảng 8 giao dịch",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 1366x768] Bước 2 Cây Merkle",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 1366x768] Bước 3 Khay mảnh ghép",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 1366x768] Bước 4 Nút Kiểm tra",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 1366x768] Bước 5 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 1366x768] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 360x800] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 360x800] Bước 1 Bảng tra cứu",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 360x800] Bước 2 Cặp thẻ ghép",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 360x800] Bước 3 Ô nhập",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 360x800] Nhập sai có phản hồi lỗi",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 360x800] Nhập đúng hiện nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 360x800] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 360x800] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[TB - 360x800] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[TB - 360x800] Bước 1 Cây Merkle",
+    "pass": true
+  },
+  {
+    "name": "[TB - 360x800] Bước 2 Phép tính",
+    "pass": true
+  },
+  {
+    "name": "[TB - 360x800] Bước 3 Điều khiển",
+    "pass": true
+  },
+  {
+    "name": "[TB - 360x800] Bước 4 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[TB - 360x800] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 360x800] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 360x800] Bước 1 Bảng 8 giao dịch",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 360x800] Bước 2 Cây Merkle",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 360x800] Bước 3 Khay mảnh ghép",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 360x800] Bước 4 Nút Kiểm tra",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 360x800] Bước 5 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 360x800] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 844x390] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 844x390] Bước 1 Bảng tra cứu",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 844x390] Bước 2 Cặp thẻ ghép",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 844x390] Bước 3 Ô nhập",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 844x390] Nhập sai có phản hồi lỗi",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 844x390] Nhập đúng hiện nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 844x390] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Dễ - 844x390] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[TB - 844x390] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[TB - 844x390] Bước 1 Cây Merkle",
+    "pass": true
+  },
+  {
+    "name": "[TB - 844x390] Bước 2 Phép tính",
+    "pass": true
+  },
+  {
+    "name": "[TB - 844x390] Bước 3 Điều khiển",
+    "pass": true
+  },
+  {
+    "name": "[TB - 844x390] Bước 4 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[TB - 844x390] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 844x390] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 844x390] Bước 1 Bảng 8 giao dịch",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 844x390] Bước 2 Cây Merkle",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 844x390] Bước 3 Khay mảnh ghép",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 844x390] Bước 4 Nút Kiểm tra",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 844x390] Bước 5 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Khó - 844x390] Bắt đầu bài thật thành công",
+    "pass": true
+  }
+]

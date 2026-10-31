@@ -1,5 +1,19 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { Button, Card, DraggableCard, DroppableSlot, FeedbackSheet, TapOrDragContainer, fmt, sound, type StationResult, rich } from '@so-chung/core';
+import {
+  Button,
+  Card,
+  DraggableCard,
+  DroppableSlot,
+  FeedbackSheet,
+  TapOrDragContainer,
+  TutorialSpotlight,
+  type TutorialStep,
+  tutorialTexts,
+  fmt,
+  sound,
+  type StationResult,
+  rich,
+} from '@so-chung/core';
 import { bai4Texts } from '@so-chung/core/content/lessons/bai-4';
 import { formatNumber } from '@so-chung/core/lib/format';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
@@ -46,6 +60,73 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
   // Số lần bấm "Kiểm tra"
   const [checkCount, setCheckCount] = useState<number>(0);
   const [notice, setNotice] = useState<string | null>(null);
+
+  // ==========================================
+  // HƯỚNG DẪN FOCUS & LÀM THỬ (P8 - Màn 10 Khó)
+  // ==========================================
+  const [tutorialActive, setTutorialActive] = useState<boolean>(true);
+  const [tutorialStep, setTutorialStep] = useState<number>(0);
+  const [isRevisitingTutorial, setIsRevisitingTutorial] = useState<boolean>(false);
+
+  // Lưu trạng thái trước khi mở lại giữa bài
+  const savedStateRef = useRef<{
+    placedPieces: Record<string, number | null>;
+    lockedSlots: Record<string, boolean>;
+    checkCount: number;
+  } | null>(null);
+
+  const startRealGame = useCallback(() => {
+    sound.playClick();
+    setTutorialActive(false);
+    setIsRevisitingTutorial(false);
+    // Reset lại bàn cờ về trạng thái ban đầu sạch
+    const init: Record<string, number | null> = {};
+    challenge.hidden.forEach((h) => {
+      init[`slot-${h.level}-${h.index}`] = null;
+    });
+    setPlacedPieces(init);
+    setLockedSlots({});
+    setCheckCount(0);
+    setNotice(null);
+    startTimeRef.current = Date.now();
+  }, [challenge.hidden]);
+
+  const handleOpenTutorial = useCallback(() => {
+    sound.playClick();
+    savedStateRef.current = {
+      placedPieces,
+      lockedSlots,
+      checkCount,
+    };
+    setIsRevisitingTutorial(true);
+    setTutorialActive(true);
+    setTutorialStep(0);
+  }, [placedPieces, lockedSlots, checkCount]);
+
+  const handleCloseRevisit = useCallback(() => {
+    sound.playClick();
+    setTutorialActive(false);
+    setIsRevisitingTutorial(false);
+    if (savedStateRef.current) {
+      setPlacedPieces(savedStateRef.current.placedPieces);
+      setLockedSlots(savedStateRef.current.lockedSlots);
+      setCheckCount(savedStateRef.current.checkCount);
+      savedStateRef.current = null;
+    }
+  }, []);
+
+  // Expose probe cho test
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__tutorial = {
+        active: tutorialActive,
+        step: tutorialStep,
+        setStep: (s: number) => setTutorialStep(s),
+        startRealGame,
+        openTutorial: handleOpenTutorial,
+      };
+    }
+  }, [tutorialActive, tutorialStep, startRealGame, handleOpenTutorial]);
 
   // FeedbackSheet
   const [feedback, setFeedback] = useState<{
@@ -303,112 +384,175 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
     [isHiddenCell, lockedSlots]
   );
 
+  const tutorialSteps = useMemo<TutorialStep[]>(() => {
+    return [
+      {
+        id: 'intro',
+        title: tutorialTexts.man10Kho.tieuDe,
+        content: tutorialTexts.man10Kho.intro,
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        id: 'table',
+        targetSelector: '#tutorial-man10kho-table',
+        title: tutorialTexts.man10Kho.tieuDe,
+        content: tutorialTexts.man10Kho.table,
+        nextLabel: tutorialTexts.chung.daHieu,
+      },
+      {
+        id: 'tree',
+        targetSelector: '#tutorial-man10kho-tree',
+        title: tutorialTexts.man10Kho.tieuDe,
+        content: tutorialTexts.man10Kho.place,
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        id: 'tray',
+        targetSelector: '#tutorial-man10kho-tray',
+        title: tutorialTexts.man10Kho.tieuDe,
+        content: tutorialTexts.man10Kho.tray,
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        id: 'check',
+        targetSelector: '#tutorial-man10kho-check',
+        title: tutorialTexts.man10Kho.tieuDe,
+        content: tutorialTexts.man10Kho.check,
+        interactive: true,
+      },
+      {
+        id: 'result',
+        targetSelector: '#tutorial-man10kho-tree',
+        title: tutorialTexts.man10Kho.tieuDe,
+        content: tutorialTexts.man10Kho.correct,
+      },
+    ];
+  }, []);
+
   return (
     <TapOrDragContainer onDropOrPlace={handleDropOrPlace}>
       <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-200">
         {/* Bảng 8 giao dịch */}
-        <Card variant="paper" className="p-4 sm:p-5">
-          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-3 border-b border-nau-go/30 pb-2">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">📋</span>
-              <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{T.bang8GiaoDichGoc}</h3>
-            </div>
-            <span className="text-sm text-nau-go-dam">{T.bangTraCuuGiaTri}</span>
-          </div>
-
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
-            {txs.map((tx) => (
-              <div
-                key={tx.id}
-                className="p-2 rounded-[10px] border border-nau-go/30 bg-white/70 flex flex-col items-center text-center shadow-xs"
-              >
-                <span className="font-display font-extrabold text-sm text-muc-tim-dam">
-                  {tx.id}
-                </span>
-                <span className="text-sm text-nau-go-dam font-medium truncate w-full">
-                  {tx.name}
-                </span>
-                <span className="font-display font-bold text-sm text-chu mt-0.5 bg-giay px-1.5 rounded">
-                  {tx.value}
-                </span>
+        <div id="tutorial-man10kho-table">
+          <Card variant="paper" className="p-4 sm:p-5">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-3 border-b border-nau-go/30 pb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">📋</span>
+                <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{T.bang8GiaoDichGoc}</h3>
               </div>
-            ))}
-          </div>
-        </Card>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleOpenTutorial}
+                  aria-label={tutorialTexts.chung.huongDan}
+                  className="flex items-center gap-1.5 text-nau-go-dam hover:text-muc-tim-dam font-bold"
+                >
+                  <span>💡</span>
+                  <span>{tutorialTexts.chung.huongDan}</span>
+                </Button>
+                <span className="text-sm text-nau-go-dam">{T.bangTraCuuGiaTri}</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+              {txs.map((tx) => (
+                <div
+                  key={tx.id}
+                  className="p-2 rounded-[10px] border border-nau-go/30 bg-white/70 flex flex-col items-center text-center shadow-xs"
+                >
+                  <span className="font-display font-extrabold text-sm text-muc-tim-dam">
+                    {tx.id}
+                  </span>
+                  <span className="text-sm text-nau-go-dam font-medium truncate w-full">
+                    {tx.name}
+                  </span>
+                  <span className="font-display font-bold text-sm text-chu mt-0.5 bg-giay px-1.5 rounded">
+                    {tx.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
 
         {/* Khung hiển thị Cây Merkle 8 giao dịch */}
-        <Card className="p-4 sm:p-6 space-y-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 border-b border-nau-go/30 pb-3">
-            <div>
-              <h3 className="first-letter:uppercase font-display font-extrabold text-lg text-chu">{T.cayMerkle8GiaoDich}</h3>
-              <p className="text-sm text-nau-go-dam">{T.keoHoacChamManhTu}</p>
+        <div id="tutorial-man10kho-tree">
+          <Card className="p-4 sm:p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 border-b border-nau-go/30 pb-3">
+              <div>
+                <h3 className="first-letter:uppercase font-display font-extrabold text-lg text-chu">{T.cayMerkle8GiaoDich}</h3>
+                <p className="text-sm text-nau-go-dam">{T.keoHoacChamManhTu}</p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-nau-go-dam font-semibold">{rich(T.luotKiemTra, { checkCount })}</span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-nau-go-dam font-semibold">{rich(T.luotKiemTra, { checkCount })}</span>
-            </div>
-          </div>
+            {/* Cây Merkle SVG */}
+            <CayMerkle
+              compact
+              treeValues={displayTreeValues}
+              renderSlot={renderCustomSlot}
+            />
 
-          {/* Cây Merkle SVG */}
-          <CayMerkle
-            compact
-            treeValues={displayTreeValues}
-            renderSlot={renderCustomSlot}
-          />
-
-          {/* Cảnh báo chưa điền đủ */}
-          {notice && (
-            <div className="p-2.5 rounded-[10px] bg-do-son/10 border border-do-son text-sm font-bold text-do-son-dam text-center animate-in fade-in duration-200">
-              ⚠️ {notice}
-            </div>
-          )}
-
-          {/* Nút bấm Kiểm tra */}
-          <div className="flex justify-center pt-2">
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={handleCheck}
-              className="min-w-[200px]"
-            >{T.kiemTraCayMerkle}</Button>
-          </div>
-        </Card>
-
-        {/* Khay mảnh ghép */}
-        <Card variant="paper" className="p-4 sm:p-5 space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-nau-go/30 pb-2">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🧩</span>
-              <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{fmt(T.khayManhGhepManh, { so: availableTrayPieces.length, so2: trayPieces.length })}</h3>
-            </div>
-            <span className="text-sm text-nau-go-dam">{T.chua6GiaTriDung}</span>
-          </div>
-
-          {/* Vùng thả về khay (DroppableSlot tray-zone) */}
-          <DroppableSlot
-            id="tray-zone"
-            placeholder={T.thaManhVeKhayTai}
-            className="!p-3 !bg-white/60 !border-dashed !border-muc-tim/30 min-h-[90px]"
-          >
-            {availableTrayPieces.length === 0 ? (
-              <span className="text-sm text-nau-go-dam italic">{T.tatCaManhGhepDa}</span>
-            ) : (
-              <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 w-full">
-                {availableTrayPieces.map((pieceVal) => (
-                  <DraggableCard
-                    key={`piece-${pieceVal}`}
-                    id={`piece-${pieceVal}`}
-                    className="p-2.5 sm:p-3 rounded-[12px] bg-white/70 border-2 border-muc-tim text-muc-tim-dam flex items-center justify-center min-w-[70px] sm:min-w-[80px]"
-                  >
-                    <span className="font-display font-extrabold text-base sm:text-lg">
-                      {formatNumber(pieceVal)}
-                    </span>
-                  </DraggableCard>
-                ))}
+            {/* Cảnh báo chưa điền đủ */}
+            {notice && (
+              <div className="p-2.5 rounded-[10px] bg-do-son/10 border border-do-son text-sm font-bold text-do-son-dam text-center animate-in fade-in duration-200">
+                ⚠️ {notice}
               </div>
             )}
-          </DroppableSlot>
-        </Card>
+
+            {/* Nút bấm Kiểm tra */}
+            <div id="tutorial-man10kho-check" className="flex justify-center pt-2">
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={handleCheck}
+                className="min-w-[200px]"
+              >{T.kiemTraCayMerkle}</Button>
+            </div>
+          </Card>
+        </div>
+
+        {/* Khay mảnh ghép */}
+        <div id="tutorial-man10kho-tray">
+          <Card variant="paper" className="p-4 sm:p-5 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-nau-go/30 pb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🧩</span>
+                <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{fmt(T.khayManhGhepManh, { so: availableTrayPieces.length, so2: trayPieces.length })}</h3>
+              </div>
+              <span className="text-sm text-nau-go-dam">{T.chua6GiaTriDung}</span>
+            </div>
+
+            {/* Vùng thả về khay (DroppableSlot tray-zone) */}
+            <DroppableSlot
+              id="tray-zone"
+              placeholder={T.thaManhVeKhayTai}
+              className="!p-3 !bg-white/60 !border-dashed !border-muc-tim/30 min-h-[90px]"
+            >
+              {availableTrayPieces.length === 0 ? (
+                <span className="text-sm text-nau-go-dam italic">{T.tatCaManhGhepDa}</span>
+              ) : (
+                <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 w-full">
+                  {availableTrayPieces.map((pieceVal) => (
+                    <DraggableCard
+                      key={`piece-${pieceVal}`}
+                      id={`piece-${pieceVal}`}
+                      className="p-2.5 sm:p-3 rounded-[12px] bg-white/70 border-2 border-muc-tim text-muc-tim-dam flex items-center justify-center min-w-[70px] sm:min-w-[80px]"
+                    >
+                      <span className="font-display font-extrabold text-base sm:text-lg">
+                        {formatNumber(pieceVal)}
+                      </span>
+                    </DraggableCard>
+                  ))}
+                </div>
+              )}
+            </DroppableSlot>
+          </Card>
+        </div>
 
         {/* Phản hồi FeedbackSheet */}
         <FeedbackSheet
@@ -422,6 +566,27 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
             setFeedback((prev) => ({ ...prev, isOpen: false }));
           }}
           continueLabel={T.thuLai}
+        />
+
+        {/* Hướng dẫn Focus Spotlight (P8) */}
+        <TutorialSpotlight
+          isOpen={tutorialActive}
+          steps={tutorialSteps}
+          currentStepIndex={tutorialStep}
+          onNext={() => setTutorialStep((prev) => Math.min(prev + 1, tutorialSteps.length - 1))}
+          onPrev={() => setTutorialStep((prev) => Math.max(0, prev - 1))}
+          onSkip={startRealGame}
+          actionButton={
+            tutorialStep === tutorialSteps.length - 1
+              ? {
+                  label: isRevisitingTutorial
+                    ? tutorialTexts.chung.troLaiBaiLam
+                    : tutorialTexts.chung.batDauChoi,
+                  onClick: isRevisitingTutorial ? handleCloseRevisit : startRealGame,
+                  variant: 'primary',
+                }
+              : undefined
+          }
         />
       </div>
     </TapOrDragContainer>

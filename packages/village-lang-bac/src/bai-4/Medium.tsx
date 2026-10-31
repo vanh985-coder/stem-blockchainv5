@@ -1,5 +1,19 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { Avatar, Button, Card, FeedbackSheet, NumberInput, fmt, sound, starsFromMistakes, type StationResult, rich } from '@so-chung/core';
+import {
+  Avatar,
+  Button,
+  Card,
+  FeedbackSheet,
+  NumberInput,
+  TutorialSpotlight,
+  type TutorialStep,
+  tutorialTexts,
+  fmt,
+  sound,
+  starsFromMistakes,
+  type StationResult,
+  rich,
+} from '@so-chung/core';
 import { bai4Texts } from '@so-chung/core/content/lessons/bai-4';
 import { GAME_CONFIG } from '@so-chung/core/config/gameConfig';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
@@ -145,6 +159,83 @@ export function Medium({
     setInputVal(null);
     setInputError(undefined);
   }, [isT12Solved, isT34Solved, isRootSolved]);
+
+  // ==========================================
+  // HƯỚNG DẪN FOCUS & LÀM THỬ (P8 - Màn 10 Trung bình)
+  // ==========================================
+  const [tutorialActive, setTutorialActive] = useState<boolean>(true);
+  const [tutorialStep, setTutorialStep] = useState<number>(0);
+  const [isRevisitingTutorial, setIsRevisitingTutorial] = useState<boolean>(false);
+
+  // Lưu trạng thái trước khi mở lại giữa bài
+  const savedStateRef = useRef<{
+    phase: MediumPhase;
+    stepA: number;
+    valT12: number | null;
+    valT34: number | null;
+    valRoot: number | null;
+    selectedSlot: 't12' | 't34' | 'root' | null;
+    inputVal: number | null;
+    mistakesB: number;
+  } | null>(null);
+
+  const startRealGame = useCallback(() => {
+    sound.playClick();
+    setTutorialActive(false);
+    setIsRevisitingTutorial(false);
+    setPhase('phase_a');
+    setStepA(0);
+    startTimeRef.current = Date.now();
+  }, []);
+
+  const handleOpenTutorial = useCallback(() => {
+    sound.playClick();
+    savedStateRef.current = {
+      phase,
+      stepA,
+      valT12,
+      valT34,
+      valRoot,
+      selectedSlot,
+      inputVal,
+      mistakesB,
+    };
+    setIsRevisitingTutorial(true);
+    setTutorialActive(true);
+    setTutorialStep(0);
+    setPhase('phase_a');
+    setStepA(0);
+  }, [phase, stepA, valT12, valT34, valRoot, selectedSlot, inputVal, mistakesB]);
+
+  const handleCloseRevisit = useCallback(() => {
+    sound.playClick();
+    setTutorialActive(false);
+    setIsRevisitingTutorial(false);
+    if (savedStateRef.current) {
+      setPhase(savedStateRef.current.phase);
+      setStepA(savedStateRef.current.stepA);
+      setValT12(savedStateRef.current.valT12);
+      setValT34(savedStateRef.current.valT34);
+      setValRoot(savedStateRef.current.valRoot);
+      setSelectedSlot(savedStateRef.current.selectedSlot);
+      setInputVal(savedStateRef.current.inputVal);
+      setMistakesB(savedStateRef.current.mistakesB);
+      savedStateRef.current = null;
+    }
+  }, []);
+
+  // Expose probe cho test
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__tutorial = {
+        active: tutorialActive,
+        step: tutorialStep,
+        setStep: (s: number) => setTutorialStep(s),
+        startRealGame,
+        openTutorial: handleOpenTutorial,
+      };
+    }
+  }, [tutorialActive, tutorialStep, startRealGame, handleOpenTutorial]);
 
   // Ma trận giá trị cây ở Phần B
   const currentTreeB = useMemo(() => {
@@ -293,42 +384,93 @@ export function Medium({
     whatHappened: '',
   });
 
+  const tutorialSteps = useMemo<TutorialStep[]>(() => {
+    return [
+      {
+        id: 'intro',
+        title: tutorialTexts.man10Tb.tieuDe,
+        content: tutorialTexts.man10Tb.intro,
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        id: 'treeStructure',
+        targetSelector: '#tutorial-man10tb-tree',
+        title: tutorialTexts.man10Tb.tieuDe,
+        content: tutorialTexts.man10Tb.treeStructure,
+        nextLabel: tutorialTexts.chung.daHieu,
+      },
+      {
+        id: 'stepByStep',
+        targetSelector: '#tutorial-man10tb-calc',
+        title: tutorialTexts.man10Tb.tieuDe,
+        content: tutorialTexts.man10Tb.stepByStep,
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        id: 'controls',
+        targetSelector: '#tutorial-man10tb-controls',
+        title: tutorialTexts.man10Tb.tieuDe,
+        content: tutorialTexts.man10Tb.practice,
+        interactive: true,
+      },
+      {
+        id: 'result',
+        targetSelector: '#tutorial-man10tb-tree',
+        title: tutorialTexts.man10Tb.tieuDe,
+        content: tutorialTexts.man10Tb.correct,
+      },
+    ];
+  }, []);
+
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-200">
-      {/* Tab chuyển đổi trạng thái 3 phần */}
-      <div className="flex items-center justify-between bg-white/70 p-2 rounded-[16px] border border-nau-go/30 text-sm font-bold">
-        <button
-          type="button"
-          onClick={() => setPhase('phase_a')}
-          className={`flex-1 py-2 px-3 rounded-[10px] transition-all cursor-pointer text-center ${
-            phase === 'phase_a'
-              ? 'bg-muc-tim text-white shadow-xs'
-              : 'text-nau-go-dam hover:bg-giay'
-          }`}
-        >{T.tabXemDungCay}</button>
-        <button
-          type="button"
-          onClick={() => setPhase('phase_b')}
-          className={`flex-1 py-2 px-3 rounded-[10px] transition-all cursor-pointer text-center ${
-            phase === 'phase_b'
-              ? 'bg-muc-tim text-white shadow-xs'
-              : 'text-nau-go-dam hover:bg-giay'
-          }`}
-        >{T.tabTuXayCay}</button>
-        <button
-          type="button"
-          onClick={() => {
-            if (isRootSolved) setPhase('phase_c');
-          }}
-          disabled={!isRootSolved}
-          className={`flex-1 py-2 px-3 rounded-[10px] transition-all text-center ${
-            phase === 'phase_c'
-              ? 'bg-muc-tim text-white shadow-xs cursor-pointer'
-              : isRootSolved
-              ? 'text-nau-go-dam hover:bg-giay cursor-pointer'
-              : 'text-nau-go-dam cursor-not-allowed'
-          }`}
-        >{T.tabKhamPha}</button>
+      {/* Tab chuyển đổi trạng thái 3 phần & nút Hướng dẫn */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="flex items-center justify-between bg-white/70 p-2 rounded-[16px] border border-nau-go/30 text-sm font-bold flex-1 w-full">
+          <button
+            type="button"
+            onClick={() => setPhase('phase_a')}
+            className={`flex-1 py-2 px-3 rounded-[10px] transition-all cursor-pointer text-center ${
+              phase === 'phase_a'
+                ? 'bg-muc-tim text-white shadow-xs'
+                : 'text-nau-go-dam hover:bg-giay'
+            }`}
+          >{T.tabXemDungCay}</button>
+          <button
+            type="button"
+            onClick={() => setPhase('phase_b')}
+            className={`flex-1 py-2 px-3 rounded-[10px] transition-all cursor-pointer text-center ${
+              phase === 'phase_b'
+                ? 'bg-muc-tim text-white shadow-xs'
+                : 'text-nau-go-dam hover:bg-giay'
+            }`}
+          >{T.tabTuXayCay}</button>
+          <button
+            type="button"
+            onClick={() => {
+              if (isRootSolved) setPhase('phase_c');
+            }}
+            disabled={!isRootSolved}
+            className={`flex-1 py-2 px-3 rounded-[10px] transition-all text-center ${
+              phase === 'phase_c'
+                ? 'bg-muc-tim text-white shadow-xs cursor-pointer'
+                : isRootSolved
+                ? 'text-nau-go-dam hover:bg-giay cursor-pointer'
+                : 'text-nau-go-dam cursor-not-allowed'
+            }`}
+          >{T.tabKhamPha}</button>
+        </div>
+
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleOpenTutorial}
+          aria-label={tutorialTexts.chung.huongDan}
+          className="flex items-center gap-1.5 text-nau-go-dam hover:text-muc-tim-dam font-bold shrink-0"
+        >
+          <span>💡</span>
+          <span>{tutorialTexts.chung.huongDan}</span>
+        </Button>
       </div>
 
       {/* ========================================================= */}
@@ -347,13 +489,15 @@ export function Medium({
           </div>
 
           {/* Cây Merkle SVG */}
-          <CayMerkle
-            treeValues={currentTreeA}
-            caption={T.cayMerkle4GiaoDich}
-          />
+          <div id="tutorial-man10tb-tree">
+            <CayMerkle
+              treeValues={currentTreeA}
+              caption={T.cayMerkle4GiaoDich}
+            />
+          </div>
 
           {/* Hộp hiển thị phép tính đã thế số */}
-          <div className="p-4 rounded-[14px] bg-white/60 border border-muc-tim/10 text-center">
+          <div id="tutorial-man10tb-calc" className="p-4 rounded-[14px] bg-white/60 border border-muc-tim/10 text-center">
             <div className="text-sm text-nau-go-dam font-semibold mb-1">{T.phepTinhTuongUng}</div>
             <div className="font-display font-bold text-base sm:text-lg text-muc-tim-dam">
               {stepAInfo.calc}
@@ -361,7 +505,7 @@ export function Medium({
           </div>
 
           {/* Nút điều khiển bước */}
-          <div className="flex items-center justify-between pt-2">
+          <div id="tutorial-man10tb-controls" className="flex items-center justify-between pt-2">
             <Button
               variant="secondary"
               size="sm"
@@ -575,6 +719,27 @@ export function Medium({
           setFeedback((prev) => ({ ...prev, isOpen: false }));
         }}
         continueLabel={T.thuLai}
+      />
+
+      {/* Hướng dẫn Focus Spotlight (P8) */}
+      <TutorialSpotlight
+        isOpen={tutorialActive}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => setTutorialStep((prev) => Math.min(prev + 1, tutorialSteps.length - 1))}
+        onPrev={() => setTutorialStep((prev) => Math.max(0, prev - 1))}
+        onSkip={startRealGame}
+        actionButton={
+          tutorialStep === tutorialSteps.length - 1
+            ? {
+                label: isRevisitingTutorial
+                  ? tutorialTexts.chung.troLaiBaiLam
+                  : tutorialTexts.chung.batDauChoi,
+                onClick: isRevisitingTutorial ? handleCloseRevisit : startRealGame,
+                variant: 'primary',
+              }
+            : undefined
+        }
       />
     </div>
   );

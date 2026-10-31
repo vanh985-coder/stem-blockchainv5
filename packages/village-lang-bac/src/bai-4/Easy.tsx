@@ -1,5 +1,20 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { Avatar, Button, Card, FeedbackSheet, NumberInput, ProgressBar, fmt, sound, starsFromMistakes, type StationResult, rich } from '@so-chung/core';
+import {
+  Avatar,
+  Button,
+  Card,
+  FeedbackSheet,
+  NumberInput,
+  ProgressBar,
+  TutorialSpotlight,
+  type TutorialStep,
+  tutorialTexts,
+  fmt,
+  sound,
+  starsFromMistakes,
+  type StationResult,
+  rich,
+} from '@so-chung/core';
 import { bai4Texts } from '@so-chung/core/content/lessons/bai-4';
 import { GAME_CONFIG } from '@so-chung/core/config/gameConfig';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
@@ -37,6 +52,76 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
   const [mergedCard, setMergedCard] = useState<{ label: string; value: number } | null>(null);
   const [mistakes, setMistakes] = useState(0);
 
+  // ==========================================
+  // HƯỚNG DẪN FOCUS & LÀM THỬ (P8 - Màn 10 Dễ)
+  // ==========================================
+  const [tutorialActive, setTutorialActive] = useState<boolean>(true);
+  const [tutorialStep, setTutorialStep] = useState<number>(0);
+  const [isRevisitingTutorial, setIsRevisitingTutorial] = useState<boolean>(false);
+  const [practiceError, setPracticeError] = useState<string | undefined>();
+
+  // Lưu trạng thái trước khi mở lại giữa bài
+  const savedStateRef = useRef<{
+    currentIndex: number;
+    inputValue: number | null;
+    mistakes: number;
+  } | null>(null);
+
+  const startRealGame = useCallback(() => {
+    sound.playClick();
+    setTutorialActive(false);
+    setIsRevisitingTutorial(false);
+    setIsMerging(false);
+    setMergedCard(null);
+    setInputValue(null);
+    setInputError(undefined);
+    setCurrentIndex(0);
+    setMistakes(0);
+    startTimeRef.current = Date.now();
+  }, []);
+
+  const handleOpenTutorial = useCallback(() => {
+    sound.playClick();
+    savedStateRef.current = {
+      currentIndex,
+      inputValue,
+      mistakes,
+    };
+    setIsRevisitingTutorial(true);
+    setTutorialActive(true);
+    setTutorialStep(0);
+    setPracticeError(undefined);
+    setIsMerging(false);
+    setMergedCard(null);
+  }, [currentIndex, inputValue, mistakes]);
+
+  const handleCloseRevisit = useCallback(() => {
+    sound.playClick();
+    setTutorialActive(false);
+    setIsRevisitingTutorial(false);
+    setIsMerging(false);
+    setMergedCard(null);
+    if (savedStateRef.current) {
+      setCurrentIndex(savedStateRef.current.currentIndex);
+      setInputValue(savedStateRef.current.inputValue);
+      setMistakes(savedStateRef.current.mistakes);
+      savedStateRef.current = null;
+    }
+  }, []);
+
+  // Expose probe cho test
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__tutorial = {
+        active: tutorialActive,
+        step: tutorialStep,
+        setStep: (s: number) => setTutorialStep(s),
+        startRealGame,
+        openTutorial: handleOpenTutorial,
+      };
+    }
+  }, [tutorialActive, tutorialStep, startRealGame, handleOpenTutorial]);
+
   // Quản lý phản hồi FeedbackSheet
   const [feedback, setFeedback] = useState<{
     isOpen: boolean;
@@ -66,6 +151,40 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
   // Xử lý kiểm tra đáp án
   const handleCheck = useCallback(() => {
     if (isMerging) return;
+
+    // Xử lý khi đang trong chế độ Hướng dẫn & Làm thử
+    if (tutorialActive) {
+      if (inputValue === null || inputValue < 10 || inputValue > 99) {
+        sound.playWrong();
+        setPracticeError(tutorialTexts.man10De.nhapSaiKhoang);
+        return;
+      }
+
+      if (inputValue === expectedValue) {
+        sound.playCorrect();
+        setPracticeError(undefined);
+        setIsMerging(true);
+
+        const mergeDelay = GAME_CONFIG.lesson4.cardMergeDelayMs || 400;
+        timerRef.current = setTimeout(() => {
+          setMergedCard({
+            label: pairLabel,
+            value: expectedValue,
+          });
+          setTutorialStep(4);
+        }, mergeDelay);
+      } else {
+        sound.playWrong();
+        setPracticeError(
+          fmt(tutorialTexts.man10De.wrong, {
+            value: txA.value,
+            value2: txB.value,
+            expected: expectedValue,
+          })
+        );
+      }
+      return;
+    }
 
     // 1. Kiểm tra ô trống hoặc ngoài khoảng
     if (inputValue === null || inputValue < 10 || inputValue > 99) {
@@ -153,14 +272,89 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
     questions.length,
     mistakes,
     onComplete,
+    tutorialActive,
+    expectedValue,
+    pairLabel,
+    txA.value,
+    txB.value,
   ]);
+
+  const tutorialSteps = useMemo<TutorialStep[]>(() => {
+    return [
+      {
+        id: 'intro',
+        title: tutorialTexts.man10De.tieuDe,
+        content: tutorialTexts.man10De.intro,
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        id: 'table',
+        targetSelector: '#tutorial-man10de-table',
+        title: tutorialTexts.man10De.tieuDe,
+        content: fmt(tutorialTexts.man10De.table, {
+          id: txA.id,
+          id2: txB.id,
+          value: txA.value,
+          value2: txB.value,
+        }),
+        nextLabel: tutorialTexts.chung.daHieu,
+      },
+      {
+        id: 'pair',
+        targetSelector: '#tutorial-man10de-pair',
+        title: tutorialTexts.man10De.tieuDe,
+        content:
+          fmt(tutorialTexts.man10De.pair, {
+            pairLabel,
+            id: txA.id,
+            id2: txB.id,
+            value: txA.value,
+            value2: txB.value,
+          }) +
+          ' ' +
+          fmt(tutorialTexts.man10De.formula, {
+            pairLabel,
+            value: txA.value,
+            value2: txB.value,
+            expected: expectedValue,
+          }),
+        nextLabel: tutorialTexts.chung.thuTinhNgay,
+      },
+      {
+        id: 'input',
+        targetSelector: '#tutorial-man10de-input',
+        title: tutorialTexts.man10De.tieuDe,
+        content: fmt(tutorialTexts.man10De.input, { expected: expectedValue }),
+        interactive: true,
+        hideNextButton: true,
+      },
+      {
+        id: 'result',
+        targetSelector: '#tutorial-man10de-pair',
+        title: tutorialTexts.man10De.tieuDe,
+        content: fmt(tutorialTexts.man10De.correct, { pairLabel, expected: expectedValue }),
+      },
+    ];
+  }, [txA, txB, pairLabel, expectedValue]);
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-200">
       <div className="space-y-1">
-        <div className="flex justify-between text-sm text-nau-go-dam font-semibold">
+        <div className="flex items-center justify-between text-sm text-nau-go-dam font-semibold">
           <span>{T.tienDoGhepCap}</span>
-          <span>{fmt(T.cauHoi, { so: currentIndex + 1, so2: questions.length })}</span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleOpenTutorial}
+              aria-label={tutorialTexts.chung.huongDan}
+              className="flex items-center gap-1.5 text-nau-go-dam hover:text-muc-tim-dam font-bold"
+            >
+              <span>💡</span>
+              <span>{tutorialTexts.chung.huongDan}</span>
+            </Button>
+            <span>{fmt(T.cauHoi, { so: currentIndex + 1, so2: questions.length })}</span>
+          </div>
         </div>
         <ProgressBar
           current={currentIndex + 1}
@@ -169,41 +363,43 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
       </div>
 
       {/* Bảng giao dịch tra cứu */}
-      <Card variant="paper" className="p-4 sm:p-5">
-        <div className="flex items-center justify-between mb-3 border-b border-nau-go/30 pb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">📋</span>
-            <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{T.bangGiaoDich}</h3>
-          </div>
-          <span className="text-sm text-nau-go-dam">{T.bangTraCuuGiaTri}</span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          {txs.map((tx) => (
-            <div
-              key={tx.id}
-              className={`p-2.5 rounded-[12px] border-2 transition-all flex flex-col items-center text-center ${
-                tx.id === txA.id || tx.id === txB.id
-                  ? 'border-muc-tim bg-white/60'
-                  : 'border-nau-go/30 bg-white/70 opacity-80'
-              }`}
-            >
-              <div className="flex items-center gap-1 mb-1">
-                <Avatar portrait={portraitOf(tx.character)} size="sm" />
-                <span className="font-display font-extrabold text-sm text-muc-tim-dam">
-                  {tx.id}
-                </span>
-              </div>
-              <div className="text-sm text-nau-go-dam font-medium truncate w-full">
-                {tx.name} {tx.item}
-              </div>
-              <div className="font-display font-extrabold text-base text-chu mt-1 bg-giay px-2 py-0.5 rounded-[6px]">
-                {tx.value}
-              </div>
+      <div id="tutorial-man10de-table">
+        <Card variant="paper" className="p-4 sm:p-5">
+          <div className="flex items-center justify-between mb-3 border-b border-nau-go/30 pb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">📋</span>
+              <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{T.bangGiaoDich}</h3>
             </div>
-          ))}
-        </div>
-      </Card>
+            <span className="text-sm text-nau-go-dam">{T.bangTraCuuGiaTri}</span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            {txs.map((tx) => (
+              <div
+                key={tx.id}
+                className={`p-2.5 rounded-[12px] border-2 transition-all flex flex-col items-center text-center ${
+                  tx.id === txA.id || tx.id === txB.id
+                    ? 'border-muc-tim bg-white/60'
+                    : 'border-nau-go/30 bg-white/70 opacity-80'
+                }`}
+              >
+                <div className="flex items-center gap-1 mb-1">
+                  <Avatar portrait={portraitOf(tx.character)} size="sm" />
+                  <span className="font-display font-extrabold text-sm text-muc-tim-dam">
+                    {tx.id}
+                  </span>
+                </div>
+                <div className="text-sm text-nau-go-dam font-medium truncate w-full">
+                  {tx.name} {tx.item}
+                </div>
+                <div className="font-display font-extrabold text-base text-chu mt-1 bg-giay px-2 py-0.5 rounded-[6px]">
+                  {tx.value}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
 
       {/* Khu vực ghép thẻ */}
       <Card className="p-6 sm:p-8 flex flex-col items-center text-center relative overflow-hidden">
@@ -212,7 +408,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
         </p>
 
         {/* Khung hiển thị hai thẻ trượt vào nhau */}
-        <div className="min-h-[120px] flex items-center justify-center relative w-full mb-6">
+        <div id="tutorial-man10de-pair" className="min-h-[120px] flex items-center justify-center relative w-full mb-6">
           {mergedCard ? (
             <div className="animate-in zoom-in-95 duration-200 p-4 rounded-[16px] border-2 border-xanh-la-dam bg-xanh-la/10 flex flex-col items-center min-w-[140px]">
               <span className="text-sm font-bold text-xanh-la-dam uppercase">{fmt(T.theGop, { label: mergedCard.label })}</span>
@@ -275,7 +471,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
         </div>
 
         {/* Ô nhập số và nút nộp */}
-        <div className="flex flex-col items-center gap-3 w-full max-w-xs">
+        <div id="tutorial-man10de-input" className="flex flex-col items-center gap-3 w-full max-w-xs">
           <div className="flex items-center justify-center gap-2 w-full">
             <span className="font-display font-bold text-sm text-nau-go-dam">
               {pairLabel} =
@@ -285,12 +481,13 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
               onChange={(val) => {
                 setInputValue(val);
                 if (inputError) setInputError(undefined);
+                if (practiceError) setPracticeError(undefined);
               }}
               min={10}
               max={99}
               showButtons={false}
               placeholder="??"
-              error={inputError}
+              error={tutorialActive ? practiceError : inputError}
               onEnter={handleCheck}
               autoFocus
               className="w-28"
@@ -319,6 +516,29 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
           setFeedback((prev) => ({ ...prev, isOpen: false }));
         }}
         continueLabel={T.thuLai}
+      />
+
+      {/* Hướng dẫn Focus Spotlight (P8) */}
+      <TutorialSpotlight
+        isOpen={tutorialActive}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => setTutorialStep((prev) => Math.min(prev + 1, tutorialSteps.length - 1))}
+        onPrev={() => setTutorialStep((prev) => Math.max(0, prev - 1))}
+        onSkip={startRealGame}
+        feedbackMessage={practiceError}
+        feedbackType={practiceError ? 'error' : undefined}
+        actionButton={
+          tutorialStep === tutorialSteps.length - 1
+            ? {
+                label: isRevisitingTutorial
+                  ? tutorialTexts.chung.troLaiBaiLam
+                  : tutorialTexts.chung.batDauChoi,
+                onClick: isRevisitingTutorial ? handleCloseRevisit : startRealGame,
+                variant: 'primary',
+              }
+            : undefined
+        }
       />
     </div>
   );

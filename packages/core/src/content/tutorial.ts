@@ -131,4 +131,37 @@ export const tutorialTexts = {
     nhapSaiKhoang: 'Số x phải nằm trong khoảng từ 1 đến 22',
     chuaNhap: 'Em chưa nhập số x. Hãy nhập một số từ 1 đến 22 vào ô nhé!',
   },
+
+  man10De: {
+    tieuDe: 'Làm thử: Ghép cặp giao dịch',
+    intro: 'Chào mừng em đến Làng Bạc! Bài 4 học về Cây Merkle: gộp nhiều giao dịch thành một mã gốc duy nhất bằng cách ghép từng cặp từ dưới lên.',
+    table: 'Bảng giao dịch: Mỗi giao dịch có một mã số định danh ({id}, {id2}...) và một giá trị tương ứng ({value}, {value2}...).',
+    pair: 'Cặp giao dịch đang cần ghép: {pairLabel} gồm {id} ({value}) và {id2} ({value2}). Công thức ghép: lấy số thứ nhất nhân 10 rồi cộng số thứ hai.',
+    formula: 'Ví dụ với cặp này: {pairLabel} = {value} × 10 + {value2} = {expected}.',
+    input: 'Em hãy tính nhẩm và nhập kết quả {expected} vào ô rồi bấm "Ghép giao dịch" nhé!',
+    correct: 'Chính xác! Hai thẻ đã trượt vào nhau tạo thành Thẻ gộp {pairLabel} với giá trị {expected}! Thẻ gộp này sẽ tiếp tục được ghép lên tầng trên.',
+    wrong: 'Chưa đúng rồi: Công thức là {value} × 10 + {value2} = {expected}. Em hãy thử lại nhé!',
+    nhapSaiKhoang: 'Kết quả ghép là số có hai chữ số (từ 10 đến 99)',
+    chuaNhap: 'Em chưa nhập số. Hãy tính nhẩm và nhập kết quả vào ô nhé!',
+  },
+
+  man10Tb: {
+    tieuDe: 'Làm thử: Dựng cây và Soi cây Merkle',
+    intro: 'Ở trạm Trung bình, em sẽ quan sát toàn bộ Cây Merkle được dựng từ 4 lá sen ở đáy lên 1 gốc duy nhất, và học cách soi tìm giao dịch bị sửa đổi!',
+    treeStructure: 'Cấu trúc cây: Tầng đáy gồm 4 lá (T1, T2, T3, T4). Tầng giữa ghép đôi thành T12 và T34. Tầng trên cùng ghép thành Gốc Merkle đại diện cho toàn bộ sổ.',
+    stepByStep: 'Mỗi bước ghép: Hai nút con ở dưới nhân 10 và cộng lại để tạo thành nút cha ở trên: Gốc = T12 × 100 + T34.',
+    practice: 'Em hãy bấm các nút điều khiển để theo dõi các tầng cây được ghép từ lá lên gốc nhé!',
+    correct: 'Tuyệt vời! Em đã nắm rõ nguyên lý dựng cây từ lá lên gốc. Bây giờ hãy tự xây cây và khám phá bí mật của Cây Merkle nhé!',
+  },
+
+  man10Kho: {
+    tieuDe: 'Làm thử: Hoàn thiện Cây Merkle 8 giao dịch',
+    intro: 'Ở trạm Khó, cây Merkle mở rộng lên 8 giao dịch (3 tầng ghép). Một số vị trí bị khuyết dấu hỏi "?" và em cần đặt đúng mảnh ghép từ khay vào cây!',
+    table: 'Bảng 8 giao dịch gốc ở đáy (T1 đến T8). Đây là dữ liệu nguồn cố định không đổi.',
+    tray: 'Khay mảnh ghép chứa các số cần điền, bao gồm cả các số đúng và các số bẫy (như bị ghép ngược thứ tự).',
+    place: 'Em hãy kéo hoặc chạm một mảnh ghép từ khay đặt vào ô dấu "?" tương ứng trên cây (hoặc chọn ô rồi chọn mảnh).',
+    check: 'Sau khi điền đủ các ô, bấm "Kiểm tra cây Merkle" để hệ thống thẩm định toàn bộ các tầng cây!',
+    correct: 'Chính xác! Em đã nắm vững cách ghép và kiểm tra các tầng của cây Merkle 8 giao dịch!',
+    wrong: 'Chưa đúng rồi. Hãy tính cẩn thận từ các nút con ở dưới lên nút cha ở trên nhé!',
+  },
 };
