@@ -13,8 +13,11 @@ import {
   useManifest,
   useSettings,
   whackUi,
+  TutorialSpotlight,
+  tutorialTexts,
   type MiniGameRenderProps,
   type ScorePart,
+  type TutorialStep,
 } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { WHACK_SPEC, type MouseKind } from './whackConfig';
@@ -160,9 +163,15 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   // Bảo vệ Enter giữ/lặp trong dialog câu hỏi
   const enterReleasedAfterAnswer = useRef(false);
 
-  // Dừng vòng lặp khi pause hoặc khi quiz đang mở hoặc kết thúc
-  const holdRef = useRef(paused);
-  holdRef.current = paused;
+  // Trạng thái hướng dẫn focus và làm thử (P8)
+  const [tutorialActive, setTutorialActive] = useState(attempt <= 1);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [, setTutorialPracticeDone] = useState(false);
+
+  // Dừng vòng lặp khi pause hoặc khi quiz đang mở hoặc khi tutorial đang mở
+  const holdLoop = paused || tutorialActive;
+  const holdRef = useRef(holdLoop);
+  holdRef.current = holdLoop;
   const lastTickTime = useRef(performance.now());
 
   useGameHint(setHint, 5, () => hintFor(state));
@@ -182,10 +191,10 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     lastTickTime.current = performance.now();
   }, [state]);
 
-  // Cập nhật lastTickTime khi pause thay đổi để tránh nhảy thời gian khi unpause
+  // Cập nhật lastTickTime khi pause hoặc tutorial thay đổi để tránh nhảy thời gian khi unpause
   useEffect(() => {
     lastTickTime.current = performance.now();
-  }, [paused]);
+  }, [paused, tutorialActive]);
 
   // Thêm hiệu ứng điểm nổi
   const addEffect = useCallback((lane: number, pos: number, text: string, kind: HitEffect['kind']) => {
@@ -292,6 +301,72 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
       hittingTimer.current = null;
     }, 180);
   }, []);
+
+  // Xử lý thao tác làm thử ở bước 4 của tutorial
+  const doPracticeHit = useCallback(() => {
+    triggerHeroHit();
+    triggerLaneFlash(0);
+    sound.playWhoosh();
+    setTutorialPracticeDone(true);
+    setTutorialStep(5);
+  }, [triggerHeroHit, triggerLaneFlash]);
+
+  // Lắng nghe phím tắt D/1 khi đang ở bước 4 làm thử
+  useEffect(() => {
+    if (!tutorialActive || tutorialStep !== 4) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.code === 'KeyD' || e.code === 'Digit1' || e.code === 'Numpad1') {
+        e.preventDefault();
+        doPracticeHit();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [tutorialActive, tutorialStep, doPracticeHit]);
+
+  // Danh sách các bước hướng dẫn focus Màn 5
+  const tutorialSteps: TutorialStep[] = useMemo(() => [
+    {
+      id: 'intro',
+      title: fmt(tutorialTexts.man5.tieuDe),
+      content: fmt(tutorialTexts.man5.intro),
+    },
+    {
+      id: 'lanes',
+      targetSelector: '#tutorial-man5-lanes',
+      title: fmt(tutorialTexts.man5.tieuDe),
+      content: tutorialTexts.man5.lanes,
+      nextLabel: tutorialTexts.chung.daHieu,
+    },
+    {
+      id: 'soChung',
+      targetSelector: '#tutorial-man5-book',
+      title: fmt(tutorialTexts.man5.tieuDe),
+      content: tutorialTexts.man5.soChung,
+      nextLabel: tutorialTexts.chung.daHieu,
+    },
+    {
+      id: 'buttons',
+      targetSelector: '#tutorial-man5-buttons',
+      title: fmt(tutorialTexts.man5.tieuDe),
+      content: tutorialTexts.man5.buttons,
+      nextLabel: tutorialTexts.chung.thuTinhNgay,
+    },
+    {
+      id: 'practice',
+      targetSelector: '#tutorial-man5-buttons',
+      title: fmt(tutorialTexts.man5.tieuDe),
+      content: tutorialTexts.man5.practice,
+      interactive: true,
+      hideNextButton: true,
+    },
+    {
+      id: 'ready',
+      title: fmt(tutorialTexts.man5.tieuDe),
+      content: tutorialTexts.man5.correct,
+    },
+  ], []);
 
   // Thao tác đập một làn: dùng chung thống nhất cho cả phím, nút đập và chạm làn/chuột
   const hit = useCallback(
@@ -467,7 +542,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   }, [onFinish, state]);
 
   // Probe phục vụ tự động kiểm thử Puppeteer
-  if (PROBE) {
+  if (PROBE && typeof window !== 'undefined') {
     Object.assign(window, {
       __whack: state,
       __whackQuestions: questions,
@@ -486,6 +561,12 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
         bump();
       },
       __whackBump: () => bump(),
+      __whackTutorial: {
+        active: tutorialActive,
+        step: tutorialStep,
+        setStep: setTutorialStep,
+        setActive: setTutorialActive,
+      },
     });
   }
 
@@ -493,6 +574,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
 
   return (
     <div
+      id="tutorial-man5-game"
       className="fixed inset-0 z-20 flex flex-col items-center justify-between overflow-hidden select-none font-display text-giay"
       data-testid="man5"
     >
@@ -558,6 +640,22 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
         <div className="flex items-center gap-1 font-bold text-amber-200 text-xs sm:text-sm">
           <span>{fmt(whackUi.trum, { so: state.bossesDone, max: WHACK_SPEC.boss.count })}</span>
         </div>
+
+        {/* Nút mở lại Hướng dẫn */}
+        <button
+          type="button"
+          aria-label={tutorialTexts.chung.huongDan}
+          onClick={() => {
+            setTutorialActive(true);
+            setTutorialStep(0);
+            setTutorialPracticeDone(true);
+          }}
+          className="flex items-center gap-1 rounded-lg border border-amber-500/60 bg-amber-900/60 px-2 py-0.5 text-xs font-bold text-amber-200 transition-colors hover:bg-amber-800/80 active:scale-95"
+          data-testid="btn-open-tutorial"
+        >
+          <span>💡</span>
+          <span className="hidden sm:inline">{tutorialTexts.chung.huongDan}</span>
+        </button>
       </header>
 
       {/* 3. KHU VỰC TRUNG TÂM: NHÂN VẬT + SÂN 4 LÀN DỌC + CUỐN SỔ + NÚT ĐẬP */}
@@ -593,6 +691,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
 
           {/* SÂN 4 LÀN CHÍNH */}
           <main
+            id="tutorial-man5-lanes"
             role="application"
             aria-label={whackUi.khung}
             className="relative flex flex-1 h-full select-none overflow-hidden"
@@ -821,6 +920,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
 
         {/* 4. CUỐN SỔ CHUNG Ở ĐÁY CÁC LÀN (book.png) & CÁC CHẤM MỰC */}
         <div
+          id="tutorial-man5-book"
           className="relative z-20 w-full max-w-[340px] sm:max-w-[460px] md:max-w-[560px] lg:max-w-[640px] xl:max-w-[700px] flex flex-col items-center -mt-1 sm:-mt-2"
           data-testid="so-chung-day"
         >
@@ -855,11 +955,15 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
         </div>
 
         {/* 5. CÁC NÚT ĐẬP D F J K CHÂN LÀN */}
-        <footer className="z-20 mt-1 sm:mt-2 w-full max-w-[340px] sm:max-w-[460px] md:max-w-[560px] lg:max-w-[640px] xl:max-w-[700px] px-1">
+        <footer
+          id="tutorial-man5-buttons"
+          className="z-20 mt-1 sm:mt-2 w-full max-w-[340px] sm:max-w-[460px] md:max-w-[560px] lg:max-w-[640px] xl:max-w-[700px] px-1"
+        >
           <div className="grid w-full grid-cols-4 gap-1.5 sm:gap-2 md:gap-3">
             {[0, 1, 2, 3].map((lane) => (
               <button
                 key={lane}
+                id={lane === 0 ? 'tutorial-man5-btn-0' : undefined}
                 type="button"
                 className={`flex h-11 sm:h-12 md:h-14 min-h-[46px] flex-col items-center justify-center rounded-xl border-2 text-white shadow-md active:scale-95 focus:outline-none focus:ring-2 focus:ring-amber-300 ${LANE_BTN_STYLES[lane]}`}
                 data-testid={`nut-dap-${lane}`}
@@ -971,6 +1075,49 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
           </div>
         </div>
       )}
+
+      {/* 8. HƯỚNG DẪN FOCUS VÀ LÀM THỬ (P8) */}
+      <TutorialSpotlight
+        isOpen={tutorialActive}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => {
+          if (tutorialStep < tutorialSteps.length - 1) {
+            setTutorialStep((prev) => prev + 1);
+          } else {
+            setTutorialActive(false);
+          }
+        }}
+        onPrev={() => {
+          if (tutorialStep > 0) {
+            setTutorialStep((prev) => prev - 1);
+          }
+        }}
+        onSkip={() => setTutorialActive(false)}
+        actionButton={
+          tutorialStep === tutorialSteps.length - 1
+            ? {
+                label: tutorialTexts.chung.batDauChoi,
+                onClick: () => setTutorialActive(false),
+                variant: 'primary',
+              }
+            : undefined
+        }
+      >
+        {tutorialActive && tutorialStep === 4 && (
+          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={doPracticeHit}
+              className="shadow-xl animate-bounce"
+            >
+              <span>🔨</span>
+              <span>{tutorialTexts.man5.dapThu}</span>
+            </Button>
+          </div>
+        )}
+      </TutorialSpotlight>
     </div>
   );
 }

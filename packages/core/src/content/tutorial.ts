@@ -185,4 +185,25 @@ export const tutorialTexts = {
     practice: 'Em hãy bấm nút "Soi công thức" để kiểm tra tính hợp lệ của trang sổ mẫu nhé!',
     correct: 'Tuyệt vời! Em đã biết cách dùng công cụ Soi và phân loại trang thật, trang giả. Sẵn sàng ghép sổ thôi nào!',
   },
+
+  man5: {
+    tieuDe: 'Làm thử: Đập {phanDien}',
+    intro: '{phanDien} và lũ chuột đang tìm cách phá hoại cuốn Sổ Chung! Em hãy dùng búa đập tan lũ chuột khi chúng chạy vào vùng đập.',
+    lanes: '4 làn chạy mang sắc màu truyền thống của Làng Dệt. Chuột chạy từ trên xuống, và em CHỈ ĐƯỢC ĐẬP khi chuột đã chạy vào Vùng đập có viền sáng!',
+    soChung: 'Cuốn Sổ Chung nằm ở đáy 4 làn. Nếu để chuột lọt qua vùng đập, mỗi con sẽ làm loang 1 vết mực trên trang sổ. Đầy đủ 8 vết mực thì hỏng sổ!',
+    buttons: 'Điều khiển: Bấm 4 nút D, F, J, K ở chân làn, chạm thẳng vào làn/chuột trên màn hình cảm ứng, hoặc bấm phím D, F, J, K (hoặc 1, 2, 3, 4).',
+    practice: 'Em hãy bấm nút "Đập thử làn 1 (D)" hoặc nhấn phím D trên bàn phím để vung búa thử một nhịp nhé!',
+    dapThu: 'Đập thử làn 1 (D)',
+    correct: 'Rất nhanh tay! Chú ý: Chuột to cần đập 2 lần, chuột có dấu ❓ là Chuột câu hỏi - hãy đập và trả lời đúng để xóa bớt vết mực nhé!',
+  },
+
+  man6: {
+    tieuDe: 'Làm thử: Diều đưa sổ',
+    intro: 'Em hãy điều khiển cánh diều no gió bay qua các rặng tre đồng làng, nhặt các trang sổ bị thất lạc và đưa về các cổng làng an toàn!',
+    hud: 'Thanh theo dõi: Em có 3 tim, số trang sổ đã nhặt và số cổng làng đã giao sổ an toàn.',
+    controls: 'Điều khiển: Bấm chuột, chạm ngón tay vào màn hình hoặc bấm phím Space để vỗ cánh nâng diều lên cao. Thả tay để diều tự lượn xuống.',
+    practice: 'Em hãy bấm nút "Vỗ cánh thử" hoặc nhấn phím Space trên bàn phím để cánh diều bay lượn thử một nhịp nhé!',
+    voCanhThu: 'Vỗ cánh thử',
+    correct: 'Cánh diều đã vút lên rất mượt mà! Hãy khéo léo lượn qua các khe tre, và khi đến cổng làng hãy trả lời đúng câu hỏi để giao sổ nhé!',
+  },
 };

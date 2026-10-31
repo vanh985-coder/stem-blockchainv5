@@ -1,5 +1,21 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { Button, Panel, ProgressBar, QuizCard, fmt, kiteUi, pickQuestions, sound, useGameHint, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import {
+  Button,
+  Panel,
+  ProgressBar,
+  QuizCard,
+  fmt,
+  kiteUi,
+  pickQuestions,
+  sound,
+  useGameHint,
+  useSettings,
+  TutorialSpotlight,
+  tutorialTexts,
+  type MiniGameRenderProps,
+  type ScorePart,
+  type TutorialStep,
+} from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { Scene25D, isQualityChoice, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
@@ -80,9 +96,14 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
   const quizLeft = useRef(0);
   const shownLeft = useRef(0);
 
+  // Trạng thái hướng dẫn focus và làm thử (P8)
+  const [tutorialActive, setTutorialActive] = useState(attempt <= 1);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [, setTutorialPracticeDone] = useState(false);
+
   const ready = warm && textures.done;
   const rotated = mode === 'rotate';
-  const holdLoop = paused || !ready || rotated;
+  const holdLoop = paused || !ready || rotated || tutorialActive;
   const holdRef = useRef(holdLoop);
   holdRef.current = holdLoop;
   useGameHint(setHint, LEVEL_ID, () => hintFor(state));
@@ -96,6 +117,59 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
     setEnding(null);
     setDelivered(null);
   }, [state]);
+
+  // Thao tác làm thử ở bước 3: vỗ cánh diều
+  const doPracticeFlap = useCallback(() => {
+    sound.playWhoosh();
+    setTutorialPracticeDone(true);
+    setTutorialStep(4);
+  }, []);
+
+  // Lắng nghe phím Space khi đang ở bước 3 làm thử
+  useEffect(() => {
+    if (!tutorialActive || tutorialStep !== 3) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code !== 'Space' || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+      e.preventDefault();
+      doPracticeFlap();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [tutorialActive, tutorialStep, doPracticeFlap]);
+
+  // Danh sách các bước hướng dẫn focus Màn 6
+  const tutorialSteps: TutorialStep[] = useMemo(() => [
+    {
+      id: 'intro',
+      title: fmt(tutorialTexts.man6.tieuDe),
+      content: fmt(tutorialTexts.man6.intro),
+    },
+    {
+      id: 'hud',
+      targetSelector: '#tutorial-man6-hud',
+      title: fmt(tutorialTexts.man6.tieuDe),
+      content: tutorialTexts.man6.hud,
+      nextLabel: tutorialTexts.chung.daHieu,
+    },
+    {
+      id: 'controls',
+      title: fmt(tutorialTexts.man6.tieuDe),
+      content: tutorialTexts.man6.controls,
+      nextLabel: tutorialTexts.chung.thuTinhNgay,
+    },
+    {
+      id: 'practice',
+      title: fmt(tutorialTexts.man6.tieuDe),
+      content: tutorialTexts.man6.practice,
+      interactive: true,
+      hideNextButton: true,
+    },
+    {
+      id: 'ready',
+      title: fmt(tutorialTexts.man6.tieuDe),
+      content: tutorialTexts.man6.correct,
+    },
+  ], []);
 
   // Nạp trước: cho mọi hình trong pool hiện rất nhỏ lúc màn hình tải còn che cảnh, để texture lên GPU trước và lần đầu không khựng
   const warmUp = useCallback(() => {
@@ -245,11 +319,24 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
   }, [onFinish, state]);
 
   const onModeChange = useCallback((m: FrameMode) => setMode(m), []);
-  if (PROBE) Object.assign(window, { __kite: state, __kiteView: view.current, __kiteQuestions: questions, __kiteUi: { ready, quiz, ending, mode } });
+  if (PROBE && typeof window !== 'undefined') {
+    Object.assign(window, {
+      __kite: state,
+      __kiteView: view.current,
+      __kiteQuestions: questions,
+      __kiteUi: { ready, quiz, ending, mode },
+      __kiteTutorial: {
+        active: tutorialActive,
+        step: tutorialStep,
+        setStep: setTutorialStep,
+        setActive: setTutorialActive,
+      },
+    });
+  }
 
-  const showStart = ready && state.phase === 'ready' && !rotated && !paused;
+  const showStart = ready && state.phase === 'ready' && !rotated && !paused && !tutorialActive;
   return (
-    <div className="fixed inset-0 select-none bg-black" data-testid="man6">
+    <div id="tutorial-man6-game" className="fixed inset-0 select-none bg-black" data-testid="man6">
       <Scene25D
         background={null}
         quality={forced}
@@ -258,7 +345,7 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
         onModeChange={onModeChange}
         overlay={
           <div className="absolute inset-0 touch-none select-none" role="application" aria-label={kiteUi.khung} data-testid="man6-khung" data-phase={state.phase} onPointerDown={onPointerDown}>
-            <div className={`pointer-events-none absolute top-2 flex flex-col space-y-1 ${quiz ? 'left-2 items-start' : 'right-14 items-end'}`} data-testid="hud">
+            <div className={`pointer-events-none absolute top-2 flex flex-col space-y-1 ${quiz ? 'left-2 items-start' : 'right-14 items-end'}`} data-testid="hud" id="tutorial-man6-hud">
               <div className="flex items-center gap-0.5 rounded-2xl border-2 border-nau-go bg-giay px-2 py-1" role="img" aria-label={fmt(kiteUi.tim, { so: state.hearts, max: C.hearts })} data-testid="tim">
                 {Array.from({ length: C.hearts }, (_, i) => (
                   <HeartIcon key={i} on={i < state.hearts} />
@@ -272,6 +359,20 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
                 <span data-testid="cong">{fmt(kiteUi.cong, gateCounter(state.gatesDone))}</span>
                 <span data-testid="diem">{fmt(kiteUi.diem, { so: state.score })}</span>
               </div>
+              <button
+                type="button"
+                aria-label={tutorialTexts.chung.huongDan}
+                onClick={() => {
+                  setTutorialActive(true);
+                  setTutorialStep(0);
+                  setTutorialPracticeDone(true);
+                }}
+                className="pointer-events-auto flex items-center gap-1 rounded-2xl border-2 border-nau-go bg-giay px-2 py-0.5 text-xs font-bold text-nau-go shadow transition-colors hover:bg-giay/90 active:scale-95"
+                data-testid="btn-open-tutorial"
+              >
+                <span>💡</span>
+                <span className="hidden sm:inline">{tutorialTexts.chung.huongDan}</span>
+              </button>
             </div>
 
             {showStart && (
@@ -334,6 +435,49 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
       >
         <KiteStage view={view} textures={textures} reduced={reduced} />
       </Scene25D>
+
+      {/* Hướng dẫn focus và làm thử (P8) */}
+      <TutorialSpotlight
+        isOpen={tutorialActive}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => {
+          if (tutorialStep < tutorialSteps.length - 1) {
+            setTutorialStep((prev) => prev + 1);
+          } else {
+            setTutorialActive(false);
+          }
+        }}
+        onPrev={() => {
+          if (tutorialStep > 0) {
+            setTutorialStep((prev) => prev - 1);
+          }
+        }}
+        onSkip={() => setTutorialActive(false)}
+        actionButton={
+          tutorialStep === tutorialSteps.length - 1
+            ? {
+                label: tutorialTexts.chung.batDauChoi,
+                onClick: () => setTutorialActive(false),
+                variant: 'primary',
+              }
+            : undefined
+        }
+      >
+        {tutorialActive && tutorialStep === 3 && (
+          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={doPracticeFlap}
+              className="shadow-xl animate-bounce"
+            >
+              <span>🪁</span>
+              <span>{tutorialTexts.man6.voCanhThu}</span>
+            </Button>
+          </div>
+        )}
+      </TutorialSpotlight>
     </div>
   );
 }
