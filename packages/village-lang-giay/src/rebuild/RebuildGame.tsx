@@ -124,7 +124,7 @@ function HudBar({
   onOpenTutorial: () => void;
 }) {
   return (
-    <div className="absolute flex items-center justify-between" style={{ left: `${AREAS.hud.x0}cqw`, right: `${100 - AREAS.hud.x1}cqw`, top: `${AREAS.hud.y0}%` }}>
+    <div className="absolute flex items-center justify-between" style={{ left: `${AREAS.hud.x0}cqw`, right: `max(${100 - AREAS.hud.x1}cqw, 4.25rem)`, top: `${AREAS.hud.y0}%` }}>
       <div className={`flex items-center rounded-nut border-2 border-nau-go bg-giay/90 px-3 ${clock !== null ? 'gap-2 py-0' : 'gap-3 py-1'}`} data-testid="hud">
         <Hearts current={hearts} max={SPEC.hearts} size="sm" />
         <span className="font-display text-base font-extrabold" data-testid="vong">
@@ -141,11 +141,11 @@ function HudBar({
         {status && <ChainStatus status={status} />}
       </div>
       <div className="flex items-center gap-2">
-        <Button size="sm" variant="secondary" onClick={onOpenTutorial} className="min-h-11 text-nau-go-dam font-bold" aria-label={tutorialTexts.chung.huongDan}>
+        <Button size="sm" variant="secondary" onClick={onOpenTutorial} className="min-h-11 min-w-11 text-nau-go-dam font-bold" aria-label={tutorialTexts.chung.huongDan}>
           <span>💡</span>
           <span className="hidden sm:inline">{tutorialTexts.chung.huongDan}</span>
         </Button>
-        <Button id="tutorial-man3-soi" size="sm" variant={soiOpen ? 'primary' : 'secondary'} onClick={onSoi} className="min-h-11" data-testid="nut-soi" aria-pressed={soiOpen}>
+        <Button id="tutorial-man3-soi" size="sm" variant={soiOpen ? 'primary' : 'secondary'} onClick={onSoi} className="min-h-11 min-w-11" data-testid="nut-soi" aria-pressed={soiOpen}>
           {rebuildUi.soiNut}
         </Button>
       </div>

@@ -14,7 +14,7 @@ export interface Box {
 
 /** Vùng của từng phần: x tính theo phần trăm bề rộng khung, y theo phần trăm bề cao khung. */
 export const AREAS = {
-  hud: { x0: 1, x1: 99, y0: 1, y1: 10 },
+  hud: { x0: 1, x1: 92, y0: 1, y1: 10 },
   chain: { x0: 18, x1: 96, y0: 14, y1: 34 },
   /** Dải giữa: nhân vật đứng, lời Bi, ô soi công thức, banner hết vòng */
   mid: { x0: 18, x1: 78, y0: 35, y1: 65 },

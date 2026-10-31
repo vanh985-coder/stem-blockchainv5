@@ -20,7 +20,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 |---|---|
 | 0–2 | ✅ Xong (mốc 2 chưa deploy) |
 | 3. Nhân rộng | ✅ **Chốt.** Đủ 12 màn, cả 4 làng dựng to, **đã gộp web** (≈2086 test xanh). Việc còn dở dời xuống **cuối mốc 4** |
-| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt; P5 đã chốt; P6a, P6b đã xong; P7a, P7b, P7c đã nghiệm thu; P8 ĐÃ HOÀN THÀNH TOÀN DIỆN ĐỦ 12 MÀN (31/10/2026, 325/325 E2E tests đạt, 248 ảnh minh chứng, 28/28 unit tests đạt)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
+| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt; P5 đã chốt; P6a, P6b đã xong; P7a, P7b, P7c đã nghiệm thu; P8 ĐÃ TRIỂN KHAI ĐỦ 12 MÀN (31/10/2026, 325/325 E2E tests đạt, 248 ảnh minh chứng, 28/28 unit tests đạt, đang chờ người dùng kiểm thử và nghiệm thu hoàn toàn)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
 
 **⚠️ 15b vẫn chưa làm:** server có thể đang 530, mốc 2 và toàn bộ mốc 3 (≈60 commit, mới nhất `2bd76bf`) chưa push, chưa chạy trên máy thật. Cách làm: khôi phục `cloudflared` + Docker, deploy theo `DEPLOY.md` (h), Cache Rule (i), thử trên điện thoại.
 
@@ -35,12 +35,12 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | P5 | **ĐÃ XONG (29/10/2026, mục "P5" bên dưới):** (1) Biển chọn màn trong làng làm thành cột sáng giống cuộn "Em có biết?" (mỗi màn một cột, dáng và chữ theo trạng thái, giữ chữ tên màn) | 1 |
 | P6 | (3) Sau khi đọc thẻ "Em có biết?": 1 ví dụ ngắn + 1 câu hỏi ABCD (hoặc điền số). Mặc định: trả lời sai vẫn nhận thẻ, hiện giải thích. **P6a (nội dung 16 câu) đã duyệt; P6b (tích hợp) ĐÃ XONG (30/10/2026, mục "P6b" bên dưới)** | 1–2 |
 | P7 | **P7a ĐÃ XONG (30/10/2026, mục "P7a" bên dưới):** Bản chơi được Màn 5 "Đập {phanDien}" bằng 2D 4 làn dọc (Talking Tom), 2 loại chuột (thường và câu hỏi ❓), chống click ma, dừng khi mở câu hỏi/?, tự hoàn thành. **P7b:** trau chuốt đồ họa và cân bằng nhịp sinh. | 3–4 |
-| P8 | **P8 ĐÃ HOÀN THÀNH TOÀN DIỆN ĐỦ 12 MÀN (31/10/2026, mục "P8" bên dưới):** Cơ chế dùng chung `TutorialSpotlight` và làm thử tương tác cho cả 12 màn (4 bài học × 3 trạm + 8 mini-game). Kiểm tra E2E Puppeteer đạt **325/325 tests (100%)**, 248 ảnh minh chứng, 28/28 unit tests, 4 lệnh bắt buộc xanh 100%. | 2–3 |
+| P8 | **P8 ĐÃ TRIỂN KHAI ĐỦ 12 MÀN (31/10/2026, mục "P8" bên dưới):** Cơ chế dùng chung `TutorialSpotlight` và làm thử tương tác cho cả 12 màn (4 bài học × 3 trạm + 8 mini-game). Kiểm tra E2E Puppeteer đạt **325/325 tests (100%)**, 248 ảnh minh chứng, 28/28 unit tests, 4 lệnh bắt buộc xanh 100%. Đang chờ người dùng kiểm thử và nghiệm thu hoàn toàn. | 2–3 |
 
 Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mốc 3 và hội làng.
 
 
-### P8 — Hướng dẫn focus và làm thử cho cả 12 màn (ĐÃ HOÀN THÀNH TOÀN DIỆN, 31/10/2026)
+### P8 — Hướng dẫn focus và làm thử cho cả 12 màn (ĐÃ TRIỂN KHAI ĐỦ 12 MÀN, ĐANG CHỜ NGƯỜI DÙNG KIỂM THỬ, 31/10/2026)
 
 - **Cơ chế dùng chung `TutorialSpotlight`:** khoét sáng chính xác vùng target qua `#tutorial-*`, viền sáng vàng hào quang, tooltip thông minh 4 hướng không che target, focus trap Tab, chống click ma ở capture phase (`detail === 0` khi chưa arm sau 400ms), chống kích hoạt lặp khi giữ phím Enter (`keydown`/`keyup` cycle).
 - **Phủ kín toàn bộ 12 màn:**
@@ -475,10 +475,13 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   4. *Bằng chứng kiểm thử:* 325 assertions là tổng số kiểm tra tích lũy qua các kịch bản Puppeteer E2E của 12 màn; các màn sửa đổi (Màn 3, 8, 11) đã được chạy lại kiểm tra trên mã cuối và đạt 100%. Ghi rõ toàn bộ kiểm thử chạy với Khách thật (`sc_guest`) và unit test; chưa nghiệm thu hay triển khai Supabase/RLS thật trên máy chủ production.
   5. *Chất lượng mã nguồn:* 4 lệnh kiểm tra cốt lõi đạt sạch 100%: `check:text` (438 file), `typecheck` (10 package), `pnpm test --maxWorkers=2` (2321 passed / 2321 tests, 5 skipped), `pnpm build` (5 app monorepo).
 - Báo cáo tổng hợp chi tiết lưu tại `BAO-CAO-P8-TONG-HOP.md`. Máy chủ preview cổng 5193 và assets cổng 5180 tiếp tục chạy ổn định để chủ dự án trải nghiệm trực tiếp.
+- **Trạng thái P8:** P8 ở trạng thái đã triển khai đủ 12 màn, đang chờ người dùng kiểm thử; chưa ghi nghiệm thu hoàn toàn.
 
 ## Việc để sau / cần theo dõi
 
-- **Màn 3:** nút “?” đè chữ “Soi công thức”; ghi nhận để sửa riêng, không sửa trong P2a.
+- **Màn 7:** Rà diễn đạt về tìm ngược khóa; không khẳng định bắt buộc vét cạn (làm rõ hàm một chiều và độ phức tạp tính toán, phân biệt mô hình bài tập số mũ rời rạc $5^x \bmod 23$ với hệ mật mã thực tế, tránh ngộ nhận là chỉ có duy nhất thuật toán vét cạn).
+- **Mã nguồn sau sửa `MemoryGame.tsx`:** Xác nhận đủ bốn lệnh kiểm trên mã cuối sau khi sửa (đã chạy và đạt 2321 unit tests, 0 lỗi text/type/build).
+- **Màn 3:** ĐÃ XONG (31/10/2026): nút “?” và nút “Soi công thức” đã tách biệt hoàn toàn (khoảng cách 57.56px ở 1366×768, 91.34px ở 844×390), diện tích chạm $\ge 44 \times 44$ px, không che nút/chữ hay spotlight, dừng khi mở trợ giúp và xoay dọc, 16/16 E2E assertions đạt (chi tiết: `docs/screenshots/man3-buttons/BAO-CAO-MAN3-BUTTONS.md`).
 
 - Sau gộp web, số nút DOM nhích 588 → 598 ở 2 vòng cuối một lượt đo; theo dõi.
 - Bạc mức Vừa: 1 trong 5 lượt có 1 khung 55,6 ms. Số đo Bạc mức Thấp/Cao chạy trên bản trước khi đặt tầm 260 (đường mã hai mức này không đổi).
