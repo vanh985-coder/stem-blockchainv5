@@ -140,7 +140,7 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
     - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2306 tests pass (thêm 6 unit tests mới `man4Tutorial.test.tsx`), `pnpm build` đạt toàn bộ 5 apps.
     - Kiểm tra E2E Puppeteer `scripts/p8c-e2e-check.mjs`: **Đạt 100% (22/22 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390). Lưu đầy đủ 22 ảnh chụp minh chứng tại `docs/screenshots/p8c/` và `BAO-CAO-P8C.md`.
 
-12. **P8d — hoàn thành hướng dẫn focus và làm thử cho TOÀN BỘ 12 MÀN (31/10/2026):**
+12. **P8d — hoàn thành và rà soát kỹ thuật hướng dẫn focus và làm thử cho TOÀN BỘ 12 MÀN (31/10/2026):**
     - Hoàn tất tuần tự qua tất cả 6 nhóm theo chỉ đạo:
       - Nhóm 1: Màn 7 Làng Khắc Dấu (Dễ, Trung bình, Khó) -> Commit `0bae0ad`.
       - Nhóm 2: Màn 10 Làng Bạc (Dễ, Trung bình, Khó) -> Commit `e7d314a`.
@@ -148,16 +148,13 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
       - Nhóm 4: Mini-game Màn 5 & 6 Làng Dệt (Whack 2D Talking Tom, Kite diều đưa sổ 2.5D) -> Commit `f8c7cea`.
       - Nhóm 5: Mini-game Màn 8 & 9 Làng Khắc Dấu (Memory ghép cặp khóa, Chicken bắn thuốc giải mã) -> Commit `6c84597`.
       - Nhóm 6: Mini-game Màn 11 & 12 Làng Bạc (Match-3 ghép lá Merkle, Climb leo cây tìm lá giả) -> Commit `4440bdc`.
-    - Thao tác làm thử tương tác thực tế ở cả 12 màn: người chơi phải tự gõ số, bấm nút hoặc nhấn phím; hệ thống kiểm tra logic trước khi mở nút "Bắt đầu chơi thật".
-    - Tách biệt 100% làm thử khỏi ván thật: không tính giờ, không trừ tim, không cộng điểm/xu/sao/tiến độ/Trang Sổ Vàng. Hoàn thành hoặc bỏ qua thì ván thật bấm giờ sạch từ đầu.
-    - Nút "💡 Hướng dẫn" luôn hiện diện trên HUD của cả 12 màn: mở lại dừng toàn bộ đồng hồ và animation; đóng lại khôi phục đúng trạng thái bài dở.
-    - Chống click ma và Enter lặp chuẩn xác bằng capture phase và cycle keydown/keyup.
-    - **Tổng hợp nghiệm thu:**
-      - **325 / 325 E2E tests ĐẠT (100.0%)** trên 3 độ phân giải (1366×768, 360×800, 844×390).
-      - **248 ảnh PNG minh chứng** lưu tại `docs/screenshots/p8*` và `docs/screenshots/*-tutorial/`.
-      - **28 / 28 unit tests tutorial ĐẠT (100%)** qua 9 test files; Vitest tổng **2321 / 2321 tests passed**.
-      - 4 lệnh bắt buộc đạt sạch: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2321 pass, `pnpm build` cả 5 apps thành công.
-    - Báo cáo tổng hợp chi tiết lưu tại `C:\Users\Acer\.gemini\antigravity\brain\1e39ed0d-2120-4c6a-a44c-3cf2d34b3087\BAO-CAO-P8-TONG-HOP.md`.
+    - **Rà soát 5 điểm trọng tâm theo chỉ đạo:**
+      - *Màn 10:* Mã nguồn, logic thuần (`logic.ts`), content (`tutorial.ts`), hàm chấm (`Easy.tsx`) và script kiểm tra đều dùng chuẩn công thức $A \times 10 + B$ (`combine(a, b)`). Đính chính nhầm lẫn công thức $(A \times 3 + B) \bmod 100$ trong văn bản báo cáo cũ; giữ nguyên code game chuẩn.
+      - *Màn 7:* Rà soát phân biệt rõ ràng: Ký bằng khóa riêng của mình, xác minh bằng khóa công khai tra từ Danh bạ chuẩn của làng; trạm Khó là bài tập số mũ rời rạc $5^x \bmod 23$ minh họa tính một chiều. Tuyệt đối không có chuyện yêu cầu/cung cấp khóa riêng của người khác để xác minh.
+      - *8 Mini-game:* Toàn bộ thao tác làm thử gắn liền với phản ứng thực tế của engine (âm thanh, hoạt cảnh Three.js/2D), điều kiện hoàn thành gắn với thao tác thật (đặc biệt: Màn 3 soi và ghép thẻ vào chuỗi thật sự `placeCard`, Màn 8 lật thẻ thật 180° trên lưới `flipCard`, Màn 11 tráo ô hợp lệ trên bàn cờ 7x7 `swapCells`); khi vào ván thật khởi tạo lại ván sạch sẽ bằng hàm logic riêng.
+      - *Bằng chứng kiểm thử:* Con số 325 assertions là tổng số kiểm tra tích lũy qua các kịch bản Puppeteer E2E của 12 màn; các màn sửa đổi (Màn 3, 8, 11) đã được chạy lại kiểm tra trên mã cuối và đạt 100% (`p2-p3`: 48/48, `p8-p9`: 42/42, `p11-p12`: 42/42). Ghi rõ minh bạch toàn bộ kiểm thử chạy với Khách thật (`sc_guest`) và unit test; chưa nghiệm thu hay triển khai Supabase/RLS thật trên máy chủ production.
+      - *Chất lượng mã nguồn:* 4 lệnh bắt buộc đạt sạch 100%: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2321 pass (5 skipped, 217 files), `pnpm build` cả 5 apps thành công.
+    - Báo cáo tổng hợp chi tiết lưu tại `C:\Users\Acer\.gemini\antigravity\brain\1e39ed0d-2120-4c6a-a44c-3cf2d34b3087\BAO-CAO-P8-TONG-HOP.md`. Máy chủ preview cổng 5193 và assets cổng 5180 tiếp tục chạy ổn định để chủ dự án trải nghiệm trực tiếp.
 
 ## 6. Việc để sau (không làm trước khi chủ dự án giao)
 

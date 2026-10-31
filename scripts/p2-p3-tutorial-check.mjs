@@ -244,18 +244,18 @@ async function main() {
       });
       results.push({ name: `[Màn 3 - ${vp.name}] Bước 4 Nút Soi công thức`, pass: hasSoiTarget });
 
-      // Bước 5: Làm thử thao tác bấm Soi
+      // Bước 5: Làm thử thao tác Ghép trang hoặc Soi
       await clickTutorialNext(page);
-      const hasSoiAction = await page.evaluate(() => {
-        const btn = [...document.querySelectorAll('button')].find((b) => (b.textContent || '').includes('Soi công thức'));
+      const hasPracticeAction = await page.evaluate(() => {
+        const btn = [...document.querySelectorAll('button')].find((b) => (b.textContent || '').includes('Ghép thử vào chuỗi') || (b.textContent || '').includes('Soi công thức'));
         return Boolean(btn);
       });
-      results.push({ name: `[Màn 3 - ${vp.name}] Bước 5 Nút Soi công thức làm thử`, pass: hasSoiAction });
+      results.push({ name: `[Màn 3 - ${vp.name}] Bước 5 Nút thao tác làm thử`, pass: hasPracticeAction });
       await page.screenshot({ path: `${OUT}/man3-${vp.name}-step5-practice.png` });
 
-      // Bấm nút Soi công thức
+      // Bấm nút Ghép thử vào chuỗi
       await page.evaluate(() => {
-        const btn = [...document.querySelectorAll('button')].find((b) => (b.textContent || '').includes('Soi công thức'));
+        const btn = [...document.querySelectorAll('button')].find((b) => (b.textContent || '').includes('Ghép thử vào chuỗi') || (b.textContent || '').includes('Soi công thức'));
         if (btn) btn.click();
       });
       await sleep(500);

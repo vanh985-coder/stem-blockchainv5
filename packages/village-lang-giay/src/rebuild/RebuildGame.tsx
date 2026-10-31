@@ -643,6 +643,33 @@ export function RebuildGame({ paused: pausedByFrame, attempt, onFinish, setHint 
   const armed = playing && (!!selected || !!ghost);
   const flightSeconds = keepMode ? (KEEP_VILLAIN_TIMING.dropAt - KEEP_VILLAIN_TIMING.enterEnd) * (reduced ? REDUCED_MOTION_SCALE : 1) : 0.7;
 
+  const doPracticePlace = useCallback(() => {
+    const lastCode = state.chain.length > 0 ? state.chain[state.chain.length - 1].code : state.deal.genesis;
+    const targetCard = state.tray.find((c) => c.prev === lastCode && !c.isFake) || state.tray[0];
+    if (!targetCard) return;
+    const res = placeCard(state, targetCard.id);
+    if (res.kind === 'ok') {
+      sound.playPickup(true);
+      setSelected(null);
+      setSoiOpen(false);
+      setSoiPracticed(true);
+      react('cheer');
+      setTutorialStep(6);
+      bump();
+    }
+  }, [react, state]);
+
+  const startRealGame = useCallback(() => {
+    setTutorialActive(false);
+    setSoiOpen(false);
+    const fresh = createRebuild(newSeed());
+    Object.assign(state, fresh);
+    setSelected(null);
+    setFresh(null);
+    setSay(null);
+    bump();
+  }, [state]);
+
   const tutorialSteps: TutorialStep[] = useMemo(() => [
     {
       id: 'intro',
@@ -679,7 +706,7 @@ export function RebuildGame({ paused: pausedByFrame, attempt, onFinish, setHint 
     },
     {
       id: 'practice',
-      targetSelector: '#tutorial-man3-soi',
+      targetSelector: '#tutorial-man3-tray',
       title: fmt(tutorialTexts.man3.tieuDe),
       content: tutorialTexts.man3.practice,
       interactive: true,
@@ -824,8 +851,7 @@ export function RebuildGame({ paused: pausedByFrame, attempt, onFinish, setHint 
           if (tutorialStep < tutorialSteps.length - 1) {
             setTutorialStep((prev) => prev + 1);
           } else {
-            setTutorialActive(false);
-            setSoiOpen(false);
+            startRealGame();
           }
         }}
         onPrev={() => {
@@ -833,38 +859,39 @@ export function RebuildGame({ paused: pausedByFrame, attempt, onFinish, setHint 
             setTutorialStep((prev) => prev - 1);
           }
         }}
-        onSkip={() => {
-          setTutorialActive(false);
-          setSoiOpen(false);
-        }}
+        onSkip={startRealGame}
         actionButton={
           tutorialStep === tutorialSteps.length - 1
             ? {
                 label: tutorialTexts.chung.batDauChoi,
-                onClick: () => {
-                  setTutorialActive(false);
-                  setSoiOpen(false);
-                },
+                onClick: startRealGame,
                 variant: 'primary',
               }
             : undefined
         }
       >
         {tutorialActive && tutorialStep === 5 && (
-          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
+          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-3 pointer-events-auto">
             <Button
-              variant="primary"
+              variant="secondary"
               size="lg"
               onClick={() => {
-                setSoiOpen(true);
-                setSoiPracticed(true);
+                setSoiOpen((o) => !o);
                 sound.playClick();
-                setTutorialStep(6);
               }}
-              className="shadow-xl animate-bounce"
+              className="shadow-xl"
             >
               <span>🔍</span>
               <span>{rebuildUi.soiNut}</span>
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={doPracticePlace}
+              className="shadow-xl animate-bounce"
+            >
+              <span>🧩</span>
+              <span>{tutorialTexts.man3.ghepThu}</span>
             </Button>
           </div>
         )}

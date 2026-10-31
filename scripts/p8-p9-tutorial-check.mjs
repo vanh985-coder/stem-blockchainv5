@@ -131,21 +131,22 @@ async function main() {
       results.push({ name: `[Màn 8 - ${vp.name}] Bước 2 Máy tính Mod`, pass: hasCalcTarget });
       await page.screenshot({ path: `${OUT}/man8-${vp.name}-step2.png` });
 
-      // Bước 3: Làm thử thao tác mở máy tính
+      // Bước 3: Làm thử thao tác lật thẻ hoặc mở máy tính
       await clickTutorialNext(page);
-      const hasCalcButton = await page.evaluate(() => {
-        const btn = [...document.querySelectorAll('button')].find((b) => (b.textContent || '').includes('Mở máy tính'));
+      const hasPracticeButton = await page.evaluate(() => {
+        const btn = [...document.querySelectorAll('button')].find((b) => (b.textContent || '').includes('Lật thử') || (b.textContent || '').includes('Mở máy tính'));
         return Boolean(btn);
       });
-      results.push({ name: `[Màn 8 - ${vp.name}] Bước 3 Nút Mở máy tính thử`, pass: hasCalcButton });
+      results.push({ name: `[Màn 8 - ${vp.name}] Bước 3 Nút thao tác làm thử`, pass: hasPracticeButton });
       await page.screenshot({ path: `${OUT}/man8-${vp.name}-step3-practice.png` });
 
-      // Bấm nút Mở máy tính thử
+      // Bấm nút Lật thử một cặp thẻ
       await page.evaluate(() => {
-        const btn = [...document.querySelectorAll('button')].find((b) => (b.textContent || '').includes('Mở máy tính'));
+        const btn = [...document.querySelectorAll('button')].find((b) => (b.textContent || '').includes('Lật thử')) ||
+          [...document.querySelectorAll('button')].find((b) => (b.textContent || '').includes('Mở máy tính'));
         if (btn) btn.click();
       });
-      await sleep(500);
+      await sleep(1000);
 
       // Bước 4: Nút Bắt đầu chơi thật
       const hasActionBtn8 = await page.evaluate(() => {

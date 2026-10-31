@@ -182,8 +182,9 @@ export const tutorialTexts = {
     tray: 'Khay thẻ: Chứa các trang nhặt được. Có trang thật và có cả trang giả mạo do {phanDien} trà trộn vào!',
     basket: 'Rổ trang giả: Nếu phát hiện trang bị sai mã, hãy kéo hoặc bấm vứt vào rổ để loại bỏ trang giả mạo!',
     soi: 'Nút "Soi công thức": Bấm để máy tính tính toán và so sánh công thức trang sổ giúp em khi băn khoăn.',
-    practice: 'Em hãy bấm nút "Soi công thức" để kiểm tra tính hợp lệ của trang sổ mẫu nhé!',
-    correct: 'Tuyệt vời! Em đã biết cách dùng công cụ Soi và phân loại trang thật, trang giả. Sẵn sàng ghép sổ thôi nào!',
+    practice: 'Em hãy chọn một trang trong khay rồi bấm "Soi công thức" để kiểm tra, sau đó bấm "Ghép thử vào chuỗi" để thực hành ghép trang sổ nhé!',
+    ghepThu: 'Ghép thử vào chuỗi',
+    correct: 'Trang sổ đã được ghép chuẩn xác vào chuỗi! Hãy tiếp tục ghép các trang thật và vứt trang giả vào rổ nhé.',
   },
 
   man5: {
@@ -212,9 +213,10 @@ export const tutorialTexts = {
     intro: 'Nhiệm vụ của em là tìm và ghép từng cặp: Thẻ Khuôn (Khóa riêng x) với Thẻ Mẫu (Khóa công khai y = 5^x mod 23).',
     grid: 'Lưới thẻ: Mỗi lượt lật 2 thẻ. Nếu 2 thẻ tạo thành cặp khóa hợp lệ thì thẻ sẽ ngửa cố định. Nếu sai, thẻ sẽ tự úp lại sau một thoáng!',
     calculator: 'Máy tính Mod: Công cụ hỗ trợ tính nhanh 5^x mod 23 ở góc màn hình, giúp em kiểm tra kết quả khi phân vân.',
-    practice: 'Em hãy bấm nút "Mở máy tính thử" để quan sát cách tính và kiểm tra cặp khóa nhé!',
+    practice: 'Em hãy bấm lật thử một cặp thẻ trên lưới (hoặc dùng Máy tính mod kiểm tra y = 5^x mod 23) để làm quen thao tác lật thẻ nhé!',
+    latThu: 'Lật thử một cặp thẻ',
     moMayTinh: 'Mở máy tính thử',
-    correct: 'Tuyệt vời! Em đã biết cách tra cứu và ghép cặp khóa. Hãy chú ý: ở vòng 3, {phanDien} sẽ thỉnh thoảng tráo đổi vị trí thẻ đấy nhé!',
+    correct: 'Thao tác lật thẻ rất nhịp nhàng! Hãy tính toán cẩn thận và ghép đủ các cặp thẻ trước khi hết giờ nhé.',
   },
 
   man9: {
@@ -232,7 +234,7 @@ export const tutorialTexts = {
     intro: 'Em hãy gom các giao dịch bằng cách ghép các cặp lá hợp lệ trên bàn cờ để bồi đắp cây Merkle hoàn chỉnh!',
     board: 'Bàn ghép lá 7×7: Chạm hoặc vuốt hai lá kề nhau (hoặc dùng phím mũi tên và phím Space / Enter) để tạo hàng 3 lá cùng loại.',
     hud: 'Cây Merkle và Thanh chỉ số: Khi gom đủ 3 lá, lá sẽ bay lên cành cây tạo thành các nút lá và nút gốc Merkle. Hãy chú ý số lượt còn lại của mỗi vòng!',
-    practice: 'Em hãy bấm nút "Tráo thử một nước" dưới đây hoặc nhấn phím Space để thực hành thao tác tráo lá mẫu nhé!',
+    practice: 'Em hãy chạm hoặc tráo 2 lá kề nhau trên bàn cờ 7×7, hoặc bấm nút "Tráo thử một nước" dưới đây để xem các lá khớp hàng bay lên cành cây nhé!',
     traoThu: 'Tráo thử một nước',
     correct: 'Các lá đã khớp hàng và bay lên cành cây Merkle rất đẹp mắt! Cố gắng hoàn thành cả 3 cây trước khi hết lượt nhé!',
   },

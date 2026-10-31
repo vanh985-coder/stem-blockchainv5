@@ -88,8 +88,8 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
   const finished = useRef(false);
   const ready = warm && textures.done && framePx > 0;
 
-  const refs = useRef({ paused, ready, banner, sel, reduced, tutorialActive });
-  refs.current = { paused, ready, banner, sel, reduced, tutorialActive };
+  const refs = useRef({ paused, ready, banner, sel, reduced, tutorialActive, tutorialStep });
+  refs.current = { paused, ready, banner, sel, reduced, tutorialActive, tutorialStep };
 
   // Ván mới
   useEffect(() => {
@@ -185,7 +185,8 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
 
   const canAct = useCallback(() => {
     const r = refs.current;
-    return r.ready && !r.paused && !r.banner && !engine.playing && state.phase === 'play' && !r.tutorialActive;
+    const isPractice = r.tutorialActive && r.tutorialStep === 3;
+    return r.ready && !r.paused && !r.banner && !engine.playing && state.phase === 'play' && (!r.tutorialActive || isPractice);
   }, [engine, state]);
 
   const doPracticeSwap = useCallback(() => {
@@ -276,6 +277,10 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
       engine.playEvents(res.events, refs.current.reduced, onMark);
       setBusy(true);
       setHud((h) => ({ ...h, turns: state.turnsLeft }));
+      if (refs.current.tutorialActive && refs.current.tutorialStep === 3) {
+        setPracticeDone(true);
+        setTutorialStep(4);
+      }
       bump();
     },
     [canAct, engine, onMark, saySomething, state],

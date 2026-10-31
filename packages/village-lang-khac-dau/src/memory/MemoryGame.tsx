@@ -185,13 +185,46 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   const cardPx = framePx > 0 ? grid.card * pxPerUnit(frame, framePx) : 0;
   const atlas = useFaceAtlas(art, cardPx, settings.largeText);
 
-  // Thao tác làm thử ở bước 3: mở máy tính Mod
+  const doPracticeFlipPair = useCallback(() => {
+    if (state.cards.length >= 2) {
+      flipCard(state, 0);
+      sound.playClick();
+      bump();
+      setTimeout(() => {
+        const r = flipCard(state, 1);
+        if (r.kind === 'mismatch') {
+          sound.playWrong();
+          setLine({ kind: 'sai', n: Date.now() });
+        } else if (r.kind === 'match') {
+          sound.playCorrect();
+          const [k, m] = r.cards[0].type === 'khuon' ? r.cards : [r.cards[1], r.cards[0]];
+          setLine({ kind: 'khop', x: k.value, y: m.value, n: Date.now() });
+        }
+        setTutorialPracticeDone(true);
+        setTutorialStep(4);
+        bump();
+      }, 300);
+    }
+  }, [state]);
+
+  // Thao tác làm thử ở bước 3: mở máy tính Mod hoặc lật thử một cặp thẻ
   const doPracticeCalc = useCallback(() => {
     setCalcOpen(true);
     sound.playClick();
-    setTutorialPracticeDone(true);
-    setTutorialStep(4);
-  }, []);
+    doPracticeFlipPair();
+  }, [doPracticeFlipPair]);
+
+  const startRealGame = useCallback(() => {
+    setTutorialActive(false);
+    setCalcOpen(false);
+    const fresh = createMemoryGame(newSeed());
+    Object.assign(state, fresh);
+    setShown(ids(state));
+    setLine(null);
+    setCursor(0);
+    roundErrors.current = [];
+    bump();
+  }, [state]);
 
   // Danh sách các bước hướng dẫn focus Màn 8
   const tutorialSteps: TutorialStep[] = useMemo(() => [
@@ -216,7 +249,7 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
     },
     {
       id: 'practice',
-      targetSelector: '#tutorial-man8-calc',
+      targetSelector: '#tutorial-man8-grid',
       title: fmt(tutorialTexts.man8.tieuDe),
       content: tutorialTexts.man8.practice,
       interactive: true,
@@ -292,7 +325,8 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
 
   const onFlip = useCallback(
     (id: string) => {
-      if (!playing) return;
+      const isPractice = tutorialActive && tutorialStep === 3;
+      if (!playing && !isPractice) return;
       const r = flipCard(
         state,
         state.cards.findIndex((c) => c.id === id),
@@ -302,18 +336,25 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
       else if (r.kind === 'mismatch') {
         sound.playWrong();
         setLine((l) => ({ kind: 'sai', n: (l?.n ?? 0) + 1 }));
+        if (isPractice) {
+          setTutorialPracticeDone(true);
+          setTutorialStep(4);
+        }
       } else {
         const [k, m] = r.cards[0].type === 'khuon' ? r.cards : [r.cards[1], r.cards[0]];
         sound.playCorrect();
         setLine((l) => ({ kind: 'khop', x: k.value, y: m.value, n: (l?.n ?? 0) + 1 }));
-        if (r.roundDone) {
+        if (isPractice) {
+          setTutorialPracticeDone(true);
+          setTutorialStep(4);
+        } else if (r.roundDone) {
           roundErrors.current.push(state.errors);
           sound.playLevelComplete();
         }
       }
       bump();
     },
-    [playing, state],
+    [playing, state, tutorialActive, tutorialStep],
   );
 
   const finish = useCallback(() => {
@@ -453,7 +494,7 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
                     type="button"
                     tabIndex={slot === cursor ? 0 : -1}
                     aria-label={label}
-                    aria-disabled={!playing || up}
+                    aria-disabled={(!playing && !(tutorialActive && tutorialStep === 3)) || up}
                     data-testid="the"
                     data-slot={slot}
                     data-id={id}
@@ -494,7 +535,7 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
           if (tutorialStep < tutorialSteps.length - 1) {
             setTutorialStep((prev) => prev + 1);
           } else {
-            setTutorialActive(false);
+            startRealGame();
           }
         }}
         onPrev={() => {
@@ -502,27 +543,36 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
             setTutorialStep((prev) => prev - 1);
           }
         }}
-        onSkip={() => setTutorialActive(false)}
+        onSkip={startRealGame}
         actionButton={
           tutorialStep === tutorialSteps.length - 1
             ? {
                 label: tutorialTexts.chung.batDauChoi,
-                onClick: () => setTutorialActive(false),
+                onClick: startRealGame,
                 variant: 'primary',
               }
             : undefined
         }
       >
         {tutorialActive && tutorialStep === 3 && (
-          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
+          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-3 pointer-events-auto">
             <Button
-              variant="primary"
+              variant="secondary"
               size="lg"
               onClick={doPracticeCalc}
-              className="shadow-xl animate-bounce"
+              className="shadow-xl"
             >
               <span>🧮</span>
               <span>{tutorialTexts.man8.moMayTinh}</span>
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={doPracticeFlipPair}
+              className="shadow-xl animate-bounce"
+            >
+              <span>🃏</span>
+              <span>{tutorialTexts.man8.latThu}</span>
             </Button>
           </div>
         )}

@@ -452,6 +452,30 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   - Kiểm tra E2E Puppeteer trên Production Preview 5193 (`scripts/p8c-e2e-check.mjs`): **Đạt 100% (22/22 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390) cho mọi luồng: đúng lần đầu, sai $\to$ giữ số $\to$ sửa đúng, cảnh báo ô trống, mở lại giữa bài, và bảo toàn cookie tiến độ khách.
   - Lưu 22 ảnh chụp minh chứng tại `docs/screenshots/p8c/` và `docs/screenshots/p8c/BAO-CAO-P8C.md`.
 
+## P8 — Hướng dẫn Focus và Làm thử đủ 12 màn — đã hoàn thiện và rà soát kỹ thuật (31/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md`, `CLAUDE.md`, tự commit và tự push nhánh `claude/wonderful-dijkstra-x092dj` lên `origin` khi 4 lệnh kiểm tra bắt buộc đạt.**
+- **Phạm vi triển khai toàn diện đủ 12 màn (4 bài học × 3 độ khó + 8 mini-game):**
+  - Màn 1 (Bài 1 Giấy): Focus công thức, tự tính $12 \times 2 + 5 = 29$, so chuỗi phát hiện trang sửa lén, sửa chuỗi bị đứt gãy.
+  - Màn 2 (Runner): Focus 3 tim, phím chạy/nhảy; thao tác phím Space/↑/W hoặc nút "Nhảy thử" kích hoạt nhân vật nhảy né vật cản trong Scene 3D.
+  - Màn 3 (Rebuild): Focus chuỗi trang và khay thẻ; thao tác chọn thẻ, soi công thức và ghép thử trang vào chuỗi thật sự (`placeCard`), âm thanh pickup, Tí reo vui `cheer`.
+  - Màn 4 (Bài 2 Dệt): Bố cục đối chiếu 2 cột trái-phải; thực hành dùng máy tính mod, so sổ người gửi và biểu quyết đồng ý/từ chối trang mới.
+  - Màn 5 (Whack 2D): Focus 4 làn lụa, vùng đập $[6.5, 9.0]$, 8 chấm mực; thao tác vung búa đập thử làn 1 (phím D / nút bấm) kèm anim hero đập 180ms.
+  - Màn 6 (Kite): Focus HUD tim/trang sổ/cổng làng; thao tác phím Space hoặc chạm ngón tay vỗ cánh nâng diều bay lượn vút lên trong Scene 2.5D.
+  - Màn 7 (Bài 3 Khắc Dấu): Focus nguyên tắc chữ ký số (ký bằng Khóa riêng của mình, xác minh bằng Khóa công khai từ Danh bạ chuẩn); trạm Khó minh họa tính một chiều của hàm số mũ rời rạc $5^x \bmod 23$.
+  - Màn 8 (Memory): Focus lưới thẻ và máy tính mod; thao tác click lật thử cặp thẻ trên lưới (thẻ xoay 180°), hoặc bấm nút "Lật thử một cặp thẻ", hoặc dùng máy tính mod.
+  - Màn 9 (Chicken): Focus khay nạp thuốc và ná bắn; thao tác bấm phím 1/Space hoặc nút bắn thử giương ná bắn viên thuốc giải mã về phía đàn gà.
+  - Màn 10 (Bài 4 Bạc): Focus cây Merkle, nút băm gốc; thực hành tính nhẩm ghép 2 nút lá chuẩn công thức $A \times 10 + B$ (`combine(a, b)`).
+  - Màn 11 (Match-3): Focus bàn cờ 7×7 và cành cây Merkle; thao tác chạm tráo trực tiếp cặp lá hợp lệ trên bàn cờ hoặc bấm nút "Tráo thử một nước" (`swapCells`), lá khớp hàng bay lên cây Merkle.
+  - Màn 12 (Climb): Focus cặp tay nắm trượt và so sánh mã Sổ/Nay; thao tác bấm phím Space hoặc nút nhảy bám thử vươn tay bám chắc vào cành cây Merkle.
+- **Rà soát 5 điểm trọng tâm:**
+  1. *Màn 10 logic:* Khẳng định mã nguồn, spec, logic thuần, content, hàm chấm và script kiểm tra đều dùng chuẩn công thức $A \times 10 + B$, không đổi code; đính chính nhầm lẫn công thức trong văn bản báo cáo cũ.
+  2. *Màn 7 bảo mật:* Phân biệt rành mạch ký bằng khóa riêng của mình, kiểm tra bằng khóa công khai của người gửi tra từ Danh bạ làng; trạm Khó là bài tập số mũ rời rạc minh họa tính một chiều. Tuyệt đối không yêu cầu/cung cấp khóa riêng của người khác để xác minh.
+  3. *8 Mini-game:* Toàn bộ thao tác làm thử gắn liền với phản ứng thực tế của engine (âm thanh, hoạt cảnh 3D/2D), điều kiện hoàn thành gắn với thao tác thật; khi vào ván thật khởi tạo lại ván sạch sẽ bằng hàm logic riêng.
+  4. *Bằng chứng kiểm thử:* 325 assertions là tổng số kiểm tra tích lũy qua các kịch bản Puppeteer E2E của 12 màn; các màn sửa đổi (Màn 3, 8, 11) đã được chạy lại kiểm tra trên mã cuối và đạt 100%. Ghi rõ toàn bộ kiểm thử chạy với Khách thật (`sc_guest`) và unit test; chưa nghiệm thu hay triển khai Supabase/RLS thật trên máy chủ production.
+  5. *Chất lượng mã nguồn:* 4 lệnh kiểm tra cốt lõi đạt sạch 100%: `check:text` (438 file), `typecheck` (10 package), `pnpm test --maxWorkers=2` (2321 passed / 2321 tests, 5 skipped), `pnpm build` (5 app monorepo).
+- Báo cáo tổng hợp chi tiết lưu tại `BAO-CAO-P8-TONG-HOP.md`. Máy chủ preview cổng 5193 và assets cổng 5180 tiếp tục chạy ổn định để chủ dự án trải nghiệm trực tiếp.
+
 ## Việc để sau / cần theo dõi
 
 - **Màn 3:** nút “?” đè chữ “Soi công thức”; ghi nhận để sửa riêng, không sửa trong P2a.
