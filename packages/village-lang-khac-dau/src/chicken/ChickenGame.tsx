@@ -1,5 +1,19 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { Button, chickenUi, fmt, plainPower, rich, sound, useGameHint, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import {
+  Button,
+  chickenUi,
+  fmt,
+  plainPower,
+  rich,
+  sound,
+  useGameHint,
+  useSettings,
+  TutorialSpotlight,
+  tutorialTexts,
+  type MiniGameRenderProps,
+  type ScorePart,
+  type TutorialStep,
+} from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { Scene25D, isQualityChoice, type Aim, type PoseRequest, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
@@ -107,9 +121,14 @@ export function ChickenGame({ paused, attempt, onFinish, setHint }: MiniGameRend
   const ringEl = useRef<HTMLDivElement | null>(null);
   const finished = useRef(false);
 
+  // Trạng thái hướng dẫn focus và làm thử (P8)
+  const [tutorialActive, setTutorialActive] = useState(attempt <= 1);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [, setTutorialPracticeDone] = useState(false);
+
   const ready = warm && textures.done;
   const rotated = mode === 'rotate';
-  const holdLoop = paused || !ready || rotated;
+  const holdLoop = paused || !ready || rotated || tutorialActive;
   const holdRef = useRef(holdLoop);
   holdRef.current = holdLoop;
   useGameHint(setHint, LEVEL_ID, () => hintFor(state));
@@ -127,6 +146,59 @@ export function ChickenGame({ paused, attempt, onFinish, setHint }: MiniGameRend
     setStudentAim(null);
     setVillain({ clip: 'idle', n: 0 });
   }, [state]);
+
+  // Thao tác làm thử ở bước 3: bắn ná thử một viên
+  const doPracticeShoot = useCallback(() => {
+    sound.playWhoosh();
+    setTutorialPracticeDone(true);
+    setTutorialStep(4);
+  }, []);
+
+  // Lắng nghe phím Space khi đang ở bước 3 làm thử
+  useEffect(() => {
+    if (!tutorialActive || tutorialStep !== 3) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code !== 'Space' || e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+      e.preventDefault();
+      doPracticeShoot();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [tutorialActive, tutorialStep, doPracticeShoot]);
+
+  // Danh sách các bước hướng dẫn focus Màn 9
+  const tutorialSteps: TutorialStep[] = useMemo(() => [
+    {
+      id: 'intro',
+      title: fmt(tutorialTexts.man9.tieuDe),
+      content: fmt(tutorialTexts.man9.intro),
+    },
+    {
+      id: 'load',
+      targetSelector: '#tutorial-man9-load',
+      title: fmt(tutorialTexts.man9.tieuDe),
+      content: tutorialTexts.man9.load,
+      nextLabel: tutorialTexts.chung.daHieu,
+    },
+    {
+      id: 'shoot',
+      title: fmt(tutorialTexts.man9.tieuDe),
+      content: tutorialTexts.man9.shoot,
+      nextLabel: tutorialTexts.chung.thuTinhNgay,
+    },
+    {
+      id: 'practice',
+      title: fmt(tutorialTexts.man9.tieuDe),
+      content: tutorialTexts.man9.practice,
+      interactive: true,
+      hideNextButton: true,
+    },
+    {
+      id: 'ready',
+      title: fmt(tutorialTexts.man9.tieuDe),
+      content: tutorialTexts.man9.correct,
+    },
+  ], []);
 
   // Đo khung (điểm ảnh) để đặt thẻ số: callback ref vì lớp phủ chỉ gắn vào sau khi cảnh đo xong khung
   const setOverlay = useCallback((el: HTMLDivElement | null) => {
@@ -487,11 +559,17 @@ export function ChickenGame({ paused, attempt, onFinish, setHint }: MiniGameRend
   }, [state]);
 
   const onModeChange = useCallback((m: FrameMode) => setMode(m), []);
-  if (PROBE) {
+  if (PROBE && typeof window !== 'undefined') {
     Object.assign(window, {
       __chicken: state,
       __chickenView: view.current,
       __chickenUi: { ready, mode, ending, phase: state.phase },
+      __chickenTutorial: {
+        active: tutorialActive,
+        step: tutorialStep,
+        setStep: setTutorialStep,
+        setActive: setTutorialActive,
+      },
       // tua nhanh để thử gà trùm và hết ván: chạy `seconds` giây của luật rồi xử lý sự kiện như bình thường
       __chickenSim: (seconds: number) => {
         const step = 1 / 30;
@@ -516,7 +594,7 @@ export function ChickenGame({ paused, attempt, onFinish, setHint }: MiniGameRend
   const endText = ending === 'complete' ? fmt(chickenUi.xongTrum) : ending === 'hearts' ? fmt(chickenUi.hetTim) : ending === 'boss' ? fmt(chickenUi.trumToiCong) : '';
 
   return (
-    <div className="fixed inset-0 select-none bg-black" data-testid="man9">
+    <div id="tutorial-man9-game" className="fixed inset-0 select-none bg-black" data-testid="man9">
       <Scene25D
         background={BACKGROUND}
         quality={forced}
@@ -536,6 +614,24 @@ export function ChickenGame({ paused, attempt, onFinish, setHint }: MiniGameRend
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
           >
+            {/* Nút mở lại Hướng dẫn giữa bài */}
+            <div className="absolute top-2 right-14 sm:right-16 z-20 pointer-events-auto">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => {
+                  setTutorialActive(true);
+                  setTutorialStep(0);
+                  setTutorialPracticeDone(true);
+                }}
+                className="min-h-11 shadow-md bg-giay/90 text-nau-go-dam font-bold"
+                aria-label={tutorialTexts.chung.huongDan}
+              >
+                <span>💡</span>
+                <span className="hidden sm:inline">{tutorialTexts.chung.huongDan}</span>
+              </Button>
+            </div>
+
             <p role="status" aria-live="polite" className="sr-only" data-testid="loi-doc">
               {live}
             </p>
@@ -618,7 +714,11 @@ export function ChickenGame({ paused, attempt, onFinish, setHint }: MiniGameRend
               </p>
             ))}
 
-            {phase === 'load' && ready && <ChickenLoad key={`${attempt}-${state.round}`} state={state} reduced={reduced} onDrop={onDrop} onStart={onStart} />}
+            {phase === 'load' && (
+              <div id="tutorial-man9-load" className="contents">
+                {ready && <ChickenLoad key={`${attempt}-${state.round}`} state={state} reduced={reduced} onDrop={onDrop} onStart={onStart} />}
+              </div>
+            )}
 
             {ending && (
               <div data-chicken-ui role="status" className="absolute inset-x-4 top-[28%] z-30 mx-auto flex max-w-md flex-col items-center gap-3 rounded-2xl border-[3px] border-nau-go bg-giay p-4 text-center" data-testid="het-van" onPointerDown={(e) => e.stopPropagation()}>
@@ -636,6 +736,49 @@ export function ChickenGame({ paused, attempt, onFinish, setHint }: MiniGameRend
       >
         <ChickenStage view={view} textures={textures} studentAim={studentAim} villain={villain} />
       </Scene25D>
+
+      {/* Hướng dẫn focus và làm thử (P8) */}
+      <TutorialSpotlight
+        isOpen={tutorialActive}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => {
+          if (tutorialStep < tutorialSteps.length - 1) {
+            setTutorialStep((prev) => prev + 1);
+          } else {
+            setTutorialActive(false);
+          }
+        }}
+        onPrev={() => {
+          if (tutorialStep > 0) {
+            setTutorialStep((prev) => prev - 1);
+          }
+        }}
+        onSkip={() => setTutorialActive(false)}
+        actionButton={
+          tutorialStep === tutorialSteps.length - 1
+            ? {
+                label: tutorialTexts.chung.batDauChoi,
+                onClick: () => setTutorialActive(false),
+                variant: 'primary',
+              }
+            : undefined
+        }
+      >
+        {tutorialActive && tutorialStep === 3 && (
+          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={doPracticeShoot}
+              className="shadow-xl animate-bounce"
+            >
+              <span>🎯</span>
+              <span>{tutorialTexts.man9.banThu}</span>
+            </Button>
+          </div>
+        )}
+      </TutorialSpotlight>
     </div>
   );
 }

@@ -206,4 +206,24 @@ export const tutorialTexts = {
     voCanhThu: 'Vỗ cánh thử',
     correct: 'Cánh diều đã vút lên rất mượt mà! Hãy khéo léo lượn qua các khe tre, và khi đến cổng làng hãy trả lời đúng câu hỏi để giao sổ nhé!',
   },
+
+  man8: {
+    tieuDe: 'Làm thử: Lật thẻ tìm cặp khóa',
+    intro: 'Nhiệm vụ của em là tìm và ghép từng cặp: Thẻ Khuôn (Khóa riêng x) với Thẻ Mẫu (Khóa công khai y = 5^x mod 23).',
+    grid: 'Lưới thẻ: Mỗi lượt lật 2 thẻ. Nếu 2 thẻ tạo thành cặp khóa hợp lệ thì thẻ sẽ ngửa cố định. Nếu sai, thẻ sẽ tự úp lại sau một thoáng!',
+    calculator: 'Máy tính Mod: Công cụ hỗ trợ tính nhanh 5^x mod 23 ở góc màn hình, giúp em kiểm tra kết quả khi phân vân.',
+    practice: 'Em hãy bấm nút "Mở máy tính thử" để quan sát cách tính và kiểm tra cặp khóa nhé!',
+    moMayTinh: 'Mở máy tính thử',
+    correct: 'Tuyệt vời! Em đã biết cách tra cứu và ghép cặp khóa. Hãy chú ý: ở vòng 3, {phanDien} sẽ thỉnh thoảng tráo đổi vị trí thẻ đấy nhé!',
+  },
+
+  man9: {
+    tieuDe: 'Làm thử: Chữa đàn gà',
+    intro: 'Đàn gà bị {phanDien} làm nhiễm bệnh đang chạy về phía cổng làng! Em hãy dùng ná bắn thuốc giải mã đúng để chữa khỏi cho đàn gà.',
+    load: 'Giai đoạn nạp thuốc: Trước mỗi đợt, em kéo hoặc chọn đúng nhãn Khóa công khai dán vào từng ô thuốc theo công thức y = 5^x mod 23.',
+    shoot: 'Giai đoạn bắn ná: Đàn gà mang thẻ số chạy vào 3 làn. Chọn viên thuốc phù hợp (phím 1-4) rồi ngắm bắn vào con gà mang khóa tương ứng!',
+    practice: 'Em hãy bấm nút "Bắn thử một viên" để trải nghiệm thao tác ngắm bắn nhé!',
+    banThu: 'Bắn thử một viên',
+    correct: 'Phát bắn rất chuẩn xác! Hãy nhanh tay nạp thuốc và bảo vệ cổng làng trước đàn gà và gà trùm nhé!',
+  },
 };
