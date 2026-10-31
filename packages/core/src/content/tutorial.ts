@@ -60,4 +60,39 @@ export const tutorialTexts = {
     nhapSaiKhoang: 'Mã trang là số từ 0 đến 99',
     chuaNhap: 'Em chưa nhập mã trang. Hãy tính nhẩm và nhập số từ 0 đến 99 vào ô mã trang nhé!',
   },
+
+  man4De: {
+    tieuDe: 'Làm thử: Duyệt trang mới',
+    intro: 'Em là một node giữ sổ. Khi người khác gửi trang mới, em phải tự kiểm tra mã trang trước và tính lại mã trước khi bấm Đồng ý hoặc Từ chối.',
+    myLedger: 'Đây là sổ của em. Hãy chú ý mã trang cuối cùng hiện tại: X = {x}.',
+    proposal: 'Bạn {nguoi} gửi một trang mới có nội dung {c} và mã đề xuất là {ma}. Mã trang trước phải khớp với mã cuối X = {x} của em.',
+    calculator: 'Dùng máy tính để tính: ({x} × 2 + {c}) mod 100. Máy tính sẽ giúp em tính nhanh và chính xác.',
+    decision: 'Mã tính ra là {dung}. So sánh với mã đề xuất {ma}: nếu khớp thì bấm "Đồng ý", nếu sai thì bấm "Từ chối" nhé!',
+    correct: 'Chính xác! ({x} × 2 + {c}) mod 100 = {dung}, khớp với mã đề xuất nên em chọn Đồng ý là hoàn toàn đúng!',
+    wrong: 'Chưa đúng rồi: ({x} × 2 + {c}) mod 100 = {dung}, khớp với mã đề xuất {ma} nên phải chọn Đồng ý. Em hãy thử lại nhé!',
+  },
+
+  man4Tb: {
+    tieuDe: 'Làm thử: So sổ trước khi duyệt',
+    intro: 'Ở trạm Trung bình, kẻ gian có thể sửa lén các trang cũ trong sổ của họ. Em cần so sánh cả 3 trang cũ giữa 2 cuốn sổ trước khi duyệt trang mới!',
+    compare: 'Đối chiếu từng trang: Sổ của em (bên trái) và Sổ của {nguoi} (bên phải). Hãy tìm xem có trang nào bị sửa nội dung hoặc sai mã không!',
+    inspectError: 'Phát hiện rồi: Trang {n} trong sổ của {nguoi} đã bị sửa nội dung từ {cu} thành {moi}, khiến mã trang sau đó bị lệch và không khớp với sổ của em!',
+    calcAndCheck: 'Kiểm tra trang mới: Vì cuốn sổ của {nguoi} đã bị sửa lén từ trước, mã trang trước không khớp với sổ của em và trang mới này không hợp lệ.',
+    decision: 'Vì cuốn sổ của {nguoi} đã bị sửa lén, trang mới không hợp lệ. Em hãy bấm "Từ chối" nhé!',
+    correct: 'Chính xác! Sổ của người gửi không khớp với sổ của em, nên phải từ chối để bảo vệ tính toàn vẹn của chuỗi sổ chung!',
+    wrong: 'Chưa đúng rồi: Trang {n} trong sổ của {nguoi} đã bị sửa lén, không khớp với sổ của em nên bắt buộc phải Từ chối. Em hãy thử lại nhé!',
+  },
+
+  man4Kho: {
+    tieuDe: 'Làm thử: Đặt cọc và tạo trang',
+    intro: 'Cơ chế Proof of Stake: Mỗi người đặt cọc 30 điểm để tạo trang. Tạo trang đúng thì được thưởng thêm điểm, nếu gian lận sẽ bị phát hiện và mất cọc!',
+    stake: 'Bảng điểm cọc của 4 người chơi. Ai cũng bắt đầu với 100 điểm. Người tạo trang phải cọc 30 điểm cho mỗi lượt đề xuất.',
+    create: 'Đến lượt em tạo trang: Mã trang trước là X = {x}, nội dung được giao là {c}. Hãy tính mã đúng: ({x} × 2 + {c}) mod 100 = {dung}.',
+    input: 'Em hãy tính nhẩm (hoặc dùng công thức) và nhập mã {dung} vào ô rồi bấm "Ghi trang thật" nhé!',
+    inputPlaceholder: '0-99',
+    correct: 'Chính xác! Mã trang là {dung}. Khi em đề xuất trang thật, đa số các node khác sẽ đồng ý và em sẽ nhận thưởng điểm cọc!',
+    wrong: 'Chưa đúng rồi: ({x} × 2 + {c}) mod 100 = {dung}. Hãy nhập đúng mã để các node khác đồng ý nhé. Em thử lại nào!',
+    nhapSaiKhoang: 'Mã trang là số từ 0 đến 99',
+    chuaNhap: 'Em chưa nhập mã trang. Hãy tính nhẩm và nhập số từ 0 đến 99 vào ô mã trang nhé!',
+  },
 };

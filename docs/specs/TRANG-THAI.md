@@ -35,7 +35,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | P5 | **ĐÃ XONG (29/10/2026, mục "P5" bên dưới):** (1) Biển chọn màn trong làng làm thành cột sáng giống cuộn "Em có biết?" (mỗi màn một cột, dáng và chữ theo trạng thái, giữ chữ tên màn) | 1 |
 | P6 | (3) Sau khi đọc thẻ "Em có biết?": 1 ví dụ ngắn + 1 câu hỏi ABCD (hoặc điền số). Mặc định: trả lời sai vẫn nhận thẻ, hiện giải thích. **P6a (nội dung 16 câu) đã duyệt; P6b (tích hợp) ĐÃ XONG (30/10/2026, mục "P6b" bên dưới)** | 1–2 |
 | P7 | **P7a ĐÃ XONG (30/10/2026, mục "P7a" bên dưới):** Bản chơi được Màn 5 "Đập {phanDien}" bằng 2D 4 làn dọc (Talking Tom), 2 loại chuột (thường và câu hỏi ❓), chống click ma, dừng khi mở câu hỏi/?, tự hoàn thành. **P7b:** trau chuốt đồ họa và cân bằng nhịp sinh. | 3–4 |
-| P8 | **P8a ĐÃ XONG (30/10/2026, mục "P8a" bên dưới):** Cơ chế dùng chung `TutorialSpotlight` và tích hợp mẫu tại Màn 1 trạm Dễ. **P8b ĐÃ XONG (31/10/2026, mục "P8b" bên dưới):** Triển khai hướng dẫn focus và làm thử cho Màn 1 trạm Trung bình (sửa trộm sổ, hiệu ứng domino) và trạm Khó (đua với mạng lưới, tạm dừng đồng hồ 100%), kiểm E2E đạt 20/20 test. P8c: nhân rộng các màn tiếp theo sau khi duyệt mẫu. | 2–3 |
+| P8 | **P8a ĐÃ XONG (30/10/2026, mục "P8a" bên dưới):** Cơ chế dùng chung `TutorialSpotlight` và tích hợp mẫu tại Màn 1 trạm Dễ. **P8b ĐÃ XONG (31/10/2026, mục "P8b" bên dưới):** Triển khai hướng dẫn focus và làm thử cho Màn 1 trạm Trung bình và Khó. **P8c ĐÃ XONG (31/10/2026, mục "P8c" bên dưới):** Triển khai hướng dẫn focus và làm thử cho Màn 4 Làng Dệt đủ 3 trạm (Dễ, Trung bình, Khó), kiểm E2E đạt 22/22 test. | 2–3 |
 
 Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mốc 3 và hội làng.
 
@@ -414,6 +414,39 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   - `pnpm build`: Đạt toàn bộ 5 ứng dụng.
   - Kiểm tra E2E Puppeteer trên Production Preview 5193 (`scripts/p8b-e2e-check.mjs`): **Đạt 100% (20/20 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390) cho mọi luồng: đúng lần đầu, sai $\to$ giữ số $\to$ sửa đúng, cảnh báo ô trống, tạm dừng đồng hồ, mở lại giữa bài, hồi quy Màn 1 Dễ và bảo toàn cookie tiến độ.
   - Lưu ảnh chụp minh chứng tại `docs/screenshots/p8b/` và `docs/screenshots/p8b/BAO-CAO-P8B.md`.
+
+## P8c — Hướng dẫn focus và làm thử Màn 4 Làng Dệt (Đủ Dễ, Trung bình, Khó) (31/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, commit và push nhánh `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này.
+- **Đã làm:**
+  - Tái sử dụng trọn vẹn cơ chế `TutorialSpotlight` (Portal, định vị tooltip thông minh, backdrop khoét sáng target, focus trap, chống Enter lặp, chống click ma).
+  - Trạm Dễ (`packages/village-lang-det/src/bai-2/Easy.tsx`):
+    - Dữ liệu làm thử cố định: Sổ của em có mã cuối $X = 40$, bạn Chi gửi trang mới có nội dung $c = 15$ dải lụa, mã đề xuất $95$. Phép tính: $(40 \times 2 + 15) \bmod 100 = 95$.
+    - Luồng 6 bước: Giới thiệu $\to$ Sổ của em $\to$ Trang đề xuất của Chi $\to$ Máy tính $\to$ Biểu quyết Đồng ý/Từ chối $\to$ Phản hồi kết quả.
+    - Quyết định đúng: Đồng ý $\to$ Nút "Bắt đầu chơi thật" vào ván 1 sạch với 3 tim.
+    - Quyết định sai: Từ chối $\to$ giải thích công thức $\to$ nút "Thử lại" đưa về bước biểu quyết để học sinh chọn lại.
+  - Trạm Trung bình (`packages/village-lang-det/src/bai-2/Medium.tsx`):
+    - Dữ liệu làm thử cố định: Sổ của em có mã cuối 72. Sổ của Tí bị sửa lén ở trang 2 từ 14 sang 15 dải lụa khiến mã chuỗi sau đó lệch ($74 \neq 72$). Trang mới Tí gửi có mã trước $prevCode = 74$ sai lệch với sổ em.
+    - Bố cục đối chiếu 2 cột trái - phải rõ ràng: Sổ của em (trái) và Sổ của Tí (phải), nổi bật vết sửa lén.
+    - Quyết định đúng: Từ chối $\to$ Chúc mừng $\to$ Nút "Bắt đầu chơi thật".
+    - Quyết định sai: Đồng ý $\to$ Cảnh báo sổ người gửi đã bị sửa lén $\to$ nút "Thử lại".
+  - Trạm Khó (`packages/village-lang-det/src/bai-2/Hard.tsx`):
+    - Dữ liệu làm thử cố định: Bảng điểm cọc 4 người chơi (mỗi người 100 điểm ban đầu, cọc 30 điểm mỗi lượt).
+    - Lượt em tạo trang: Mã trước $X = 25$, nội dung $c = 18$. Mã đúng: $(25 \times 2 + 18) \bmod 100 = 68$.
+    - Ô nhập số `NumberInput`, nút "Gửi trang". Nút "Ghi trang gian" bị vô hiệu hóa trong làm thử.
+    - Ô trống bấm Gửi trang: hiện cảnh báo đỏ `role="alert"` rõ ràng, viền đỏ, giữ focus.
+    - Nhập sai (ví dụ 50): báo sai $\to$ nút "Thử lại" quay lại bước nhập và **giữ nguyên số 50 trong ô** để học sinh sửa lại thành 68.
+    - Nhập đúng 68: chúc mừng và nút "Bắt đầu chơi thật".
+  - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: không ghi nhận sao/xu/điểm/tiến độ; cookie `sc_guest` được bảo toàn nguyên vẹn.
+  - Nút "💡 Hướng dẫn" xem lại giữa bài: mở lại thì đồng hồ và ván bài thật dừng; đóng thì bảo lưu nguyên vẹn trạng thái bài đang dở.
+  - Toàn bộ chuỗi hiển thị nằm trong `packages/core/src/content/tutorial.ts`, xưng "em", định dạng biến `{phanDien}` qua `fmt()`.
+- **Kiểm tra đã đạt:**
+  - `pnpm check:text`: sạch (438 files).
+  - `pnpm typecheck`: 10 package biên dịch thành công 100%.
+  - `pnpm test --maxWorkers=2`: 211 test files passed, 2306 tests passed, 5 skipped (thêm 6 unit tests mới trong `apps/hub/src/man4Tutorial.test.tsx`).
+  - `pnpm build`: Đạt toàn bộ monorepo (hub merged `VITE_MERGED=true`).
+  - Kiểm tra E2E Puppeteer trên Production Preview 5193 (`scripts/p8c-e2e-check.mjs`): **Đạt 100% (22/22 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390) cho mọi luồng: đúng lần đầu, sai $\to$ giữ số $\to$ sửa đúng, cảnh báo ô trống, mở lại giữa bài, và bảo toàn cookie tiến độ khách.
+  - Lưu 22 ảnh chụp minh chứng tại `docs/screenshots/p8c/` và `docs/screenshots/p8c/BAO-CAO-P8C.md`.
 
 ## Việc để sau / cần theo dõi
 

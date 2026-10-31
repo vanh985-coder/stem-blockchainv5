@@ -132,9 +132,17 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
     - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2300 tests pass (thêm 4 unit tests mới `man1MediumHardTutorial.test.tsx`), `pnpm build` đạt toàn bộ 5 apps.
     - Kiểm tra E2E Puppeteer `scripts/p8b-e2e-check.mjs`: **Đạt 100% (20/20 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390). Lưu đầy đủ ảnh chụp minh chứng tại `docs/screenshots/p8b/` và `BAO-CAO-P8B.md`.
 
+11. **P8c — hướng dẫn focus và làm thử Màn 4 Làng Dệt đủ 3 trạm Dễ, Trung bình, Khó (31/10/2026):**
+    - Trạm Dễ (`Easy.tsx`): 6 bước hướng dẫn node giữ sổ, mã trang cuối $X = 40$, bạn Chi gửi trang mới $c = 15$, mã đề xuất $95$. Dùng máy tính $(40 \times 2 + 15) \bmod 100 = 95$ và biểu quyết Đồng ý / Từ chối (đáp án đúng: Đồng ý $\to$ nút "Bắt đầu chơi thật"; sai: Từ chối $\to$ giải thích công thức $\to$ nút "Thử lại").
+    - Trạm Trung bình (`Medium.tsx`): 6 bước hướng dẫn quan sát bố cục đối chiếu 2 cột trái - phải giữa Sổ của em và Sổ của Tí. Phát hiện trang 2 của Tí bị sửa lén từ 14 sang 15 dải lụa khiến chuỗi mã sau đó lệch ($74 \neq 72$). Nhận biết trang mới đề xuất dựa trên sổ sai là không hợp lệ và biểu quyết Từ chối (đáp án đúng: Từ chối; sai: Đồng ý $\to$ cảnh báo $\to$ thử lại).
+    - Trạm Khó (`Hard.tsx`): 5 bước hướng dẫn cơ chế đặt cọc Proof of Stake, bảng điểm cọc 4 người chơi (100 điểm ban đầu, cọc 30 điểm mỗi lượt). Lượt em tạo trang với $X = 25$, $c = 18$, tính nhẩm công thức $(25 \times 2 + 18) \bmod 100 = 68$. Ô nhập `NumberInput`, nút Ghi trang thật (nút Ghi trang gian bị vô hiệu hóa trong làm thử). Xử lý ô trống $\to$ cảnh báo `role="alert"`; nhập sai 50 $\to$ báo sai $\to$ thử lại **giữ nguyên số 50** để học sinh sửa lại thành 68 $\to$ chúc mừng $\to$ bắt đầu chơi thật.
+    - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: không ghi nhận xu, sao, điểm, tiến độ; cookie `sc_guest` được bảo toàn nguyên vẹn. Nút "💡 Hướng dẫn" giữa bài cho phép xem lại bất cứ lúc nào và bảo lưu nguyên vẹn trạng thái bài đang dở.
+    - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2306 tests pass (thêm 6 unit tests mới `man4Tutorial.test.tsx`), `pnpm build` đạt toàn bộ 5 apps.
+    - Kiểm tra E2E Puppeteer `scripts/p8c-e2e-check.mjs`: **Đạt 100% (22/22 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390). Lưu đầy đủ 22 ảnh chụp minh chứng tại `docs/screenshots/p8c/` và `BAO-CAO-P8C.md`.
+
 ## 6. Việc để sau (không làm trước khi chủ dự án giao)
 
-- **P8c:** nhân rộng hướng dẫn focus & làm thử cho các màn tiếp theo (Màn 4, 7, 10 và các mini-game) sau khi chủ dự án đánh giá và duyệt mẫu Màn 1 (Dễ, Trung bình, Khó).
+- **P8d:** nhân rộng hướng dẫn focus & làm thử cho các màn tiếp theo (Màn 7, 10 và các mini-game) sau khi chủ dự án đánh giá và duyệt Màn 1 và Màn 4.
 - **Việc dời từ mốc 3 và hội làng làm CUỐI mốc 4**, theo thứ tự ở mục "Việc dời từ mốc 3" của `TRANG-THAI.md`: deploy bản gộp (15b), kiểm tra toàn bộ (G2), thử với 5–10 học sinh, hội làng (`FESTIVAL_LAUNCHED` hiện `false`).
 - Chưa làm theo lời giao trước đó: sửa nút "?" ở màn 3, HUD che tên biển trong một số góc nhìn (ví dụ dòng nhiệm vụ che biển trái ở Làng Bạc), vòng tích che số cây đa đã được thu nhỏ ở P5.
 
