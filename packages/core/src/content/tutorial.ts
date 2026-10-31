@@ -164,4 +164,25 @@ export const tutorialTexts = {
     correct: 'Chính xác! Em đã nắm vững cách ghép và kiểm tra các tầng của cây Merkle 8 giao dịch!',
     wrong: 'Chưa đúng rồi. Hãy tính cẩn thận từ các nút con ở dưới lên nút cha ở trên nhé!',
   },
+
+  man2: {
+    tieuDe: 'Làm thử: Đuổi theo {phanDien}',
+    intro: 'Em cần chạy tiếp sức đuổi theo {phanDien} và nhặt lại các trang sổ rơi rải rác trên đường làng!',
+    hud: 'Thanh theo dõi: Em có 3 tim. Hãy nhặt thật nhiều trang sổ, tiền đồng và né các chướng ngại vật qua 4 vòng chạy!',
+    controls: 'Điều khiển: Dùng phím ← / → (hoặc A / D, hoặc vuốt) để đổi làn; phím ↑ / W / Space (hoặc vuốt lên) để NHẢY; phím ↓ / S (hoặc vuốt xuống) để TRƯỢT!',
+    practice: 'Em hãy thực hành thao tác mẫu: bấm phím NHẢY (Space hoặc ↑) hoặc bấm nút "Nhảy thử" dưới đây nhé!',
+    nhayThu: 'Nhảy thử',
+    correct: 'Rất chuẩn xác! Em đã nắm rõ cách nhảy và đổi làn né vật cản. Hãy bắt đầu chạy thật nào!',
+  },
+
+  man3: {
+    tieuDe: 'Làm thử: Ghép lại cuốn sổ',
+    intro: 'Các trang sổ bị xé rơi rải rác. Em hãy giúp bác An ghép lại cuốn sổ hoàn chỉnh theo quy tắc chuỗi!',
+    chain: 'Chuỗi trang sổ: Mỗi trang mới phải có mã trang trước khớp với mã của trang đứng trước nó.',
+    tray: 'Khay thẻ: Chứa các trang nhặt được. Có trang thật và có cả trang giả mạo do {phanDien} trà trộn vào!',
+    basket: 'Rổ trang giả: Nếu phát hiện trang bị sai mã, hãy kéo hoặc bấm vứt vào rổ để loại bỏ trang giả mạo!',
+    soi: 'Nút "Soi công thức": Bấm để máy tính tính toán và so sánh công thức trang sổ giúp em khi băn khoăn.',
+    practice: 'Em hãy bấm nút "Soi công thức" để kiểm tra tính hợp lệ của trang sổ mẫu nhé!',
+    correct: 'Tuyệt vời! Em đã biết cách dùng công cụ Soi và phân loại trang thật, trang giả. Sẵn sàng ghép sổ thôi nào!',
+  },
 };

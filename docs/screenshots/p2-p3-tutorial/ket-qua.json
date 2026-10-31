@@ -1,0 +1,194 @@
+[
+  {
+    "name": "[Màn 2 - 1366x768] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 1366x768] Bước 1 Thanh HUD",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 1366x768] Bước 2 Điều khiển",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 1366x768] Bước 3 Nút Nhảy thử",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 1366x768] Bước 4 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 1366x768] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 1366x768] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 1366x768] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 1366x768] Bước 1 Chuỗi trang",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 1366x768] Bước 2 Khay thẻ",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 1366x768] Bước 3 Rổ trang giả",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 1366x768] Bước 4 Nút Soi công thức",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 1366x768] Bước 5 Nút Soi công thức làm thử",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 1366x768] Bước 6 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 1366x768] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 1366x768] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 360x800] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 360x800] Bước 1 Thanh HUD",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 360x800] Bước 2 Điều khiển",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 360x800] Bước 3 Nút Nhảy thử",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 360x800] Bước 4 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 360x800] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 360x800] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 360x800] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 360x800] Bước 1 Chuỗi trang",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 360x800] Bước 2 Khay thẻ",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 360x800] Bước 3 Rổ trang giả",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 360x800] Bước 4 Nút Soi công thức",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 360x800] Bước 5 Nút Soi công thức làm thử",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 360x800] Bước 6 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 360x800] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 360x800] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 844x390] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 844x390] Bước 1 Thanh HUD",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 844x390] Bước 2 Điều khiển",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 844x390] Bước 3 Nút Nhảy thử",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 844x390] Bước 4 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 844x390] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Màn 2 - 844x390] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 844x390] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 844x390] Bước 1 Chuỗi trang",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 844x390] Bước 2 Khay thẻ",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 844x390] Bước 3 Rổ trang giả",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 844x390] Bước 4 Nút Soi công thức",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 844x390] Bước 5 Nút Soi công thức làm thử",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 844x390] Bước 6 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 844x390] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Màn 3 - 844x390] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  }
+]

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { BiAvatar, Button, Hearts, fmt, rebuildUi, sound, useGameHint, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import { BiAvatar, Button, Hearts, TutorialSpotlight, fmt, rebuildUi, sound, tutorialTexts, useGameHint, useSettings, type MiniGameRenderProps, type ScorePart, type TutorialStep } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { Scene25D, isQualityChoice, type QualityChoice, type Sprite25D } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
@@ -103,8 +103,26 @@ function InspectPanel({ card, onClose }: { card: Card | null; onClose: () => voi
 /** m:ss từ số giây còn lại. */
 const clockText = (sec: number): string => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
 
-/** Thanh trên: tim, vòng, điểm, (đoạn giữ sổ cuối vòng 2: đồng hồ 45 giây và thanh trạng thái chuỗi), nút "Soi công thức". */
-function HudBar({ hearts, round, score, soiOpen, onSoi, clock, status }: { hearts: number; round: number; score: number; soiOpen: boolean; onSoi: () => void; clock: number | null; status: 'dung' | 'lech' | null }) {
+/** Thanh trên: tim, vòng, điểm, (đoạn giữ sổ cuối vòng 2: đồng hồ 45 giây và thanh trạng thái chuỗi), nút "💡 Hướng dẫn" và nút "Soi công thức". */
+function HudBar({
+  hearts,
+  round,
+  score,
+  soiOpen,
+  onSoi,
+  clock,
+  status,
+  onOpenTutorial,
+}: {
+  hearts: number;
+  round: number;
+  score: number;
+  soiOpen: boolean;
+  onSoi: () => void;
+  clock: number | null;
+  status: 'dung' | 'lech' | null;
+  onOpenTutorial: () => void;
+}) {
   return (
     <div className="absolute flex items-center justify-between" style={{ left: `${AREAS.hud.x0}cqw`, right: `${100 - AREAS.hud.x1}cqw`, top: `${AREAS.hud.y0}%` }}>
       <div className={`flex items-center rounded-nut border-2 border-nau-go bg-giay/90 px-3 ${clock !== null ? 'gap-2 py-0' : 'gap-3 py-1'}`} data-testid="hud">
@@ -122,9 +140,15 @@ function HudBar({ hearts, round, score, soiOpen, onSoi, clock, status }: { heart
         )}
         {status && <ChainStatus status={status} />}
       </div>
-      <Button size="sm" variant={soiOpen ? 'primary' : 'secondary'} onClick={onSoi} className="min-h-11" data-testid="nut-soi" aria-pressed={soiOpen}>
-        {rebuildUi.soiNut}
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button size="sm" variant="secondary" onClick={onOpenTutorial} className="min-h-11 text-nau-go-dam font-bold" aria-label={tutorialTexts.chung.huongDan}>
+          <span>💡</span>
+          <span className="hidden sm:inline">{tutorialTexts.chung.huongDan}</span>
+        </Button>
+        <Button id="tutorial-man3-soi" size="sm" variant={soiOpen ? 'primary' : 'secondary'} onClick={onSoi} className="min-h-11" data-testid="nut-soi" aria-pressed={soiOpen}>
+          {rebuildUi.soiNut}
+        </Button>
+      </div>
     </div>
   );
 }
@@ -230,7 +254,13 @@ export function RebuildGame({ paused: pausedByFrame, attempt, onFinish, setHint 
   // Điện thoại xoay dọc thì cảnh hiện nhắc "Xoay ngang để chơi" phủ kín: đồng hồ giữ sổ và {phanDien} phải đứng yên (như màn 6), không phạt em lúc em không chơi được (P4b)
   const [frame, setFrame] = useState<FrameMode>('landscape');
   const onModeChange = useCallback((m: FrameMode) => setFrame(m), []);
-  const paused = pausedByFrame || frame === 'rotate';
+
+  // Hướng dẫn focus và làm thử Màn 3
+  const [tutorialActive, setTutorialActive] = useState(attempt <= 1);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [, setSoiPracticed] = useState(false);
+
+  const paused = pausedByFrame || frame === 'rotate' || tutorialActive;
   const forced = useMemo(forcedQuality, []);
   const state = useMemo<RebuildState>(() => createRebuild(newSeed()), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
   const [version, bump] = useReducer((n: number) => n + 1, 0);
@@ -596,7 +626,7 @@ export function RebuildGame({ paused: pausedByFrame, attempt, onFinish, setHint 
           : null;
   const intro = phase === 'keep' && !!keep && !keep.running;
 
-  if (PROBE) Object.assign(window, { __rebuild: state, __rebuildUi: { overlay: overlayRef } });
+  if (PROBE && typeof window !== 'undefined') Object.assign(window, { __rebuild: state, __rebuildUi: { overlay: overlayRef } });
 
   const sprites = useMemo(basketSprites, []);
   // Nhân vật 3D chỉ dựng lại khi phản ứng hay giai đoạn của {phanDien} đổi, không dựng lại mỗi lần kéo thẻ (mỗi lần kéo là một lần vẽ lại lớp thẻ HTML)
@@ -613,6 +643,55 @@ export function RebuildGame({ paused: pausedByFrame, attempt, onFinish, setHint 
   const armed = playing && (!!selected || !!ghost);
   const flightSeconds = keepMode ? (KEEP_VILLAIN_TIMING.dropAt - KEEP_VILLAIN_TIMING.enterEnd) * (reduced ? REDUCED_MOTION_SCALE : 1) : 0.7;
 
+  const tutorialSteps: TutorialStep[] = useMemo(() => [
+    {
+      id: 'intro',
+      title: fmt(tutorialTexts.man3.tieuDe),
+      content: fmt(tutorialTexts.man3.intro),
+    },
+    {
+      id: 'chain',
+      targetSelector: '#tutorial-man3-chain',
+      title: fmt(tutorialTexts.man3.tieuDe),
+      content: tutorialTexts.man3.chain,
+      nextLabel: tutorialTexts.chung.daHieu,
+    },
+    {
+      id: 'tray',
+      targetSelector: '#tutorial-man3-tray',
+      title: fmt(tutorialTexts.man3.tieuDe),
+      content: fmt(tutorialTexts.man3.tray),
+      nextLabel: tutorialTexts.chung.daHieu,
+    },
+    {
+      id: 'basket',
+      targetSelector: '#tutorial-man3-basket',
+      title: fmt(tutorialTexts.man3.tieuDe),
+      content: tutorialTexts.man3.basket,
+      nextLabel: tutorialTexts.chung.daHieu,
+    },
+    {
+      id: 'soi',
+      targetSelector: '#tutorial-man3-soi',
+      title: fmt(tutorialTexts.man3.tieuDe),
+      content: tutorialTexts.man3.soi,
+      nextLabel: tutorialTexts.chung.thuTinhNgay,
+    },
+    {
+      id: 'practice',
+      targetSelector: '#tutorial-man3-soi',
+      title: fmt(tutorialTexts.man3.tieuDe),
+      content: tutorialTexts.man3.practice,
+      interactive: true,
+      hideNextButton: true,
+    },
+    {
+      id: 'ready',
+      title: fmt(tutorialTexts.man3.tieuDe),
+      content: tutorialTexts.man3.correct,
+    },
+  ], []);
+
   return (
     <div className="fixed inset-0 select-none bg-black" data-testid="man3">
       <Scene25D
@@ -624,34 +703,59 @@ export function RebuildGame({ paused: pausedByFrame, attempt, onFinish, setHint 
         onModeChange={onModeChange}
         overlay={
           <div ref={overlayRef} className="absolute inset-0 select-none" style={{ containerType: 'size' }} data-testid="man3-khung" data-phase={phase} data-villain={villain.stage} data-flying={villain.flying ? (villain.landed ? 'landed' : 'start') : 'no'}>
-            <HudBar hearts={state.hearts} round={state.round} score={score} soiOpen={soiOpen} onSoi={() => setSoiOpen((o) => !o)} clock={keepMode ? clock : null} status={keep ? keepChainStatus(keep) : null} />
+            <HudBar
+              hearts={state.hearts}
+              round={state.round}
+              score={score}
+              soiOpen={soiOpen}
+              onSoi={() => {
+                setSoiOpen((o) => !o);
+                if (tutorialActive && tutorialStep === 5) {
+                  setSoiPracticed(true);
+                  setTutorialStep(6);
+                }
+              }}
+              clock={keepMode ? clock : null}
+              status={keep ? keepChainStatus(keep) : null}
+              onOpenTutorial={() => {
+                setTutorialActive(true);
+                setTutorialStep(0);
+                setSoiPracticed(false);
+              }}
+            />
             <p className="absolute rounded-nut bg-giay/90 px-[1cqw] py-[0.15cqw] font-bold text-chu" style={{ left: `${AREAS.chain.x0}cqw`, top: keepMode ? '35%' : '10.2%', fontSize: 'max(1.45cqw, 11px)' }}>
               {rebuildUi.chuThich}
             </p>
-            {keep ? (
-              <>
-                <KeepChainRow
-                  width={width}
-                  genesis={state.deal.genesis}
-                  slots={keep.slots}
-                  selected={selected}
-                  shake={shake}
-                  dragId={ghost?.id ?? null}
-                  enabled={playing}
-                  armed={armed}
-                  hoverSlot={slotOfTarget(hover)}
-                  badSlot={badSlot}
-                  bind={bind as (id: string) => Record<string, unknown>}
-                  onSelectKey={onTap}
-                  onSlotActivate={activateSlot}
-                  version={version}
-                />
-              </>
-            ) : (
-              <ChainRow slots={slots} width={width} genesis={state.deal.genesis} chain={state.chain} armed={armed} hover={hover === 'chain'} badFlash={badFlash} onActivate={activateChain} version={version} />
-            )}
-            <Basket armed={armed} hover={hover === 'basket'} onActivate={activateBasket} label={rebuildUi.roTrangGia} />
-            <Tray cards={state.tray} width={width} selected={selected} shake={shake} fresh={fresh} freshIds={freshIds} dragId={ghost?.id ?? null} enabled={playing} bind={bind as (id: string) => Record<string, unknown>} onSelectKey={onTap} version={version} />
+            <div id="tutorial-man3-chain">
+              {keep ? (
+                <>
+                  <KeepChainRow
+                    width={width}
+                    genesis={state.deal.genesis}
+                    slots={keep.slots}
+                    selected={selected}
+                    shake={shake}
+                    dragId={ghost?.id ?? null}
+                    enabled={playing && !tutorialActive}
+                    armed={armed}
+                    hoverSlot={slotOfTarget(hover)}
+                    badSlot={badSlot}
+                    bind={bind as (id: string) => Record<string, unknown>}
+                    onSelectKey={onTap}
+                    onSlotActivate={activateSlot}
+                    version={version}
+                  />
+                </>
+              ) : (
+                <ChainRow slots={slots} width={width} genesis={state.deal.genesis} chain={state.chain} armed={armed} hover={hover === 'chain'} badFlash={badFlash} onActivate={activateChain} version={version} />
+              )}
+            </div>
+            <div id="tutorial-man3-basket">
+              <Basket armed={armed} hover={hover === 'basket'} onActivate={activateBasket} label={rebuildUi.roTrangGia} />
+            </div>
+            <div id="tutorial-man3-tray">
+              <Tray cards={state.tray} width={width} selected={selected} shake={shake} fresh={fresh} freshIds={freshIds} dragId={ghost?.id ?? null} enabled={playing && !tutorialActive} bind={bind as (id: string) => Record<string, unknown>} onSelectKey={onTap} version={version} />
+            </div>
             {villain.flying && <FlyingPage landed={villain.landed} width={width} seconds={flightSeconds} />}
             <KeepWarm width={width} />
             <DragGhost ghost={ghost} card={findCard(ghost?.id ?? null)} width={width} />
@@ -711,6 +815,60 @@ export function RebuildGame({ paused: pausedByFrame, attempt, onFinish, setHint 
       >
         {actors}
       </Scene25D>
+
+      <TutorialSpotlight
+        isOpen={tutorialActive}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => {
+          if (tutorialStep < tutorialSteps.length - 1) {
+            setTutorialStep((prev) => prev + 1);
+          } else {
+            setTutorialActive(false);
+            setSoiOpen(false);
+          }
+        }}
+        onPrev={() => {
+          if (tutorialStep > 0) {
+            setTutorialStep((prev) => prev - 1);
+          }
+        }}
+        onSkip={() => {
+          setTutorialActive(false);
+          setSoiOpen(false);
+        }}
+        actionButton={
+          tutorialStep === tutorialSteps.length - 1
+            ? {
+                label: tutorialTexts.chung.batDauChoi,
+                onClick: () => {
+                  setTutorialActive(false);
+                  setSoiOpen(false);
+                },
+                variant: 'primary',
+              }
+            : undefined
+        }
+      >
+        {tutorialActive && tutorialStep === 5 && (
+          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => {
+                setSoiOpen(true);
+                setSoiPracticed(true);
+                sound.playClick();
+                setTutorialStep(6);
+              }}
+              className="shadow-xl animate-bounce"
+            >
+              <span>🔍</span>
+              <span>{rebuildUi.soiNut}</span>
+            </Button>
+          </div>
+        )}
+      </TutorialSpotlight>
     </div>
   );
 }

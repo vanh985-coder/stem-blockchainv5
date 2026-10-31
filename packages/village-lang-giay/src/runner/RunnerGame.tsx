@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
-import { AssetImage, Button, Hearts, Panel, ProgressBar, QuizCard, fmt, gameUi, pickQuestions, runnerScoreLabels, runnerUi, useGameHint, type MiniGameRenderProps, type Question, type ScorePart } from '@so-chung/core';
+import { AssetImage, Button, Hearts, Panel, ProgressBar, QuizCard, TutorialSpotlight, fmt, gameUi, pickQuestions, runnerScoreLabels, runnerUi, sound, tutorialTexts, useGameHint, type MiniGameRenderProps, type Question, type ScorePart, type TutorialStep } from '@so-chung/core';
 import { Scene3D, isQualityChoice, type QualityChoice } from '@so-chung/core/three/index';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { RUNNER_SPEC as SPEC } from './runnerConfig';
@@ -55,7 +55,7 @@ function PowerChip({ icon, name, seconds }: { icon: ReactNode; name: string; sec
 /** Thanh trên: tim, trang sổ, tiền đồng, quãng đường, vòng; hàng dưới là các vật đặc biệt còn tác dụng (biểu tượng + giây còn lại). */
 function RunnerHudBar({ hud }: { hud: RunnerHud }) {
   return (
-    <div className="pointer-events-none absolute left-3 top-3 z-20 flex max-w-[calc(100%-4.5rem)] flex-col items-start gap-2">
+    <div id="tutorial-man2-hud" className="pointer-events-none absolute left-3 top-3 z-20 flex max-w-[calc(100%-8.5rem)] flex-col items-start gap-2">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-nut border-2 border-nau-go bg-giay/90 px-3 py-1.5 shadow-md">
         <Hearts current={hud.hearts} max={SPEC.hearts} />
         <span role="img" aria-label={fmt(runnerUi.trang, { so: hud.pages })} className="flex items-center gap-1 font-display text-xl font-extrabold" data-testid="so-trang">
@@ -146,7 +146,7 @@ export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   // 4 câu hỏi Bài 1 cho ván này (không lặp, đã trộn thứ tự đáp án)
   const questions = useMemo(() => pickQuestions({ bai: 1, soCau: SPEC.rounds, seed: session.seed }), [session]);
   // chỉ bản dev và bản đo `VITE_PROBE`: để script kiểm đọc trạng thái ván (tốc độ, tim, điểm)
-  if (PROBE) Object.assign(window, { __runner: session, __runnerQuestions: questions, __makeCell: makeCell });
+  if (PROBE && typeof window !== 'undefined') Object.assign(window, { __runner: session, __runnerQuestions: questions, __makeCell: makeCell });
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
   // Nút "?": câu nhắc theo trạng thái ván (không lộ đáp án)
@@ -154,6 +154,12 @@ export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   const [ready, setReady] = useState(false);
   const [hud, setHud] = useState<RunnerHud>(INITIAL_HUD);
   const [quiz, setQuiz] = useState<QuizView | null>(null);
+
+  // Hướng dẫn focus và làm thử Màn 2
+  const [tutorialActive, setTutorialActive] = useState(attempt <= 1);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [, setJumpedPractice] = useState(false);
+
   useEffect(() => {
     setHud(INITIAL_HUD);
     setQuiz(null);
@@ -168,10 +174,10 @@ export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRende
     [session],
   );
 
-  // Bàn phím: ←/→ hoặc A/D đổi làn; ↑, W, Space nhảy; ↓, S trượt. Mỗi lần bấm là một lệnh (không lặp khi giữ phím). Lúc hỏi thì để phím cho câu hỏi.
+  // Bàn phím: ←/→ hoặc A/D đổi làn; ↑, W, Space nhảy; ↓, S trượt. Mỗi lần bấm là một lệnh (không lặp khi giữ phím). Lúc hỏi hoặc lúc hướng dẫn thì để phím cho chức năng đó.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (session.state.phase === 'quiz' || pausedRef.current) return;
+      if (session.state.phase === 'quiz' || pausedRef.current || tutorialActive) return;
       const c = keyToCommand(e.code);
       if (!c) return;
       e.preventDefault();
@@ -179,7 +185,22 @@ export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRende
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [session]);
+  }, [session, tutorialActive]);
+
+  // Bắt phím Nhảy trong bước làm thử của hướng dẫn
+  useEffect(() => {
+    if (!tutorialActive || tutorialStep !== 3) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+        e.preventDefault();
+        setJumpedPractice(true);
+        sound.playWhoosh();
+        setTutorialStep(4);
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [tutorialActive, tutorialStep]);
 
   // Chỉ khi chạy dev: ?bot=good hoặc ?bot=avg cho bot chơi thay (kiểm tra trọn một ván trên cảnh 3D thật); câu hỏi vẫn do người (hoặc kịch bản) bấm.
   useEffect(() => {
@@ -220,7 +241,7 @@ export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   };
   const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     const t = touch.current;
-    if (t.id !== e.pointerId || t.fired || session.state.phase === 'quiz' || pausedRef.current) return;
+    if (t.id !== e.pointerId || t.fired || session.state.phase === 'quiz' || pausedRef.current || tutorialActive) return;
     const c = swipeToCommand(e.clientX - t.x, e.clientY - t.y, SWIPE_MIN_PX);
     if (c) {
       t.fired = true;
@@ -230,6 +251,39 @@ export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   const onPointerEnd = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (touch.current.id === e.pointerId) touch.current.id = -1;
   };
+
+  const tutorialSteps: TutorialStep[] = useMemo(() => [
+    {
+      id: 'intro',
+      title: fmt(tutorialTexts.man2.tieuDe),
+      content: fmt(tutorialTexts.man2.intro),
+    },
+    {
+      id: 'hud',
+      targetSelector: '#tutorial-man2-hud',
+      title: fmt(tutorialTexts.man2.tieuDe),
+      content: tutorialTexts.man2.hud,
+      nextLabel: tutorialTexts.chung.daHieu,
+    },
+    {
+      id: 'controls',
+      title: fmt(tutorialTexts.man2.tieuDe),
+      content: tutorialTexts.man2.controls,
+      nextLabel: tutorialTexts.chung.thuTinhNgay,
+    },
+    {
+      id: 'practice',
+      title: fmt(tutorialTexts.man2.tieuDe),
+      content: tutorialTexts.man2.practice,
+      interactive: true,
+      hideNextButton: true,
+    },
+    {
+      id: 'ready',
+      title: fmt(tutorialTexts.man2.tieuDe),
+      content: tutorialTexts.man2.correct,
+    },
+  ], []);
 
   return (
     <div
@@ -250,10 +304,74 @@ export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRende
         shadowFollowPlayer
         onReady={() => setReady(true)}
       >
-        <RunnerWorld session={session} paused={paused || !ready} onHud={setHud} onQuiz={setQuiz} onOver={onOver} />
+        <RunnerWorld session={session} paused={paused || !ready || tutorialActive} onHud={setHud} onQuiz={setQuiz} onOver={onOver} />
       </Scene3D>
       {ready && <RunnerHudBar hud={hud} />}
+      {ready && (
+        <div className="absolute top-3 right-16 z-20">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => {
+              setTutorialActive(true);
+              setTutorialStep(0);
+              setJumpedPractice(false);
+            }}
+            className="min-h-11 shadow-md bg-giay/90 text-nau-go-dam font-bold"
+            aria-label={tutorialTexts.chung.huongDan}
+          >
+            <span>💡</span>
+            <span className="hidden sm:inline">{tutorialTexts.chung.huongDan}</span>
+          </Button>
+        </div>
+      )}
       {quiz && questions[quiz.round] && <QuizOverlay session={session} question={questions[quiz.round]} quiz={quiz} hearts={hud.hearts} />}
+
+      <TutorialSpotlight
+        isOpen={tutorialActive}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => {
+          if (tutorialStep < tutorialSteps.length - 1) {
+            setTutorialStep((prev) => prev + 1);
+          } else {
+            setTutorialActive(false);
+          }
+        }}
+        onPrev={() => {
+          if (tutorialStep > 0) {
+            setTutorialStep((prev) => prev - 1);
+          }
+        }}
+        onSkip={() => setTutorialActive(false)}
+        actionButton={
+          tutorialStep === tutorialSteps.length - 1
+            ? {
+                label: tutorialTexts.chung.batDauChoi,
+                onClick: () => setTutorialActive(false),
+                variant: 'primary',
+              }
+            : undefined
+        }
+      >
+        {tutorialActive && tutorialStep === 3 && (
+          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => {
+                setJumpedPractice(true);
+                sound.playWhoosh();
+                setTutorialStep(4);
+              }}
+              className="shadow-xl animate-bounce"
+            >
+              <span>🦘</span>
+              <span>{tutorialTexts.man2.nhayThu}</span>
+            </Button>
+          </div>
+        )}
+      </TutorialSpotlight>
     </div>
   );
 }
