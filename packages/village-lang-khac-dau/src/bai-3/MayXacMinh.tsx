@@ -271,19 +271,21 @@ export const MayXacMinh: React.FC<MayXacMinhProps> = ({
         </div>
 
         {onVerify && (
-          <Button
-            variant="primary"
-            size="md"
-            disabled={!slot1Key || !slot2Tx || isVerifying}
-            onClick={onVerify}
-            className="w-full sm:w-auto"
-          >{T.kiemTraChuKy}</Button>
+          <div id="tutorial-man7tb-verify-btn">
+            <Button
+              variant="primary"
+              size="md"
+              disabled={!slot1Key || !slot2Tx || isVerifying}
+              onClick={onVerify}
+              className="w-full sm:w-auto"
+            >{T.kiemTraChuKy}</Button>
+          </div>
         )}
       </div>
 
       {/* Khe in phiếu kết quả (Ticket Printer) */}
       {result && (
-        <div className="mt-4 pt-3.5 border-t border-dashed border-white/20 animate-fadeIn">
+        <div id="tutorial-man7tb-verify-result" className="mt-4 pt-3.5 border-t border-dashed border-white/20 animate-fadeIn">
           <div className="text-sm font-mono tracking-wider text-[#A69EBF] mb-2 flex items-center justify-between">
             <span>{T.phieuKetQuaThamDinh}</span>
             <span>{fmt(T.ma, { testedKey: result.testedKey })}</span>

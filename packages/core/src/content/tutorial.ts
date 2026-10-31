@@ -95,4 +95,40 @@ export const tutorialTexts = {
     nhapSaiKhoang: 'Mã trang là số từ 0 đến 99',
     chuaNhap: 'Em chưa nhập mã trang. Hãy tính nhẩm và nhập số từ 0 đến 99 vào ô mã trang nhé!',
   },
+
+  man7De: {
+    tieuDe: 'Làm thử: Ký và xác minh chữ ký số',
+    intro: 'Chào mừng em đến Làng Khắc Dấu! Bài 3 học về Chữ ký số và Cặp khóa: Khóa riêng (bí mật) dùng để ký, Khóa công khai (ai cũng biết) dùng để kiểm tra.',
+    keys: 'Em có Khóa riêng bí mật là {priv} (giữ trong két sắt) và Khóa công khai là {pub} ({formula}). Mọi người đều biết khóa {pub} này trong Danh bạ làng!',
+    pickAndSign: 'Chọn một giao dịch mẫu và bấm "Ký bằng khóa riêng của Em ({priv})" để tạo chữ ký số không thể giả mạo.',
+    signedCard: 'Thẻ giao dịch đã được ký kèm cặp số chữ ký (r, s). Bây giờ hãy đưa thẻ này vào Máy xác minh để đối chiếu với Danh bạ!',
+    machineScan: 'Bấm "Thả vào máy xác minh". Máy sẽ tra cứu Khóa công khai {pub} của em trên Danh bạ làng và kiểm tra chữ ký.',
+    correct: 'Chính xác! Đèn xanh bật sáng: Chữ ký khớp hoàn hảo với Khóa công khai {pub} của em trên Danh bạ! Không ai có thể chối cãi hay làm giả chữ ký này.',
+    wrong: 'Chưa đúng thao tác rồi. Em hãy làm theo hướng dẫn để trải nghiệm quy trình ký và xác minh nhé!',
+  },
+
+  man7Tb: {
+    tieuDe: 'Làm thử: Thẩm định giao dịch bằng Danh bạ',
+    intro: 'Ở trạm Trung bình, hòm thư nhận được 4 thẻ giao dịch. Kẻ mạo danh có thể đính kèm một khóa lạ để lừa em! Em phải dùng Danh bạ chuẩn của làng để xác minh.',
+    danhBa: 'Danh bạ chuẩn của làng: Đây là nguồn tin cậy duy nhất lưu Khóa công khai chính thức của mọi người. Không bao giờ tin khóa lạ do người gửi tự dán vào thẻ!',
+    slots: 'Máy xác minh có 2 khe: Khe 1 nhận Khóa công khai từ Danh bạ chuẩn, Khe 2 nhận Thẻ giao dịch cần thẩm định.',
+    actionSelect: 'Em hãy chạm chọn bạn {nguoi} trên Danh bạ để nạp Khóa {pub} vào Khe 1, và chọn Thẻ giao dịch của {nguoi} vào Khe 2 nhé!',
+    actionVerify: 'Bấm nút "Kiểm tra" trong Máy xác minh để máy bắt đầu chạy thuật toán xác minh chữ ký số.',
+    decision: 'Đèn bật Xanh: Chữ ký hợp lệ và người gửi đúng là {nguoi}. Em hãy bấm nút "Thật" trên thẻ giao dịch nhé!',
+    correct: 'Chính xác! Em đã dùng đúng Khóa công khai từ Danh bạ chuẩn để xác minh thành công giao dịch thật!',
+    wrong: 'Chưa đúng rồi: Nhớ lấy khóa từ Danh bạ chuẩn của làng, không lấy khóa đính kèm không rõ nguồn gốc. Em thử lại nhé!',
+  },
+
+  man7Kho: {
+    tieuDe: 'Làm thử: Dò tìm khóa riêng (Số mũ rời rạc)',
+    intro: 'Ở trạm Khó, em sẽ thấy sức mạnh của hàm một chiều: Tính xuôi 5^x mod 23 rất nhanh, nhưng từ kết quả tìm ngược lại khóa riêng x thì cực kỳ khó!',
+    target: 'Bạn An có Khóa công khai là {target} ({formula}). Nhiệm vụ của em là tìm ra số bí mật x trong khoảng từ 1 đến 22.',
+    inputTry: 'Vì không có công thức giải ngược, em hãy nhập thử một số x (ví dụ: x = {tryX}) vào ô rồi bấm "Thử x này" để xem kết quả tính nhé!',
+    history: 'Bảng lịch sử ghi lại kết quả thử: 5^{tryX} mod 23 = {val} {notMatch}. Em thấy đấy, các số nhảy lộn xộn không theo quy luật nào!',
+    inputCorrect: 'Bây giờ em hãy thử nhập x = {correctX} rồi bấm "Thử x này" để tìm ra khóa bí mật của bạn An nhé!',
+    correct: 'Chính xác! 5^{correctX} mod 23 = {target}! Em đã tìm thấy khóa riêng x = {correctX}. Với số lớn (hàng trăm chữ số), việc thử từng số như thế này là bất khả thi!',
+    wrong: 'Chưa đúng rồi: Hãy nhập đúng số x để thử nghiệm nhé. Em bấm Thử lại nào!',
+    nhapSaiKhoang: 'Số x phải nằm trong khoảng từ 1 đến 22',
+    chuaNhap: 'Em chưa nhập số x. Hãy nhập một số từ 1 đến 22 vào ô nhé!',
+  },
 };

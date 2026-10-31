@@ -1,5 +1,18 @@
-import { useState, useRef, useMemo } from 'react';
-import { Button, FeedbackSheet, Modal, TapOrDragContainer, fmt, sound, useAuth, type StationResult, rich } from '@so-chung/core';
+import { useState, useRef, useMemo, useEffect } from 'react';
+import {
+  Button,
+  FeedbackSheet,
+  Modal,
+  TapOrDragContainer,
+  TutorialSpotlight,
+  type TutorialStep,
+  tutorialTexts,
+  fmt,
+  sound,
+  useAuth,
+  type StationResult,
+  rich,
+} from '@so-chung/core';
 import { bai3Texts } from '@so-chung/core/content/lessons/bai-3';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { generateMedium, verify, PEOPLE, STRANGER, type MediumTx } from '@so-chung/core/lessons/bai-3/logic';
@@ -55,6 +68,95 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
     whatHappened: '',
   });
 
+  // ==========================================
+  // HƯỚNG DẪN FOCUS & LÀM THỬ (P8 - Nhóm 1)
+  // ==========================================
+  const [tutorialActive, setTutorialActive] = useState<boolean>(true);
+  const [tutorialStep, setTutorialStep] = useState<number>(0);
+  const [isRevisitingTutorial, setIsRevisitingTutorial] = useState<boolean>(false);
+  const [practiceDone, setPracticeDone] = useState<boolean>(false);
+
+  // Snapshot khi mở lại giữa bài
+  const savedMediumRef = useRef<{
+    decisions: Record<string, 'real' | 'fake' | null>;
+    slot1Key: number | null;
+    selectedTxId: string | null;
+    verifyResult: MayXacMinhResult | null;
+  } | null>(null);
+
+  const startRealGame = () => {
+    sound.playClick();
+    setTutorialActive(false);
+    setIsRevisitingTutorial(false);
+    setPracticeDone(false);
+    setDecisions({});
+    setSlot1Key(null);
+    setSelectedTxId(null);
+    setVerifyResult(null);
+    startTimeRef.current = Date.now();
+  };
+
+  const handleOpenTutorial = () => {
+    sound.playClick();
+    savedMediumRef.current = {
+      decisions,
+      slot1Key,
+      selectedTxId,
+      verifyResult,
+    };
+    setIsRevisitingTutorial(true);
+    setTutorialActive(true);
+    setTutorialStep(0);
+    setPracticeDone(false);
+    setSlot1Key(null);
+    setSelectedTxId(null);
+    setVerifyResult(null);
+  };
+
+  const handleCloseRevisit = () => {
+    sound.playClick();
+    setTutorialActive(false);
+    setIsRevisitingTutorial(false);
+    setPracticeDone(false);
+    if (savedMediumRef.current) {
+      setDecisions(savedMediumRef.current.decisions);
+      setSlot1Key(savedMediumRef.current.slot1Key);
+      setSelectedTxId(savedMediumRef.current.selectedTxId);
+      setVerifyResult(savedMediumRef.current.verifyResult);
+      savedMediumRef.current = null;
+    }
+  };
+
+  const handleRetryPractice = () => {
+    sound.playClick();
+    setPracticeDone(false);
+    setSlot1Key(null);
+    setSelectedTxId(null);
+    setVerifyResult(null);
+    setTutorialStep(3);
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__tutorial = {
+        isActive: tutorialActive,
+        step: tutorialStep,
+        practiceDone,
+        close: () => {
+          if (isRevisitingTutorial) handleCloseRevisit();
+          else startRealGame();
+        },
+        next: () => setTutorialStep((s) => s + 1),
+        skip: () => startRealGame(),
+      };
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).__tutorial;
+      }
+    };
+  }, [tutorialActive, tutorialStep, practiceDone, isRevisitingTutorial]);
+
   // Giao dịch đang trong Slot 2
   const currentSlotTx = useMemo(() => {
     if (!selectedTxId) return null;
@@ -70,6 +172,9 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
     }
     setSlot1Key(key);
     setVerifyResult(null);
+    if (tutorialActive && (tutorialStep === 3 || tutorialStep === 4) && selectedTxId !== null) {
+      setTutorialStep(5);
+    }
   };
 
   // Chọn giao dịch cho Slot 2
@@ -77,6 +182,9 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
     sound.playClick();
     setSelectedTxId(txId);
     setVerifyResult(null);
+    if (tutorialActive && (tutorialStep === 3 || tutorialStep === 4) && slot1Key !== null) {
+      setTutorialStep(5);
+    }
   };
 
   // Xử lý kéo thả / chạm đặt vào 2 khe của Máy xác minh
@@ -132,6 +240,11 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
         ownerName,
         isAttachedKey: slot1Key === currentSlotTx.attachedKey,
       });
+
+      if (tutorialActive) {
+        setPracticeDone(true);
+        setTutorialStep(6);
+      }
     }, 350);
   };
 
@@ -213,6 +326,62 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
     setFeedback((f) => ({ ...f, isOpen: false }));
   };
 
+  const tutorialSteps: TutorialStep[] = useMemo(() => {
+    const firstTx = txList[0];
+    const sender = firstTx ? tenNhan(firstTx.senderId, myName) : '';
+    const pubKey = firstTx ? firstTx.correctKey : 18;
+
+    return [
+      {
+        title: tutorialTexts.man7Tb.tieuDe,
+        content: tutorialTexts.man7Tb.intro,
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        target: '#tutorial-man7tb-danhba',
+        title: tutorialTexts.man7Tb.tieuDe,
+        content: tutorialTexts.man7Tb.danhBa,
+        nextLabel: tutorialTexts.chung.daHieu,
+      },
+      {
+        target: '#tutorial-man7tb-machine',
+        title: tutorialTexts.man7Tb.tieuDe,
+        content: tutorialTexts.man7Tb.slots,
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        target: '#tutorial-man7tb-first-tx',
+        title: tutorialTexts.man7Tb.tieuDe,
+        content: fmt(tutorialTexts.man7Tb.actionSelect, { nguoi: sender, pub: pubKey }),
+        nextLabel: tutorialTexts.chung.daHieu,
+      },
+      {
+        target: '#tutorial-man7tb-machine',
+        title: tutorialTexts.man7Tb.tieuDe,
+        content: fmt(tutorialTexts.man7Tb.actionSelect, { nguoi: sender, pub: pubKey }),
+      },
+      {
+        target: '#tutorial-man7tb-verify-btn',
+        title: tutorialTexts.man7Tb.tieuDe,
+        content: tutorialTexts.man7Tb.actionVerify,
+      },
+      {
+        target: '#tutorial-man7tb-verify-result',
+        title: tutorialTexts.man7Tb.tieuDe,
+        content: fmt(tutorialTexts.man7Tb.decision, { nguoi: sender }),
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        target: '#tutorial-man7tb-first-tx',
+        title: tutorialTexts.man7Tb.tieuDe,
+        content: tutorialTexts.man7Tb.correct,
+        nextLabel: isRevisitingTutorial
+          ? tutorialTexts.chung.troLaiBaiLam
+          : tutorialTexts.chung.batDauChoi,
+      },
+    ];
+  }, [txList, myName, isRevisitingTutorial]);
+
   return (
     <div className="space-y-8 max-w-5xl mx-auto pb-12">
       {/* Header hướng dẫn */}
@@ -226,13 +395,25 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
           <p className="text-sm text-nau-go-dam mt-0.5">{T.dungMayXacMinhDe}</p>
         </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          disabled={!isReadyToSubmit}
-          onClick={handleSubmit}
-          className="shrink-0 w-full sm:w-auto"
-        >{T.nopKetQuaThamDinh}</Button>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleOpenTutorial}
+            aria-label={tutorialTexts.chung.huongDan}
+            className="flex items-center gap-1.5 text-nau-go-dam hover:text-muc-tim-dam font-bold shrink-0"
+          >
+            <span>💡</span>
+            <span className="hidden sm:inline">{tutorialTexts.chung.huongDan}</span>
+          </Button>
+          <Button
+            variant="primary"
+            size="md"
+            disabled={!isReadyToSubmit}
+            onClick={handleSubmit}
+            className="shrink-0 w-full sm:w-auto"
+          >{T.nopKetQuaThamDinh}</Button>
+        </div>
       </div>
 
       {/* Cảnh báo popup lần đầu bấm khóa đính kèm */}
@@ -255,16 +436,18 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
         {/* Khu vực thao tác chính: Danh bạ & Máy xác minh */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Cột trái: Danh bạ (interactive) */}
-          <DanhBa
-            interactive
-            enableDrag
-            selectedKey={slot1Key}
-            onSelectKey={(key) => handleSelectKey(key, false)}
-            userName={myName}
-          />
+          <div id="tutorial-man7tb-danhba">
+            <DanhBa
+              interactive
+              enableDrag
+              selectedKey={slot1Key}
+              onSelectKey={(key) => handleSelectKey(key, false)}
+              userName={myName}
+            />
+          </div>
 
           {/* Cột phải: Máy xác minh */}
-          <div className="space-y-3">
+          <div id="tutorial-man7tb-machine" className="space-y-3">
             <MayXacMinh
               mode="medium"
               droppable
@@ -308,29 +491,30 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {txList.map((tx) => {
+            {txList.map((tx, idx) => {
               const isSelected = selectedTxId === tx.id;
               const currentDecision = decisions[tx.id] || null;
 
               return (
-                <TheGiaoDich
-                  key={tx.id}
-                  id={tx.id}
-                  senderId={tx.senderId}
-                  message={tx.message}
-                  sig={tx.sig}
-                  attachedKey={tx.attachedKey}
-                  isSelected={isSelected}
-                  enableDrag
-                  onSelect={() => handleSelectTx(tx.id)}
-                  onSelectAttachedKey={(k) => handleSelectKey(k, true)}
-                  showDecisionButtons
-                  decision={currentDecision}
-                  onDecisionChange={(dec) => {
-                    sound.playClick();
-                    setDecisions((prev) => ({ ...prev, [tx.id]: dec }));
-                  }}
-                />
+                <div key={tx.id} id={idx === 0 ? 'tutorial-man7tb-first-tx' : undefined}>
+                  <TheGiaoDich
+                    id={tx.id}
+                    senderId={tx.senderId}
+                    message={tx.message}
+                    sig={tx.sig}
+                    attachedKey={tx.attachedKey}
+                    isSelected={isSelected}
+                    enableDrag
+                    onSelect={() => handleSelectTx(tx.id)}
+                    onSelectAttachedKey={(k) => handleSelectKey(k, true)}
+                    showDecisionButtons
+                    decision={currentDecision}
+                    onDecisionChange={(dec) => {
+                      sound.playClick();
+                      setDecisions((prev) => ({ ...prev, [tx.id]: dec }));
+                    }}
+                  />
+                </div>
               );
             })}
           </div>
@@ -391,6 +575,48 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
             handleRetry();
           }
         }}
+      />
+
+      {/* Hướng dẫn focus và làm thử */}
+      <TutorialSpotlight
+        steps={tutorialSteps}
+        activeStep={tutorialStep}
+        isOpen={tutorialActive}
+        onClose={() => {
+          if (isRevisitingTutorial) handleCloseRevisit();
+          else startRealGame();
+        }}
+        onNext={() => {
+          if (tutorialStep >= tutorialSteps.length - 1) {
+            if (isRevisitingTutorial) handleCloseRevisit();
+            else startRealGame();
+          } else {
+            setTutorialStep((s) => s + 1);
+          }
+        }}
+        onPrev={() => setTutorialStep((s) => Math.max(0, s - 1))}
+        onSkip={() => startRealGame()}
+        customActions={
+          tutorialStep === 7 ? (
+            <div className="flex items-center gap-2">
+              <Button variant="secondary" size="sm" onClick={handleRetryPractice}>
+                {tutorialTexts.chung.thuLai}
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => {
+                  if (isRevisitingTutorial) handleCloseRevisit();
+                  else startRealGame();
+                }}
+              >
+                {isRevisitingTutorial
+                  ? tutorialTexts.chung.troLaiBaiLam
+                  : tutorialTexts.chung.batDauChoi}
+              </Button>
+            </div>
+          ) : undefined
+        }
       />
     </div>
   );

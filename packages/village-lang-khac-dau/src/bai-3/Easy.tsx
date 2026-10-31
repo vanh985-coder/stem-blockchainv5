@@ -6,6 +6,9 @@ import {
   DraggableCard,
   DroppableSlot,
   TapOrDragContainer,
+  TutorialSpotlight,
+  type TutorialStep,
+  tutorialTexts,
   fmt,
   sound,
   useAuth,
@@ -48,14 +51,16 @@ const MachinePart1Slot: React.FC<{
     >
       <div className="flex flex-col items-center justify-center gap-2 w-full">
         {step === 'signed' && (
-          <Button
-            variant="primary"
-            size="md"
-            onClick={(e) => {
-              e.stopPropagation();
-              onScanMy();
-            }}
-          >{T.thaVaoMayXacMinh}</Button>
+          <div id="tutorial-man7de-verify-btn">
+            <Button
+              variant="primary"
+              size="md"
+              onClick={(e) => {
+                e.stopPropagation();
+                onScanMy();
+              }}
+            >{T.thaVaoMayXacMinh}</Button>
+          </div>
         )}
         {step === 'ti_fraud_ready' && (
           <Button
@@ -176,6 +181,82 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
   // Giao dịch giả của Tí
   const [tiSig, setTiSig] = useState<Signature | null>(null);
 
+  // ==========================================
+  // HƯỚNG DẪN FOCUS & LÀM THỬ (P8 - Nhóm 1)
+  // ==========================================
+  const [tutorialActive, setTutorialActive] = useState<boolean>(true);
+  const [tutorialStep, setTutorialStep] = useState<number>(0);
+  const [isRevisitingTutorial, setIsRevisitingTutorial] = useState<boolean>(false);
+  const [practiceDone, setPracticeDone] = useState<boolean>(false);
+
+  // Lưu trạng thái trước khi mở lại giữa bài
+  const savedStateRef = useRef<{
+    part: 1 | 2;
+    p1Step: any;
+    mySig: Signature | null;
+    p1Led: any;
+    scanIndex: number | null;
+  } | null>(null);
+
+  const startRealGame = () => {
+    sound.playClick();
+    setTutorialActive(false);
+    setIsRevisitingTutorial(false);
+    setPracticeDone(false);
+    setPart(1);
+    setP1Step('initial');
+    setMySig(null);
+    setP1Led('idle');
+    setScanIndex(null);
+    startTimeRef.current = Date.now();
+  };
+
+  const handleOpenTutorial = () => {
+    sound.playClick();
+    savedStateRef.current = {
+      part,
+      p1Step,
+      mySig,
+      p1Led,
+      scanIndex,
+    };
+    setIsRevisitingTutorial(true);
+    setTutorialActive(true);
+    setTutorialStep(0);
+    setPracticeDone(false);
+    setPart(1);
+    setP1Step('initial');
+    setMySig(null);
+    setP1Led('idle');
+    setScanIndex(null);
+  };
+
+  const handleCloseRevisit = () => {
+    sound.playClick();
+    setTutorialActive(false);
+    setIsRevisitingTutorial(false);
+    setPracticeDone(false);
+    if (savedStateRef.current) {
+      setPart(savedStateRef.current.part);
+      setP1Step(savedStateRef.current.p1Step);
+      setMySig(savedStateRef.current.mySig);
+      setP1Led(savedStateRef.current.p1Led);
+      setScanIndex(savedStateRef.current.scanIndex);
+      savedStateRef.current = null;
+    }
+  };
+
+  const handleRetryPractice = () => {
+    sound.playClick();
+    setPracticeDone(false);
+    setPart(1);
+    setP1Step('initial');
+    setMySig(null);
+    setP1Led('idle');
+    setScanIndex(null);
+    setTutorialStep(2);
+  };
+
   // Dọn dẹp timer khi unmount
   useEffect(() => {
     return () => {
@@ -204,6 +285,9 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
     const sig = signUnique(12, sampleMessages[selectedTxIdx], DIRECTORY_KEYS, rngRef.current);
     setMySig(sig);
     setP1Step('signed');
+    if (tutorialActive && (tutorialStep === 2 || tutorialStep === 3)) {
+      setTutorialStep(4);
+    }
   };
 
   // Quét danh bạ cho Em
@@ -219,8 +303,33 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
       sound.playCorrect({ answer: null });
       setP1Led('green');
       setP1Step('verified_my');
+      if (tutorialActive) {
+        setPracticeDone(true);
+        setTutorialStep(6);
+      }
     }, GAME_CONFIG.lesson3.verifyScanDelayMs);
   };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__tutorial = {
+        isActive: tutorialActive,
+        step: tutorialStep,
+        practiceDone,
+        close: () => {
+          if (isRevisitingTutorial) handleCloseRevisit();
+          else startRealGame();
+        },
+        next: () => setTutorialStep((s) => s + 1),
+        skip: () => startRealGame(),
+      };
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).__tutorial;
+      }
+    };
+  }, [tutorialActive, tutorialStep, practiceDone, isRevisitingTutorial]);
 
   // Bắt đầu kịch bản Tí gian lận
   const handleStartTiScenario = () => {
@@ -417,6 +526,52 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
     }
   };
 
+  const tutorialSteps: TutorialStep[] = useMemo(() => {
+    return [
+      {
+        title: tutorialTexts.man7De.tieuDe,
+        content: tutorialTexts.man7De.intro,
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        target: '#tutorial-man7de-keys',
+        title: tutorialTexts.man7De.tieuDe,
+        content: fmt(tutorialTexts.man7De.keys, { priv: 12, pub: 18, formula: '5¹² mod 23' }),
+        nextLabel: tutorialTexts.chung.daHieu,
+      },
+      {
+        target: '#tutorial-man7de-sign-card',
+        title: tutorialTexts.man7De.tieuDe,
+        content: fmt(tutorialTexts.man7De.pickAndSign, { priv: 12 }),
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        target: '#tutorial-man7de-sign-btn',
+        title: tutorialTexts.man7De.tieuDe,
+        content: fmt(tutorialTexts.man7De.pickAndSign, { priv: 12 }),
+      },
+      {
+        target: '#tutorial-man7de-verify-slot',
+        title: tutorialTexts.man7De.tieuDe,
+        content: tutorialTexts.man7De.signedCard,
+        nextLabel: tutorialTexts.chung.daHieu,
+      },
+      {
+        target: '#tutorial-man7de-verify-btn',
+        title: tutorialTexts.man7De.tieuDe,
+        content: fmt(tutorialTexts.man7De.machineScan, { pub: 18 }),
+      },
+      {
+        target: '#tutorial-man7de-machine-result',
+        title: tutorialTexts.man7De.tieuDe,
+        content: fmt(tutorialTexts.man7De.correct, { pub: 18 }),
+        nextLabel: isRevisitingTutorial
+          ? tutorialTexts.chung.troLaiBaiLam
+          : tutorialTexts.chung.batDauChoi,
+      },
+    ];
+  }, [isRevisitingTutorial]);
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-8">
       {/* Thanh chuyển đổi bước */}
@@ -429,7 +584,19 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
             {part === 1 ? T.phan1KyGiaoDich : T.phan2GhepCapKhoa}
           </span>
         </div>
-        <span className="text-sm font-bold text-muc-tim-dam bg-muc-tim/10 px-2.5 py-1 rounded-full">{T.tramDe}</span>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleOpenTutorial}
+            aria-label={tutorialTexts.chung.huongDan}
+            className="flex items-center gap-1.5 text-nau-go-dam hover:text-muc-tim-dam font-bold"
+          >
+            <span>💡</span>
+            <span className="hidden sm:inline">{tutorialTexts.chung.huongDan}</span>
+          </Button>
+          <span className="text-sm font-bold text-muc-tim-dam bg-muc-tim/10 px-2.5 py-1 rounded-full">{T.tramDe}</span>
+        </div>
       </div>
 
       {/* ======================================================================= */}
@@ -477,7 +644,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
             </Card>
 
             {/* Cặp khóa của Em: Két sắt & Thẻ tên */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            <div id="tutorial-man7de-keys" className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               {/* Két sắt bí mật */}
               <Card variant="default" className="p-5 bg-vang/15 border-2 border-vang/60 rounded-[18px]">
                 <div className="flex items-center justify-between mb-2.5">
@@ -523,7 +690,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
 
             {/* BƯỚC 1: Em ký giao dịch */}
             {p1Step === 'initial' && (
-              <Card variant="paper" className="p-5 sm:p-6 rounded-[18px]">
+              <Card id="tutorial-man7de-sign-card" variant="paper" className="p-5 sm:p-6 rounded-[18px]">
                 <h4 className="font-display font-extrabold text-base sm:text-lg text-chu mb-2 flex items-center gap-2">
                   <span>📝</span>{' '}{T.buoc1ChonGiaoDich}</h4>
                 <p className="text-sm sm:text-sm text-nau-go-dam mb-4 leading-relaxed">{rich(T.chonMotGiaoDichMau)}</p>
@@ -551,14 +718,16 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                   ))}
                 </div>
 
-                <Button variant="primary" size="md" onClick={handleSign}>{T.kyBangKhoaRiengCua}</Button>
+                <div id="tutorial-man7de-sign-btn">
+                  <Button variant="primary" size="md" onClick={handleSign}>{T.kyBangKhoaRiengCua}</Button>
+                </div>
               </Card>
             )}
 
             {/* BƯỚC 2: Thả vào máy xác minh (Giao dịch của Em) */}
             {(p1Step === 'signed' || p1Step === 'scanning_my' || p1Step === 'verified_my') && (
               <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div id="tutorial-man7de-verify-slot" className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {/* Thẻ giao dịch của Em */}
                   {mySig && (
                     <div>
@@ -608,7 +777,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
                       )}
 
                       {p1Step === 'verified_my' && (
-                        <div className="p-3.5 bg-xanh-la-dam/20 border border-xanh-la-dam rounded-[14px] text-sm sm:text-sm space-y-1">
+                        <div id="tutorial-man7de-machine-result" className="p-3.5 bg-xanh-la-dam/20 border border-xanh-la-dam rounded-[14px] text-sm sm:text-sm space-y-1">
                           <div className="font-bold text-[#4ADE80] text-sm sm:text-base">{T.chuKyChinhChu}</div>
                           <div>{fmt(T.khopHoanHaoVoiKhoa, { myName })}</div>
                         </div>
@@ -956,6 +1125,48 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
           </div>
         </div>
       )}
+
+      {/* Hướng dẫn focus và làm thử */}
+      <TutorialSpotlight
+        steps={tutorialSteps}
+        activeStep={tutorialStep}
+        isOpen={tutorialActive}
+        onClose={() => {
+          if (isRevisitingTutorial) handleCloseRevisit();
+          else startRealGame();
+        }}
+        onNext={() => {
+          if (tutorialStep >= tutorialSteps.length - 1) {
+            if (isRevisitingTutorial) handleCloseRevisit();
+            else startRealGame();
+          } else {
+            setTutorialStep((s) => s + 1);
+          }
+        }}
+        onPrev={() => setTutorialStep((s) => Math.max(0, s - 1))}
+        onSkip={() => startRealGame()}
+        customActions={
+          tutorialStep === 6 ? (
+            <div className="flex items-center gap-2">
+              <Button variant="secondary" size="sm" onClick={handleRetryPractice}>
+                {tutorialTexts.chung.thuLai}
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => {
+                  if (isRevisitingTutorial) handleCloseRevisit();
+                  else startRealGame();
+                }}
+              >
+                {isRevisitingTutorial
+                  ? tutorialTexts.chung.troLaiBaiLam
+                  : tutorialTexts.chung.batDauChoi}
+              </Button>
+            </div>
+          ) : undefined
+        }
+      />
     </div>
   );
 }

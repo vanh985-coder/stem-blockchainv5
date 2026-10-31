@@ -20,6 +20,10 @@ describe('tutorial.ts content and logic checks (P8a)', () => {
     expect(tutorialTexts.man1De.check).toBeTruthy();
     expect(tutorialTexts.man1De.correct).toBeTruthy();
     expect(tutorialTexts.man1De.wrong).toBeTruthy();
+
+    expect(tutorialTexts.man7De.tieuDe).toBeTruthy();
+    expect(tutorialTexts.man7Tb.tieuDe).toBeTruthy();
+    expect(tutorialTexts.man7Kho.tieuDe).toBeTruthy();
   });
 
   it('dữ liệu mẫu cố định 12 và 5 khớp hoàn toàn công thức pageCode và solutionSteps', () => {
