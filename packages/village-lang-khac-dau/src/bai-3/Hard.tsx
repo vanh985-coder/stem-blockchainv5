@@ -1,5 +1,21 @@
-import { useState, useRef, useEffect } from 'react';
-import { Avatar, Button, Card, Modal, NumberInput, fmt, sound, useAuth, type StationResult, formatPower, plainPower, rich } from '@so-chung/core';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import {
+  Avatar,
+  Button,
+  Card,
+  Modal,
+  NumberInput,
+  TutorialSpotlight,
+  type TutorialStep,
+  tutorialTexts,
+  fmt,
+  sound,
+  useAuth,
+  type StationResult,
+  formatPower,
+  plainPower,
+  rich,
+} from '@so-chung/core';
 import { emitSubmission } from '@so-chung/core/audio/answerSignal';
 import { bai3Texts } from '@so-chung/core/content/lessons/bai-3';
 import { formatNumber, formatDecimal, formatTime } from '@so-chung/core/lib/format';
@@ -51,6 +67,92 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
   const [showTableModal, setShowTableModal] = useState<boolean>(false);
   const p1AutoTimerRef = useRef<number | null>(null);
 
+  // ==========================================
+  // HƯỚNG DẪN FOCUS & LÀM THỬ (P8 - Nhóm 1)
+  // ==========================================
+  const [tutorialActive, setTutorialActive] = useState<boolean>(true);
+  const [tutorialStep, setTutorialStep] = useState<number>(0);
+  const [isRevisitingTutorial, setIsRevisitingTutorial] = useState<boolean>(false);
+  const [practiceDone, setPracticeDone] = useState<boolean>(false);
+
+  // Snapshot khi mở lại giữa bài
+  const savedHardRef = useRef<{
+    part: 1 | 2 | 3;
+    p1History: { x: number; val: number; isMatch: boolean }[];
+    p1Found: boolean;
+    p1InputX: number;
+    p1ManualXs: number[];
+  } | null>(null);
+
+  const startRealGame = () => {
+    sound.playClick();
+    setTutorialActive(false);
+    setIsRevisitingTutorial(false);
+    setPracticeDone(false);
+    setPart(1);
+    setP1History([]);
+    setP1Found(false);
+    setP1ManualXs([]);
+    setP1InputX(1);
+    startTimeRef.current = Date.now();
+  };
+
+  const handleOpenTutorial = () => {
+    sound.playClick();
+    savedHardRef.current = {
+      part,
+      p1History,
+      p1Found,
+      p1InputX,
+      p1ManualXs,
+    };
+    setIsRevisitingTutorial(true);
+    setTutorialActive(true);
+    setTutorialStep(0);
+    setPracticeDone(false);
+    setPart(1);
+    setP1History([]);
+    setP1Found(false);
+    setP1ManualXs([]);
+    setP1InputX(2);
+  };
+
+  const handleCloseRevisit = () => {
+    sound.playClick();
+    setTutorialActive(false);
+    setIsRevisitingTutorial(false);
+    setPracticeDone(false);
+    if (savedHardRef.current) {
+      setPart(savedHardRef.current.part);
+      setP1History(savedHardRef.current.p1History);
+      setP1Found(savedHardRef.current.p1Found);
+      setP1InputX(savedHardRef.current.p1InputX);
+      setP1ManualXs(savedHardRef.current.p1ManualXs);
+      savedHardRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__tutorial = {
+        isActive: tutorialActive,
+        step: tutorialStep,
+        practiceDone,
+        close: () => {
+          if (isRevisitingTutorial) handleCloseRevisit();
+          else startRealGame();
+        },
+        next: () => setTutorialStep((s) => s + 1),
+        skip: () => startRealGame(),
+      };
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).__tutorial;
+      }
+    };
+  }, [tutorialActive, tutorialStep, practiceDone, isRevisitingTutorial]);
+
   // Dọn dẹp timer
   useEffect(() => {
     return () => {
@@ -83,6 +185,15 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
       setP1ManualXs((prev) => [...prev, p1InputX]);
     }
     testX(p1InputX);
+
+    if (tutorialActive) {
+      if (p1InputX === 7) {
+        setPracticeDone(true);
+        setTutorialStep(5);
+      } else if (tutorialStep === 2) {
+        setTutorialStep(3);
+      }
+    }
   };
 
   const handleAutoRun = () => {
@@ -351,6 +462,53 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
     }
   };
 
+  const tutorialSteps: TutorialStep[] = useMemo(() => {
+    return [
+      {
+        id: 'intro',
+        title: tutorialTexts.man7Kho.tieuDe,
+        content: tutorialTexts.man7Kho.intro,
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        id: 'target',
+        targetSelector: '#tutorial-man7kho-target',
+        title: tutorialTexts.man7Kho.tieuDe,
+        content: fmt(tutorialTexts.man7Kho.target, { target: 19, formula: '5^x mod 23 = 19' }),
+        nextLabel: tutorialTexts.chung.daHieu,
+      },
+      {
+        id: 'input-try',
+        targetSelector: '#tutorial-man7kho-input-box',
+        title: tutorialTexts.man7Kho.tieuDe,
+        content: fmt(tutorialTexts.man7Kho.inputTry, { tryX: 2 }),
+        interactive: true,
+        hideNextButton: true,
+      },
+      {
+        id: 'history',
+        targetSelector: '#tutorial-man7kho-history',
+        title: tutorialTexts.man7Kho.tieuDe,
+        content: fmt(tutorialTexts.man7Kho.history, { tryX: 2, val: 2, notMatch: '≠ 19' }),
+        nextLabel: tutorialTexts.chung.tiep,
+      },
+      {
+        id: 'input-correct',
+        targetSelector: '#tutorial-man7kho-input-box',
+        title: tutorialTexts.man7Kho.tieuDe,
+        content: fmt(tutorialTexts.man7Kho.inputCorrect, { correctX: 7 }),
+        interactive: true,
+        hideNextButton: true,
+      },
+      {
+        id: 'complete',
+        targetSelector: '#tutorial-man7kho-input-box',
+        title: tutorialTexts.man7Kho.tieuDe,
+        content: fmt(tutorialTexts.man7Kho.correct, { correctX: 7, target: 19 }),
+      },
+    ];
+  }, []);
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
       {/* Header chỉ số phần */}
@@ -371,7 +529,19 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
               : T.phan3TinhHuongMat}
           </span>
         </div>
-        <span className="text-sm font-bold text-do-son-dam bg-do-son/10 px-2.5 py-1 rounded-full">{T.tramKho}</span>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleOpenTutorial}
+            aria-label={tutorialTexts.chung.huongDan}
+            className="flex items-center gap-1.5 text-nau-go-dam hover:text-muc-tim-dam font-bold"
+          >
+            <span>💡</span>
+            <span className="hidden sm:inline">{tutorialTexts.chung.huongDan}</span>
+          </Button>
+          <span className="text-sm font-bold text-do-son-dam bg-do-son/10 px-2.5 py-1 rounded-full">{T.tramKho}</span>
+        </div>
       </div>
 
       {/* ======================================================================= */}
@@ -380,7 +550,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
       {part === 1 && (
         <div className="space-y-4">
           <Card variant="paper" className="p-4 sm:p-5">
-            <div className="flex items-start gap-3 mb-3">
+            <div id="tutorial-man7kho-target" className="flex items-start gap-3 mb-3">
               <Avatar portrait={portraitOf("ti")} size="sm" />
               <div>
                 <h4 className="font-display font-extrabold text-base text-chu">{fmt(T.muonBeKhoaCua)}</h4>
@@ -414,7 +584,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
             </div>
 
             {/* Bảng điều khiển thử số */}
-            <div className="p-4 bg-white/60 rounded-[16px] border border-muc-tim/30 space-y-3">
+            <div id="tutorial-man7kho-input-box" className="p-4 bg-white/60 rounded-[16px] border border-muc-tim/30 space-y-3">
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold text-chu">{T.nhapSoX122}</span>
@@ -429,12 +599,14 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
                   />
                 </div>
 
-                <Button
-                  variant="primary"
-                  size="sm"
-                  disabled={p1Found || p1AutoRunning}
-                  onClick={handleManualTry}
-                >{T.thuGiaTriX}</Button>
+                <div id="tutorial-man7kho-try-btn">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    disabled={p1Found || p1AutoRunning}
+                    onClick={handleManualTry}
+                  >{T.thuGiaTriX}</Button>
+                </div>
 
                 <Button
                   variant="secondary"
@@ -473,7 +645,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
 
             {/* Lịch sử các lần thử */}
             {p1History.length > 0 && (
-              <div className="mt-4 pt-3 border-t border-giay">
+              <div id="tutorial-man7kho-history" className="mt-4 pt-3 border-t border-giay">
                 <div className="text-sm font-bold text-nau-go-dam mb-2 uppercase">{fmt(T.lichSuThuNghiemLan, { so: p1History.length })}</div>
                 <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-1">
                   {p1History.map((h, i) => (
@@ -1065,6 +1237,27 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
           </div>
         </div>
       </Modal>
+
+      {/* Hướng dẫn focus và làm thử */}
+      <TutorialSpotlight
+        isOpen={tutorialActive}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => setTutorialStep((s) => Math.min(tutorialSteps.length - 1, s + 1))}
+        onPrev={() => setTutorialStep((s) => Math.max(0, s - 1))}
+        onSkip={() => (isRevisitingTutorial ? handleCloseRevisit() : startRealGame())}
+        actionButton={
+          tutorialStep === 5
+            ? {
+                label: isRevisitingTutorial
+                  ? tutorialTexts.chung.troLaiBaiLam
+                  : tutorialTexts.chung.batDauChoi,
+                onClick: () => (isRevisitingTutorial ? handleCloseRevisit() : startRealGame()),
+                variant: 'primary',
+              }
+            : undefined
+        }
+      />
     </div>
   );
 }

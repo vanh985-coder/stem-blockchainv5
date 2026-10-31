@@ -127,15 +127,6 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
     }
   };
 
-  const handleRetryPractice = () => {
-    sound.playClick();
-    setPracticeDone(false);
-    setSlot1Key(null);
-    setSelectedTxId(null);
-    setVerifyResult(null);
-    setTutorialStep(3);
-  };
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       (window as any).__tutorial = {
@@ -329,58 +320,68 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
   const tutorialSteps: TutorialStep[] = useMemo(() => {
     const firstTx = txList[0];
     const sender = firstTx ? tenNhan(firstTx.senderId, myName) : '';
-    const pubKey = firstTx ? firstTx.correctKey : 18;
+    const person = firstTx ? PEOPLE.find((p) => p.id === firstTx.senderId) : null;
+    const pubKey = person ? person.publicKey : 18;
 
     return [
       {
+        id: 'intro',
         title: tutorialTexts.man7Tb.tieuDe,
         content: tutorialTexts.man7Tb.intro,
         nextLabel: tutorialTexts.chung.tiep,
       },
       {
-        target: '#tutorial-man7tb-danhba',
+        id: 'danhba',
+        targetSelector: '#tutorial-man7tb-danhba',
         title: tutorialTexts.man7Tb.tieuDe,
         content: tutorialTexts.man7Tb.danhBa,
         nextLabel: tutorialTexts.chung.daHieu,
       },
       {
-        target: '#tutorial-man7tb-machine',
+        id: 'machine',
+        targetSelector: '#tutorial-man7tb-machine',
         title: tutorialTexts.man7Tb.tieuDe,
         content: tutorialTexts.man7Tb.slots,
         nextLabel: tutorialTexts.chung.tiep,
       },
       {
-        target: '#tutorial-man7tb-first-tx',
+        id: 'first-tx',
+        targetSelector: '#tutorial-man7tb-first-tx',
         title: tutorialTexts.man7Tb.tieuDe,
         content: fmt(tutorialTexts.man7Tb.actionSelect, { nguoi: sender, pub: pubKey }),
         nextLabel: tutorialTexts.chung.daHieu,
       },
       {
-        target: '#tutorial-man7tb-machine',
+        id: 'select-both',
+        targetSelector: '#tutorial-man7tb-machine',
         title: tutorialTexts.man7Tb.tieuDe,
         content: fmt(tutorialTexts.man7Tb.actionSelect, { nguoi: sender, pub: pubKey }),
+        interactive: true,
+        hideNextButton: true,
       },
       {
-        target: '#tutorial-man7tb-verify-btn',
+        id: 'verify-btn',
+        targetSelector: '#tutorial-man7tb-verify-btn',
         title: tutorialTexts.man7Tb.tieuDe,
         content: tutorialTexts.man7Tb.actionVerify,
+        interactive: true,
+        hideNextButton: true,
       },
       {
-        target: '#tutorial-man7tb-verify-result',
+        id: 'verify-result',
+        targetSelector: '#tutorial-man7tb-verify-result',
         title: tutorialTexts.man7Tb.tieuDe,
         content: fmt(tutorialTexts.man7Tb.decision, { nguoi: sender }),
         nextLabel: tutorialTexts.chung.tiep,
       },
       {
-        target: '#tutorial-man7tb-first-tx',
+        id: 'complete',
+        targetSelector: '#tutorial-man7tb-first-tx',
         title: tutorialTexts.man7Tb.tieuDe,
         content: tutorialTexts.man7Tb.correct,
-        nextLabel: isRevisitingTutorial
-          ? tutorialTexts.chung.troLaiBaiLam
-          : tutorialTexts.chung.batDauChoi,
       },
     ];
-  }, [txList, myName, isRevisitingTutorial]);
+  }, [txList, myName]);
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto pb-12">
@@ -397,7 +398,7 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <Button
-            variant="ghost"
+            variant="secondary"
             size="sm"
             onClick={handleOpenTutorial}
             aria-label={tutorialTexts.chung.huongDan}
@@ -579,43 +580,22 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
 
       {/* Hướng dẫn focus và làm thử */}
       <TutorialSpotlight
-        steps={tutorialSteps}
-        activeStep={tutorialStep}
         isOpen={tutorialActive}
-        onClose={() => {
-          if (isRevisitingTutorial) handleCloseRevisit();
-          else startRealGame();
-        }}
-        onNext={() => {
-          if (tutorialStep >= tutorialSteps.length - 1) {
-            if (isRevisitingTutorial) handleCloseRevisit();
-            else startRealGame();
-          } else {
-            setTutorialStep((s) => s + 1);
-          }
-        }}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => setTutorialStep((s) => Math.min(tutorialSteps.length - 1, s + 1))}
         onPrev={() => setTutorialStep((s) => Math.max(0, s - 1))}
-        onSkip={() => startRealGame()}
-        customActions={
-          tutorialStep === 7 ? (
-            <div className="flex items-center gap-2">
-              <Button variant="secondary" size="sm" onClick={handleRetryPractice}>
-                {tutorialTexts.chung.thuLai}
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => {
-                  if (isRevisitingTutorial) handleCloseRevisit();
-                  else startRealGame();
-                }}
-              >
-                {isRevisitingTutorial
+        onSkip={() => (isRevisitingTutorial ? handleCloseRevisit() : startRealGame())}
+        actionButton={
+          tutorialStep === 7
+            ? {
+                label: isRevisitingTutorial
                   ? tutorialTexts.chung.troLaiBaiLam
-                  : tutorialTexts.chung.batDauChoi}
-              </Button>
-            </div>
-          ) : undefined
+                  : tutorialTexts.chung.batDauChoi,
+                onClick: () => (isRevisitingTutorial ? handleCloseRevisit() : startRealGame()),
+                variant: 'primary',
+              }
+            : undefined
         }
       />
     </div>

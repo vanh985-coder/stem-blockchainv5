@@ -246,17 +246,6 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
     }
   };
 
-  const handleRetryPractice = () => {
-    sound.playClick();
-    setPracticeDone(false);
-    setPart(1);
-    setP1Step('initial');
-    setMySig(null);
-    setP1Led('idle');
-    setScanIndex(null);
-    setTutorialStep(2);
-  };
-
   // Dọn dẹp timer khi unmount
   useEffect(() => {
     return () => {
@@ -529,48 +518,56 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
   const tutorialSteps: TutorialStep[] = useMemo(() => {
     return [
       {
+        id: 'intro',
         title: tutorialTexts.man7De.tieuDe,
         content: tutorialTexts.man7De.intro,
         nextLabel: tutorialTexts.chung.tiep,
       },
       {
-        target: '#tutorial-man7de-keys',
+        id: 'keys',
+        targetSelector: '#tutorial-man7de-keys',
         title: tutorialTexts.man7De.tieuDe,
         content: fmt(tutorialTexts.man7De.keys, { priv: 12, pub: 18, formula: '5¹² mod 23' }),
         nextLabel: tutorialTexts.chung.daHieu,
       },
       {
-        target: '#tutorial-man7de-sign-card',
+        id: 'sign-card',
+        targetSelector: '#tutorial-man7de-sign-card',
         title: tutorialTexts.man7De.tieuDe,
         content: fmt(tutorialTexts.man7De.pickAndSign, { priv: 12 }),
         nextLabel: tutorialTexts.chung.tiep,
       },
       {
-        target: '#tutorial-man7de-sign-btn',
+        id: 'sign-btn',
+        targetSelector: '#tutorial-man7de-sign-btn',
         title: tutorialTexts.man7De.tieuDe,
         content: fmt(tutorialTexts.man7De.pickAndSign, { priv: 12 }),
+        interactive: true,
+        hideNextButton: true,
       },
       {
-        target: '#tutorial-man7de-verify-slot',
+        id: 'verify-slot',
+        targetSelector: '#tutorial-man7de-verify-slot',
         title: tutorialTexts.man7De.tieuDe,
         content: tutorialTexts.man7De.signedCard,
         nextLabel: tutorialTexts.chung.daHieu,
       },
       {
-        target: '#tutorial-man7de-verify-btn',
+        id: 'verify-btn',
+        targetSelector: '#tutorial-man7de-verify-btn',
         title: tutorialTexts.man7De.tieuDe,
         content: fmt(tutorialTexts.man7De.machineScan, { pub: 18 }),
+        interactive: true,
+        hideNextButton: true,
       },
       {
-        target: '#tutorial-man7de-machine-result',
+        id: 'result',
+        targetSelector: '#tutorial-man7de-machine-result',
         title: tutorialTexts.man7De.tieuDe,
         content: fmt(tutorialTexts.man7De.correct, { pub: 18 }),
-        nextLabel: isRevisitingTutorial
-          ? tutorialTexts.chung.troLaiBaiLam
-          : tutorialTexts.chung.batDauChoi,
       },
     ];
-  }, [isRevisitingTutorial]);
+  }, []);
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-8">
@@ -586,7 +583,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
         </div>
         <div className="flex items-center gap-2">
           <Button
-            variant="ghost"
+            variant="secondary"
             size="sm"
             onClick={handleOpenTutorial}
             aria-label={tutorialTexts.chung.huongDan}
@@ -1128,43 +1125,22 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
 
       {/* Hướng dẫn focus và làm thử */}
       <TutorialSpotlight
-        steps={tutorialSteps}
-        activeStep={tutorialStep}
         isOpen={tutorialActive}
-        onClose={() => {
-          if (isRevisitingTutorial) handleCloseRevisit();
-          else startRealGame();
-        }}
-        onNext={() => {
-          if (tutorialStep >= tutorialSteps.length - 1) {
-            if (isRevisitingTutorial) handleCloseRevisit();
-            else startRealGame();
-          } else {
-            setTutorialStep((s) => s + 1);
-          }
-        }}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => setTutorialStep((s) => Math.min(tutorialSteps.length - 1, s + 1))}
         onPrev={() => setTutorialStep((s) => Math.max(0, s - 1))}
-        onSkip={() => startRealGame()}
-        customActions={
-          tutorialStep === 6 ? (
-            <div className="flex items-center gap-2">
-              <Button variant="secondary" size="sm" onClick={handleRetryPractice}>
-                {tutorialTexts.chung.thuLai}
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => {
-                  if (isRevisitingTutorial) handleCloseRevisit();
-                  else startRealGame();
-                }}
-              >
-                {isRevisitingTutorial
+        onSkip={() => (isRevisitingTutorial ? handleCloseRevisit() : startRealGame())}
+        actionButton={
+          tutorialStep === 6
+            ? {
+                label: isRevisitingTutorial
                   ? tutorialTexts.chung.troLaiBaiLam
-                  : tutorialTexts.chung.batDauChoi}
-              </Button>
-            </div>
-          ) : undefined
+                  : tutorialTexts.chung.batDauChoi,
+                onClick: () => (isRevisitingTutorial ? handleCloseRevisit() : startRealGame()),
+                variant: 'primary',
+              }
+            : undefined
         }
       />
     </div>
