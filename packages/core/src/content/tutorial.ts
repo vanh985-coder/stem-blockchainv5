@@ -226,4 +226,24 @@ export const tutorialTexts = {
     banThu: 'Bắn thử một viên',
     correct: 'Phát bắn rất chuẩn xác! Hãy nhanh tay nạp thuốc và bảo vệ cổng làng trước đàn gà và gà trùm nhé!',
   },
+
+  man11: {
+    tieuDe: 'Làm thử: Ghép lá cây sổ',
+    intro: 'Em hãy gom các giao dịch bằng cách ghép các cặp lá hợp lệ trên bàn cờ để bồi đắp cây Merkle hoàn chỉnh!',
+    board: 'Bàn ghép lá 7×7: Chạm hoặc vuốt hai lá kề nhau (hoặc dùng phím mũi tên và phím Space / Enter) để tạo hàng 3 lá cùng loại.',
+    hud: 'Cây Merkle và Thanh chỉ số: Khi gom đủ 3 lá, lá sẽ bay lên cành cây tạo thành các nút lá và nút gốc Merkle. Hãy chú ý số lượt còn lại của mỗi vòng!',
+    practice: 'Em hãy bấm nút "Tráo thử một nước" dưới đây hoặc nhấn phím Space để thực hành thao tác tráo lá mẫu nhé!',
+    traoThu: 'Tráo thử một nước',
+    correct: 'Các lá đã khớp hàng và bay lên cành cây Merkle rất đẹp mắt! Cố gắng hoàn thành cả 3 cây trước khi hết lượt nhé!',
+  },
+
+  man12: {
+    tieuDe: 'Làm thử: Leo cây tìm lá giả',
+    intro: 'Em hãy leo lên cây Merkle cao vút, đối chiếu các mã băm để phát hiện nhánh bị {phanDien} tráo lá giả mạo!',
+    tree: 'Cặp tay nắm: Ở mỗi tầng, hai bên có hai tay nắm trượt. Hãy so sánh hai số: số trong Sổ và số tính Nay. Nhánh nào có số Nay KHÁC số Sổ là nhánh có lá bị tráo!',
+    hud: 'Thanh theo dõi: Em có 3 tim. Nhảy đúng nhánh lệch sẽ nhặt được tiền đồng và tiếp tục leo; nhảy nhầm nhánh cụt sẽ bị ngã và mất tim!',
+    practice: 'Em hãy bấm nút "Nhảy bám thử" dưới đây hoặc bấm phím Space để thực hành nhịp nhảy bám cành cây nhé!',
+    nhayThu: 'Nhảy bám thử',
+    correct: 'Cú nhảy rất nhịp nhàng! Hãy tập trung đối chiếu mã Sổ và mã Nay để leo thẳng tới đỉnh cây vạch trần {phanDien} nhé!',
+  },
 };

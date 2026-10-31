@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { Button, fmt, match3Ui, sound, useGameHint, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import { Button, fmt, match3Ui, sound, TutorialSpotlight, type TutorialStep, tutorialTexts, useGameHint, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { Scene25D, isQualityChoice, type ClipName, type PoseRequest, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
@@ -81,11 +81,15 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
   const [say, setSay] = useState<Say>(null);
   const [banner, setBanner] = useState<Banner>(null);
   const [hud, setHud] = useState(() => ({ turns: state.turnsLeft, score: 0, trees: 0 }));
+  const [tutorialActive, setTutorialActive] = useState(true);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [isReviewingTutorial, setIsReviewingTutorial] = useState(false);
+  const [practiceDone, setPracticeDone] = useState(false);
   const finished = useRef(false);
   const ready = warm && textures.done && framePx > 0;
 
-  const refs = useRef({ paused, ready, banner, sel, reduced });
-  refs.current = { paused, ready, banner, sel, reduced };
+  const refs = useRef({ paused, ready, banner, sel, reduced, tutorialActive });
+  refs.current = { paused, ready, banner, sel, reduced, tutorialActive };
 
   // Ván mới
   useEffect(() => {
@@ -181,8 +185,81 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
 
   const canAct = useCallback(() => {
     const r = refs.current;
-    return r.ready && !r.paused && !r.banner && !engine.playing && state.phase === 'play';
+    return r.ready && !r.paused && !r.banner && !engine.playing && state.phase === 'play' && !r.tutorialActive;
   }, [engine, state]);
+
+  const doPracticeSwap = useCallback(() => {
+    if (practiceDone) return;
+    const moves = legalMoves(state.board);
+    if (moves.length > 0) {
+      const m = moves[0];
+      const res = swapCells(state, m.a, m.b);
+      setSel(null);
+      if (res.events.length > 0) {
+        engine.playEvents(res.events, refs.current.reduced, onMark);
+        setBusy(true);
+        bump();
+      }
+    } else {
+      sound.playClick();
+    }
+    setPracticeDone(true);
+    setTutorialStep(4);
+  }, [engine, onMark, practiceDone, state]);
+
+  const handleCloseTutorial = useCallback(() => {
+    setTutorialActive(false);
+    if (!isReviewingTutorial) {
+      // Bắt đầu bài thật sạch: tạo bàn mới
+      const fresh = createMatch3Game(newSeed());
+      Object.assign(state, fresh);
+      engine.startRound(state.board, state.slots.length);
+      setHud({ turns: state.turnsLeft, score: 0, trees: 0 });
+      setBanner(null);
+      setSay(null);
+      setSel(null);
+      setBusy(false);
+      bump();
+    }
+  }, [engine, isReviewingTutorial, state]);
+
+  const tutorialSteps = useMemo<TutorialStep[]>(() => [
+    {
+      id: 'intro',
+      title: fmt(tutorialTexts.man11.tieuDe),
+      content: fmt(tutorialTexts.man11.intro),
+      nextLabel: tutorialTexts.chung.tiep,
+    },
+    {
+      id: 'board',
+      title: fmt(tutorialTexts.man11.tieuDe),
+      content: fmt(tutorialTexts.man11.board),
+      targetSelector: '#tutorial-man11-board',
+      nextLabel: tutorialTexts.chung.tiep,
+    },
+    {
+      id: 'hud',
+      title: fmt(tutorialTexts.man11.tieuDe),
+      content: fmt(tutorialTexts.man11.hud),
+      targetSelector: '#tutorial-man11-hud',
+      nextLabel: tutorialTexts.chung.tiep,
+    },
+    {
+      id: 'practice',
+      title: fmt(tutorialTexts.man11.tieuDe),
+      content: fmt(tutorialTexts.man11.practice),
+      targetSelector: '#tutorial-man11-board',
+      interactive: true,
+      hideNextButton: true,
+    },
+    {
+      id: 'done',
+      title: fmt(tutorialTexts.man11.tieuDe),
+      content: fmt(tutorialTexts.man11.correct),
+      targetSelector: '#tutorial-man11-board',
+      nextLabel: isReviewingTutorial ? tutorialTexts.chung.troLaiBaiLam : tutorialTexts.chung.batDauChoi,
+    },
+  ], [isReviewingTutorial]);
 
   const tryMove = useCallback(
     (a: Pos, b: Pos) => {
@@ -213,6 +290,13 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === 'BUTTON' || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+      if (tutorialActive) {
+        if (tutorialStep === 3 && (e.key === ' ' || e.code === 'Space' || e.key === 'Enter')) {
+          e.preventDefault();
+          if (!e.repeat) doPracticeSwap();
+        }
+        return;
+      }
       const dir = DIRS[e.key];
       if (dir) {
         if (!canAct()) return;
@@ -235,7 +319,7 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [canAct, cursor, tryMove]);
+  }, [canAct, cursor, doPracticeSwap, tryMove, tutorialActive, tutorialStep]);
 
   // Chạm, kéo: chạm một ô để chọn, chạm ô kề để đổi; hoặc kéo từ ô này sang ô kề
   const hit = useRef<HTMLDivElement>(null);
@@ -319,7 +403,7 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
 
   const onModeChange = useCallback((m: FrameMode) => setFrame(m === 'landscape' ? 'landscape' : 'portrait'), []);
 
-  if (PROBE) {
+  if (PROBE && typeof window !== 'undefined') {
     Object.assign(window, {
       __match3: state,
       __match3Engine: engine,
@@ -396,8 +480,24 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
             data-turns={state.turnsLeft}
             data-frame={frame}
           >
+            {/* Nút mở lại hướng dẫn */}
+            <Button
+              id="tutorial-man11-guide-btn"
+              variant="secondary"
+              size="sm"
+              className="absolute top-2 right-14 sm:right-16 z-20 min-h-9 px-2 text-xs font-bold bg-giay/90 border border-nau-go/40 shadow-sm"
+              onClick={() => {
+                setIsReviewingTutorial(true);
+                setTutorialStep(0);
+                setPracticeDone(false);
+                setTutorialActive(true);
+              }}
+              title={tutorialTexts.chung.huongDan}
+            >
+              💡 {tutorialTexts.chung.huongDan}
+            </Button>
             {/* HUD: vòng, lượt, cây xong, điểm (khung dọc hẹp: hai hàng hai ô) */}
-            <div className="pointer-events-none absolute grid gap-1" style={{ left: hudLeft, top: hudTop, width: hudWidth, height: hudHeight, gridTemplateColumns: portrait ? '1fr 1fr' : 'repeat(4, auto)', justifyContent: 'start', columnGap: 6 }} data-testid="hud">
+            <div id="tutorial-man11-hud" className="pointer-events-none absolute grid gap-1" style={{ left: hudLeft, top: hudTop, width: hudWidth, height: hudHeight, gridTemplateColumns: portrait ? '1fr 1fr' : 'repeat(4, auto)', justifyContent: 'start', columnGap: 6 }} data-testid="hud">
               <span className={pill} data-testid="hud-vong">
                 {fmt(match3Ui.vong, { so: state.round + 1, max: state.spec.rounds.length })}
               </span>
@@ -413,6 +513,7 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
             </div>
             {/* Vùng chạm của bàn 7 × 7 và viền ô đang chọn */}
             <div
+              id="tutorial-man11-board"
               ref={hit}
               className="absolute touch-none"
               style={{ left: boardLeft, top: boardTop, width: cellPx * GRID, height: cellPx * GRID }}
@@ -479,6 +580,52 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
           pose={pose}
         />
       </Scene25D>
+      <TutorialSpotlight
+        isOpen={tutorialActive}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => {
+          if (tutorialStep === 3) {
+            doPracticeSwap();
+          } else if (tutorialStep < tutorialSteps.length - 1) {
+            setTutorialStep((s) => s + 1);
+          } else {
+            handleCloseTutorial();
+          }
+        }}
+        onPrev={() => setTutorialStep((s) => Math.max(0, s - 1))}
+        onSkip={handleCloseTutorial}
+        actionButton={
+          tutorialStep === 3
+            ? {
+                label: `✨ ${tutorialTexts.man11.traoThu}`,
+                onClick: doPracticeSwap,
+                variant: 'primary',
+              }
+            : tutorialStep === 4
+            ? {
+                label: isReviewingTutorial ? tutorialTexts.chung.troLaiBaiLam : tutorialTexts.chung.batDauChoi,
+                onClick: handleCloseTutorial,
+                variant: 'primary',
+              }
+            : undefined
+        }
+      >
+        {tutorialActive && tutorialStep === 3 && (
+          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
+            <Button
+              id="tutorial-man11-swap-btn"
+              variant="primary"
+              size="lg"
+              onClick={doPracticeSwap}
+              className="shadow-xl animate-bounce"
+            >
+              <span>✨</span>
+              <span>{tutorialTexts.man11.traoThu}</span>
+            </Button>
+          </div>
+        )}
+      </TutorialSpotlight>
     </div>
   );
 }

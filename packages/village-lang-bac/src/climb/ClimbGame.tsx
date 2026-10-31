@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import type { Texture } from 'three';
-import { AssetImage, BiAvatar, Button, Hearts, climbUi, fmt, hasSeenGameTip, sound, useGameHint, useProgress, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import { AssetImage, BiAvatar, Button, Hearts, climbUi, fmt, hasSeenGameTip, sound, TutorialSpotlight, type TutorialStep, tutorialTexts, useGameHint, useProgress, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { Scene25D, isQualityChoice, type ClipName, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
@@ -86,6 +86,10 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   const [banner, setBanner] = useState<Banner>(null);
   const [say, setSay] = useState<Say>(null);
   const [tip, setTip] = useState(() => !hasSeenGameTip(progress.game.data, LEVEL_ID));
+  const [tutorialActive, setTutorialActive] = useState(true);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [isReviewingTutorial, setIsReviewingTutorial] = useState(false);
+  const [practiceDone, setPracticeDone] = useState(false);
   const [warm, setWarm] = useState(false);
   const [clips, setClips] = useState<{ student: ClipName; sn: number; hang: boolean; villain: ClipName; vn: number }>({ student: 'idle', sn: 0, hang: true, villain: 'idle', vn: 0 });
   const finished = useRef(false);
@@ -171,9 +175,72 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   );
 
   // Vòng lặp thời gian (requestAnimationFrame, không dùng useFrame nên không đụng cảnh 3D): tay nắm trượt theo đồng hồ của logic
-  const holdLoop = paused || !ready || tip || banner !== null;
+  const holdLoop = paused || !ready || tip || banner !== null || tutorialActive;
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
+
+  const doPracticeJump = useCallback(() => {
+    if (practiceDone) return;
+    sound.playWhoosh();
+    setClips((cl) => ({ ...cl, student: 'jump', sn: cl.sn + 1, hang: false }));
+    setTimeout(() => {
+      setClips((cl) => ({ ...cl, student: 'idle', sn: cl.sn + 1, hang: true }));
+    }, 500);
+    setPracticeDone(true);
+    setTutorialStep(4);
+  }, [practiceDone]);
+
+  const handleCloseTutorial = useCallback(() => {
+    setTutorialActive(false);
+    if (!isReviewingTutorial) {
+      const fresh = createClimbGame(newSeed());
+      Object.assign(state, fresh);
+      Object.assign(anim, newAnim(state.tree.depth));
+      setBanner(null);
+      setSay(null);
+      setClips((c) => ({ ...c, student: 'idle', sn: c.sn + 1, hang: true, villain: 'idle', vn: c.vn + 1 }));
+      bump();
+    }
+  }, [anim, isReviewingTutorial, state]);
+
+  const tutorialSteps = useMemo<TutorialStep[]>(() => [
+    {
+      id: 'intro',
+      title: fmt(tutorialTexts.man12.tieuDe),
+      content: fmt(tutorialTexts.man12.intro),
+      nextLabel: tutorialTexts.chung.tiep,
+    },
+    {
+      id: 'tree',
+      title: fmt(tutorialTexts.man12.tieuDe),
+      content: fmt(tutorialTexts.man12.tree),
+      targetSelector: '#tutorial-man12-tree',
+      nextLabel: tutorialTexts.chung.tiep,
+    },
+    {
+      id: 'hud',
+      title: fmt(tutorialTexts.man12.tieuDe),
+      content: fmt(tutorialTexts.man12.hud),
+      targetSelector: '#tutorial-man12-hud',
+      nextLabel: tutorialTexts.chung.tiep,
+    },
+    {
+      id: 'practice',
+      title: fmt(tutorialTexts.man12.tieuDe),
+      content: fmt(tutorialTexts.man12.practice),
+      targetSelector: '#tutorial-man12-tree',
+      interactive: true,
+      hideNextButton: true,
+    },
+    {
+      id: 'done',
+      title: fmt(tutorialTexts.man12.tieuDe),
+      content: fmt(tutorialTexts.man12.correct),
+      targetSelector: '#tutorial-man12-tree',
+      nextLabel: isReviewingTutorial ? tutorialTexts.chung.troLaiBaiLam : tutorialTexts.chung.batDauChoi,
+    },
+  ], [isReviewingTutorial]);
+
   // Nút "?": câu nhắc theo trạng thái ván (không lộ đáp án)
   useGameHint(setHint, 12, () => hintFor(state));
   useEffect(() => {
@@ -212,11 +279,17 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
       const t = e.target as HTMLElement | null;
       if (t && (t.tagName === 'BUTTON' || t.tagName === 'INPUT')) return;
       e.preventDefault();
+      if (tutorialActive) {
+        if (tutorialStep === 3 && !e.repeat) {
+          doPracticeJump();
+        }
+        return;
+      }
       if (!e.repeat) tryJump();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [tryJump]);
+  }, [doPracticeJump, tryJump, tutorialActive, tutorialStep]);
 
   const nextRound = useCallback(() => {
     if (!advanceRound(state)) return;
@@ -233,7 +306,7 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
 
   const onModeChange = useCallback((m: FrameMode) => setFrame(m === 'landscape' ? 'landscape' : 'portrait'), []);
 
-  if (PROBE) Object.assign(window, { __climb: state, __climbUi: { ppu, fontPx: labels?.fontPx ?? 0, frame, banner, tip, ready } });
+  if (PROBE && typeof window !== 'undefined') Object.assign(window, { __climb: state, __climbUi: { ppu, fontPx: labels?.fontPx ?? 0, frame, banner, tip, ready } });
 
   // Nhãn cho trình đọc màn hình: hai tay nắm tầng trên (đổi khi lên tầng, không đổi theo khung hình)
   const pair =
@@ -272,7 +345,23 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
               tryJump();
             }}
           >
-            <div className="pointer-events-none absolute inset-x-2 top-2 flex items-center justify-between gap-2 pr-12" data-testid="hud">
+            {/* Nút mở lại hướng dẫn */}
+            <Button
+              id="tutorial-man12-guide-btn"
+              variant="secondary"
+              size="sm"
+              className="pointer-events-auto absolute top-2 right-14 sm:right-16 z-20 min-h-9 px-2 text-xs font-bold bg-giay/90 border border-nau-go/40 shadow-sm"
+              onClick={() => {
+                setIsReviewingTutorial(true);
+                setTutorialStep(0);
+                setPracticeDone(false);
+                setTutorialActive(true);
+              }}
+              title={tutorialTexts.chung.huongDan}
+            >
+              💡 {tutorialTexts.chung.huongDan}
+            </Button>
+            <div id="tutorial-man12-hud" className="pointer-events-none absolute inset-x-2 top-2 flex items-center justify-between gap-2 pr-12" data-testid="hud">
               <div className="flex items-center gap-3 rounded-2xl border-2 border-nau-go bg-giay px-3 py-1 font-display font-extrabold">
                 <span data-testid="vong">{fmt(climbUi.vong, { so: state.round + 1, max: CLIMB_SPEC.rounds.length })}</span>
                 <Hearts current={state.hearts} max={CLIMB_SPEC.hearts} size="sm" />
@@ -282,6 +371,8 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
                 <span>{state.coins}</span>
               </div>
             </div>
+            {/* Vùng thân cây Merkle */}
+            <div id="tutorial-man12-tree" className="pointer-events-none absolute inset-x-12 top-[22%] bottom-[22%] rounded-2xl border-2 border-dashed border-nau-go/20" />
             <p className="sr-only" aria-live="polite">
               {pair.join('. ')}
             </p>
@@ -340,6 +431,52 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
           villainTrigger={clips.vn}
         />
       </Scene25D>
+      <TutorialSpotlight
+        isOpen={tutorialActive}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => {
+          if (tutorialStep === 3) {
+            doPracticeJump();
+          } else if (tutorialStep < tutorialSteps.length - 1) {
+            setTutorialStep((s) => s + 1);
+          } else {
+            handleCloseTutorial();
+          }
+        }}
+        onPrev={() => setTutorialStep((s) => Math.max(0, s - 1))}
+        onSkip={handleCloseTutorial}
+        actionButton={
+          tutorialStep === 3
+            ? {
+                label: `🚀 ${tutorialTexts.man12.nhayThu}`,
+                onClick: doPracticeJump,
+                variant: 'primary',
+              }
+            : tutorialStep === 4
+            ? {
+                label: isReviewingTutorial ? tutorialTexts.chung.troLaiBaiLam : tutorialTexts.chung.batDauChoi,
+                onClick: handleCloseTutorial,
+                variant: 'primary',
+              }
+            : undefined
+        }
+      >
+        {tutorialActive && tutorialStep === 3 && (
+          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
+            <Button
+              id="tutorial-man12-jump-btn"
+              variant="primary"
+              size="lg"
+              onClick={doPracticeJump}
+              className="shadow-xl animate-bounce"
+            >
+              <span>🚀</span>
+              <span>{tutorialTexts.man12.nhayThu}</span>
+            </Button>
+          </div>
+        )}
+      </TutorialSpotlight>
     </div>
   );
 }
