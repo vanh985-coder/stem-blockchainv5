@@ -125,9 +125,16 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
    - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2294 tests pass (thêm test mới `TutorialSpotlight.test.tsx` và `man1EasyTutorial.test.tsx`), `pnpm build` đạt (toàn bộ 5 apps build thành công).
    - Đo lường và kiểm tra Puppeteer `scripts/p8a-check.mjs`: Đạt cả 3 kích thước 1366×768, 360×800, 844×390 (21 ảnh chụp minh chứng lưu tại `docs/screenshots/p8a/` và `BAO-CAO-P8A.md`). Xác minh tiến độ không đổi (`progressUnchangedAfterPractice = true`), Enter không kích hoạt đúp (`enterHoldSafe = true`), bài thật hoàn thành bình thường sau hướng dẫn (`realStationDoneNormally = true`).
 
+10. **P8b — hướng dẫn focus và làm thử Màn 1 Trung bình và Khó (31/10/2026):**
+    - Trạm Trung bình (`Medium.tsx`): 6 bước hướng dẫn quan sát trang 2 bị Tí đổi từ 8 sang 9, gạch ngang số cũ, đối chiếu công thức $29 \times 2 + 9 = 67$, tự nhập 67 (hoặc nhập sai 15 $\to$ thử lại giữ nguyên số 15 để sửa $\to$ sửa đúng 67 $\to$ kích hoạt hiệu ứng domino $\to$ bắt đầu chơi thật). Cảnh báo ô trống khi bấm Cập nhật mã mà chưa nhập.
+    - Trạm Khó (`Hard.tsx`): 6 bước hướng dẫn tìm trang sai đầu tiên (trang 2), công thức $24 \times 2 + 7 = 55$, nhập đúng 55 (hoặc sai 20 $\to$ giữ số 20 $\to$ sửa 55). Tạm dừng đồng hồ (`CountdownTimer`) và mạng lưới 100% trong suốt hướng dẫn. Nút "💡 Hướng dẫn" giữa bài tạm dừng đồng hồ bảo lưu chính xác thời gian còn lại, đóng hướng dẫn tiếp tục chạy mượt mà.
+    - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: không ghi nhận xu, sao, điểm, tiến độ; cookie `sc_guest` được bảo toàn nguyên vẹn.
+    - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2300 tests pass (thêm 4 unit tests mới `man1MediumHardTutorial.test.tsx`), `pnpm build` đạt toàn bộ 5 apps.
+    - Kiểm tra E2E Puppeteer `scripts/p8b-e2e-check.mjs`: **Đạt 100% (20/20 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390). Lưu đầy đủ ảnh chụp minh chứng tại `docs/screenshots/p8b/` và `BAO-CAO-P8B.md`.
+
 ## 6. Việc để sau (không làm trước khi chủ dự án giao)
 
-- **P8b:** nhân rộng hướng dẫn focus & làm thử cho các trạm và màn còn lại sau khi chủ dự án đánh giá và duyệt mẫu Màn 1 trạm Dễ.
+- **P8c:** nhân rộng hướng dẫn focus & làm thử cho các màn tiếp theo (Màn 4, 7, 10 và các mini-game) sau khi chủ dự án đánh giá và duyệt mẫu Màn 1 (Dễ, Trung bình, Khó).
 - **Việc dời từ mốc 3 và hội làng làm CUỐI mốc 4**, theo thứ tự ở mục "Việc dời từ mốc 3" của `TRANG-THAI.md`: deploy bản gộp (15b), kiểm tra toàn bộ (G2), thử với 5–10 học sinh, hội làng (`FESTIVAL_LAUNCHED` hiện `false`).
 - Chưa làm theo lời giao trước đó: sửa nút "?" ở màn 3, HUD che tên biển trong một số góc nhìn (ví dụ dòng nhiệm vụ che biển trái ở Làng Bạc), vòng tích che số cây đa đã được thu nhỏ ở P5.
 

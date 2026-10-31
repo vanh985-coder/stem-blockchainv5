@@ -35,7 +35,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | P5 | **ĐÃ XONG (29/10/2026, mục "P5" bên dưới):** (1) Biển chọn màn trong làng làm thành cột sáng giống cuộn "Em có biết?" (mỗi màn một cột, dáng và chữ theo trạng thái, giữ chữ tên màn) | 1 |
 | P6 | (3) Sau khi đọc thẻ "Em có biết?": 1 ví dụ ngắn + 1 câu hỏi ABCD (hoặc điền số). Mặc định: trả lời sai vẫn nhận thẻ, hiện giải thích. **P6a (nội dung 16 câu) đã duyệt; P6b (tích hợp) ĐÃ XONG (30/10/2026, mục "P6b" bên dưới)** | 1–2 |
 | P7 | **P7a ĐÃ XONG (30/10/2026, mục "P7a" bên dưới):** Bản chơi được Màn 5 "Đập {phanDien}" bằng 2D 4 làn dọc (Talking Tom), 2 loại chuột (thường và câu hỏi ❓), chống click ma, dừng khi mở câu hỏi/?, tự hoàn thành. **P7b:** trau chuốt đồ họa và cân bằng nhịp sinh. | 3–4 |
-| P8 | **P8a ĐÃ XONG (30/10/2026, mục "P8a" bên dưới):** Cơ chế dùng chung `TutorialSpotlight` và tích hợp mẫu tại Màn 1 trạm Dễ (6 bước, dữ liệu ví dụ 12 & 5, tách làm thử khỏi tiến độ thật, chống Enter kích hoạt đúp, xem lại giữa bài). P8b: nhân rộng các màn tiếp theo sau khi duyệt mẫu. | 2–3 |
+| P8 | **P8a ĐÃ XONG (30/10/2026, mục "P8a" bên dưới):** Cơ chế dùng chung `TutorialSpotlight` và tích hợp mẫu tại Màn 1 trạm Dễ. **P8b ĐÃ XONG (31/10/2026, mục "P8b" bên dưới):** Triển khai hướng dẫn focus và làm thử cho Màn 1 trạm Trung bình (sửa trộm sổ, hiệu ứng domino) và trạm Khó (đua với mạng lưới, tạm dừng đồng hồ 100%), kiểm E2E đạt 20/20 test. P8c: nhân rộng các màn tiếp theo sau khi duyệt mẫu. | 2–3 |
 
 Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mốc 3 và hội làng.
 
@@ -389,6 +389,31 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   - `pnpm test --maxWorkers=2`: 209 test files passed, 2295 tests passed, 5 skipped (thêm test layout flex-col và footer shrink-0 trong `tutorialSpotlight.test.tsx`).
   - `pnpm build`: Đạt toàn bộ 5 ứng dụng.
   - Đo lường và kiểm tra Puppeteer trên bản build production preview (`scripts/p8a-viewport-fix-check.mjs` và `scripts/p8a-e2e-final-check.mjs`): Đạt 100% (13/13 test) tại cả 3 kích thước 1366×768, 360×800, 844×390 với các ca kiểm: nhập đúng 29 lần đầu $\to$ vào bài thật; nhập sai 2 lần (15 $\to$ 16) $\to$ giữ số khi thử lại $\to$ sửa 29 thành công; ô trống bấm Kiểm tra $\to$ cảnh báo rõ ràng $\to$ gõ tiếp không kẹt; bỏ qua và mở lại giữa bài; xác minh cookie `sc_guest` không trao thưởng hay tiến độ giả lập. Bằng chứng lưu tại `docs/screenshots/p8a/ket-qua-p8a-e2e.json` và `docs/screenshots/p8a/BAO-CAO-P8A.md`.
+
+## P8b — Hướng dẫn focus và làm thử Màn 1 Trung bình và Khó (31/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, commit và push nhánh `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này.
+- **Đã làm:**
+  - Tái sử dụng trọn vẹn cơ chế `TutorialSpotlight` (Portal, định vị thông minh, cấu trúc flex-col chống tràn, footer shrink-0 tiếp cận được 100%, chống Enter lặp).
+  - Trạm Trung bình (`packages/village-lang-giay/src/bai-1/Medium.tsx`):
+    - Dữ liệu làm thử cố định: Genesis 12, trang 1 (5, code 29), trang 2 bị Tí sửa trộm từ 8 sang 9 (mã cũ 66, công thức tính lại $29 \times 2 + 9 = 67$), domino sang các trang sau.
+    - Luồng 6 bước: Giới thiệu $\to$ Quan sát trang bị sửa $\to$ Công thức gợi ý $\to$ Nhập mã trang mới $\to$ Nút Cập nhật mã (hoặc gõ Enter) $\to$ Phản hồi kết quả.
+    - Nhập sai (15) $\to$ giải thích công thức $\to$ nút "Thử lại" giữ số 15 để học sinh sửa $\to$ sửa đúng 67 $\to$ nút "Bắt đầu chơi thật".
+    - Ô trống bấm Cập nhật mã: cảnh báo đỏ rõ ràng, viền đỏ, focus lại input.
+  - Trạm Khó (`packages/village-lang-giay/src/bai-1/Hard.tsx`):
+    - Dữ liệu làm thử cố định: Genesis 10, trang 1 (4, code 24), trang 2 (7, mã sai 50, công thức $24 \times 2 + 7 = 55$), tổng 6 trang, cần sửa 5 trang.
+    - Tạm dừng đồng hồ và mạng lưới tuyệt đối: `CountdownTimer` đứng yên 100% trong suốt hướng dẫn; mạng lưới sinh trang mới bị ngắt.
+    - Nhập sai (20) $\to$ giải thích $\to$ thử lại giữ số $\to$ sửa đúng 55 $\to$ bấm "Bắt đầu chơi thật" $\to$ đồng hồ bắt đầu đếm ngược từ 60s sạch sẽ.
+    - Nút "💡 Hướng dẫn" xem lại giữa bài: mở lại thì đồng hồ tạm dừng bảo lưu mốc thời gian; đóng thì tiếp tục chạy đúng mốc đó, không trôi giây.
+  - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: không ghi nhận sao/xu/điểm/tiến độ; cookie `sc_guest` được bảo toàn nguyên vẹn.
+  - Toàn bộ chuỗi hiển thị nằm trong `packages/core/src/content/tutorial.ts`, xưng "em", định dạng biến `{phanDien}` qua `fmt()`.
+- **Kiểm tra đã đạt:**
+  - `pnpm check:text`: sạch (438 files).
+  - `pnpm typecheck`: 10 package biên dịch thành công 100%.
+  - `pnpm test --maxWorkers=2`: 210 test files passed, 2300 tests passed, 5 skipped (thêm 4 unit tests mới trong `apps/hub/src/man1MediumHardTutorial.test.tsx`).
+  - `pnpm build`: Đạt toàn bộ 5 ứng dụng.
+  - Kiểm tra E2E Puppeteer trên Production Preview 5193 (`scripts/p8b-e2e-check.mjs`): **Đạt 100% (20/20 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390) cho mọi luồng: đúng lần đầu, sai $\to$ giữ số $\to$ sửa đúng, cảnh báo ô trống, tạm dừng đồng hồ, mở lại giữa bài, hồi quy Màn 1 Dễ và bảo toàn cookie tiến độ.
+  - Lưu ảnh chụp minh chứng tại `docs/screenshots/p8b/` và `docs/screenshots/p8b/BAO-CAO-P8B.md`.
 
 ## Việc để sau / cần theo dõi
 
