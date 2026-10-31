@@ -30,5 +30,6 @@ export const tutorialTexts = {
     correct: 'Chính xác! Mã trang là {ma}. Trang này đã được gắn chặt vào chuỗi!',
     wrong: 'Chưa đúng rồi: {truoc} × 2 = {gapDoi}, cộng {nd} thành {tong}. Em hãy thử lại nhé!',
     nhapSaiKhoang: 'Mã trang là số từ 0 đến 99',
+    chuaNhap: 'Em chưa nhập mã trang. Hãy tính nhẩm và nhập số từ 0 đến 99 vào ô mã trang nhé!',
   },
 };

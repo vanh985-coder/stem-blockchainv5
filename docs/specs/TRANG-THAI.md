@@ -372,6 +372,13 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
     - Màn hình ngang thấp (844×390): Thuật toán tự động chuyển sang đặt bên cạnh (`right` hoặc `left`), không che ô nhập hay nút kiểm tra, không tràn mép dưới.
     - Bắt sự kiện `resize`, `scroll` (capture phase) và `window.visualViewport` để cập nhật vị trí tức thì khi cuộn trang hay đổi kích thước cửa sổ.
   - Xử lý chu kỳ phím Enter chống kích hoạt đúp: nộp bài bằng Enter tại ô nhập không tự ý kích hoạt chuyển tiếp hoặc bắt đầu bài thật; bắt buộc thả phím `keyup` rồi nhấn Enter chu kỳ mới mới tiếp tục.
+  - Sửa triệt để luồng thực hành làm thử (bước nhập số và bấm Kiểm tra):
+    - Vùng khoét sáng chung `[data-tutorial="practice-area"]` bao trùm cả dải trang sổ và khung công thức + nút Kiểm tra ở cả 3 bước 3, 4, 5. Xóa bỏ hoàn toàn tình trạng backdrop che chắn chéo giữa ô nhập và nút Kiểm tra.
+    - Highlight riêng biệt: ô nhập viền vàng ở bước 3, nút Kiểm tra viền vàng ở bước 4. Cả hai đều thao tác được ở cả 2 bước.
+    - Gỡ bỏ chuyển bước vội vã trong `onChange`, tránh cướp focus khiến học sinh không gõ được số 2 chữ số.
+    - Sửa `retryPractice`: giữ nguyên số đã nhập (không set `null`), tự động `focus()` và `select()` để học sinh sửa số nhanh chóng.
+    - Xử lý khi ô trống bấm Kiểm tra: hiển thị cảnh báo đỏ rõ ràng trong Tooltip (`tutorialTexts.man1De.chuaNhap`), viền đỏ ô nhập, chuyển về bước 3 và focus ô input, không kẹt vô tận.
+    - Chu kỳ phím Enter yêu cầu nhả phím rồi nhấn mới; click chuột/chạm thật (`e.detail > 0`) kích hoạt tức thì.
   - Tích hợp mẫu tại Màn 1 trạm Dễ (`packages/village-lang-giay/src/bai-1/Easy.tsx`) qua 6 bước: Giới thiệu mục tiêu ngắn -> Focus vùng số 12 và 5 -> Focus công thức gợi ý -> Focus ô nhập và cho học sinh tự gõ -> Focus nút Kiểm tra -> Phản hồi kết quả (đúng: xác nhận mã 29 và hiện nút "Bắt đầu chơi thật"; sai: báo lỗi, giải thích công thức và hiện nút "Thử lại").
   - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: dữ liệu mẫu cố định 12 & 5, không gọi `record()`, không tính giờ/xu/sao/tiến độ/Trang Sổ Vàng. Bắt đầu bài thật bấm giờ sạch từ đầu.
   - Nút "💡 Hướng dẫn" trên giao diện cho phép xem lại giữa bài; khi đóng quay lại đúng trạng thái bài đang làm dở.
@@ -381,7 +388,7 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   - `pnpm typecheck`: 10 package biên dịch thành công 100%.
   - `pnpm test --maxWorkers=2`: 209 test files passed, 2295 tests passed, 5 skipped (thêm test layout flex-col và footer shrink-0 trong `tutorialSpotlight.test.tsx`).
   - `pnpm build`: Đạt toàn bộ 5 ứng dụng.
-  - Đo lường và kiểm tra Puppeteer trên bản build production preview (`scripts/p8a-viewport-fix-check.mjs`): Đạt 100% (`allPassed = true`) tại cả 3 kích thước 1366×768, 360×800, 844×390. Xác minh bounding rect của Tooltip và các nút bấm luôn nằm trọn trong viewport `[0, innerHeight]`, không trôi, không tràn đáy, mở lại giữa bài và cuộn trang đều bám sát chuẩn xác.
+  - Đo lường và kiểm tra Puppeteer trên bản build production preview (`scripts/p8a-viewport-fix-check.mjs` và `scripts/p8a-e2e-final-check.mjs`): Đạt 100% (13/13 test) tại cả 3 kích thước 1366×768, 360×800, 844×390 với các ca kiểm: nhập đúng 29 lần đầu $\to$ vào bài thật; nhập sai 2 lần (15 $\to$ 16) $\to$ giữ số khi thử lại $\to$ sửa 29 thành công; ô trống bấm Kiểm tra $\to$ cảnh báo rõ ràng $\to$ gõ tiếp không kẹt; bỏ qua và mở lại giữa bài; xác minh cookie `sc_guest` không trao thưởng hay tiến độ giả lập. Bằng chứng lưu tại `docs/screenshots/p8a/ket-qua-p8a-e2e.json` và `docs/screenshots/p8a/BAO-CAO-P8A.md`.
 
 ## Việc để sau / cần theo dõi
 

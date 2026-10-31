@@ -1,0 +1,54 @@
+[
+  {
+    "name": "Test 1 (1366x768): Nhập đúng 29 -> vào bài thật",
+    "pass": true
+  },
+  {
+    "name": "Test 2 (1366x768): Nhập sai 2 lần (15 -> 16) -> giữ số -> sửa 29 thành công",
+    "pass": true
+  },
+  {
+    "name": "Test 3 (1366x768): Ô trống bấm Kiểm tra -> có cảnh báo rõ -> gõ 29 tiếp không kẹt",
+    "pass": true
+  },
+  {
+    "name": "Test 4 (1366x768): Bỏ qua hướng dẫn & mở lại giữa bài bảo toàn bài thật",
+    "pass": true
+  },
+  {
+    "name": "Test 1 (360x800): Nhập đúng 29 -> vào bài thật",
+    "pass": true
+  },
+  {
+    "name": "Test 2 (360x800): Nhập sai 2 lần (15 -> 16) -> giữ số -> sửa 29 thành công",
+    "pass": true
+  },
+  {
+    "name": "Test 3 (360x800): Ô trống bấm Kiểm tra -> có cảnh báo rõ -> gõ 29 tiếp không kẹt",
+    "pass": true
+  },
+  {
+    "name": "Test 4 (360x800): Bỏ qua hướng dẫn & mở lại giữa bài bảo toàn bài thật",
+    "pass": true
+  },
+  {
+    "name": "Test 1 (844x390): Nhập đúng 29 -> vào bài thật",
+    "pass": true
+  },
+  {
+    "name": "Test 2 (844x390): Nhập sai 2 lần (15 -> 16) -> giữ số -> sửa 29 thành công",
+    "pass": true
+  },
+  {
+    "name": "Test 3 (844x390): Ô trống bấm Kiểm tra -> có cảnh báo rõ -> gõ 29 tiếp không kẹt",
+    "pass": true
+  },
+  {
+    "name": "Test 4 (844x390): Bỏ qua hướng dẫn & mở lại giữa bài bảo toàn bài thật",
+    "pass": true
+  },
+  {
+    "name": "Test 5: Làm thử đúng 29 không tự ý cộng xu, sao hay hoàn thành trạm",
+    "pass": true
+  }
+]

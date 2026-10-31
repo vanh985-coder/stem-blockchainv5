@@ -11,6 +11,7 @@ describe('Màn 1 Trạm Dễ - Tích hợp Hướng dẫn focus & Làm thử (P8
 
     // Tiêu đề và dải chuỗi ở chế độ làm thử
     expect(html).toContain(tutorialTexts.man1De.tieuDe);
+    expect(html).toContain('data-tutorial="practice-area"');
     expect(html).toContain('data-tutorial="chain-strip"');
     expect(html).toContain('data-tutorial="formula-box"');
     expect(html).toContain('data-tutorial="check-button"');
@@ -29,5 +30,15 @@ describe('Màn 1 Trạm Dễ - Tích hợp Hướng dẫn focus & Làm thử (P8
     );
     // Khung công thức thế số cho ví dụ mẫu: 12 và 5
     expect(html).toContain('(12 × 2 + 5) mod 100 = ?');
+  });
+
+  it('vùng làm thử bao trùm cả dải trang sổ và nút Kiểm tra, nội dung cảnh báo ô trống đầy đủ', () => {
+    const html = renderToStaticMarkup(
+      <Easy onComplete={() => {}} onChainBuilt={() => {}} />
+    );
+    expect(html).toContain('data-tutorial="practice-area"');
+    expect(tutorialTexts.man1De.chuaNhap).toBe(
+      'Em chưa nhập mã trang. Hãy tính nhẩm và nhập số từ 0 đến 99 vào ô mã trang nhé!'
+    );
   });
 });

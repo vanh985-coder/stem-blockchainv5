@@ -60,6 +60,7 @@ export function Easy({
   const [tutorialStep, setTutorialStep] = useState(0);
   const [practiceVal, setPracticeVal] = useState<number | null>(null);
   const [practiceError, setPracticeError] = useState<string | undefined>();
+  const [practiceErrorPrompt, setPracticeErrorPrompt] = useState<string | undefined>();
   const [practiceConfirmed, setPracticeConfirmed] = useState(false);
   const [practiceResult, setPracticeResult] = useState<'correct' | 'wrong' | null>(null);
 
@@ -76,6 +77,7 @@ export function Easy({
     setPracticeConfirmed(false);
     setPracticeResult(null);
     setPracticeError(undefined);
+    setPracticeErrorPrompt(undefined);
     // Bấm giờ bài thật từ khoảnh khắc này
     realStartTime.current = performance.now();
     setTimeout(() => {
@@ -91,27 +93,35 @@ export function Easy({
     setPracticeConfirmed(false);
     setPracticeResult(null);
     setPracticeError(undefined);
+    setPracticeErrorPrompt(undefined);
   }, []);
 
-  // Thử lại khi làm thử sai
+  // Thử lại khi làm thử sai: giữ nguyên số đã nhập để học sinh sửa, không xóa trắng
   const retryPractice = useCallback(() => {
-    setPracticeVal(null);
     setPracticeResult(null);
     setPracticeError(undefined);
+    setPracticeErrorPrompt(undefined);
     setTutorialStep(3); // Quay lại bước ô nhập
     setTimeout(() => {
       practiceCodeRef.current?.focus();
+      practiceCodeRef.current?.select();
     }, 50);
   }, []);
 
   // Kiểm tra kết quả làm thử
   const handlePracticeCheck = useCallback(() => {
     if (practiceVal === null || practiceVal < 0 || practiceVal > 99) {
-      setPracticeError(tutorialTexts.man1De.nhapSaiKhoang);
+      setPracticeError(tutorialTexts.man1De.chuaNhap);
+      setPracticeErrorPrompt(tutorialTexts.man1De.chuaNhap);
       sound.playClick();
+      setTutorialStep(3); // Chuyển về bước ô nhập để học sinh nhìn thấy và nhập số
+      setTimeout(() => {
+        practiceCodeRef.current?.focus();
+      }, 50);
       return;
     }
     setPracticeError(undefined);
+    setPracticeErrorPrompt(undefined);
 
     if (practiceVal === practiceSolution.code) {
       sound.playCorrect();
@@ -259,7 +269,7 @@ export function Easy({
     },
     {
       id: 'input',
-      targetSelector: '[data-tutorial="code-input"]',
+      targetSelector: '[data-tutorial="practice-area"]',
       title: tutorialTexts.man1De.tieuDe,
       content: tutorialTexts.man1De.input,
       interactive: true,
@@ -267,7 +277,7 @@ export function Easy({
     },
     {
       id: 'check',
-      targetSelector: '[data-tutorial="check-button"]',
+      targetSelector: '[data-tutorial="practice-area"]',
       title: tutorialTexts.man1De.tieuDe,
       content: tutorialTexts.man1De.check,
       interactive: true,
@@ -275,8 +285,7 @@ export function Easy({
     },
     {
       id: 'result',
-      targetSelector:
-        practiceResult === 'correct' ? '[data-tutorial="chain-strip"]' : '[data-tutorial="code-input"]',
+      targetSelector: '[data-tutorial="practice-area"]',
       title: tutorialTexts.man1De.tieuDe,
       content:
         practiceResult === 'correct'
@@ -323,90 +332,104 @@ export function Easy({
         )}
       </div>
 
-      {/* Dải trang sổ: hiển thị làm thử hoặc bài thật */}
-      <div
-        className="overflow-hidden rounded-bang border-2 border-nau-go/50 bg-white/50"
-        data-tutorial="chain-strip"
-      >
-        <div data-tutorial={tutorialOpen && tutorialStep === 1 ? 'numbers-source' : undefined}>
-          <ChainStrip
-            genesisCode={displayGenesis}
-            pages={displayPages}
-            firstInvalidIndex={-1}
-            activePageIndex={tutorialOpen ? 0 : activeIdx}
-            isPageConfirmed={(idx) => (tutorialOpen ? practiceConfirmed && idx === 0 : idx < activeIdx)}
-            isPageDimmed={(idx) => (tutorialOpen ? idx > 0 : idx > activeIdx)}
-            renderCodeSlot={(idx) => {
-              if (tutorialOpen) {
-                if (idx !== 0) return undefined;
-                return (
+      {/* Vùng làm thử bao trùm dải trang sổ và khung công thức + nút Kiểm tra (P8a) */}
+      <div data-tutorial="practice-area" className="space-y-4">
+        {/* Dải trang sổ: hiển thị làm thử hoặc bài thật */}
+        <div
+          className="overflow-hidden rounded-bang border-2 border-nau-go/50 bg-white/50"
+          data-tutorial="chain-strip"
+        >
+          <div data-tutorial={tutorialOpen && tutorialStep === 1 ? 'numbers-source' : undefined}>
+            <ChainStrip
+              genesisCode={displayGenesis}
+              pages={displayPages}
+              firstInvalidIndex={-1}
+              activePageIndex={tutorialOpen ? 0 : activeIdx}
+              isPageConfirmed={(idx) => (tutorialOpen ? practiceConfirmed && idx === 0 : idx < activeIdx)}
+              isPageDimmed={(idx) => (tutorialOpen ? idx > 0 : idx > activeIdx)}
+              renderCodeSlot={(idx) => {
+                if (tutorialOpen) {
+                  if (idx !== 0) return undefined;
+                  return (
+                    <div
+                      className={`flex w-full flex-col items-center transition-all ${
+                        tutorialOpen && tutorialStep === 3
+                          ? 'ring-4 ring-yellow-400 rounded-xl shadow-[0_0_15px_rgba(250,204,21,0.8)]'
+                          : ''
+                      }`}
+                      data-tutorial="code-input"
+                    >
+                      <NumberInput
+                        className="w-full"
+                        id={practiceCodeId}
+                        ref={practiceCodeRef}
+                        autoFocus={tutorialStep >= 3}
+                        value={practiceVal}
+                        showButtons={false}
+                        placeholder={tutorialTexts.man1De.inputPlaceholder}
+                        ariaLabel={fmt(T.de.nhanMaTrang, { n: 1 })}
+                        inputClassName="!h-10 !w-full !text-lg"
+                        onChange={(v) => {
+                          setPracticeVal(v);
+                          setPracticeError(undefined);
+                          setPracticeErrorPrompt(undefined);
+                        }}
+                        onEnter={handlePracticeCheck}
+                        error={practiceError}
+                      />
+                    </div>
+                  );
+                }
+
+                return idx !== activeIdx ? undefined : (
                   <div className="flex w-full flex-col items-center" data-tutorial="code-input">
                     <NumberInput
                       className="w-full"
-                      id={practiceCodeId}
-                      ref={practiceCodeRef}
-                      autoFocus={tutorialStep >= 3}
-                      value={practiceVal}
+                      id={codeId}
+                      ref={codeRef}
+                      autoFocus
+                      value={codeVal}
                       showButtons={false}
-                      placeholder={tutorialTexts.man1De.inputPlaceholder}
-                      ariaLabel={fmt(T.de.nhanMaTrang, { n: 1 })}
+                      placeholder={T.chung.khoangSo}
+                      ariaLabel={fmt(T.de.nhanMaTrang, { n: activeIdx + 1 })}
                       inputClassName="!h-10 !w-full !text-lg"
                       onChange={(v) => {
-                        setPracticeVal(v);
-                        setPracticeError(undefined);
-                        // Khi đang ở bước nhập và đã gõ số, tự chuyển hướng dẫn sang nút Kiểm tra
-                        if (tutorialStep === 3 && v !== null) {
-                          setTutorialStep(4);
-                        }
+                        setCodeVal(v);
+                        setCodeError(undefined);
                       }}
-                      onEnter={handlePracticeCheck}
-                      error={practiceError}
+                      onEnter={checkReal}
+                      error={codeError}
                     />
                   </div>
                 );
-              }
-
-              return idx !== activeIdx ? undefined : (
-                <div className="flex w-full flex-col items-center" data-tutorial="code-input">
-                  <NumberInput
-                    className="w-full"
-                    id={codeId}
-                    ref={codeRef}
-                    autoFocus
-                    value={codeVal}
-                    showButtons={false}
-                    placeholder={T.chung.khoangSo}
-                    ariaLabel={fmt(T.de.nhanMaTrang, { n: activeIdx + 1 })}
-                    inputClassName="!h-10 !w-full !text-lg"
-                    onChange={(v) => {
-                      setCodeVal(v);
-                      setCodeError(undefined);
-                    }}
-                    onEnter={checkReal}
-                    error={codeError}
-                  />
-                </div>
-              );
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Khung gợi ý công thức và nút Kiểm tra */}
-      <div className="flex flex-col items-center justify-between gap-4 rounded-bang border-2 border-nau-go/50 bg-white/60 p-4 sm:flex-row min-[1280px]:sticky min-[1280px]:bottom-3 min-[1280px]:z-20 min-[1280px]:bg-giay/95">
-        <div className="flex items-center gap-3" data-tutorial="formula-box">
-          <PortraitFrame portrait="bi" size={72} />
-          <div className="rounded-2xl border-2 border-nau-go/50 bg-giay p-3">
-            <span className="mb-0.5 block text-sm font-semibold text-nau-go-dam">
-              <span aria-hidden="true">💡 </span>
-              {fmt(T.chung.congThuc, { n: tutorialOpen ? 1 : activeIdx + 1 })}
-            </span>
-            <span className="font-display text-lg font-extrabold text-muc-tim-dam">{formula}</span>
+              }}
+            />
           </div>
         </div>
 
-        <div data-tutorial="check-button">
-          <Button onClick={tutorialOpen ? handlePracticeCheck : checkReal}>{T.de.kiemTra}</Button>
+        {/* Khung gợi ý công thức và nút Kiểm tra */}
+        <div className="flex flex-col items-center justify-between gap-4 rounded-bang border-2 border-nau-go/50 bg-white/60 p-4 sm:flex-row min-[1280px]:sticky min-[1280px]:bottom-3 min-[1280px]:z-20 min-[1280px]:bg-giay/95">
+          <div className="flex items-center gap-3" data-tutorial="formula-box">
+            <PortraitFrame portrait="bi" size={72} />
+            <div className="rounded-2xl border-2 border-nau-go/50 bg-giay p-3">
+              <span className="mb-0.5 block text-sm font-semibold text-nau-go-dam">
+                <span aria-hidden="true">💡 </span>
+                {fmt(T.chung.congThuc, { n: tutorialOpen ? 1 : activeIdx + 1 })}
+              </span>
+              <span className="font-display text-lg font-extrabold text-muc-tim-dam">{formula}</span>
+            </div>
+          </div>
+
+          <div
+            data-tutorial="check-button"
+            className={`transition-all rounded-nut ${
+              tutorialOpen && tutorialStep === 4
+                ? 'ring-4 ring-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]'
+                : ''
+            }`}
+          >
+            <Button onClick={tutorialOpen ? handlePracticeCheck : checkReal}>{T.de.kiemTra}</Button>
+          </div>
         </div>
       </div>
 
@@ -415,22 +438,38 @@ export function Easy({
         isOpen={tutorialOpen}
         steps={tutorialSteps}
         currentStepIndex={tutorialStep}
-        onNext={() => setTutorialStep((s) => Math.min(tutorialSteps.length - 1, s + 1))}
-        onPrev={() => setTutorialStep((s) => Math.max(0, s - 1))}
+        onNext={() => {
+          setPracticeErrorPrompt(undefined);
+          setTutorialStep((s) => Math.min(tutorialSteps.length - 1, s + 1));
+        }}
+        onPrev={() => {
+          setPracticeErrorPrompt(undefined);
+          setTutorialStep((s) => Math.max(0, s - 1));
+        }}
         onSkip={finishTutorial}
         feedbackMessage={
-          practiceResult === 'correct'
-            ? fmt(tutorialTexts.man1De.correct, { ma: practiceSolution.code })
-            : practiceResult === 'wrong'
-              ? fmt(tutorialTexts.man1De.wrong, {
-                  truoc: PRACTICE_GENESIS,
-                  gapDoi: practiceSolution.doubled,
-                  nd: PRACTICE_CONTENT,
-                  tong: practiceSolution.sum,
-                })
-              : undefined
+          practiceErrorPrompt
+            ? practiceErrorPrompt
+            : practiceResult === 'correct'
+              ? fmt(tutorialTexts.man1De.correct, { ma: practiceSolution.code })
+              : practiceResult === 'wrong'
+                ? fmt(tutorialTexts.man1De.wrong, {
+                    truoc: PRACTICE_GENESIS,
+                    gapDoi: practiceSolution.doubled,
+                    nd: PRACTICE_CONTENT,
+                    tong: practiceSolution.sum,
+                  })
+                : undefined
         }
-        feedbackType={practiceResult === 'correct' ? 'success' : practiceResult === 'wrong' ? 'error' : 'info'}
+        feedbackType={
+          practiceErrorPrompt
+            ? 'error'
+            : practiceResult === 'correct'
+              ? 'success'
+              : practiceResult === 'wrong'
+                ? 'error'
+                : 'info'
+        }
         actionButton={
           tutorialStep === 5
             ? practiceResult === 'correct'

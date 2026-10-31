@@ -113,15 +113,24 @@ export function TutorialSpotlight({
       }
     };
 
-    // Cho phép sau 400ms đối với thao tác chuột/chạm
+    // Cho phép sau 400ms đối với thao tác bàn phím nếu phím Enter đã nhả
     const timer = setTimeout(() => {
       actionArmedRef.current = true;
     }, 400);
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && actionArmedRef.current) {
+        e.preventDefault();
+        actionButton.onClick();
+      }
+    };
+
     window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
       clearTimeout(timer);
       window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [actionButton]);
 
@@ -510,8 +519,8 @@ export function TutorialSpotlight({
               size="sm"
               variant={actionButton.variant || 'primary'}
               autoFocus={false}
-              onClick={() => {
-                if (!actionArmedRef.current) return;
+              onClick={(e) => {
+                if (e.detail === 0 && !actionArmedRef.current) return;
                 actionButton.onClick();
               }}
             >

@@ -104,6 +104,36 @@ Chạy trực tiếp trên mã nguồn đã build production (`apps/hub/dist`, `
 
 ---
 
+### Đợt 4: Đo lường và sửa triệt để luồng thực hành làm thử (Giao diện bước tính thử & Bấm Kiểm tra chấm bài)
+Được triển khai sau phản hồi thực tế của người dùng:
+1. **Nguyên nhân gốc rễ đã xác định qua script chẩn đoán thực tế (`reproduce-exact-issue.mjs`):**
+   - **Lỗi 1 (Cướp focus khi gõ số):** `onChange` tự động gọi `setTutorialStep(4)` ngay khi gõ ký tự đầu tiên (ví dụ gõ '1' trong '15' hoặc '2' trong '29'). Khi đổi bước sang 4, target chuyển sang nút Kiểm tra và cuộn màn hình, khiến ô input bị mất focus (`blur`), học sinh không thể gõ ký tự thứ hai.
+   - **Lỗi 2 (Backdrop che chắn chéo khiến không nhận thao tác):**
+     - Ở bước 3, spotlight chỉ khoét ô input (`code-input`), nút "Kiểm tra" nằm dưới `bottom backdrop` (`topEl: DIV.fixed.bottom-0...`), khiến học sinh click vào nút Kiểm tra thì click trúng backdrop, nút không nhận được sự kiện click.
+     - Ở bước 4, spotlight chỉ khoét nút Kiểm tra (`check-button`), ô input nằm dưới `top backdrop` (`topEl: DIV.fixed.left-0...`), khiến học sinh không thể click vào ô input để sửa số.
+   - **Lỗi 3 (Bấm Kiểm tra khi ô trống gây kẹt vô tận):** Khi ô trống hoặc chưa nhập đủ, `handlePracticeCheck` chỉ set `practiceError` và return mà không chuyển bước hay hiện thông báo trong Tooltip. Vì ô input bị backdrop che nên học sinh không thấy dòng lỗi, nút bấm không phản hồi, bị kẹt mãi ở bước 4.
+   - **Lỗi 4 (Xóa trắng dữ liệu khi thử lại):** Hàm `retryPractice` gọi `setPracticeVal(null)` xóa sạch số vừa gõ, buộc học sinh gõ lại từ đầu và lại bị lỗi cướp focus lặp lại vô tận.
+2. **Giải pháp kỹ thuật đã triển khai:**
+   - **Vùng khoét sáng chung `[data-tutorial="practice-area"]`:** Bao trọn cả dải trang sổ (chứa ô input) và khung công thức + nút Kiểm tra ở cả 3 bước 3, 4, 5. Cả ô input và nút Kiểm tra luôn sáng rõ, 100% không bị backdrop che phủ, học sinh có thể click/nhập/sửa hoặc bấm Kiểm tra ở bất kỳ thời điểm nào.
+   - **Highlight riêng biệt theo bước:** Ô input nhận viền vàng nổi bật `ring-4 ring-yellow-400 rounded-xl` ở bước 3; nút Kiểm tra nhận viền vàng `ring-4 ring-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]` ở bước 4.
+   - **Gỡ bỏ chuyển bước tự động trong `onChange`:** Học sinh tự do gõ số 2 chữ số tự nhiên và bấm nút "Tiếp tục" trong Tooltip, bấm nút "Kiểm tra", hoặc nhấn phím Enter để nộp bài.
+   - **Bảo lưu dữ liệu khi "Thử lại":** `retryPractice` giữ nguyên `practiceVal` (không set `null`), tự động `focus()` và `select()` ô input để học sinh sửa số nhanh chóng.
+   - **Xử lý khi ô trống:** Khi bấm Kiểm tra mà ô đang trống, hệ thống hiển thị thông báo lỗi rõ ràng trong Tooltip (`tutorialTexts.man1De.chuaNhap`), viền đỏ ô input, tự động chuyển về bước 3 và focus vào input; học sinh gõ số tiếp bình thường, không bao giờ bị kẹt.
+   - **Chu kỳ phím Enter và chống click ma:** Chu kỳ phím Enter yêu cầu nhả phím (`keyup`) rồi nhấn phím mới mới kích hoạt hành động tiếp theo; click chuột/chạm thật (`e.detail > 0`) được kích hoạt tức thì.
+3. **Bảng kết quả kiểm tra tự động E2E qua giao diện thật (`scripts/p8a-e2e-final-check.mjs`):**
+
+| Nhóm kiểm thử | Độ phân giải 1366×768 (Chuột + Phím) | Độ phân giải 360×800 (Chạm giả lập) | Độ phân giải 844×390 (Chạm giả lập) |
+| :--- | :---: | :---: | :---: |
+| **Test 1: Nhập đúng 29 ngay lần đầu** $\to$ Chúc mừng $\to$ Bắt đầu chơi thật | **ĐẠT** | **ĐẠT** | **ĐẠT** |
+| **Test 2: Nhập sai 2 lần (15 $\to$ 16)** $\to$ Giữ số khi Thử lại $\to$ Sửa 29 thành công | **ĐẠT** | **ĐẠT** | **ĐẠT** |
+| **Test 3: Ô trống bấm Kiểm tra** $\to$ Báo lỗi rõ $\to$ Gõ 29 tiếp không kẹt | **ĐẠT** | **ĐẠT** | **ĐẠT** |
+| **Test 4: Bỏ qua hướng dẫn & mở lại giữa bài** $\to$ Bảo lưu nguyên vẹn bài thật (giá trị 25) | **ĐẠT** | **ĐẠT** | **ĐẠT** |
+| **Test 5: Kiểm tra tiến độ cookie `sc_guest`** $\to$ Làm thử đúng 29 không tự ý cộng xu, sao hay hoàn thành trạm | **ĐẠT** (`c = 0`, `lv = {}`) | | |
+
+- **Kết luận:** **13/13 test đạt hoàn toàn!** Bằng chứng lưu tại `docs/screenshots/p8a/ket-qua-p8a-e2e.json` và các ảnh chụp màn hình `test1-correct-*.png`.
+
+---
+
 ## 6. Kết quả 4 lệnh kiểm tra bắt buộc
 
 1. `pnpm check:text`: Sạch 100% (**438 file**).
