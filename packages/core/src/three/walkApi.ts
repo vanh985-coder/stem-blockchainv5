@@ -34,17 +34,38 @@ export interface WalkApi {
   camera: CameraAngles;
   /** Vị trí và hướng mặt của người chơi (`WalkWorld` gán đối tượng trạng thái có sẵn; null khi chưa có cảnh): bản đồ nhỏ ở phần DOM đọc để vẽ, không cần render lại React */
   player: { x: number; z: number; yaw: number } | null;
+  /** Dịch chuyển người chơi tới tọa độ an toàn và đặt hướng nhìn (yaw) */
+  teleport: (x: number, z: number, yaw: number) => void;
+}
+
+let activeWalkApi: WalkApi | null = null;
+
+export function setActiveWalkApi(api: WalkApi | null): void {
+  activeWalkApi = api;
+}
+
+export function getActiveWalkApi(): WalkApi | null {
+  return activeWalkApi;
 }
 
 export function createWalkApi(cameraYaw = 0): WalkApi {
-  return {
+  const api: WalkApi = {
     lock: { request: () => undefined, exit: () => undefined },
     input: { keyAxis: { x: 0, y: 0 }, keyRun: false, stick: { x: 0, y: 0 }, stickMag: 0, jump: false },
     keys: createKeyState(),
     held: new Set(),
     camera: createCameraAngles(cameraYaw),
     player: null,
+    teleport: (x: number, z: number, yaw: number) => {
+      if (api.player) {
+        api.player.x = x;
+        api.player.z = z;
+        api.player.yaw = yaw;
+      }
+      api.camera.yaw = yaw;
+    },
   };
+  return api;
 }
 
 /** Thả hết: phím, cần điều khiển, lệnh nhảy chờ (khi tạm dừng hoặc mất focus). Không đụng tới camera. */

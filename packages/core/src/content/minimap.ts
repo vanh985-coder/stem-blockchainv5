@@ -58,3 +58,23 @@ export const banDoThe = {
   /** Dòng danh sách (số thẻ nằm ở hình tròn bên cạnh) */
   dong: 'Gần {khu}',
 } as const;
+
+/** Chữ của tính năng dịch chuyển trên bản đồ lớn (mốc 2, bước X4). */
+export const banDoDichChuyen = {
+  /** Tiêu đề khung xác nhận dịch chuyển: "Đi tới: <tên điểm>" */
+  xacNhan: 'Đi tới: {ten}',
+  /** Nút xác nhận dịch chuyển */
+  diToi: 'Đi tới',
+  /** Nút hủy dịch chuyển */
+  huy: 'Hủy',
+  /** Tên điểm tâm chợ */
+  tamCho: 'Tâm chợ',
+  /** Tên điểm cổng làng */
+  congLang: 'Cổng {lang}',
+  /** Tên điểm thẻ Em có biết */
+  the: 'Thẻ "Em có biết?" {so} ({lang})',
+  /** Tên mặc định của màn chơi khi không có tên biển */
+  manMacDinh: 'Màn {so}',
+  /** Nhãn aria-label cho nút dịch chuyển */
+  nhanDiToi: 'Dịch chuyển tới {ten}',
+} as const;

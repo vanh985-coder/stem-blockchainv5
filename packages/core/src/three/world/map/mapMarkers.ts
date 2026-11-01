@@ -25,11 +25,11 @@ export function boardMark(state: LevelState | undefined): BoardMark {
 }
 
 export type MapMarker =
-  | { id: string; kind: 'gate'; x: number; z: number; village: VillageId; open: boolean }
-  | { id: string; kind: 'board'; x: number; z: number; village: VillageId; level: number; mark: BoardMark }
-  | { id: string; kind: 'scroll'; x: number; z: number; village: VillageId; index: number }
-  | { id: string; kind: 'target'; x: number; z: number }
-  | { id: string; kind: 'name'; x: number; z: number; village: VillageId };
+  | { id: string; kind: 'gate'; x: number; z: number; village: VillageId; open: boolean; teleport?: boolean }
+  | { id: string; kind: 'board'; x: number; z: number; village: VillageId; level: number; mark: BoardMark; teleport?: boolean }
+  | { id: string; kind: 'scroll'; x: number; z: number; village: VillageId; index: number; teleport?: boolean }
+  | { id: string; kind: 'target'; x: number; z: number; teleport?: boolean }
+  | { id: string; kind: 'name'; x: number; z: number; village: VillageId; teleport?: boolean };
 
 export type MapVillageInput = Pick<WorldVillage, 'id' | 'frame' | 'gate' | 'center'> & {
   layout: { boards: readonly { level: number; x: number; z: number }[]; scrolls?: readonly { index: number; x: number; z: number }[] };
@@ -63,7 +63,7 @@ export type MapScope = 'mini' | 'big';
 export function mapMarkers(input: MarkerInput, scope: MapScope): MapMarker[] {
   const out: MapMarker[] = [];
   for (const v of input.villages) {
-    out.push({ id: `gate:${v.gate.id}`, kind: 'gate', x: v.gate.x, z: v.gate.z, village: v.id, open: input.gateOpen[v.gate.id] === true });
+    out.push({ id: `gate:${v.gate.id}`, kind: 'gate', x: v.gate.x, z: v.gate.z, village: v.id, open: input.gateOpen[v.gate.id] === true, teleport: true });
     if (scope === 'big') {
       const c = reservedCenter(v.frame);
       out.push({ id: `name:${v.id}`, kind: 'name', x: c.x, z: c.z, village: v.id });
@@ -72,11 +72,11 @@ export function mapMarkers(input: MarkerInput, scope: MapScope): MapMarker[] {
       out.push({ id: `name:${v.id}`, kind: 'name', x: q.x, z: q.z, village: v.id });
     }
     if (scope === 'big' || input.inside === v.id) {
-      for (const b of v.layout.boards) out.push({ id: `board:${v.id}:${b.level}`, kind: 'board', x: b.x, z: b.z, village: v.id, level: b.level, mark: boardMark(input.levelStates[b.level]) });
+      for (const b of v.layout.boards) out.push({ id: `board:${v.id}:${b.level}`, kind: 'board', x: b.x, z: b.z, village: v.id, level: b.level, mark: boardMark(input.levelStates[b.level]), teleport: true });
     }
     const mask = input.knowMasks[v.id] ?? 0;
     for (const s of v.layout.scrolls ?? []) {
-      if (!hasKnowCard(mask, s.index)) out.push({ id: `scroll:${v.id}:${s.index}`, kind: 'scroll', x: s.x, z: s.z, village: v.id, index: s.index });
+      if (!hasKnowCard(mask, s.index)) out.push({ id: `scroll:${v.id}:${s.index}`, kind: 'scroll', x: s.x, z: s.z, village: v.id, index: s.index, teleport: true });
     }
   }
   if (input.target) out.push({ id: 'target', kind: 'target', x: input.target.x, z: input.target.z });

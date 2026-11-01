@@ -11,7 +11,7 @@ import type { ClipName } from './clips';
 import { nearestInteractable, type Interactable } from './interaction';
 import { RUN_SPEED, WALK_SPEED, animationFor, createPlayerState, jumpTimeScale, locomotionTimeScale, stepPlayer, type MoveInput, type PlayerState, type World } from './playerMotion';
 import { shadowFocus } from './shadowFocus';
-import { combineInput, type WalkApi } from './walkApi';
+import { combineInput, setActiveWalkApi, type WalkApi } from './walkApi';
 import { PROBE } from '../lib/dev';
 
 /** Người chơi ở cảnh đi lại là học sinh (spec 03 mục 3.1). */
@@ -129,7 +129,7 @@ function ChaseCamera({ api, player, blockers }: { api: WalkApi; player: PlayerSt
       wz = fz + (wz - fz) * tmp.scale;
     }
     tmp.want.set(wx, wy, wz);
-    if (!tmp.init) {
+    if (!tmp.init || camera.position.distanceTo(tmp.want) > 20) {
       camera.position.copy(tmp.want);
       tmp.look.copy(tmp.lookWant);
       tmp.init = true;
@@ -212,10 +212,23 @@ export function WalkWorld({ api, paused, obstacles, boundsRadius, interactables,
   if (PROBE) (window as unknown as { __walkPlayer?: PlayerState }).__walkPlayer = player;
   useEffect(() => {
     api.player = player;
+    setActiveWalkApi(api);
+    api.teleport = (x: number, z: number, yaw: number) => {
+      player.x = x;
+      player.z = z;
+      player.yaw = yaw;
+      player.vx = 0;
+      player.vz = 0;
+      player.vy = 0;
+      if (groundHeight) player.y = groundHeight(x, z);
+      api.camera.yaw = yaw;
+    };
     return () => {
       api.player = null;
+      api.teleport = () => undefined;
+      setActiveWalkApi(null);
     };
-  }, [api, player]);
+  }, [api, player, groundHeight]);
   const world = useMemo<World>(() => ({ obstacles, boundsRadius, groundHeight }), [obstacles, boundsRadius, groundHeight]);
   return (
     <>
