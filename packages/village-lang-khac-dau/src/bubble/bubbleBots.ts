@@ -37,7 +37,7 @@ export interface BubbleBot {
 }
 
 export const GOOD_BOT: BubbleBot = { name: 'good', loadMistake: 0.1, angleStep: 2, noise: 0.4, sloppy: 0.02, wrongType: 0 };
-export const AVERAGE_BOT: BubbleBot = { name: 'average', loadMistake: 0.5, angleStep: 4, noise: 2, sloppy: 0.2, wrongType: 0.12 };
+export const AVERAGE_BOT: BubbleBot = { name: 'average', loadMistake: 0.5, angleStep: 3, noise: 2, sloppy: 0.12, wrongType: 0.08 };
 export const WEAK_BOT: BubbleBot = { name: 'weak', loadMistake: 0.7, angleStep: 5, noise: 3, sloppy: 0.35, wrongType: 0.2 };
 
 /** Kết quả tạm của một phát: số trứng vỡ, số trứng rơi, ô dính, và số ô kề cùng số (khi không vỡ) */

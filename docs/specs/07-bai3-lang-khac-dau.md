@@ -177,31 +177,54 @@ Thay game cũ "Chữa đàn gà" (bắn ná). Giữ nguyên: id màn (9), route 
 3. **Bàn:** mỗi trứng mang một mẫu công khai của đợt. Mỗi số một màu cố định và chữ số luôn hiện rõ (không phân biệt chỉ bằng màu).
 4. **Bắn:** em PHẢI chọn loại trứng trong máy bắn mới bắn được (bấm trứng ở khay cạnh máy bắn, hoặc phím 1 đến 5); ban đầu chưa chọn thì nút "Bắn" khóa và có lời nhắc. Lựa chọn giữ nguyên sau mỗi phát; loại không còn trên bàn thì mờ, không chọn được (đang chọn mà hết loại đó thì bỏ chọn). Ngắm: PC rê chuột rồi bấm, hoặc phím mũi tên trái phải và Space/Enter; điện thoại kéo ngón tay để ngắm, thả tay để bắn. Góc giới hạn 12° đến 168° (90° là thẳng lên). Có vạch ngắm nét đứt tới lần nảy tường đầu tiên.
 5. Trứng nảy tường trái/phải, dính vào ô lưới gần nhất khi chạm trứng khác hoặc trần. Từ 3 trứng cùng số liền nhau trở lên thì vỡ; trứng không còn nối với trần thì rơi.
-6. Cứ **8 phát (đợt 3: 6 phát)** cả bàn hạ 1 hàng. Trứng chạm dây giới hạn: mất 1 tim, xóa 2 hàng dưới cùng, chơi tiếp. 3 tim cho cả ván; hết tim thì hết ván. Sạch bàn thì sang đợt sau (nạp trứng đợt kế); xong đợt 3 thì thắng.
-7. **Điểm** = trứng vỡ × 10 + trứng rơi × 20 + 30 mỗi đợt nạp không sai + 100 mỗi đợt xong + tim còn × 50 (cộng lúc hết ván).
+6. Cứ **12 phát (đợt 3: 10 phát)** cả bàn hạ 1 hàng. Trứng chạm dây giới hạn: mất 1 tim, xóa 2 hàng dưới cùng, chơi tiếp. 3 tim cho cả ván; hết tim thì hết ván. Sạch bàn thì sang đợt sau (nạp trứng đợt kế); xong đợt 3 thì thắng.
+7. **Điểm** = trứng vỡ × 10 + trứng rơi × 20 + 30 mỗi đợt nạp không sai + 100 mỗi đợt xong + tim còn × 50 (cộng lúc hết ván). **Chỉ trứng có sẵn trên bàn lúc bắt đầu đợt mới được tính** khi vỡ hay rơi; trứng em bắn KHÔNG BAO GIỜ được tính (kể cả khi vỡ cùng cụm hay rơi sau đó), và trứng bị xóa khi mất tim cũng không tính. Bắn thừa vì thế không bao giờ tăng điểm.
 8. **Tạm dừng thật** khi mở "?", câu nhắc và hướng dẫn (trứng bay, hiệu ứng đứng yên). `hintFor` chỉ trả khóa câu nhắc, không lộ trứng nào đúng hay chỗ nên bắn.
 
 ### Mốc điểm (TẠM, chỉnh khi học sinh chơi thật)
 
 | Mốc | Điểm | Nghĩa |
 |---|---|---|
-| Đồng | 1200 | qua được khoảng một đến hai đợt |
-| Bạc | 2200 | gần như xong cả 3 đợt, còn lại vài tim hay vài trứng sót |
-| Vàng | 2750 | xong cả 3 đợt, thường còn tim |
+| Đồng | 1600 | qua được khoảng hai đợt |
+| Bạc | 2450 | xong cả 3 đợt nhưng mất vài tim hay sót nhiều trứng |
+| Vàng | 2750 | xong cả 3 đợt gọn, còn tim |
 
-Đặt theo quy tắc phân vị bot (chạy `bubbleBalance.test.ts`): Vàng gần phân vị 5% của bot giỏi; Bạc gần trung vị của bot trung bình; Đồng gần phân vị 10% của bot trung bình. Điểm tối đa lý thuyết (`bubbleMaxScore`, mọi trứng ban đầu đều rơi) là 4.360, nên điểm cao nhất cũ của game gà (tối đa 750) nằm trong thang mới; nếu một điểm lưu vượt số này thì màn kết quả và thẻ bắt đầu hiện "Kỷ lục từ phiên bản trước" như màn 3 (prop `maxScore` của `MiniGameLevel`).
+Đặt theo quy tắc phân vị bot (`bubbleBalance.test.ts`): Vàng 2750 ở dưới phân vị 5% của bot giỏi (bot giỏi Vàng 96,7%); Bạc 2450 gần phân vị 15% của bot trung bình; Đồng 1600 gần phân vị 1% của bot trung bình (và trên đa số ván bot yếu). Điểm tối đa lý thuyết (`bubbleMaxScore`, mọi trứng có sẵn đều rơi) là 4.360, nên điểm cũ của game gà (tối đa 750) nằm trong thang mới; điểm lưu vượt số này mới hiện "Kỷ lục từ phiên bản trước" (prop `maxScore` của `MiniGameLevel`).
+
+### Cấu hình độ khó (điều chỉnh sau lần đầu; luật giữ nguyên)
+
+Lần đầu bot trung bình hết tim 98,7% vì điểm tăng theo số phát bắn (trứng em bắn từng được tính điểm khi vỡ), nên không thể vừa để bot trung bình qua được ván vừa giữ điểm của họ dưới bot giỏi. Đã sửa cách đếm điểm (mục luật 7) và nới cấu hình:
+
+| Số | Cũ | Mới |
+|---|---|---|
+| Dây giới hạn (hàng đầu chạm dây, tính từ tấm trần) | 10 | **13** |
+| Số phát mỗi lần hạ bàn (đợt 1 / 2 / 3) | 8 / 8 / 6 | **12 / 12 / 10** |
+| Số hàng đầu đợt, số khóa mỗi đợt | 5 / 7 / 8, 3 / 4 / 5 | giữ nguyên |
+
+Các cấu hình đã thử (cách đếm điểm mới, bot trung bình hồ sơ mới trừ khi ghi khác; hết tim, tim mất TB): dây 13, 12/12/10: 1% / 0,01 (bot giỏi); dây 14, 12/12/10: bot trung bình hết tim 2%, Vàng khoảng 25%; dây 12, 12/12/10: hết tim 6%. Chọn dây 13 với bot trung bình có thêm lỗi (bên dưới) cho hết tim 15%, Vàng dưới 25%.
 
 ### Bot và cân bằng (`bubbleBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300, chỉ dùng thao tác của học sinh)
 
-Bot chọn trứng ở khay nạp, chọn loại trứng, chọn góc bắn (dò mọi góc, chọn phát cho nhiều điểm nhất). Bot giỏi: nạp sai 10% số đợt, dò góc 2°, lệch tay 0,4°, 2% phát bắn ẩu. Bot trung bình: nạp sai 50%, dò góc 4°, lệch tay 2°, 20% phát bắn ẩu, 12% chọn loại trứng bừa. Bot yếu: nạp sai 70%, dò góc 5°, lệch tay 3°, 35% bắn ẩu, 20% chọn loại bừa.
+Bot chọn trứng ở khay nạp, chọn loại trứng, chọn góc bắn (dò mọi góc, chọn phát cho nhiều điểm nhất). **Hồ sơ bot:**
 
-| Bot | Điểm TB (nhỏ nhất đến lớn nhất) | Chưa đạt | Đồng | Bạc | Vàng | Hết tim | Tim mất TB | Phát bắn TB | Đợt nạp không sai TB | Đợt xong TB |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Giỏi | 2960 (2260 đến 3230) | 0% | 0% | 4,7% | **95,3%** | 1,7% | 0,71 | 88,9 | 2,70 | 2,98 |
-| Trung bình | 2260 (980 đến 3580) | 2,7% | 33,0% | 52,0% | 12,3% | 98,7% | 2,98 | 111,1 | 1,40 | 1,74 |
-| Yếu | 1467 (240 đến 2800) | 26,7% | 65,3% | 7,7% | 0,3% | 100% | 3,00 | 86,0 | 0,57 | 0,91 |
+| Bot | Nạp sai | Bước dò góc | Lệch tay | Bắn ẩu | Chọn loại bừa |
+|---|---|---|---|---|---|
+| Giỏi | 10% số đợt | 2° | 0,4° | 2% | 0% |
+| Trung bình (MỚI) | 50% | 3° | 2° | 12% | 8% |
+| Trung bình (cũ) | 50% | 4° | 2° | 20% | 12% |
+| Yếu | 70% | 5° | 3° | 35% | 20% |
 
-Đạt tiêu chí: bot giỏi ≥ 90% Vàng (95,3%); bot trung bình chủ yếu Đồng hoặc Bạc (85%), Vàng 12,3% (dưới 15%, hầu như không Vàng). Test assert các điều này. Đổi cấu hình thì chạy lại và cập nhật số.
+Hồ sơ trung bình mới ít bắn bừa hơn (bắn ẩu 20% → 12%, chọn loại bừa 12% → 8%, dò góc mịn hơn).
+
+| Bot | Điểm TB (nhỏ nhất đến lớn nhất) | Chưa đạt | Đồng | Bạc | Vàng | Hết tim | Tim mất TB | Phát bắn TB | Đợt xong TB |
+|---|---|---|---|---|---|---|---|---|---|
+| Giỏi (trước) | 2960 (2260 đến 3230) | 0% | 0% | 4,7% | 95,3% | 1,7% | 0,71 | 88,9 | 2,98 |
+| Giỏi (sau) | 2858 (2690 đến 3100) | 0% | 0% | 3,3% | **96,7%** | **0%** | 0,01 | 94,8 | 3,00 |
+| Trung bình (trước) | 2260 (980 đến 3580) | 2,7% | 33,0% | 52,0% | 12,3% | 98,7% | 2,98 | 111,1 | 1,74 |
+| Trung bình (sau) | 2595 (1310 đến 2880) | 0,3% | 14,7% | 69,3% | **15,7%** | **15,0%** | 1,02 | 201,2 | 2,85 |
+| Yếu (sau) | 1559 (570 đến 2520) | 45,7% | 53,3% | 1,0% | 0% | 99,0% | 2,98 | 209,9 | 1,59 |
+
+Đạt mục tiêu: bot giỏi Vàng ≥ 90% (96,7%) và hết tim ≤ 2% (0%); bot trung bình hết tim ≤ 40% (15%), Đồng + Bạc ≥ 70% (84,0%), Vàng < 25% (15,7%). Test assert các điều này. Đổi cấu hình thì chạy lại và cập nhật số.
 
 ### Bố cục (`bubbleLayout.ts`, hàm thuần có test)
 
@@ -229,13 +252,13 @@ Vẽ bằng code (không dùng three.js): trứng oval có bóng mềm, dấu kh
 
 ### Test
 
-`bubbleLogic.test.ts` (27 ca: `publicKey` của 3, 5, 6, 7, 9 là 10, 20, 8, 17, 11; khay nạp 500 seed; chọn sai/đúng; chỉ vào đợt khi nạp đủ; bàn 5/7/8 hàng và độ rộng hàng; chưa chọn loại thì không bắn; loại hết thì không chọn; góc kẹp 12° đến 168°; nảy tường; dính ô; vỡ từ 3 trứng; trứng rơi; hạ bàn sau 8/8/6 phát; chạm dây mất tim và dọn 2 hàng; hết tim; sạch bàn sang đợt sau và thắng; công thức điểm; cùng seed cùng ván), `bubbleHint.test.ts`, `bubbleLayout.test.ts`, `bubbleBalance.test.ts`. Kiểm bằng Chrome thật: `scripts/man9-bubble-check.mjs` (chuột 1366×768 và 1920×1080, chạm 360×800; nạp sai/đúng, chưa chọn thì không bắn, nổ cụm, trứng rơi, hạ bàn, mất tim, "?" dừng, hướng dẫn làm thử, tự hoàn thành); ảnh ở `docs/screenshots/man9-bubble/`.
+`bubbleLogic.test.ts` (29 ca: `publicKey` của 3, 5, 6, 7, 9 là 10, 20, 8, 17, 11; khay nạp 500 seed; chọn sai/đúng; chỉ vào đợt khi nạp đủ; bàn 5/7/8 hàng và độ rộng hàng; chưa chọn loại thì không bắn; loại hết thì không chọn; góc kẹp 12° đến 168°; nảy tường; dính ô; vỡ từ 3 trứng; trứng rơi; hạ bàn sau 12/12/10 phát; chạm dây mất tim và dọn 2 hàng; hết tim; sạch bàn sang đợt sau và thắng; công thức điểm; cùng seed cùng ván), `bubbleHint.test.ts`, `bubbleLayout.test.ts`, `bubbleBalance.test.ts`. Kiểm bằng Chrome thật: `scripts/man9-bubble-check.mjs` (chuột 1366×768 và 1920×1080, chạm 360×800; nạp sai/đúng, chưa chọn thì không bắn, nổ cụm, trứng rơi, hạ bàn, mất tim, "?" dừng, hướng dẫn làm thử, tự hoàn thành); ảnh ở `docs/screenshots/man9-bubble/`.
 
 ### Tự chọn (spec và lời giao chưa nói)
 
 - **Hạ bàn là tấm trần cùng đàn trứng hạ xuống 1 hàng, KHÔNG thêm trứng mới.** (Thử chèn hàng mới thì ván không kết thúc: bot giỏi bắn hơn 300 phát mỗi ván.) Ván hữu hạn; trứng tiến dần tới dây giới hạn.
-- **Dây giới hạn nằm ở mép trên của hàng 10** (tính từ tấm trần chưa hạ; hàng 0 là hàng đầu). Trứng nằm ở hàng 10 trở xuống là chạm dây. Chạm dây thì xóa 2 hàng dưới cùng (lặp tới khi hết trứng chạm dây, vẫn chỉ mất 1 tim).
-- Trứng em bắn KHÔNG tính vào "trứng vỡ" (chỉ tính trứng đã nằm trên bàn): nhóm 3 trứng vỡ được 20 điểm. Nếu tính cả trứng bắn thì bắn thừa cũng thêm điểm, bot yếu cao điểm hơn bot giỏi.
+- **Dây giới hạn nằm ở mép trên của hàng 13** (tính từ tấm trần chưa hạ; hàng 0 là hàng đầu). Trứng nằm ở hàng 13 trở xuống là chạm dây. Chạm dây thì xóa 2 hàng dưới cùng (lặp tới khi hết trứng chạm dây, vẫn chỉ mất 1 tim).
+- Trứng em bắn KHÔNG BAO GIỜ được tính điểm (vỡ hay rơi); chỉ trứng có sẵn lúc bắt đầu đợt được tính (`BubbleState.mine` ghi các ô giữ trứng của em). Nếu tính thì bắn thừa tăng điểm, bot trung bình cao điểm hơn bot giỏi.
 - Khóa riêng mỗi đợt rút trong 2 đến 15 (mẫu công khai khác nhau vì 5 là căn nguyên thủy mod 23). Trứng nhiễu "ghi chính số khóa riêng" chọn trong các khóa của đợt sao cho số đó không trùng mẫu đúng nào.
 - Bàn đầu đợt sinh có kiểm để hầu như không có sẵn cụm 3 trứng cùng số (dưới 10% số trứng nằm trong cụm); hết lựa chọn thì rút tùy ý.
 - Va chạm: trứng bay dừng khi tâm cách tâm trứng khác dưới 0,9 đường kính (trượt qua khe hẹp dễ hơn); dính vào ô trống gần chỗ dừng nhất mà kề một trứng (hoặc ở hàng đầu).
@@ -264,7 +287,7 @@ Chunk `Man9` (tải lười khi vào màn 9), bản build hub `VITE_MERGED=true`
 - [x] Màn 9 (Bắn trứng khắc dấu):
   - [x] nạp trứng chỉ tính xuôi;
   - [x] chưa chọn loại trứng thì không bắn được; ba trứng cùng số liền nhau thì vỡ, trứng không nối trần thì rơi;
-  - [x] cứ 8 phát (đợt 3: 6 phát) bàn hạ một hàng; chạm dây thì mất tim.
+  - [x] cứ 12 phát (đợt 3: 10 phát) bàn hạ một hàng; chạm dây thì mất tim.
   - [x] **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
 - [x] Xong màn 9: nhận Trang Sổ Vàng; cổng Làng Bạc mở (test `unlock.test.ts`).
 

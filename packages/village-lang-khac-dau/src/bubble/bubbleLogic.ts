@@ -83,6 +83,8 @@ export interface BubbleState {
   shift: number;
   /** Số hàng tấm trần (cùng đàn trứng) đã hạ xuống trong đợt này */
   lowered: number;
+  /** Ô (r * 32 + c) đang giữ trứng do em bắn: không bao giờ được tính điểm khi vỡ hay rơi */
+  mine: Set<number>;
   /** Chỉ số (trong `plans[round].values`) loại trứng em đã chọn ở máy bắn; null là chưa chọn */
   selected: number | null;
   shotsSinceDescent: number;
@@ -194,6 +196,7 @@ export function createBubbleGame(seed: number, spec: BubbleSpec = BUBBLE_SPEC): 
     board: [],
     shift: 0,
     lowered: 0,
+    mine: new Set<number>(),
     selected: null,
     shotsSinceDescent: 0,
     hearts: spec.hearts,
@@ -245,6 +248,7 @@ function buildBoard(s: BubbleState): void {
   const values = planOf(s).values;
   s.shift = 0;
   s.lowered = 0;
+  s.mine.clear();
   s.board = [];
   for (let r = 0; r < rows; r++) {
     ensureRow(s, r);
@@ -432,6 +436,7 @@ export function anchoredSet(s: BubbleState): Set<number> {
 }
 
 function dropFloaters(s: BubbleState, ev: BubbleEvent[], score: boolean): void {
+  let own = 0;
   const anchored = anchoredSet(s);
   const cells: (Cell & { value: number })[] = [];
   for (let r = 0; r < s.board.length; r++) {
@@ -440,11 +445,12 @@ function dropFloaters(s: BubbleState, ev: BubbleEvent[], score: boolean): void {
       if (v !== null && !anchored.has(r * 32 + c)) {
         cells.push({ r, c, value: v });
         s.board[r][c] = null;
+        if (s.mine.delete(r * 32 + c)) own++;
       }
     }
   }
   if (cells.length === 0) return;
-  if (score) s.stats.dropped += cells.length;
+  if (score) s.stats.dropped += cells.length - own;
   ev.push({ type: 'drop', cells });
 }
 
@@ -464,6 +470,7 @@ function checkLimit(s: BubbleState, ev: BubbleEvent[]): void {
       if (r < 0) break;
       cleared += s.board[r].filter((v) => v !== null).length;
       s.board[r].fill(null);
+      for (let c = 0; c < 32; c++) s.mine.delete(r * 32 + c);
     }
   }
   trimRows(s);
@@ -515,12 +522,15 @@ export function land(s: BubbleState): BubbleEvent[] {
   s.flying = null;
   ensureRow(s, f.cell.r);
   s.board[f.cell.r][f.cell.c] = f.value;
+  s.mine.add(f.cell.r * 32 + f.cell.c);
   ev.push({ type: 'land', cell: f.cell, value: f.value });
   const group = groupAt(s, f.cell.r, f.cell.c);
   if (group.length >= s.spec.minGroup) {
-    for (const g of group) s.board[g.r][g.c] = null;
-    // trứng em bắn không tính điểm vỡ (chỉ tính trứng đã nằm trên bàn), để bắn thừa không được thêm điểm
-    s.stats.popped += group.length - 1;
+    for (const g of group) {
+      s.board[g.r][g.c] = null;
+      // chỉ trứng có sẵn lúc bắt đầu đợt mới được tính điểm; trứng em bắn không bao giờ được tính
+      if (!s.mine.delete(g.r * 32 + g.c)) s.stats.popped++;
+    }
     ev.push({ type: 'pop', cells: group, value: f.value });
     dropFloaters(s, ev, true);
   }

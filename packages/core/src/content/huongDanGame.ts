@@ -270,7 +270,7 @@ export const HUONG_DAN_GAME = {
       '{phanDien} trộn trứng gà bệnh khắc dấu giả vào ổ trứng của làng. Em nạp đúng trứng khắc mẫu công khai, rồi bắn để gom các trứng cùng mẫu cho vỡ.',
       'Trước mỗi đợt em nạp trứng: mỗi khóa riêng cần một trứng khắc đúng mẫu công khai, tính bằng {congThuc}. Có Máy tính mod để tính, và có trứng nhiễu không dùng tới. Chọn sai thì trứng bật ra và đợt đó mất thưởng nạp.',
       'Chọn loại trứng trong máy bắn rồi ngắm và bắn. Trứng nảy tường, dính vào trứng khác; từ 3 trứng cùng số liền nhau thì vỡ, trứng không còn dính trần thì rơi.',
-      'Cứ 8 phát (đợt 3 là 6 phát) cả bàn hạ một hàng. Trứng xuống tới dây đỏ thì em mất 1 tim và hai hàng dưới cùng bị dọn; em có 3 tim và 3 đợt.',
+      'Cứ 12 phát (đợt 3 là 10 phát) cả bàn hạ một hàng. Trứng xuống tới dây đỏ thì em mất 1 tim và hai hàng dưới cùng bị dọn; em có 3 tim và 3 đợt.',
     ],
     dieuKhien: {
       mayTinh: 'Nạp trứng: bấm vào trứng đúng ở khay · Chọn loại trứng: bấm trứng ở khay cạnh máy bắn hoặc phím 1 đến 5 · Ngắm: rê chuột (hoặc phím mũi tên trái phải) · Bắn: bấm chuột (hoặc Space, Enter)',
@@ -295,7 +295,7 @@ export const HUONG_DAN_GAME = {
       },
       {
         hinh: { art: 'ha-ban' },
-        may: 'Cứ 8 phát bắn (đợt 3 là 6 phát) cả bàn hạ một hàng. Trứng xuống tới dây đỏ thì em mất 1 tim và hai hàng dưới cùng bị dọn. Hết 3 tim là hết ván; sạch bàn thì sang đợt sau.',
+        may: 'Cứ 12 phát bắn (đợt 3 là 10 phát) cả bàn hạ một hàng. Trứng xuống tới dây đỏ thì em mất 1 tim và hai hàng dưới cùng bị dọn. Hết 3 tim là hết ván; sạch bàn thì sang đợt sau.',
       },
     ],
     nhac: {

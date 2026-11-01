@@ -1,5 +1,5 @@
 {
-  "ngay": "2026-11-01T10:54:57.485Z",
+  "ngay": "2026-11-01T13:57:56.177Z",
   "tong": 109,
   "hong": 0,
   "ca": [
@@ -25,7 +25,7 @@
       "tag": "1366x768",
       "name": "nạp sai: trứng bật ra, báo \"Chưa đúng\", đợt mất thưởng nạp, chưa vào máy bắn",
       "ok": true,
-      "detail": "Chưa đúng: không khóa nào của đợt này có 5^x mod 23 bằng 15."
+      "detail": "Chưa đúng: không khóa nào của đợt này có 5^x mod 23 bằng 13."
     },
     {
       "tag": "1366x768",
@@ -73,7 +73,7 @@
       "tag": "1366x768",
       "name": "ảnh ban-moi.jpg dưới 300 KB",
       "ok": true,
-      "detail": "77 KB"
+      "detail": "66 KB"
     },
     {
       "tag": "1366x768",
@@ -85,7 +85,7 @@
       "tag": "1366x768",
       "name": "ảnh chua-chon.jpg dưới 300 KB",
       "ok": true,
-      "detail": "77 KB"
+      "detail": "66 KB"
     },
     {
       "tag": "1366x768",
@@ -97,7 +97,7 @@
       "tag": "1366x768",
       "name": "bàn thử có phát bắn làm vỡ cụm",
       "ok": true,
-      "detail": "{\"score\":3,\"type\":1,\"angle\":12,\"pop\":3,\"drop\":0}"
+      "detail": "{\"score\":3,\"type\":1,\"angle\":13,\"pop\":3,\"drop\":0}"
     },
     {
       "tag": "1366x768",
@@ -115,19 +115,19 @@
       "tag": "1366x768",
       "name": "ảnh no-cum.jpg dưới 300 KB",
       "ok": true,
-      "detail": "56 KB"
+      "detail": "52 KB"
     },
     {
       "tag": "1366x768",
       "name": "bàn thử có phát bắn làm trứng rơi",
       "ok": true,
-      "detail": "{\"score\":303,\"type\":0,\"angle\":16,\"pop\":3,\"drop\":3}"
+      "detail": "{\"score\":303,\"type\":0,\"angle\":13,\"pop\":3,\"drop\":3}"
     },
     {
       "tag": "1366x768",
       "name": "ảnh trung-roi-dang-bay.jpg dưới 300 KB",
       "ok": true,
-      "detail": "50 KB"
+      "detail": "47 KB"
     },
     {
       "tag": "1366x768",
@@ -143,15 +143,15 @@
     },
     {
       "tag": "1366x768",
-      "name": "đủ 8 phát thì cả bàn hạ 1 hàng và bộ đếm quay về 8",
+      "name": "đủ số phát thì cả bàn hạ 1 hàng và bộ đếm quay về đủ số phát",
       "ok": true,
-      "detail": "lowered=1 còn=8"
+      "detail": "lowered=1 còn=12"
     },
     {
       "tag": "1366x768",
       "name": "ảnh ha-ban.jpg dưới 300 KB",
       "ok": true,
-      "detail": "61 KB"
+      "detail": "55 KB"
     },
     {
       "tag": "1366x768",
@@ -163,13 +163,13 @@
       "tag": "1366x768",
       "name": "ảnh mat-tim.jpg dưới 300 KB",
       "ok": true,
-      "detail": "51 KB"
+      "detail": "50 KB"
     },
     {
       "tag": "1366x768",
       "name": "mở \"?\": đồng hồ hoạt cảnh đứng yên (tạm dừng thật)",
       "ok": true,
-      "detail": "7.678 → 7.678"
+      "detail": "8.949 → 8.949"
     },
     {
       "tag": "1366x768",
@@ -187,13 +187,13 @@
       "tag": "1366x768",
       "name": "ảnh hop-goi-y.jpg dưới 300 KB",
       "ok": true,
-      "detail": "54 KB"
+      "detail": "53 KB"
     },
     {
       "tag": "1366x768",
       "name": "bấm \"Chơi tiếp\": đồng hồ chạy lại",
       "ok": true,
-      "detail": "t2=7.68 t3=8.18 {\"hint\":false,\"vis\":\"visible\",\"phase\":\"play\",\"dialogs\":0}"
+      "detail": "t2=8.95 t3=9.48 {\"hint\":false,\"vis\":\"visible\",\"phase\":\"play\",\"dialogs\":0}"
     },
     {
       "tag": "1920x1080",
@@ -217,7 +217,7 @@
       "tag": "1920x1080",
       "name": "nạp sai: trứng bật ra, báo \"Chưa đúng\", đợt mất thưởng nạp, chưa vào máy bắn",
       "ok": true,
-      "detail": "Chưa đúng: không khóa nào của đợt này có 5^x mod 23 bằng 11."
+      "detail": "Chưa đúng: không khóa nào của đợt này có 5^x mod 23 bằng 6. "
     },
     {
       "tag": "1920x1080",
@@ -247,7 +247,7 @@
       "tag": "1920x1080",
       "name": "ảnh nap-dung.jpg dưới 300 KB",
       "ok": true,
-      "detail": "71 KB"
+      "detail": "72 KB"
     },
     {
       "tag": "1920x1080",
@@ -265,7 +265,7 @@
       "tag": "1920x1080",
       "name": "ảnh ban-moi.jpg dưới 300 KB",
       "ok": true,
-      "detail": "118 KB"
+      "detail": "104 KB"
     },
     {
       "tag": "1920x1080",
@@ -277,7 +277,7 @@
       "tag": "1920x1080",
       "name": "ảnh chua-chon.jpg dưới 300 KB",
       "ok": true,
-      "detail": "119 KB"
+      "detail": "104 KB"
     },
     {
       "tag": "1920x1080",
@@ -289,7 +289,7 @@
       "tag": "1920x1080",
       "name": "bàn thử có phát bắn làm vỡ cụm",
       "ok": true,
-      "detail": "{\"score\":3,\"type\":1,\"angle\":12,\"pop\":3,\"drop\":0}"
+      "detail": "{\"score\":3,\"type\":1,\"angle\":13,\"pop\":3,\"drop\":0}"
     },
     {
       "tag": "1920x1080",
@@ -307,19 +307,19 @@
       "tag": "1920x1080",
       "name": "ảnh no-cum.jpg dưới 300 KB",
       "ok": true,
-      "detail": "79 KB"
+      "detail": "74 KB"
     },
     {
       "tag": "1920x1080",
       "name": "bàn thử có phát bắn làm trứng rơi",
       "ok": true,
-      "detail": "{\"score\":303,\"type\":0,\"angle\":16,\"pop\":3,\"drop\":3}"
+      "detail": "{\"score\":303,\"type\":0,\"angle\":13,\"pop\":3,\"drop\":3}"
     },
     {
       "tag": "1920x1080",
       "name": "ảnh trung-roi-dang-bay.jpg dưới 300 KB",
       "ok": true,
-      "detail": "67 KB"
+      "detail": "65 KB"
     },
     {
       "tag": "1920x1080",
@@ -335,15 +335,15 @@
     },
     {
       "tag": "1920x1080",
-      "name": "đủ 8 phát thì cả bàn hạ 1 hàng và bộ đếm quay về 8",
+      "name": "đủ số phát thì cả bàn hạ 1 hàng và bộ đếm quay về đủ số phát",
       "ok": true,
-      "detail": "lowered=1 còn=8"
+      "detail": "lowered=1 còn=12"
     },
     {
       "tag": "1920x1080",
       "name": "ảnh ha-ban.jpg dưới 300 KB",
       "ok": true,
-      "detail": "86 KB"
+      "detail": "81 KB"
     },
     {
       "tag": "1920x1080",
@@ -361,7 +361,7 @@
       "tag": "1920x1080",
       "name": "mở \"?\": đồng hồ hoạt cảnh đứng yên (tạm dừng thật)",
       "ok": true,
-      "detail": "7.304 → 7.304"
+      "detail": "9.133 → 9.133"
     },
     {
       "tag": "1920x1080",
@@ -379,13 +379,13 @@
       "tag": "1920x1080",
       "name": "ảnh hop-goi-y.jpg dưới 300 KB",
       "ok": true,
-      "detail": "69 KB"
+      "detail": "68 KB"
     },
     {
       "tag": "1920x1080",
       "name": "bấm \"Chơi tiếp\": đồng hồ chạy lại",
       "ok": true,
-      "detail": "t2=7.30 t3=7.82 {\"hint\":false,\"vis\":\"visible\",\"phase\":\"play\",\"dialogs\":0}"
+      "detail": "t2=9.13 t3=9.66 {\"hint\":false,\"vis\":\"visible\",\"phase\":\"play\",\"dialogs\":0}"
     },
     {
       "tag": "360x800",
@@ -409,7 +409,7 @@
       "tag": "360x800",
       "name": "nạp sai: trứng bật ra, báo \"Chưa đúng\", đợt mất thưởng nạp, chưa vào máy bắn",
       "ok": true,
-      "detail": "Chưa đúng: không khóa nào của đợt này có 5^x mod 23 bằng 13."
+      "detail": "Chưa đúng: không khóa nào của đợt này có 5^x mod 23 bằng 7. "
     },
     {
       "tag": "360x800",
@@ -457,7 +457,7 @@
       "tag": "360x800",
       "name": "ảnh ban-moi.jpg dưới 300 KB",
       "ok": true,
-      "detail": "39 KB"
+      "detail": "36 KB"
     },
     {
       "tag": "360x800",
@@ -469,7 +469,7 @@
       "tag": "360x800",
       "name": "ảnh chua-chon.jpg dưới 300 KB",
       "ok": true,
-      "detail": "39 KB"
+      "detail": "36 KB"
     },
     {
       "tag": "360x800",
@@ -481,7 +481,7 @@
       "tag": "360x800",
       "name": "bàn thử có phát bắn làm vỡ cụm",
       "ok": true,
-      "detail": "{\"score\":3,\"type\":1,\"angle\":12,\"pop\":3,\"drop\":0}"
+      "detail": "{\"score\":3,\"type\":1,\"angle\":13,\"pop\":3,\"drop\":0}"
     },
     {
       "tag": "360x800",
@@ -499,19 +499,19 @@
       "tag": "360x800",
       "name": "ảnh no-cum.jpg dưới 300 KB",
       "ok": true,
-      "detail": "31 KB"
+      "detail": "29 KB"
     },
     {
       "tag": "360x800",
       "name": "bàn thử có phát bắn làm trứng rơi",
       "ok": true,
-      "detail": "{\"score\":303,\"type\":0,\"angle\":16,\"pop\":3,\"drop\":3}"
+      "detail": "{\"score\":303,\"type\":0,\"angle\":13,\"pop\":3,\"drop\":3}"
     },
     {
       "tag": "360x800",
       "name": "ảnh trung-roi-dang-bay.jpg dưới 300 KB",
       "ok": true,
-      "detail": "29 KB"
+      "detail": "27 KB"
     },
     {
       "tag": "360x800",
@@ -527,15 +527,15 @@
     },
     {
       "tag": "360x800",
-      "name": "đủ 8 phát thì cả bàn hạ 1 hàng và bộ đếm quay về 8",
+      "name": "đủ số phát thì cả bàn hạ 1 hàng và bộ đếm quay về đủ số phát",
       "ok": true,
-      "detail": "lowered=1 còn=8"
+      "detail": "lowered=1 còn=12"
     },
     {
       "tag": "360x800",
       "name": "ảnh ha-ban.jpg dưới 300 KB",
       "ok": true,
-      "detail": "34 KB"
+      "detail": "30 KB"
     },
     {
       "tag": "360x800",
@@ -547,13 +547,13 @@
       "tag": "360x800",
       "name": "ảnh mat-tim.jpg dưới 300 KB",
       "ok": true,
-      "detail": "31 KB"
+      "detail": "29 KB"
     },
     {
       "tag": "360x800",
       "name": "mở \"?\": đồng hồ hoạt cảnh đứng yên (tạm dừng thật)",
       "ok": true,
-      "detail": "7.366 → 7.366"
+      "detail": "8.851 → 8.851"
     },
     {
       "tag": "360x800",
@@ -571,13 +571,13 @@
       "tag": "360x800",
       "name": "ảnh hop-goi-y.jpg dưới 300 KB",
       "ok": true,
-      "detail": "37 KB"
+      "detail": "36 KB"
     },
     {
       "tag": "360x800",
       "name": "bấm \"Chơi tiếp\": đồng hồ chạy lại",
       "ok": true,
-      "detail": "t2=7.37 t3=7.87 {\"hint\":false,\"vis\":\"visible\",\"phase\":\"play\",\"dialogs\":0}"
+      "detail": "t2=8.85 t3=9.38 {\"hint\":false,\"vis\":\"visible\",\"phase\":\"play\",\"dialogs\":0}"
     },
     {
       "tag": "1366x768-huong-dan",
@@ -607,19 +607,19 @@
       "tag": "1366x768-huong-dan",
       "name": "ảnh buoc-2.jpg dưới 300 KB",
       "ok": true,
-      "detail": "46 KB"
+      "detail": "44 KB"
     },
     {
       "tag": "1366x768-huong-dan",
       "name": "ảnh buoc-3.jpg dưới 300 KB",
       "ok": true,
-      "detail": "60 KB"
+      "detail": "55 KB"
     },
     {
       "tag": "1366x768-huong-dan",
       "name": "ảnh buoc-4.jpg dưới 300 KB",
       "ok": true,
-      "detail": "59 KB"
+      "detail": "55 KB"
     },
     {
       "tag": "1366x768-huong-dan",

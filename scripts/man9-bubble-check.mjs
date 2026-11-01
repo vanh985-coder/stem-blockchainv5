@@ -324,12 +324,13 @@ async function playScenarios(ctx) {
   if (s.phase === 'play') {
     best = await ctx.eval(() => window.__best('none'));
     await selectTypeBtn(ctx, best.type);
+    const every = await ctx.eval(() => window.__bubble.spec.rounds[window.__bubble.round].descendEvery);
     const l0 = (await st(ctx)).lowered;
     await aimAndFire(ctx, best.angle);
     await settle(ctx);
     s = await st(ctx);
     const haText = await ctx.eval(() => document.querySelector('[data-testid="ha-ban"]').getAttribute('data-left'));
-    check(tag, 'đủ 8 phát thì cả bàn hạ 1 hàng và bộ đếm quay về 8', s.lowered === l0 + 1 && haText === '8', `lowered=${s.lowered} còn=${haText}`);
+    check(tag, 'đủ số phát thì cả bàn hạ 1 hàng và bộ đếm quay về đủ số phát', s.lowered === l0 + 1 && haText === String(every), `lowered=${s.lowered} còn=${haText}`);
     await shot(page, tag, 'ha-ban');
 
     // ---- chạm dây: mất tim

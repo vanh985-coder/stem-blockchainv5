@@ -2,7 +2,7 @@
  * Số liệu của màn 9 "Bắn trứng khắc dấu" (spec 07, mục "Màn 9"; game kiểu Bubble Shooter). Đơn vị bàn: đường kính một quả trứng = 1; tâm ô (hàng r, cột c) tính bằng `cellCenter` trong `bubbleLogic.ts`.
  *
  * Những chỗ lời giao chưa nói (tự chọn, ghi cả ở spec 07):
- *  - dây giới hạn nằm ở mép trên của hàng 10 (hàng đầu là hàng 0); trứng nằm ở hàng 10 trở xuống là chạm dây;
+ *  - dây giới hạn nằm ở mép trên của hàng 13 (hàng đầu là hàng 0); trứng nằm ở hàng 13 trở xuống là chạm dây;
  *  - khóa riêng mỗi đợt rút trong 2 đến 15 (mẫu công khai khác nhau vì 5 là căn nguyên thủy mod 23), các khóa trong đợt khác nhau;
  *  - bàn đầu đợt không có cụm 3 trứng cùng số dính nhau (sinh có kiểm), hàng mới khi hạ bàn rút ngẫu nhiên trong các số của đợt;
  *  - mốc điểm đặt theo bot (xem `bubbleBalance.test.ts`).
@@ -50,15 +50,15 @@ export interface BubbleSpec {
 export const BUBBLE_SPEC: BubbleSpec = {
   width: 10,
   rowH: Math.sqrt(3) / 2,
-  limitRow: 10,
+  limitRow: 13,
   hitDist: 0.9,
   minAngle: 12,
   maxAngle: 168,
   speed: 34,
   rounds: [
-    { keys: 3, rows: 5, descendEvery: 8 },
-    { keys: 4, rows: 7, descendEvery: 8 },
-    { keys: 5, rows: 8, descendEvery: 6 },
+    { keys: 3, rows: 5, descendEvery: 12 },
+    { keys: 4, rows: 7, descendEvery: 12 },
+    { keys: 5, rows: 8, descendEvery: 10 },
   ],
   hearts: 3,
   penaltyRows: 2,
@@ -66,7 +66,7 @@ export const BUBBLE_SPEC: BubbleSpec = {
   minGroup: 3,
   points: { pop: 10, drop: 20, cleanLoad: 30, round: 100, heart: 50 },
   keyRange: [2, 15],
-  medals: [1200, 2200, 2750],
+  medals: [1600, 2450, 2750],
 };
 
 /**

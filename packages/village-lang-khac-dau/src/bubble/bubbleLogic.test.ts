@@ -310,8 +310,8 @@ describe('bubbleLogic: vỡ, rơi, hạ bàn, tim, đợt', () => {
     expect(s.board[1][0]).toBe(y);
   });
 
-  it('cứ 8 phát (đợt 3: 6 phát) cả bàn hạ một hàng, không thêm trứng', () => {
-    for (const [round, every] of [[0, 8], [1, 8], [2, 6]] as const) {
+  it('cứ 12 phát (đợt 3: 10 phát) cả bàn hạ một hàng, không thêm trứng', () => {
+    for (const [round, every] of [[0, 12], [1, 12], [2, 10]] as const) {
       const s = playing(12, round);
       const [x, y] = planOf(s).values;
       // bàn lớn không vỡ: hai hàng xen kẽ x y, bắn vào hàng 0 trống cuối
@@ -415,6 +415,52 @@ describe('bubbleLogic: điểm và tất định', () => {
       return out;
     };
     expect(run()).toEqual(run());
+  });
+
+  it('trứng em bắn không bao giờ được tính: bắn thừa không làm điểm cao hơn bắn gọn (cùng seed)', () => {
+    const base = (): BubbleState => {
+      const s = playing(21);
+      const [x, y] = planOf(s).values;
+      setBoard(s, [[x, x, null, y, y]]);
+      return s;
+    };
+    const tidy = base();
+    const [x] = planOf(tidy).values;
+    drop(tidy, x, { r: 0, c: 2 }); // vỡ cụm x: 2 trứng có sẵn
+    const messy = base();
+    // bắn thừa: ba trứng z của em dính vào bàn rồi vỡ cùng cụm (đều là trứng em bắn), sau đó vỡ cụm x như ván gọn
+    const z = planOf(messy).values[2];
+    drop(messy, z, { r: 0, c: 8 });
+    drop(messy, z, { r: 0, c: 9 });
+    drop(messy, z, { r: 1, c: 8 });
+    expect(messy.board[0][8]).toBeNull();
+    drop(messy, x, { r: 0, c: 2 });
+    expect(bubbleScore(messy)).toBe(bubbleScore(tidy));
+    // trứng em bắn vỡ cùng cụm: không tính; chỉ 2 trứng có sẵn của cụm x được 10 điểm mỗi quả
+    expect(tidy.stats.popped).toBe(2);
+    const t2 = playing(22);
+    const [p] = planOf(t2).values;
+    setBoard(t2, [[p, p]]);
+    drop(t2, p, { r: 0, c: 2 });
+    expect(t2.stats.popped).toBe(2);
+    expect(t2.stats.dropped).toBe(0);
+  });
+
+  it('trứng em bắn rơi theo cụm cũng không được tính; trứng bị xóa khi mất tim không tính', () => {
+    const s = playing(23);
+    const [x, y] = planOf(s).values;
+    setBoard(s, [[x, x]]);
+    drop(s, y, { r: 1, c: 0 }); // trứng em bắn, nối với trần qua hai trứng x
+    drop(s, x, { r: 0, c: 2 }); // vỡ cụm x, trứng y của em rơi
+    expect(s.stats.popped).toBe(2);
+    expect(s.stats.dropped).toBe(0);
+    const h = playing(24);
+    const [a, b] = planOf(h).values;
+    setBoard(h, [[a, b, a], [b, a], [a, b, a]]);
+    h.lowered = BUBBLE_SPEC.limitRow - 2;
+    const before = bubbleScore(h);
+    drop(h, b, { r: 0, c: 5 });
+    expect(bubbleScore(h)).toBe(before);
   });
 
   it('mốc điểm tăng dần', () => {

@@ -68,15 +68,17 @@ describe('bubbleBalance: 300 ván mỗi bot (seed 1 đến 300)', () => {
     }, 240_000);
   }
 
-  it('bot giỏi: ít nhất 90% ván đạt Vàng', () => {
+  it('bot giỏi: ít nhất 90% ván đạt Vàng và hết tim không quá 2%', () => {
     const r = rows.get('good')!;
     expect(r.medal[3] / GAMES).toBeGreaterThanOrEqual(0.9);
+    expect(r.lost / GAMES).toBeLessThanOrEqual(0.02);
   });
 
-  it('bot trung bình: chủ yếu Đồng hoặc Bạc, hầu như không Vàng (dưới 15%)', () => {
+  it('bot trung bình: hết tim không quá 40%, Đồng + Bạc ≥ 70%, Vàng dưới 25%', () => {
     const r = rows.get('average')!;
-    expect((r.medal[1] + r.medal[2]) / GAMES).toBeGreaterThanOrEqual(0.5);
-    expect(r.medal[3] / GAMES).toBeLessThan(0.15);
+    expect(r.lost / GAMES).toBeLessThanOrEqual(0.4);
+    expect((r.medal[1] + r.medal[2]) / GAMES).toBeGreaterThanOrEqual(0.7);
+    expect(r.medal[3] / GAMES).toBeLessThan(0.25);
   });
 
   it('bot yếu: gần như không bao giờ Vàng, và thua nhiều hơn bot giỏi', () => {
