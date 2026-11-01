@@ -164,123 +164,91 @@ Mỗi vòng chọn ngẫu nhiên các khuôn trong bộ khuôn tập.
 
 Đạt tiêu chí như màn 2, 3 (bot giỏi ≥ 90% Vàng; bot trung bình Đồng hoặc Bạc ≥ 80%, Vàng dưới 10%). Màn này không có tim nên không có tỉ lệ hết tim. Hồ sơ bot trung bình là tự chọn.
 
-## Màn 9 — Game phụ 2: "Chữa đàn gà" (bắn ná)
+## Màn 9 — Game phụ 2: "Bắn trứng khắc dấu" (bắn trứng kiểu Bubble Shooter)
 
-Logic đặt trong `chickenLogic.ts` (hàm thuần, có test).
+Thay game cũ "Chữa đàn gà" (bắn ná). Giữ nguyên: id màn (9), route `man/9`, khung `MiniGameLevel` (thẻ bắt đầu, nút "Hướng dẫn chơi", nút "?" tạm dừng thật, màn kết quả, ghi tiến độ), nút Tự hoàn thành cả màn, Trang Sổ Vàng thứ 3 (trao sau khi chơi màn 9). Code: `packages/village-lang-khac-dau/src/bubble/`. Vẽ bằng **canvas 2D, không three.js**.
 
-**Câu chuyện:** {phanDien} lùa một đàn gà bệnh vào làng để phá phiên chợ. Mỗi con gà đeo một thẻ số, là mẫu công khai. Học sinh dùng ná cao su bắn **viên thuốc** đúng loại để chữa cho gà.
+**Câu chuyện:** {phanDien} trộn trứng gà bệnh khắc dấu giả vào ổ trứng của làng. Em nạp đúng trứng khắc **mẫu công khai**, rồi bắn gom các trứng cùng mẫu cho vỡ. Bài học giữ nguyên: chỉ tính **xuôi** (khóa riêng x ra mẫu công khai 5^x mod 23, luôn gọi `publicKey` của `lessons/bai-3/logic`), không bao giờ bắt đoán ngược.
 
-**Bước "Nạp đạn"** (trước mỗi đợt):
-- Có 3–4 loại thuốc, mỗi loại ghi một **khuôn riêng**, ví dụ "Thuốc 3", "Thuốc 5", "Thuốc 6".
-- Học sinh kéo nhãn mẫu công khai (lẫn vài nhãn nhiễu) vào đúng loại thuốc, tức là tính xuôi 5^x mod 23. Có máy tính mod để hỗ trợ.
-- Nạp đúng hết thì đợt gà bắt đầu. Nạp sai thì nhãn bật ra, trừ điểm thưởng nạp.
-- **Lưu ý về bài học:** game chỉ bắt tính **xuôi** (từ khuôn riêng ra mẫu công khai). Không bao giờ bắt đoán ngược, đúng như Bài 3 dạy.
+### Luật
 
-**Dựng bằng `Scene25D`:**
-- Nền: `scenes/man-09-duong-lang`: đường đất có 3 làn chạy từ xa về phía cổng làng ở dưới.
-- **3 làn:** cấu hình bằng đoạn thẳng trên ảnh, giống màn 5. Có trang `/dev/man-09-lanes` để chỉnh.
-- **Gà:** hình rời `sprites/man-09-chua-ga/ga-benh`, `ga-khoe`, `ga-trum`. Code làm gà chạy lạch bạch: nảy lên xuống, nghiêng trái phải; càng xa càng nhỏ. Thẻ số treo trên đầu gà.
-- **Ná cao su:** hình rời `sprites/man-09-chua-ga/na-cao-su`, đặt giữa đáy màn hình, xoay hướng về con gà được chọn.
-- **Học sinh:** model 3D đứng cạnh ná, quay người theo hướng bắn.
-- **Bảng thuốc:** 3–4 nút thuốc ở cạnh dưới.
+1. **3 đợt.** Đợt 1: 3 khóa riêng, bàn 5 hàng; đợt 2: 4 khóa, 7 hàng; đợt 3: 5 khóa, 8 hàng. Bàn lưới lục giác rộng 10 trứng (hàng lẻ 9).
+2. **Nạp trứng** (trước mỗi đợt, không tính giờ): hiện các khóa riêng của đợt. Khay có các trứng ghi mẫu công khai đúng (mỗi khóa một trứng) và 3 trứng nhiễu: 1 trứng ghi chính số khóa riêng, 2 trứng ghi mẫu công khai của khóa ngoài đợt; nhiễu không trùng mẫu đúng, các số trong khay khác nhau. Em bấm chọn trứng: đúng thì trứng bay vào máy bắn, sai thì bật ra và đợt đó mất thưởng nạp. Có Máy tính mod dùng chung (màn 8). Chọn đủ trứng đúng thì bấm "Bắt đầu đợt".
+3. **Bàn:** mỗi trứng mang một mẫu công khai của đợt. Mỗi số một màu cố định và chữ số luôn hiện rõ (không phân biệt chỉ bằng màu).
+4. **Bắn:** em PHẢI chọn loại trứng trong máy bắn mới bắn được (bấm trứng ở khay cạnh máy bắn, hoặc phím 1 đến 5); ban đầu chưa chọn thì nút "Bắn" khóa và có lời nhắc. Lựa chọn giữ nguyên sau mỗi phát; loại không còn trên bàn thì mờ, không chọn được (đang chọn mà hết loại đó thì bỏ chọn). Ngắm: PC rê chuột rồi bấm, hoặc phím mũi tên trái phải và Space/Enter; điện thoại kéo ngón tay để ngắm, thả tay để bắn. Góc giới hạn 12° đến 168° (90° là thẳng lên). Có vạch ngắm nét đứt tới lần nảy tường đầu tiên.
+5. Trứng nảy tường trái/phải, dính vào ô lưới gần nhất khi chạm trứng khác hoặc trần. Từ 3 trứng cùng số liền nhau trở lên thì vỡ; trứng không còn nối với trần thì rơi.
+6. Cứ **8 phát (đợt 3: 6 phát)** cả bàn hạ 1 hàng. Trứng chạm dây giới hạn: mất 1 tim, xóa 2 hàng dưới cùng, chơi tiếp. 3 tim cho cả ván; hết tim thì hết ván. Sạch bàn thì sang đợt sau (nạp trứng đợt kế); xong đợt 3 thì thắng.
+7. **Điểm** = trứng vỡ × 10 + trứng rơi × 20 + 30 mỗi đợt nạp không sai + 100 mỗi đợt xong + tim còn × 50 (cộng lúc hết ván).
+8. **Tạm dừng thật** khi mở "?", câu nhắc và hướng dẫn (trứng bay, hiệu ứng đứng yên). `hintFor` chỉ trả khóa câu nhắc, không lộ trứng nào đúng hay chỗ nên bắn.
 
-**Đợt gà:**
-- Gà chạy lạch bạch từ cuối đường về phía cổng làng, theo 3 làn.
-- Chọn loại thuốc: phím 1–4, hoặc chạm nút thuốc. Sau đó chạm hoặc bấm vào con gà để bắn; viên thuốc bay theo đường vòng cung.
-- **Đúng thuốc** (`publicKey(khuôn của thuốc)` bằng thẻ trên gà): gà lấp lánh, đổi sang hình `ga-khoe` rồi chạy về chuồng (ở mép đường). +20.
-- **Sai thuốc:** hiện "Không đúng thuốc!", gà vẫn chạy tiếp. −5.
-- Gà chạy tới cổng làng: mất 1 tim.
+### Mốc điểm (TẠM, chỉnh khi học sinh chơi thật)
 
-**Ba đợt:**
+| Mốc | Điểm | Nghĩa |
+|---|---|---|
+| Đồng | 1200 | qua được khoảng một đến hai đợt |
+| Bạc | 2200 | gần như xong cả 3 đợt, còn lại vài tim hay vài trứng sót |
+| Vàng | 2750 | xong cả 3 đợt, thường còn tim |
 
-| Đợt | Thuốc (khuôn riêng) | Mẫu công khai trên gà | Số gà |
+Đặt theo quy tắc phân vị bot (chạy `bubbleBalance.test.ts`): Vàng gần phân vị 5% của bot giỏi; Bạc gần trung vị của bot trung bình; Đồng gần phân vị 10% của bot trung bình. Điểm tối đa lý thuyết (`bubbleMaxScore`, mọi trứng ban đầu đều rơi) là 4.360, nên điểm cao nhất cũ của game gà (tối đa 750) nằm trong thang mới; nếu một điểm lưu vượt số này thì màn kết quả và thẻ bắt đầu hiện "Kỷ lục từ phiên bản trước" như màn 3 (prop `maxScore` của `MiniGameLevel`).
+
+### Bot và cân bằng (`bubbleBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300, chỉ dùng thao tác của học sinh)
+
+Bot chọn trứng ở khay nạp, chọn loại trứng, chọn góc bắn (dò mọi góc, chọn phát cho nhiều điểm nhất). Bot giỏi: nạp sai 10% số đợt, dò góc 2°, lệch tay 0,4°, 2% phát bắn ẩu. Bot trung bình: nạp sai 50%, dò góc 4°, lệch tay 2°, 20% phát bắn ẩu, 12% chọn loại trứng bừa. Bot yếu: nạp sai 70%, dò góc 5°, lệch tay 3°, 35% bắn ẩu, 20% chọn loại bừa.
+
+| Bot | Điểm TB (nhỏ nhất đến lớn nhất) | Chưa đạt | Đồng | Bạc | Vàng | Hết tim | Tim mất TB | Phát bắn TB | Đợt nạp không sai TB | Đợt xong TB |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Giỏi | 2960 (2260 đến 3230) | 0% | 0% | 4,7% | **95,3%** | 1,7% | 0,71 | 88,9 | 2,70 | 2,98 |
+| Trung bình | 2260 (980 đến 3580) | 2,7% | 33,0% | 52,0% | 12,3% | 98,7% | 2,98 | 111,1 | 1,40 | 1,74 |
+| Yếu | 1467 (240 đến 2800) | 26,7% | 65,3% | 7,7% | 0,3% | 100% | 3,00 | 86,0 | 0,57 | 0,91 |
+
+Đạt tiêu chí: bot giỏi ≥ 90% Vàng (95,3%); bot trung bình chủ yếu Đồng hoặc Bạc (85%), Vàng 12,3% (dưới 15%, hầu như không Vàng). Test assert các điều này. Đổi cấu hình thì chạy lại và cập nhật số.
+
+### Bố cục (`bubbleLayout.ts`, hàm thuần có test)
+
+- **PC ngang** (rộng ≥ 1,1 lần cao): nền phủ cả màn; ba cột. Giữa: bàn trứng khoảng 44% chiều rộng, có khung viền, máy bắn ở đáy giữa của khung, khay chọn loại trứng và nút "Bắn" ngay dưới khung (cạnh máy bắn). Trái: các khóa riêng của đợt và Máy tính mod (luôn hiện). Phải: tim, đợt, điểm, số phát còn lại trước lần hạ bàn, số trứng còn, chân dung {phanDien}, nút "Hướng dẫn" (chừa chỗ cho nút "?" của khung).
+- **Điện thoại dọc**: bàn rộng hết màn (96% ở 360×800), dải trên (HUD, nút Hướng dẫn, Máy tính mod), dải dưới (khóa riêng, {phanDien}); điện thoại ngang dùng khung ngang. Nút ≥ 44 px; số trên trứng ≥ 14 px (kiểm ở 360×800).
+
+### Đồ họa
+
+Vẽ bằng code (không dùng three.js): trứng oval có bóng mềm, dấu khắc tròn kiểu đóng dấu (vòng đôi), số ở giữa viền trắng; màu theo số (góc màu theo tỉ lệ vàng); máy bắn, khung bàn, tấm trần, dây giới hạn đỏ nét đứt, vạch ngắm, hiệu ứng vỡ (to ra, mờ dần, vòng sáng) và rơi (rơi và xoay) đều có hình thay thế bằng code. Nền tạm là dải màu ấm. Mỗi hình thử tải từ manifest trước (`sprites/man-09-ban-trung/...`), thiếu thì dùng hình code, không lỗi trang. Chủ dự án có thể vẽ thêm theo bảng sau (đặt ở `assets/sprites/man-09-ban-trung/`, rồi `pnpm assets:build`):
+
+#### Đồ họa cần tạo
+
+| Tên file (không đuôi) | Kích thước | Nền | Mô tả |
 |---|---|---|---|
-| 1 | 3, 5, 6 | 10, 20, 8 | 8 |
-| 2 | 5, 7, 9 | 20, 17, 11 | 10, chạy nhanh hơn |
-| 3 | 3, 6, 7, 9 | 10, 8, 17, 11 | 12, rồi tới gà trùm |
+| `nen-pc` | 1920×1080 | KHÔNG trong suốt | Nền ngang phủ cả màn, vibe Làng Khắc Dấu: sân đình ấm, mái ngói, ổ rơm và trứng, dải màu cam vàng nâu; tối và nhạt vừa phải để bàn trứng ở giữa nổi bật; không chữ, không số. Giữa ảnh (khoảng 40% chiều rộng) để thoáng. |
+| `khung-ban` | 920×1100 | Trong suốt | Khung bàn trứng: viền gỗ nâu dày bo góc, bên trong nền giấy ấm nhạt (hơi trong), phía trên là tấm trần gỗ. Tỉ lệ khung chơi 10 : 11,9; code vẽ tấm trần hạ dần và dây giới hạn đè lên. Không chữ. |
+| `trung-1` đến `trung-7` | 128×128 mỗi ảnh | Trong suốt | Bảy quả trứng, mỗi quả một màu khác nhau (đỏ, cam, vàng, xanh lá, xanh dương, tím, hồng), hình trứng oval hơi thon ở đỉnh, có bóng sáng, bóng mềm dưới đáy, chiếm khoảng 88% ảnh; ở giữa có dấu khắc tròn kiểu đóng dấu (vòng đôi nhạt) để code vẽ số lên; KHÔNG có số, KHÔNG có chữ. Code dùng ảnh `trung-(số mod 7 + 1)`. |
+| `may-ban` | 256×320 | Trong suốt | Máy bắn trứng bằng gỗ: nòng hướng thẳng LÊN, đế tròn ở dưới; tâm xoay ở khoảng 62% chiều cao tính từ trên xuống, chính giữa chiều ngang. Không chữ. |
+| `trung-vo` | 256×256 | Trong suốt | Hiệu ứng trứng vỡ: vỏ văng ra bốn phía, chút lòng trứng, tâm ảnh là chỗ trứng vỡ. Không chữ. |
 
-**Gà trùm cuối đợt 3:**
-- {phanDien} cưỡi con gà trùm: hình rời `ga-trum`, với model 3D {phanDien} ngồi trên yên (`idle`, thu nhỏ cho vừa).
-- Gà trùm cần chữa **3 lần**; sau mỗi lần đúng, thẻ trên gà đổi sang một số khác trong bộ đã nạp.
-- Chữa xong: {phanDien} ngã nhào (`hurt`), kêu "Ối!" rồi chạy mất (`run`).
+### Hướng dẫn và nút "?"
 
-**Tim, điểm:**
-- 3 tim.
-- Điểm = số gà chữa được × 20, trừ 5 cho mỗi phát sai, cộng 30 cho mỗi lần nạp đạn không sai, cộng 60 khi chữa xong gà trùm.
+- Hướng dẫn chơi (`content/huongDanGame.ts`, mục 9; không đổi thứ tự hay xóa mục trong `GUIDE_SECTIONS`): 4 luật, cách điều khiển máy tính và điện thoại, 4 trang với 5 hình vẽ code trong `GuideArt.tsx` (`nap-trung`, `chon-trung-may`, `ngam-phim`, `ngam-cham`, `ha-ban`), 7 câu nhắc (`napDan`, `napXong`, `chuaChon`, `ngamBan`, `sapHa`, `motTim`, `hetVan`).
+- **Hướng dẫn P8** (`TutorialSpotlight` bản gọn, `tutorialTexts.man9`; tự mở ở ván đầu, mở lại bằng nút "💡 Hướng dẫn"): giới thiệu → chọn 1 trứng đúng ở khay nạp → chọn trứng ở máy bắn → ngắm → bắn thử 1 phát trên bàn mẫu nhỏ (1 khóa, 2 hàng trứng cùng số, không hạ bàn). Dữ liệu riêng (`PRACTICE_SPEC`), không cộng điểm hay tiến độ, ván thật chưa bị đụng tới.
 
-| Mốc | Điểm |
-|---|---|
-| Đồng | 300 |
-| Bạc | 500 |
-| Vàng | 700 |
+### Test
 
-**Test (`chickenLogic.ts`):**
+`bubbleLogic.test.ts` (27 ca: `publicKey` của 3, 5, 6, 7, 9 là 10, 20, 8, 17, 11; khay nạp 500 seed; chọn sai/đúng; chỉ vào đợt khi nạp đủ; bàn 5/7/8 hàng và độ rộng hàng; chưa chọn loại thì không bắn; loại hết thì không chọn; góc kẹp 12° đến 168°; nảy tường; dính ô; vỡ từ 3 trứng; trứng rơi; hạ bàn sau 8/8/6 phát; chạm dây mất tim và dọn 2 hàng; hết tim; sạch bàn sang đợt sau và thắng; công thức điểm; cùng seed cùng ván), `bubbleHint.test.ts`, `bubbleLayout.test.ts`, `bubbleBalance.test.ts`. Kiểm bằng Chrome thật: `scripts/man9-bubble-check.mjs` (chuột 1366×768 và 1920×1080, chạm 360×800; nạp sai/đúng, chưa chọn thì không bắn, nổ cụm, trứng rơi, hạ bàn, mất tim, "?" dừng, hướng dẫn làm thử, tự hoàn thành); ảnh ở `docs/screenshots/man9-bubble/`.
 
-| Tình huống | Kết quả mong đợi |
-|---|---|
-| `publicKey` của 3, 5, 6, 7, 9 | 10, 20, 8, 17, 11 |
-| Thuốc 5 bắn gà có thẻ 20 / thẻ 8 | Chữa được / không chữa được |
-| Thẻ trên gà | Chỉ lấy trong bộ mẫu công khai của đợt đã nạp |
-| Gà trùm | Cần đúng 3 lần chữa |
-| Gà chạy tới cổng | Mất 1 tim |
-| Nạp đạn | Chỉ cho bắt đầu khi mọi nhãn đều đúng |
+### Tự chọn (spec và lời giao chưa nói)
 
-### Chốt cho logic (mốc 3, bước B10; code ở `packages/village-lang-khac-dau/src/chicken/`; cảnh ở bước B11 bên dưới, màn 9 đã `ready`)
+- **Hạ bàn là tấm trần cùng đàn trứng hạ xuống 1 hàng, KHÔNG thêm trứng mới.** (Thử chèn hàng mới thì ván không kết thúc: bot giỏi bắn hơn 300 phát mỗi ván.) Ván hữu hạn; trứng tiến dần tới dây giới hạn.
+- **Dây giới hạn nằm ở mép trên của hàng 10** (tính từ tấm trần chưa hạ; hàng 0 là hàng đầu). Trứng nằm ở hàng 10 trở xuống là chạm dây. Chạm dây thì xóa 2 hàng dưới cùng (lặp tới khi hết trứng chạm dây, vẫn chỉ mất 1 tim).
+- Trứng em bắn KHÔNG tính vào "trứng vỡ" (chỉ tính trứng đã nằm trên bàn): nhóm 3 trứng vỡ được 20 điểm. Nếu tính cả trứng bắn thì bắn thừa cũng thêm điểm, bot yếu cao điểm hơn bot giỏi.
+- Khóa riêng mỗi đợt rút trong 2 đến 15 (mẫu công khai khác nhau vì 5 là căn nguyên thủy mod 23). Trứng nhiễu "ghi chính số khóa riêng" chọn trong các khóa của đợt sao cho số đó không trùng mẫu đúng nào.
+- Bàn đầu đợt sinh có kiểm để hầu như không có sẵn cụm 3 trứng cùng số (dưới 10% số trứng nằm trong cụm); hết lựa chọn thì rút tùy ý.
+- Va chạm: trứng bay dừng khi tâm cách tâm trứng khác dưới 0,9 đường kính (trượt qua khe hẹp dễ hơn); dính vào ô trống gần chỗ dừng nhất mà kề một trứng (hoặc ở hàng đầu).
+- Tốc độ bay 34 đơn vị/giây (chỉ ảnh hưởng hoạt cảnh; luật xử lý ngay tại đường bay đã tính). Hạ bàn và hết ván diễn ra ngay khi trứng tới nơi; bảng kết thúc hiện sau 0,9 giây.
+- Màu theo số: góc màu = (số × 137,5°) mod 360° (hai số khác nhau luôn khác màu); khi có ảnh `trung-1` đến `trung-7` thì dùng ảnh theo (số mod 7), hai số có thể dùng chung ảnh, nên số luôn được vẽ rõ.
+- Khung dọc: Máy tính mod là nút ở dải trên (bảng mở xuống); khung ngang: bảng luôn hiện. Ngưỡng khung ngang/dọc: rộng ≥ 1,1 lần cao.
+- Cảm ứng: bấm nhanh một chấm trên bàn cũng bắn theo hướng chấm đó (kéo rồi thả là cùng một thao tác); chuột: mỗi lần bấm (nhấn rồi nhả) bắn một phát tại góc đang trỏ.
+- Hết ván còn điểm "tim còn × 50" chỉ cộng khi ván kết thúc (khi chưa kết thúc, điểm đang hiện chưa gồm phần này).
+- Đã bỏ trang dev `/dev/man-09-lanes` (chọn 3 làn của game gà) và ảnh `scenes/man-09-duong-lang`, `sprites/man-09-chua-ga/*` không còn được dùng (file gốc còn ở `assets/`, chưa xóa).
 
-`chickenConfig.ts` (số liệu, `chickenVariant` cho các phương án độ khó), `chickenLogic.ts` (hàm thuần: `createChickenGame`, `dropLabel`, `startWave`, `selectMedicine`, `shoot`, `stepChicken(s, dt)` bước cố định 1/120 giây, `tickChicken`, `chickenScore`), `chickenBots.ts` (bot cân bằng, chỉ dùng trong test), `chickenLogic.test.ts` (26 ca), `chickenBalance.test.ts` (15 ca), `index.ts`. Mẫu công khai luôn tính bằng `publicKey` của bài 3 (`lessons/bai-3/logic`), không viết lại công thức. Mọi số ngẫu nhiên từ `createMulberry32(seed)`: ba lần nạp đạn và dãy thẻ của gà trùm rút SẴN khi tạo ván; số ngẫu nhiên khi sinh gà (làn rồi thẻ, hai số mỗi con) chỉ rút lúc sinh, nên chuỗi gà không phụ thuộc người chơi bắn thế nào.
+### Kích thước chunk
 
-**Chốt trong lời giao B10 (spec chưa nói):**
-- Làn dài 10 đơn vị (0 là cuối đường, 10 là cổng làng), 3 làn.
-- Gà chạy từ 0 tới cổng: đợt 1 là 9 giây, đợt 2 là 7 giây, đợt 3 là 6 giây; gà trùm 14 giây. Nhịp sinh 1,6 / 1,3 / 1,1 giây (con đầu sau đúng một nhịp: tự chọn); không sinh vào làn có con gần cuối đường nhất còn dưới 1,5 (làn nào cũng vướng thì thử lại bước sau, không rút số ngẫu nhiên). Hết đợt khi đã sinh đủ và không còn gà thường trên đường; rồi sang nạp đạn đợt sau, hoặc gà trùm sau đợt 3.
-- Bắn: chọn thuốc (mặc định thuốc 1) rồi chọn một con gà; viên thuốc LUÔN trúng con đã chọn, bay 0,4 giây, xét kết quả lúc tới (so `publicKey(khuôn của thuốc lúc bắn)` với thẻ lúc viên thuốc tới); gà đã tới cổng (hay đã được chữa) trước đó thì phát đó không tính (không trừ, không cộng; tính vào `voidShots`). Giữa hai phát tối thiểu 0,35 giây. Gà tới cổng cùng bước với viên thuốc thì cổng xét trước (phát không tính).
-- Gà trùm ở làn giữa, cần chữa đúng 3 lần; mỗi lần chữa đúng không có điểm riêng (điểm tối đa 750 chỉ tính 30 gà thường) và thẻ đổi sang số KHÁC thẻ liền trước, trong bộ mẫu công khai của đợt 3 (10, 8, 17, 11); chữa đủ 3 lần thì +60 và hết ván (`complete`). Phát sai vào trùm vẫn −5 và không mất lần chữa. Trùm tới cổng mà chưa chữa xong: mất 1 tim và hết ván (`boss`, không +60). Hết tim cũng hết ván (`hearts`).
-- Nạp đạn (trước mỗi đợt, không tính giờ): mỗi thuốc 1 nhãn đúng (= `publicKey` của khuôn) cùng 2 nhãn nhiễu CHO CẢ ĐỢT (không phải mỗi thuốc 2 nhãn): một nhãn BẪY bằng chính số khuôn của một thuốc trong đợt (chọn trong các khuôn không trùng mẫu công khai nào của đợt) và một nhãn là mẫu công khai của một khuôn ngoài đợt; nhãn nhiễu không trùng mẫu công khai nào của đợt và các nhãn khác nhau. Kéo nhãn vào thuốc sai (kể cả nhãn nhiễu, và nhãn đúng vào thuốc khác) thì nhãn bật ra và đợt đó mất thưởng 30; xong khi mọi nhãn đúng đã nằm đúng thuốc (nhãn nhiễu để lại khay), rồi `startWave`. Thưởng 30 cộng lúc đợt bắt đầu.
-- Điểm = gà chữa được × 20 − 5 × phát sai + 30 × số đợt nạp không sai + 60 nếu chữa xong trùm; hiển thị không âm (`chickenScore`). Tối đa 30 × 20 + 3 × 30 + 60 = **750**. 3 tim.
-
-**Test thêm so với bảng spec** (`chickenLogic.test.ts`): nhãn nạp đạn mỗi đợt (đủ nhãn đúng, đúng 1 nhãn bẫy bằng số khuôn, 1 nhãn khuôn ngoài đợt, nhãn nhiễu không trùng mẫu công khai của đợt; 500 seed); đợt chỉ bắt đầu khi mọi nhãn đúng đã nạp, nạp sai một lần thì mất thưởng 30; gà trùm đổi thẻ sau mỗi lần chữa đúng (thẻ mới khác thẻ cũ, thuộc bộ đợt 3), tới cổng thì hết ván; viên thuốc bay 0,4 giây, gà tới cổng trước thì phát đó không tính; khoảng cách tối thiểu 0,35 giây; tốc độ và nhịp sinh từng đợt đúng số chốt; cùng seed cùng ván; dt 1/30, 1/60, 1/144 cho cùng kết quả; tạm dừng không đổi gì; người chơi hoàn hảo đúng 750 điểm.
-
-**Cân bằng (`chickenBalance.test.ts`, 300 ván mỗi bot, seed 1 đến 300, mốc 300 / 500 / 700).** Bot bắn con gà gần cổng nhất trước (không nhắm con đã có viên thuốc đang bay tới), chỉ dùng thao tác của học sinh. Bot giỏi: nghĩ 0,4 giây mỗi phát, đúng thuốc 98%, nạp không sai ở 90% số đợt. Bot trung bình: 0,8 giây, đúng 85%, nạp sai một lần ở 50% số đợt. Bot chậm (sửa sau B10): 1,2 giây, đúng 80%, nạp sai một lần ở 60% số đợt (`SLOW_BOT`).
-
-| Bot | Chưa đạt | Đồng | Bạc | Vàng | Điểm TB (nhỏ nhất đến lớn nhất) | Tới trùm | Chữa xong trùm | Hết tim | Tim mất TB | Phát sai TB | Đợt nạp không sai TB |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| lý tưởng | 0% | 0% | 0% | 100% | 750 (750 đến 750) | 100% | 100% | 0% | 0 | 0 | 3,00 |
-| giỏi | 0% | 0% | 3,0% | **97,0%** | 737,4 (675 đến 750) | 100% | 100% | 0% | 0 | 0,8 | 2,71 |
-| trung bình | 0% | 0% | 77,7% | 22,3% | 671,3 (590 đến 750) | 100% | 100% | 0% | 0 | 6,4 | 1,45 |
-| chậm | 1,0% | 16,0% | 77,3% | 5,7% | 604,3 (200 đến 720) | **70,3%** | 70,3% | 29,7% | 1,06 | 8,0 | 1,20 |
-
-- **Độ khó:** mục tiêu là bot giỏi Vàng ≥ 85% (mốc 700) và bot chậm tới được gà trùm ≥ 60% (assert trong test; bot trung bình chỉ in bảng, không assert ngưỡng Vàng). Luật gốc đạt cả hai (bot chậm tới trùm 70,3%), nên **không dùng phương án A, B, C** (A: gà chậm hơn 20% mọi đợt; B: A + 4 tim; C: B + nhịp sinh giãn 20%; `chickenVariant`, đã có test cấu hình). Để đối chiếu, số liệu bot chậm ở các phương án (300 ván, mốc 300 / 500 / 700): A tới trùm 92,7%, hết tim 22 ván, Vàng 6,3%; B tới trùm 98,0%, hết tim 6 ván, Vàng 6,3%; C tới trùm 99,7%, hết tim 1 ván, Vàng 6,7%; bot giỏi và bot trung bình không đổi ở mọi phương án (không bao giờ mất tim). Ván gốc dễ về sống sót với bot nhanh (không mất tim nào trong 300 ván của bot giỏi và bot trung bình), khó hơn với bot chậm (1,06 tim mất mỗi ván, 29,7% hết tim, thường ở đợt 3).
-- **Mốc 300 / 500 / 700 (TẠM, chỉnh khi học sinh chơi thật), giữ đúng spec, theo nghĩa:** **Vàng 700** = chữa hết gà và gà trùm, sai rất ít (tối đa 750); **Bạc 500** = chơi hết 3 đợt (chữa hết 30 gà thường đã được 600 điểm trừ phát sai); **Đồng 300** = qua 1 đến 2 đợt (một đợt chữa hết chỉ 190 điểm, hai đợt 360 điểm). Với mốc này bot giỏi Vàng 97,0% (291 ván), bot trung bình Vàng 22,3% (67 ván), bot chậm Vàng 5,7% (17 ván), chủ yếu Bạc.
-- **Vì sao không dùng mốc theo phân vị của bước B10 (650 / 690 / 710):** điểm dồn trong khoảng 600 đến 750 (ván chữa hết gà là 600 điểm cộng thưởng), nên quy tắc phân vị cho ba mốc sát nhau; em chữa hết gà mà sai 12 phát thành "chưa đạt" là sai tinh thần. Thí dụ: chữa hết 30 gà và trùm, nạp sai cả ba đợt, sai 12 phát được 600 điểm: mốc 650 / 690 / 710 cho "chưa đạt", mốc 300 / 500 / 700 cho Bạc.
-
-**Điểm các kịch bản (`chickenBalance.test.ts`, chơi bằng đúng thao tác của học sinh, điểm tính đúng công thức, mốc 300 / 500 / 700):**
-
-| Kịch bản | Điểm tính | Điểm | Mốc |
-|---|---|---|---|
-| (a) chữa hết gà và trùm, nạp đúng cả 3 đợt, sai 2 phát | 600 + 90 + 60 − 10 | 740 | **Vàng** |
-| (b) chữa hết gà và trùm, nạp sai 2 đợt, sai 6 phát | 600 + 30 + 60 − 30 | 660 | **Bạc** |
-| (b2) chữa hết gà và trùm, nạp đúng, sai 12 phát | 600 + 90 + 60 − 60 | 690 | Bạc |
-| (b3) chữa hết gà và trùm, nạp sai cả 3 đợt, sai 12 phát (xấu nhất khi chữa xong trùm) | 600 + 0 + 60 − 60 | 600 | Bạc (mốc cũ 650: chưa đạt) |
-| (c) hết tim giữa đợt 3, hai đợt đầu chữa hết, nạp đúng cả ba đợt, chữa 3 gà đợt 3 rồi 3 gà tới cổng | 360 + 90 + 60 | 510 | **Bạc** |
-| (c2) hết tim giữa đợt 3, nạp sai cả ba đợt, sai 8 phát, chưa chữa gà nào ở đợt 3 | 360 − 40 | 320 | **Đồng** |
-| (d) hết tim ở đợt 1 (nhiều nhất chữa 5 gà trước khi 3 gà tới cổng) | 5 × 20 + 30 | 130 | **chưa đạt** |
-| (d2) hết tim ở đợt 1, chưa chữa gà nào | 0 + 30 | 30 | chưa đạt |
-
-Hết tim giữa đợt 3 thì **Bạc hoặc Đồng tùy điểm**: từ 500 trở lên khi hai đợt đầu chữa hết, nạp đúng và chữa thêm vài gà ở đợt 3 (kịch bản c: 510); dưới 500 khi nạp sai và sai nhiều phát (kịch bản c2: 320). Hai đợt đầu chữa hết mà sai dưới 12 phát thì không dưới Đồng (360 − 5 × 11 = 305).
-
-### Cảnh màn 9 (mốc 3, bước B11; code ở `packages/village-lang-khac-dau/src/chicken/`)
-
-Dùng lại logic B10 nguyên vẹn (không sửa luật). File: `man09Lanes.ts` (+ test), `DevMan09Lanes.tsx` (trang `/dev/man-09-lanes`, chỉ khi chạy dev, vỏ Làng Khắc Dấu cổng 5176), `chickenLayout.ts` (+ test, hàm thuần), `chickenArt.ts` (nạp hình rời, tia lấp lánh và viên thuốc vẽ bằng canvas), `ChickenStage.tsx` (cảnh Scene25D, pool, không cấp phát trong `useFrame`), `ChickenLoad.tsx` (bước nạp đạn), `ChickenGame.tsx` (vòng lặp, thẻ số, bảng thuốc, HUD, điều khiển), `chickenHint.ts` (+ test), `pages/Man9.tsx`, route `man/9`. Máy tính mod dùng lại `ui/ModCalculator.tsx`.
-
-- **Ba làn** (`MAN09_LANES`, tọa độ chuẩn hóa của ảnh `scenes/man-09-duong-lang`, đo trên ảnh): làn 1 từ (0,55; 0,30) xuống (0,25; 0,69), làn 2 từ (0,654; 0,30) xuống (0,41; 0,70), làn 3 từ (0,748; 0,30) xuống (0,60; 0,69); mỗi làn có thêm nửa bề rộng ở hai đầu để vẽ hình thang. Ba dải đường tỏa ra phía người xem nên gà chạy chếch xuống bên trái; hình gà gốc quay sang phải nên cảnh lật lại. Gà nhỏ 0,38 ở cuối đường, cỡ đầy đủ ở cuối làn. Chuồng gà là cái chòi tre ở mép trái đường (`COOP_POINT`).
-- **Bố cục** (test `chickenLayout.test.ts` ở 640×360, 844×390, 1366×768, 1024×768): ná cao su ở giữa đáy khung (xoay tối đa ±0,6 rad về con gà được chọn, di chuột lên gà cũng xoay), học sinh đứng bên phải ná (cách 2,3 đơn vị), bảng thuốc 3 hoặc 4 nút ở góc dưới trái (mỗi nút 60 × 58 điểm ảnh), HUD ở góc trên trái (250 × 64). Không đồ nào chồng lên nửa dưới ba làn (từ giữa làn tới cổng, kể cả thân gà và thẻ số trên đầu) và không chồng lên nhau. Chữ thẻ số trên gà cỡ theo gà trên màn hình, kẹp 14 đến 30 điểm ảnh (không dưới 14 ở mọi chỗ gà đứng, "Chữ to" nhân 1,15). Khung dọc: nhắc "Xoay ngang để chơi" như màn 5 (không `allowPortrait`).
-- **Nạp đạn** (`ChickenLoad.tsx`): lọ "Thuốc x" kèm màu và số phím 1 đến 4; khay nhãn gồm nhãn đúng và 2 nhãn nhiễu của logic. Kéo thả bằng con trỏ (chuột và cảm ứng), hoặc chạm nhãn rồi chạm lọ, hoặc Tab chọn nhãn rồi nhấn phím 1 đến 4. Nạp sai: nhãn bay về khay (không bay khi "Giảm chuyển động", chỉ rung) và hiện "Chưa đúng: 5^^x^^ mod 23 của thuốc này không ra số đó". Nút "Bắt đầu đợt n" chỉ mở khi mọi lọ đã đủ nhãn. Nút Máy tính mod ở góc trên (lệch trái nút "?").
-- **Đợt gà**: gà chạy nảy và nghiêng (không nảy, không nghiêng khi "Giảm chuyển động"; gà vẫn chạy vì đó là luật chơi), thẻ số HTML treo trên đầu gà. Chọn thuốc: phím 1 đến 4 hoặc chạm nút thuốc (thuốc đang chọn viền vàng dày). Bắn: bấm hay chạm vào con gà (nhận ngay ở `pointerdown`), hoặc mũi tên trái phải chọn gà (thẻ viền vàng và vòng sáng dưới chân) rồi Enter hay Space. Viên thuốc bay vòng cung 0,4 giây (bay thẳng khi "Giảm chuyển động"), học sinh quay người và chỉ về phía gà. Đúng thuốc: lấp lánh, đổi sang `ga-khoe` (to bằng gà thường, thu nhỏ 0,8), chạy về chuồng rồi mờ dần; sai: "Không đúng thuốc!" trên đầu gà. Gà lọt qua cổng: gà chạy tiếp rồi mờ dần, mất 1 tim.
-- **Gà trùm**: `ga-trum` ở làn giữa với {phanDien} (model `ti`, `idle`, thu nhỏ còn 0,42 chiều cao gà) đứng trên yên, đi theo gà trùm (cùng độ nảy); thẻ đổi số sau mỗi lần chữa đúng kèm lấp lánh. Chữa xong lần thứ ba: gà trùm hóa `ga-khoe` chạy về chuồng, {phanDien} rơi từ yên xuống đất (0,35 giây), `hurt`, hiện "Ối!" (1,1 giây), rồi `run` chạy lên cuối đường (1,5 giây); bảng kết thúc hiện sau 3 giây. Gà trùm tới cổng hay hết tim: bảng kết thúc sau 0,9 giây.
-- **Hướng dẫn và nút "?"** (luật chung, spec 03 mục 3.8 và 6): phần `man-9` ở `content/huongDanGame.ts` (4 luật, cách điều khiển, 4 trang với 5 hình vẽ trong `GuideArt.tsx`: `nap-nhan`, `nhan-bay`, `ban-ga-phim`, `ban-ga-cham`, `ga-trum`; 7 câu nhắc), thêm vào CUỐI `GUIDE_SECTIONS`. `hintFor` trả khóa, KHÔNG lộ thuốc nào chữa thẻ nào, không nói số cụ thể nào ngoài công thức. Hộp "?" tạm dừng thật (gà, viên thuốc, nhịp sinh, hoạt cảnh đứng yên). Màn kết quả: màn cuối của làng nên chỉ có "Chơi lại" và "Về làng"; hiện số gà chữa, số phát sai, số đợt nạp đúng, đã chữa gà trùm chưa.
-- **Mở khóa**: màn 9 `ready`; Trang Sổ Vàng 3 trao sau khi chơi màn 9 (màn cuối đã ra mắt của làng), không còn sau màn 8. Tài khoản đã có trang 3 từ trước giữ nguyên (test `unlock.test.ts`). Biển màn 9 của làng tối giản mở được sau khi chơi màn 8 (test `minimal.test.ts`).
-- **Chữ**: `chickenUi` ở `content/games.ts`. Câu nhắc "nạp đạn" viết "Dùng Máy tính mod để tính nếu cần" thay vì "Tính bằng Máy tính mod nếu cần" của lời giao (tự chọn: test `huongDanGame.test.ts` cấm chuỗi "Tí" trong chữ hướng dẫn và "Tính" bắt đầu bằng "Tí").
-
-**Tự chọn của bước B11 (spec chưa nói):** hình gà lật cho quay sang trái theo hướng chạy; gà khỏe chạy về cái chòi tre ở mép trái đường; cỡ gà thường cao 2,3 đơn vị ở cuối làn và gà trùm 3,3; nhịp lạch bạch 11 rad/giây, nảy 6% chiều cao gà, nghiêng 0,1 rad; viên thuốc có màu theo loại thuốc (đỏ, xanh dương, xanh lá, vàng; luôn kèm chữ "Thuốc x"); di chuột lên gà cũng xoay ná và đặt vòng sáng; bảng thuốc hiện nhãn đã nạp trong mỗi nút; ván tua (`window.__chickenSim`) chỉ có khi chạy dev hay build có `VITE_PROBE`.
+Chunk `Man9` (tải lười khi vào màn 9), bản build hub `VITE_MERGED=true` ngày 01/11/2026: **34,91 kB (gzip 12,57 kB)**; bản vỏ riêng `apps/lang-khac-dau`: 34,76 kB (gzip 12,51 kB). Game cũ (three.js, Scene25D) không còn trong chunk này.
 
 ## Kết thúc làng
 
@@ -289,19 +257,19 @@ Dùng lại logic B10 nguyên vẹn (không sửa luật). File: `man09Lanes.ts`
 
 ## Checklist nghiệm thu
 
-- [ ] Test Bài 3 (giai đoạn 1), `memoryLogic` và `chickenLogic` đều ✅.
+- [ ] Test Bài 3 (giai đoạn 1), `memoryLogic` và `bubbleLogic` đều ✅.
 - [ ] Màn 7: máy soi dấu chỉ đúng người đã đóng dấu; dò số với p = 1.000.003 không làm đơ giao diện.
 - [ ] Màn 8: {phanDien} tráo bài có hoạt cảnh rõ ràng, không bao giờ đụng thẻ đã khớp.
   - [x] **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng"). (đã làm ở bước HD: phần `man-8`, `memoryHint.ts`, "Chơi tiếp" không có vì làng chưa có màn sau.)
-- [x] Màn 9 (bước B11):
-  - [x] nạp đạn chỉ tính xuôi;
-  - [x] bắn đúng thuốc thì gà khỏi bệnh chạy về chuồng;
-  - [x] gà trùm có {phanDien} cưỡi.
+- [x] Màn 9 (Bắn trứng khắc dấu):
+  - [x] nạp trứng chỉ tính xuôi;
+  - [x] chưa chọn loại trứng thì không bắn được; ba trứng cùng số liền nhau thì vỡ, trứng không nối trần thì rơi;
+  - [x] cứ 8 phát (đợt 3: 6 phát) bàn hạ một hàng; chạm dây thì mất tim.
   - [x] **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
 - [x] Xong màn 9: nhận Trang Sổ Vàng; cổng Làng Bạc mở (test `unlock.test.ts`).
 
 ## Bổ sung mốc 4 và bàn giao Claude — 01/11/2026
 
-- P8 đã tích hợp Màn 7 đủ Dễ/TB/Khó, Màn 8 lật cặp và máy tính mod, Màn 9 nạp/bắn thuốc; xem spec P8 và TRANG-THAI.md về bằng chứng/giới hạn.
+- P8 đã tích hợp Màn 7 đủ Dễ/TB/Khó, Màn 8 lật cặp và máy tính mod, Màn 9 nạp trứng/bắn trứng (đã thay game gà bằng "Bắn trứng khắc dấu", xem mục Màn 9); xem spec P8 và TRANG-THAI.md về bằng chứng/giới hạn.
 - Ký bằng khóa riêng của mình, xác minh bằng khóa công khai người gửi. Bài tập tìm x với 5^x mod23 là mô hình thu nhỏ. Thử tuần tự là phương pháp minh họa, không khẳng định đó là phương pháp duy nhất hay suy ra thời gian bảo mật thực chỉ từ kích thước không gian khóa.
 - Rà các câu trái với nguyên tắc trên trong content và báo cáo là việc CÒN TỒN, chưa được đánh dấu sửa mã. Máy tính Màn 8 giữ hiển thị sẵn, kích thước dễ đọc; không quay lại bắt bấm mới mở.

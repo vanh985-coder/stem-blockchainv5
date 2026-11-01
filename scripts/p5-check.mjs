@@ -21,7 +21,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const ORDER = arg('vil', 'lang-giay,lang-det,lang-khac-dau,lang-bac').split(',');
 const SC_ONLY = arg('sc', '');
 const FIRST = { 'lang-giay': 1, 'lang-det': 4, 'lang-khac-dau': 7, 'lang-bac': 10 };
-const BIEN = { 1: 'Học cùng bác An', 2: 'Đuổi theo', 3: 'Ghép lại cuốn sổ', 4: 'Học cùng cụ Bình', 5: 'Đập', 6: 'Diều đưa sổ', 7: 'Học cùng chú Dũng', 8: 'Lật thẻ tìm cặp khóa', 9: 'Chữa đàn gà', 10: 'Học cùng thầy Linh', 11: 'Ghép lá cây sổ', 12: 'Leo cây tìm lá giả' };
+const BIEN = { 1: 'Học cùng bác An', 2: 'Đuổi theo', 3: 'Ghép lại cuốn sổ', 4: 'Học cùng cụ Bình', 5: 'Đập', 6: 'Diều đưa sổ', 7: 'Học cùng chú Dũng', 8: 'Lật thẻ tìm cặp khóa', 9: 'Bắn trứng khắc dấu', 10: 'Học cùng thầy Linh', 11: 'Ghép lá cây sổ', 12: 'Leo cây tìm lá giả' };
 mkdirSync(OUT, { recursive: true });
 
 const results = [];

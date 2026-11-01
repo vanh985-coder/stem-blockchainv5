@@ -1,0 +1,661 @@
+{
+  "ngay": "2026-11-01T10:54:57.485Z",
+  "tong": 109,
+  "hong": 0,
+  "ca": [
+    {
+      "tag": "1366x768",
+      "name": "cột bàn trứng khoảng 40 đến 45% chiều rộng",
+      "ok": true,
+      "detail": "43.5%"
+    },
+    {
+      "tag": "1366x768",
+      "name": "không cuộn ngang",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "ảnh nap-dau.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "59 KB"
+    },
+    {
+      "tag": "1366x768",
+      "name": "nạp sai: trứng bật ra, báo \"Chưa đúng\", đợt mất thưởng nạp, chưa vào máy bắn",
+      "ok": true,
+      "detail": "Chưa đúng: không khóa nào của đợt này có 5^x mod 23 bằng 15."
+    },
+    {
+      "tag": "1366x768",
+      "name": "ảnh nap-sai.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "62 KB"
+    },
+    {
+      "tag": "1366x768",
+      "name": "ảnh nap-giua-chung.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "59 KB"
+    },
+    {
+      "tag": "1366x768",
+      "name": "nạp đúng: mọi trứng đúng vào máy bắn, nút \"Bắt đầu đợt\" mở",
+      "ok": true,
+      "detail": "3/3"
+    },
+    {
+      "tag": "1366x768",
+      "name": "trứng ở khay nạp là nút ≥ 44 px",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "ảnh nap-dung.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "59 KB"
+    },
+    {
+      "tag": "1366x768",
+      "name": "sau khi bắt đầu đợt: đang chơi, bàn 5 hàng, chưa chọn loại trứng",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "đợt nạp có sai thì không được thưởng nạp",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "ảnh ban-moi.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "77 KB"
+    },
+    {
+      "tag": "1366x768",
+      "name": "chưa chọn loại trứng: bấm bàn không bắn, nút bắn khóa, có lời nhắc",
+      "ok": true,
+      "detail": "shots=0"
+    },
+    {
+      "tag": "1366x768",
+      "name": "ảnh chua-chon.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "77 KB"
+    },
+    {
+      "tag": "1366x768",
+      "name": "nút chọn loại trứng và nút Bắn ≥ 44 px",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "bàn thử có phát bắn làm vỡ cụm",
+      "ok": true,
+      "detail": "{\"score\":3,\"type\":1,\"angle\":12,\"pop\":3,\"drop\":0}"
+    },
+    {
+      "tag": "1366x768",
+      "name": "chọn loại trứng ở khay: máy bắn đã nạp (selected)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "bắn nổ cụm: trứng vỡ tăng (trứng bắn không tính)",
+      "ok": true,
+      "detail": "popped=2"
+    },
+    {
+      "tag": "1366x768",
+      "name": "ảnh no-cum.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "56 KB"
+    },
+    {
+      "tag": "1366x768",
+      "name": "bàn thử có phát bắn làm trứng rơi",
+      "ok": true,
+      "detail": "{\"score\":303,\"type\":0,\"angle\":16,\"pop\":3,\"drop\":3}"
+    },
+    {
+      "tag": "1366x768",
+      "name": "ảnh trung-roi-dang-bay.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "50 KB"
+    },
+    {
+      "tag": "1366x768",
+      "name": "trứng không còn nối với trần thì rơi (đếm trứng rơi tăng)",
+      "ok": true,
+      "detail": "dropped=3"
+    },
+    {
+      "tag": "1366x768",
+      "name": "sau phát làm trứng rơi ván vẫn đang chơi (để kiểm tiếp hạ bàn, mất tim)",
+      "ok": true,
+      "detail": "play"
+    },
+    {
+      "tag": "1366x768",
+      "name": "đủ 8 phát thì cả bàn hạ 1 hàng và bộ đếm quay về 8",
+      "ok": true,
+      "detail": "lowered=1 còn=8"
+    },
+    {
+      "tag": "1366x768",
+      "name": "ảnh ha-ban.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "61 KB"
+    },
+    {
+      "tag": "1366x768",
+      "name": "trứng chạm dây giới hạn: mất 1 tim, 2 hàng dưới cùng được dọn, chơi tiếp",
+      "ok": true,
+      "detail": "tim=2 hàng=1"
+    },
+    {
+      "tag": "1366x768",
+      "name": "ảnh mat-tim.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "51 KB"
+    },
+    {
+      "tag": "1366x768",
+      "name": "mở \"?\": đồng hồ hoạt cảnh đứng yên (tạm dừng thật)",
+      "ok": true,
+      "detail": "7.678 → 7.678"
+    },
+    {
+      "tag": "1366x768",
+      "name": "câu nhắc không lộ số trứng đúng",
+      "ok": true,
+      "detail": "Việc của em lúc này: Ngắm theo vạch nét đứt rồi bắn. Ba trứng cùng số liền nhau "
+    },
+    {
+      "tag": "1366x768",
+      "name": "đang mở \"?\" thì bắn và đổi loại trứng không được (phím Space và 2 bị bỏ qua)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768",
+      "name": "ảnh hop-goi-y.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "54 KB"
+    },
+    {
+      "tag": "1366x768",
+      "name": "bấm \"Chơi tiếp\": đồng hồ chạy lại",
+      "ok": true,
+      "detail": "t2=7.68 t3=8.18 {\"hint\":false,\"vis\":\"visible\",\"phase\":\"play\",\"dialogs\":0}"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "cột bàn trứng khoảng 40 đến 45% chiều rộng",
+      "ok": true,
+      "detail": "43.6%"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "không cuộn ngang",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1920x1080",
+      "name": "ảnh nap-dau.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "72 KB"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "nạp sai: trứng bật ra, báo \"Chưa đúng\", đợt mất thưởng nạp, chưa vào máy bắn",
+      "ok": true,
+      "detail": "Chưa đúng: không khóa nào của đợt này có 5^x mod 23 bằng 11."
+    },
+    {
+      "tag": "1920x1080",
+      "name": "ảnh nap-sai.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "75 KB"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "ảnh nap-giua-chung.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "72 KB"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "nạp đúng: mọi trứng đúng vào máy bắn, nút \"Bắt đầu đợt\" mở",
+      "ok": true,
+      "detail": "3/3"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "trứng ở khay nạp là nút ≥ 44 px",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1920x1080",
+      "name": "ảnh nap-dung.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "71 KB"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "sau khi bắt đầu đợt: đang chơi, bàn 5 hàng, chưa chọn loại trứng",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1920x1080",
+      "name": "đợt nạp có sai thì không được thưởng nạp",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1920x1080",
+      "name": "ảnh ban-moi.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "118 KB"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "chưa chọn loại trứng: bấm bàn không bắn, nút bắn khóa, có lời nhắc",
+      "ok": true,
+      "detail": "shots=0"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "ảnh chua-chon.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "119 KB"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "nút chọn loại trứng và nút Bắn ≥ 44 px",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1920x1080",
+      "name": "bàn thử có phát bắn làm vỡ cụm",
+      "ok": true,
+      "detail": "{\"score\":3,\"type\":1,\"angle\":12,\"pop\":3,\"drop\":0}"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "chọn loại trứng ở khay: máy bắn đã nạp (selected)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1920x1080",
+      "name": "bắn nổ cụm: trứng vỡ tăng (trứng bắn không tính)",
+      "ok": true,
+      "detail": "popped=2"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "ảnh no-cum.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "79 KB"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "bàn thử có phát bắn làm trứng rơi",
+      "ok": true,
+      "detail": "{\"score\":303,\"type\":0,\"angle\":16,\"pop\":3,\"drop\":3}"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "ảnh trung-roi-dang-bay.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "67 KB"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "trứng không còn nối với trần thì rơi (đếm trứng rơi tăng)",
+      "ok": true,
+      "detail": "dropped=3"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "sau phát làm trứng rơi ván vẫn đang chơi (để kiểm tiếp hạ bàn, mất tim)",
+      "ok": true,
+      "detail": "play"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "đủ 8 phát thì cả bàn hạ 1 hàng và bộ đếm quay về 8",
+      "ok": true,
+      "detail": "lowered=1 còn=8"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "ảnh ha-ban.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "86 KB"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "trứng chạm dây giới hạn: mất 1 tim, 2 hàng dưới cùng được dọn, chơi tiếp",
+      "ok": true,
+      "detail": "tim=2 hàng=1"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "ảnh mat-tim.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "66 KB"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "mở \"?\": đồng hồ hoạt cảnh đứng yên (tạm dừng thật)",
+      "ok": true,
+      "detail": "7.304 → 7.304"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "câu nhắc không lộ số trứng đúng",
+      "ok": true,
+      "detail": "Việc của em lúc này: Ngắm theo vạch nét đứt rồi bắn. Ba trứng cùng số liền nhau "
+    },
+    {
+      "tag": "1920x1080",
+      "name": "đang mở \"?\" thì bắn và đổi loại trứng không được (phím Space và 2 bị bỏ qua)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1920x1080",
+      "name": "ảnh hop-goi-y.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "69 KB"
+    },
+    {
+      "tag": "1920x1080",
+      "name": "bấm \"Chơi tiếp\": đồng hồ chạy lại",
+      "ok": true,
+      "detail": "t2=7.30 t3=7.82 {\"hint\":false,\"vis\":\"visible\",\"phase\":\"play\",\"dialogs\":0}"
+    },
+    {
+      "tag": "360x800",
+      "name": "bàn trứng rộng gần hết màn (khung dọc)",
+      "ok": true,
+      "detail": "96.7%"
+    },
+    {
+      "tag": "360x800",
+      "name": "không cuộn ngang",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "ảnh nap-dau.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "40 KB"
+    },
+    {
+      "tag": "360x800",
+      "name": "nạp sai: trứng bật ra, báo \"Chưa đúng\", đợt mất thưởng nạp, chưa vào máy bắn",
+      "ok": true,
+      "detail": "Chưa đúng: không khóa nào của đợt này có 5^x mod 23 bằng 13."
+    },
+    {
+      "tag": "360x800",
+      "name": "ảnh nap-sai.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "43 KB"
+    },
+    {
+      "tag": "360x800",
+      "name": "ảnh nap-giua-chung.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "40 KB"
+    },
+    {
+      "tag": "360x800",
+      "name": "nạp đúng: mọi trứng đúng vào máy bắn, nút \"Bắt đầu đợt\" mở",
+      "ok": true,
+      "detail": "3/3"
+    },
+    {
+      "tag": "360x800",
+      "name": "trứng ở khay nạp là nút ≥ 44 px",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "ảnh nap-dung.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "40 KB"
+    },
+    {
+      "tag": "360x800",
+      "name": "sau khi bắt đầu đợt: đang chơi, bàn 5 hàng, chưa chọn loại trứng",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "đợt nạp có sai thì không được thưởng nạp",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "ảnh ban-moi.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "39 KB"
+    },
+    {
+      "tag": "360x800",
+      "name": "chưa chọn loại trứng: bấm bàn không bắn, nút bắn khóa, có lời nhắc",
+      "ok": true,
+      "detail": "shots=0"
+    },
+    {
+      "tag": "360x800",
+      "name": "ảnh chua-chon.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "39 KB"
+    },
+    {
+      "tag": "360x800",
+      "name": "nút chọn loại trứng và nút Bắn ≥ 44 px",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "bàn thử có phát bắn làm vỡ cụm",
+      "ok": true,
+      "detail": "{\"score\":3,\"type\":1,\"angle\":12,\"pop\":3,\"drop\":0}"
+    },
+    {
+      "tag": "360x800",
+      "name": "chọn loại trứng ở khay: máy bắn đã nạp (selected)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "bắn nổ cụm: trứng vỡ tăng (trứng bắn không tính)",
+      "ok": true,
+      "detail": "popped=2"
+    },
+    {
+      "tag": "360x800",
+      "name": "ảnh no-cum.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "31 KB"
+    },
+    {
+      "tag": "360x800",
+      "name": "bàn thử có phát bắn làm trứng rơi",
+      "ok": true,
+      "detail": "{\"score\":303,\"type\":0,\"angle\":16,\"pop\":3,\"drop\":3}"
+    },
+    {
+      "tag": "360x800",
+      "name": "ảnh trung-roi-dang-bay.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "29 KB"
+    },
+    {
+      "tag": "360x800",
+      "name": "trứng không còn nối với trần thì rơi (đếm trứng rơi tăng)",
+      "ok": true,
+      "detail": "dropped=3"
+    },
+    {
+      "tag": "360x800",
+      "name": "sau phát làm trứng rơi ván vẫn đang chơi (để kiểm tiếp hạ bàn, mất tim)",
+      "ok": true,
+      "detail": "play"
+    },
+    {
+      "tag": "360x800",
+      "name": "đủ 8 phát thì cả bàn hạ 1 hàng và bộ đếm quay về 8",
+      "ok": true,
+      "detail": "lowered=1 còn=8"
+    },
+    {
+      "tag": "360x800",
+      "name": "ảnh ha-ban.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "34 KB"
+    },
+    {
+      "tag": "360x800",
+      "name": "trứng chạm dây giới hạn: mất 1 tim, 2 hàng dưới cùng được dọn, chơi tiếp",
+      "ok": true,
+      "detail": "tim=2 hàng=1"
+    },
+    {
+      "tag": "360x800",
+      "name": "ảnh mat-tim.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "31 KB"
+    },
+    {
+      "tag": "360x800",
+      "name": "mở \"?\": đồng hồ hoạt cảnh đứng yên (tạm dừng thật)",
+      "ok": true,
+      "detail": "7.366 → 7.366"
+    },
+    {
+      "tag": "360x800",
+      "name": "câu nhắc không lộ số trứng đúng",
+      "ok": true,
+      "detail": "Việc của em lúc này: Ngắm theo vạch nét đứt rồi bắn. Ba trứng cùng số liền nhau "
+    },
+    {
+      "tag": "360x800",
+      "name": "đang mở \"?\" thì bắn và đổi loại trứng không được (phím Space và 2 bị bỏ qua)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "360x800",
+      "name": "ảnh hop-goi-y.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "37 KB"
+    },
+    {
+      "tag": "360x800",
+      "name": "bấm \"Chơi tiếp\": đồng hồ chạy lại",
+      "ok": true,
+      "detail": "t2=7.37 t3=7.87 {\"hint\":false,\"vis\":\"visible\",\"phase\":\"play\",\"dialogs\":0}"
+    },
+    {
+      "tag": "1366x768-huong-dan",
+      "name": "hướng dẫn làm thử tự mở khi vào ván đầu",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768-huong-dan",
+      "name": "ảnh buoc-0.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "52 KB"
+    },
+    {
+      "tag": "1366x768-huong-dan",
+      "name": "ảnh buoc-1.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "53 KB"
+    },
+    {
+      "tag": "1366x768-huong-dan",
+      "name": "bước nạp: chọn đúng 1 trứng thì hiện nút Tiếp tục",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768-huong-dan",
+      "name": "ảnh buoc-2.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "46 KB"
+    },
+    {
+      "tag": "1366x768-huong-dan",
+      "name": "ảnh buoc-3.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "60 KB"
+    },
+    {
+      "tag": "1366x768-huong-dan",
+      "name": "ảnh buoc-4.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "59 KB"
+    },
+    {
+      "tag": "1366x768-huong-dan",
+      "name": "bắn thử 1 phát trên bàn mẫu nhỏ rồi sang bước kết",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768-huong-dan",
+      "name": "ảnh buoc-5.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "41 KB"
+    },
+    {
+      "tag": "1366x768-huong-dan",
+      "name": "ván thật không bị cộng điểm hay tiến độ từ bước làm thử",
+      "ok": true,
+      "detail": "{\"phase\":\"load\",\"round\":0,\"shots\":0,\"popped\":0,\"picked\":0,\"score\":\"Điểm: 0\"}"
+    },
+    {
+      "tag": "1366x768-tu-hoan-thanh",
+      "name": "có nút Tự hoàn thành cả màn trên thẻ bắt đầu (bản dev)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768-tu-hoan-thanh",
+      "name": "Tự hoàn thành: hiện khung \"đã tự hoàn thành\" (không điểm)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "tag": "1366x768-tu-hoan-thanh",
+      "name": "ảnh tu-hoan-thanh.jpg dưới 300 KB",
+      "ok": true,
+      "detail": "27 KB"
+    }
+  ]
+}

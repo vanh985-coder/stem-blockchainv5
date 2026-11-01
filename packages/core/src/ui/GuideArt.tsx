@@ -285,89 +285,37 @@ function Courtyard({ mouseLane }: { mouseLane?: number }) {
   );
 }
 
-/** Gà của màn 9 (hình minh họa): thân tròn, đầu quay sang trái; `sick` có đốm tím, `boss` to hơn, màu đỏ nâu, có yên. Tâm ở giữa thân; không có chữ. */
-function ChickenIcon({ x, y, s = 1, sick = true, boss = false }: { x: number; y: number; s?: number; sick?: boolean; boss?: boolean }) {
-  const body = boss ? '#c9602a' : sick ? '#d8e08a' : '#f2b94b';
+/** Quả trứng khắc dấu của màn 9 (hình minh họa): thân oval, vòng dấu khắc ở giữa, không có chữ. `ring` là viền đứt nổi bật, `dim` là trứng mờ (không còn trên bàn). Tâm ở giữa thân. */
+function EggIcon({ x, y, s = 1, color = '#f2b94b', ring, dim = false }: { x: number; y: number; s?: number; color?: string; ring?: string; dim?: boolean }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${s})`}>
-      <path d="M-5 22 l-3 14 m-6 0 h12 M10 22 l3 14 m-6 0 h12" stroke="#e0903a" strokeWidth={3.5} strokeLinecap="round" fill="none" />
-      <path d="M24 -4 q18 -12 10 -24 q-12 8 -16 16 Z" fill={body} stroke={C.ink} strokeWidth={2.5} strokeLinejoin="round" />
-      <ellipse cx={0} cy={4} rx={26} ry={22} fill={body} stroke={C.ink} strokeWidth={2.5} />
-      <ellipse cx={6} cy={6} rx={12} ry={9} fill="rgba(0,0,0,0.12)" stroke={C.ink} strokeWidth={1.5} />
-      <circle cx={-20} cy={-14} r={13} fill={body} stroke={C.ink} strokeWidth={2.5} />
-      <polygon points="-32,-16 -42,-12 -32,-8" fill="#f0a030" stroke={C.ink} strokeWidth={2} strokeLinejoin="round" />
-      <circle cx={-24} cy={-17} r={2.4} fill={C.ink} />
-      <g fill={boss ? '#8f1f2a' : C.red} stroke={C.ink} strokeWidth={1.8}>
-        <circle cx={-23} cy={-29} r={5} />
-        <circle cx={-17} cy={-31} r={5} />
-        <circle cx={-12} cy={-27} r={5} />
-      </g>
-      {sick && (
-        <g fill={C.purple}>
-          <circle cx={-6} cy={-4} r={3} />
-          <circle cx={9} cy={14} r={3.2} />
-          <circle cx={-14} cy={11} r={2.6} />
-          <circle cx={15} cy={-2} r={2.6} />
-          <circle cx={-18} cy={-12} r={2} />
-        </g>
+    <g transform={`translate(${x} ${y}) scale(${s})`} opacity={dim ? 0.35 : 1}>
+      {ring && <circle cx={0} cy={1} r={27} fill="none" stroke={ring} strokeWidth={4} strokeDasharray="7 5" />}
+      <path d="M0 -21 C12 -21 18 -5 18 6 C18 17 10 22 0 22 C-10 22 -18 17 -18 6 C-18 -5 -12 -21 0 -21 Z" fill={color} stroke={C.ink} strokeWidth={2.5} strokeLinejoin="round" />
+      <circle cx={0} cy={4} r={10} fill="none" stroke={C.ink} strokeWidth={2} />
+      <circle cx={0} cy={4} r={6} fill="none" stroke={C.ink} strokeWidth={1.5} />
+    </g>
+  );
+}
+
+const EGG_COLORS = ['#f2b94b', '#7fbf6a', '#6aa8e0', '#e07a9a', '#b58be0'];
+
+/** Bàn trứng nhỏ (hình minh họa): vài hàng trứng xếp lục giác dưới tấm trần; `lowered` hàng tấm trần đã hạ. */
+function MiniBoard({ x, y, rows = 3, lowered = 0 }: { x: number; y: number; rows?: number; lowered?: number }) {
+  const cell = 24;
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <rect x={-4} y={-4} width={cell * 5 + 8} height={cell * 6 + 8} rx={8} fill="#fff3d0" stroke={C.wood} strokeWidth={3} />
+      <rect x={-4} y={-4} width={cell * 5 + 8} height={10 + lowered * cell * 0.87} rx={5} fill="#8a5a2b" stroke={C.ink} strokeWidth={2} />
+      {Array.from({ length: rows }, (_, r) =>
+        Array.from({ length: r % 2 === 0 ? 5 : 4 }, (_, c) => (
+          <EggIcon key={`${r}${c}`} x={12 + c * cell + (r % 2 === 0 ? 0 : cell / 2)} y={16 + lowered * cell * 0.87 + r * cell * 0.87} s={0.5} color={EGG_COLORS[(r * 2 + c) % 3]} />
+        )),
       )}
-      {boss && <rect x={4} y={-20} width={16} height={9} rx={3} fill="#7a4a2a" stroke={C.ink} strokeWidth={2} />}
+      <path d={`M0 ${cell * 5.2} H${cell * 5}`} stroke="#c0392b" strokeWidth={2.5} strokeDasharray="6 4" />
     </g>
   );
 }
 
-/** Thẻ số treo trên đầu gà (hình minh họa): chỉ là ô trắng có hai chấm, không có chữ. */
-function NumberCard({ x, y, ring }: { x: number; y: number; ring?: string }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      {ring && <rect x={-6} y={-6} width={42} height={30} rx={9} fill="none" stroke={ring} strokeWidth={3.5} strokeDasharray="7 5" />}
-      <rect x={0} y={0} width={30} height={18} rx={5} fill="#fffaf0" stroke={C.wood} strokeWidth={2.5} />
-      <circle cx={10} cy={9} r={3} fill={C.ink} />
-      <circle cx={20} cy={9} r={3} fill={C.ink} />
-    </g>
-  );
-}
-
-/** Lọ thuốc (hình minh họa): thân trong suốt, nắp màu, ô dán nhãn ở giữa (`filled` thì có nhãn xanh, không thì viền đứt). */
-function Jar({ x, y, color, filled = false, ring }: { x: number; y: number; color: string; filled?: boolean; ring?: string }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      {ring && <rect x={-6} y={-6} width={62} height={90} rx={14} fill="none" stroke={ring} strokeWidth={4} strokeDasharray="8 6" />}
-      <rect x={4} y={0} width={42} height={12} rx={4} fill={color} stroke={C.ink} strokeWidth={2.5} />
-      <rect x={0} y={10} width={50} height={64} rx={12} fill={C.glass} stroke={C.wood} strokeWidth={3} />
-      {filled ? <rect x={8} y={28} width={34} height={22} rx={6} fill="#d6ecc2" stroke={C.green} strokeWidth={3} /> : <rect x={8} y={28} width={34} height={22} rx={6} fill="none" stroke={C.wood} strokeWidth={2.5} strokeDasharray="6 4" />}
-    </g>
-  );
-}
-
-/** Nhãn mẫu công khai (hình minh họa): viên thuốc nhỏ bo tròn, không có chữ. */
-function LabelChip({ x, y, mark }: { x: number; y: number; mark?: "ok" | "no" }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <rect x={0} y={0} width={42} height={26} rx={8} fill="#fffaf0" stroke={C.wood} strokeWidth={3} />
-      <path d="M10 13 h22" stroke={C.ink} strokeWidth={4} strokeLinecap="round" />
-      {mark === "ok" && <Check x={44} y={0} />}
-      {mark === "no" && <Cross x={44} y={0} />}
-    </g>
-  );
-}
-
-/** Đường ba làn của màn 9 (hình minh họa): ba dải đất chạy từ xa (trên) về phía cổng làng (dưới), kèm ná cao su ở giữa đáy. */
-function ChickenRoad() {
-  return (
-    <g>
-      <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.grass} />
-      {[0, 1, 2].map((i) => (
-        <polygon key={i} points={`${70 + i * 40},8 ${96 + i * 40},8 ${130 + i * 62},120 ${52 + i * 62},120`} fill={C.road} stroke="#b9854a" strokeWidth={2} />
-      ))}
-      <rect x={150} y={150} width={20} height={4} fill="#fffaf0" opacity={0} />
-      <g transform="translate(160 172)">
-        <path d="M0 0 v-22 M0 -22 l-12 -18 M0 -22 l12 -18" stroke="#8a5a2c" strokeWidth={6} strokeLinecap="round" fill="none" />
-        <path d="M-12 -40 q12 16 24 0" stroke="#e0903a" strokeWidth={3} fill="none" />
-      </g>
-    </g>
-  );
-}
 const K = huongDan.phim;
 
 /** Diều của màn 6 (hình minh họa): thân hình thoi, đuôi dây; `dark` là diều đen của {phanDien} (có mặt cười nhếch). Tâm ở thân diều. */
@@ -961,81 +909,77 @@ const ARTS: Record<GuideArtId, () => ReactNode> = {
       <Check x={30} y={140} />
     </g>
   ),
-  'nap-nhan': () => (
+  'nap-trung': () => (
     <g>
       <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
-      <Jar x={34} y={22} color="#e0544b" filled />
-      <Jar x={135} y={22} color="#3d7fd9" ring={C.green} />
-      <Jar x={236} y={22} color="#3aa35a" />
-      <rect x={24} y={122} width={272} height={44} rx={12} fill="#fffaf0" stroke={C.wood} strokeWidth={3} />
-      <LabelChip x={44} y={131} />
-      <LabelChip x={116} y={131} />
-      <LabelChip x={188} y={131} />
-      <LabelChip x={248} y={131} />
-      <Arrow x1={209} y1={128} x2={166} y2={98} width={5} />
+      <rect x={24} y={14} width={272} height={64} rx={14} fill="#fffaf0" stroke={C.wood} strokeWidth={3} />
+      <EggIcon x={64} y={46} color={EGG_COLORS[0]} ring={C.green} />
+      <EggIcon x={128} y={46} color={EGG_COLORS[1]} />
+      <EggIcon x={192} y={46} color={EGG_COLORS[2]} />
+      <EggIcon x={256} y={46} color={EGG_COLORS[3]} />
+      <Check x={74} y={20} />
+      <Cross x={202} y={20} />
+      <Arrow x1={64} y1={82} x2={110} y2={124} width={5} />
+      {[0, 1, 2].map((i) => (
+        <rect key={i} x={94 + i * 52} y={126} width={42} height={42} rx={21} fill="none" stroke={C.wood} strokeWidth={3} strokeDasharray="6 4" />
+      ))}
     </g>
   ),
-  'nhan-bay': () => (
+  'chon-trung-may': () => (
     <g>
       <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
-      <rect x={24} y={30} width={76} height={110} rx={12} fill="#fffaf0" stroke={C.wood} strokeWidth={4} />
-      <rect x={34} y={40} width={56} height={22} rx={5} fill="#cfe8f7" stroke={C.ink} strokeWidth={2.5} />
-      {[0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => <rect key={`${r}${c}`} x={35 + c * 19} y={72 + r * 20} width={15} height={14} rx={4} fill={C.gold} stroke={C.goldDark} strokeWidth={2} />))}
-      <Arrow x1={110} y1={85} x2={150} y2={85} />
-      <LabelChip x={166} y={44} mark="ok" />
-      <LabelChip x={166} y={96} mark="no" />
-      <LabelChip x={166} y={140} mark="no" />
-    </g>
-  ),
-  'ban-ga-phim': () => (
-    <g>
-      <ChickenRoad />
-      <ChickenIcon x={120} y={80} s={0.9} />
-      <NumberCard x={80} y={22} ring={C.purple} />
-      <ChickenIcon x={64} y={118} s={0.6} sick />
-      <Arrow x1={160} y1={126} x2={128} y2={96} color={C.purple} width={4} />
-      <Key x={206} y={20} w={30} h={30} label="1" />
-      <Key x={242} y={20} w={30} h={30} label="2" />
-      <Key x={278} y={20} w={30} h={30} label="3" />
-      <Key x={206} y={70} w={34} h={34} arrow="left" />
-      <Key x={246} y={70} w={34} h={34} arrow="right" />
-      <Key x={206} y={120} w={102} h={32} label={huongDan.phim.space} />
-    </g>
-  ),
-  'ban-ga-cham': () => (
-    <g>
-      <ChickenRoad />
-      <ChickenIcon x={150} y={74} s={1} />
-      <NumberCard x={106} y={14} />
-      <ChickenIcon x={90} y={112} s={0.62} sick />
-      <Arrow x1={160} y1={126} x2={152} y2={100} color={C.purple} width={4} />
-      <Finger x={150} y={76} />
+      <ellipse cx={160} cy={150} rx={70} ry={20} fill="#5a3716" />
+      <rect x={150} y={96} width={20} height={52} rx={6} fill="#8a5a2b" stroke={C.ink} strokeWidth={2.5} />
+      <EggIcon x={160} y={84} s={0.9} color={EGG_COLORS[1]} />
       {[0, 1, 2].map((i) => (
         <g key={i}>
-          <rect x={14 + i * 52} y={142} width={46} height={30} rx={8} fill="#fffaf0" stroke={i === 1 ? C.purple : C.wood} strokeWidth={i === 1 ? 4 : 2.5} />
-          <circle cx={26 + i * 52} cy={157} r={6} fill={["#e0544b", "#3d7fd9", "#3aa35a"][i]} stroke={C.ink} strokeWidth={1.5} />
-          <path d="M38 157 h14" transform={`translate(${i * 52} 0)`} stroke={C.ink} strokeWidth={3.5} strokeLinecap="round" />
+          <rect x={36 + i * 92} y={14} width={68} height={50} rx={12} fill="#fffaf0" stroke={i === 1 ? C.purple : C.wood} strokeWidth={i === 1 ? 5 : 3} />
+          <EggIcon x={70 + i * 92} y={40} s={0.7} color={EGG_COLORS[i]} dim={i === 2} />
+        </g>
+      ))}
+      <Arrow x1={128} y1={70} x2={152} y2={98} width={4} />
+    </g>
+  ),
+  'ngam-phim': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      <MiniBoard x={20} y={14} />
+      <path d="M72 164 L112 70 L128 40" stroke={C.purple} strokeWidth={4} strokeDasharray="8 7" strokeLinecap="round" fill="none" />
+      <EggIcon x={72} y={160} s={0.55} color={EGG_COLORS[1]} />
+      <Key x={186} y={20} w={30} h={30} label="1" />
+      <Key x={222} y={20} w={30} h={30} label="2" />
+      <Key x={258} y={20} w={30} h={30} label="3" />
+      <Key x={186} y={70} w={34} h={34} arrow="left" />
+      <Key x={226} y={70} w={34} h={34} arrow="right" />
+      <Key x={186} y={120} w={102} h={32} label={huongDan.phim.space} />
+    </g>
+  ),
+  'ngam-cham': () => (
+    <g>
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      <MiniBoard x={104} y={8} />
+      <path d="M160 164 L214 70 L226 44" stroke={C.purple} strokeWidth={4} strokeDasharray="8 7" strokeLinecap="round" fill="none" />
+      <EggIcon x={160} y={160} s={0.55} color={EGG_COLORS[1]} />
+      <Arrow x1={160} y1={150} x2={196} y2={104} color={C.purple} width={4} />
+      <Finger x={198} y={104} />
+      {[0, 1, 2].map((i) => (
+        <g key={i}>
+          <rect x={10 + i * 0} y={20 + i * 50} width={56} height={40} rx={10} fill="#fffaf0" stroke={i === 1 ? C.purple : C.wood} strokeWidth={i === 1 ? 4 : 2.5} />
+          <EggIcon x={38} y={40 + i * 50} s={0.55} color={EGG_COLORS[i]} />
         </g>
       ))}
     </g>
   ),
-  'ga-trum': () => (
+  'ha-ban': () => (
     <g>
-      <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.grass} />
-      <rect x={0} y={110} width={ART_W} height={70} fill={C.road} />
-      <ChickenIcon x={106} y={96} s={1.7} boss />
-      <circle cx={118} cy={20} r={13} fill="#f2c9a0" stroke={C.ink} strokeWidth={3} />
-      <rect x={108} y={32} width={20} height={24} rx={6} fill="#6a4bb0" stroke={C.ink} strokeWidth={3} />
-      <NumberCard x={42} y={4} />
-      {[0, 1, 2].map((i) => (
-        <g key={i}>
-          <circle cx={226 + i * 30} cy={52} r={13} fill={i < 2 ? C.green : "none"} stroke={i < 2 ? C.green : C.wood} strokeWidth={3} strokeDasharray={i < 2 ? undefined : "6 4"} />
-          {i < 2 && <path d={`M${219 + i * 30} 52 l5 5 l9 -10`} fill="none" stroke="#fff" strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round" />}
-        </g>
-      ))}
-      <Heart x={240} y={120} s={0.8} />
-      <Heart x={272} y={120} s={0.8} />
-      <Heart x={304} y={120} s={0.8} color="none" />
+      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
+      <MiniBoard x={24} y={10} rows={5} lowered={1} />
+      <Arrow x1={170} y1={30} x2={170} y2={86} color={C.red} width={5} />
+      <Heart x={206} y={30} s={0.9} />
+      <Heart x={240} y={30} s={0.9} />
+      <Heart x={274} y={30} s={0.9} color="none" />
+      <EggIcon x={236} y={118} s={0.8} color={EGG_COLORS[3]} />
+      <Cross x={252} y={96} />
     </g>
   ),
   'doi-o-phim': () => (
