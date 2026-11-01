@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { MemoryGame } from '../../../packages/village-lang-khac-dau/src/memory/MemoryGame';
-import { ChickenGame } from '../../../packages/village-lang-khac-dau/src/chicken/ChickenGame';
+import { BubbleGame } from '../../../packages/village-lang-khac-dau/src/bubble/BubbleGame';
 import { fmt, tutorialTexts } from '@so-chung/core';
 
 describe('Màn 8 Lật thẻ - Tích hợp Hướng dẫn focus & Làm thử', () => {
@@ -26,10 +26,10 @@ describe('Màn 8 Lật thẻ - Tích hợp Hướng dẫn focus & Làm thử', (
   });
 });
 
-describe('Màn 9 Chữa gà - Tích hợp Hướng dẫn focus & Làm thử', () => {
+describe('Màn 9 Bắn trứng khắc dấu - Tích hợp Hướng dẫn focus & Làm thử', () => {
   it('tự động bật hướng dẫn làm thử khi vừa mount màn 9 (attempt = 0)', () => {
     const html = renderToStaticMarkup(
-      <ChickenGame
+      <BubbleGame
         paused={false}
         attempt={0}
         onFinish={() => {}}

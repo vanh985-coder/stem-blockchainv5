@@ -68,12 +68,12 @@ export const GUIDE_ART_IDS = [
   'dieu-khe',
   'dieu-den',
   'cong-lang',
-  // màn 9 (bước B11)
-  'nap-nhan',
-  'nhan-bay',
-  'ban-ga-phim',
-  'ban-ga-cham',
-  'ga-trum',
+  // màn 9 (Bắn trứng khắc dấu)
+  'nap-trung',
+  'chon-trung-may',
+  'ngam-phim',
+  'ngam-cham',
+  'ha-ban',
   // màn 11 (bước B13)
   'doi-o-phim',
   'doi-o-vuot',

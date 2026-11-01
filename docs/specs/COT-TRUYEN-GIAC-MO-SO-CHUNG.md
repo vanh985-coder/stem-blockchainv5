@@ -115,11 +115,11 @@ Cổng Làng Dệt mở.
 - Tí trộn lung tung **bộ khuôn tập** của chú Dũng (khuôn chú khắc cho thợ học việc luyện tay, không phải khuôn riêng thật của ai). A lật thẻ, tính 5^x mod 23 để ghép mỗi khuôn với mẫu công khai của nó.
 - Ở vòng cuối, Tí lén tráo chỗ các thẻ đang úp.
 
-**Màn 9 · Game: Chữa đàn gà**
-- Tí lùa một đàn gà bệnh vào làng để phá phiên chợ. Mỗi con đeo một thẻ số (khóa công khai).
-- A dùng ná bắn **viên thuốc** có khóa riêng tương ứng để chữa cho gà: trúng là gà khỏe lại, chạy về chuồng.
-- Trước mỗi đợt có bước "nạp đạn": tính xuôi từ khóa riêng ra khóa công khai.
-- Đợt cuối, Tí cưỡi con gà trùm xông vào.
+**Màn 9 · Game: Bắn trứng khắc dấu**
+- Tí trộn trứng gà bệnh khắc dấu giả vào ổ trứng của làng. Mỗi quả trứng mang một số, là mẫu công khai.
+- Trước mỗi đợt A nạp trứng: tính xuôi từ khóa riêng ra mẫu công khai (5^x mod 23), chọn đúng trứng khắc mẫu đó cho máy bắn.
+- A chọn loại trứng trong máy bắn rồi bắn gom các trứng cùng mẫu: từ ba trứng cùng số liền nhau thì vỡ, trứng mất chỗ bám thì rơi. Cứ vài phát cả bàn hạ xuống một hàng; trứng giả chạm dây đỏ thì A mất một tim.
+- Sạch ba đợt là ổ trứng của làng đã sạch.
 
 **Kết chương.** Chú Dũng trao **Trang Sổ Vàng thứ ba**:
 

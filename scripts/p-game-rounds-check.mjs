@@ -260,9 +260,9 @@ async function run() {
     }
 
     // -------------------------------------------------------------
-    // MÀN 9: Game Chạy 3 làn 2D (Chữa đàn gà)
+    // MÀN 9: Game bắn trứng canvas 2D (Bắn trứng khắc dấu)
     // -------------------------------------------------------------
-    console.log('\n=== Màn 9: Chữa đàn gà 2D ===');
+    console.log('\n=== Màn 9: Bắn trứng khắc dấu (canvas 2D) ===');
     // Ca 1: Trạng thái nạp đạn (phase === 'load')
     {
       const ctx = await newPageCtx(browser, 9);
@@ -276,8 +276,8 @@ async function run() {
       const ctx = await newPageCtx(browser, 9);
       await openGame(ctx, 'lang-khac-dau', 9);
       await testAutoInState(ctx, 'Màn 9 (Đợt 3 có gà trùm cuối đường)', () => {
-        if (window.__chicken) {
-          window.__chicken.round = 2;
+        if (window.__bubble) {
+          window.__bubble.round = 2; window.__bubble.phase = 'load';
         }
       });
       await ctx.page.close();

@@ -220,13 +220,16 @@ export const tutorialTexts = {
   },
 
   man9: {
-    tieuDe: 'Làm thử: Chữa đàn gà',
-    intro: 'Đàn gà bị {phanDien} làm nhiễm bệnh đang chạy về phía cổng làng! Em hãy dùng ná bắn thuốc giải mã đúng để chữa khỏi cho đàn gà.',
-    load: 'Giai đoạn nạp thuốc: Trước mỗi đợt, em kéo hoặc chọn đúng nhãn Khóa công khai dán vào từng ô thuốc theo công thức y = 5^x mod 23.',
-    shoot: 'Giai đoạn bắn ná: Đàn gà mang thẻ số chạy vào 3 làn. Chọn viên thuốc phù hợp (phím 1-4) rồi ngắm bắn vào con gà mang khóa tương ứng!',
-    practice: 'Em hãy bấm nút "Bắn thử một viên" để trải nghiệm thao tác ngắm bắn nhé!',
-    banThu: 'Bắn thử một viên',
-    correct: 'Phát bắn rất chuẩn xác! Hãy nhanh tay nạp thuốc và bảo vệ cổng làng trước đàn gà và gà trùm nhé!',
+    tieuDe: 'Làm thử: Bắn trứng khắc dấu',
+    intro: '{phanDien} trộn trứng gà bệnh khắc dấu giả vào ổ trứng của làng! Em làm thử bốn việc: nạp trứng đúng, chọn trứng trong máy bắn, ngắm, rồi bắn thử một phát trên bàn mẫu nhỏ. Làm thử không tính điểm.',
+    load: 'Khay nạp trứng: em bấm vào trứng ghi mẫu công khai đúng của khóa riêng, tính bằng y = 5^x mod 23. Có Máy tính mod để kiểm tra. Hãy thử chọn một trứng đúng nhé!',
+    loadDung: 'Trứng đúng đã bay vào máy bắn! Trứng sai thì bật ra và đợt đó mất điểm thưởng nạp.',
+    pick: 'Khay trứng cạnh máy bắn: em phải chọn một loại trứng (bấm vào đó, hoặc phím 1 đến 5) thì mới bắn được. Hãy chọn trứng nhé!',
+    aim: 'Bàn trứng: rê chuột (hoặc kéo ngón tay, hoặc phím mũi tên trái phải) để ngắm. Vạch nét đứt chỉ đường bay tới chỗ trứng nảy tường đầu tiên.',
+    practice: 'Em hãy bắn thử một phát: bấm chuột (thả tay, hoặc Space) khi đã ngắm vào cụm trứng cùng số. Từ 3 trứng cùng số liền nhau thì vỡ!',
+    banThu: 'Bắn thử một phát',
+    correct: 'Phát bắn rất chuẩn xác! Nhớ là cứ vài phát cả bàn lại hạ một hàng, trứng chạm dây đỏ thì mất tim. Chúc em gom hết trứng giả!',
+    batDauThu: 'Bắt đầu làm thử',
   },
 
   man11: {

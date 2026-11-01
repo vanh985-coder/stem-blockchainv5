@@ -60,12 +60,12 @@ export const VILLAGE_SCENE: Partial<Record<VillageId, VillageSceneText>> = {
     guideNext: {
       lesson: 'Em ra biển gỗ "Học cùng chú Dũng" nhé. Chú sẽ chỉ em cách đóng dấu bằng khuôn riêng và kiểm dấu bằng mẫu chung.',
       game1: 'Giờ tới biển "Lật thẻ tìm cặp khóa" nhé. {phanDien} trộn lung tung bộ khuôn tập của chú đấy!',
-      game2: 'Còn biển "Chữa đàn gà": {phanDien} lùa một đàn gà bệnh vào làng, em dùng ná bắn viên thuốc đúng loại để chữa cho gà nhé.',
+      game2: 'Còn biển "Bắn trứng khắc dấu": {phanDien} trộn trứng gà bệnh khắc dấu giả vào ổ trứng của làng, em nạp đúng trứng mẫu công khai rồi bắn gom trứng cùng mẫu cho vỡ nhé.',
       done: 'Làng Khắc Dấu cảm ơn em nhiều! Em quay về chợ để ghé làng khác nhé.',
     },
     award: {
       loi: [
-        'Em đã ghép lại bộ khuôn và chữa cả đàn gà rồi đấy! Chú trao em Trang Sổ Vàng thứ ba.',
+        'Em đã ghép lại bộ khuôn và dọn sạch trứng giả rồi đấy! Chú trao em Trang Sổ Vàng thứ ba.',
         'Không giả dấu được nữa, {phanDien} chuyển sang trò trộn giao dịch ở Làng Bạc rồi.',
       ],
     },
