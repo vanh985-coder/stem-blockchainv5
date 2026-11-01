@@ -173,19 +173,23 @@ export function ClimbStage({ state, anim, frame, textures, labels, version, redu
       m.visible = true;
       m.position.x = cx;
       m.position.y = cy;
-      if (m.userData.v !== c.value) {
+      const cracked = c.crack !== null;
+      // có ảnh bac-go-nut thì bậc nứt ĐỔI sang tấm ván nứt (thay bac-go), không phủ thêm lớp vết nứt
+      const crackedMap = cracked ? labels?.cracked.get(c.value) ?? null : null;
+      const swap = crackedMap !== null;
+      if (m.userData.v !== c.value || m.userData.k !== swap) {
         m.userData.v = c.value;
+        m.userData.k = swap;
         const mm = choiceMat(i);
-        mm.map = labels?.steps.get(c.value) ?? null;
+        mm.map = crackedMap ?? labels?.steps.get(c.value) ?? null;
         mm.color.set(mm.map ? '#ffffff' : PLACEHOLDER.step);
         mm.needsUpdate = true;
       }
-      const cracked = c.crack !== null;
       const a = cracked ? crackAlpha(c.crack ?? 0) : 1;
       choiceMat(i).opacity = a;
       m.rotation.z = cracked && !reduced ? (1 - a) * 0.2 * (i % 2 ? 1 : -1) : 0;
-      cr.visible = cracked;
-      if (cracked) {
+      cr.visible = cracked && !swap;
+      if (cracked && !swap) {
         cr.position.x = cx;
         cr.position.y = cy;
         crackMats[i].opacity = a;

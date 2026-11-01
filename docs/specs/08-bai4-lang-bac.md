@@ -459,12 +459,12 @@ Bot trung bình nhầm 1,74 lần và hụt 0,86 lần mỗi ván. Bot giỏi 10
 
 ### Đồ họa cần tạo (không bắt buộc: thiếu thì dùng hình code)
 
-Cảnh thử tải trước hai file dưới đây từ manifest (`ART.step`, `ART.stepCrack` ở `climbArt.ts`); chưa có thì dùng ván vẽ bằng code và vết nứt vẽ bằng code, không lỗi trang. Khi có file thật thì chạy `pnpm assets:build` rồi commit `assets-build/`.
+Cảnh thử tải trước hai file dưới đây từ manifest (`ART.step`, `ART.stepCrack` ở `climbArt.ts`); chưa có: thiếu `bac-go` thì dùng ván vẽ bằng code; thiếu `bac-go-nut` thì giữ cách cũ: bậc sai vẫn là ván thường (`bac-go` hay ván code) kèm lớp vết nứt vẽ bằng code phủ lên, mờ dần. Có `bac-go-nut` thì bậc sai ĐỔI sang ảnh đó thay cho `bac-go`, không phủ thêm lớp nào. Không lỗi trang trong mọi trường hợp. Khi có file thật thì chạy `pnpm assets:build` rồi commit `assets-build/`.
 
 | Tên file (đường dẫn trong manifest) | Kích thước | Mô tả |
 |---|---|---|
 | `sprites/man-12-leo-cay/bac-go` (bậc gỗ thường) | 512 × 240 điểm ảnh, PNG nền trong suốt (tỉ lệ 1,7 : 0,8 như bậc trong cảnh) | Tấm ván gỗ nâu vàng nằm ngang, vân ngang rõ, hai đinh ở hai đầu, viền nâu đậm, bo góc nhẹ; mặt bậc ở cạnh trên của ảnh. KHÔNG có chữ hay số (code vẽ số ở giữa, chừa vùng giữa ảnh tương đối phẳng để số dễ đọc). |
-| `sprites/man-12-leo-cay/bac-go-nut` (bậc gỗ nứt) | 512 × 240 điểm ảnh, PNG nền trong suốt, cùng khung với `bac-go` | Chỉ vẽ phần **vết nứt phủ lên bậc**: 3 đến 4 đường nứt nâu đen tỏa ra từ giữa, vài mảnh vụn nhỏ ở mép; phần còn lại trong suốt để số của bậc vẫn thấy qua. KHÔNG có chữ hay số. |
+| `sprites/man-12-leo-cay/bac-go-nut` (bậc gỗ nứt) | 512 × 240 điểm ảnh, PNG nền trong suốt, CÙNG KHUNG và cùng cỡ với `bac-go` | **Cả tấm ván đã nứt** (không phải lớp vết nứt phủ lên): cùng tấm ván, cùng vân, đinh, viền như `bac-go` nhưng nứt toạc ở giữa (3 đến 4 vết nứt lớn, mép ván vỡ, vài mảnh vụn). Khi bậc sai nứt, cảnh đổi sang ảnh này THAY cho `bac-go` (số vẫn do code vẽ lên giữa ván). KHÔNG có chữ hay số; chừa vùng giữa tương đối phẳng để số dễ đọc. |
 | Nền | Không cần: trời vẽ bằng code (dải màu chuyển) | |
 
 ### Đã làm (01/11/2026) và đường dẫn

@@ -62,7 +62,7 @@ function useTouchUi(): boolean {
 }
 
 /** Số trên bậc vẽ bằng canvas: chờ phông chữ nạp xong rồi vẽ lại khi đổi vòng, đổi cỡ khung (mỗi 4 px CSS mỗi đơn vị) hay bật "Chữ to". */
-function useLabels(state: ClimbState, version: number, ppu: number, largeText: boolean, plank: CanvasImageSource | null): ClimbLabels | null {
+function useLabels(state: ClimbState, version: number, ppu: number, largeText: boolean, plank: CanvasImageSource | null, crackedPlank: CanvasImageSource | null): ClimbLabels | null {
   const [fontsReady, setFontsReady] = useState(false);
   useEffect(() => {
     let alive = true;
@@ -81,12 +81,13 @@ function useLabels(state: ClimbState, version: number, ppu: number, largeText: b
   }, []);
   const bucket = Math.floor(ppu / 4) * 4;
   const out = useMemo(
-    () => (fontsReady && bucket > 0 ? drawRoundLabels(state.tree, state.tiers, bucket, largeText, plank) : null),
-    [fontsReady, bucket, largeText, state, version, plank], // eslint-disable-line react-hooks/exhaustive-deps
+    () => (fontsReady && bucket > 0 ? drawRoundLabels(state.tree, state.tiers, bucket, largeText, plank, crackedPlank) : null),
+    [fontsReady, bucket, largeText, state, version, plank, crackedPlank], // eslint-disable-line react-hooks/exhaustive-deps
   );
   useEffect(
     () => () => {
       out?.steps.forEach((t) => t.dispose());
+      out?.cracked.forEach((t) => t.dispose());
       out?.sign.dispose();
     },
     [out],
@@ -138,7 +139,8 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   const textures = useClimbTextures();
   const ppu = framePx > 0 ? pxPerUnit(frame, framePx) : 0;
   const plank = (textures.step?.image as CanvasImageSource | undefined) ?? null;
-  const labels = useLabels(state, version, ppu, settings.largeText, plank);
+  const crackedPlank = (textures.stepCrack?.image as CanvasImageSource | undefined) ?? null;
+  const labels = useLabels(state, version, ppu, settings.largeText, plank, crackedPlank);
   const ready = warm && textures.done && !!labels;
 
   // "Giảm chuyển động" đổi giữa ván: bậc trượt chậm lại một nửa

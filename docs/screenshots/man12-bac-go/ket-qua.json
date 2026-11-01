@@ -75,7 +75,7 @@
    "area": "hướng dẫn",
    "name": "mở lại hướng dẫn giữa ván: ván thật tạm dừng thật (đồng hồ đứng yên)",
    "ok": true,
-   "detail": "0.5313000000000005 → 0.5388000000000005"
+   "detail": "0.5203000000000004 → 0.5273000000000004"
   },
   {
    "size": "1366x768",
@@ -145,7 +145,7 @@
    "area": "nhảy sai",
    "name": "đang nứt: đúng 1 bậc nứt, còn dưới 0,4 giây",
    "ok": true,
-   "detail": "{\"left\":0.1915999999999994,\"ch\":1}"
+   "detail": "{\"left\":0.20569999999999972,\"ch\":1}"
   },
   {
    "size": "1366x768",
@@ -159,7 +159,7 @@
    "area": "nhảy sai",
    "name": "rơi về bậc cũ, vẫn ở tầng 0, còn 2 tim",
    "ok": true,
-   "detail": "{\"level\":0,\"y\":0,\"grounded\":true,\"hearts\":2,\"mistakes\":1,\"values\":[7,16],\"slots\":[0,1]}"
+   "detail": "{\"level\":0,\"y\":0,\"grounded\":true,\"hearts\":2,\"mistakes\":1,\"values\":[24,28],\"slots\":[0,1]}"
   },
   {
    "size": "1366x768",
@@ -264,14 +264,14 @@
    "area": "vòng 2",
    "name": "bậc lựa chọn trượt qua lại",
    "ok": true,
-   "detail": "-2.536 → -2.555"
+   "detail": "-2.249 → -2.360"
   },
   {
    "size": "1366x768",
    "area": "\"?\" tạm dừng",
    "name": "mở hộp \"?\": đồng hồ, bậc trượt và người chơi đứng yên (kể cả khi bấm phím)",
    "ok": true,
-   "detail": "{\"t\":1.1350999999999998,\"c\":1.1350999999999998,\"x\":-2.5157479279714825,\"px\":1.1} → {\"t\":1.1429999999999993,\"c\":1.1429999999999993,\"x\":-2.510217927971483,\"px\":1.1}"
+   "detail": "{\"t\":1.1378,\"c\":1.1378,\"x\":-2.399324735201001,\"px\":-1.1} → {\"t\":1.1445999999999992,\"c\":1.1445999999999992,\"x\":-2.4040847352010006,\"px\":-1.1}"
   },
   {
    "size": "1366x768",
@@ -285,7 +285,7 @@
    "area": "\"?\" tạm dừng",
    "name": "đóng hộp thì chạy tiếp",
    "ok": true,
-   "detail": "1.1429999999999993 → 1.6465999999999994"
+   "detail": "1.1445999999999992 → 1.6580999999999977"
   },
   {
    "size": "1366x768",
@@ -320,7 +320,7 @@
    "area": "vòng 3",
    "name": "bậc lựa chọn trượt qua lại",
    "ok": true,
-   "detail": "0.083 → 0.303"
+   "detail": "0.182 → -0.042"
   },
   {
    "size": "1366x768",
@@ -341,12 +341,12 @@
    "area": "bậc trượt",
    "name": "vòng 3 trượt nhanh hơn vòng 2",
    "ok": true,
-   "detail": "0.00 / 0.13 / 1.46"
+   "detail": "0.00 / 0.74 / 1.49"
   },
   {
    "size": "1366x768",
    "area": "FPS",
-   "name": "mẫu 3 giây giữa vòng 2: 128 khung/giây (trình duyệt không đầu, WebGL phần mềm; chỉ để tham khảo)",
+   "name": "mẫu 3 giây giữa vòng 2: 144 khung/giây (trình duyệt không đầu, WebGL phần mềm; chỉ để tham khảo)",
    "ok": true,
    "detail": ""
   },
@@ -516,7 +516,7 @@
    "area": "hướng dẫn",
    "name": "mở lại hướng dẫn giữa ván: ván thật tạm dừng thật (đồng hồ đứng yên)",
    "ok": true,
-   "detail": "0.5180000000000001 → 0.5493000000000003"
+   "detail": "0.5134000000000007 → 0.5480000000000003"
   },
   {
    "size": "360x800",
@@ -593,7 +593,7 @@
    "area": "nhảy sai",
    "name": "đang nứt: đúng 1 bậc nứt, còn dưới 0,4 giây",
    "ok": true,
-   "detail": "{\"left\":0.21169999999999975,\"ch\":1}"
+   "detail": "{\"left\":0.21299999999999988,\"ch\":1}"
   },
   {
    "size": "360x800",
@@ -607,14 +607,14 @@
    "area": "nhảy sai",
    "name": "rơi về bậc cũ, vẫn ở tầng 0, còn 2 tim",
    "ok": true,
-   "detail": "{\"level\":0,\"y\":0,\"grounded\":true,\"hearts\":2,\"mistakes\":1,\"values\":[68,86],\"slots\":[1,0]}"
+   "detail": "{\"level\":0,\"y\":0,\"grounded\":true,\"hearts\":2,\"mistakes\":1,\"values\":[78,87],\"slots\":[0,1]}"
   },
   {
    "size": "360x800",
    "area": "nhảy sai",
    "name": "làm lại tầng: các lựa chọn giữ số, đổi chỗ",
    "ok": true,
-   "detail": "0,1 → 1,0"
+   "detail": "1,0 → 0,1"
   },
   {
    "size": "360x800",
@@ -649,7 +649,7 @@
    "area": "rơi khỏi mép",
    "name": "bước ra khỏi mép: rơi về bậc cũ, không mất tim, khóa nhảy",
    "ok": true,
-   "detail": "{\"hearts\":3,\"level\":0,\"y\":0,\"x\":1.1}"
+   "detail": "{\"hearts\":3,\"level\":0,\"y\":0,\"x\":-1.1}"
   },
   {
    "size": "360x800",
@@ -677,7 +677,7 @@
    "area": "vòng 1",
    "name": "bậc đứng yên",
    "ok": true,
-   "detail": "-2.2 → -2.2"
+   "detail": "2.2 → 2.2"
   },
   {
    "size": "360x800",
@@ -712,14 +712,14 @@
    "area": "vòng 2",
    "name": "bậc lựa chọn trượt qua lại",
    "ok": true,
-   "detail": "-2.381 → -2.489"
+   "detail": "-2.002 → -1.890"
   },
   {
    "size": "360x800",
    "area": "\"?\" tạm dừng",
    "name": "mở hộp \"?\": đồng hồ, bậc trượt và người chơi đứng yên (kể cả khi bấm phím)",
    "ok": true,
-   "detail": "{\"t\":1.1060999999999983,\"c\":1.1060999999999983,\"x\":-2.5162717540454853,\"px\":1.1} → {\"t\":1.1447999999999992,\"c\":1.1447999999999992,\"x\":-2.543361754045486,\"px\":1.1}"
+   "detail": "{\"t\":1.1240000000000006,\"c\":1.1240000000000006,\"x\":-1.8608412869989872,\"px\":-1.1} → {\"t\":1.158600000000001,\"c\":1.158600000000001,\"x\":-1.8366212869989869,\"px\":-1.1}"
   },
   {
    "size": "360x800",
@@ -733,7 +733,7 @@
    "area": "\"?\" tạm dừng",
    "name": "đóng hộp thì chạy tiếp",
    "ok": true,
-   "detail": "1.1447999999999992 → 1.6522999999940375"
+   "detail": "1.158600000000001 → 1.6654999999880788"
   },
   {
    "size": "360x800",
@@ -768,7 +768,7 @@
    "area": "vòng 3",
    "name": "bậc lựa chọn trượt qua lại",
    "ok": true,
-   "detail": "0.291 → 0.076"
+   "detail": "-0.041 → 0.182"
   },
   {
    "size": "360x800",
@@ -789,12 +789,12 @@
    "area": "bậc trượt",
    "name": "vòng 3 trượt nhanh hơn vòng 2",
    "ok": true,
-   "detail": "0.00 / 0.72 / 1.44"
+   "detail": "0.00 / 0.74 / 1.49"
   },
   {
    "size": "360x800",
    "area": "FPS",
-   "name": "mẫu 3 giây giữa vòng 2: 127 khung/giây (trình duyệt không đầu, WebGL phần mềm; chỉ để tham khảo)",
+   "name": "mẫu 3 giây giữa vòng 2: 144 khung/giây (trình duyệt không đầu, WebGL phần mềm; chỉ để tham khảo)",
    "ok": true,
    "detail": ""
   },
@@ -964,7 +964,7 @@
    "area": "hướng dẫn",
    "name": "mở lại hướng dẫn giữa ván: ván thật tạm dừng thật (đồng hồ đứng yên)",
    "ok": true,
-   "detail": "0.5177 → 0.5490000000000003"
+   "detail": "0.5200999999999998 → 0.5548000000000006"
   },
   {
    "size": "844x390",
@@ -1041,7 +1041,7 @@
    "area": "nhảy sai",
    "name": "đang nứt: đúng 1 bậc nứt, còn dưới 0,4 giây",
    "ok": true,
-   "detail": "{\"left\":0.19349999999999992,\"ch\":1}"
+   "detail": "{\"left\":0.2126999999999997,\"ch\":1}"
   },
   {
    "size": "844x390",
@@ -1055,7 +1055,7 @@
    "area": "nhảy sai",
    "name": "rơi về bậc cũ, vẫn ở tầng 0, còn 2 tim",
    "ok": true,
-   "detail": "{\"level\":0,\"y\":0,\"grounded\":true,\"hearts\":2,\"mistakes\":1,\"values\":[93,97],\"slots\":[1,0]}"
+   "detail": "{\"level\":0,\"y\":0,\"grounded\":true,\"hearts\":2,\"mistakes\":1,\"values\":[35,39],\"slots\":[1,0]}"
   },
   {
    "size": "844x390",
@@ -1160,14 +1160,14 @@
    "area": "vòng 2",
    "name": "bậc lựa chọn trượt qua lại",
    "ok": true,
-   "detail": "-2.441 → -2.336"
+   "detail": "2.242 → 2.135"
   },
   {
    "size": "844x390",
    "area": "\"?\" tạm dừng",
    "name": "mở hộp \"?\": đồng hồ, bậc trượt và người chơi đứng yên (kể cả khi bấm phím)",
    "ok": true,
-   "detail": "{\"t\":1.1227999999999991,\"c\":1.1227999999999991,\"x\":-2.3031656168484695,\"px\":-1.1} → {\"t\":1.1622000000000008,\"c\":1.1622000000000008,\"x\":-2.2755856168484687,\"px\":-1.1}"
+   "detail": "{\"t\":1.109900000000001,\"c\":1.109900000000001,\"x\":2.1058439845961328,\"px\":-1.1} → {\"t\":1.1446000000000014,\"c\":1.1446000000000014,\"x\":2.0815539845961326,\"px\":-1.1}"
   },
   {
    "size": "844x390",
@@ -1181,7 +1181,7 @@
    "area": "\"?\" tạm dừng",
    "name": "đóng hộp thì chạy tiếp",
    "ok": true,
-   "detail": "1.1622000000000008 → 1.6751999999880791"
+   "detail": "1.1446000000000014 → 1.657999999999999"
   },
   {
    "size": "844x390",
@@ -1216,7 +1216,7 @@
    "area": "vòng 3",
    "name": "bậc lựa chọn trượt qua lại",
    "ok": true,
-   "detail": "0.202 → -0.019"
+   "detail": "2.488 → 2.274"
   },
   {
    "size": "844x390",
@@ -1237,12 +1237,12 @@
    "area": "bậc trượt",
    "name": "vòng 3 trượt nhanh hơn vòng 2",
    "ok": true,
-   "detail": "0.00 / 0.70 / 1.48"
+   "detail": "0.00 / 0.71 / 1.42"
   },
   {
    "size": "844x390",
    "area": "FPS",
-   "name": "mẫu 3 giây giữa vòng 2: 127 khung/giây (trình duyệt không đầu, WebGL phần mềm; chỉ để tham khảo)",
+   "name": "mẫu 3 giây giữa vòng 2: 144 khung/giây (trình duyệt không đầu, WebGL phần mềm; chỉ để tham khảo)",
    "ok": true,
    "detail": ""
   },
@@ -1345,43 +1345,43 @@
   },
   {
    "file": "man12-huong-dan-nhay-1366x768.jpg",
-   "bytes": 37724
+   "bytes": 37687
   },
   {
    "file": "man12-huong-dan-xong-1366x768.jpg",
-   "bytes": 44162
+   "bytes": 45992
   },
   {
    "file": "man12-bat-dau-1366x768.jpg",
-   "bytes": 28544
+   "bytes": 28624
   },
   {
    "file": "man12-len-tang-1-1366x768.jpg",
-   "bytes": 29167
+   "bytes": 29452
   },
   {
    "file": "man12-bac-nut-1366x768.jpg",
-   "bytes": 30592
+   "bytes": 31037
   },
   {
    "file": "man12-roi-khoi-mep-1366x768.jpg",
-   "bytes": 31727
+   "bytes": 32084
   },
   {
    "file": "man12-vong-1-xong-1366x768.jpg",
-   "bytes": 49302
+   "bytes": 49280
   },
   {
    "file": "man12-vong-2-bac-truot-1366x768.jpg",
-   "bytes": 28513
+   "bytes": 28550
   },
   {
    "file": "man12-hop-goi-y-1366x768.jpg",
-   "bytes": 41493
+   "bytes": 41444
   },
   {
    "file": "man12-vong-3-xong-1366x768.jpg",
-   "bytes": 49483
+   "bytes": 49822
   },
   {
    "file": "man12-cao-trao-1366x768.jpg",
@@ -1393,7 +1393,7 @@
   },
   {
    "file": "man12-het-tim-1366x768.jpg",
-   "bytes": 35806
+   "bytes": 37730
   },
   {
    "file": "man12-tu-hoan-thanh-1366x768.jpg",
@@ -1401,39 +1401,39 @@
   },
   {
    "file": "man12-huong-dan-0-360x800.jpg",
-   "bytes": 19311
+   "bytes": 19310
   },
   {
    "file": "man12-huong-dan-nhay-360x800.jpg",
-   "bytes": 25682
+   "bytes": 25795
   },
   {
    "file": "man12-huong-dan-xong-360x800.jpg",
-   "bytes": 27146
+   "bytes": 29601
   },
   {
    "file": "man12-bat-dau-360x800.jpg",
-   "bytes": 18117
+   "bytes": 18126
   },
   {
    "file": "man12-len-tang-1-360x800.jpg",
-   "bytes": 21144
+   "bytes": 20845
   },
   {
    "file": "man12-bac-nut-360x800.jpg",
-   "bytes": 18434
+   "bytes": 18358
   },
   {
    "file": "man12-roi-khoi-mep-360x800.jpg",
-   "bytes": 18471
+   "bytes": 18452
   },
   {
    "file": "man12-vong-1-xong-360x800.jpg",
-   "bytes": 21236
+   "bytes": 21259
   },
   {
    "file": "man12-vong-2-bac-truot-360x800.jpg",
-   "bytes": 18401
+   "bytes": 18405
   },
   {
    "file": "man12-hop-goi-y-360x800.jpg",
@@ -1441,7 +1441,7 @@
   },
   {
    "file": "man12-vong-3-xong-360x800.jpg",
-   "bytes": 21951
+   "bytes": 22012
   },
   {
    "file": "man12-cao-trao-360x800.jpg",
@@ -1453,7 +1453,7 @@
   },
   {
    "file": "man12-het-tim-360x800.jpg",
-   "bytes": 19751
+   "bytes": 19535
   },
   {
    "file": "man12-tu-hoan-thanh-360x800.jpg",
@@ -1465,35 +1465,35 @@
   },
   {
    "file": "man12-huong-dan-nhay-844x390.jpg",
-   "bytes": 24013
+   "bytes": 24016
   },
   {
    "file": "man12-huong-dan-xong-844x390.jpg",
-   "bytes": 25439
+   "bytes": 25384
   },
   {
    "file": "man12-bat-dau-844x390.jpg",
-   "bytes": 19227
+   "bytes": 19209
   },
   {
    "file": "man12-len-tang-1-844x390.jpg",
-   "bytes": 19358
+   "bytes": 19366
   },
   {
    "file": "man12-bac-nut-844x390.jpg",
-   "bytes": 20525
+   "bytes": 20583
   },
   {
    "file": "man12-roi-khoi-mep-844x390.jpg",
-   "bytes": 21263
+   "bytes": 21221
   },
   {
    "file": "man12-vong-1-xong-844x390.jpg",
-   "bytes": 25399
+   "bytes": 25417
   },
   {
    "file": "man12-vong-2-bac-truot-844x390.jpg",
-   "bytes": 19091
+   "bytes": 19045
   },
   {
    "file": "man12-hop-goi-y-844x390.jpg",
@@ -1501,11 +1501,11 @@
   },
   {
    "file": "man12-vong-3-xong-844x390.jpg",
-   "bytes": 26432
+   "bytes": 26273
   },
   {
    "file": "man12-cao-trao-844x390.jpg",
-   "bytes": 26076
+   "bytes": 26026
   },
   {
    "file": "man12-ket-qua-844x390.jpg",
@@ -1513,7 +1513,7 @@
   },
   {
    "file": "man12-het-tim-844x390.jpg",
-   "bytes": 21729
+   "bytes": 21743
   },
   {
    "file": "man12-tu-hoan-thanh-844x390.jpg",

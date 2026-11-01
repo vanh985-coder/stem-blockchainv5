@@ -153,14 +153,12 @@ export function TutorialSpotlight({
       return;
     }
 
-    setTargetRect({
-      left: r.left,
-      top: r.top,
-      width: r.width,
-      height: r.height,
-      right: r.right,
-      bottom: r.bottom,
-    });
+    // Giữ nguyên đối tượng cũ nếu vị trí không đổi: khỏi tính lại vị trí tooltip mỗi 80 ms
+    setTargetRect((prev) =>
+      prev && prev.left === r.left && prev.top === r.top && prev.width === r.width && prev.height === r.height
+        ? prev
+        : { left: r.left, top: r.top, width: r.width, height: r.height, right: r.right, bottom: r.bottom },
+    );
   }, [isOpen, step?.targetSelector]);
 
   // Cuộn target vào khung nhìn khi bước thay đổi
@@ -231,7 +229,9 @@ export function TutorialSpotlight({
     if (!isOpen) return;
 
     const tooltipEl = tooltipRef.current;
-    const ttHeight = tooltipEl ? tooltipEl.offsetHeight : 180;
+    // Chiều cao TỰ NHIÊN (nội dung không bị kẹp bởi maxHeight của lần trước): nếu đo offsetHeight đã bị kẹp thì vị trí tính ra sai, rồi tự sửa dần qua nhiều lần đo (tooltip nhảy chỗ ~1 giây, chạm vào nút lúc đó trượt)
+    const body = tooltipEl?.querySelector<HTMLElement>('[data-tooltip-body]');
+    const ttHeight = tooltipEl ? (body ? tooltipEl.offsetHeight - body.clientHeight + body.scrollHeight : tooltipEl.offsetHeight) : 180;
     const ttWidth = tooltipEl ? tooltipEl.offsetWidth : 360;
 
     const vp = getViewportDimensions();
@@ -456,9 +456,8 @@ export function TutorialSpotlight({
         aria-modal="true"
         aria-labelledby="tutorial-step-title"
         data-testid="tutorial-tooltip"
-        className={`fixed z-50 flex flex-col w-full max-w-[min(440px,calc(100vw-24px))] rounded-2xl border-2 border-nau-go/80 bg-giay/98 p-3.5 sm:p-4 text-chu shadow-2xl ${
-          reducedMotion ? '' : 'transition-all duration-150'
-        }`}
+        // KHÔNG có transition ở top/left/max-height: tooltip đổi chỗ khi sang bước khác, nếu trượt 150 ms thì nút đang chạm bị dời khỏi ngón tay (chạm trượt)
+        className="fixed z-50 flex flex-col w-full max-w-[min(440px,calc(100vw-24px))] rounded-2xl border-2 border-nau-go/80 bg-giay/98 p-3.5 sm:p-4 text-chu shadow-2xl"
         style={{
           top: tooltipPos.top,
           left: tooltipPos.left,
@@ -488,7 +487,7 @@ export function TutorialSpotlight({
         </div>
 
         {/* Nội dung chỉ dẫn và thông báo: cuộn được nếu màn hình hẹp hoặc nội dung dài */}
-        <div className="overflow-y-auto flex-1 min-h-0 pr-1 space-y-2">
+        <div data-tooltip-body className="overflow-y-auto flex-1 min-h-0 pr-1 space-y-2">
           <p className="text-sm sm:text-base font-medium leading-relaxed text-chu-dam">{step?.content}</p>
 
           {feedbackMessage && (

@@ -144,12 +144,8 @@ async function sTutorial(browser, size) {
   await shot(ctx, 'huong-dan-xong');
   const real = await S(ctx, () => ({ level: window.__climbReal.level, hearts: window.__climbReal.hearts, time: window.__climbReal.time, rounds: window.__climbReal.roundsDone }));
   check(ctx, 'hướng dẫn', 'ván thật chưa bị đụng trong lúc làm thử', real.level === 0 && real.hearts === 3 && real.time === 0 && real.rounds === 0, JSON.stringify(real));
-  for (let i = 0; i < 4; i++) {
-    await sleep(700);
-    await tapText(ctx, /Bắt đầu chơi/);
-    await sleep(500);
-    if (!(await S(ctx, () => window.__climbUi.tutorialActive))) break;
-  }
+  await tapText(ctx, /Bắt đầu chơi/);
+  await sleep(500);
   const closed = await S(ctx, () => ({ active: window.__climbUi.tutorialActive, practice: window.__climb.practice, tip: window.__climbUi.tip, skipBtn: [...document.querySelectorAll('button')].some((b) => /Bỏ qua/.test(b.innerText)) }));
   check(ctx, 'hướng dẫn', 'xong thì spotlight đóng, vào ván thật vòng 1', closed.active === false && !closed.practice && !closed.skipBtn, JSON.stringify(closed));
   const after = await cookieNow(ctx);

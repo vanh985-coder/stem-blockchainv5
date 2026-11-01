@@ -15,6 +15,7 @@ export const ART = {
   crown: 'sprites/man-12-leo-cay/ngon-cay',
   /** Tùy chọn (chưa có trong bộ đồ họa, xem bảng "Đồ họa cần tạo" ở spec 08): thiếu thì dùng hình vẽ bằng code */
   step: 'sprites/man-12-leo-cay/bac-go',
+  /** Cả tấm ván đã nứt (cùng khung với `bac-go`): khi bậc sai nứt thì hiện ảnh này thay cho `bac-go` */
   stepCrack: 'sprites/man-12-leo-cay/bac-go-nut',
   fakeLeaf: 'ui/tiles/la-gia',
 } as const;
@@ -150,7 +151,9 @@ function paintNumber(ctx: CanvasRenderingContext2D, text: string, cx: number, cy
 export interface ClimbLabels {
   /** Bậc gỗ có số, khóa là giá trị số */
   steps: Map<number, CanvasTexture>;
-  /** Biển khắc "Gốc trong sổ" kèm số gốc trong sổ */
+  /** Bậc gỗ ĐÃ NỨT có số (chỉ có khi manifest có ảnh `bac-go-nut`: cả tấm ván đã nứt, thay cho `bac-go`); rỗng thì cảnh phủ vết nứt vẽ bằng code lên bậc thường */
+  cracked: Map<number, CanvasTexture>;
+  /** Biển khắc "Gốc trong sổ" kèm số gốc trong sổ của vòng */
   sign: CanvasTexture;
   /** Cỡ chữ số đã dùng (px CSS) */
   fontPx: number;
@@ -171,7 +174,7 @@ export function labelValues(tree: ClimbTree, tiers: readonly ClimbTier[]): numbe
  * Bậc gỗ có số của một vòng, vẽ theo số điểm ảnh thật (`ppu`: px CSS mỗi đơn vị) để chữ số ≥ 16 px (Chữ to nhân 1,15), và biển "Gốc trong sổ".
  * `plank` là ảnh `bac-go` nếu có. Mọi texture do hàm này tạo, người gọi giải phóng.
  */
-export function drawRoundLabels(tree: ClimbTree, tiers: readonly ClimbTier[], ppu: number, largeText: boolean, plank: CanvasImageSource | null): ClimbLabels {
+export function drawRoundLabels(tree: ClimbTree, tiers: readonly ClimbTier[], ppu: number, largeText: boolean, plank: CanvasImageSource | null, crackedPlank: CanvasImageSource | null = null): ClimbLabels {
   const dpr = dprOf();
   const w = Math.max(64, Math.min(512, Math.round(STEP.width * ppu * dpr)));
   const h = Math.max(32, Math.min(256, Math.round(STEP.height * ppu * dpr)));
@@ -196,6 +199,21 @@ export function drawRoundLabels(tree: ClimbTree, tiers: readonly ClimbTier[], pp
     }
     steps.set(v, prepare(new CanvasTexture(c)) as CanvasTexture);
   }
+  // bậc nứt: chỉ các số có thể nằm trên bậc lựa chọn (bậc sai là một trong các bậc lựa chọn của tầng)
+  const cracked = new Map<number, CanvasTexture>();
+  if (crackedPlank) {
+    for (const v of new Set(tiers.flatMap((t) => t.options))) {
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(crackedPlank, 0, 0, w, h);
+        paintNumber(ctx, String(v), w / 2, h * 0.5, fontPx * dpr);
+      }
+      cracked.set(v, prepare(new CanvasTexture(c)) as CanvasTexture);
+    }
+  }
   // biển gỗ trên ngọn
   const sw = Math.max(96, Math.min(768, Math.round(SIGN.width * ppu * dpr)));
   const sh = Math.max(48, Math.min(384, Math.round(SIGN.height * ppu * dpr)));
@@ -209,10 +227,10 @@ export function drawRoundLabels(tree: ClimbTree, tiers: readonly ClimbTier[], pp
     paintNumber(sctx, climbUi.gocTrongSo, sw / 2, sh * 0.3, small);
     paintNumber(sctx, String(tree.book[tree.depth][0]), sw / 2, sh * 0.7, Math.max(16 * dpr, Math.min(fontPx * dpr, sh * 0.4)));
   }
-  return { steps, sign: prepare(new CanvasTexture(sc)) as CanvasTexture, fontPx };
+  return { steps, cracked, sign: prepare(new CanvasTexture(sc)) as CanvasTexture, fontPx };
 }
 
-/** Vết nứt phủ lên bậc sai (nền trong suốt): dùng khi không có ảnh `bac-go-nut`. */
+/** Hình dự phòng khi không có ảnh `bac-go-nut`: vết nứt vẽ bằng code (nền trong suốt) phủ lên bậc sai. */
 export function makeCrackTexture(): CanvasTexture {
   const c = document.createElement('canvas');
   c.width = 256;
