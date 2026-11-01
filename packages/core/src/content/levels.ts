@@ -36,7 +36,7 @@ export const LEVELS: readonly LevelDef[] = [
   { id: 9, lang: 'lang-khac-dau', kind: 'game', ten: 'Chữa đàn gà', bien: 'Chữa đàn gà', status: 'ready' },
   { id: 10, lang: 'lang-bac', kind: 'lesson', ten: 'Cây gộp sổ', bien: 'Học cùng thầy Linh', status: 'ready' },
   { id: 11, lang: 'lang-bac', kind: 'game', ten: 'Ghép lá cây sổ', bien: 'Ghép lá cây sổ', status: 'ready' },
-  { id: 12, lang: 'lang-bac', kind: 'game', ten: 'Leo cây tìm lá giả', bien: 'Leo cây tìm lá giả', status: 'ready' },
+  { id: 12, lang: 'lang-bac', kind: 'game', ten: 'Leo bậc gỗ', bien: 'Leo bậc gỗ', status: 'ready' },
 ];
 
 export function levelById(id: number): LevelDef | undefined {

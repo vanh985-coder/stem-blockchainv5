@@ -1,22 +1,23 @@
 /**
- * Hình của màn 12: nạp hình rời theo manifest (thiếu file thì null, cảnh dùng màu thay thế), cắt theo khung có hình, vẽ trời bằng dải màu chuyển và vẽ nhãn "Sổ / Nay" của tay nắm.
- * Hai hình lá (ui/tiles/la-*) đã được pipeline assets:build tách nền (scripts/assets-build.mjs), không tách ở đây nữa. Dùng canvas của trình duyệt; phần tính toán thuần nằm ở climbLayout.ts.
+ * Hình của màn 12 "Leo bậc gỗ": nạp hình rời theo manifest (thiếu file thì null, cảnh dùng hình code vẽ hay màu thay thế), cắt theo khung có hình, vẽ trời bằng dải màu chuyển,
+ * vẽ bậc gỗ có số bằng canvas (có ảnh `bac-go` trong manifest thì vẽ ảnh đó làm nền, không thì tấm ván vẽ bằng code), vết nứt và biển "Gốc trong sổ".
+ * Dùng canvas của trình duyệt; phần tính toán thuần nằm ở climbLayout.ts.
  */
 import { useEffect, useMemo, useState } from 'react';
 import { CanvasTexture, LinearFilter, SRGBColorSpace, Texture } from 'three';
-import { ASSETS_URL, climbUi, fmt, lookupAsset, useManifest } from '@so-chung/core';
-import { CROPS, LABEL, labelFontPx } from './climbLayout';
-import { nodeLabel, type ClimbTree } from './climbLogic';
+import { ASSETS_URL, climbUi, lookupAsset, useManifest } from '@so-chung/core';
+import { CROPS, SIGN, STEP, labelFontPx } from './climbLayout';
+import { nodeValue, siblingValue, type ClimbTier, type ClimbTree } from './climbLogic';
 
 export const ART = {
   trunk: 'sprites/man-12-leo-cay/than-cay',
-  bar: 'sprites/man-12-leo-cay/canh-ngang',
-  handle: 'sprites/man-12-leo-cay/tay-nam',
   root: 'sprites/man-12-leo-cay/goc-cay',
   crown: 'sprites/man-12-leo-cay/ngon-cay',
+  /** Tùy chọn (chưa có trong bộ đồ họa, xem bảng "Đồ họa cần tạo" ở spec 08): thiếu thì dùng hình vẽ bằng code */
+  step: 'sprites/man-12-leo-cay/bac-go',
+  /** Cả tấm ván đã nứt (cùng khung với `bac-go`): khi bậc sai nứt thì hiện ảnh này thay cho `bac-go` */
+  stepCrack: 'sprites/man-12-leo-cay/bac-go-nut',
   fakeLeaf: 'ui/tiles/la-gia',
-  leaf: 'ui/tiles/la-da',
-  coin: 'ui/icons/tien-dong',
 } as const;
 export type ArtKey = keyof typeof ART;
 export type ClimbTextures = { [K in ArtKey]: Texture | null } & { done: boolean };
@@ -37,7 +38,7 @@ function crop(t: Texture, c: { u0: number; u1: number; v0: number; v1: number })
   return t;
 }
 
-/** Nạp mọi hình của màn (một lần), giải phóng khi rời màn. */
+/** Nạp mọi hình của màn (một lần), giải phóng khi rời màn. Hình nào thiếu thì null. */
 export function useClimbTextures(): ClimbTextures {
   const manifest = useManifest();
   const empty = useMemo(() => Object.fromEntries(Object.keys(ART).map((k) => [k, null])) as { [K in ArtKey]: Texture | null }, []);
@@ -56,8 +57,6 @@ export function useClimbTextures(): ClimbTextures {
         img.onload = () => {
           const t = prepare(new Texture(img));
           if (key === 'trunk') crop(t, CROPS.trunk);
-          if (key === 'bar') crop(t, CROPS.bar);
-          if (key === 'handle') crop(t, CROPS.handle);
           if (key === 'root') crop(t, CROPS.root);
           if (key === 'crown') crop(t, CROPS.crown);
           made.push(t);
@@ -98,61 +97,161 @@ export function makeSkyTexture(): CanvasTexture {
   return prepare(new CanvasTexture(c)) as CanvasTexture;
 }
 
-/** Phông chữ nhãn (cùng phông tiêu đề của trang). */
+/** Phông chữ số (cùng phông tiêu đề của trang). */
 const FONT = '"Baloo 2", "Be Vietnam Pro", system-ui, sans-serif';
 
-/** Các nút cần nhãn trong một vòng: gốc, và hai con của từng nút trên đường tới lá bị tráo (người chơi chỉ leo được theo đường đó). */
-export function labelNodes(tree: ClimbTree): { level: number; index: number }[] {
-  const out = [{ level: 0, index: 0 }];
-  for (let k = 1; k <= tree.depth; k++) {
-    const parent = tree.tamperedIndex >> (tree.depth - k + 1);
-    out.push({ level: k, index: 2 * parent }, { level: k, index: 2 * parent + 1 });
+const dprOf = (): number => (typeof window === 'undefined' ? 1 : Math.min(2, window.devicePixelRatio || 1));
+
+/** Tấm ván gỗ vẽ bằng code (khi thiếu `bac-go`): nền gỗ chuyển màu, vân, hai đinh, viền tối. */
+function paintPlank(ctx: CanvasRenderingContext2D, w: number, h: number): void {
+  const r = h * 0.22;
+  const g = ctx.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, '#d9a45c');
+  g.addColorStop(0.5, '#bd8443');
+  g.addColorStop(1, '#8f5d2c');
+  ctx.fillStyle = g;
+  ctx.strokeStyle = '#5a3a1c';
+  ctx.lineWidth = Math.max(2, h * 0.07);
+  ctx.beginPath();
+  ctx.roundRect(ctx.lineWidth / 2, ctx.lineWidth / 2, w - ctx.lineWidth, h - ctx.lineWidth, r);
+  ctx.fill();
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(90,58,28,0.35)';
+  ctx.lineWidth = Math.max(1, h * 0.03);
+  for (const [y, a, b] of [
+    [0.2, 0.08, 0.7],
+    [0.82, 0.3, 0.92],
+  ] as const) {
+    ctx.beginPath();
+    ctx.moveTo(w * a, h * y);
+    ctx.lineTo(w * b, h * y);
+    ctx.stroke();
   }
-  return out;
+  ctx.fillStyle = '#4a2f16';
+  for (const x of [0.07, 0.93]) {
+    ctx.beginPath();
+    ctx.arc(w * x, h * 0.5, h * 0.05, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }
 
-export const labelKey = (level: number, index: number): string => `${level}:${index}`;
+/** Chữ số ghi trên bậc: màu kem, viền nâu đậm cho dễ đọc trên nền gỗ. */
+function paintNumber(ctx: CanvasRenderingContext2D, text: string, cx: number, cy: number, fontPx: number): void {
+  ctx.font = `800 ${fontPx}px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = Math.max(2, fontPx * 0.18);
+  ctx.strokeStyle = '#3b2410';
+  ctx.strokeText(text, cx, cy);
+  ctx.fillStyle = '#fff6dc';
+  ctx.fillText(text, cx, cy);
+}
+
+export interface ClimbLabels {
+  /** Bậc gỗ có số, khóa là giá trị số */
+  steps: Map<number, CanvasTexture>;
+  /** Bậc gỗ ĐÃ NỨT có số (chỉ có khi manifest có ảnh `bac-go-nut`: cả tấm ván đã nứt, thay cho `bac-go`); rỗng thì cảnh phủ vết nứt vẽ bằng code lên bậc thường */
+  cracked: Map<number, CanvasTexture>;
+  /** Biển khắc "Gốc trong sổ" kèm số gốc trong sổ của vòng */
+  sign: CanvasTexture;
+  /** Cỡ chữ số đã dùng (px CSS) */
+  fontPx: number;
+}
+
+/** Mọi giá trị cần vẽ trên bậc của một vòng: nút và anh em trên đường, cùng mọi bậc lựa chọn. */
+export function labelValues(tree: ClimbTree, tiers: readonly ClimbTier[]): number[] {
+  const set = new Set<number>();
+  for (let k = 0; k <= tree.depth; k++) {
+    set.add(nodeValue(tree, k));
+    if (k < tree.depth) set.add(siblingValue(tree, k));
+  }
+  for (const t of tiers) for (const v of t.options) set.add(v);
+  return [...set];
+}
 
 /**
- * Nhãn hai dòng "Sổ: …" / "Nay: …" cho các nút của vòng, vẽ theo số điểm ảnh thật (`ppu`: px CSS mỗi đơn vị) để chữ ≥ 14 px. Cả hai dòng cùng màu, không đánh dấu nhánh nào lệch:
- * học sinh phải tự so hai số. Trả về Map khóa `level:index` → texture, và cỡ chữ đã dùng (px CSS).
+ * Bậc gỗ có số của một vòng, vẽ theo số điểm ảnh thật (`ppu`: px CSS mỗi đơn vị) để chữ số ≥ 16 px (Chữ to nhân 1,15), và biển "Gốc trong sổ".
+ * `plank` là ảnh `bac-go` nếu có. Mọi texture do hàm này tạo, người gọi giải phóng.
  */
-export function drawLabels(tree: ClimbTree, ppu: number, largeText: boolean): { map: Map<string, CanvasTexture>; fontPx: number } {
-  const dpr = typeof window === 'undefined' ? 1 : Math.min(2, window.devicePixelRatio || 1);
-  const w = Math.max(64, Math.round(LABEL.width * ppu * dpr));
-  const h = Math.max(32, Math.round(LABEL.height * ppu * dpr));
-  const nodes = labelNodes(tree).map((n) => ({ ...n, text: nodeLabel(tree, n.level, n.index) }));
-  const lines = nodes.flatMap((n) => [fmt(climbUi.so, { so: n.text.book }), fmt(climbUi.nay, { so: n.text.now })]);
+export function drawRoundLabels(tree: ClimbTree, tiers: readonly ClimbTier[], ppu: number, largeText: boolean, plank: CanvasImageSource | null, crackedPlank: CanvasImageSource | null = null): ClimbLabels {
+  const dpr = dprOf();
+  const w = Math.max(64, Math.min(512, Math.round(STEP.width * ppu * dpr)));
+  const h = Math.max(32, Math.min(256, Math.round(STEP.height * ppu * dpr)));
+  const values = labelValues(tree, tiers);
   const probe = document.createElement('canvas').getContext('2d');
   let widest = 0;
   if (probe) {
-    probe.font = `700 100px ${FONT}`;
-    for (const l of lines) widest = Math.max(widest, probe.measureText(l).width / 100);
+    probe.font = `800 100px ${FONT}`;
+    for (const v of values) widest = Math.max(widest, probe.measureText(String(v)).width / 100);
   }
-  const fontPx = labelFontPx(ppu, largeText, widest || 6);
-  const map = new Map<string, CanvasTexture>();
-  for (const n of nodes) {
+  const fontPx = labelFontPx(ppu, largeText, widest || 4);
+  const steps = new Map<number, CanvasTexture>();
+  for (const v of values) {
     const c = document.createElement('canvas');
     c.width = w;
     c.height = h;
     const ctx = c.getContext('2d');
     if (ctx) {
-      const r = h * 0.18;
-      ctx.fillStyle = '#fdf6e3';
-      ctx.strokeStyle = '#6b4a2b';
-      ctx.lineWidth = Math.max(2, h * 0.045);
-      ctx.beginPath();
-      ctx.roundRect(ctx.lineWidth / 2, ctx.lineWidth / 2, w - ctx.lineWidth, h - ctx.lineWidth, r);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = '#2b1d14';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.font = `700 ${fontPx * dpr}px ${FONT}`;
-      ctx.fillText(fmt(climbUi.so, { so: n.text.book }), w / 2, h * 0.3);
-      ctx.fillText(fmt(climbUi.nay, { so: n.text.now }), w / 2, h * 0.72);
+      if (plank) ctx.drawImage(plank, 0, 0, w, h);
+      else paintPlank(ctx, w, h);
+      paintNumber(ctx, String(v), w / 2, h * 0.5, fontPx * dpr);
     }
-    map.set(labelKey(n.level, n.index), prepare(new CanvasTexture(c)) as CanvasTexture);
+    steps.set(v, prepare(new CanvasTexture(c)) as CanvasTexture);
   }
-  return { map, fontPx };
+  // bậc nứt: chỉ các số có thể nằm trên bậc lựa chọn (bậc sai là một trong các bậc lựa chọn của tầng)
+  const cracked = new Map<number, CanvasTexture>();
+  if (crackedPlank) {
+    for (const v of new Set(tiers.flatMap((t) => t.options))) {
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(crackedPlank, 0, 0, w, h);
+        paintNumber(ctx, String(v), w / 2, h * 0.5, fontPx * dpr);
+      }
+      cracked.set(v, prepare(new CanvasTexture(c)) as CanvasTexture);
+    }
+  }
+  // biển gỗ trên ngọn
+  const sw = Math.max(96, Math.min(768, Math.round(SIGN.width * ppu * dpr)));
+  const sh = Math.max(48, Math.min(384, Math.round(SIGN.height * ppu * dpr)));
+  const sc = document.createElement('canvas');
+  sc.width = sw;
+  sc.height = sh;
+  const sctx = sc.getContext('2d');
+  if (sctx) {
+    paintPlank(sctx, sw, sh);
+    const small = Math.max(16 * dpr, Math.min(fontPx * dpr * 0.9, sh * 0.34));
+    paintNumber(sctx, climbUi.gocTrongSo, sw / 2, sh * 0.3, small);
+    paintNumber(sctx, String(tree.book[tree.depth][0]), sw / 2, sh * 0.7, Math.max(16 * dpr, Math.min(fontPx * dpr, sh * 0.4)));
+  }
+  return { steps, cracked, sign: prepare(new CanvasTexture(sc)) as CanvasTexture, fontPx };
+}
+
+/** Hình dự phòng khi không có ảnh `bac-go-nut`: vết nứt vẽ bằng code (nền trong suốt) phủ lên bậc sai. */
+export function makeCrackTexture(): CanvasTexture {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 80;
+  const ctx = c.getContext('2d');
+  if (ctx) {
+    ctx.strokeStyle = '#2b1808';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(120, 0);
+    ctx.lineTo(136, 24);
+    ctx.lineTo(112, 40);
+    ctx.lineTo(140, 60);
+    ctx.lineTo(126, 80);
+    ctx.moveTo(136, 24);
+    ctx.lineTo(176, 30);
+    ctx.moveTo(112, 40);
+    ctx.lineTo(76, 36);
+    ctx.stroke();
+  }
+  return prepare(new CanvasTexture(c)) as CanvasTexture;
 }

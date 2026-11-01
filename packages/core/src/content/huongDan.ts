@@ -51,11 +51,11 @@ export const GUIDE_ART_IDS = [
   'may-tinh-mod',
   'tran-the',
   // màn 12 (bước HD)
-  'den-long-so-nay',
-  'bat-len-phim',
-  'bat-len-cham',
-  'tim-dong',
-  'tang-la',
+  'bac-go-cap',
+  'di-nhay-phim',
+  'di-nhay-cham',
+  'bac-nut',
+  'goc-tren-ngon',
   // màn 5 (bước B7)
   'dap-lan-phim',
   'dap-lan-cham',

@@ -142,10 +142,10 @@ Ba trạm:
 - A ghép các lá giao dịch cùng loại cho chúng bay lên cây, đủ cặp thì thành cành, đủ cành thì thành gốc.
 - Tí rải **lá giả** chắn khắp bàn; A ghép lá ngay cạnh lá giả để phá nó.
 
-**Màn 12 · Game: Leo cây tìm lá giả** (cao trào)
+**Màn 12 · Game: Leo bậc gỗ** (cao trào)
 - Lái buôn phương xa vừa trả một khoản bạc lớn, và **Tí tráo một chiếc lá giao dịch** trên cây gộp sổ để khoản bạc chảy về túi mình. Số gốc lập tức báo lệch.
-- A leo từ gốc cây lên, ở mỗi tầng chọn nhánh có hai số lệch nhau. Chỉ vài tầng là tới đúng chiếc lá giả.
-- Tí đang ôm lá giả trên ngọn cây định trốn, và bị bắt quả tang.
+- A đứng trên bậc gỗ của chiếc lá bị tráo, bên cạnh là bậc anh em đã biết số. Ở mỗi tầng, A ghép số của mình với số của bậc anh em (đúng thứ tự trái rồi phải) rồi nhảy lên bậc ghi số đó: nhảy nhầm thì bậc nứt, A rơi xuống và mất một tim; nhảy hụt thì thử lại.
+- Leo tới ngọn, gốc A tính ra khác gốc trong sổ: lá giả lộ ra. Chỉ vài phép ghép là tới gốc, thay vì phải kiểm tra cả cây. Tí đang ôm lá giả trên ngọn cây định trốn, và bị bắt quả tang.
 
 **Tí hối cải:**
 

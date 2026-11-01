@@ -1,431 +1,445 @@
 import { describe, expect, it } from 'vitest';
 import { combine } from '@so-chung/core/lessons/bai-4/logic';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
-import { CLIMB_ROUNDS, CLIMB_SPEC } from './climbConfig';
+import { CLIMB_MAX_SCORE, CLIMB_SPEC } from './climbConfig';
 import {
-  addCoins,
   advanceRound,
+  buildTiers,
+  choiceBaseX,
+  choiceValues,
+  choiceX,
   climbMedal,
   climbScore,
   createClimbGame,
+  createPracticeGame,
   generateTree,
-  grabAt,
-  grabWindow,
-  handleCenter,
-  isMismatch,
+  isLeftChild,
   jump,
   makeTree,
-  mutateCode,
-  nextCenter,
-  nodeLabel,
-  shortCode,
+  nodeValue,
+  nodeX,
+  overlapX,
+  setMove,
+  setSlow,
+  siblingValue,
+  siblingX,
+  slideOffset,
   stepClimb,
-  swayPeriod,
+  tickClimb,
+  tierY,
+  tri,
+  type ClimbEvent,
   type ClimbState,
 } from './climbLogic';
 
-/** Số chữ số khác nhau giữa hai mã cùng độ dài. */
-const diffDigits = (a: string, b: string) => a.split('').filter((c, i) => c !== b[i]).length;
-
-/** Thời điểm sớm nhất ≥ `from` mà bật lên thì ở đỉnh tay nắm `side` của tầng trên ở gần người chơi (|x| ≤ ngưỡng). */
-function timeToJump(s: ClimbState, side: 'left' | 'right', from: number, within: number): number {
-  const r = CLIMB_ROUNDS[s.round];
-  for (let t = from; t < from + 2 * swayPeriod(r.speed) + 1; t += 0.001) {
-    const c = nextCenter(s, t + CLIMB_SPEC.jumpPeak);
-    const x = side === 'left' ? c - CLIMB_SPEC.halfGap : c + CLIMB_SPEC.halfGap;
-    if (Math.abs(x) <= within) return t;
-  }
-  throw new Error('no window');
+/** Chạy `seconds` giây theo khung 1/60 và gom sự kiện. */
+function run(s: ClimbState, seconds: number): ClimbEvent[] {
+  const out: ClimbEvent[] = [];
+  for (let i = 0; i < Math.round(seconds * 60); i++) out.push(...stepClimb(s, 1 / 60));
+  return out;
 }
+const kinds = (e: readonly ClimbEvent[]) => e.map((x) => x.kind);
 
-/** Chờ tới lúc `t` rồi bật, rồi chờ qua đỉnh; trả về các sự kiện. */
-function jumpAt(s: ClimbState, t: number) {
-  if (t > s.time) stepClimb(s, t - s.time);
+/** Đặt người chơi ngay dưới một bậc lựa chọn rồi nhảy thẳng lên (bậc đứng yên ở vòng 1). */
+function jumpOnto(s: ClimbState, choiceIndex: number): ClimbEvent[] {
+  const target = choiceX(s, s.choices[choiceIndex]);
+  s.player.x = Math.max(-CLIMB_SPEC.bounds, Math.min(CLIMB_SPEC.bounds, target));
+  s.player.grounded = true;
+  s.player.y = tierY(s.level);
+  // đứng lơ lửng trên không thì rơi; nhảy ngay để thân ở đúng x lúc đáp
+  s.player.on = 0;
   expect(jump(s)).toBe(true);
-  return stepClimb(s, CLIMB_SPEC.jumpPeak + 0.01);
+  return run(s, 2.6);
 }
 
-const EXAMPLE = [3, 7, 5, 2, 6, 1, 4, 8];
-
-describe('bảng test của spec 08, Màn 12', () => {
-  it('ca 1: lá [3,7,5,2,6,1,4,8], đổi T8 thành 9: gốc 4878/4879; T1234 422/422; T5678 658/659; T56 61/61; T78 48/49; T7 4/4; T8 8/9', () => {
-    const t = makeTree(EXAMPLE, 7, 9);
+describe('cây và giá trị nút (Bài 4)', () => {
+  it('lá [3,7,5,2,6,1,4,8], đổi lá thứ 8 thành 9: gốc 4878 / 4879 và các nút khớp bảng spec', () => {
+    const t = makeTree([3, 7, 5, 2, 6, 1, 4, 8], 7, 9);
     expect(t.depth).toBe(3);
-    const pair = (k: number, i: number) => [t.book[k][i], t.now[k][i]];
-    expect(pair(0, 0)).toEqual([4878, 4879]);
-    expect(pair(1, 0)).toEqual([422, 422]); // T1234
-    expect(pair(1, 1)).toEqual([658, 659]); // T5678
-    expect(pair(2, 2)).toEqual([61, 61]); // T56
-    expect(pair(2, 3)).toEqual([48, 49]); // T78
-    expect(pair(3, 6)).toEqual([4, 4]); // T7
-    expect(pair(3, 7)).toEqual([8, 9]); // T8
-    // dựng bằng combine của Bài 4 (không viết lại công thức)
-    expect(t.book[2][3]).toBe(combine(4, 8));
-    expect(nodeLabel(t, 1, 1)).toEqual({ book: '658', now: '659' });
+    expect([t.book[3][0], t.now[3][0]]).toEqual([4878, 4879]);
+    expect([t.book[2][0], t.now[2][0]]).toEqual([422, 422]);
+    expect([t.book[2][1], t.now[2][1]]).toEqual([658, 659]);
+    expect([t.book[1][2], t.now[1][2]]).toEqual([61, 61]);
+    expect([t.book[1][3], t.now[1][3]]).toEqual([48, 49]);
+    expect([t.book[0][6], t.now[0][6]]).toEqual([4, 4]);
+    expect([t.book[0][7], t.now[0][7]]).toEqual([8, 9]);
   });
 
-  it('ca 2: sinh 500 cây mỗi vòng: trên đường từ gốc tới lá tráo, mỗi tầng đúng một nhánh lệch; mọi nút ngoài đường đều khớp', () => {
-    for (const round of CLIMB_ROUNDS) {
-      for (let seed = 1; seed <= 500; seed++) {
-        const t = generateTree(createMulberry32(seed), round);
-        expect(t.leaves).toHaveLength(round.leaves);
-        expect(t.depth).toBe(round.depth);
-        for (const d of [...t.leaves, ...t.tamperedLeaves]) expect(d >= 1 && d <= 9).toBe(true);
-        const changed = t.leaves.map((d, i) => (d !== t.tamperedLeaves[i] ? i : -1)).filter((i) => i >= 0);
-        expect(changed).toEqual([t.tamperedIndex]);
+  it('công thức ghép dùng combine của Bài 4: nút = combine(trái, phải), nên đổi chỗ là ra số khác', () => {
+    const t = makeTree([3, 7, 5, 2], 1, 8);
+    expect(t.now[1]).toEqual([combine(3, 8), combine(5, 2)]);
+    expect(combine(3, 8)).toBe(38);
+    expect(combine(8, 3)).not.toBe(38);
+  });
+
+  it('sinh 500 cây: lá 1–9, đúng một lá bị tráo, nút lệch đúng là các nút trên đường từ lá đó tới gốc, gốc luôn lệch', () => {
+    for (let seed = 1; seed <= 500; seed++) {
+      const rng = createMulberry32(seed);
+      for (const n of [4, 8, 16]) {
+        const t = generateTree(rng, n);
+        expect(t.leaves.every((d) => d >= 1 && d <= 9)).toBe(true);
+        expect(t.leaves.filter((d, i) => d !== t.tamperedLeaves[i])).toHaveLength(1);
         for (let k = 0; k <= t.depth; k++) {
-          const onPath = t.tamperedIndex >> (t.depth - k);
-          for (let i = 0; i < 2 ** k; i++) expect(isMismatch(t, k, i), `vòng ${round.depth} seed ${seed} tầng ${k} nút ${i}`).toBe(i === onPath);
-        }
-        // mỗi nút trên đường có đúng một con lệch
-        for (let k = 0; k < t.depth; k++) {
-          const i = t.tamperedIndex >> (t.depth - k);
-          expect(Number(isMismatch(t, k + 1, 2 * i)) + Number(isMismatch(t, k + 1, 2 * i + 1))).toBe(1);
+          t.book[k].forEach((v, i) => {
+            const onPath = i === t.tamperedIndex >> k;
+            expect(v !== t.now[k][i]).toBe(onPath);
+          });
         }
       }
     }
   });
 
-  it('ca 3: mã rút gọn của nhánh lệch khác 1–2 chữ số so với số trong sổ và luôn khác; nút khớp trùng mã (500 cây mỗi vòng có mã)', () => {
-    for (const round of CLIMB_ROUNDS.filter((r) => r.codes)) {
-      for (let seed = 1; seed <= 500; seed++) {
-        const t = generateTree(createMulberry32(seed), round);
-        for (let k = 0; k <= t.depth; k++) {
-          for (let i = 0; i < 2 ** k; i++) {
-            const { book, now } = nodeLabel(t, k, i);
-            expect(book).toBe(shortCode(t.book[k][i]));
-            expect(book).toMatch(/^\d{4}$/);
-            expect(now).toMatch(/^\d{4}$/);
-            if (isMismatch(t, k, i)) {
-              expect(now).not.toBe(book);
-              expect([1, 2]).toContain(diffDigits(book, now));
-            } else expect(now).toBe(book);
-          }
-        }
-      }
+  it('bậc anh em của nút trên đường có cùng giá trị trong sổ và hiện tại; nút trái/phải theo chỉ số chẵn/lẻ', () => {
+    const t = makeTree([3, 7, 5, 2, 6, 1, 4, 8], 3, 9);
+    for (let k = 0; k < t.depth; k++) {
+      const i = t.tamperedIndex >> k;
+      expect(siblingValue(t, k)).toBe(t.book[k][i ^ 1]);
+      expect(isLeftChild(t, k)).toBe(i % 2 === 0);
+      expect(nodeX(t, k)).toBe(isLeftChild(t, k) ? -CLIMB_SPEC.pairX : CLIMB_SPEC.pairX);
+      expect(siblingX(t, k)).toBe(-nodeX(t, k));
     }
-    // vòng 1–2 hiện giá trị thật
-    const t1 = generateTree(createMulberry32(5), CLIMB_ROUNDS[0]);
-    expect(t1.bookCode).toBeNull();
-    expect(nodeLabel(t1, 0, 0).book).toBe(String(t1.book[0][0]));
-  });
-
-  it('ca 4: tay cách tay nắm 0,5 khi tầm với là 0,6 thì nắm được (cả hai bên); cách 0,61 thì không', () => {
-    // tay trái ở x = c − 1,5; tay phải ở x = c + 1,5
-    expect(grabAt(1.0, 0.6)).toBe('left'); // x trái = −0,5
-    expect(grabAt(1.5, 0.6)).toBe('left'); // x trái = 0
-    expect(grabAt(-1.0, 0.6)).toBe('right'); // x phải = 0,5
-    expect(grabAt(0.89, 0.6)).toBeNull(); // x trái = −0,61
-    expect(grabAt(0, 0.6)).toBeNull();
-  });
-
-  it('ca 5: nắm nhầm nhánh khớp: "ngõ cụt", ở lại tầng cũ, mất 1 tim, khóa bật 1 giây', () => {
-    const s = createClimbGame(11);
-    const wrong = isMismatch(s.tree, 1, 0) ? 'right' : 'left';
-    const t = timeToJump(s, wrong, 0, 0.1);
-    const ev = jumpAt(s, t);
-    expect(ev.map((e) => e.kind)).toEqual(['deadEnd']);
-    expect(s.level).toBe(0);
-    expect(s.hearts).toBe(2);
-    // khóa 1 giây kể từ đỉnh
-    expect(jump(s)).toBe(false);
-    stepClimb(s, t + CLIMB_SPEC.jumpPeak + 1 - s.time + 1e-6);
-    expect(jump(s)).toBe(true);
-  });
-
-  it('ca 6: không nắm được gì: giữ nguyên tầng, tim không đổi, khóa bật 1 giây', () => {
-    const s = createClimbGame(12);
-    // bật lúc tâm cặp tay nắm ở giữa: hai tay nắm cách người chơi 1,5
-    let t = 0;
-    while (Math.abs(nextCenter(s, t + CLIMB_SPEC.jumpPeak)) > 0.05) t += 0.001;
-    const ev = jumpAt(s, t);
-    expect(ev.map((e) => e.kind)).toEqual(['miss']);
-    expect(s.level).toBe(0);
-    expect(s.hearts).toBe(3);
-    expect(jump(s)).toBe(false);
+    expect(nodeValue(t, 0)).toBe(9);
   });
 });
 
-describe('bước B3: cặp tay nắm trượt', () => {
-  it('c(t) luôn trong [−1,5; 1,5], tốc độ đúng của vòng; trong mỗi chu kỳ cả tay trái lẫn tay phải đều có lúc |x| ≤ tầm với (cả 4 vòng)', () => {
-    for (const r of CLIMB_ROUNDS) {
-      const T = swayPeriod(r.speed);
-      for (const phase of [0, 1.3, 2.9, 5.7]) {
-        let left = 0;
-        let right = 0;
-        const dt = 0.0005;
-        for (let t = 0; t < T; t += dt) {
-          const c = handleCenter(t, r.speed, phase);
-          expect(c).toBeGreaterThanOrEqual(-1.5 - 1e-9);
-          expect(c).toBeLessThanOrEqual(1.5 + 1e-9);
-          const g = grabAt(c, r.reach);
-          if (g === 'left') left += dt;
-          if (g === 'right') right += dt;
-          const v = Math.abs(handleCenter(t + 1e-4, r.speed, phase) - c) / 1e-4;
-          expect(Math.abs(v - r.speed) < 1e-6 || v < r.speed).toBe(true); // ở chỗ quay đầu vận tốc đổi dấu
-        }
-        // cửa sổ nắm được mỗi chu kỳ đúng như grabWindow (2 × tầm với / tốc độ)
-        expect(left).toBeCloseTo(grabWindow(r), 2);
-        expect(right).toBeCloseTo(grabWindow(r), 2);
-        expect(grabWindow(r)).toBeCloseTo((2 * r.reach) / r.speed, 9);
+describe('các bậc lựa chọn', () => {
+  it('đúng một bậc ghi combine(trái, phải) theo đúng thứ tự trái–phải của hai nút; bậc nhiễu khác nhau và khác đáp án', () => {
+    for (let seed = 1; seed <= 500; seed++) {
+      const rng = createMulberry32(seed);
+      for (const count of [2, 3]) {
+        const t = generateTree(rng, 16);
+        const tiers = buildTiers(t, count, rng);
+        expect(tiers).toHaveLength(t.depth);
+        tiers.forEach((tier, k) => {
+          expect(tier.options).toHaveLength(count);
+          expect(tier.options[0]).toBe(combine(tier.left, tier.right));
+          expect(tier.options[0]).toBe(t.now[k + 1][t.tamperedIndex >> (k + 1)]);
+          expect(new Set(tier.options).size).toBe(count);
+        });
       }
     }
   });
 
-  it('hai tay nắm cách nhau 3 > 2 × tầm với nên không bao giờ nắm được cả hai', () => {
-    for (const r of CLIMB_ROUNDS) expect(2 * CLIMB_SPEC.halfGap).toBeGreaterThan(2 * r.reach);
+  it('thứ tự trái–phải theo vị trí hai nút: nút con trái đứng trái, con phải đứng phải', () => {
+    const t = makeTree([3, 7, 5, 2], 1, 8); // lá 1 là con phải của nút 0 tầng 1
+    const tiers = buildTiers(t, 2, createMulberry32(1));
+    expect([tiers[0].left, tiers[0].right]).toEqual([3, 8]);
+    expect(tiers[0].options[0]).toBe(38);
+    expect([tiers[1].left, tiers[1].right]).toEqual([38, 52]);
   });
 
-  it('bật khi đang bay hay khi không còn chơi thì bỏ qua', () => {
-    const s = createClimbGame(3);
-    expect(jump(s)).toBe(true);
-    expect(jump(s)).toBe(false);
-    s.phase = 'lost';
-    expect(stepClimb(s, 1)).toEqual([]);
-  });
-});
-
-/** Bot canh đúng: bật lúc tay nắm của nhánh lệch sẽ ở ngay trên đầu ở đỉnh cú bật. */
-function playPerfect(seed: number) {
-  const s = createClimbGame(seed);
-  let guard = 0;
-  while (s.phase !== 'won' && s.phase !== 'lost' && guard++ < 200) {
-    if (s.phase === 'roundDone') {
-      advanceRound(s);
-      continue;
-    }
-    const side = isMismatch(s.tree, s.level + 1, 2 * s.index) ? 'left' : 'right';
-    const reach = CLIMB_ROUNDS[s.round].reach;
-    jumpAt(s, timeToJump(s, side, Math.max(s.time, s.lockUntil), reach * 0.5));
-  }
-  return s;
-}
-
-describe('bước B3: bot canh đúng và điểm', () => {
-  it('bot canh đúng leo hết 4 vòng, không mất tim, với 300 seed', () => {
+  it('bậc nhiễu lấy từ: đảo thứ tự, trái + phải, số đúng lệch đúng 1 chữ số', () => {
+    const seen = new Set<string>();
     for (let seed = 1; seed <= 300; seed++) {
-      const s = playPerfect(seed);
-      expect(s.phase, `seed ${seed}`).toBe('won');
-      expect(s.roundsDone).toBe(4);
-      expect(s.hearts).toBe(3);
-    }
-  });
-
-  it('nắm được lá lệch ở tầng trên cùng là xong vòng; xong vòng 4 là thắng; hết tim thì kết thúc', () => {
-    const s = createClimbGame(21);
-    for (let r = 0; r < 4; r++) {
-      expect(s.round).toBe(r);
-      expect(s.tree.depth).toBe(CLIMB_ROUNDS[r].depth);
-      for (let k = 0; k < s.tree.depth; k++) {
-        const side = isMismatch(s.tree, s.level + 1, 2 * s.index) ? 'left' : 'right';
-        const ev = jumpAt(s, timeToJump(s, side, Math.max(s.time, s.lockUntil), 0.1));
-        expect(ev[0]).toEqual({ kind: 'up', level: k + 1, index: s.index, coins: 2, lostCoins: 0 });
+      const left = 38;
+      const right = 52;
+      const [correct, ...rest] = choiceValues(left, right, 3, createMulberry32(seed));
+      expect(correct).toBe(432);
+      for (const v of rest) {
+        if (v === combine(right, left)) seen.add('swap');
+        else if (v === left + right) seen.add('sum');
+        else {
+          const a = String(correct);
+          const b = String(v);
+          expect(b.length).toBe(a.length);
+          expect([...a].filter((ch, i) => ch !== b[i])).toHaveLength(1);
+          seen.add('digit');
+        }
       }
-      expect(s.index).toBe(s.tree.tamperedIndex);
-      expect(s.phase).toBe(r < 3 ? 'roundDone' : 'won');
-      if (r < 3) expect(advanceRound(s)).toBe(true);
+      expect(rest).toContain(combine(right, left)); // 3 lựa chọn luôn có bậc đảo thứ tự
     }
-    expect(advanceRound(s)).toBe(false);
-
-    const l = createClimbGame(22);
-    for (let h = 3; h >= 1; h--) {
-      const wrong = isMismatch(l.tree, 1, 0) ? 'right' : 'left';
-      const ev = jumpAt(l, timeToJump(l, wrong, Math.max(l.time, l.lockUntil), 0.1));
-      expect(ev[0].kind).toBe('deadEnd');
-      if (h === 1) expect(ev.map((e) => e.kind)).toEqual(['deadEnd', 'lost']);
-    }
-    expect(l.phase).toBe('lost');
-    expect(l.hearts).toBe(0);
-    expect(jump(l)).toBe(false);
+    expect([...seen].sort()).toEqual(['digit', 'sum', 'swap']);
   });
 
-  it('điểm: 4 vòng, 10 đồng, 2 tim → 510; mốc 250 / 450 / 570', () => {
-    expect(climbScore({ roundsDone: 4, coins: 10, hearts: 2 })).toBe(510);
-    const s = createClimbGame(1);
-    addCoins(s, 3);
-    addCoins(s);
-    addCoins(s, -5);
-    expect(s.coins).toBe(4);
-    expect(CLIMB_SPEC.medals).toEqual([250, 450, 570]);
-    expect(climbMedal(249)).toBe(0);
-    expect(climbMedal(250)).toBe(1);
-    expect(climbMedal(449)).toBe(1);
-    expect(climbMedal(450)).toBe(2);
-    expect(climbMedal(510)).toBe(2);
-    expect(climbMedal(569)).toBe(2);
-    expect(climbMedal(570)).toBe(3);
-  });
-
-  it('cùng seed thì cùng cây (và cùng pha tay nắm); khác seed thì (gần như) khác', () => {
-    const a = createClimbGame(2026);
-    const b = createClimbGame(2026);
-    expect(a.tree).toEqual(b.tree);
-    expect(a.phases).toEqual(b.phases);
-    const trees = new Set<string>();
-    for (let seed = 1; seed <= 50; seed++) trees.add(JSON.stringify(createClimbGame(seed).tree));
-    expect(trees.size).toBeGreaterThanOrEqual(49);
-  });
-
-  it('mutateCode: mã toàn chữ số giống nhau thì đổi một chữ số', () => {
-    const rng = createMulberry32(9);
-    for (let i = 0; i < 200; i++) {
-      const m = mutateCode('0000', rng);
-      expect(diffDigits('0000', m)).toBe(1);
+  it('hai nút bằng nhau (đảo thứ tự ra đúng đáp án): vẫn đủ bậc nhiễu khác nhau', () => {
+    for (let seed = 1; seed <= 100; seed++) {
+      const v = choiceValues(5, 5, 3, createMulberry32(seed));
+      expect(v[0]).toBe(55);
+      expect(new Set(v).size).toBe(3);
     }
   });
 });
 
-/** Chơi hết ván, canh đúng mọi lần trừ một lần sai ở tầng `atLevel` của vòng `atRound` (`kind`: ngõ cụt hay trượt). */
-function playWithOneSlip(seed: number, atRound: number, atLevel: number, kind: 'deadEnd' | 'miss' | null) {
-  const s = createClimbGame(seed);
-  let slipped = kind === null;
-  let guard = 0;
-  while (s.phase !== 'won' && s.phase !== 'lost' && guard++ < 200) {
-    if (s.phase === 'roundDone') {
-      advanceRound(s);
-      continue;
-    }
-    const good = isMismatch(s.tree, s.level + 1, 2 * s.index) ? 'left' : 'right';
-    const from = Math.max(s.time, s.lockUntil);
-    if (!slipped && s.round === atRound && s.level === atLevel) {
-      slipped = true;
-      if (kind === 'deadEnd') {
-        jumpAt(s, timeToJump(s, good === 'left' ? 'right' : 'left', from, 0.1));
-      } else {
-        let t = from;
-        while (Math.abs(nextCenter(s, t + CLIMB_SPEC.jumpPeak)) > 0.05) t += 0.001;
-        jumpAt(s, t);
+describe('hình học', () => {
+  it('sóng tam giác nằm trong [−1; 1], trượt không quá biên độ, và vòng 1 đứng yên', () => {
+    for (let u = -9; u < 9; u += 0.37) expect(Math.abs(tri(u))).toBeLessThanOrEqual(1);
+    for (let c = 0; c < 20; c += 0.13) expect(Math.abs(slideOffset(1.4, c, 1.7))).toBeLessThanOrEqual(CLIMB_SPEC.slideAmplitude + 1e-9);
+    expect(slideOffset(0, 5, 1)).toBe(0);
+  });
+  it('hai bậc kề nhau không chồng nhau dù đang trượt (2 lựa chọn và 3 lựa chọn)', () => {
+    for (const n of [2, 3]) {
+      const xs = CLIMB_SPEC.choiceX[n];
+      for (let i = 0; i + 1 < xs.length; i++) {
+        expect(xs[i + 1] - xs[i] - 2 * CLIMB_SPEC.slideAmplitude).toBeGreaterThan(CLIMB_SPEC.stepWidth);
       }
-      continue;
-    }
-    jumpAt(s, timeToJump(s, good, from, CLIMB_ROUNDS[s.round].reach * 0.5));
-  }
-  return s;
-}
-
-describe('bước B4: tiền đồng', () => {
-  it('mỗi khoảng giữa hai tầng có 2 đồng, tối đa 36 đồng; leo hoàn hảo → 586 điểm', () => {
-    expect(CLIMB_SPEC.coinsPerGap * CLIMB_ROUNDS.reduce((a, r) => a + r.depth, 0)).toBe(36);
-    for (const seed of [1, 7, 42]) {
-      const s = playWithOneSlip(seed, 0, 0, null);
-      expect(s.coins).toBe(36);
-      expect(climbScore(s)).toBe(586);
     }
   });
-
-  it('một lần ngõ cụt → mất 2 đồng của khoảng đó và 1 tim: 534 điểm', () => {
-    const s = playWithOneSlip(5, 2, 3, 'deadEnd');
-    expect(s.phase).toBe('won');
-    expect(s.coins).toBe(34);
-    expect(s.hearts).toBe(2);
-    expect(climbScore(s)).toBe(534);
+  it('phần giao theo trục x', () => {
+    expect(overlapX(0, 0)).toBeCloseTo(2 * CLIMB_SPEC.playerHalf);
+    expect(overlapX(5, 0)).toBeLessThan(0);
+    expect(overlapX(CLIMB_SPEC.stepWidth / 2, 0)).toBeCloseTo(CLIMB_SPEC.playerHalf);
   });
+  it('cú nhảy vừa tới tầng trên: đỉnh cao hơn khoảng cách tầng nhưng chưa tới tầng thứ hai', () => {
+    expect(CLIMB_SPEC.jumpApex).toBeGreaterThan(CLIMB_SPEC.gap);
+    expect(CLIMB_SPEC.jumpApex).toBeLessThan(2 * CLIMB_SPEC.gap);
+    const s = createClimbGame(3);
+    jump(s);
+    let top = 0;
+    for (let i = 0; i < 120; i++) {
+      stepClimb(s, 1 / 60);
+      top = Math.max(top, s.player.y);
+    }
+    expect(top - tierY(0)).toBeCloseTo(CLIMB_SPEC.jumpApex, 1);
+  });
+});
 
-  it('một lần trượt → mất 2 đồng của khoảng đó, không mất tim: 584 điểm', () => {
-    const s = playWithOneSlip(6, 1, 0, 'miss');
-    expect(s.coins).toBe(34);
+describe('ván chơi: luật nhảy', () => {
+  it('bắt đầu: vòng 1 (8 lá, 2 lựa chọn), 3 tim, đứng trên bậc của lá bị tráo, bên cạnh có bậc anh em', () => {
+    const s = createClimbGame(11);
+    expect(s.tree.depth).toBe(3);
+    expect(s.choices).toHaveLength(2);
     expect(s.hearts).toBe(3);
-    expect(climbScore(s)).toBe(584);
+    expect(s.level).toBe(0);
+    expect(s.player).toMatchObject({ x: nodeX(s.tree, 0), y: 0, grounded: true });
+    expect(s.choices.filter((c) => c.correct)).toHaveLength(1);
   });
 
-  it('sự kiện lên tầng báo số đồng nhặt được và số đồng mất; sai nhiều lần ở cùng tầng chỉ mất 2 đồng của khoảng đó', () => {
+  it('nhảy lên đúng bậc: bậc đó thành nút hiện tại, hiện bậc anh em và các lựa chọn tầng trên', () => {
+    const s = createClimbGame(5);
+    const before = s.choices.map((c) => c.value);
+    const ev = jumpOnto(s, s.choices.findIndex((c) => c.correct));
+    expect(kinds(ev)).toEqual(['up']);
+    expect(s.level).toBe(1);
+    expect(s.hearts).toBe(3);
+    expect(s.player.y).toBe(tierY(1));
+    expect(s.player.x).toBe(nodeX(s.tree, 1));
+    expect(s.choices).toHaveLength(2);
+    expect(s.choices.map((c) => c.value)).not.toEqual(before);
+    expect(s.choices.find((c) => c.correct)!.value).toBe(s.tiers[1].options[0]);
+  });
+
+  it('leo hết cây: lên tới gốc thì xong vòng, gốc em tính ra khác gốc trong sổ nên lộ lá giả', () => {
     const s = createClimbGame(8);
-    const good = isMismatch(s.tree, 1, 0) ? 'left' : 'right';
-    for (let k = 0; k < 2; k++) {
-      let t = Math.max(s.time, s.lockUntil);
-      while (Math.abs(nextCenter(s, t + CLIMB_SPEC.jumpPeak)) > 0.05) t += 0.001;
-      jumpAt(s, t);
+    let last: ClimbEvent[] = [];
+    for (let k = 0; k < s.tree.depth; k++) last = jumpOnto(s, s.choices.findIndex((c) => c.correct));
+    expect(s.level).toBe(s.tree.depth);
+    expect(s.phase).toBe('roundDone');
+    expect(s.roundsDone).toBe(1);
+    const done = last.find((e) => e.kind === 'roundDone');
+    expect(done).toMatchObject({ mismatch: true, rootBook: s.tree.book[s.tree.depth][0], rootNow: s.tree.now[s.tree.depth][0] });
+    expect(s.rootRevealed).toBe(true);
+    expect(s.choices).toHaveLength(0);
+  });
+
+  it('nhảy vào bậc sai: bậc nứt 0,4 giây rồi biến mất, rơi về bậc vừa đứng, mất 1 tim, làm lại tầng (giữ số, đổi chỗ)', () => {
+    const s = createClimbGame(5);
+    const values = s.choices.map((c) => c.value).sort();
+    const wrong = s.choices.findIndex((c) => !c.correct);
+    const slotsBefore = s.choices.map((c) => c.slot);
+    jumpOnto(s, wrong);
+    expect(s.hearts).toBe(2);
+    expect(s.mistakes).toBe(1);
+    expect(s.level).toBe(0);
+    expect(s.mode).toBe('free');
+    expect(s.player.y).toBe(tierY(0));
+    expect(s.choices.map((c) => c.value).sort()).toEqual(values);
+    expect(s.choices.map((c) => c.slot)).not.toEqual(slotsBefore);
+    expect(s.choices.every((c) => c.crack === null)).toBe(true);
+  });
+
+  it('chuỗi sự kiện khi nhầm: wrong → (0,4 giây) vanish → rơi → retry; đứng yên trên bậc nứt đúng 0,4 giây', () => {
+    const s = createClimbGame(5);
+    const wrong = s.choices.findIndex((c) => !c.correct);
+    s.player.x = choiceX(s, s.choices[wrong]);
+    jump(s);
+    const ev: ClimbEvent[] = [];
+    let wrongAt = -1;
+    let vanishAt = -1;
+    for (let i = 0; i < 400; i++) {
+      const e = stepClimb(s, 1 / 120);
+      ev.push(...e);
+      if (e.some((x) => x.kind === 'wrong')) wrongAt = i;
+      if (e.some((x) => x.kind === 'vanish')) vanishAt = i;
     }
-    const ev = jumpAt(s, timeToJump(s, good, Math.max(s.time, s.lockUntil), 0.1));
-    expect(ev[0]).toMatchObject({ kind: 'up', level: 1, coins: 0, lostCoins: 2 });
-    expect(s.coins).toBe(0);
-    // tầng mới: lần đầu leo qua thì nhặt lại được
-    const good2 = isMismatch(s.tree, 2, 2 * s.index) ? 'left' : 'right';
-    expect(jumpAt(s, timeToJump(s, good2, Math.max(s.time, s.lockUntil), 0.1))[0]).toMatchObject({ kind: 'up', coins: 2, lostCoins: 0 });
-    expect(s.coins).toBe(2);
+    expect(kinds(ev)).toEqual(['wrong', 'vanish', 'retry']);
+    expect((vanishAt - wrongAt) / 120).toBeCloseTo(CLIMB_SPEC.crackSeconds, 1);
+  });
+
+  it('nhầm lần cuối (hết tim): rơi về xong thì thua, điểm theo số vòng đã xong', () => {
+    const s = createClimbGame(5);
+    s.hearts = 1;
+    const ev = jumpOnto(s, s.choices.findIndex((c) => !c.correct));
+    expect(kinds(ev)).toEqual(['wrong', 'vanish', 'lost']);
+    expect(s.phase).toBe('lost');
+    expect(s.hearts).toBe(0);
+    expect(climbScore(s)).toBe(0);
+  });
+
+  it('nhảy hụt (không chạm bậc nào): về bậc cũ, không mất tim, khóa nhảy 0,6 giây', () => {
+    const s = createClimbGame(5);
+    s.player.x = 0; // giữa hai bậc lựa chọn (±2,1) và ngoài hai bậc đứng
+    s.player.x = nodeX(s.tree, 0);
+    expect(jump(s)).toBe(true);
+    const ev = run(s, 1.5);
+    expect(kinds(ev)).toEqual(['miss']);
+    expect(s.hearts).toBe(3);
+    expect(s.player.grounded).toBe(true);
+    expect(s.level).toBe(0);
+    const lockedAt = s.lockUntil;
+    expect(lockedAt - (s.time - 1.5)).toBeGreaterThan(0);
+    // đang khóa: không nhảy được
+    s.time = lockedAt - 0.1;
+    expect(jump(s)).toBe(false);
+    s.time = lockedAt + 0.01;
+    expect(jump(s)).toBe(true);
+  });
+
+  it('khóa sau nhảy hụt dài đúng 0,6 giây', () => {
+    const s = createClimbGame(5);
+    jump(s);
+    let missTime = -1;
+    for (let i = 0; i < 300 && missTime < 0; i++) if (stepClimb(s, 1 / 120).some((e) => e.kind === 'miss')) missTime = s.time;
+    expect(s.lockUntil - missTime).toBeCloseTo(CLIMB_SPEC.missLock, 2);
+  });
+
+  it('bước ra khỏi mép bậc: rơi về bậc cũ, không mất tim, khóa nhảy 0,6 giây', () => {
+    const s = createClimbGame(5);
+    const x0 = s.player.x;
+    setMove(s, x0 < 0 ? -1 : 1);
+    const ev: ClimbEvent[] = [];
+    while (!ev.some((e) => e.kind === 'fell')) ev.push(...stepClimb(s, 1 / 60));
+    setMove(s, 0);
+    ev.push(...run(s, 1));
+    expect(kinds(ev)).toEqual(['fell']);
+    expect(s.hearts).toBe(3);
+    expect(s.player).toMatchObject({ y: 0, grounded: true });
+    expect(Math.abs(s.player.x - x0)).toBeLessThan(0.1);
+    expect(s.lockUntil - (s.time - 1)).toBeCloseTo(CLIMB_SPEC.missLock, 1);
+  });
+
+  it('giữ phím khi đang bay thì lái được trên không', () => {
+    const s = createClimbGame(5);
+    const x0 = s.player.x;
+    jump(s);
+    setMove(s, 1);
+    run(s, 0.3);
+    expect(s.player.grounded).toBe(false);
+    expect(s.player.x - x0).toBeGreaterThan(1);
+  });
+
+  it('chỉ đáp xuống bậc khi đang rơi: bay lên xuyên qua bậc phía trên không bị chặn', () => {
+    const s = createClimbGame(5);
+    s.player.x = choiceX(s, s.choices[0]);
+    jump(s);
+    for (let i = 0; i < 40; i++) stepClimb(s, 1 / 120);
+    expect(s.level).toBe(0);
+    expect(s.hearts).toBe(3);
+  });
+
+  it('tạm dừng: không có gì đổi (đồng hồ, bậc trượt, người chơi) và không có sự kiện', () => {
+    const s = createClimbGame(5);
+    s.round = 1;
+    jump(s);
+    setMove(s, 1);
+    run(s, 0.2);
+    const snap = JSON.stringify({ t: s.time, c: s.slideClock, p: s.player, ch: s.choices });
+    expect(tickClimb(s, 1, true)).toEqual([]);
+    expect(JSON.stringify({ t: s.time, c: s.slideClock, p: s.player, ch: s.choices })).toBe(snap);
+    tickClimb(s, 0.1, false);
+    expect(s.time).toBeGreaterThan(JSON.parse(snap).t);
+  });
+
+  it('không phụ thuộc bước dt: cùng thao tác, dt 1/30 hay 1/144 cho cùng kết quả', () => {
+    const play = (dt: number) => {
+      const s = createClimbGame(5);
+      s.player.x = choiceX(s, s.choices.find((c) => c.correct)!);
+      jump(s);
+      for (let t = 0; t < 1.2; t += dt) stepClimb(s, dt);
+      return [s.level, s.hearts];
+    };
+    expect(play(1 / 30)).toEqual(play(1 / 144));
   });
 });
 
-type Slip = { round: number; level: number; kind: 'deadEnd' | 'miss' };
+describe('vòng, bậc trượt, điểm, mốc', () => {
+  it('3 vòng: 8 lá 2 lựa chọn đứng yên; 8 lá 2 lựa chọn trượt; 16 lá 3 lựa chọn trượt nhanh hơn', () => {
+    const [a, b, c] = CLIMB_SPEC.rounds;
+    expect([a.leaves, a.choices, a.slide]).toEqual([8, 2, 0]);
+    expect([b.leaves, b.choices]).toEqual([8, 2]);
+    expect(b.slide).toBeGreaterThan(0);
+    expect([c.leaves, c.choices]).toEqual([16, 3]);
+    expect(c.slide).toBeGreaterThan(b.slide);
+  });
 
-/** Chơi hết ván, canh đúng mọi lần trừ các lần sai trong `slips` (mỗi phần tử một lần sai, theo thứ tự; cùng (vòng, tầng) lặp nhiều lần được). */
-function playSlips(seed: number, slips: Slip[]) {
-  const s = createClimbGame(seed);
-  const todo = [...slips];
-  let guard = 0;
-  while (s.phase !== 'won' && s.phase !== 'lost' && guard++ < 400) {
-    if (s.phase === 'roundDone') {
-      advanceRound(s);
-      continue;
-    }
-    const good = isMismatch(s.tree, s.level + 1, 2 * s.index) ? 'left' : 'right';
-    const from = Math.max(s.time, s.lockUntil);
-    const next = todo[0];
-    if (next && next.round === s.round && next.level === s.level) {
-      todo.shift();
-      if (next.kind === 'deadEnd') jumpAt(s, timeToJump(s, good === 'left' ? 'right' : 'left', from, 0.1));
-      else {
-        let t = from;
-        while (Math.abs(nextCenter(s, t + CLIMB_SPEC.jumpPeak)) > 0.05) t += 0.001;
-        jumpAt(s, t);
-      }
-      continue;
-    }
-    jumpAt(s, timeToJump(s, good, from, CLIMB_ROUNDS[s.round].reach * 0.5));
-  }
-  return s;
-}
+  it('advanceRound: chỉ khi xong vòng; vòng sau có cây mới, giữ tim, về lại tầng lá', () => {
+    const s = createClimbGame(2);
+    expect(advanceRound(s)).toBe(false);
+    for (let k = 0; k < s.tree.depth; k++) jumpOnto(s, s.choices.findIndex((c) => c.correct));
+    s.hearts = 2;
+    expect(advanceRound(s)).toBe(true);
+    expect(s.round).toBe(1);
+    expect(s.level).toBe(0);
+    expect(s.hearts).toBe(2);
+    expect(s.tree.depth).toBe(3);
+    expect(s.phase).toBe('playing');
+    for (let k = 0; k < s.tree.depth; k++) jumpOnto(s, s.choices.findIndex((c) => c.correct) );
+  });
 
-describe('mốc 250 / 450 / 570: Đồng qua 3 vòng, Bạc leo hết 4 vòng nhầm tối đa 2 lần, Vàng không nhầm lần nào', () => {
-  const dead = (round: number, level: number): Slip => ({ round, level, kind: 'deadEnd' });
+  it('vòng 2 và 3: bậc lựa chọn trượt qua lại theo đồng hồ; "Giảm chuyển động" thì chậm đi một nửa', () => {
+    const fast = createClimbGame(4);
+    fast.round = 2;
+    const slow = createClimbGame(4);
+    slow.round = 2;
+    setSlow(slow, true);
+    fast.player.move = 0;
+    // giữ người chơi đứng yên: chỉ xem đồng hồ trượt
+    run(fast, 1);
+    run(slow, 1);
+    expect(slow.slideClock).toBeCloseTo(fast.slideClock * CLIMB_SPEC.reducedSlideScale, 3);
+    const c = fast.choices[0];
+    const x0 = choiceX(fast, c);
+    run(fast, 0.5);
+    expect(choiceX(fast, c)).not.toBeCloseTo(x0, 3);
+    expect(Math.abs(choiceX(fast, c) - choiceBaseX(fast.choices.length, c.slot))).toBeLessThanOrEqual(CLIMB_SPEC.slideAmplitude + 1e-9);
+  });
 
-  it('leo hoàn hảo: 586 điểm → Vàng', () => {
-    const s = playSlips(1, []);
+  it('điểm = số vòng xong × 100 + tim còn × 50, tối đa 450', () => {
+    expect(climbScore({ roundsDone: 3, hearts: 3 })).toBe(450);
+    expect(CLIMB_MAX_SCORE).toBe(450);
+    expect(climbScore({ roundsDone: 2, hearts: 0 })).toBe(200);
+    expect(climbScore({ roundsDone: 3, hearts: 1 })).toBe(350);
+    expect(climbScore({ roundsDone: 3, hearts: 2 })).toBe(400);
+  });
+
+  it('mốc theo nghĩa: Đồng 200 = xong 2 vòng; Bạc 350 = xong 3 vòng nhầm ≤ 2 lần; Vàng 450 = không nhầm lần nào', () => {
+    expect(CLIMB_SPEC.medals).toEqual([200, 350, 450]);
+    expect(climbMedal(climbScore({ roundsDone: 1, hearts: 0 }))).toBe(0);
+    expect(climbMedal(climbScore({ roundsDone: 2, hearts: 0 }))).toBe(1);
+    for (const mistakes of [1, 2]) expect(climbMedal(climbScore({ roundsDone: 3, hearts: 3 - mistakes }))).toBe(2);
+    expect(climbMedal(climbScore({ roundsDone: 3, hearts: 3 }))).toBe(3);
+  });
+
+  it('cùng seed thì cùng cây, cùng lựa chọn', () => {
+    const a = createClimbGame(77);
+    const b = createClimbGame(77);
+    expect(a.tree).toEqual(b.tree);
+    expect(a.tiers).toEqual(b.tiers);
+    expect(a.choices).toEqual(b.choices);
+    expect(createClimbGame(78).tree).not.toEqual(a.tree);
+  });
+});
+
+describe('cây mẫu của phần hướng dẫn', () => {
+  it('4 lá [3,7,5,2], lá thứ hai bị tráo thành 8; không tính vào ván thật; xong thì thắng', () => {
+    const s = createPracticeGame();
+    expect(s.practice).toBe(true);
+    expect(s.tree.leaves).toEqual([3, 7, 5, 2]);
+    expect(s.tree.tamperedLeaves).toEqual([3, 8, 5, 2]);
+    expect(s.tree.depth).toBe(2);
+    expect(s.choices).toHaveLength(2);
+    for (let k = 0; k < 2; k++) jumpOnto(s, s.choices.findIndex((c) => c.correct));
     expect(s.phase).toBe('won');
-    expect(climbScore(s)).toBe(586);
-    expect(climbMedal(climbScore(s))).toBe(3);
-  });
-
-  it('trượt (không nhầm nhánh) nhiều lần vẫn Vàng nếu đủ 570: 8 lần trượt ở 8 tầng khác nhau → 570', () => {
-    const slips: Slip[] = [0, 1, 2].map((level) => ({ round: 0, level, kind: 'miss' as const })).concat([0, 1, 2, 3].map((level) => ({ round: 1, level, kind: 'miss' as const })), [{ round: 2, level: 0, kind: 'miss' as const }]);
-    const s = playSlips(2, slips);
-    expect(s.hearts).toBe(3);
-    expect(climbScore(s)).toBe(586 - 16);
-    expect(climbMedal(climbScore(s))).toBe(3);
-  });
-
-  it('1 lần ngõ cụt: 534 → Bạc', () => {
-    const s = playSlips(3, [dead(1, 1)]);
-    expect(s.phase).toBe('won');
-    expect(climbScore(s)).toBe(534);
-    expect(climbMedal(climbScore(s))).toBe(2);
-  });
-
-  it('2 lần ngõ cụt (ở hai tầng khác nhau) hết 4 vòng: 482 → Bạc', () => {
-    const s = playSlips(4, [dead(0, 0), dead(3, 2)]);
-    expect(s.phase).toBe('won');
-    expect(s.hearts).toBe(1);
-    expect(s.roundsDone).toBe(4);
-    expect(climbScore(s)).toBe(400 + 32 + 50);
-    expect(climbMedal(climbScore(s))).toBe(2);
-  });
-
-  it('hết tim ở vòng 4 (đã xong 3 vòng) → Đồng', () => {
-    const s = playSlips(5, [dead(3, 0), dead(3, 0), dead(3, 0)]);
-    expect(s.phase).toBe('lost');
-    expect(s.roundsDone).toBe(3);
-    expect(s.hearts).toBe(0);
-    const score = climbScore(s);
-    expect(score).toBe(300 + 24); // 3 vòng: 6 + 8 + 10 đồng, 0 tim
-    expect(climbMedal(score)).toBe(1);
-  });
-
-  it('hết tim ở vòng 3 (mới xong 2 vòng) → chưa đạt', () => {
-    const s = playSlips(6, [dead(2, 0), dead(2, 0), dead(2, 0)]);
-    expect(s.phase).toBe('lost');
-    expect(s.roundsDone).toBe(2);
-    const score = climbScore(s);
-    expect(score).toBe(200 + 14);
-    expect(climbMedal(score)).toBe(0);
+    expect(s.roundsDone).toBe(0);
+    expect(s.rootRevealed).toBe(true);
   });
 });

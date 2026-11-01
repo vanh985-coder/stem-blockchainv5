@@ -149,21 +149,22 @@ describe('hướng dẫn riêng của màn 8 và màn 12 (bước HD)', () => {
     expect(all).toMatch(/tráo chỗ 2 thẻ đang úp/);
     expect(all).toContain('Tí');
   });
-  it('màn 12 nói đủ: đèn lồng ghi Sổ và Nay, chọn cái có hai số khác nhau, bật đúng lúc đèn tới trên đầu, nắm nhầm mất 1 tim, trượt mất 2 đồng, tầng lá bắt {phanDien}', () => {
+  it('màn 12 nói đủ: bậc anh em, ghép số bên trái nhân 10 cộng số bên phải, nhảy nhầm bậc thì nứt và mất 1 tim, nhảy hụt không mất tim, gốc trong sổ, lá giả, {phanDien}', () => {
     const all = man12.trang.map((p) => guideText(p, 'may')).join(' ');
-    expect(all).toMatch(/đèn lồng ghi số Sổ và số Nay/);
-    expect(all).toMatch(/hai số khác nhau/);
-    expect(all).toMatch(/ngay trên đầu/);
+    expect(all).toMatch(/bậc anh em/);
+    expect(all).toMatch(/bên trái nhân 10 rồi cộng số bên phải/);
+    expect(all).toMatch(/bậc nứt/);
     expect(all).toMatch(/mất 1 tim/);
-    expect(all).toMatch(/mất 2 đồng/);
-    expect(all).toMatch(/tầng lá/);
+    expect(all).toMatch(/nhảy hụt/);
+    expect(all).toMatch(/gốc trong sổ/);
+    expect(all).toMatch(/lá giả/);
     expect(all).toContain('{phanDien}');
   });
-  it('màn 12: cách bật khác nhau theo thiết bị (máy tính: chuột hoặc Space; điện thoại: chạm); các trang khác dùng lời chung', () => {
+  it('màn 12: cách điều khiển khác nhau theo thiết bị (máy tính: phím mũi tên, Space; điện thoại: nút ◀ ▶ và Nhảy); các trang khác dùng lời chung', () => {
     const p = man12.trang[1];
     expect(guideText(p, 'may')).toMatch(/Space/);
-    expect(guideText(p, 'dt')).toMatch(/chạm/);
-    expect(guideText(p, 'dt')).not.toMatch(/Space|chuột/);
+    expect(guideText(p, 'dt')).toMatch(/nút/);
+    expect(guideText(p, 'dt')).not.toMatch(/Space|phím|chuột/);
     expect(guideFigure(p, 'may')).not.toEqual(guideFigure(p, 'dt'));
   });
   it('màn 8: lời cho điện thoại nói chạm, lời cho máy tính nói phím mũi tên và Enter', () => {

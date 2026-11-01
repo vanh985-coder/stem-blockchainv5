@@ -77,7 +77,7 @@ export const VILLAGE_SCENE: Partial<Record<VillageId, VillageSceneText>> = {
     guideNext: {
       lesson: 'Em ra biển gỗ "Học cùng thầy Linh" nhé. Thầy sẽ chỉ em cách gộp cả cuốn sổ thành một con số ở gốc cây.',
       game1: 'Giờ tới biển "Ghép lá cây sổ" nhé. {phanDien} ném lá giả lẫn vào cây, em ghép các lá cho đúng để gộp cây cho xong!',
-      game2: 'Còn biển "Leo cây tìm lá giả": {phanDien} đã tráo một chiếc lá trên cây đa, em leo từ gốc theo nhánh lệch để bắt nó nhé.',
+      game2: 'Còn biển "Leo bậc gỗ": {phanDien} đã tráo một chiếc lá trên cây đa, em leo từ lá lên gốc theo từng bậc gỗ để bắt nó nhé.',
       done: 'Làng Bạc cảm ơn em nhiều! Nhờ em, cả bốn làng đã giữ sổ cùng nhau.',
     },
     // không có `award`: Trang Sổ Vàng thứ tư trao trong cảnh cao trào sau màn 12

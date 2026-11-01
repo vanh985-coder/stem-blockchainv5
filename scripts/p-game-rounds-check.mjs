@@ -131,6 +131,8 @@ async function run() {
   });
 
   try {
+    // ONLY=12 chỉ chạy phần màn 12 (các màn khác có thể cần GPU thật)
+    if (process.env.ONLY !== "12") {
     // -------------------------------------------------------------
     // MÀN 2: Game Runner 3D (Đuổi theo phản diện)
     // -------------------------------------------------------------
@@ -305,25 +307,35 @@ async function run() {
       await ctx.page.close();
     }
 
+    }
     // -------------------------------------------------------------
-    // MÀN 12: Game Leo cây 2.5D (Leo cây tìm lá giả)
+    // MÀN 12: Game Leo bậc gỗ (2.5D; hướng dẫn làm thử luôn chạy khi vào màn nên bỏ qua trước; ván thật là window.__climbReal)
     // -------------------------------------------------------------
-    console.log('\n=== Màn 12: Leo cây 2.5D ===');
-    // Ca 1: Vòng 1 (8 lá, depth 3)
+    console.log('\n=== Màn 12: Leo bậc gỗ 2.5D ===');
+    const skipClimbTutorial = async (ctx) => {
+      await ctx.page.waitForSelector('[data-testid="tutorial-tooltip"]', { timeout: 15000 });
+      const skip = await ctx.page.evaluateHandle(() => [...document.querySelectorAll('[data-testid="tutorial-tooltip"] button')].find((b) => /Bỏ qua/.test(b.innerText)) ?? null);
+      await tap(ctx, skip.asElement());
+      await ctx.page.waitForFunction(() => !document.querySelector('[data-testid="tutorial-spotlight"]'), { timeout: 5000 });
+      await sleep(400);
+    };
+    // Ca 1: Vòng 1 (8 lá, 3 tầng, 2 lựa chọn)
     {
       const ctx = await newPageCtx(browser, 12);
       await openGame(ctx, 'lang-bac', 12);
-      await testAutoInState(ctx, 'Màn 12 (Vòng 1 - 8 lá depth 3)');
+      await skipClimbTutorial(ctx);
+      await testAutoInState(ctx, 'Màn 12 (Vòng 1 - 8 lá, 2 lựa chọn)');
       await ctx.page.close();
     }
 
-    // Ca 2: Vòng 4 (Vòng cuối, 64 lá, depth 6, codes)
+    // Ca 2: Vòng 3 (vòng cuối, 16 lá, 4 tầng, 3 lựa chọn, bậc trượt nhanh)
     {
       const ctx = await newPageCtx(browser, 12);
       await openGame(ctx, 'lang-bac', 12);
-      await testAutoInState(ctx, 'Màn 12 (Vòng 4 - vòng cuối 64 lá depth 6)', () => {
-        if (window.__climb) {
-          window.__climb.round = 3;
+      await skipClimbTutorial(ctx);
+      await testAutoInState(ctx, 'Màn 12 (Vòng 3 - vòng cuối 16 lá, 3 lựa chọn)', () => {
+        if (window.__climbReal) {
+          window.__climbReal.round = 2;
         }
       });
       await ctx.page.close();

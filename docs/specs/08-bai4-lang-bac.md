@@ -335,71 +335,56 @@ Test (`man11Anim.test.ts`, `man11Engine.test.ts`): 120 ván ngẫu nhiên × 80 
 4. **Nút của màn kết quả dùng chung** (`.mg-result-buttons` ở `theme.css`, điện thoại ngang thấp dưới 500 điểm ảnh): nhãn một dòng, không gãy chữ ("Chơi lại", "Chơi tiếp", "Về làng", "Xem lại cảnh cuối"): cỡ chữ 0,875rem (14 điểm ảnh, "Chữ to" nhân lên 16,1), lề ngang 8, `white-space: nowrap`, nút chia chỗ theo độ dài nhãn, không đủ chỗ thì xuống hàng cả nút. Trước sửa chữ 24 điểm ảnh gãy 2 đến 3 dòng (ví dụ "Xem lại cảnh cuối" thành 4 dòng ở 640 × 360). Đã kiểm màn 2, 3, 5, 6, 8, 9, 11, 12 ở 844 × 390 và 640 × 360 (màn 12 có nút thứ ba "Xem lại cảnh cuối": `/dev/minigame?level=12&finale=1`), và màn 12 với "Chữ to" ở 640 × 360: bảng không cuộn, nút nằm trong bảng.
 5. **Gió xoáy:** móc dev `__match3PlaceWind(r, c)` dựng bàn có sẵn ô gió; ở bàn thử đổi gió ở (3, 3) với lá loại 5 ở (3, 4): bàn có 9 lá loại đó, đợt nổ đầu có đúng 10 ô (9 lá và ô gió), `windOf` = 5, 10 vòng nổ, mọi lá loại đó nổ cùng lúc, không lá loại khác (ảnh `05-gio-xoay-dang-no`). Test thuần `man11Anim.test.ts`: đợt nổ đầu xóa đúng mọi lá cùng loại và ô gió, mọi miếng đó mờ hẳn cuối đợt, bàn hiển thị cuối khớp logic.
 
-## Màn 12 — Game phụ 2: "Leo cây tìm lá giả" (kiểu leo dây của Talking Tom) và cao trào
+## Màn 12 — Game phụ 2: "Leo bậc gỗ" (đi từ lá lên gốc, như một bằng chứng Merkle) và cao trào
 
-Logic đặt trong `climbLogic.ts` (hàm thuần, có test).
+Làm lại toàn bộ lối chơi ngày 01/11/2026 (nhánh `feat/man12-bac-go`; lối chơi cũ "Leo cây tìm lá giả": bật bám tay nắm, số Sổ/Nay, mã rút gọn, tiền đồng, đã bỏ). Giữ nguyên: số màn 12, đường dẫn, khung `MiniGameLevel`, cảnh cao trào sau màn 12 (cả khi hết tim, Bi giúp), cờ `climaxSeen`, câu của Bi lần đầu vào màn, nút "Tự hoàn thành", nút "?", lưu tiến độ. Logic đặt trong `packages/village-lang-bac/src/climb/` (hàm thuần, có test).
 
-**Câu chuyện:** lái buôn phương xa vừa trả một khoản bạc lớn. {phanDien} tráo một chiếc lá giao dịch trên cây đa để khoản bạc chảy về túi mình, nên số gốc báo lệch. Học sinh leo từ gốc lên, lần theo nhánh lệch để bắt {phanDien}.
+**Câu chuyện:** lái buôn phương xa vừa trả một khoản bạc lớn. {phanDien} tráo một chiếc lá giao dịch trên cây đa để khoản bạc chảy về túi mình, nên số gốc báo lệch. Em đứng trên bậc của chiếc lá bị tráo và leo từng tầng lên gốc: ở mỗi tầng em tự ghép số của mình với số của bậc anh em để biết bậc nào đúng. Lên tới gốc, gốc em tính ra khác gốc trong sổ: lá giả lộ ra.
 
-### Dựng bằng `Scene25D` (khung dọc, camera đi theo người chơi lên trên)
+Đây chính là **bằng chứng Merkle** của bài 4 (spec giai đoạn 1 `05-bai4-merkle.md`): chỉ cần các nút anh em dọc đường từ một lá lên gốc là tính lại được gốc. Công thức ghép là `combine(a, b) = a × 10 + b` của `lessons/bai-4/logic.ts` (mô hình ghép số, không phải hàm băm mật mã thật); màn này dùng `buildTree` và `combine` của bài 4, không viết lại công thức.
 
-- **Thân cây:** ghép nối từ `sprites/man-12-leo-cay/than-cay` theo chiều dọc; dưới cùng là `goc-cay`, trên cùng là `ngon-cay`.
-- **Mỗi tầng:** thanh `canh-ngang`; hai tay nắm dùng `tay-nam`, số ghi trên tay nắm do code vẽ.
-- **Nền trời:** code vẽ dải màu chuyển; tiền đồng dùng `ui/icons/tien-dong`.
-- **Học sinh:** model 3D, tư thế `hang` dựng bằng code (clip `idle` cộng tư thế treo, xem spec 03 mục 3.3; clip `hang` trong file model sai nên không dùng) khi đang treo, clip `jump` khi bật lên.
-- **{phanDien}:** model 3D ngồi trên ngọn cây ôm chiếc lá giả.
-- **Khung nhìn:** chơi được cả khung dọc lẫn ngang. Khung ngang thì để cây ở giữa, hai bên là bầu trời.
+### Dựng bằng `Scene25D` (khung dọc, camera đi theo tầng em đứng)
 
-### Cây và cách leo
+- **Cây:** thân ghép từ `sprites/man-12-leo-cay/than-cay`, dưới cùng `goc-cay`, trên cùng `ngon-cay`. Cây mọc như cây thật: gốc ở dưới, lá ở trên; hàng lá (tầng 0) ở đáy, gốc của cây Merkle ở ngọn. Lần đầu vào màn, Bi nói: "Trên bảng thì gốc vẽ ở trên cùng; còn ở cây thật thì gốc ở dưới. Vẫn là một cây thôi!"
+- **Bậc gỗ:** vẽ bằng code (texture canvas): ván gỗ có vân, hai đinh, viền nâu; số ghi trên bậc bằng phông Baloo 2, **cao ≥ 16 px CSS** (đo 19,8 px ở 360 × 800 và 844 × 390, 41,7 px ở 1366 × 768; "Chữ to" nhân 1,15; đo cả 3 vòng đều 19,8 px ở 360 × 800 kể cả vòng 3 có số dài tới 6 chữ số; hàm `climbLayout.labelFontPx` tự thu chữ cho vừa bề rộng bậc nhưng không dưới 16). Thử tải trước `sprites/man-12-leo-cay/bac-go` và `bac-go-nut` từ manifest; thiếu thì dùng hình code (hiện tại chưa có hai file này: xem bảng "Đồ họa cần tạo").
+- **Ngọn cây:** biển gỗ khắc "Gốc trong sổ" kèm số gốc trong sổ của vòng; {phanDien} (model `characters/ti`) ngồi trên biển, ôm lá giả (`ui/tiles/la-gia`); khi lên tới gốc lá giả rơi xuống, {phanDien} nhảy cẫng.
+- **Nhân vật:** `hoc-sinh-nam` với clip `idle` (đứng), `run` (đi), `jump` (bay); quay mặt theo hướng đi. Khi bậc sai biến mất và em rơi, dùng tư thế `sad` dựng bằng code (xem "Tự chọn": tư thế `hurt` chỉ có tác dụng với Tí, `isPoseAllowed`).
+- **Nền trời:** code vẽ dải màu chuyển. **Khung nhìn:** chơi được cả khung dọc lẫn ngang; khung ngang thì cây ở giữa, hai bên là trời. Camera đi theo tầng em đứng.
+- **Giảm chuyển động:** bậc lựa chọn trượt chậm lại một nửa, camera nhảy thẳng (không lắc, không mượt), bậc sai không nghiêng, lá giả không bay lượn.
+- Hiệu năng: mỗi cảnh dùng chung một hình học; bậc nút và bậc anh em có sẵn từng tầng (hiện khi em đã tới), ba bậc lựa chọn và ba lớp vết nứt là bể dùng lại; vị trí cập nhật mỗi khung hình từ trạng thái logic, không tạo object mới trong `useFrame`; rời màn thì giải phóng hình học, vật liệu và texture.
 
-- **Cây mọc như cây thật:** gốc ở dưới, lá ở trên. Lần đầu vào màn, Bi giải thích: "Trên bảng thì gốc vẽ ở trên cùng; còn ở cây thật thì gốc ở dưới. Vẫn là một cây thôi!"
-- **Thanh ngang:** mỗi tầng cây là một thanh ngang có **2 tay nắm** (`tay-nam`), ứng với nhánh trái và nhánh phải.
-  - Mỗi tay nắm ghi 2 số: **số trong sổ / số hiện tại**.
-- **Mô hình leo (mốc 3, bước B3; thay câu cũ "mỗi tay nắm ở một nửa thanh, trượt đối xứng", vì câu đó làm người chơi ở nửa trái không bao giờ với được nhánh phải):**
-  - Tầng 0 là gốc (người chơi bắt đầu ở đây); ở tầng k, cặp tay nắm phía trên là 2 con của nút người chơi đang giữ; tầng trên cùng là các lá.
-  - Người chơi treo ở x = 0 (giữa thân cây). Mỗi lần nắm được thì coi như kéo về giữa (hoạt cảnh làm ở bước B4).
-  - Cặp tay nắm tầng trên trượt cùng nhau: x_trái = c(t) − 1,5, x_phải = c(t) + 1,5. c(t) là sóng tam giác trong [−1,5; 1,5], tốc độ |dc/dt| bằng tốc độ của vòng, pha ban đầu ngẫu nhiên mỗi tầng. Chu kỳ = 6 / tốc độ.
-  - **Bật lên** (chạm, bấm chuột hoặc Space) lúc t: xét ở đỉnh cú bật, lúc t + 0,35 giây. Tay nắm nào có |x| ≤ tầm với thì nắm được. Hai tay nắm cách nhau 3 > 2 × tầm với nên không bao giờ nắm được cả hai.
-  - Học sinh chọn nhánh bằng cách **canh lúc bật lên**: tay nắm trái tới ngay trên đầu khi c ở gần +1,5, tay phải khi c ở gần −1,5. Mỗi chu kỳ, mỗi tay nắm ở trong tầm với 2 × tầm với / tốc độ giây: vòng 1 là 1,0 giây, vòng 2 là 0,69 giây, vòng 3 là 0,5 giây, vòng 4 là 0,375 giây (chu kỳ 5; 3,75; 3; 2,5 giây).
-- **Nắm trúng nhánh lệch:** lên tầng trên.
-- **Nắm nhầm nhánh khớp:** "Ngõ cụt!", {phanDien} cười; ở lại tầng cũ, mất 1 tim, không bật được trong 1 giây.
-- **Không nắm được gì:** ở lại tầng cũ, không mất tim, không bật được trong 1 giây.
-- **Tầng trên cùng là các chiếc lá:** nắm được lá lệch (lá giả) là bắt được {phanDien} đang ngồi trên ngọn cây, xong vòng. Xong vòng 4 là thắng. Hết tim thì kết thúc game (Bi vào giúp, vẫn sang cao trào: bước B5).
-- **Tiền đồng (bước B4):** mỗi khoảng giữa hai tầng có 2 đồng treo trên thân. Chỉ nhặt được khi leo qua khoảng đó ngay lần bật đầu tiên ở tầng đó (chưa trượt, chưa ngõ cụt ở tầng đó); không thì 2 đồng đó rơi mất. Tối đa 2 × (3 + 4 + 5 + 6) = 36 đồng. Leo hoàn hảo: 400 + 36 + 150 = 586 điểm; một lần ngõ cụt: 534; một lần trượt: 584. Logic: `coinsPerGap` trong `climbConfig.ts`, sự kiện `up` báo `coins` và `lostCoins`.
+### Luật
 
-### 4 vòng
+1. **Cây mỗi vòng:** lá là chữ số 1–9. {phanDien} đã tráo đúng 1 lá (sang chữ số 1–9 khác). Em bắt đầu đứng trên bậc của lá bị tráo; bên cạnh, cùng tầng, là **bậc anh em** đã biết giá trị. Phía trên là các **bậc lựa chọn**.
+2. **Bậc lựa chọn:** đúng 1 bậc ghi `combine(trái, phải)` theo đúng thứ tự trái–phải của hai nút (nút ở bên trái nếu là con có chỉ số chẵn). Bậc nhiễu lấy từ: **đảo thứ tự** `combine(phải, trái)`, **trái + phải**, **số đúng lệch đúng 1 chữ số**; các số khác nhau và khác đáp án (vòng 3 luôn có bậc đảo thứ tự nếu nó khác đáp án).
+3. **Nhảy lên đúng bậc:** bậc đó thành nút hiện tại (em và bậc trượt về chỗ nút trong 0,16 giây), hiện bậc anh em của nó (giá trị lấy từ cây) cùng các lựa chọn tầng trên, cứ thế tới gốc. Ở ngọn cây khắc sẵn "Gốc trong sổ". Gốc em tính ra khác gốc trong sổ thì lộ lá giả, {phanDien} bị bắt, xong vòng, hiện **"Em chỉ cần d phép ghép thay vì kiểm tra cả 2^d lá!"** (d là số tầng, 2^d là số lá) cùng dòng "Gốc em tính là X, khác gốc trong sổ là Y." (gốc em tính luôn khác gốc trong sổ: mỗi bước lên một tầng độ lệch bị nhân 10 hoặc giữ nguyên, không bao giờ về 0).
+4. **Nhảy vào bậc sai:** em đứng lên bậc, bậc **nứt rồi biến mất sau 0,4 giây**, em rơi về bậc vừa đứng và **mất 1 tim**, rồi **làm lại tầng đó** (các lựa chọn giữ số nhưng đổi chỗ). Hết tim thì sau khi rơi về xong là thua (Bi vào giúp, vẫn sang cao trào).
+5. **Nhảy hụt** (không chạm bậc nào) **hay bước ra khỏi mép bậc:** rơi về bậc cũ, **không mất tim**, **khóa nhảy 0,6 giây**.
+6. **Vòng:**
 
-| Vòng | Số lá | Số tầng | Tốc độ tay nắm | Tầm với | Con số |
-|---|---|---|---|---|---|
-| 1 | 8 | 3 | 1,2 | 0,6 | Giá trị thật tính bằng `combine` |
-| 2 | 16 | 4 | 1,6 | 0,55 | Giá trị thật tính bằng `combine` |
-| 3 | 32 | 5 | 2,0 | 0,5 | Mã rút gọn 4 chữ số |
-| 4 | 64 | 6 | 2,4 | 0,45 | Mã rút gọn 4 chữ số |
+| Vòng | Số lá | Số tầng (số lần nhảy) | Lựa chọn mỗi tầng | Bậc lựa chọn |
+|---|---|---|---|---|
+| 1 | 8 | 3 | 2 | đứng yên |
+| 2 | 8 | 3 | 2 | trượt qua lại (0,7 đơn vị/giây) |
+| 3 | 16 | 4 | 3 | trượt nhanh hơn (1,4 đơn vị/giây) |
 
-- **Cây mỗi vòng:** lá là chữ số 1–9; chọn đúng 1 lá bị {phanDien} tráo, đổi sang chữ số 1–9 khác. "Số trong sổ" là cây dựng từ lá gốc, "số hiện tại" là cây dựng từ lá đã tráo, cả hai bằng `buildTree` của Bài 4. Các nút lệch đúng là các nút trên đường từ lá bị tráo lên gốc.
-- **Mã rút gọn (vòng 3–4):** ở nhánh lệch, hai số chỉ khác nhau 1–2 chữ số, cho khó nhận ra hơn. Cách sinh (bước B3):
-  - Mã trong sổ = 4 chữ số cuối của giá trị trong sổ (đệm 0 bên trái).
-  - Nút khớp: mã hiện tại = mã trong sổ.
-  - Nút lệch: mã hiện tại biến đổi từ mã trong sổ bằng rng: hoặc đổi 1 chữ số sang chữ số khác, hoặc đảo 2 chữ số liền nhau KHÁC nhau (mã không có cặp như vậy thì đổi 1 chữ số). Luôn khác mã trong sổ.
-  - KHÔNG lấy mã hiện tại từ 4 chữ số cuối của giá trị hiện tại: lá bị sửa ở sâu thì độ lệch bị nhân 10^k, nên 4 chữ số cuối có thể trùng nhau.
-- **Hết mỗi vòng**, hiện: "Em chỉ leo d tầng thay vì kiểm tra cả 2^d lá!", trong đó d là số tầng, 2^d là số lá.
+   Số liệu nằm ở `climbConfig.ts` (`CLIMB_SPEC.rounds`).
+7. **Điều khiển kiểu platformer đơn giản:** máy tính ←/→ hoặc A/D để đi, Space/↑/W để nhảy, **giữ phím để lái trên không**; điện thoại có nút ◀ ▶ và nút **Nhảy** ở đáy màn hình (mỗi nút ≥ 48 px, thực tế 60 px; hiện khi con trỏ là cảm ứng hoặc cửa sổ rộng ≤ 900 px). Độ cao nhảy vừa tới tầng trên (đỉnh 1,25 × khoảng cách tầng). **Đáp xuống tính theo phần giao theo trục x** của thân với bậc lúc chân qua độ cao của bậc, chỉ khi đang rơi (bay lên xuyên qua bậc phía trên không bị chặn).
+8. **Tạm dừng thật** khi mở "?", hướng dẫn: đồng hồ, bậc trượt và người chơi đứng yên (`tickClimb(s, dt, paused)` không đổi gì). `hintFor` chỉ trả khóa (`soSanh`, `laiTrenKhong`, `lamLai`, `motTim`, `tangGoc`, `xongVong`, `hetVan`), không nói bậc nào hay số nào là đúng; chữ ở `content/huongDanGame.ts` màn 12 (`nhac`).
 
-### Tim, điểm
+### Tim, điểm, mốc
 
-- 3 tim cho cả game. Hết tim thì Bi vào giúp ("Để Bi giúp em!") và vẫn dẫn vào cảnh cao trào.
-- Điểm = số vòng xong × 100 + số tiền đồng + số tim còn lại × 50.
+- 3 tim cho cả game (không hồi giữa các vòng).
+- **Điểm = số vòng xong × 100 + số tim còn × 50** (tối đa 450 = 3 × 100 + 3 × 50). Không còn tiền đồng.
 
-| Mốc | Điểm |
-|---|---|
-| Đồng | 250 |
-| Bạc | 450 |
-| Vàng | 570 |
+| Mốc | Điểm | Nghĩa |
+|---|---|---|
+| Đồng | 200 | xong 2 vòng (hết tim ở vòng 3 vẫn được 200; hết tim ở vòng 2 chỉ được 100: chưa đạt) |
+| Bạc | 350 | xong cả 3 vòng, nhầm tối đa 2 lần (hai lần nhầm: 300 + 1 × 50 = 350; ba lần nhầm đã hết tim) |
+| Vàng | 450 | xong cả 3 vòng, không nhầm lần nào |
 
-**Nghĩa của mốc** (đổi ở bước sửa sau B4; điểm hoàn hảo là 586 = 400 + 36 đồng + 150 điểm tim):
-- **Đồng (250):** qua được 3 vòng (3 × 100 cộng đồng nhặt được); hết tim ở vòng 4 vẫn được Đồng (324 điểm khi nhầm 3 lần ở tầng đầu vòng 4).
-- **Bạc (450):** leo hết 4 vòng, nhầm nhánh tối đa 2 lần (hai ngõ cụt: 482 điểm; ba ngõ cụt đã hết tim nên không leo hết 4 vòng).
-- **Vàng (570):** không nhầm nhánh lần nào (586). Trượt (không nắm được gì) chỉ mất 2 đồng mỗi lần nên vẫn còn Vàng khi trượt tối đa 8 lần.
-- Hết tim ở vòng 3 (mới xong 2 vòng) là 214 điểm: chưa đạt mốc.
+- Nhảy hụt và rơi khỏi mép không mất tim nên không tính là nhầm; một lần nhầm: 400 (Bạc).
+- **Điểm cao nhất cũ vượt 450** (lối chơi cũ tối đa 586) thì thẻ bắt đầu hiện "Kỷ lục từ phiên bản trước" như màn 3: `Man12.tsx` truyền `maxScore={CLIMB_MAX_SCORE}` (450) cho `MiniGameLevel`.
 
 ### Cảnh cao trào (sau màn 12, bỏ qua được)
 
@@ -426,35 +411,69 @@ Chạy ngay sau khi màn 12 kết thúc (hết vòng 4, hoặc hết tim sau khi
 - Đi theo thứ tự thường (màn 12 là màn cuối): giữ nguyên, cảnh tự chiếu sau ván rồi mới tới màn kết quả.
 - Ở thế giới mở, Làng Bạc không chiếu thêm cảnh trao trang riêng (`VILLAGE_SCENE` không có `lang-bac`).
 
-### Test (`climbLogic.ts`)
+### Test (`climbLogic.ts`, `climbLayout.ts`, `climbHint.ts`, `climbBalance.test.ts`)
 
 | Tình huống | Kết quả mong đợi |
 |---|---|
-| Lá `[3,7,5,2,6,1,4,8]`, đổi T8 thành 9 | Gốc 4878 / 4879; T1234 422 / 422; T5678 658 / 659; T56 61 / 61; T78 48 / 49; T7 4 / 4; T8 8 / 9 |
-| Sinh 500 cây | Trên đường từ gốc tới lá giả, mỗi tầng có đúng một nhánh lệch; mọi nút ngoài đường đi đều khớp |
-| Mã rút gọn của nhánh lệch | Khác 1–2 chữ số so với số trong sổ, và luôn khác số trong sổ |
-| Tay cách tay nắm 0,5 khi tầm với là 0,6 | Nắm được |
-| Nắm nhầm nhánh khớp | Ở lại tầng cũ, mất 1 tim, khóa bật 1 giây |
-| Không nắm được gì | Giữ nguyên tầng, tim không đổi, khóa bật 1 giây |
+| Lá `[3,7,5,2,6,1,4,8]`, đổi lá thứ 8 thành 9 | Gốc 4878 / 4879; T1234 422 / 422; T5678 658 / 659; T56 61 / 61; T78 48 / 49; T7 4 / 4; T8 8 / 9 |
+| Công thức ghép | `now[1] = [combine(3, 8), combine(5, 2)]` = 38, 52; đổi chỗ (83) ra số khác |
+| Sinh 500 cây (4, 8, 16 lá) | Lá 1–9, đúng 1 lá bị tráo; nút lệch đúng là các nút trên đường từ lá đó tới gốc; gốc luôn lệch |
+| Bậc lựa chọn (500 seed, 2 và 3 lựa chọn) | Đúng 1 bậc là `combine(trái, phải)` theo thứ tự trái–phải của hai nút; các số khác nhau; bằng `now[k + 1]` của nút trên đường |
+| Bậc nhiễu | Có đủ ba loại: đảo thứ tự, trái + phải, lệch đúng 1 chữ số; 3 lựa chọn luôn có bậc đảo thứ tự; hai nút bằng nhau vẫn đủ bậc nhiễu khác nhau |
+| Nhảy lên đúng bậc | Lên tầng +1, giữ tim, đứng ở chỗ nút, hiện các lựa chọn tầng trên |
+| Leo hết cây | Xong vòng; sự kiện `roundDone` báo gốc em tính khác gốc trong sổ (`mismatch`) |
+| Nhảy vào bậc sai | `wrong` → (0,4 giây) `vanish` → rơi → `retry`; mất 1 tim; ở lại tầng cũ; lựa chọn giữ số, đổi chỗ |
+| Nhảy sai khi còn 1 tim | `wrong`, `vanish`, `lost`; điểm 0 |
+| Nhảy hụt | Sự kiện `miss`, tim không đổi, khóa nhảy đúng 0,6 giây (đang khóa thì không nhảy được) |
+| Bước ra khỏi mép bậc | Sự kiện `fell`, về bậc cũ, tim không đổi, khóa nhảy 0,6 giây |
+| Giữ phím khi đang bay | Lái được trên không |
+| Bay lên xuyên bậc phía trên | Không bị chặn, không đáp |
+| Tạm dừng | `tickClimb(..., true)` qua 500 bước: không sự kiện, đồng hồ, bậc trượt, người chơi không đổi |
+| Dt khác nhau (1/30 và 1/144 giây) | Cùng kết quả |
+| Bậc trượt | Trong biên độ; vòng 1 đứng yên; "Giảm chuyển động" chậm đúng một nửa |
+| Điểm và mốc | 450 / 400 / 350 / 200; mốc Đồng, Bạc, Vàng đúng nghĩa |
+| Cây mẫu của hướng dẫn | 4 lá [3,7,5,2], lá thứ hai thành 8; leo xong thì thắng; không tăng `roundsDone` |
+| Bố cục | Khung dọc và ngang thấy người chơi, bậc đứng, bậc lựa chọn và đỉnh cú nhảy; chữ số ≥ 16 px ở 360 × 800 |
+| `hintFor` | Đúng khóa theo trạng thái; 200 trạng thái ngẫu nhiên: câu thuộc danh sách có sẵn, không chứa số của bậc nào, không chỉ bậc trái/phải/giữa |
 
-Code ở `packages/village-lang-bac/src/climb/` (`climbConfig.ts`, `climbLogic.ts`, `climbLogic.test.ts`). Ngoài bảng trên, test còn có: sinh 500 cây mỗi vòng, mã rút gọn của 500 cây, c(t) luôn trong [−1,5; 1,5] và cửa sổ nắm được đúng 2 × tầm với / tốc độ ở cả 4 vòng, bot canh đúng leo hết 4 vòng không mất tim với 300 seed, điểm (4 vòng, 10 đồng, 2 tim → 510), cùng seed thì cùng cây.
-
-**Đã làm (mốc 3, bước B4: cảnh, chưa có cao trào; màn 12 vẫn `coming-soon`, chơi thử ở `/dev/man-12` của vỏ lang-bac khi chạy dev):**
-- Code: `climbLayout.ts` (bố cục thuần, có test), `climbArt.ts` (nạp hình, cắt khung, tách nền trắng của hai hình lá, vẽ trời và nhãn), `ClimbStage.tsx` (cảnh trong Scene25D), `ClimbGame.tsx` (màn chơi), `pages/Man12.tsx`, `climbBots.ts` + `climbBalance.test.ts`. Scene25D nhận `background={null}` để cảnh tự vẽ trời.
-- Cảnh: cây ghép từ `than-cay` (cắt bỏ hai đầu tròn), `goc-cay` dưới cùng, `ngon-cay` trên cùng; mỗi tầng một `canh-ngang`, tay nắm `tay-nam` (tầng lá dùng `ui/tiles/la-da`), {phanDien} trên ngọn ôm `ui/tiles/la-gia`. Hai hình lá (`ui/tiles/la-gia`, `la-da`) in sẵn nền trắng vào ảnh nên `pnpm assets:build` tách nền (xem spec 01); vẫn còn một vệt bóng xám nhạt dưới lá. Khoảng cách tầng 3,6 đơn vị; camera đi theo tầng người chơi đang giữ (Giảm chuyển động: nhảy thẳng).
-- Nhãn trên tay nắm: hai dòng "Sổ: …" / "Nay: …" cùng màu, không đánh dấu nhánh nào lệch. Đo: 17,3 px ở 360 × 640 và 844 × 390, 36,3 px ở 1366 × 768 (không dưới 14 px, "Chữ to" nhân 1,15).
-- Cú bật nhận ở `pointerdown` và `keydown` (Space không cuộn trang). Nắm được thì tay nắm kéo về giữa thân trong 0,3 giây (chỉ là hình). Ngõ cụt: "Ngõ cụt!", {phanDien} `cheer`, nhân vật tụt về. Bắt được: {phanDien} `jump`, sau 1,1 giây hiện "Bắt được {phanDien}!" và "Em chỉ leo d tầng thay vì kiểm tra cả 2^d lá!".
-- Lần đầu vào màn Bi nói câu "Trên bảng thì gốc vẽ ở trên cùng…"; cờ `gameTipSeen` (`progress/gameTips.ts`, cookie `gt`, bit số màn − 1).
-- **Tư thế treo (sửa sau B4, chỉnh lại ở B5):** clip `hang` trong file `hoc-sinh-nam` sai (ở `/dev/3d` cho tư thế ngồi co, tay ôm mặt) nên màn 12 dùng tư thế `hang` dựng bằng code (spec 03 mục 3.3): xương đòn nâng 30°, hai tay giơ thẳng, khuỷu thẳng, hai bàn tay khép lại nằm hẳn trên đỉnh đầu, thân thẳng, chân thả lỏng, đung đưa ±4° (tắt khi Giảm chuyển động). Hai lòng bàn tay (cao 0,985 × chiều cao) nắm vào đáy thân đèn lồng của `tay-nam`, ở dưới thanh 0,95; đầu nằm hẳn dưới đèn; chân ở `feetY(k)`.
-
-**Cân bằng (300 ván mỗi bot, seed 1 đến 300, mốc 250 / 450 / 570):**
+**Cân bằng (300 ván mỗi bot, seed 1 đến 300, mốc 200 / 350 / 450):**
 
 | Bot | Điểm trung bình | Chưa đạt | Đồng | Bạc | Vàng | Hết tim |
 |---|---|---|---|---|---|---|
-| Giỏi: lệch giờ σ 0,04 giây, không đọc nhầm | 586 | 0% | 0% | 0% | 100% | 0% |
-| Trung bình: lệch giờ σ 0,12 giây, đọc nhầm số 10% số lần | 441,9 (2 đến 586) | 12,0% | 18,7% | 55,7% | 13,7% | 30,7% |
+| Giỏi: tính đúng, canh đúng, không nhầm, không hụt | 450 | 0% | 0% | 0% | 100% | 0% |
+| Trung bình: nhầm thứ tự 15%, nhảy hụt 10% mỗi lần thử | 317,8 (0 đến 450) | 12,0% | 19,0% | 54,0% | 15,0% | 31,0% |
 
-Bot giỏi 100% Vàng (có assert). Bot trung bình chỉ in bảng tỉ lệ, KHÔNG assert ngưỡng Đồng/Bạc ≥ 80% và Vàng < 10% cho màn này: ngưỡng chỉnh khi học sinh chơi thật. Kết quả do số lần đọc nhầm số quyết định (mỗi lần mất 1 tim và có thể hết tim); lệch giờ gần như không đổi kết quả vì trượt chỉ mất 2 đồng.
+Bot trung bình nhầm 1,74 lần và hụt 0,86 lần mỗi ván. Bot giỏi 100% Vàng (có assert); bot trung bình chỉ in bảng tỉ lệ, KHÔNG assert ngưỡng (mốc màn 12 theo nghĩa, không áp quy tắc "hầu như không Vàng"; ngưỡng chỉnh khi học sinh chơi thật). Bot chỉ dùng thao tác của học sinh (`setMove`, `jump`) và chạy từng khung 1/60 giây (`climbBots.ts`).
+
+### Tự chọn (lời giao chưa nói; có thể chỉnh ở `climbConfig.ts`)
+
+- **Số vật lý:** khoảng cách tầng 3,0; bậc rộng 1,7, dày 0,8; thân rộng 0,6, đáp cần phần giao ≥ 0,15; tốc độ đi 5 đơn vị/giây; trọng lực 30; đỉnh cú nhảy 3,75; đi ngang trong ± 3,9. Hai bậc ở tầng em đứng ở x = ± 1,1 (khe giữa 0,5 nên đi bộ sang bậc anh em là rơi: phải nhảy). Bậc lựa chọn: 2 lựa chọn ở x = ± 2,2; 3 lựa chọn ở x = −2,6, 0, 2,6; biên độ trượt 0,4 (ba bậc kề nhau không chạm nhau); tốc độ trượt vòng 2 là 0,7, vòng 3 là 1,4 đơn vị/giây. Mọi bậc lựa chọn với tới được từ mọi bậc đứng (bot giỏi chứng minh bằng 100% Vàng).
+- **Rơi dùng tư thế `sad`** thay `hurt`: `hurt` chỉ có tác dụng với Tí (`isPoseAllowed`, có test), nên dùng tư thế `sad` dựng bằng code cho học sinh.
+- **Mất tim ngay lúc đáp lên bậc sai**, không đợi nứt xong; hết tim thì thua sau khi rơi về xong (cho thấy hết hoạt cảnh).
+- **Bậc nhiễu chọn ngẫu nhiên đều** trong ba loại hợp lệ ở vòng 1 và 2; vòng 3 (3 lựa chọn) luôn gồm bậc đảo thứ tự cộng một bậc ngẫu nhiên.
+- **Đứng được cả bậc anh em** (nhảy tại chỗ ở đó rồi lên tầng trên vẫn tính bình thường); rơi về "bậc cũ" là bậc em vừa đứng.
+- **Nhảy hụt được phát hiện lúc đáp lại tầng cũ;** rơi sâu quá 1,5 dưới bậc thì về bậc cũ, em hiện lại ở bậc với hoạt cảnh dịch 0,24 giây.
+- **Nút cảm ứng** hiện khi `(pointer: coarse)` hoặc cửa sổ rộng ≤ 900 px; nút "Hướng dẫn" (💡) dời xuống hàng thứ hai bên phải để không chồng lên tim và nút "?".
+- **Hướng dẫn làm thử luôn chạy khi vào màn** (như trước); cây mẫu của hướng dẫn là dữ liệu riêng (ván `practice`), không cộng điểm hay tiến độ.
+- **Tên màn hiển thị đổi thành "Leo bậc gỗ"** ở `levels.ts` (tên và chữ biển), `games.ts`, lời người dẫn Làng Bạc (`villageScene.ts`) và câu giải thích thẻ (`knowQuiz.ts`). Các tài liệu cũ (`TRANG-THAI.md`, ảnh chụp đã lưu, spec cốt truyện ghi nhật ký) còn tên cũ; `TRANG-THAI.md` không sửa theo lời giao.
+
+### Đồ họa cần tạo (không bắt buộc: thiếu thì dùng hình code)
+
+Cảnh thử tải trước hai file dưới đây từ manifest (`ART.step`, `ART.stepCrack` ở `climbArt.ts`); chưa có: thiếu `bac-go` thì dùng ván vẽ bằng code; thiếu `bac-go-nut` thì giữ cách cũ: bậc sai vẫn là ván thường (`bac-go` hay ván code) kèm lớp vết nứt vẽ bằng code phủ lên, mờ dần. Có `bac-go-nut` thì bậc sai ĐỔI sang ảnh đó thay cho `bac-go`, không phủ thêm lớp nào. Không lỗi trang trong mọi trường hợp. Khi có file thật thì chạy `pnpm assets:build` rồi commit `assets-build/`.
+
+| Tên file (đường dẫn trong manifest) | Kích thước | Mô tả |
+|---|---|---|
+| `sprites/man-12-leo-cay/bac-go` (bậc gỗ thường) | 512 × 240 điểm ảnh, PNG nền trong suốt (tỉ lệ 1,7 : 0,8 như bậc trong cảnh) | Tấm ván gỗ nâu vàng nằm ngang, vân ngang rõ, hai đinh ở hai đầu, viền nâu đậm, bo góc nhẹ; mặt bậc ở cạnh trên của ảnh. KHÔNG có chữ hay số (code vẽ số ở giữa, chừa vùng giữa ảnh tương đối phẳng để số dễ đọc). |
+| `sprites/man-12-leo-cay/bac-go-nut` (bậc gỗ nứt) | 512 × 240 điểm ảnh, PNG nền trong suốt, CÙNG KHUNG và cùng cỡ với `bac-go` | **Cả tấm ván đã nứt** (không phải lớp vết nứt phủ lên): cùng tấm ván, cùng vân, đinh, viền như `bac-go` nhưng nứt toạc ở giữa (3 đến 4 vết nứt lớn, mép ván vỡ, vài mảnh vụn). Khi bậc sai nứt, cảnh đổi sang ảnh này THAY cho `bac-go` (số vẫn do code vẽ lên giữa ván). KHÔNG có chữ hay số; chừa vùng giữa tương đối phẳng để số dễ đọc. |
+| Nền | Không cần: trời vẽ bằng code (dải màu chuyển) | |
+
+### Đã làm (01/11/2026) và đường dẫn
+
+- Code: `climbConfig.ts` (số liệu, `CLIMB_MAX_SCORE`), `climbLogic.ts` (logic thuần: cây, bậc lựa chọn, vật lý nhảy, ván, điểm), `climbBots.ts` + `climbBalance.test.ts` (bot), `climbHint.ts`, `climbLayout.ts` (bố cục thuần, có test), `climbArt.ts` (nạp hình, vẽ bậc và biển bằng canvas), `ClimbStage.tsx` (cảnh trong `Scene25D`), `ClimbGame.tsx` (phím, nút chạm, hoạt cảnh, hướng dẫn làm thử), `pages/Man12.tsx`.
+- Chữ: `content/games.ts` (`climbUi`), `content/huongDanGame.ts` (màn 12: luật, điều khiển, 4 trang hướng dẫn riêng, câu nhắc), `content/tutorial.ts` (`man12`: hướng dẫn làm thử P8). Hình hướng dẫn không chữ, không số: `bac-go-cap`, `di-nhay-phim`, `di-nhay-cham`, `bac-nut`, `goc-tren-ngon` ở `ui/GuideArt.tsx` (thay năm hình cũ của màn 12; thứ tự `GUIDE_SECTIONS` không đổi, `man-12` vẫn là bit 7).
+- **Hướng dẫn làm thử (P8, `TutorialSpotlight`), bản gọn:** giới thiệu cây mẫu 4 lá, chỉ bậc của em và bậc anh em, nói tim, rồi hai bước thao tác thật: đi trái/phải, nhảy lên đúng bậc (bậc ghi 38 = 3 × 10 + 8). Chạy trên ván riêng (`createPracticeGame`), không đụng ván thật (đồng hồ ván thật đứng yên), không cộng điểm hay tiến độ.
+- **Số đo (máy phát triển, 01/11/2026):** chunk `Man12` của hub 34,8 kB (gzip 12,8 kB), của vỏ `apps/lang-bac` 38,1 kB (gzip 14,6 kB). Mẫu 3 giây giữa vòng 2: 127 đến 130 khung/giây ở Chrome không đầu (WebGL phần mềm, mức Thấp) ở cả ba cỡ khung; đây chỉ là số tham khảo, chưa đo trên điện thoại thật.
+- Kiểm bằng trình duyệt: `scripts/man12-bac-go-check.mjs` (phím ở 1366 × 768, nút chạm giả lập ở 360 × 800 và 844 × 390); ảnh ở `docs/screenshots/man12-bac-go/`.
 
 ## Checklist nghiệm thu
 
@@ -465,16 +484,16 @@ Bot giỏi 100% Vàng (có assert). Bot trung bình chỉ in bảng tỉ lệ, K
   - lá giả chỉ mất khi có hàng nổ sát bên;
   - cây lấp ô đúng loại lá (lá bay lên đúng ô, cây chỉ hiện khi lá tới nơi).
   - **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
-- [ ] Màn 12:
-  - canh nhảy chọn nhánh được trên cả điện thoại lẫn máy tính;
-  - con số khó dần qua 4 vòng;
-  - hết tim vẫn xem được cao trào.
-  - [x] **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng"). (đã làm ở bước HD: phần `man-12`, `climbHint.ts`; màn kết quả chỉ có "Chơi lại", "Về làng" và "Xem lại cảnh cuối" vì màn 11 chưa ra mắt.)
+- [x] Màn 12 "Leo bậc gỗ" (làm lại 01/11/2026):
+  - nhảy chọn bậc được trên cả điện thoại (nút ◀ ▶ Nhảy) lẫn máy tính (phím);
+  - khó dần qua 3 vòng (bậc đứng yên, bậc trượt, 16 lá 3 lựa chọn trượt nhanh);
+  - hết tim vẫn xem được cao trào;
+  - **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
 - [ ] Sau cao trào: có đủ 4 Trang Sổ Vàng, chuyển sang hội làng.
 
 ## Bổ sung mốc 4 và bàn giao Claude — 01/11/2026
 
-- P8 đã tích hợp Màn 10 đủ Dễ/TB/Khó (ghép số/dựng cây/điền cây), Màn 11 tráo lá và Màn 12 nhảy bám; xem spec P8. Người dùng chưa nghiệm thu tổng thể.
+- P8 đã tích hợp Màn 10 đủ Dễ/TB/Khó (ghép số/dựng cây/điền cây), Màn 11 tráo lá và Màn 12 (hướng dẫn làm thử của màn 12 viết lại ngày 01/11/2026 cho lối chơi "Leo bậc gỗ": đi trái/phải rồi nhảy lên đúng bậc trên cây mẫu 4 lá); xem spec P8. Người dùng chưa nghiệm thu tổng thể.
 - Mọi tầng cây dùng combine(a,b)=a×10+b theo lessons/bai-4/logic.ts; không đổi thành ×100 hoặc (a×3+b) mod100. Đây là mô hình ghép số, không phải hàm băm mật mã thật.
 - Ngày 01/11 đọc source thấy tutorial.ts::man10Tb.stepByStep ghi “Gốc = T12 × 100 + T34”. Đã ghi lỗi bàn giao, CHƯA sửa content trong lượt cập nhật tài liệu này. Claude cần sửa thành ×10 và kiểm hồi quy nội dung.
 - Giữ cây Khó 15 ô và vùng đặt tối thiểu 44px của P1a. Xem lại hướng dẫn phải bảo toàn cây/khay/lượt còn lại của ván thật.

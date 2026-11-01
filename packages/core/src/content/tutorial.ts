@@ -240,12 +240,12 @@ export const tutorialTexts = {
   },
 
   man12: {
-    tieuDe: 'Làm thử: Leo cây tìm lá giả',
-    intro: 'Em hãy leo lên cây Merkle cao vút, đối chiếu các mã băm để phát hiện nhánh bị {phanDien} tráo lá giả mạo!',
-    tree: 'Cặp tay nắm: Ở mỗi tầng, hai bên có hai tay nắm trượt. Hãy so sánh hai số: số trong Sổ và số tính Nay. Nhánh nào có số Nay KHÁC số Sổ là nhánh có lá bị tráo!',
-    hud: 'Thanh theo dõi: Em có 3 tim. Nhảy đúng nhánh lệch sẽ nhặt được tiền đồng và tiếp tục leo; nhảy nhầm nhánh cụt sẽ bị ngã và mất tim!',
-    practice: 'Em hãy bấm nút "Nhảy bám thử" dưới đây hoặc bấm phím Space để thực hành nhịp nhảy bám cành cây nhé!',
-    nhayThu: 'Nhảy bám thử',
-    correct: 'Cú nhảy rất nhịp nhàng! Hãy tập trung đối chiếu mã Sổ và mã Nay để leo thẳng tới đỉnh cây vạch trần {phanDien} nhé!',
+    tieuDe: 'Làm thử: Leo bậc gỗ',
+    intro: 'Em sẽ leo từ lá bị {phanDien} tráo lên tới gốc cây. Mình tập trên một cây nhỏ có 4 lá trước nhé!',
+    tree: 'Em đứng trên bậc của lá bị tráo. Bên cạnh là bậc anh em đã biết số, phía trên là các bậc lựa chọn.',
+    hud: 'Em có 3 tim. Nhảy nhầm bậc thì bậc nứt, em rơi xuống và mất 1 tim. Nhảy hụt thì không mất tim.',
+    di: 'Trước hết em tập đi: bấm ← → hoặc A D (điện thoại: nút ◀ ▶) để đi sang trái, sang phải trên bậc.',
+    practice: 'Bậc của em ghi 8, bậc anh em bên trái ghi 3. Ghép theo thứ tự trái rồi phải: 3 × 10 + 8 = 38. Hãy nhảy lên bậc ghi 38 (Space hoặc nút Nhảy)!',
+    correct: 'Em nhảy đúng rồi! Cứ ghép từng tầng như vậy tới gốc là bắt được {phanDien}.',
   },
 };
