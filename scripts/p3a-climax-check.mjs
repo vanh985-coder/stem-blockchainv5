@@ -10,6 +10,7 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { SIZES } from './lib/p2a-real.mjs';
+import { autoplay } from './lib/man12-play.mjs';
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:5190';
 const OUT = 'docs/screenshots/p3a';
@@ -108,22 +109,19 @@ async function playKite(ctx) {
   }
 }
 
-/** Màn 12 (leo cây): vào màn, bắt đầu, nhảy bằng phím cách (hay chạm) và bấm các nút trong hộp thoại của game cho tới khi game kết thúc (hết tim: Bi giúp). Dừng ngay khi có cảnh cuối hay màn kết quả. */
+/** Màn 12 (leo bậc gỗ): vào màn, bỏ qua hướng dẫn làm thử, cố ý nhảy vào bậc sai (người chơi tự động ở scripts/lib/man12-play.mjs: phím hay chạm thật) cho tới hết tim (Bi giúp), rồi xem kết quả. Dừng ngay khi có cảnh cuối hay màn kết quả. */
 async function playClimb(ctx) {
   await ctx.page.goto(`${BASE}/lang/lang-bac/man/12`, { waitUntil: 'networkidle0' });
   await tapText(ctx, /^Bắt đầu/);
   await waitFor(ctx, () => window.__climbUi?.ready, 90000);
   await sleep(1200);
-  for (let i = 0; i < 400; i++) {
-    const done = await ctx.page.evaluate(() => Boolean(document.querySelector('[data-testid="man-cuoi"]')) || [...document.querySelectorAll('button')].some((b) => /^Chơi lại/.test(b.innerText)));
-    if (done) return;
-    const btn = await ctx.page.evaluateHandle(() => [...document.querySelectorAll('[role="dialog"] button, [role="status"] button')].find((b) => b.offsetParent !== null) ?? null);
-    if (btn.asElement()) await tap(ctx, btn.asElement());
-    else if (ctx.touch) await tap(ctx, await ctx.page.$('[data-testid="man12-khung"]'));
-    else await ctx.page.keyboard.press('Space');
-    await sleep(650);
-  }
-  throw new Error('Màn 12 không kết thúc');
+  const skip = await byText(ctx, /Bỏ qua/);
+  if (skip.asElement()) await tap(ctx, skip.asElement());
+  await sleep(600);
+  await autoplay(ctx, { want: { wrong: true }, timeoutMs: 120000 });
+  const btn = await ctx.page.evaluateHandle(() => [...document.querySelectorAll('[role="status"] button')].find((b) => b.offsetParent !== null) ?? null);
+  if (btn.asElement()) await tap(ctx, btn.asElement());
+  await waitFor(ctx, () => Boolean(document.querySelector('[data-testid="man-cuoi"]')) || [...document.querySelectorAll('button')].some((b) => /^Chơi lại/.test(b.innerText)), 30000);
 }
 
 /** Lật qua các bước cao trào bằng nút "Tiếp"/nút cuối (không bấm "Bỏ qua"); ghi lại chữ từng lượt và bước. Trả về khi cảnh đóng. */

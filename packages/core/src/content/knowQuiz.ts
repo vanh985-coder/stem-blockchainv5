@@ -221,7 +221,7 @@ export const KNOW_QUIZ: Readonly<Record<VillageId, readonly KnowQuiz[]>> = {
       ],
       correct: 3,
       explanation:
-        'Hai gốc tính cùng quy tắc, cùng thứ tự mà khác nhau cho biết chắc chắn hai bản không giống nhau, nhưng không cho biết giao dịch nào bị sửa và cũng không cho biết bản nào đúng (gốc lớn hơn không có nghĩa là đúng). Muốn tìm ra chỗ sửa thì đi xuống từ gốc theo các nhánh khác nhau, như em làm ở trạm Trung bình và ở màn "Leo cây tìm lá giả". Ngược lại, hai gốc giống nhau chưa phải chứng minh tuyệt đối hai bản giống hệt: với hàm băm thật xác suất trùng cực nhỏ nên được coi là giống, còn công thức ghép số của bài thì có thể trùng (ví dụ lá 1, 20 và lá 2, 10 đều cho 30).',
+        'Hai gốc tính cùng quy tắc, cùng thứ tự mà khác nhau cho biết chắc chắn hai bản không giống nhau, nhưng không cho biết giao dịch nào bị sửa và cũng không cho biết bản nào đúng (gốc lớn hơn không có nghĩa là đúng). Muốn tìm ra chỗ sửa thì đi xuống từ gốc theo các nhánh khác nhau, như em làm ở trạm Trung bình và ở màn "Leo bậc gỗ". Ngược lại, hai gốc giống nhau chưa phải chứng minh tuyệt đối hai bản giống hệt: với hàm băm thật xác suất trùng cực nhỏ nên được coi là giống, còn công thức ghép số của bài thì có thể trùng (ví dụ lá 1, 20 và lá 2, 10 đều cho 30).',
     },
   ],
 };

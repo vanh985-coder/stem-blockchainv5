@@ -23,6 +23,18 @@ const C = {
   glass: 'rgba(255,255,255,0.55)',
 } as const;
 
+/** Bậc gỗ (hình minh họa): tấm ván có vân; `mark` thêm chấm đánh dấu chỗ em đứng, `cracked` thêm vết nứt. Không có chữ hay số trong hình. */
+function Plank({ x, y, w = 84, mark, cracked }: { x: number; y: number; w?: number; mark?: boolean; cracked?: boolean }) {
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={20} rx={5} fill="#b8803f" stroke={C.wood} strokeWidth={3} />
+      <path d={`M${x + 8} ${y + 7} h${w - 16} M${x + 8} ${y + 14} h${w - 30}`} stroke="#8a5a2b" strokeWidth={2} strokeLinecap="round" />
+      {mark && <circle cx={x + w / 2} cy={y - 8} r={5} fill={C.purple} />}
+      {cracked && <path d={`M${x + w / 2 - 6} ${y} l8 8 l-6 5 l8 7`} fill="none" stroke={C.ink} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />}
+    </g>
+  );
+}
+
 type Dir = 'up' | 'down' | 'left' | 'right';
 
 function Key({ x, y, w = 34, h = 34, label, arrow }: { x: number; y: number; w?: number; h?: number; label?: string; arrow?: Dir }) {
@@ -204,33 +216,8 @@ function Check({ x, y }: { x: number; y: number }) {
   );
 }
 
-/** Đèn lồng của màn 12 (hình minh họa): thân đỏ, hai ô số xếp dọc (trên là Sổ, dưới là Nay) vẽ thành hai viên màu, không có chữ. */
-function Lantern({ x, y, top = C.gold, bottom = C.gold, ring }: { x: number; y: number; top?: string; bottom?: string; ring?: string }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      {ring && <ellipse cx={0} cy={36} rx={46} ry={62} fill="none" stroke={ring} strokeWidth={4} strokeDasharray="8 6" />}
-      <line x1={0} y1={-26} x2={0} y2={-12} stroke={C.wood} strokeWidth={3} />
-      <rect x={-10} y={-14} width={20} height={8} rx={3} fill={C.wood} />
-      <ellipse cx={0} cy={22} rx={32} ry={34} fill="#d8452f" stroke={C.wood} strokeWidth={3} />
-      <rect x={-17} y={6} width={34} height={16} rx={6} fill={top} stroke={C.ink} strokeWidth={2} />
-      <rect x={-17} y={26} width={34} height={16} rx={6} fill={bottom} stroke={C.ink} strokeWidth={2} />
-      <rect x={-8} y={56} width={16} height={6} rx={3} fill={C.wood} />
-      <path d="M-6 62 v12 M0 62 v16 M6 62 v12" stroke={C.gold} strokeWidth={3} strokeLinecap="round" />
-    </g>
-  );
-}
-
 function Heart({ x, y, s = 1, color = C.red }: { x: number; y: number; s?: number; color?: string }) {
   return <path transform={`translate(${x} ${y}) scale(${s})`} d="M0 18 C-30 -2 -22 -26 -8 -24 C-3 -24 0 -20 0 -16 C0 -20 3 -24 8 -24 C22 -26 30 -2 0 18 Z" fill={color} stroke={C.ink} strokeWidth={2.5} strokeLinejoin="round" />;
-}
-
-function Coin({ x, y, faded = false }: { x: number; y: number; faded?: boolean }) {
-  return (
-    <g opacity={faded ? 0.5 : 1}>
-      <circle cx={x} cy={y} r={17} fill={C.gold} stroke={C.goldDark} strokeWidth={3} strokeDasharray={faded ? '6 4' : undefined} />
-      <rect x={x - 5} y={y - 5} width={10} height={10} fill="none" stroke={C.goldDark} strokeWidth={2.5} />
-    </g>
-  );
 }
 
 function Cross({ x, y }: { x: number; y: number }) {
@@ -780,62 +767,69 @@ const ARTS: Record<GuideArtId, () => ReactNode> = {
       <path d="M42 34 V20 M42 34 L52 40" stroke={C.ink} strokeWidth={3.5} strokeLinecap="round" />
     </g>
   ),
-  'den-long-so-nay': () => (
+  'bac-go-cap': () => (
     <g>
       <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.sky} />
-      <rect x={0} y={150} width={ART_W} height={30} fill={C.grass} />
-      <line x1={40} y1={6} x2={280} y2={6} stroke={C.wood} strokeWidth={6} strokeLinecap="round" />
-      <Lantern x={96} y={30} />
-      <Lantern x={224} y={30} top={C.gold} bottom={C.purple} ring={C.green} />
-      <path d="M80 126 h32 M80 136 h32" stroke={C.ink} strokeWidth={5} strokeLinecap="round" />
-      <path d="M208 126 h32 M208 136 h32 M214 146 l20 -26" stroke={C.ink} strokeWidth={5} strokeLinecap="round" />
-      <Check x={224} y={162} />
+      <rect x={146} y={0} width={28} height={ART_H} fill="#8b5e34" stroke={C.wood} strokeWidth={3} />
+      <Plank x={52} y={30} />
+      <Plank x={188} y={30} />
+      <Plank x={52} y={92} />
+      <Plank x={188} y={92} />
+      <Plank x={52} y={150} mark />
+      <Plank x={188} y={150} />
+      <Arrow x1={110} y1={140} x2={110} y2={104} width={4} />
     </g>
   ),
-  'bat-len-phim': () => (
+  'di-nhay-phim': () => (
     <g>
       <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.sky} />
-      <rect x={0} y={150} width={ART_W} height={30} fill={C.grass} />
-      <line x1={30} y1={6} x2={290} y2={6} stroke={C.wood} strokeWidth={6} strokeLinecap="round" />
-      <Lantern x={160} y={18} />
-      <Runner x={160} y={142} s={1.1} />
-      <Arrow x1={160} y1={104} x2={160} y2={92} width={4} />
-      <Key x={206} y={130} w={96} h={32} label={K.space} />
+      <Plank x={36} y={50} />
+      <Plank x={190} y={50} />
+      <Plank x={36} y={124} mark />
+      <Runner x={74} y={118} s={1} />
+      <Arrow x1={96} y1={102} x2={176} y2={62} width={4} />
+      <Key x={150} y={134} w={34} h={34} arrow="left" />
+      <Key x={188} y={134} w={34} h={34} arrow="right" />
+      <Key x={226} y={134} w={80} h={34} label={K.space} />
     </g>
   ),
-  'bat-len-cham': () => (
+  'di-nhay-cham': () => (
     <g>
       <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.sky} />
-      <rect x={0} y={150} width={ART_W} height={30} fill={C.grass} />
-      <line x1={30} y1={6} x2={290} y2={6} stroke={C.wood} strokeWidth={6} strokeLinecap="round" />
-      <Lantern x={160} y={18} />
-      <Runner x={120} y={142} s={1.1} />
-      <Arrow x1={120} y1={104} x2={120} y2={92} width={4} />
-      <Finger x={236} y={128} />
+      <Plank x={36} y={40} />
+      <Plank x={190} y={40} />
+      <Plank x={36} y={104} mark />
+      <Runner x={74} y={98} s={1} />
+      <Arrow x1={96} y1={82} x2={176} y2={52} width={4} />
+      <rect x={20} y={134} width={52} height={38} rx={10} fill="#fffaf0" stroke={C.wood} strokeWidth={3} />
+      <polygon points="52,144 52,162 34,153" fill={C.ink} />
+      <rect x={80} y={134} width={52} height={38} rx={10} fill="#fffaf0" stroke={C.wood} strokeWidth={3} />
+      <polygon points="100,144 100,162 118,153" fill={C.ink} />
+      <rect x={214} y={134} width={84} height={38} rx={10} fill={C.gold} stroke={C.wood} strokeWidth={3} />
+      <Arrow x1={256} y1={160} x2={256} y2={144} color={C.ink} width={4} />
     </g>
   ),
-  'tim-dong': () => (
+  'bac-nut': () => (
     <g>
       <rect x={0} y={0} width={ART_W} height={ART_H} fill="#fbf1d6" />
-      <Heart x={84} y={84} s={1.9} />
-      <Cross x={128} y={42} />
-      <Coin x={206} y={70} faded />
-      <Coin x={252} y={70} faded />
-      <Cross x={278} y={34} />
+      <Plank x={30} y={40} cracked />
+      <Plank x={30} y={116} />
+      <Arrow x1={100} y1={78} x2={100} y2={110} color={C.red} width={4} />
+      <Heart x={210} y={84} s={1.9} />
+      <Cross x={256} y={44} />
     </g>
   ),
-  'tang-la': () => (
+  'goc-tren-ngon': () => (
     <g>
       <rect x={0} y={0} width={ART_W} height={ART_H} fill={C.sky} />
-      <rect x={140} y={110} width={40} height={70} fill="#8b5e34" stroke={C.wood} strokeWidth={3} />
-      {[[70, 70, -20], [110, 50, 10], [150, 38, -8], [190, 50, 14], [230, 70, 22], [96, 90, 30], [210, 94, -26], [130, 74, 0], [176, 76, 8]].map(([lx, ly, r]) => (
-        <Leaf key={`${lx}${ly}`} x={lx} y={ly} rot={r} />
-      ))}
-      <Leaf x={160} y={60} rot={-4} color="#e08a2e" />
-      <ellipse cx={160} cy={60} rx={30} ry={30} fill="none" stroke={C.green} strokeWidth={4} strokeDasharray="8 6" />
-      <circle cx={256} cy={118} r={11} fill="#8a5a36" />
-      <rect x={246} y={128} width={20} height={26} rx={7} fill="#6b4a2f" />
-      <Arrow x1={240} y1={110} x2={196} y2={76} width={4} />
+      <rect x={140} y={80} width={40} height={100} fill="#8b5e34" stroke={C.wood} strokeWidth={3} />
+      <Plank x={120} y={96} mark />
+      <rect x={96} y={14} width={128} height={42} rx={9} fill="#fffaf0" stroke={C.wood} strokeWidth={3} />
+      <path d="M116 30 h88 M116 42 h56" stroke={C.ink} strokeWidth={5} strokeLinecap="round" />
+      <Leaf x={252} y={56} rot={-10} color="#e08a2e" />
+      <circle cx={262} cy={118} r={11} fill="#8a5a36" />
+      <rect x={252} y={128} width={20} height={26} rx={7} fill="#6b4a2f" />
+      <Arrow x1={246} y1={104} x2={214} y2={70} width={4} />
     </g>
   ),
   'dap-lan-phim': () => (

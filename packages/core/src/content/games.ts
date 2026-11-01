@@ -27,7 +27,7 @@ export const GAMES: Readonly<Partial<Record<number, GameText>>> = {
   8: textOf(8, 'Lật thẻ tìm cặp khóa'),
   9: textOf(9, 'Chữa đàn gà'),
   11: textOf(11, 'Ghép lá cây sổ'),
-  12: textOf(12, 'Leo cây tìm lá giả'),
+  12: textOf(12, 'Leo bậc gỗ'),
 };
 
 /** Tên các phần điểm ở màn kết quả của màn 2 (điểm = trang × 10 + tiền đồng + quãng đường ÷ 10 + câu đúng × 30). */
@@ -198,33 +198,37 @@ export const modCalcUi = {
   dong: 'Đóng',
 } as const;
 
-/** Chữ trong màn 12 "Leo cây tìm lá giả" (spec 08 mục Màn 12). Số trên tay nắm do code vẽ: hai dòng, không tô màu, không đánh dấu nhánh nào lệch. */
+/** Chữ trong màn 12 "Leo bậc gỗ" (spec 08 mục Màn 12). Số trên bậc gỗ do code vẽ. */
 export const climbUi = {
   vong: 'Vòng {so}/{max}',
-  dong: 'Tiền đồng: {so}',
-  /** Hai dòng trên tay nắm: số trong sổ và số bây giờ (vòng 3–4 là mã 4 chữ số) */
-  so: 'Sổ: {so}',
-  nay: 'Nay: {so}',
   /** Nhãn đọc cho người dùng đọc màn hình */
-  khung: 'Cây đa. Chạm, bấm chuột hoặc phím Space để bật lên.',
-  tayNam: 'Tay nắm {nhan}: số trong sổ {so}, số bây giờ {so2}',
-  trai: 'bên trái',
-  phai: 'bên phải',
-  nguCut: 'Ngõ cụt!',
-  truot: 'Hụt rồi, em canh lại nhé.',
+  khung: 'Cây đa. Đi sang trái, sang phải và nhảy lên bậc ghi số đúng.',
+  /** Nút cảm ứng ở đáy màn hình */
+  nutTrai: 'Đi sang trái',
+  nutPhai: 'Đi sang phải',
+  nutNhay: 'Nhảy',
+  /** Đọc cho trình đọc màn hình mỗi khi lên tầng mới: số của em và số bậc anh em */
+  docTang: 'Em đứng ở bậc ghi {so}. Bậc anh em bên {nhan} ghi {so2}.',
+  trai: 'trái',
+  phai: 'phải',
+  /** Chữ khắc trên ngọn cây (số gốc trong sổ do code vẽ cạnh chữ này) */
+  gocTrongSo: 'Gốc trong sổ',
+  /** Hiện khi lên tới gốc: gốc em tính ra */
+  gocEmTinh: 'Gốc em tính là {so}, khác gốc trong sổ là {so2}.',
+  nguCut: 'Bậc này nứt rồi!',
+  truot: 'Hụt rồi, em thử lại nhé.',
   /** Bi giải thích lần đầu vào màn (spec 08) */
   biGocCay: 'Trên bảng thì gốc vẽ ở trên cùng; còn ở cây thật thì gốc ở dưới. Vẫn là một cây thôi!',
   hieuRoi: 'Em hiểu rồi',
-  /** Bắt được {phanDien} ở lá trên cùng: hết vòng */
+  /** Lên tới gốc, gốc em tính khác gốc trong sổ: lộ lá giả, bắt được {phanDien}, hết vòng */
   batDuoc: 'Bắt được {phanDien}!',
-  vongXong: 'Em chỉ leo {so} tầng thay vì kiểm tra cả {so2} lá!',
+  vongXong: 'Em chỉ cần {so} phép ghép thay vì kiểm tra cả {so2} lá!',
   vongTiep: 'Vòng tiếp theo',
   xemKetQua: 'Xem kết quả',
   /** Hết tim */
   biGiup: 'Để Bi giúp em!',
   /** Phần điểm ở màn kết quả */
   phanVong: 'Vòng leo xong (× {diem})',
-  phanDong: 'Tiền đồng',
   phanTim: 'Tim còn lại (× {diem})',
 } as const;
 

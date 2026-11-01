@@ -1,292 +1,523 @@
 /**
- * Logic màn 12 "Leo cây tìm lá giả" (spec 08, mục "Màn 12"). Hàm thuần (không React, không Three); ngẫu nhiên chỉ qua `rng` (createMulberry32) nên cùng seed cùng kết quả.
- * Giá trị các nút dựng bằng `buildTree` của Bài 4 (công thức `combine`: T_ab = T_a × 10 + T_b), không viết lại công thức.
+ * Logic màn 12 "Leo bậc gỗ" (spec 08, mục "Màn 12"). Hàm thuần (không React, không Three); ngẫu nhiên chỉ qua `rng` (createMulberry32) nên cùng seed cùng kết quả.
+ * Giá trị các nút dựng bằng `buildTree` và `combine` của Bài 4 (combine(a, b) = a × 10 + b), không viết lại công thức.
  *
- * Cách gọi tầng khi leo: tầng 0 là gốc (người chơi bắt đầu ở đây), tầng k gồm 2^k nút, tầng `depth` là các lá. Nút i ở tầng k có hai con 2i (trái) và 2i + 1 (phải) ở tầng k + 1.
+ * Tầng gọi theo chiều leo: tầng 0 là hàng lá, tầng `depth` là gốc (đúng thứ tự của `buildTree`). Nút i ở tầng k có cha là nút i >> 1 ở tầng k + 1; i chẵn là con trái.
+ * Em đứng ở bậc của lá bị tráo (tầng 0). Ở mỗi tầng, bên cạnh em là bậc anh em đã biết giá trị; phía trên là các bậc lựa chọn, đúng một bậc ghi combine(trái, phải) đúng thứ tự.
+ *
+ * Vật lý: một người chơi (x, y là chân), đi ngang, nhảy, rơi. Bậc là mặt phẳng một chiều: chỉ đáp xuống khi đang rơi và chân đi qua độ cao của bậc; phần giao theo trục x của thân
+ * với bậc từ `minOverlap` trở lên mới đứng được. Mỗi bước dt chia nhỏ tối đa `SUBSTEP` giây nên kết quả không phụ thuộc dt của màn hình.
  */
-import { buildTree } from '@so-chung/core/lessons/bai-4/logic';
+import { buildTree, combine } from '@so-chung/core/lessons/bai-4/logic';
 import { medalOf, type Medal } from '@so-chung/core';
-import { createMulberry32, randInt } from '@so-chung/core/lib/rng';
+import { createMulberry32, randInt, shuffle } from '@so-chung/core/lib/rng';
 import { CLIMB_SPEC, type ClimbRoundSpec } from './climbConfig';
 
+const SUBSTEP = 1 / 120;
+const EPS = 1e-9;
+
 // ---------------------------------------------------------------------------
-// Cây: số trong sổ / số hiện tại
+// Cây
 
 export interface ClimbTree {
-  /** Số tầng trên lá (số lá = 2^depth) */
+  /** Số tầng trên hàng lá (số lá = 2^depth) */
   depth: number;
   /** Lá gốc (trong sổ) và lá sau khi {phanDien} tráo (hiện tại): chữ số 1–9 */
   leaves: number[];
   tamperedLeaves: number[];
-  /** Vị trí lá bị tráo */
   tamperedIndex: number;
-  /** Giá trị theo tầng leo: `book[k][i]`, `now[k][i]` là nút i ở tầng k (k = 0 là gốc) */
+  /** Giá trị theo tầng, tầng 0 là lá: `book[k][i]` trong sổ, `now[k][i]` hiện tại */
   book: number[][];
   now: number[][];
-  /** Mã rút gọn 4 chữ số theo tầng leo (vòng 3–4); null ở vòng hiện giá trị thật */
-  bookCode: string[][] | null;
-  nowCode: string[][] | null;
 }
 
-/** Đổi kết quả `buildTree` (tầng lá trước, gốc sau) sang thứ tự tầng leo (gốc trước, lá sau). */
-function byClimbLevel(leaves: readonly number[]): number[][] {
-  return buildTree(leaves).reverse();
-}
-
-/** Mã trong sổ: 4 chữ số cuối của giá trị trong sổ, đệm 0 bên trái. */
-export function shortCode(value: number, digits: number = CLIMB_SPEC.codeDigits): string {
-  const mod = 10 ** digits;
-  return String(((value % mod) + mod) % mod).padStart(digits, '0');
-}
-
-/**
- * Biến mã của nút lệch: hoặc đổi một chữ số sang chữ số khác, hoặc đảo hai chữ số liền nhau KHÁC nhau (mã không có cặp liền nhau khác nhau, ví dụ "0000", thì đổi một chữ số).
- * Luôn khác mã trong sổ, khác 1 hoặc 2 chữ số. Không lấy từ chữ số cuối của giá trị hiện tại: lá bị sửa ở sâu thì độ lệch bị nhân 10^k nên 4 chữ số cuối có thể trùng.
- */
-export function mutateCode(code: string, rng: () => number): string {
-  const d = code.split('');
-  const swaps: number[] = [];
-  for (let i = 0; i + 1 < d.length; i++) if (d[i] !== d[i + 1]) swaps.push(i);
-  if (swaps.length > 0 && rng() < 0.5) {
-    const i = swaps[Math.floor(rng() * swaps.length)];
-    [d[i], d[i + 1]] = [d[i + 1], d[i]];
-    return d.join('');
-  }
-  const pos = Math.floor(rng() * d.length);
-  const others = '0123456789'.split('').filter((c) => c !== d[pos]);
-  d[pos] = others[Math.floor(rng() * others.length)];
-  return d.join('');
-}
-
-/**
- * Dựng cây từ lá cho trước, đổi lá `tamperedIndex` thành `newDigit`. `codes` kèm `rng` thì sinh mã rút gọn: nút khớp có mã hiện tại = mã trong sổ, nút lệch có mã hiện tại biến từ mã trong sổ.
- */
-export function makeTree(leaves: readonly number[], tamperedIndex: number, newDigit: number, codesRng: (() => number) | null = null): ClimbTree {
+export function makeTree(leaves: readonly number[], tamperedIndex: number, newDigit: number): ClimbTree {
   const tamperedLeaves = [...leaves];
   tamperedLeaves[tamperedIndex] = newDigit;
-  const book = byClimbLevel(leaves);
-  const now = byClimbLevel(tamperedLeaves);
-  let bookCode: string[][] | null = null;
-  let nowCode: string[][] | null = null;
-  if (codesRng) {
-    bookCode = book.map((level) => level.map((v) => shortCode(v)));
-    nowCode = bookCode.map((level, k) => level.map((c, i) => (book[k][i] === now[k][i] ? c : mutateCode(c, codesRng))));
-  }
-  return { depth: book.length - 1, leaves: [...leaves], tamperedLeaves, tamperedIndex, book, now, bookCode, nowCode };
+  const book = buildTree(leaves);
+  const now = buildTree(tamperedLeaves);
+  return { depth: book.length - 1, leaves: [...leaves], tamperedLeaves, tamperedIndex, book, now };
 }
 
-/** Sinh cây của một vòng: lá là chữ số 1–9; chọn đúng 1 lá bị tráo, đổi sang chữ số 1–9 khác. */
-export function generateTree(rng: () => number, round: ClimbRoundSpec): ClimbTree {
-  const leaves = Array.from({ length: round.leaves }, () => randInt(1, 9, rng));
-  const tamperedIndex = randInt(0, round.leaves - 1, rng);
+/** Sinh cây của một vòng: lá là chữ số 1–9; đúng 1 lá bị tráo sang chữ số 1–9 khác. */
+export function generateTree(rng: () => number, leafCount: number): ClimbTree {
+  const leaves = Array.from({ length: leafCount }, () => randInt(1, 9, rng));
+  const tamperedIndex = randInt(0, leafCount - 1, rng);
   let newDigit = randInt(1, 8, rng);
-  if (newDigit >= leaves[tamperedIndex]) newDigit++; // chữ số 1–9 khác chữ số cũ
-  return makeTree(leaves, tamperedIndex, newDigit, round.codes ? rng : null);
+  if (newDigit >= leaves[tamperedIndex]) newDigit++;
+  return makeTree(leaves, tamperedIndex, newDigit);
 }
 
-/** Nút i ở tầng k có lệch không (số hiện tại khác số trong sổ). */
-export const isMismatch = (tree: ClimbTree, level: number, index: number): boolean => tree.book[level][index] !== tree.now[level][index];
+/** Chỉ số nút trên đường từ lá bị tráo lên gốc, ở tầng k. */
+export const pathIndex = (tree: ClimbTree, k: number): number => tree.tamperedIndex >> k;
+/** Nút trên đường có là con trái không (tầng k < depth). */
+export const isLeftChild = (tree: ClimbTree, k: number): boolean => (pathIndex(tree, k) & 1) === 0;
+export const nodeValue = (tree: ClimbTree, k: number): number => tree.now[k][pathIndex(tree, k)];
+/** Giá trị bậc anh em của nút trên đường ở tầng k (tầng k < depth). Anh em nằm ngoài đường lệch nên số trong sổ và số hiện tại giống nhau. */
+export const siblingValue = (tree: ClimbTree, k: number): number => tree.now[k][pathIndex(tree, k) ^ 1];
 
-/** Hai số ghi trên tay nắm của nút (trong sổ / hiện tại): giá trị thật hay mã rút gọn. */
-export function nodeLabel(tree: ClimbTree, level: number, index: number): { book: string; now: string } {
-  if (tree.bookCode && tree.nowCode) return { book: tree.bookCode[level][index], now: tree.nowCode[level][index] };
-  return { book: String(tree.book[level][index]), now: String(tree.now[level][index]) };
+// ---------------------------------------------------------------------------
+// Các bậc lựa chọn của một tầng
+
+/** Số lệch đúng 1 chữ số so với `value` (khác `value`, không bắt đầu bằng 0), không nằm trong `taken`. */
+export function digitOff(value: number, rng: () => number, taken: ReadonlySet<number>): number {
+  const s = String(value);
+  const cands: number[] = [];
+  for (let i = 0; i < s.length; i++) {
+    for (let d = 0; d <= 9; d++) {
+      if (String(d) === s[i] || (i === 0 && d === 0 && s.length > 1)) continue;
+      const n = Number(s.slice(0, i) + d + s.slice(i + 1));
+      if (n !== value && !taken.has(n)) cands.push(n);
+    }
+  }
+  if (cands.length > 0) return cands[Math.floor(rng() * cands.length)];
+  // chỉ xảy ra khi mọi biến thể đã bị lấy: tăng dần cho tới khi khác
+  let n = value + 1;
+  while (taken.has(n) || n === value) n++;
+  return n;
+}
+
+/**
+ * Giá trị các bậc lựa chọn khi nút trái là `left`, nút phải là `right`: phần tử 0 là đáp án đúng combine(left, right); các bậc nhiễu khác nhau và khác đáp án, lấy từ:
+ * đảo thứ tự combine(right, left), left + right, số đúng lệch 1 chữ số. Có 3 lựa chọn thì luôn có bậc đảo thứ tự (nếu nó khác đáp án).
+ */
+export function choiceValues(left: number, right: number, count: number, rng: () => number): number[] {
+  const correct = combine(left, right);
+  const taken = new Set<number>([correct]);
+  const out = [correct];
+  const swap = combine(right, left);
+  const sum = left + right;
+  const kinds = shuffle(['swap', 'sum', 'digit'] as const, rng);
+  if (count >= 3) kinds.sort((a, b) => (a === 'swap' ? -1 : b === 'swap' ? 1 : 0));
+  for (const kind of kinds) {
+    if (out.length >= count) break;
+    const v = kind === 'swap' ? swap : kind === 'sum' ? sum : digitOff(correct, rng, taken);
+    if (taken.has(v)) continue;
+    taken.add(v);
+    out.push(v);
+  }
+  while (out.length < count) {
+    const v = digitOff(correct, rng, taken);
+    taken.add(v);
+    out.push(v);
+  }
+  return out;
+}
+
+export interface ClimbTier {
+  /** Giá trị hai nút con theo thứ tự trái, phải */
+  left: number;
+  right: number;
+  /** options[0] là đáp án đúng */
+  options: number[];
+}
+
+/** Các tầng của cây: tier[k] là bước từ tầng k lên tầng k + 1. */
+export function buildTiers(tree: ClimbTree, count: number, rng: () => number): ClimbTier[] {
+  const tiers: ClimbTier[] = [];
+  for (let k = 0; k < tree.depth; k++) {
+    const mine = nodeValue(tree, k);
+    const sib = siblingValue(tree, k);
+    const left = isLeftChild(tree, k) ? mine : sib;
+    const right = isLeftChild(tree, k) ? sib : mine;
+    tiers.push({ left, right, options: choiceValues(left, right, count, rng) });
+  }
+  return tiers;
 }
 
 // ---------------------------------------------------------------------------
-// Cặp tay nắm trượt
+// Hình học
 
-/** Chu kỳ của sóng tam giác c(t) (giây): đi hết 4 × sway với tốc độ `speed`. */
-export const swayPeriod = (speed: number): number => (4 * CLIMB_SPEC.sway) / speed;
+/** Độ cao mặt bậc của tầng k. */
+export const tierY = (k: number): number => k * CLIMB_SPEC.gap;
 
-/** Tâm cặp tay nắm: sóng tam giác trong [−sway; sway], |dc/dt| = speed; `phase` (0 đến 4 × sway) là quãng đã đi lúc t = 0. */
-export function handleCenter(t: number, speed: number, phase: number): number {
-  const A = CLIMB_SPEC.sway;
-  const span = 4 * A;
-  const u = (((t * speed + phase) % span) + span) % span;
-  return u < 2 * A ? -A + u : 3 * A - u;
+/** x của nút trên đường ở tầng k < depth: con trái đứng bên trái, con phải bên phải. */
+export const nodeX = (tree: ClimbTree, k: number): number => (isLeftChild(tree, k) ? -CLIMB_SPEC.pairX : CLIMB_SPEC.pairX);
+/** x của bậc anh em ở tầng k < depth (đối xứng với nút). Tầng gốc không có bậc anh em, nút đứng giữa. */
+export const siblingX = (tree: ClimbTree, k: number): number => -nodeX(tree, k);
+/** x của nút ở tầng k, tầng gốc ở giữa. */
+export const standX = (tree: ClimbTree, k: number): number => (k >= tree.depth ? 0 : nodeX(tree, k));
+
+/** Sóng tam giác chu kỳ 4 trong [−1; 1]. */
+export const tri = (u: number): number => Math.abs((((u % 4) + 4) % 4) - 2) - 1;
+
+export interface ClimbChoice {
+  value: number;
+  correct: boolean;
+  /** Chỗ (0 tới count − 1) trên hàng bậc */
+  slot: number;
+  /** Pha trượt (0 tới 4) */
+  phase: number;
+  /** Số giây còn lại trước khi biến mất khi đã bị nhảy trúng sai; null nếu chưa nứt */
+  crack: number | null;
 }
 
-/** Tay nắm nắm được khi người chơi (ở x = 0) với tới: 'left' (con 2i), 'right' (con 2i + 1) hay null. */
-export function grabAt(center: number, reach: number): 'left' | 'right' | null {
-  if (Math.abs(center - CLIMB_SPEC.halfGap) <= reach) return 'left';
-  if (Math.abs(center + CLIMB_SPEC.halfGap) <= reach) return 'right';
-  return null;
+/** x của bậc lựa chọn: x gốc của chỗ cộng độ trượt theo đồng hồ trượt của ván. */
+export function choiceX(s: Pick<ClimbState, 'slideClock' | 'round' | 'choices'>, c: ClimbChoice): number {
+  const spec = CLIMB_SPEC.rounds[Math.min(s.round, CLIMB_SPEC.rounds.length - 1)];
+  return choiceBaseX(s.choices.length, c.slot) + slideOffset(spec.slide, s.slideClock, c.phase);
+}
+export const choiceBaseX = (count: number, slot: number): number => CLIMB_SPEC.choiceX[count]?.[slot] ?? 0;
+export function slideOffset(speed: number, clock: number, phase: number): number {
+  if (speed <= 0) return 0;
+  const A = CLIMB_SPEC.slideAmplitude;
+  return A * tri((clock * speed) / A + phase);
 }
 
-/** Độ dài cửa sổ nắm được một tay nắm trong mỗi chu kỳ (giây): tay trái nắm được khi c ở [halfGap − reach; sway], đi lên rồi đi xuống. */
-export const grabWindow = (round: ClimbRoundSpec): number => (2 * Math.min(round.reach, CLIMB_SPEC.sway - (CLIMB_SPEC.halfGap - round.reach))) / round.speed;
+/** Phần giao theo trục x giữa thân (tâm px) và bậc (tâm sx). */
+export function overlapX(px: number, sx: number): number {
+  const a = Math.max(px - CLIMB_SPEC.playerHalf, sx - CLIMB_SPEC.stepWidth / 2);
+  const b = Math.min(px + CLIMB_SPEC.playerHalf, sx + CLIMB_SPEC.stepWidth / 2);
+  return b - a;
+}
 
 // ---------------------------------------------------------------------------
 // Ván chơi
 
 export type ClimbPhase = 'playing' | 'roundDone' | 'won' | 'lost';
+/** free: đi, nhảy, rơi; crack: đứng trên bậc sai đang nứt; fall: bậc đã biến mất, rơi về bậc vừa đứng */
+export type ClimbMode = 'free' | 'crack' | 'fall';
+
+export interface ClimbPlayer {
+  x: number;
+  /** Độ cao chân */
+  y: number;
+  vy: number;
+  grounded: boolean;
+  /** Bậc đang đứng (hay vừa đứng): 0 là nút hiện tại, 1 là bậc anh em */
+  on: 0 | 1;
+  /** Chiều đang giữ phím: −1, 0, +1 */
+  move: -1 | 0 | 1;
+  /** Đang bay từ một cú nhảy mà chưa chạm bậc nào */
+  airborne: boolean;
+}
 
 export interface ClimbState {
   seed: number;
   rng: () => number;
-  /** Vòng hiện tại 0 đến 3 */
+  /** Vòng hiện tại (0 tới 2) */
   round: number;
   tree: ClimbTree;
-  /** Tầng người chơi đang giữ (0 = gốc) và chỉ số nút ở tầng đó */
+  tiers: ClimbTier[];
+  /** Tầng em đang đứng (0 là hàng lá) */
   level: number;
-  index: number;
-  /** Pha của cặp tay nắm từng tầng (tầng k = cặp tay nắm là con của nút tầng k − 1), k từ 1 tới depth */
-  phases: number[];
-  /** Đồng hồ của vòng (giây) */
+  choices: ClimbChoice[];
+  player: ClimbPlayer;
+  mode: ClimbMode;
+  /** Đồng hồ của vòng (giây); đứng yên khi tạm dừng */
   time: number;
-  /** Đang bật lên: thời điểm tới đỉnh; null nếu đang treo */
-  peakAt: number | null;
-  /** Không bật được trước thời điểm này */
+  /** Đồng hồ trượt của bậc lựa chọn (chạy chậm lại khi `slow`) */
+  slideClock: number;
+  /** Giảm chuyển động: bậc trượt chậm lại một nửa */
+  slow: boolean;
+  /** Không nhảy được trước thời điểm này */
   lockUntil: number;
-  /** Giờ (đồng hồ của vòng) lúc lên tầng đang giữ: 0 ở gốc; dùng cho câu nhắc của nút "?" */
-  arrivedAt: number;
-  /** Chưa trượt hay ngõ cụt lần nào ở tầng đang giữ: leo qua được thì nhặt tiền đồng của khoảng đó */
-  cleanTry: boolean;
+  /** Chờ bậc sai biến mất (giây còn lại); chỉ có nghĩa ở mode crack */
+  crackLeft: number;
+  /** Đã hết tim: khi rơi về xong thì thua */
+  dying: boolean;
   hearts: number;
-  coins: number;
   roundsDone: number;
+  /** Số lần nhảy nhầm bậc sai cả ván */
+  mistakes: number;
+  /** Đã lên tới gốc và gốc em tính ra khác gốc trong sổ */
+  rootRevealed: boolean;
   phase: ClimbPhase;
+  /** Ván làm thử: không tính điểm, không ghi tiến độ (chỉ để hướng dẫn) */
+  practice: boolean;
 }
 
 export type ClimbEvent =
-  /** Lên tầng trên; `coins` là số đồng nhặt được ở khoảng vừa leo qua, `lostCoins` là số đồng mất (đã trượt hay ngõ cụt ở tầng dưới) */
-  | { kind: 'up'; level: number; index: number; coins: number; lostCoins: number }
-  | { kind: 'deadEnd'; level: number; index: number; hearts: number }
+  | { kind: 'jump' }
+  /** Nhảy trúng bậc đúng: lên tầng `level`; `fromX` là x lúc đáp (hình trượt về chỗ nút) */
+  | { kind: 'up'; level: number; fromX: number }
+  /** Nhảy trúng bậc sai (đứng trên bậc đang nứt), mất 1 tim */
+  | { kind: 'wrong'; choice: number; hearts: number }
+  /** Bậc sai biến mất, em bắt đầu rơi về bậc vừa đứng */
+  | { kind: 'vanish'; choice: number }
+  /** Rơi về xong, làm lại tầng (các lựa chọn đổi chỗ) */
+  | { kind: 'retry' }
+  /** Nhảy hụt, không chạm bậc nào, đáp về bậc cũ */
   | { kind: 'miss' }
-  | { kind: 'roundDone'; round: number }
+  /** Rơi khỏi mép bậc (hay trượt xuống dưới bậc), về bậc cũ */
+  | { kind: 'fell'; fromX: number }
+  | { kind: 'roundDone'; round: number; rootBook: number; rootNow: number; mismatch: boolean }
   | { kind: 'won' }
   | { kind: 'lost' };
 
-function newPhases(rng: () => number, depth: number): number[] {
-  const out = [0];
-  for (let k = 1; k <= depth; k++) out.push(rng() * 4 * CLIMB_SPEC.sway);
-  return out;
+function layoutChoices(tier: ClimbTier, rng: () => number): ClimbChoice[] {
+  const slots = shuffle(tier.options.map((_, i) => i), rng);
+  return tier.options.map((value, i) => ({ value, correct: i === 0, slot: slots[i], phase: rng() * 4, crack: null }));
 }
 
-/** Khởi tạo ván mới từ seed: vòng 1, đứng ở gốc, đủ tim. */
-export function createClimbGame(seed: number): ClimbState {
+/** Đổi chỗ các bậc lựa chọn (giữ số): khác thứ tự cũ nếu có từ 2 bậc. */
+function reshuffleChoices(s: ClimbState): void {
+  const n = s.choices.length;
+  const old = s.choices.map((c) => c.slot);
+  let slots = shuffle(old.map((_, i) => i), s.rng);
+  for (let tries = 0; tries < 20 && n > 1 && slots.every((v, i) => v === old[i]); tries++) slots = shuffle(old.map((_, i) => i), s.rng);
+  if (n > 1 && slots.every((v, i) => v === old[i])) slots = [...old.slice(1), old[0]];
+  s.choices.forEach((c, i) => {
+    c.slot = slots[i];
+    c.phase = s.rng() * 4;
+    c.crack = null;
+  });
+}
+
+function startRound(s: ClimbState, tree: ClimbTree, spec: ClimbRoundSpec): void {
+  s.tree = tree;
+  s.tiers = buildTiers(tree, spec.choices, s.rng);
+  s.level = 0;
+  s.choices = layoutChoices(s.tiers[0], s.rng);
+  s.player = { x: nodeX(tree, 0), y: tierY(0), vy: 0, grounded: true, on: 0, move: 0, airborne: false };
+  s.mode = 'free';
+  s.time = 0;
+  s.slideClock = 0;
+  s.lockUntil = 0;
+  s.crackLeft = 0;
+  s.dying = false;
+  s.rootRevealed = false;
+  s.phase = 'playing';
+}
+
+/** Khởi tạo ván mới từ seed: vòng 1, đứng ở bậc của lá bị tráo, đủ tim. `slow` là "Giảm chuyển động". */
+export function createClimbGame(seed: number, slow = false): ClimbState {
   const rng = createMulberry32(seed);
-  const tree = generateTree(rng, CLIMB_SPEC.rounds[0]);
-  return {
-    seed,
-    rng,
-    round: 0,
-    tree,
-    level: 0,
-    index: 0,
-    phases: newPhases(rng, tree.depth),
-    time: 0,
-    peakAt: null,
-    lockUntil: 0,
-    arrivedAt: 0,
-    cleanTry: true,
-    hearts: CLIMB_SPEC.hearts,
-    coins: 0,
-    roundsDone: 0,
-    phase: 'playing',
-  };
+  const spec = CLIMB_SPEC.rounds[0];
+  const tree = generateTree(rng, spec.leaves);
+  const s = { seed, rng, round: 0, slow, hearts: CLIMB_SPEC.hearts, roundsDone: 0, mistakes: 0, practice: false } as ClimbState;
+  startRound(s, tree, spec);
+  return s;
 }
 
-export const roundSpec = (s: Pick<ClimbState, 'round'>): ClimbRoundSpec => CLIMB_SPEC.rounds[s.round];
-
-/** Tâm cặp tay nắm của tầng ngay trên người chơi lúc t. */
-export function nextCenter(s: ClimbState, t: number = s.time): number {
-  return handleCenter(t, roundSpec(s).speed, s.phases[s.level + 1] ?? 0);
+/** Cây mẫu 4 lá của phần hướng dẫn: [3, 7, 5, 2], lá thứ hai bị tráo thành 8. Dữ liệu riêng, 2 lựa chọn, bậc đứng yên. */
+export function createPracticeGame(seed = 7): ClimbState {
+  const rng = createMulberry32(seed);
+  const s = { seed, rng, round: 0, slow: false, hearts: CLIMB_SPEC.hearts, roundsDone: 0, mistakes: 0, practice: true } as ClimbState;
+  startRound(s, makeTree([3, 7, 5, 2], 1, 8), { leaves: 4, choices: 2, slide: 0 });
+  return s;
 }
 
-/** Bật lên (chạm, bấm chuột, Space). Bỏ qua khi đang bay, đang bị khóa hay không còn chơi. Trả về có bật hay không. */
+export const roundSpec = (s: Pick<ClimbState, 'round' | 'practice'>): ClimbRoundSpec =>
+  s.practice ? { leaves: 4, choices: 2, slide: 0 } : CLIMB_SPEC.rounds[s.round];
+
+/** Bật/tắt chế độ giảm chuyển động giữa ván (bậc trượt chậm lại một nửa). */
+export function setSlow(s: ClimbState, slow: boolean): void {
+  s.slow = slow;
+}
+
+/** Chiều đang giữ phím (−1 trái, 0 đứng, +1 phải). */
+export function setMove(s: ClimbState, dir: -1 | 0 | 1): void {
+  s.player.move = dir;
+}
+
+/** Nhảy. Chỉ nhảy được khi đang đứng trên bậc, chưa bị khóa và đang chơi. Trả về có nhảy hay không. */
 export function jump(s: ClimbState): boolean {
-  if (s.phase !== 'playing' || s.peakAt !== null || s.time < s.lockUntil || s.level >= s.tree.depth) return false;
-  s.peakAt = s.time + CLIMB_SPEC.jumpPeak;
+  const p = s.player;
+  if (s.phase !== 'playing' || s.mode !== 'free' || !p.grounded || s.time < s.lockUntil) return false;
+  p.vy = Math.sqrt(2 * CLIMB_SPEC.gravity * CLIMB_SPEC.jumpApex);
+  p.grounded = false;
+  p.airborne = true;
   return true;
 }
 
-/** Xét cú bật ở đúng thời điểm đỉnh (không phụ thuộc bước dt). */
-function resolvePeak(s: ClimbState, at: number, out: ClimbEvent[]): void {
-  s.peakAt = null;
-  const side = grabAt(nextCenter(s, at), roundSpec(s).reach);
-  if (!side) {
-    s.cleanTry = false;
-    s.lockUntil = at + CLIMB_SPEC.lockAfterFail;
+/** x của bậc đang đứng (nút hay anh em) ở tầng hiện tại. */
+export function standingX(s: ClimbState, on: 0 | 1 = s.player.on): number {
+  return on === 0 ? standX(s.tree, s.level) : siblingX(s.tree, s.level);
+}
+
+/** Bậc có thể chạm nhau (nút, anh em) ở tầng hiện tại: tầng gốc chỉ có nút. */
+function hasSibling(s: ClimbState): boolean {
+  return s.level < s.tree.depth;
+}
+
+function land(s: ClimbState, out: ClimbEvent[]): void {
+  const p = s.player;
+  p.y = tierY(s.level);
+  p.vy = 0;
+  p.grounded = true;
+  if (p.airborne) {
+    p.airborne = false;
+    s.lockUntil = s.time + CLIMB_SPEC.missLock;
     out.push({ kind: 'miss' });
-    return;
-  }
-  const level = s.level + 1;
-  const index = 2 * s.index + (side === 'left' ? 0 : 1);
-  if (!isMismatch(s.tree, level, index)) {
-    // ngõ cụt: ở lại tầng cũ, mất 1 tim
-    s.cleanTry = false;
-    s.hearts = Math.max(0, s.hearts - 1);
-    s.lockUntil = at + CLIMB_SPEC.lockAfterFail;
-    out.push({ kind: 'deadEnd', level, index, hearts: s.hearts });
-    if (s.hearts === 0) {
-      s.phase = 'lost';
-      out.push({ kind: 'lost' });
-    }
-    return;
-  }
-  s.level = level;
-  s.index = index;
-  s.arrivedAt = at;
-  const coins = s.cleanTry ? CLIMB_SPEC.coinsPerGap : 0;
-  addCoins(s, coins);
-  s.cleanTry = true;
-  out.push({ kind: 'up', level, index, coins, lostCoins: CLIMB_SPEC.coinsPerGap - coins });
-  if (level === s.tree.depth) {
-    // nắm được lá lệch: bắt được {phanDien}
-    s.roundsDone++;
-    out.push({ kind: 'roundDone', round: s.round });
-    if (s.round >= CLIMB_SPEC.rounds.length - 1) {
-      s.phase = 'won';
-      out.push({ kind: 'won' });
-    } else s.phase = 'roundDone';
   }
 }
 
-/** Bước thời gian `dt` giây: tay nắm trượt theo đồng hồ; tới đỉnh cú bật thì xét nắm. */
+function rescue(s: ClimbState, out: ClimbEvent[]): void {
+  const p = s.player;
+  out.push({ kind: 'fell', fromX: p.x });
+  p.x = standingX(s);
+  p.y = tierY(s.level);
+  p.vy = 0;
+  p.grounded = true;
+  p.airborne = false;
+  s.lockUntil = s.time + CLIMB_SPEC.missLock;
+}
+
+/** Nhảy trúng bậc `c` (đang rơi, chân vừa qua độ cao của bậc). */
+function touchChoice(s: ClimbState, ci: number, out: ClimbEvent[]): void {
+  const c = s.choices[ci];
+  const p = s.player;
+  if (c.correct) {
+    const fromX = p.x;
+    s.level += 1;
+    p.x = standX(s.tree, s.level);
+    p.y = tierY(s.level);
+    p.vy = 0;
+    p.grounded = true;
+    p.airborne = false;
+    p.on = 0;
+    out.push({ kind: 'up', level: s.level, fromX });
+    if (s.level >= s.tree.depth) {
+      s.choices = [];
+      const rootBook = s.tree.book[s.tree.depth][0];
+      const rootNow = s.tree.now[s.tree.depth][0];
+      s.rootRevealed = rootBook !== rootNow;
+      if (!s.practice) s.roundsDone += 1;
+      out.push({ kind: 'roundDone', round: s.round, rootBook, rootNow, mismatch: s.rootRevealed });
+      if (s.practice || s.round >= CLIMB_SPEC.rounds.length - 1) {
+        s.phase = 'won';
+        out.push({ kind: 'won' });
+      } else s.phase = 'roundDone';
+    } else s.choices = layoutChoices(s.tiers[s.level], s.rng);
+    return;
+  }
+  // bậc sai: đứng trên bậc đang nứt, mất 1 tim
+  c.crack = CLIMB_SPEC.crackSeconds;
+  s.crackLeft = CLIMB_SPEC.crackSeconds;
+  s.mode = 'crack';
+  p.y = tierY(s.level + 1);
+  p.vy = 0;
+  p.grounded = true;
+  p.airborne = false;
+  p.move = 0;
+  s.mistakes += 1;
+  s.hearts = Math.max(0, s.hearts - 1);
+  if (s.hearts === 0) s.dying = true;
+  out.push({ kind: 'wrong', choice: ci, hearts: s.hearts });
+}
+
+function stepFree(s: ClimbState, h: number, out: ClimbEvent[]): void {
+  const p = s.player;
+  const B = CLIMB_SPEC.bounds;
+  p.x = Math.max(-B, Math.min(B, p.x + p.move * CLIMB_SPEC.moveSpeed * h));
+  if (p.grounded) {
+    // đứng trên bậc: còn đứng vững không (bước ra khỏi mép thì rơi)
+    const own = overlapX(p.x, standingX(s, p.on));
+    const other = hasSibling(s) ? overlapX(p.x, standingX(s, p.on === 0 ? 1 : 0)) : -1;
+    if (own < CLIMB_SPEC.minOverlap) {
+      if (other >= CLIMB_SPEC.minOverlap) p.on = p.on === 0 ? 1 : 0;
+      else p.grounded = false;
+    }
+    if (p.grounded) return;
+  }
+  const prevY = p.y;
+  p.y += p.vy * h - 0.5 * CLIMB_SPEC.gravity * h * h;
+  p.vy -= CLIMB_SPEC.gravity * h;
+  if (p.vy < 0) {
+    // bậc lựa chọn (tầng trên)
+    const tc = tierY(s.level + 1);
+    if (prevY >= tc - EPS && p.y <= tc && s.choices.length > 0) {
+      let best = -1;
+      let bestOverlap: number = CLIMB_SPEC.minOverlap;
+      s.choices.forEach((c, i) => {
+        if (c.crack !== null) return;
+        const o = overlapX(p.x, choiceX(s, c));
+        if (o >= bestOverlap) {
+          best = i;
+          bestOverlap = o;
+        }
+      });
+      if (best >= 0) {
+        touchChoice(s, best, out);
+        return;
+      }
+    }
+    // bậc của tầng đang đứng
+    const tb = tierY(s.level);
+    if (prevY >= tb - EPS && p.y <= tb) {
+      const a = overlapX(p.x, standingX(s, 0));
+      const b = hasSibling(s) ? overlapX(p.x, standingX(s, 1)) : -1;
+      if (Math.max(a, b) >= CLIMB_SPEC.minOverlap) {
+        p.on = a >= b ? 0 : 1;
+        land(s, out);
+        return;
+      }
+    }
+    if (p.y < tb - CLIMB_SPEC.fallRescue) rescue(s, out);
+  }
+}
+
+function stepCrack(s: ClimbState, h: number, out: ClimbEvent[]): void {
+  s.crackLeft -= h;
+  if (s.crackLeft > 0) return;
+  const ci = s.choices.findIndex((c) => c.crack !== null);
+  out.push({ kind: 'vanish', choice: ci });
+  s.mode = 'fall';
+  s.crackLeft = 0;
+  const p = s.player;
+  p.x = standingX(s);
+  p.grounded = false;
+  p.vy = 0;
+}
+
+function stepFall(s: ClimbState, h: number, out: ClimbEvent[]): void {
+  const p = s.player;
+  p.y += p.vy * h - 0.5 * CLIMB_SPEC.gravity * h * h;
+  p.vy -= CLIMB_SPEC.gravity * h;
+  if (p.y > tierY(s.level)) return;
+  p.y = tierY(s.level);
+  p.vy = 0;
+  p.grounded = true;
+  p.airborne = false;
+  s.mode = 'free';
+  if (s.dying) {
+    s.phase = 'lost';
+    out.push({ kind: 'lost' });
+    return;
+  }
+  reshuffleChoices(s);
+  out.push({ kind: 'retry' });
+}
+
+/** Bước thời gian `dt` giây (chia nhỏ tối đa 1/120 giây). */
 export function stepClimb(s: ClimbState, dt: number): ClimbEvent[] {
   const out: ClimbEvent[] = [];
   if (s.phase !== 'playing' || !(dt > 0)) return out;
-  const end = s.time + dt;
-  if (s.peakAt !== null && s.peakAt <= end) resolvePeak(s, s.peakAt, out);
-  s.time = end;
+  const scale = s.slow ? CLIMB_SPEC.reducedSlideScale : 1;
+  let left = dt;
+  while (left > EPS && s.phase === 'playing') {
+    const h = Math.min(SUBSTEP, left);
+    left -= h;
+    s.time += h;
+    s.slideClock += h * scale;
+    if (s.mode === 'free') stepFree(s, h, out);
+    else if (s.mode === 'crack') stepCrack(s, h, out);
+    else stepFall(s, h, out);
+  }
   return out;
 }
 
 /**
- * Bước thời gian khi có thể đang tạm dừng (nút "?", tab ẩn, bảng báo): `paused` thì KHÔNG có gì đổi (tay nắm đứng yên, đồng hồ của vòng đứng yên, cú bật đang bay giữ nguyên) và không có sự kiện.
+ * Bước thời gian khi có thể đang tạm dừng (nút "?", tab ẩn, hướng dẫn, bảng báo): `paused` thì KHÔNG có gì đổi (đồng hồ, bậc trượt, người chơi đứng yên) và không có sự kiện.
  */
 export function tickClimb(s: ClimbState, dt: number, paused: boolean): ClimbEvent[] {
   return paused ? [] : stepClimb(s, dt);
 }
 
-/** Sang vòng kế tiếp sau khi xong vòng: cây mới, về gốc, đồng hồ về 0 (tim và tiền đồng giữ nguyên). */
+/** Sang vòng kế tiếp sau khi xong vòng: cây mới, về bậc của lá bị tráo (tim giữ nguyên). */
 export function advanceRound(s: ClimbState): boolean {
   if (s.phase !== 'roundDone') return false;
-  s.round++;
-  s.tree = generateTree(s.rng, roundSpec(s));
-  s.phases = newPhases(s.rng, s.tree.depth);
-  s.level = 0;
-  s.index = 0;
-  s.time = 0;
-  s.arrivedAt = 0;
-  s.peakAt = null;
-  s.lockUntil = 0;
-  s.cleanTry = true;
-  s.phase = 'playing';
+  s.round += 1;
+  const spec = CLIMB_SPEC.rounds[s.round];
+  startRound(s, generateTree(s.rng, spec.leaves), spec);
   return true;
 }
 
-/** Cộng tiền đồng nhặt được (luật nhặt: xem `coinsPerGap`; hình đồng treo trên thân cây ở cảnh). */
-export function addCoins(s: ClimbState, n = 1): void {
-  if (n > 0) s.coins += n;
-}
-
-/** Điểm = số vòng xong × 100 + số tiền đồng + số tim còn × 50. */
-export function climbScore(s: Pick<ClimbState, 'roundsDone' | 'coins' | 'hearts'>): number {
+/** Điểm = số vòng xong × 100 + số tim còn × 50 (tối đa 450). */
+export function climbScore(s: Pick<ClimbState, 'roundsDone' | 'hearts'>): number {
   const p = CLIMB_SPEC.points;
-  return s.roundsDone * p.perRound + s.coins * p.perCoin + s.hearts * p.perHeart;
+  return s.roundsDone * p.perRound + s.hearts * p.perHeart;
 }
 
 export function climbMedal(score: number): Medal {

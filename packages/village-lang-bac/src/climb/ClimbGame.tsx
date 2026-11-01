@@ -1,20 +1,26 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
-import type { Texture } from 'three';
-import { AssetImage, BiAvatar, Button, Hearts, climbUi, fmt, hasSeenGameTip, sound, TutorialSpotlight, type TutorialStep, tutorialTexts, useGameHint, useProgress, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import { BiAvatar, Button, Hearts, climbUi, fmt, hasSeenGameTip, sound, TutorialSpotlight, type TutorialStep, tutorialTexts, useGameHint, useProgress, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { Scene25D, isQualityChoice, type ClipName, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
-import { ART, drawLabels, useClimbTextures } from './climbArt';
+import { drawRoundLabels, useClimbTextures, type ClimbLabels } from './climbArt';
 import { CLIMB_SPEC } from './climbConfig';
-import { JUMP_RISE, LEVEL_GAP, pxPerUnit, type ClimbFrame } from './climbLayout';
-import { advanceRound, climbScore, createClimbGame, jump, nextCenter, nodeLabel, tickClimb, type ClimbEvent, type ClimbState } from './climbLogic';
+import { pxPerUnit, type ClimbFrame } from './climbLayout';
+import { advanceRound, choiceX, climbScore, createClimbGame, createPracticeGame, isLeftChild, jump, nodeValue, setMove, setSlow, siblingValue, tickClimb, tierY, type ClimbEvent, type ClimbState } from './climbLogic';
 import { hintFor } from './climbHint';
-import { ClimbStage, hangFeetY, newAnim, tweenAt, type ClimbAnim } from './ClimbStage';
+import { ClimbStage, newAnim, type ClimbAnim } from './ClimbStage';
 
 /** Số màn của game này (để lưu cờ "đã nghe Bi giới thiệu"). */
 const LEVEL_ID = 12;
-/** Bắt được {phanDien}: chờ chừng này (ms) cho {phanDien} giật mình rồi mới hiện bảng hết vòng. Tự chọn. */
+/** Bắt được {phanDien}: chờ chừng này (ms) cho lá giả rơi rồi mới hiện bảng hết vòng. Tự chọn. */
 const CAUGHT_DELAY_MS = 1100;
+/** Cạnh nhỏ nhất (px) của nút cảm ứng ở đáy: lời giao ≥ 48. */
+const TOUCH_BTN = 60;
+/** Bảng xong vòng / hết tim: khung dọc nằm giữa trên; khung ngang nằm bên phải để cây, biển "Gốc trong sổ" và lá giả vẫn thấy. */
+const bannerClass = {
+  portrait: 'absolute inset-x-4 top-[26%] z-20 mx-auto flex max-w-md flex-col items-center gap-3 rounded-2xl border-[3px] border-nau-go bg-giay p-4 text-center',
+  landscape: 'absolute right-4 top-1/2 z-20 flex w-[34%] max-w-sm -translate-y-1/2 flex-col items-center gap-2 rounded-2xl border-[3px] border-nau-go bg-giay p-3 text-center',
+} as const;
 
 /** Hạt giống của ván: khác nhau mỗi lần (ngẫu nhiên chỉ ở đây; luật trong `climbLogic` tất định theo hạt giống). */
 const newSeed = (): number => (Math.random() * 2 ** 31) >>> 0;
@@ -41,8 +47,22 @@ function useWidth(): [(el: HTMLDivElement | null) => void, number] {
   return [setEl, w];
 }
 
-/** Nhãn "Sổ / Nay" của vòng, vẽ lại khi đổi vòng, đổi cỡ khung (mỗi 4 px CSS mỗi đơn vị) hay bật "Chữ to"; chờ phông chữ nạp xong. */
-function useLabels(state: ClimbState, round: number, ppu: number, largeText: boolean): { map: Map<string, Texture>; fontPx: number } | null {
+/** Có hiện nút cảm ứng ở đáy không: màn hình chạm (con trỏ thô) hoặc cửa sổ hẹp như điện thoại. */
+function useTouchUi(): boolean {
+  const [touch, setTouch] = useState(false);
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const qs = [window.matchMedia('(pointer: coarse)'), window.matchMedia('(max-width: 900px)')];
+    const update = () => setTouch(qs.some((q) => q.matches));
+    update();
+    qs.forEach((q) => q.addEventListener('change', update));
+    return () => qs.forEach((q) => q.removeEventListener('change', update));
+  }, []);
+  return touch;
+}
+
+/** Số trên bậc vẽ bằng canvas: chờ phông chữ nạp xong rồi vẽ lại khi đổi vòng, đổi cỡ khung (mỗi 4 px CSS mỗi đơn vị) hay bật "Chữ to". */
+function useLabels(state: ClimbState, version: number, ppu: number, largeText: boolean, plank: CanvasImageSource | null): ClimbLabels | null {
   const [fontsReady, setFontsReady] = useState(false);
   useEffect(() => {
     let alive = true;
@@ -51,9 +71,8 @@ function useLabels(state: ClimbState, round: number, ppu: number, largeText: boo
       setFontsReady(true);
       return;
     }
-    const sample = `${fmt(climbUi.so, { so: 0 })} ${fmt(climbUi.nay, { so: 123456789 })}`;
     void fonts
-      .load(`700 24px "Baloo 2"`, sample)
+      .load(`800 24px "Baloo 2"`, `0123456789 ${climbUi.gocTrongSo}`)
       .catch(() => undefined)
       .then(() => alive && setFontsReady(true));
     return () => {
@@ -61,50 +80,80 @@ function useLabels(state: ClimbState, round: number, ppu: number, largeText: boo
     };
   }, []);
   const bucket = Math.floor(ppu / 4) * 4;
-  const out = useMemo(() => (fontsReady && bucket > 0 ? drawLabels(state.tree, bucket, largeText) : null), [fontsReady, bucket, largeText, state, round]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => () => out?.map.forEach((t) => t.dispose()), [out]);
+  const out = useMemo(
+    () => (fontsReady && bucket > 0 ? drawRoundLabels(state.tree, state.tiers, bucket, largeText, plank) : null),
+    [fontsReady, bucket, largeText, state, version, plank], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  useEffect(
+    () => () => {
+      out?.steps.forEach((t) => t.dispose());
+      out?.sign.dispose();
+    },
+    [out],
+  );
   return out;
 }
 
-type Banner = { kind: 'round'; depth: number; last: boolean } | { kind: 'lost' } | null;
+type Banner = { kind: 'round'; depth: number; last: boolean; rootNow: number; rootBook: number } | { kind: 'lost' } | null;
 type Say = { text: string; n: number; tone: 'xau' | 'tin' } | null;
+type Clips = { student: ClipName; sn: number; villain: ClipName; vn: number; fall: number };
 
 /**
- * Màn 12 "Leo cây tìm lá giả" (spec 08): Scene25D khung dọc (khung ngang thì cây ở giữa, hai bên là trời), cây mọc từ dưới lên, camera đi theo người chơi; học sinh và {phanDien} là model 3D.
- * Luật nằm hết ở `climbLogic`; ở đây chỉ nối thao tác, hoạt cảnh, âm thanh vào luật. Cú bật nhận ngay ở pointerdown và keydown (không đợi click) để bớt trễ trên điện thoại.
+ * Màn 12 "Leo bậc gỗ" (spec 08): Scene25D khung dọc (khung ngang thì cây ở giữa, hai bên là trời), camera đi theo tầng em đứng; học sinh và {phanDien} là model 3D.
+ * Luật nằm hết ở `climbLogic`; ở đây chỉ nối thao tác (phím, nút cảm ứng), hoạt cảnh, âm thanh vào luật. Hướng dẫn làm thử chạy trên một ván riêng (cây mẫu 4 lá), không đụng ván thật.
  */
 export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRenderProps) {
   const { settings } = useSettings();
   const { progress, markGameTipSeen } = useProgress();
   const reduced = settings.reducedMotion;
   const forced = useMemo(forcedQuality, []);
-  const state = useMemo<ClimbState>(() => createClimbGame(newSeed()), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
-  const anim = useMemo<ClimbAnim>(() => newAnim(state.tree.depth), [state]);
+  const real = useMemo<ClimbState>(() => createClimbGame(newSeed(), reduced), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [practiceKey, resetPractice] = useReducer((n: number) => n + 1, 0);
+  const practice = useMemo<ClimbState>(() => createPracticeGame(), [attempt, practiceKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [tutorialActive, setTutorialActive] = useState(true);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [isReviewingTutorial, setIsReviewingTutorial] = useState(false);
+  const state = tutorialActive ? practice : real;
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  const tutorialStepRef = useRef(0);
+  tutorialStepRef.current = tutorialStep;
+  const realAnim = useMemo<ClimbAnim>(() => newAnim(), [real]);
+  const practiceAnim = useMemo<ClimbAnim>(() => newAnim(), [practice]);
+  const anim = tutorialActive ? practiceAnim : realAnim;
   const [version, bump] = useReducer((n: number) => n + 1, 0);
   const [frame, setFrame] = useState<ClimbFrame>('portrait');
   const [overlayRef, framePx] = useWidth();
   const [banner, setBanner] = useState<Banner>(null);
   const [say, setSay] = useState<Say>(null);
   const [tip, setTip] = useState(() => !hasSeenGameTip(progress.game.data, LEVEL_ID));
-  const [tutorialActive, setTutorialActive] = useState(true);
-  const [tutorialStep, setTutorialStep] = useState(0);
-  const [isReviewingTutorial, setIsReviewingTutorial] = useState(false);
-  const [practiceDone, setPracticeDone] = useState(false);
   const [warm, setWarm] = useState(false);
-  const [clips, setClips] = useState<{ student: ClipName; sn: number; hang: boolean; villain: ClipName; vn: number }>({ student: 'idle', sn: 0, hang: true, villain: 'idle', vn: 0 });
+  const [clips, setClips] = useState<Clips>({ student: 'idle', sn: 0, villain: 'idle', vn: 0, fall: 0 });
+  const touchUi = useTouchUi();
   const finished = useRef(false);
+  const held = useRef({ left: false, right: false, btnLeft: false, btnRight: false });
+  const clipRef = useRef<ClipName>('idle');
+  const practiceStart = useRef(0);
 
   const textures = useClimbTextures();
   const ppu = framePx > 0 ? pxPerUnit(frame, framePx) : 0;
-  const labels = useLabels(state, state.round, ppu, settings.largeText);
+  const plank = (textures.step?.image as CanvasImageSource | undefined) ?? null;
+  const labels = useLabels(state, version, ppu, settings.largeText, plank);
   const ready = warm && textures.done && !!labels;
+
+  // "Giảm chuyển động" đổi giữa ván: bậc trượt chậm lại một nửa
+  useEffect(() => {
+    setSlow(real, reduced);
+  }, [real, reduced]);
 
   // Ván mới
   useEffect(() => {
     finished.current = false;
     setBanner(null);
     setSay(null);
-  }, [state]);
+    setClips((c) => ({ ...c, student: 'idle', sn: c.sn + 1, villain: 'idle', vn: c.vn + 1 }));
+    clipRef.current = 'idle';
+  }, [real]);
 
   useEffect(() => {
     if (!say) return;
@@ -112,11 +161,11 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     return () => clearTimeout(t);
   }, [say]);
 
-  // Nạp trước clip bật (học sinh), cười và giật mình ({phanDien}) lúc màn hình tải còn che cảnh
+  // Nạp trước clip chạy, nhảy (học sinh), cười và giật mình ({phanDien}) lúc màn hình tải còn che cảnh
   const warmUp = useCallback(() => {
-    setClips((c) => ({ ...c, student: 'jump', sn: c.sn + 1, hang: false, villain: 'cheer', vn: c.vn + 1 }));
-    setTimeout(() => setClips((c) => ({ ...c, villain: 'jump', vn: c.vn + 1 })), 400);
-    setTimeout(() => setClips((c) => ({ ...c, student: 'idle', sn: c.sn + 1, hang: true, villain: 'idle', vn: c.vn + 1 })), 800);
+    setClips((c) => ({ ...c, student: 'run', sn: c.sn + 1, villain: 'cheer', vn: c.vn + 1 }));
+    setTimeout(() => setClips((c) => ({ ...c, student: 'jump', sn: c.sn + 1, villain: 'jump', vn: c.vn + 1 })), 400);
+    setTimeout(() => setClips((c) => ({ ...c, student: 'idle', sn: c.sn + 1, villain: 'idle', vn: c.vn + 1 })), 800);
     setTimeout(() => setWarm(true), 1100);
   }, []);
 
@@ -125,124 +174,59 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     finished.current = true;
     const P = CLIMB_SPEC.points;
     const parts: ScorePart[] = [
-      { label: fmt(climbUi.phanVong, { diem: P.perRound }), count: state.roundsDone, points: state.roundsDone * P.perRound },
-      { label: climbUi.phanDong, count: state.coins, points: state.coins * P.perCoin },
-      { label: fmt(climbUi.phanTim, { diem: P.perHeart }), count: state.hearts, points: state.hearts * P.perHeart },
+      { label: fmt(climbUi.phanVong, { diem: P.perRound }), count: real.roundsDone, points: real.roundsDone * P.perRound },
+      { label: fmt(climbUi.phanTim, { diem: P.perHeart }), count: real.hearts, points: real.hearts * P.perHeart },
     ];
-    onFinish(climbScore(state), parts);
-  }, [onFinish, state]);
+    onFinish(climbScore(real), parts);
+  }, [onFinish, real]);
 
   const handleEvents = useCallback(
     (events: readonly ClimbEvent[]) => {
+      const s = stateRef.current;
+      const a = s === practice ? practiceAnim : realAnim;
       const now = performance.now();
-      const from = anim.player;
       for (const e of events) {
         if (e.kind === 'up') {
-          const y = tweenAt(from, now);
-          anim.player = { y0: y, y1: hangFeetY(e.level), start: now, dur: 160, ease: 1 };
-          anim.pull = { level: e.level, fromX: anim.pull.fromX, start: now };
-          const gap = e.level - 1;
-          for (let j = 0; j < CLIMB_SPEC.coinsPerGap; j++) {
-            const c = anim.coins[gap * CLIMB_SPEC.coinsPerGap + j];
-            if (c) {
-              c.mode = e.coins > 0 ? 1 : 2;
-              c.start = now;
-            }
-          }
-          if (e.coins > 0) sound.playPickup(true);
-          else sound.playClick();
-        } else if (e.kind === 'deadEnd' || e.kind === 'miss') {
-          const y = tweenAt(from, now);
-          anim.player = { y0: y, y1: hangFeetY(state.level), start: now, dur: 320, ease: 2 };
-          if (e.kind === 'deadEnd') {
-            sound.playWrong();
-            setSay((s) => ({ text: climbUi.nguCut, tone: 'xau', n: (s?.n ?? 0) + 1 }));
-            setClips((c) => ({ ...c, villain: 'cheer', vn: c.vn + 1 }));
-          } else setSay((s) => ({ text: climbUi.truot, tone: 'tin', n: (s?.n ?? 0) + 1 }));
+          a.tween = { fromX: e.fromX, fromY: tierY(e.level), start: now, dur: 160 };
+          sound.playPickup(true);
+        } else if (e.kind === 'wrong') {
+          sound.playWrong();
+          setSay((v) => ({ text: climbUi.nguCut, tone: 'xau', n: (v?.n ?? 0) + 1 }));
+          setClips((c) => ({ ...c, villain: 'cheer', vn: c.vn + 1 }));
+        } else if (e.kind === 'vanish') {
+          setClips((c) => ({ ...c, fall: c.fall + 1 }));
+        } else if (e.kind === 'miss') {
+          sound.playClick();
+          setSay((v) => ({ text: climbUi.truot, tone: 'tin', n: (v?.n ?? 0) + 1 }));
+        } else if (e.kind === 'fell') {
+          a.tween = { fromX: e.fromX, fromY: tierY(s.level) - CLIMB_SPEC.fallRescue, start: now, dur: 240 };
+          sound.playClick();
+          setSay((v) => ({ text: climbUi.truot, tone: 'tin', n: (v?.n ?? 0) + 1 }));
         } else if (e.kind === 'roundDone') {
-          sound.playLevelComplete();
+          a.leafStart = now;
           setClips((c) => ({ ...c, villain: 'jump', vn: c.vn + 1 }));
-          setTimeout(() => setBanner({ kind: 'round', depth: state.tree.depth, last: state.phase === 'won' }), CAUGHT_DELAY_MS);
+          if (!s.practice) {
+            sound.playLevelComplete();
+            const last = s.phase === 'won';
+            setTimeout(() => setBanner({ kind: 'round', depth: s.tree.depth, last, rootNow: e.rootNow, rootBook: e.rootBook }), CAUGHT_DELAY_MS);
+          }
         } else if (e.kind === 'lost') {
           setTimeout(() => setBanner({ kind: 'lost' }), 700);
         }
       }
-      // chạm lại tay nắm (lên tầng, ngõ cụt, hụt): về tư thế treo
-      if (events.some((e) => e.kind === 'up' || e.kind === 'deadEnd' || e.kind === 'miss')) setClips((c) => ({ ...c, student: 'idle', sn: c.sn + 1, hang: true }));
       bump();
     },
-    [anim, state],
+    [practice, practiceAnim, realAnim],
   );
 
-  // Vòng lặp thời gian (requestAnimationFrame, không dùng useFrame nên không đụng cảnh 3D): tay nắm trượt theo đồng hồ của logic
-  const holdLoop = paused || !ready || tip || banner !== null || tutorialActive;
+  const holdLoop = paused || !ready || (tip && !tutorialActive) || banner !== null;
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
 
-  const doPracticeJump = useCallback(() => {
-    if (practiceDone) return;
-    sound.playWhoosh();
-    setClips((cl) => ({ ...cl, student: 'jump', sn: cl.sn + 1, hang: false }));
-    setTimeout(() => {
-      setClips((cl) => ({ ...cl, student: 'idle', sn: cl.sn + 1, hang: true }));
-    }, 500);
-    setPracticeDone(true);
-    setTutorialStep(4);
-  }, [practiceDone]);
-
-  const handleCloseTutorial = useCallback(() => {
-    setTutorialActive(false);
-    if (!isReviewingTutorial) {
-      const fresh = createClimbGame(newSeed());
-      Object.assign(state, fresh);
-      Object.assign(anim, newAnim(state.tree.depth));
-      setBanner(null);
-      setSay(null);
-      setClips((c) => ({ ...c, student: 'idle', sn: c.sn + 1, hang: true, villain: 'idle', vn: c.vn + 1 }));
-      bump();
-    }
-  }, [anim, isReviewingTutorial, state]);
-
-  const tutorialSteps = useMemo<TutorialStep[]>(() => [
-    {
-      id: 'intro',
-      title: fmt(tutorialTexts.man12.tieuDe),
-      content: fmt(tutorialTexts.man12.intro),
-      nextLabel: tutorialTexts.chung.tiep,
-    },
-    {
-      id: 'tree',
-      title: fmt(tutorialTexts.man12.tieuDe),
-      content: fmt(tutorialTexts.man12.tree),
-      targetSelector: '#tutorial-man12-tree',
-      nextLabel: tutorialTexts.chung.tiep,
-    },
-    {
-      id: 'hud',
-      title: fmt(tutorialTexts.man12.tieuDe),
-      content: fmt(tutorialTexts.man12.hud),
-      targetSelector: '#tutorial-man12-hud',
-      nextLabel: tutorialTexts.chung.tiep,
-    },
-    {
-      id: 'practice',
-      title: fmt(tutorialTexts.man12.tieuDe),
-      content: fmt(tutorialTexts.man12.practice),
-      targetSelector: '#tutorial-man12-tree',
-      interactive: true,
-      hideNextButton: true,
-    },
-    {
-      id: 'done',
-      title: fmt(tutorialTexts.man12.tieuDe),
-      content: fmt(tutorialTexts.man12.correct),
-      targetSelector: '#tutorial-man12-tree',
-      nextLabel: isReviewingTutorial ? tutorialTexts.chung.troLaiBaiLam : tutorialTexts.chung.batDauChoi,
-    },
-  ], [isReviewingTutorial]);
-
   // Nút "?": câu nhắc theo trạng thái ván (không lộ đáp án)
-  useGameHint(setHint, 12, () => hintFor(state));
+  useGameHint(setHint, 12, () => hintFor(real));
+
+  // Vòng lặp thời gian (requestAnimationFrame, không dùng useFrame nên không đụng cảnh 3D): bậc trượt, nhảy, rơi theo đồng hồ của logic
   useEffect(() => {
     if (holdLoop) return;
     let raf = 0;
@@ -251,74 +235,170 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
       raf = requestAnimationFrame(tick);
       const dt = Math.min(0.1, (now - last) / 1000);
       last = now;
-      if (state.phase !== 'playing') return;
-      const events = tickClimb(state, dt, pausedRef.current);
+      const s = stateRef.current;
+      if (s.phase !== 'playing') return;
+      const h = held.current;
+      const locked = s.practice && tutorialStepRef.current < 3;
+      const dir = locked ? 0 : (h.left || h.btnLeft ? -1 : 0) + (h.right || h.btnRight ? 1 : 0);
+      setMove(s, dir as -1 | 0 | 1);
+      const events = tickClimb(s, dt, pausedRef.current);
       if (events.length > 0) handleEvents(events);
+      // clip theo trạng thái: đi bộ chạy, bay thì nhảy, còn lại đứng
+      const p = s.player;
+      const want: ClipName = s.mode !== 'free' ? 'idle' : !p.grounded ? 'jump' : p.move !== 0 ? 'run' : 'idle';
+      if (want !== clipRef.current) {
+        clipRef.current = want;
+        setClips((c) => ({ ...c, student: want, sn: c.sn + 1 }));
+      }
+      // bước tập đi của hướng dẫn: đã đi sang một bên
+      if (s.practice) {
+        if (Math.abs(p.x - practiceStart.current) > 0.7) setTutorialStep((n) => (n === 3 ? 4 : n));
+        if (s.level >= 1) setTutorialStep((n) => (n === 4 ? 5 : n));
+      }
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [holdLoop, state, handleEvents]);
+  }, [holdLoop, handleEvents]);
 
   const tryJump = useCallback(() => {
-    if (holdLoop || state.phase !== 'playing') return;
-    if (!jump(state)) return;
-    const now = performance.now();
-    const y = tweenAt(anim.player, now);
-    anim.player = { y0: y, y1: hangFeetY(state.level) + LEVEL_GAP * JUMP_RISE, start: now, dur: CLIMB_SPEC.jumpPeak * 1000, ease: 1 };
-    // x của tay nắm sẽ nắm (nếu nắm được) lúc tới đỉnh: để hoạt cảnh kéo tay nắm về giữa thân
-    const c = nextCenter(state, state.peakAt ?? state.time);
-    anim.pull.fromX = Math.abs(c - CLIMB_SPEC.halfGap) < Math.abs(c + CLIMB_SPEC.halfGap) ? c - CLIMB_SPEC.halfGap : c + CLIMB_SPEC.halfGap;
+    if (holdLoop) return;
+    const s = stateRef.current;
+    if (s.phase !== 'playing' || (s.practice && tutorialStepRef.current < 3)) return;
+    if (!jump(s)) return;
     sound.playWhoosh();
-    setClips((cl) => ({ ...cl, student: 'jump', sn: cl.sn + 1, hang: false }));
-  }, [anim, holdLoop, state]);
+    clipRef.current = 'jump';
+    setClips((c) => ({ ...c, student: 'jump', sn: c.sn + 1 }));
+  }, [holdLoop]);
 
-  // Space (không cuộn trang) và chạm/bấm chuột (pointerdown, không đợi click)
+  // Bàn phím: ← → hoặc A D để đi (giữ để lái trên không), Space, ↑ hoặc W để nhảy
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.code !== 'Space' && e.key !== ' ') return;
-      const t = e.target as HTMLElement | null;
-      if (t && (t.tagName === 'BUTTON' || t.tagName === 'INPUT')) return;
-      e.preventDefault();
-      if (tutorialActive) {
-        if (tutorialStep === 3 && !e.repeat) {
-          doPracticeJump();
-        }
-        return;
-      }
-      if (!e.repeat) tryJump();
+    const clear = () => {
+      held.current.left = false;
+      held.current.right = false;
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [doPracticeJump, tryJump, tutorialActive, tutorialStep]);
+    const onKey = (e: KeyboardEvent, down: boolean) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+      const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      if (k === 'ArrowLeft' || k === 'a') {
+        held.current.left = down;
+        e.preventDefault();
+      } else if (k === 'ArrowRight' || k === 'd') {
+        held.current.right = down;
+        e.preventDefault();
+      } else if (k === ' ' || k === 'Spacebar' || k === 'ArrowUp' || k === 'w') {
+        if (t && t.tagName === 'BUTTON' && k === ' ') return;
+        e.preventDefault();
+        if (down && !e.repeat) tryJump();
+      }
+    };
+    const kd = (e: KeyboardEvent) => onKey(e, true);
+    const ku = (e: KeyboardEvent) => onKey(e, false);
+    window.addEventListener('keydown', kd);
+    window.addEventListener('keyup', ku);
+    window.addEventListener('blur', clear);
+    document.addEventListener('visibilitychange', clear);
+    return () => {
+      window.removeEventListener('keydown', kd);
+      window.removeEventListener('keyup', ku);
+      window.removeEventListener('blur', clear);
+      document.removeEventListener('visibilitychange', clear);
+      clear();
+    };
+  }, [tryJump]);
 
   const nextRound = useCallback(() => {
-    if (!advanceRound(state)) return;
-    Object.assign(anim, newAnim(state.tree.depth));
+    if (!advanceRound(real)) return;
+    realAnim.leafStart = 0;
+    realAnim.tween.dur = 0;
     setBanner(null);
-    setClips((c) => ({ ...c, student: 'idle', sn: c.sn + 1, hang: true, villain: 'idle', vn: c.vn + 1 }));
+    setClips((c) => ({ ...c, student: 'idle', sn: c.sn + 1, villain: 'idle', vn: c.vn + 1 }));
+    clipRef.current = 'idle';
     bump();
-  }, [anim, state]);
+  }, [real, realAnim]);
 
   const closeTip = useCallback(() => {
     setTip(false);
     markGameTipSeen(LEVEL_ID);
   }, [markGameTipSeen]);
 
+  const openTutorial = useCallback(() => {
+    resetPractice();
+    practiceStart.current = 0;
+    setIsReviewingTutorial(true);
+    setTutorialStep(0);
+    setTutorialActive(true);
+    bump();
+  }, []);
+
+  const handleCloseTutorial = useCallback(() => {
+    setTutorialActive(false);
+    setIsReviewingTutorial(false);
+    setBanner(null);
+    setSay(null);
+    held.current.left = false;
+    held.current.right = false;
+    held.current.btnLeft = false;
+    held.current.btnRight = false;
+    bump();
+  }, []);
+
+  // Bước tập đi: nhớ chỗ đứng lúc bắt đầu
+  useEffect(() => {
+    if (tutorialActive && tutorialStep === 3) practiceStart.current = practice.player.x;
+  }, [tutorialActive, tutorialStep, practice]);
+
+  const tutorialSteps = useMemo<TutorialStep[]>(
+    () => [
+      { id: 'intro', title: fmt(tutorialTexts.man12.tieuDe), content: fmt(tutorialTexts.man12.intro), nextLabel: tutorialTexts.chung.tiep },
+      { id: 'tree', title: fmt(tutorialTexts.man12.tieuDe), content: fmt(tutorialTexts.man12.tree), targetSelector: '#tutorial-man12-tree', nextLabel: tutorialTexts.chung.tiep },
+      { id: 'hud', title: fmt(tutorialTexts.man12.tieuDe), content: fmt(tutorialTexts.man12.hud), targetSelector: '#tutorial-man12-hud', nextLabel: tutorialTexts.chung.tiep },
+      { id: 'di', title: fmt(tutorialTexts.man12.tieuDe), content: fmt(tutorialTexts.man12.di), targetSelector: '#tutorial-man12-play', interactive: true, hideNextButton: true },
+      { id: 'practice', title: fmt(tutorialTexts.man12.tieuDe), content: fmt(tutorialTexts.man12.practice), targetSelector: '#tutorial-man12-play', interactive: true, hideNextButton: true },
+      {
+        id: 'done',
+        title: fmt(tutorialTexts.man12.tieuDe),
+        content: fmt(tutorialTexts.man12.correct),
+        targetSelector: '#tutorial-man12-tree',
+        nextLabel: isReviewingTutorial ? tutorialTexts.chung.troLaiBaiLam : tutorialTexts.chung.batDauChoi,
+      },
+    ],
+    [isReviewingTutorial],
+  );
+
   const onModeChange = useCallback((m: FrameMode) => setFrame(m === 'landscape' ? 'landscape' : 'portrait'), []);
 
-  if (PROBE && typeof window !== 'undefined') Object.assign(window, { __climb: state, __climbUi: { ppu, fontPx: labels?.fontPx ?? 0, frame, banner, tip, ready } });
+  if (PROBE && typeof window !== 'undefined') Object.assign(window, { __climbChoiceX: (i: number) => { const s = stateRef.current; const c = s.choices[i]; return c ? choiceX(s, c) : null; }, __climb: state, __climbReal: real, __climbUi: { ppu, fontPx: labels?.fontPx ?? 0, frame, banner, tip, ready, tutorialActive } });
 
-  // Nhãn cho trình đọc màn hình: hai tay nắm tầng trên (đổi khi lên tầng, không đổi theo khung hình)
-  const pair =
+  // Nhãn cho trình đọc màn hình: bậc em đang đứng và bậc anh em (đổi khi lên tầng, không đổi theo khung hình)
+  const stand =
     state.level < state.tree.depth
-      ? (['trai', 'phai'] as const).map((side, j) => {
-          const t = nodeLabel(state.tree, state.level + 1, 2 * state.index + j);
-          return fmt(climbUi.tayNam, { nhan: climbUi[side], so: t.book, so2: t.now });
+      ? fmt(climbUi.docTang, {
+          so: nodeValue(state.tree, state.level),
+          nhan: isLeftChild(state.tree, state.level) ? climbUi.phai : climbUi.trai,
+          so2: siblingValue(state.tree, state.level),
         })
-      : [];
+      : fmt(climbUi.gocEmTinh, { so: nodeValue(state.tree, state.level), so2: state.tree.book[state.tree.depth][0] });
   const portrait = frame === 'portrait';
   const textSize = portrait ? 'max(3.6cqw, 0.875rem)' : 'max(1.6cqw, 0.875rem)';
-  const twoD = state.tree.depth;
+  const showTouch = touchUi && !banner && (!tip || tutorialActive);
+
+  const holdBtn = (key: 'btnLeft' | 'btnRight') => ({
+    onPointerDown: (e: React.PointerEvent) => {
+      e.preventDefault();
+      (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+      held.current[key] = true;
+    },
+    onPointerUp: () => {
+      held.current[key] = false;
+    },
+    onPointerCancel: () => {
+      held.current[key] = false;
+    },
+    onLostPointerCapture: () => {
+      held.current[key] = false;
+    },
+  });
 
   return (
     <div className="fixed inset-0 select-none bg-black" data-testid="man12">
@@ -340,53 +420,66 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
             data-phase={state.phase}
             data-round={state.round}
             data-level={state.level}
-            onPointerDown={(e) => {
-              if ((e.target as HTMLElement).closest('button')) return;
-              tryJump();
-            }}
+            data-practice={state.practice ? '1' : '0'}
           >
             {/* Nút mở lại hướng dẫn */}
             <Button
               id="tutorial-man12-guide-btn"
               variant="secondary"
               size="sm"
-              className="pointer-events-auto absolute top-2 right-14 sm:right-16 z-20 min-h-9 px-2 text-xs font-bold bg-giay/90 border border-nau-go/40 shadow-sm"
-              onClick={() => {
-                setIsReviewingTutorial(true);
-                setTutorialStep(0);
-                setPracticeDone(false);
-                setTutorialActive(true);
-              }}
+              className="pointer-events-auto absolute top-14 right-2 z-20 min-h-9 px-2 text-xs font-bold bg-giay/90 border border-nau-go/40"
+              onClick={openTutorial}
               title={tutorialTexts.chung.huongDan}
             >
               💡 {tutorialTexts.chung.huongDan}
             </Button>
-            <div id="tutorial-man12-hud" className="pointer-events-none absolute inset-x-2 top-2 flex items-center justify-between gap-2 pr-12" data-testid="hud">
+            <div id="tutorial-man12-hud" className="pointer-events-none absolute inset-x-2 top-2 flex items-center justify-between gap-2 pr-14" data-testid="hud">
               <div className="flex items-center gap-3 rounded-2xl border-2 border-nau-go bg-giay px-3 py-1 font-display font-extrabold">
                 <span data-testid="vong">{fmt(climbUi.vong, { so: state.round + 1, max: CLIMB_SPEC.rounds.length })}</span>
                 <Hearts current={state.hearts} max={CLIMB_SPEC.hearts} size="sm" />
               </div>
-              <div className="flex items-center gap-1 rounded-2xl border-2 border-nau-go bg-giay px-3 py-1 font-display font-extrabold" aria-label={fmt(climbUi.dong, { so: state.coins })} data-testid="dong">
-                <AssetImage path={ART.coin} alt="" className="size-6" />
-                <span>{state.coins}</span>
-              </div>
             </div>
-            {/* Vùng thân cây Merkle */}
-            <div id="tutorial-man12-tree" className="pointer-events-none absolute inset-x-12 top-[22%] bottom-[22%] rounded-2xl border-2 border-dashed border-nau-go/20" />
+            {/* Vùng thân cây: chỗ em đứng và các bậc lựa chọn (đích của hướng dẫn) */}
+            <div id="tutorial-man12-tree" className="pointer-events-none absolute inset-x-6 top-[14%] bottom-[24%]" />
+            <div id="tutorial-man12-play" className="pointer-events-none absolute inset-x-0 top-[12%] bottom-0" />
             <p className="sr-only" aria-live="polite">
-              {pair.join('. ')}
+              {stand}
             </p>
             {say && (
               <p
                 key={say.n}
                 role="status"
-                className={`pointer-events-none absolute inset-x-0 top-[18%] mx-auto w-fit rounded-2xl border-[3px] bg-giay px-4 py-1 font-display font-extrabold ${say.tone === 'xau' ? 'border-do-son text-do-son-dam' : 'border-muc-tim text-muc-tim-dam'}`}
+                className={`pointer-events-none absolute inset-x-0 top-[10%] mx-auto w-fit rounded-2xl border-[3px] bg-giay px-4 py-1 font-display font-extrabold ${say.tone === 'xau' ? 'border-do-son text-do-son-dam' : 'border-muc-tim text-muc-tim-dam'}`}
                 data-testid="loi"
               >
                 {say.text}
               </p>
             )}
-            {tip && ready && (
+            {showTouch && (
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex items-end justify-between gap-3 p-3" data-testid="man12-nut-cham">
+                <div className="pointer-events-auto flex gap-3">
+                  <button type="button" aria-label={climbUi.nutTrai} data-testid="man12-nut-trai" className="touch-none select-none rounded-2xl border-[3px] border-nau-go bg-giay font-display text-2xl font-extrabold active:bg-vang" style={{ width: TOUCH_BTN, height: TOUCH_BTN }} {...holdBtn('btnLeft')}>
+                    ◀
+                  </button>
+                  <button type="button" aria-label={climbUi.nutPhai} data-testid="man12-nut-phai" className="touch-none select-none rounded-2xl border-[3px] border-nau-go bg-giay font-display text-2xl font-extrabold active:bg-vang" style={{ width: TOUCH_BTN, height: TOUCH_BTN }} {...holdBtn('btnRight')}>
+                    ▶
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  data-testid="man12-nut-nhay"
+                  className="pointer-events-auto touch-none select-none rounded-2xl border-[3px] border-nau-go bg-vang px-5 font-display text-lg font-extrabold active:bg-vang-dam"
+                  style={{ minWidth: TOUCH_BTN + 24, height: TOUCH_BTN }}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    tryJump();
+                  }}
+                >
+                  {climbUi.nutNhay}
+                </button>
+              </div>
+            )}
+            {tip && !tutorialActive && ready && (
               <div role="dialog" aria-label={climbUi.biGocCay} className="absolute inset-x-4 top-[30%] z-20 mx-auto flex max-w-md flex-col items-center gap-3 rounded-2xl border-[3px] border-nau-go bg-giay p-4 text-center" data-testid="bi-goc-cay">
                 <BiAvatar size={64} />
                 <p className="font-display font-bold">{climbUi.biGocCay}</p>
@@ -396,10 +489,11 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
               </div>
             )}
             {banner && (
-              <div role="status" className="absolute inset-x-4 top-[30%] z-20 mx-auto flex max-w-md flex-col items-center gap-3 rounded-2xl border-[3px] border-nau-go bg-giay p-4 text-center" data-testid="banner">
+              <div role="status" className={portrait ? bannerClass.portrait : bannerClass.landscape} data-testid="banner">
                 {banner.kind === 'round' ? (
                   <>
                     <p className="font-display text-lg font-extrabold">{fmt(climbUi.batDuoc)}</p>
+                    <p className="font-display font-bold">{fmt(climbUi.gocEmTinh, { so: banner.rootNow, so2: banner.rootBook })}</p>
                     <p className="font-display font-bold">{fmt(climbUi.vongXong, { so: banner.depth, so2: 2 ** banner.depth })}</p>
                   </>
                 ) : (
@@ -421,12 +515,12 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
           anim={anim}
           frame={frame}
           textures={textures}
-          labels={labels?.map ?? null}
-          version={version + twoD}
+          labels={labels}
+          version={version}
           reduced={reduced}
           studentClip={clips.student}
           studentTrigger={clips.sn}
-          hanging={clips.hang}
+          fallTrigger={clips.fall}
           villainClip={clips.villain}
           villainTrigger={clips.vn}
         />
@@ -436,48 +530,12 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
         steps={tutorialSteps}
         currentStepIndex={tutorialStep}
         onNext={() => {
-          if (tutorialStep === 3) {
-            doPracticeJump();
-          } else if (tutorialStep < tutorialSteps.length - 1) {
-            setTutorialStep((s) => s + 1);
-          } else {
-            handleCloseTutorial();
-          }
+          if (tutorialStep < tutorialSteps.length - 1) setTutorialStep((n) => n + 1);
+          else handleCloseTutorial();
         }}
-        onPrev={() => setTutorialStep((s) => Math.max(0, s - 1))}
+        onPrev={() => setTutorialStep((n) => Math.max(0, n - 1))}
         onSkip={handleCloseTutorial}
-        actionButton={
-          tutorialStep === 3
-            ? {
-                label: `🚀 ${tutorialTexts.man12.nhayThu}`,
-                onClick: doPracticeJump,
-                variant: 'primary',
-              }
-            : tutorialStep === 4
-            ? {
-                label: isReviewingTutorial ? tutorialTexts.chung.troLaiBaiLam : tutorialTexts.chung.batDauChoi,
-                onClick: handleCloseTutorial,
-                variant: 'primary',
-              }
-            : undefined
-        }
-      >
-        {tutorialActive && tutorialStep === 3 && (
-          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
-            <Button
-              id="tutorial-man12-jump-btn"
-              variant="primary"
-              size="lg"
-              onClick={doPracticeJump}
-              className="shadow-xl animate-bounce"
-            >
-              <span>🚀</span>
-              <span>{tutorialTexts.man12.nhayThu}</span>
-            </Button>
-          </div>
-        )}
-      </TutorialSpotlight>
+      />
     </div>
   );
 }
-
