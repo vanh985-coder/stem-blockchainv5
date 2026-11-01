@@ -424,3 +424,9 @@ Thời gian danh nghĩa của giữ sổ: 90 giây → 45 giây (hết nửa); c
 - [x] Đống rơm ở màn 2 hiện đủ khối ở cả ba trạng thái (thấp, đang bay, đã rơi). (Bước 16.)
 - [ ] Màn 1 là bài 2D giai đoạn 1 đặt trên nền làng, lời bác An hiện đúng chỗ.
 - [ ] Ít nhất 30fps ở mức Thấp trên điện thoại tầm trung. (Bước 15a, bản build trên máy tính, mức Thấp: cảnh trao trang 546 fps, đi lại 604 fps; làm chậm CPU 4 lần còn 212 và 275 fps. Còn cần thử trên điện thoại thật.)
+
+## Bổ sung mốc 4 và bàn giao Claude — 01/11/2026
+
+- Màn 1 đủ ba trạm có focus/làm thử; Màn 2 nhảy thử; Màn 3 chọn/soi/ghép thẻ. Tuân thủ P8-HUONG-DAN-FOCUS-LAM-THU.md; triển khai không đồng nghĩa đã duyệt toàn bộ.
+- Nút “?” và “Soi công thức” Màn 3 đã tách theo báo cáo commit 6d573ac: AREAS.hud.x1=92, khoảng đệm phải tối thiểu 4.25rem, nút tối thiểu 44×44 px. Mở trợ giúp hoặc xoay dọc dừng ván; quay lại tiếp tục. Không đổi hai vòng và 45 giây giữ sổ.
+- Bằng chứng: docs/screenshots/man3-buttons/BAO-CAO-MAN3-BUTTONS.md (16 kiểm nút, 48 hồi quy Màn 2–3).

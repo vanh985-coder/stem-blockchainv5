@@ -595,6 +595,10 @@ export const ui = {
     tieuDe: 'Chợ phiên',
     /** HUD góc trên trái: {nd} là dòng nhiệm vụ (đã qua fmt) */
     nhiemVu: 'Nhiệm vụ: {nd}',
+    /** HUD góc trên trái: nút thu gọn và mở rộng dòng nhiệm vụ */
+    thuGonNhiemVu: 'Thu gọn',
+    moRongNhiemVu: 'Xem nhiệm vụ',
+    nhiemVuRutGon: 'Nhiệm vụ',
     /** HUD góc trên phải: nút mở menu (máy tính: Esc nhả chuột rồi menu hiện ra) */
     nutMenu: 'Menu',
     nutMenuNhan: 'Mở menu',

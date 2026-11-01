@@ -293,6 +293,7 @@ export function WorldPage() {
     return fmt((st === 'open' || st === 'done') && !knowGated(t.village) ? ui.langScene.nhanBien : ui.langScene.nhanBienKhoa, { bien: fmt(levelById(t.level)?.bien ?? '') });
   };
   const label = near >= 0 ? labelOf(targets[near] ?? null) : null;
+  const isNearBoard = near >= 0 && targets[near]?.kind === 'board';
 
   const nearRef = useRef(near);
   nearRef.current = near;
@@ -608,6 +609,7 @@ export function WorldPage() {
           glow={glow}
           onMenu={session.openMenu}
           onGuide={() => openGuide()}
+          nearBoard={isNearBoard}
           map={<MiniMap geo={mapGeo} markers={miniMarkers} names={miniNames} api={api} inside={inside} rotate={settings.rotateMap} size={miniMapSize(touch, settings.largeText)} touch={touch} reducedMotion={settings.reducedMotion} onOpen={() => !mapLive.current.blocked && !mapLive.current.bigMap && openMap()} />}
         />
 

@@ -665,3 +665,9 @@ Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút
 - [x] Hướng dẫn chơi (bước 16): 6 phần, mỗi phần 2 đến 4 trang; lời và hình theo máy tính hoặc điện thoại; mở từ HUD (nút ?), Menu và thẻ bắt đầu của màn 2, màn 3 (mở thẳng phần của game); lần đầu vào chợ tự mở "Đi lại và camera" một lần. (Kiểm bằng Chrome ở máy tính 1280×720 và điện thoại ngang 844×390; có test ở `huongDan.test.ts`, `guideFlags.test.ts`, `apps/hub/src/guide.test.tsx`.)
 - [x] "Em có biết?" lần đầu vào làng (sau cảnh mở đầu, "Thẻ n/tổng", nút "Vào làng", một lần, xem lại ở menu làng). (Bước 16, kiểm bằng Chrome.)
 - [ ] Test va chạm và `unlock.ts` ✅. Mức Thấp ≥ 30fps. (Bước 15a: `collision.test.ts`, `unlock.test.ts` xanh; fps trên máy tính xem spec 04 và 05; điện thoại tầm trung thật chưa thử.)
+
+## Bổ sung mốc 4 và bàn giao Claude — 01/11/2026
+
+- P8 dùng TutorialSpotlight qua Portal vào body, tránh CSS zoom của bài học; tooltip bốn hướng, thân cuộn và nút không khuất. Chu kỳ Enter phải thả/nhấn mới. Chi tiết và trạng thái nghiệm thu ở P8-HUONG-DAN-FOCUS-LAM-THU.md.
+- HUD nhiệm vụ che biển chọn màn: ĐÃ XONG 01/11/2026 (tự thu gọn khi gần biển, bấm để mở lại; khối Trang Sổ Vàng/?/Menu xuống dòng ở 360px; không dời biển/camera; kiểm 118/118 ở 4 làng × 3 cỡ, ảnh `docs/screenshots/hud-boards/`). Yêu cầu giao: sửa bố cục HUD ở 4 làng, giữ minimap/nút/menu/joystick tiếp cận được; không dời biển/camera/vùng tương tác để né HUD. Kiểm nhiệm vụ dài, đủ 4 trang và trạng thái biển mở/khóa/xong ở ba cỡ chuẩn.
+- Màn 5 hiện dùng sân chơi và sprite 2D theo P7c; mô tả 2.5D Màn 5 ở các phần lịch sử không áp cho bản mới.

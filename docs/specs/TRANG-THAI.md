@@ -2,6 +2,26 @@
 
 Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết quả đã xác minh. Bạn thay bản cũ trong project claude.ai và trong repo (`docs/specs/TRANG-THAI.md`).
 
+## Bàn giao sang Claude Code — 01/11/2026
+
+- **Người code tiếp theo: Claude Code chạy local**, đọc `CLAUDE.md`, file này, rồi spec của nhiệm vụ. `GEMINI.md` giữ làm tài liệu lịch sử bàn giao; không xóa kết quả Gemini đã làm.
+- Chủ dự án cho phép tự commit và push nhánh đang làm khi kiểm đạt; không force-push, chưa tự merge main hay deploy. Giữ thay đổi có sẵn. Người dùng sẽ kiểm P8 sau; không dừng các việc độc lập để chờ duyệt từng màn.
+- P1–P6 đã triển khai; ba sửa ưu tiên về tự hoàn thành, bố cục đối chiếu Màn 4 và máy tính Màn 8 đã báo cáo tại `ce4564c`, `936f24e`, `7684c96`, không làm lại. File Excel lời thoại đã xuất. P7 đồ họa Màn 5 đã được người dùng duyệt.
+- P8 đã triển khai 12/12 màn: bài học 1/4/7/10 đủ ba độ khó, tám mini-game có hướng dẫn/làm thử. **Chưa nghiệm thu toàn bộ bởi người dùng.** Commit rà soát và push được báo cáo: `466c640`.
+- Lỗi nút “?” che “Soi công thức” Màn 3 đã sửa, commit/push được báo cáo `6d573ac`. Báo cáo tại `docs/screenshots/man3-buttons/BAO-CAO-MAN3-BUTTONS.md`: 16/16 kiểm nút, 48/48 hồi quy Màn 2–3; bốn lệnh đạt với 2321 test, 5 bỏ qua. Đây là số liệu báo cáo trước, không phải chạy lại trong buổi cập nhật tài liệu.
+- **325 assertions P8 là tổng tích lũy qua nhiều lượt/commit**, không phải toàn bộ chạy lại trên commit cuối. Không dùng số này để kết luận thiết bị thật hay Supabase thật đã nghiệm thu.
+- Git trong lượt cập nhật tài liệu này không đọc được (`fatal: cannot change to ...`); các hash/push trên là từ báo cáo bàn giao, Claude phải kiểm lại Git thực tế trước khi làm. Không suy ra working tree sạch hoặc server còn chạy từ báo cáo cũ.
+
+### Việc tiếp theo và giới hạn
+
+1. **HUD nhiệm vụ che biển chọn màn: ĐÃ XONG (01/11/2026).** Dòng nhiệm vụ tự thu gọn thành nút khi đứng gần biển (`MarketHud.nearBoard`), bấm để mở/thu gọn; khối Trang Sổ Vàng + nút ? + Menu xuống dòng ở 360px để không tràn. Kiểm bản build 4 làng × 3 cỡ: 118/118, ảnh ở `docs/screenshots/hud-boards/` (`scripts/p5-hud-check.mjs`). Việc cũ: Rà cả bốn làng, nhất là dòng đủ 4 Trang Sổ Vàng. Không di chuyển biển/camera để né HUD; giữ minimap và điều khiển tiếp cận được. Xem bổ sung spec 03.
+2. **Màn 7:** rà câu “buộc phải vét cạn” và suy luận thời gian từ 256-bit trong content/báo cáo. Thử tuần tự chỉ là cách minh họa, không phải cách tìm ngược duy nhất. Không đổi luật bài học.
+3. **Phát hiện khi đọc mã ngày 01/11:** `packages/core/src/content/tutorial.ts`, `man10Tb.stepByStep` ghi `Gốc = T12 × 100 + T34`, trong khi `lessons/bai-4/logic.ts::combine` trả `a * 10 + b`. Claude cần sửa lời hướng dẫn thành ×10 và kiểm nơi sử dụng; buổi này chỉ cập nhật tài liệu, chưa sửa mã.
+4. Mục thiếu bốn lệnh sau sửa MemoryGame đã có báo cáo kế tiếp ở `6d573ac` (2321 test và text/type/build đạt). Không yêu cầu chạy lặp chỉ để có số mới; đối chiếu log/mã nếu cần xác nhận nguồn bằng chứng.
+5. Người dùng kiểm P8 khi thuận tiện; tiếp nhận lỗi rồi sửa theo phạm vi, không ghi đã duyệt cả 12 màn.
+6. Supabase TEST/JWT/RLS và giáo viên thật chưa nghiệm thu; migration `0003` chưa áp production. Không tự áp migration. Thiết bị thật, Safari/iPhone, bàn phím ảo, pointer lock thật và FPS điện thoại còn giới hạn.
+7. Sau các sửa ưu tiên: rà danh sách việc dời từ mốc 3 bên dưới; hội làng/thử thách cuối/bằng khen để cuối mốc 4. Merge/deploy bản cuối cần được giao riêng.
+
 ## Thông tin chung
 
 | Mục | Giá trị |
@@ -11,7 +31,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | Hosting | Windows Server, Docker Desktop (WSL2) + Caddy, cổng 18081–18086; Cloudflare Tunnel (dịch vụ Windows). `docs/DEPLOY.md` mục (h) deploy, (i) luật cache |
 | Supabase | Project `zlqxwbgcyudybxaynluf` (Singapore), migrations 0001, 0002; Edge Function `teacher-reset-password` |
 | Tài khoản thử | Giáo viên `gva`, `gvb`; học sinh `thu01`, `thu02` |
-| Người code | **Claude Code**, đọc **`CLAUDE.md`** (từ lượt sửa `FeedbackSheet` sau P2a). **Tự commit và tự push nhánh đang làm lên `origin`** khi `pnpm test`, `pnpm typecheck`, `pnpm check:text`, `pnpm build` đạt, không cần hỏi lại (từ P2b; thay cho "không push" trước đây). Không force-push, không tự merge vào `main`. P1a, P1b, P2a do Codex (đọc `AGENTS.md`) viết ban đầu, P2a hoàn thiện bởi Claude Code |
+| Người code | **Claude Code**, đọc **`CLAUDE.md`** (tiếp nhận lại từ Gemini ngày 01/11/2026). **Tự commit và tự push nhánh đang làm lên `origin`** khi `pnpm test`, `pnpm typecheck`, `pnpm check:text`, `pnpm build` đạt, không cần hỏi lại (từ P2b; thay cho "không push" trước đây). Không force-push, không tự merge vào `main`. P1a, P1b, P2a do Codex (đọc `AGENTS.md`) viết ban đầu, P2a hoàn thiện bởi Claude Code |
 | Ảnh chụp kiểm tra | Lưu vào `docs/screenshots/<bước>/` (< 300 KB mỗi ảnh); P1a: `docs/screenshots/p1a/` |
 
 ## Tiến độ
@@ -22,7 +42,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | 3. Nhân rộng | ✅ **Chốt.** Đủ 12 màn, cả 4 làng dựng to, **đã gộp web** (≈2086 test xanh). Việc còn dở dời xuống **cuối mốc 4** |
 | 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt; P5 đã chốt; P6a, P6b đã xong; P7a, P7b, P7c đã nghiệm thu; P8 ĐÃ TRIỂN KHAI ĐỦ 12 MÀN (31/10/2026, 325/325 E2E tests đạt, 248 ảnh minh chứng, 28/28 unit tests đạt, đang chờ người dùng kiểm thử và nghiệm thu hoàn toàn)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
 
-**⚠️ 15b vẫn chưa làm:** server có thể đang 530, mốc 2 và toàn bộ mốc 3 (≈60 commit, mới nhất `2bd76bf`) chưa push, chưa chạy trên máy thật. Cách làm: khôi phục `cloudflared` + Docker, deploy theo `DEPLOY.md` (h), Cache Rule (i), thử trên điện thoại.
+**15b — ghi chú lịch sử cần kiểm tra lại:** báo cáo cũ từng ghi server 530 và chưa push ở `2bd76bf`. Các báo cáo sau đã có push; không dùng dòng cũ để kết luận Git/server hiện tại. Deploy và kiểm thiết bị thật vẫn chưa được xác nhận trong bàn giao này.
 
 ## Ưu tiên mốc 4 (theo thứ tự; "mặc định" là cách hiểu đã chốt nếu chủ dự án không sửa)
 
@@ -34,7 +54,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | P4 | **P4a ĐÃ XONG (29/10/2026, mục "P4a" bên dưới): (7) Màn 2 nhanh hơn: +20% tốc độ mọi vòng (12 / 0,36 / 21,6), mốc đặt lại 216 / 499 / 638 theo phân vị bot.** **P4b ĐÃ XONG (29/10/2026, mục "P4b" bên dưới): (8b) Màn 3 bỏ vòng 3, còn 2 vòng (đoạn giữ sổ 45 giây ở cuối vòng 2), mốc 290 / 320 / 330.** (Yêu cầu gốc: vòng "giữ sổ" (Tí tráo trang) đang ở vòng 3 → mặc định chuyển cơ chế tráo trang vào cuối vòng 2 để không mất bài học phát hiện sửa lén; đặt lại mốc) | 1 |
 | P5 | **ĐÃ XONG (29/10/2026, mục "P5" bên dưới):** (1) Biển chọn màn trong làng làm thành cột sáng giống cuộn "Em có biết?" (mỗi màn một cột, dáng và chữ theo trạng thái, giữ chữ tên màn) | 1 |
 | P6 | (3) Sau khi đọc thẻ "Em có biết?": 1 ví dụ ngắn + 1 câu hỏi ABCD (hoặc điền số). Mặc định: trả lời sai vẫn nhận thẻ, hiện giải thích. **P6a (nội dung 16 câu) đã duyệt; P6b (tích hợp) ĐÃ XONG (30/10/2026, mục "P6b" bên dưới)** | 1–2 |
-| P7 | **P7a ĐÃ XONG (30/10/2026, mục "P7a" bên dưới):** Bản chơi được Màn 5 "Đập {phanDien}" bằng 2D 4 làn dọc (Talking Tom), 2 loại chuột (thường và câu hỏi ❓), chống click ma, dừng khi mở câu hỏi/?, tự hoàn thành. **P7b:** trau chuốt đồ họa và cân bằng nhịp sinh. | 3–4 |
+| P7 | **P7a ĐÃ XONG (30/10/2026, mục "P7a" bên dưới):** Bản chơi được Màn 5 "Đập {phanDien}" bằng 2D 4 làn dọc (Talking Tom), 2 loại chuột (thường và câu hỏi ❓), chống click ma, dừng khi mở câu hỏi/?, tự hoàn thành. **P7b/P7c:** đã triển khai; đồ họa P7c được người dùng duyệt. | 3–4 |
 | P8 | **P8 ĐÃ TRIỂN KHAI ĐỦ 12 MÀN (31/10/2026, mục "P8" bên dưới):** Cơ chế dùng chung `TutorialSpotlight` và làm thử tương tác cho cả 12 màn (4 bài học × 3 trạm + 8 mini-game). Kiểm tra E2E Puppeteer đạt **325/325 tests (100%)**, 248 ảnh minh chứng, 28/28 unit tests, 4 lệnh bắt buộc xanh 100%. Đang chờ người dùng kiểm thử và nghiệm thu hoàn toàn. | 2–3 |
 
 Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mốc 3 và hội làng.
@@ -47,9 +67,9 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   - **4 Bài học (12 trạm):** Màn 1 (Làng Giấy - Dễ, TB, Khó), Màn 4 (Làng Dệt - Dễ, TB, Khó), Màn 7 (Làng Khắc Dấu - Dễ, TB, Khó), Màn 10 (Làng Bạc - Dễ, TB, Khó).
   - **8 Mini-game:** Màn 2 (Runner), Màn 3 (Rebuild ghép sổ), Màn 5 (Whack đập chuột 2D), Màn 6 (Kite diều đưa sổ 2.5D), Màn 8 (Memory lật thẻ tìm khóa), Màn 9 (Chicken chữa đàn gà), Màn 11 (Match-3 ghép lá Merkle), Màn 12 (Climb leo cây tìm lá giả).
 - **Làm thử tương tác:** Mỗi màn có tình huống làm thử riêng biệt, yêu cầu thao tác thật (nhập số, bấm nút, nhảy bám, bắn thuốc, tráo lá). Tách biệt 100% khỏi ván thật (không cộng điểm/xu/sao/tiến độ/Trang Sổ Vàng).
-- **Nút "💡 Hướng dẫn":** Mở lại bất kỳ lúc nào giữa ván; khi mở dừng toàn bộ chuyển động/đồng hồ; khi đóng tiếp tục ván sạch.
+- **Nút "💡 Hướng dẫn":** Mở lại bất kỳ lúc nào giữa ván; khi mở dừng toàn bộ chuyển động/đồng hồ; khi đóng tiếp tục đúng ván đang dở; chỉ lần bắt đầu lượt mới mới khởi tạo ván sạch.
 - **Kiểm thử nghiệm thu:**
-  - E2E Puppeteer: **325 / 325 tests ĐẠT (100.0%)** trên cả 3 kích thước: 1366×768, 360×800 và 844×390.
+  - E2E Puppeteer: **325 / 325 assertions tích lũy qua nhiều lượt/commit** trên cả 3 kích thước: 1366×768, 360×800 và 844×390.
   - Ảnh minh chứng: **248 ảnh PNG** lưu tại `docs/screenshots/p8*` và `docs/screenshots/*-tutorial/`.
   - Unit tests: **28 / 28 tests tutorial ĐẠT (100%)** qua 9 test files; Vitest tổng **2321 / 2321 tests passed**.
   - `pnpm check:text` sạch 438 files; `pnpm typecheck` 10 packages đạt; `pnpm build` toàn bộ 5 apps thành công.
@@ -59,7 +79,7 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 - Lần đầu chơi tự hiện; có nút "Bỏ qua" và mở lại qua "Hướng dẫn chơi". Bước thực hành chuyển tiếp khi học sinh thực hiện đúng thao tác được yêu cầu.
 - Lượt thử dùng dữ liệu riêng, không mất tim, không chạy đồng hồ lượt chính, không cộng điểm hoặc lưu hoàn thành màn; không làm thay đổi tiến độ thật.
 - Hướng dẫn phù hợp chuột/bàn phím hoặc cảm ứng; bật giảm chuyển động thì vùng làm nổi đứng yên. Mọi chữ nằm trong `packages/core/src/content/`.
-- Chưa triển khai. Là một bước riêng của mốc 4: dựng khung dùng chung rồi tích hợp lần lượt từng màn. Hướng dẫn phải khớp lối chơi cuối sau các thay đổi màn 2, 3 và 5; việc dời từ mốc 3 và hội làng vẫn để cuối mốc 4.
+- Đã triển khai đủ 12 màn theo báo cáo P8; chờ người dùng kiểm tổng thể. Hướng dẫn phải khớp lối chơi cuối sau các thay đổi màn 2, 3 và 5; việc dời từ mốc 3 và hội làng vẫn để cuối mốc 4.
 
 
 ## P1a — đã xác minh (28/10/2026)
@@ -501,6 +521,6 @@ Từ `docs/specs/` trong repo: 00, 01, 03, 04, 06, 07, 08, 10 (đều đã đư�
 
 ## Câu mở đầu cho cửa sổ tiếp theo
 
-```
-Tiếp tục mốc 4 (trau chuốt). Đọc CLAUDE.md, tự commit và tự push nhánh đang làm khi kiểm tra đạt (không force-push, không tự merge vào main). Đọc TRANG-THAI.md: P1a và P1b đã xong, không làm lại. Yêu cầu 10 là máy tính màn 4 – Làng Dệt, không phải Bài 4/màn 10 – Làng Bạc. Chờ lời giao việc tiếp theo. Các việc dời từ mốc 3 và hội làng để cuối mốc 4.
+```text
+Tiếp tục local bằng Claude Code. Đọc CLAUDE.md, TRANG-THAI.md mục bàn giao 01/11/2026 và spec liên quan. P8 đã triển khai đủ 12 màn, người dùng sẽ kiểm sau. Không làm lại P1–P8. Kiểm Git, giữ thay đổi có sẵn; xử lý HUD nhiệm vụ che biển, rà nội dung Màn 7 và lỗi chữ ×100 ở hướng dẫn Màn 10 Trung bình theo danh sách tồn. Tự commit/push khi kiểm đạt; không force-push, chưa merge main/deploy/migration production. Việc dời mốc 3 và hội làng để cuối mốc 4.
 ```

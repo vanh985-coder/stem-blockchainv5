@@ -471,3 +471,10 @@ Bot giỏi 100% Vàng (có assert). Bot trung bình chỉ in bảng tỉ lệ, K
   - hết tim vẫn xem được cao trào.
   - [x] **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng"). (đã làm ở bước HD: phần `man-12`, `climbHint.ts`; màn kết quả chỉ có "Chơi lại", "Về làng" và "Xem lại cảnh cuối" vì màn 11 chưa ra mắt.)
 - [ ] Sau cao trào: có đủ 4 Trang Sổ Vàng, chuyển sang hội làng.
+
+## Bổ sung mốc 4 và bàn giao Claude — 01/11/2026
+
+- P8 đã tích hợp Màn 10 đủ Dễ/TB/Khó (ghép số/dựng cây/điền cây), Màn 11 tráo lá và Màn 12 nhảy bám; xem spec P8. Người dùng chưa nghiệm thu tổng thể.
+- Mọi tầng cây dùng combine(a,b)=a×10+b theo lessons/bai-4/logic.ts; không đổi thành ×100 hoặc (a×3+b) mod100. Đây là mô hình ghép số, không phải hàm băm mật mã thật.
+- Ngày 01/11 đọc source thấy tutorial.ts::man10Tb.stepByStep ghi “Gốc = T12 × 100 + T34”. Đã ghi lỗi bàn giao, CHƯA sửa content trong lượt cập nhật tài liệu này. Claude cần sửa thành ×10 và kiểm hồi quy nội dung.
+- Giữ cây Khó 15 ô và vùng đặt tối thiểu 44px của P1a. Xem lại hướng dẫn phải bảo toàn cây/khay/lượt còn lại của ván thật.

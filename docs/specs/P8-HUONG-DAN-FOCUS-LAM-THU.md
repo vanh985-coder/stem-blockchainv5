@@ -1,6 +1,6 @@
 # Hướng dẫn Focus và Làm thử (P8)
 
-Tài liệu thiết kế cơ chế hướng dẫn focus và làm thử tương tác cho các màn chơi, triển khai mẫu tại **Màn 1 trạm Dễ (P8a)**.
+Tài liệu thiết kế cơ chế hướng dẫn focus và làm thử tương tác cho các màn chơi, đã triển khai cho **12 màn** theo báo cáo P8; đang chờ người dùng kiểm tổng thể (bàn giao Claude Code ngày 01/11/2026). Mục 2 giữ làm mẫu Màn 1 Dễ.
 
 ## 1. Mục tiêu và Nguyên tắc cốt lõi (P8)
 
@@ -11,11 +11,11 @@ Tài liệu thiết kế cơ chế hướng dẫn focus và làm thử tương t
   - Lượt làm thử sử dụng dữ liệu ví dụ cố định, tính toán bằng logic bài học thuần túy có sẵn.
   - Không tính điểm, không trừ tim, không tính giờ chơi, không cộng xu, sao hay Trang Sổ Vàng.
   - Không gọi API hay hàm lưu tiến độ (`record()`, `saveNow()`).
-  - Khi hoàn thành hoặc bỏ qua hướng dẫn, khởi tạo lại bài thật sạch 100%, dọn dẹp toàn bộ timer/listener/giá trị nhập tạm.
+  - Khi hoàn thành hoặc bỏ qua hướng dẫn đầu lượt, khởi tạo bài thật sạch; khi xem lại giữa ván phải bảo lưu và tiếp tục ván cũ, dọn dẹp toàn bộ timer/listener/giá trị nhập tạm.
 - **Bỏ qua & Xem lại:**
   - Có nút "Bỏ qua hướng dẫn" ở mọi bước.
   - Mở lại được bất kỳ lúc nào từ khu vực trợ giúp của màn (nút "Hướng dẫn" trên thanh header).
-  - Tự động hiển thị khi bắt đầu một lượt chơi mới ở Màn 1 trạm Dễ. Khi mở lại giữa bài, trạng thái bài đang làm dở được bảo lưu nguyên vẹn; đóng hướng dẫn thì quay lại đúng trạng thái đó.
+  - Hiển thị hướng dẫn đầu lượt ở các màn đã tích hợp. Khi mở lại giữa bài, trạng thái bài đang làm dở được bảo lưu nguyên vẹn; đóng hướng dẫn thì quay lại đúng trạng thái đó.
 - **Khả năng tiếp cận (Accessibility):**
   - Hỗ trợ chuột, bàn phím và cảm ứng. Focus trap giới hạn phím Tab trong vùng tương tác và tooltip, không nhảy ra nền tối.
   - Chống Enter kích hoạt đúp: nộp đáp án không đồng thời kích hoạt chuyển bước hay bắt đầu bài thật.
@@ -69,7 +69,33 @@ Tài liệu thiết kế cơ chế hướng dẫn focus và làm thử tương t
 
 ## 3. Kiến trúc cơ chế dùng chung (Shared Mechanism)
 
-- **Component:** `TutorialSpotlight` trong `@so-chung/core` (`packages/core/src/ui/tutorial/TutorialSpotlight.tsx`).
-- **Hook tính toán vị trí:** `useElementRect(targetSelector)` tự động cập nhật khi resize, scroll, hoặc DOM thay đổi.
-- **Định vị Tooltip:** Tự tính toán vị trí `top` hoặc `bottom` dựa trên khoảng trống màn hình thực tế, căn giữa theo target hoặc màn hình hẹp, đảm bảo cách viền màn hình tối thiểu 12px.
+- **Component:** `TutorialSpotlight` trong `@so-chung/core` (`packages/core/src/ui/TutorialSpotlight.tsx`).
+- **Vị trí:** render qua Portal vào body để tránh zoom của bài học; đo vùng mục tiêu và cập nhật khi cuộn, resize, visualViewport thay đổi. Không coi tên hook trong bản thiết kế cũ là API bắt buộc.
+- **Định vị Tooltip:** Tự tính toán vị trí `top`, `bottom`, `left` hoặc `right` dựa trên khoảng trống màn hình thực tế, căn giữa theo target hoặc màn hình hẹp, đảm bảo cách viền màn hình tối thiểu 12px.
 - **Focus Trap:** Bắt sự kiện phím Tab, giữ focus luân chuyển trong các phần tử tương tác cho phép của bước hiện tại.
+
+## 4. Phạm vi đã triển khai và điều kiện nghiệm thu (01/11/2026)
+
+| Màn | Phần hướng dẫn/làm thử theo báo cáo |
+|---|---|
+| 1 | Dễ/TB/Khó: tính mã, phát hiện và sửa chuỗi |
+| 2 | Điều khiển và nhảy thử |
+| 3 | Chọn thẻ, soi công thức, ghép thử |
+| 4 | Dễ/TB/Khó: so sổ, biểu quyết, tạo trang/đặt cọc |
+| 5 | Bốn làn, vùng đập, vung búa thử |
+| 6 | Điều khiển nâng diều |
+| 7 | Dễ/TB/Khó: ký, kiểm bằng khóa công khai, bài tập dò khóa |
+| 8 | Máy tính mod và lật cặp thẻ |
+| 9 | Nạp thuốc và bắn thử |
+| 10 | Dễ/TB/Khó: ghép số, dựng cây, điền cây |
+| 11 | Tráo cặp lá trên bàn cờ |
+| 12 | So mã hai nhánh và nhảy bám thử |
+
+- Danh sách trên ghi nhận triển khai, không thay thế nghiệm thu tương tác. Bước thực hành phải gắn với hành động hợp lệ và phản ứng cảnh tập; nút chỉ đặt cờ “đã thử” không đủ.
+- Khi vòng sau có cơ chế mới, cần hướng dẫn bổ sung ngắn; chưa có bằng chứng bao phủ riêng mọi vòng, phải rà khi nghiệm thu.
+- Không tự đổi bước khi đang gõ; sai → thử lại giữ dữ liệu để sửa; ô trống có thông báo; Enter nộp không đồng thời chuyển bước. Kiểm cả giữ phím và thả/nhấn lại.
+- Tooltip phải ở trong viewport, không chặn mục tiêu; thân cuộn khi thiếu chỗ, nút hành động tiếp cận được. Không chỉ kiểm tọa độ: phải bấm/nộp thật.
+- Làm thử không ghi tiến độ/phần thưởng. Xem lại dừng timer, vật lý, spawn và tác vụ ván thật; đóng thì tiếp tục đúng trạng thái, không reset hoặc nhân đôi listener.
+- Kiểm build local 1366×768, 360×800, 844×390; màn chỉ chơi ngang kiểm nhắc xoay và dừng khi dọc. Không coi giả lập là thiết bị thật.
+- Bằng chứng: xem TRANG-THAI.md và các báo cáo trong docs/screenshots/p8*, *-tutorial/. 325 assertions là tổng tích lũy, chưa phải một lượt trên mã cuối. Người dùng chưa nghiệm thu toàn bộ.
+- Lỗi nội dung cần sửa: man10Tb.stepByStep đang ghi ×100 trong source được đọc 01/11; quy tắc đúng vẫn là combine(a,b)=a×10+b. Màn 7 cần rà diễn đạt về tìm ngược khóa.

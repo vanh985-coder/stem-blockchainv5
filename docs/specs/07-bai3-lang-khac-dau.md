@@ -299,3 +299,9 @@ Dùng lại logic B10 nguyên vẹn (không sửa luật). File: `man09Lanes.ts`
   - [x] gà trùm có {phanDien} cưỡi.
   - [x] **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
 - [x] Xong màn 9: nhận Trang Sổ Vàng; cổng Làng Bạc mở (test `unlock.test.ts`).
+
+## Bổ sung mốc 4 và bàn giao Claude — 01/11/2026
+
+- P8 đã tích hợp Màn 7 đủ Dễ/TB/Khó, Màn 8 lật cặp và máy tính mod, Màn 9 nạp/bắn thuốc; xem spec P8 và TRANG-THAI.md về bằng chứng/giới hạn.
+- Ký bằng khóa riêng của mình, xác minh bằng khóa công khai người gửi. Bài tập tìm x với 5^x mod23 là mô hình thu nhỏ. Thử tuần tự là phương pháp minh họa, không khẳng định đó là phương pháp duy nhất hay suy ra thời gian bảo mật thực chỉ từ kích thước không gian khóa.
+- Rà các câu trái với nguyên tắc trên trong content và báo cáo là việc CÒN TỒN, chưa được đánh dấu sửa mã. Máy tính Màn 8 giữ hiển thị sẵn, kích thước dễ đọc; không quay lại bắt bấm mới mở.

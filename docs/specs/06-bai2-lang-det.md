@@ -434,3 +434,9 @@ Logic KHÔNG đổi ở B9 (chỉ đổi mốc `medals`, xem trên). `KiteGame` 
 - [x] Màn 6 (bước B9, đã kiểm trên trình duyệt): có câu hỏi ở 4 cổng làng; diều đen không chặn kín khe.
   - **luật chung (bước HD, spec 03 mục 3.8 và 6):** có phần hướng dẫn riêng mở từ thẻ bắt đầu; nút "?" (phím H) trong lúc chơi với `hintFor(state)` không lộ đáp án và tạm dừng thật; nút "Chơi tiếp" ở màn kết quả (hết màn trong làng thì "Về làng").
 - [ ] Xong màn 6: nhận Trang Sổ Vàng; cổng Làng Khắc Dấu mở.
+
+## Bổ sung mốc 4 và bàn giao Claude — 01/11/2026
+
+- Màn 4 đủ ba trạm focus/làm thử: Dễ đối chiếu trang (40,15→95), TB so hai sổ rồi biểu quyết, Khó tạo trang (25,18→68). Giữ bố cục đối chiếu trái–phải khi đủ rộng và máy tính tự nhập; không áp kết quả làm thử vào tim, cọc hay sổ thật.
+- Màn 5 đã thay đồ họa bằng 15 ảnh P7c: bản gốc assets/man5-2d/, ảnh mẫu assets/references/man5-whack-reference.png; bản nén qua manifest trong assets-build/man5-2d/. Bốn làn xanh/vàng/đỏ/lục, hero idle/hit, sprite chuột, khung gỗ, nền và sổ. Sân chơi dùng toàn viewport PC; không quay lại bố cục nửa trang cũ. Người dùng đã duyệt đồ họa.
+- Giữ vùng đập [6.5,9], cooldown 140ms, chuột to hai lần kích hoạt riêng và chuột câu hỏi; hướng dẫn P8 cho Màn 5 đập thử, Màn 6 nâng diều. Xem spec P8 cho bảo toàn ván đang dở.
