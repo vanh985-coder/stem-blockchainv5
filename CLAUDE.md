@@ -12,6 +12,10 @@ Tài liệu này là hướng dẫn quy tắc đầy đủ nhất cho AI code; `
 - `pnpm guide:capture` (chụp ảnh thật cho Hướng dẫn chơi vào `assets/ui/huong-dan`, rồi `pnpm assets:build`)
 - `pnpm dev:hub` (5173), `pnpm dev:lang-giay` (5174), `pnpm dev:lang-det` (5175), `pnpm dev:lang-khac-dau` (5176), `pnpm dev:lang-bac` (5177), `pnpm dev:assets` (5180)
 - `pnpm assets:build`: nén đồ họa vào `assets-build/` và tạo `manifest.json`. `pnpm rls:check`: kiểm RLS Supabase.
+- **CI** (`.github/workflows/ci.yml`): GitHub Actions chạy khi push mọi nhánh và khi mở pull request vào `main`, trên ubuntu-latest, Node 22, pnpm theo `packageManager`.
+  - Thứ tự: `pnpm install --frozen-lockfile` → `pnpm check:text` → `pnpm typecheck` → `pnpm test --maxWorkers=2` → `pnpm build` (`VITE_MERGED=true`, các `VITE_*` khác là giá trị giả đặt ngay trong workflow).
+  - Không dùng secrets; không chạy Puppeteer, `assets:build`, `rls:check` hay deploy. Lượt mới hủy lượt cũ cùng nhánh; tối đa 30 phút.
+  - Xem kết quả ở tab Actions của repo trên GitHub. CI đỏ do test thật thì sửa mã, không nới timeout hay bỏ test.
 
 ## 3. Cấu trúc
 - `apps/hub`: web chính; từ bước G1 (gộp web) hub import cả 4 `village-*` (`src/villageRoutes.tsx`, mỗi làng một phần mã tải lười dưới `/lang/<id>/*`) khi `VITE_MERGED=true` (mẫu `deploy/.env.example`): mọi chỗ chuyển màn dùng `navigate` (`openLevel`, `levelPath` ở `config/urls.ts`, `goToMap`, `goToHub`), KHÔNG dùng `window.location.assign` cho đường đi giữa các màn. Trang `/cho` là thế giới mở (chợ + 4 làng trong một cảnh, `packages/core/src/three/world/`). `apps/lang-*`: vỏ chạy riêng từng làng (vẫn dùng khi `VITE_MERGED=false`; ở bản deploy gộp, 4 subdomain làng chỉ chuyển hướng 302 về hub, xem `docs/DEPLOY.md` mục j), chỉ còn trang bài học và game (`/` và `/lang/<id>` chuyển sang `/cho?tu=<id>` ở hub).
