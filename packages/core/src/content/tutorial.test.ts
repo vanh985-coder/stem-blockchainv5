@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { tutorialTexts } from './tutorial';
 import { fmt } from './characters';
 import { pageCode, solutionSteps } from '../lessons/bai-1/logic';
+import { combine } from '../lessons/bai-4/logic';
 
 describe('tutorial.ts content and logic checks (P8a)', () => {
   it('đầy đủ các chuỗi dùng chung và Màn 1 Dễ, không để trống', () => {
@@ -99,5 +100,17 @@ describe('tutorial.ts content and logic checks (P8a)', () => {
     expect(wrongStr).toContain('24');
     expect(wrongStr).toContain('5');
     expect(wrongStr).toContain('29');
+  });
+
+  it('man10Tb.stepByStep: hệ số trong công thức gốc khớp combine() của Bài 4 (a × 10 + b)', () => {
+    const m = /Gốc = T12 × (\d+) \+ T34/.exec(tutorialTexts.man10Tb.stepByStep);
+    expect(m, 'công thức gốc trong hướng dẫn').not.toBeNull();
+    const k = Number(m![1]);
+    // Ví dụ lá 4, 2, 6, 1: T12 = 42, T34 = 61, gốc = 42 × 10 + 61 = 481.
+    const t12 = combine(4, 2);
+    const t34 = combine(6, 1);
+    expect(t12 * k + t34).toBe(combine(t12, t34));
+    expect(combine(t12, t34)).toBe(481);
+    expect(tutorialTexts.man10Tb.stepByStep).not.toContain('× 100');
   });
 });

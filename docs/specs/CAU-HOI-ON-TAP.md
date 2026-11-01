@@ -48,7 +48,7 @@ AI code chép toàn bộ vào `packages/core/src/content/questions.ts`.
 | B3-02 | Với công thức 5^x mod 23, khuôn riêng 3 cho ra mẫu công khai nào? | **10** / 15 / 8 / 125 | 5³ = 125, chia 23 dư 10. |
 | B3-03 | Một lá thư ghi "Từ cụ Bình", nhưng con dấu chỉ khớp mẫu công khai của Tí. Ai đã đóng dấu thư này? | **Tí** / Cụ Bình / Không biết được | Con dấu cho biết ai thật sự đã đóng. |
 | B3-04 | Kiểm tra thư bằng mẫu công khai nào mới đúng? | **Mẫu trên bảng chính thức của làng** / Mẫu do chính người gửi đính kèm / Mẫu nào cũng được | Kẻ mạo danh có thể đính kèm mẫu của chính nó. |
-| B3-05 | Từ mẫu công khai đoán ngược ra khuôn riêng, với số thật rất lớn, thì sao? | **Gần như không thể, lâu hơn cả tuổi vũ trụ** / Mất vài phút / Chỉ cần máy tính mạnh / Dễ như tính xuôi | Tính xuôi thì dễ, tính ngược thì cực khó. |
+| B3-05 | Từ mẫu công khai đoán ngược ra khuôn riêng, với số thật rất lớn, thì sao? | **Chưa có cách nào đủ nhanh; thử lần lượt thì lâu hơn cả tuổi vũ trụ** / Mất vài phút / Chỉ cần máy tính mạnh / Dễ như tính xuôi | Tính xuôi thì dễ. Thử tuần tự chỉ là cách minh họa; với số rất lớn, chưa có cách nào đủ nhanh để tìm ngược. |
 | B3-06 | Lỡ làm mất khuôn riêng thì ai lấy lại giúp được? | **Không ai cả** / Trưởng làng / Người làm ra sổ / Các làng khác | Mất khuôn riêng là mất hết. |
 
 ## Bài 4 — Cây Merkle (dùng cho thử thách cuối)
