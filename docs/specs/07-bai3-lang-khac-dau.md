@@ -271,7 +271,7 @@ Vẽ bằng code (không dùng three.js): trứng oval có bóng mềm, dấu kh
 
 ### Kích thước chunk
 
-Chunk `Man9` (tải lười khi vào màn 9), bản build hub `VITE_MERGED=true` ngày 01/11/2026: **34,91 kB (gzip 12,57 kB)**; bản vỏ riêng `apps/lang-khac-dau`: 34,76 kB (gzip 12,51 kB). Game cũ (three.js, Scene25D) không còn trong chunk này.
+Chunk `Man9` (tải lười khi vào màn 9), bản build hub `VITE_MERGED=true` ngày 01/11/2026: **35,07 kB (gzip 12,62 kB)** (đo sau khi gộp với màn 12 và bản đồ dịch chuyển); bản vỏ riêng `apps/lang-khac-dau`: 34,92 kB (gzip 12,56 kB). Game cũ (three.js, Scene25D) không còn trong chunk này.
 
 ## Kết thúc làng
 
