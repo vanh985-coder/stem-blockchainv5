@@ -663,7 +663,7 @@ export function WorldPage() {
         </div>
       )}
       {guide && <GuideDialog section={guide.section} onClose={closeGuide} />}
-      {bigMap && <BigMap geo={mapGeo} markers={bigMarkers} names={mapNames} player={mapPlayer} progress={mapProgress} quest={questText} touch={touch} reducedMotion={settings.reducedMotion} onClose={closeMap} />}
+      {bigMap && <BigMap geo={mapGeo} markers={bigMarkers} names={mapNames} player={mapPlayer} progress={mapProgress} quest={questText} touch={touch} reducedMotion={settings.reducedMotion} onClose={closeMap} api={api} />}
 
       <WalkLockOverlay session={session} hideMenu />
       <MarketMenu session={session} onGuide={() => openGuide()} extraItems={menuKnow} />

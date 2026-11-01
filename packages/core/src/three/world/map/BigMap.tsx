@@ -10,7 +10,7 @@ import type { MapMarker } from './mapMarkers';
 import type { VillageProgress } from './mapProgress';
 import { WORLD_BOUNDS } from '../worldFrames';
 import { destinationName, isTeleportMarker, teleportTarget, type TeleportTargetInput } from '../teleport';
-import { getActiveWalkApi, type WalkApi } from '../../walkApi';
+import type { WalkApi } from '../../walkApi';
 
 /** Ký hiệu mẫu cho phần chú thích. */
 const SAMPLES: { key: keyof typeof banDoNho.chuThich; marker: MapMarker | null }[] = [
@@ -63,12 +63,21 @@ export function BigMap({ geo, markers, names, player, progress, quest, touch, re
   pendingRef.current = pendingTarget;
 
   const [fading, setFading] = useState(false);
+  const fadingRef = useRef(false); // đã bấm "Đi tới": bỏ qua bấm đúp, Esc và M cho tới khi dịch chuyển xong
   const [fadedIn, setFadedIn] = useState(false);
 
-  const walkApi = api ?? getActiveWalkApi() ?? (typeof window !== 'undefined' ? (window as unknown as { __walkApi?: WalkApi }).__walkApi ?? null : null);
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (fadingRef.current) {
+        if (e.code === 'Escape' || e.code === 'KeyM') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
       if (e.code === 'Escape') {
         e.preventDefault();
         e.stopPropagation();
@@ -90,9 +99,11 @@ export function BigMap({ geo, markers, names, player, progress, quest, touch, re
   }, []);
 
   const handleConfirmTeleport = (dest: TeleportTargetInput) => {
+    if (fadingRef.current) return;
+    fadingRef.current = true;
     const target = teleportTarget(dest);
     if (reducedMotion) {
-      walkApi?.teleport(target.x, target.z, target.yaw);
+      api?.teleport(target.x, target.z, target.yaw);
       closeRef.current();
       return;
     }
@@ -100,8 +111,8 @@ export function BigMap({ geo, markers, names, player, progress, quest, touch, re
     requestAnimationFrame(() => {
       setFadedIn(true);
     });
-    setTimeout(() => {
-      walkApi?.teleport(target.x, target.z, target.yaw);
+    timer.current = setTimeout(() => {
+      api?.teleport(target.x, target.z, target.yaw);
       closeRef.current();
     }, 300);
   };
@@ -274,7 +285,7 @@ export function BigMap({ geo, markers, names, player, progress, quest, touch, re
       {fading && (
         <div
           data-testid="fade-overlay"
-          className={`fixed inset-0 z-[100] bg-black pointer-events-none transition-opacity duration-300 ${fadedIn ? 'opacity-100' : 'opacity-0'}`}
+          className={`fixed inset-0 z-[100] bg-black transition-opacity duration-300 ${fadedIn ? 'opacity-100' : 'opacity-0'}`}
         />
       )}
     </>
