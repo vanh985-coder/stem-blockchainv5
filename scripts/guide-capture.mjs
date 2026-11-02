@@ -193,25 +193,17 @@ async function runnerShots(browser) {
 }
 
 async function rebuildShots(browser) {
-  // Ảnh màn 3 chụp ở vòng 2 (đoạn giữ sổ đã bỏ, xem spec 05): nhảy thẳng tới vòng 2 bằng cách đặt trạng thái 'vòng 1 xong' (cầu nối window.__rebuild có ở bản dev) rồi bấm 'Vòng tiếp theo'.
+  // Ảnh màn 3 chụp ở vòng 1 (đoạn giữ sổ đã bỏ, xem spec 05).
   const page = await newPage(browser, 'oneGolden');
   await page.goto(`${LANG}/lang/lang-giay/man/3?q=high`, { waitUntil: 'load' });
   await sleep(1500);
   await page.evaluate(() => [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Bắt đầu')?.click());
   await page.waitForFunction(() => window.__rebuild &&document.querySelector('[data-testid=man3-khung]'), { timeout: 120000 });
+  await page.waitForFunction(() => document.querySelector('[data-testid=the-khay]'), { timeout: 120000 });
   await sleep(2500);
-  await page.evaluate(() => {
-    const s = window.__rebuild;
-    s.round = 0;
-    s.phase = 'roundDone';
-    s.parts.push({ round: 0, errors: 0, fakeBinned: false, points: 100 });
-    document.querySelector('[data-testid=nut-soi]')?.click(); // vẽ lại để hiện bảng 'Vòng 1 xong'
-  });
-  await sleep(500);
-  await page.evaluate(() => document.querySelector('[data-testid=nut-tiep]')?.click());
-  await page.evaluate(() => document.querySelector('[data-testid=nut-soi]')?.click()); // đóng lại ô soi công thức đã bật ở trên
-  await page.waitForFunction(() => window.__rebuild?.phase === 'play' && window.__rebuild.round === 1, { timeout: 10000 });
-  await sleep(500);
+  // Đóng hướng dẫn làm thử (P8) nếu đang mở rồi chụp bàn ghép vòng 1: có chuỗi, khay thẻ và rổ trang giả
+  await page.evaluate(() => [...document.querySelectorAll('[data-testid=tutorial-tooltip] button')].find((x) => x.textContent.trim().startsWith('Bỏ qua'))?.click());
+  await sleep(1200);
   await save(page, 'man-3-ban');
   await page.browserContext().close();
 }

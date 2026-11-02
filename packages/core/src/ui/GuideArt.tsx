@@ -818,16 +818,18 @@ const ARTS: Record<GuideArtId, () => ReactNode> = {
   'trum-hoi': () => (
     <g>
       <Courtyard />
-      <circle cx={160} cy={74} r={16} fill="#8a5a36" stroke={C.ink} strokeWidth={2.5} />
-      <rect x={150} y={88} width={20} height={30} rx={7} fill="#6b4a2f" />
-      <path d="M154 54 q6 -12 12 0" fill="none" stroke={C.ink} strokeWidth={3} strokeLinecap="round" />
-      <rect x={200} y={26} width={104} height={74} rx={10} fill="#fffaf0" stroke={C.wood} strokeWidth={3.5} />
-      <rect x={210} y={36} width={84} height={9} rx={4} fill={C.wood} opacity={0.55} />
-      <rect x={210} y={52} width={36} height={14} rx={5} fill="#cfe2a6" stroke={C.green} strokeWidth={2} />
-      <rect x={252} y={52} width={36} height={14} rx={5} fill="#f4e3b2" stroke={C.wood} strokeWidth={2} />
-      <rect x={210} y={72} width={36} height={14} rx={5} fill="#f4e3b2" stroke={C.wood} strokeWidth={2} />
-      <rect x={252} y={72} width={36} height={14} rx={5} fill="#f4e3b2" stroke={C.wood} strokeWidth={2} />
-      <path d="M215 59 l5 5 l10 -11" fill="none" stroke={C.green} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={160} cy={134} r={14} fill="#8a5a36" stroke={C.ink} strokeWidth={2.5} />
+      <rect x={151} y={146} width={18} height={24} rx={6} fill="#6b4a2f" />
+      <path d="M154 120 q6 -10 12 0" fill="none" stroke={C.ink} strokeWidth={3} strokeLinecap="round" />
+      {[0, 1, 2, 3].map((i) => (
+        <g key={i} transform={`translate(${70 + i * 60} 52)`}>
+          <circle r={19} fill={C.gold} stroke={C.wood} strokeWidth={3} />
+          {Array.from({ length: i + 1 }, (_, k) => (
+            <circle key={k} cx={(k - i / 2) * 8} cy={0} r={2.6} fill={C.ink} />
+          ))}
+        </g>
+      ))}
+      <Arrow x1={160} y1={112} x2={190} y2={78} width={4} />
     </g>
   ),
   'bon-trang': () => (
