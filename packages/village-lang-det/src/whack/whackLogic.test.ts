@@ -281,13 +281,13 @@ describe('bảng test của spec 06 (màn 5)', () => {
     }
   });
 
-  it('thời gian chạy của chuột đáp án: 18 giây cho lần 1–5, 14 giây cho lần 6–10', () => {
-    expect([0, 1, 2, 3, 4].map(bossSeconds)).toEqual([18, 18, 18, 18, 18]);
-    expect([5, 6, 7, 8, 9].map(bossSeconds)).toEqual([14, 14, 14, 14, 14]);
+  it('thời gian chạy của chuột đáp án: 11 giây cho lần 1–5, 9 giây cho lần 6–10', () => {
+    expect([0, 1, 2, 3, 4].map(bossSeconds)).toEqual([11, 11, 11, 11, 11]);
+    expect([5, 6, 7, 8, 9].map(bossSeconds)).toEqual([9, 9, 9, 9, 9]);
     const s = quiet();
     const ev = callBoss(s);
     const start = ev.find((e) => e.type === 'bossStart');
-    expect(start && start.type === 'bossStart' && start.boss.answerSeconds).toBe(18);
+    expect(start && start.type === 'bossStart' && start.boss.answerSeconds).toBe(11);
   });
 
   it('sinh chuột: không sinh vào làn có con còn trong 15% đầu làn (vị trí < 1,5)', () => {

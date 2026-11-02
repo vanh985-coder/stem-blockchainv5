@@ -450,6 +450,8 @@ function stepFree(s: ClimbState, h: number, out: ClimbEvent[]): void {
 
 function stepCrack(s: ClimbState, h: number, out: ClimbEvent[]): void {
   s.crackLeft -= h;
+  // `crack` của bậc nứt là số giây còn lại (cảnh mờ dần theo nó): giảm cùng đồng hồ nứt, về 0 thì bậc biến mất
+  for (const c of s.choices) if (c.crack !== null) c.crack = Math.max(0, s.crackLeft);
   if (s.crackLeft > 0) return;
   const ci = s.choices.findIndex((c) => c.crack !== null);
   out.push({ kind: 'vanish', choice: ci });

@@ -112,7 +112,7 @@ export function BubbleGame({ paused, attempt, onFinish, setHint }: MiniGameRende
 
   const wrapEl = useRef<HTMLDivElement | null>(null);
   const canvasEl = useRef<HTMLCanvasElement | null>(null);
-  const geo = useRef<{ cw: number; ch: number; dpr: number; fit: Fit }>({ cw: 0, ch: 0, dpr: 1, fit: { scale: 1, ox: 0, oy: 0, w: 1, h: 1 } });
+  const geo = useRef<{ el: HTMLCanvasElement | null; cw: number; ch: number; dpr: number; fit: Fit }>({ el: null, cw: 0, ch: 0, dpr: 1, fit: { scale: 1, ox: 0, oy: 0, w: 1, h: 1 } });
   const imagesRef = useRef(images);
   imagesRef.current = images;
   const down = useRef(false);
@@ -185,11 +185,13 @@ export function BubbleGame({ paused, attempt, onFinish, setHint }: MiniGameRende
       const cw = Math.max(1, Math.round(rect.width));
       const ch = Math.max(1, Math.round(rect.height));
       const g = geo.current;
-      if (g.cw === cw && g.ch === ch && g.dpr === dpr) return;
+      // Cùng cỡ vẫn phải đặt lại khi canvas là phần tử MỚI (bàn bị gỡ ở bước nạp rồi dựng lại): canvas mới mặc định 300×150, không được bỏ qua
+      if (g.el === canvas && g.cw === cw && g.ch === ch && g.dpr === dpr) return;
       canvas.width = Math.round(cw * dpr);
       canvas.height = Math.round(ch * dpr);
       canvas.style.width = `${cw}px`;
       canvas.style.height = `${ch}px`;
+      g.el = canvas;
       g.cw = cw;
       g.ch = ch;
       g.dpr = dpr;

@@ -443,3 +443,86 @@ describe('cây mẫu của phần hướng dẫn', () => {
     expect(s.rootRevealed).toBe(true);
   });
 });
+
+describe('hồi quy: nhảy sai rồi nhảy đúng (mọi vòng)', () => {
+  /** Vòng `round` của ván seed 5: tới vòng đó bằng cách leo đúng các vòng trước (bậc đứng yên ở vòng 1, trượt ở vòng 2, 3 nên ép về đứng yên để dựng đúng x). */
+  function atRound(round: number): ClimbState {
+    const s = createClimbGame(5);
+    for (let r = 0; r < round; r++) {
+      s.tree = s.tree;
+      while (s.phase === 'playing') {
+        const ci = s.choices.findIndex((c) => c.correct);
+        s.slideClock = 0;
+        jumpOnto(s, ci);
+      }
+      expect(s.phase).toBe('roundDone');
+      advanceRound(s);
+    }
+    expect(s.round).toBe(round);
+    return s;
+  }
+  const wrongThenUp = (s: ClimbState, wrongs: number): void => {
+    for (let k = 0; k < wrongs; k++) {
+      s.slideClock = 0;
+      const wi = s.choices.findIndex((c) => !c.correct);
+      const ev = kinds(jumpOnto(s, wi));
+      expect(ev).toContain('wrong');
+      expect(ev).toContain('retry');
+      expect(s.mode).toBe('free');
+      expect(s.choices.every((c) => c.crack === null)).toBe(true);
+      expect(s.level).toBe(0);
+    }
+    const level = s.level;
+    s.slideClock = 0;
+    const ci = s.choices.findIndex((c) => c.correct);
+    const ev = kinds(jumpOnto(s, ci));
+    expect(ev).toContain('up');
+    expect(ev).not.toContain('wrong');
+    expect(s.level).toBe(level + 1);
+  };
+
+  for (const round of [0, 1, 2]) {
+    it(`vòng ${round + 1}: sai 1 lần rồi nhảy đúng thì lên tầng`, () => wrongThenUp(atRound(round), 1));
+    it(`vòng ${round + 1}: sai 2 lần rồi nhảy đúng thì lên tầng`, () => wrongThenUp(atRound(round), 2));
+    it(`vòng ${round + 1}: sai ở mọi tầng, mỗi tầng sau đó nhảy đúng đều lên được tới gốc`, () => {
+      const s = atRound(round);
+      let guard = 0;
+      while (s.phase === 'playing' && s.hearts > 0 && guard++ < 40) {
+        const before = s.level;
+        s.slideClock = 0;
+        const wi = s.choices.findIndex((c) => !c.correct);
+        if (s.hearts > 1 && wi >= 0) jumpOnto(s, wi);
+        s.slideClock = 0;
+        const ev = kinds(jumpOnto(s, s.choices.findIndex((c) => c.correct)));
+        expect(ev).toContain('up');
+        expect(s.level).toBe(before + 1);
+      }
+      expect(['roundDone', 'won']).toContain(s.phase);
+    });
+  }
+});
+
+describe('bậc nứt mờ dần theo đồng hồ nứt', () => {
+  it('crack của bậc sai giảm từ crackSeconds về 0 cùng crackLeft, rồi bậc biến mất và rơi', () => {
+    const s = createClimbGame(5);
+    jumpOnto(s, s.choices.findIndex((c) => !c.correct));
+    // jumpOnto chạy 2,6 giây: đã nứt, biến mất, rơi và làm lại tầng. Làm lại từ đầu để quan sát giữa chừng.
+    const t = createClimbGame(5);
+    const wi = t.choices.findIndex((c) => !c.correct);
+    t.player.x = choiceX(t, t.choices[wi]);
+    t.player.on = 0;
+    expect(jump(t)).toBe(true);
+    let guard = 0;
+    while (t.mode !== 'crack' && guard++ < 600) stepClimb(t, 1 / 120);
+    expect(t.mode).toBe('crack');
+    const bad = t.choices[wi];
+    expect(bad.crack).toBeCloseTo(CLIMB_SPEC.crackSeconds, 5);
+    run(t, 0.2);
+    expect(bad.crack).toBeGreaterThan(0);
+    expect(bad.crack).toBeLessThan(CLIMB_SPEC.crackSeconds);
+    expect(bad.crack).toBeCloseTo(t.crackLeft, 5);
+    run(t, 0.25);
+    expect(['fall', 'free']).toContain(t.mode);
+    if (t.mode === 'fall') expect(bad.crack).toBe(0);
+  });
+});

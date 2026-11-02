@@ -9,7 +9,9 @@ import { mkdirSync, statSync, writeFileSync } from 'node:fs';
 
 const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const BASE = process.env.URL || 'http://localhost:5273';
-const OUT = 'docs/screenshots/man9-bubble';
+const OUT = process.env.M9_OUT || 'docs/screenshots/man9-bubble';
+/** M9_ONLY=geo: chỉ chạy phần hình học bàn (nhanh) */
+const ONLY_GEO = process.env.M9_ONLY === 'geo';
 mkdirSync(OUT, { recursive: true });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -75,9 +77,17 @@ class Ctx {
   }
 }
 
-async function open(browser, size, { skipTutorial = true } = {}) {
+async function open(browser, size, { skipTutorial = true, dsf = 1, delayImagesMs = 0 } = {}) {
   const page = await browser.newPage();
-  await page.setViewport({ width: size.w, height: size.h, hasTouch: size.touch, isMobile: size.touch, deviceScaleFactor: 1 });
+  await page.setViewport({ width: size.w, height: size.h, hasTouch: size.touch, isMobile: size.touch, deviceScaleFactor: dsf });
+  if (delayImagesMs > 0) {
+    // Ảnh của màn (cổng đồ họa 5180) về chậm: bàn phải vẽ đúng cỡ trước khi ảnh tới
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+      if (/:5180\//.test(req.url()) && /\.(webp|png|jpg)/.test(req.url())) setTimeout(() => req.continue().catch(() => {}), delayImagesMs);
+      else req.continue().catch(() => {});
+    });
+  }
   page.on('pageerror', (e) => console.log('   pageerror:', e.message));
   await page.goto(BASE, { waitUntil: 'domcontentloaded' });
   await page.evaluate((c) => {
@@ -437,6 +447,124 @@ async function tutorialRun(browser, size) {
   await page.close();
 }
 
+
+/** Hình học bàn trứng: canvas phủ đúng cột giữa, khung bao trọn bàn, không panel nào bị canvas che. */
+async function boardGeometry(ctx, label) {
+  const tag = ctx.tag;
+  const g = await ctx.eval(() => {
+    const wrap = document.querySelector('[data-testid="man9-khung"]');
+    const cv = document.querySelector('[data-testid="ban-trung"]');
+    if (!wrap || !cv) return null;
+    const w = wrap.getBoundingClientRect();
+    const c = cv.getBoundingClientRect();
+    const fit = window.__bubbleUi?.fit;
+    const dpr = Math.min(2.5, Math.max(1, window.devicePixelRatio || 1));
+    // panel không bị che: tâm mỗi mục khóa riêng và mỗi nút loại trứng phải trúng chính nó, không phải canvas
+    const probe = Array.from(document.querySelectorAll('[data-testid="khoa-muc"], [data-testid="nut-loai"], [data-testid="khay-loai"] button')).map((e) => {
+      const r = e.getBoundingClientRect();
+      if (r.width === 0) return true;
+      const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return !!top && (e === top || e.contains(top));
+    });
+    const heading = Array.from(document.querySelectorAll('h2, h3, p')).find((e) => /Khóa riêng/.test(e.textContent || '') && e.getBoundingClientRect().width > 0 && !e.classList.contains('sr-only'));
+    let headingOk = true;
+    if (heading) {
+      const r = heading.getBoundingClientRect();
+      const top = document.elementFromPoint(r.left + Math.min(8, r.width / 2), r.top + r.height / 2);
+      headingOk = !!top && (heading === top || heading.contains(top));
+    }
+    return {
+      wrap: { x: w.x, y: w.y, w: w.width, h: w.height },
+      canvas: { x: c.x, y: c.y, w: c.width, h: c.height, bw: cv.width, bh: cv.height },
+      expected: { bw: Math.round(Math.max(1, Math.round(w.width)) * dpr), bh: Math.round(Math.max(1, Math.round(w.height)) * dpr) },
+      fit: fit ? { ox: fit.ox, oy: fit.oy, w: fit.w, h: fit.h } : null,
+      allProbed: probe.length > 0 && probe.every(Boolean),
+      headingOk,
+      scrollX: document.documentElement.scrollWidth <= innerWidth + 1,
+    };
+  });
+  if (!g) {
+    check(tag, label + ': có canvas bàn trứng', false);
+    return;
+  }
+  const near = (a, b) => Math.abs(a - b) <= 1.5;
+  const sameBox = near(g.canvas.x, g.wrap.x) && near(g.canvas.y, g.wrap.y) && near(g.canvas.w, g.wrap.w) && near(g.canvas.h, g.wrap.h);
+  check(tag, label + ': canvas phủ đúng cột giữa (không còn 300×150 mặc định)', sameBox, JSON.stringify({ wrap: g.wrap, canvas: g.canvas }));
+  check(tag, label + ': bộ đệm canvas khớp cỡ cột × tỉ lệ điểm ảnh', Math.abs(g.canvas.bw - g.expected.bw) <= 1 && Math.abs(g.canvas.bh - g.expected.bh) <= 1, JSON.stringify({ bw: g.canvas.bw, bh: g.canvas.bh, expected: g.expected }));
+  const f = g.fit;
+  check(tag, label + ': khung bao trọn bàn trong canvas', !!f && f.ox >= -0.5 && f.oy >= -0.5 && f.ox + f.w <= g.canvas.w + 0.5 && f.oy + f.h <= g.canvas.h + 0.5, JSON.stringify(f));
+  check(tag, label + ': không panel nào bị canvas che (mục khóa, nút loại trứng, tiêu đề "Khóa riêng")', g.allProbed && g.headingOk, JSON.stringify({ probed: g.allProbed, heading: g.headingOk }));
+  check(tag, label + ': không cuộn ngang', g.scrollX);
+}
+
+/** Chạy tới khi bàn trứng hiện: qua hướng dẫn làm thử (canvas dựng lại khi sang ván thật) hoặc bỏ qua, rồi nạp đúng và bắt đầu đợt. */
+async function reachPlay(ctx, { viaTutorial }) {
+  const page = ctx.page;
+  if (viaTutorial) {
+    await page.waitForSelector('[data-testid="tutorial-tooltip"]', { timeout: 15000 });
+    const clickTooltip = async (re) => {
+      const b = await page.evaluateHandle((src) => Array.from(document.querySelectorAll('[data-testid="tutorial-tooltip"] button')).find((x) => new RegExp(src).test(x.textContent || '')) || null, re);
+      if (!b.asElement()) throw new Error('Không thấy nút ' + re);
+      await ctx.tap(b.asElement());
+      await sleep(350);
+    };
+    await setupPage(ctx);
+    await clickTooltip('Bắt đầu làm thử');
+    const keys = await ctx.eval(() => Array.from(document.querySelectorAll('[data-testid="khoa-muc"]')).map((e) => Number(e.getAttribute('data-key'))));
+    await ctx.tap(await page.$('[data-testid="trung-khay"][data-value="' + pub(keys[0]) + '"]'));
+    await sleep(500);
+    await clickTooltip('Tiếp tục');
+    await page.waitForSelector('[data-testid="nut-loai"]', { timeout: 5000 });
+    await ctx.tap(await page.$('[data-testid="nut-loai"][data-index="0"]'));
+    await sleep(400);
+    await clickTooltip('Tiếp tục');
+    await clickTooltip('Thử tính ngay');
+    await ctx.tap(await page.waitForSelector('[data-testid="nut-ban-thu"]'));
+    await sleep(1400);
+    await clickTooltip('Bắt đầu chơi thật');
+    await sleep(500);
+  }
+  await loadRound(ctx);
+  await ctx.click('[data-testid="nut-bat-dau"]');
+  await page.waitForSelector('[data-testid="ban-trung"]', { timeout: 8000 });
+  await sleep(900);
+}
+
+const GEO_CASES = [
+  { w: 1536, h: 730, dsf: 0.8 },
+  { w: 1536, h: 730, dsf: 0.9 },
+  { w: 1536, h: 730, dsf: 1.1 },
+  { w: 1536, h: 730, dsf: 1.25 },
+  { w: 1536, h: 730, dsf: 1.5 },
+  { w: 1280, h: 650, dsf: 1 },
+  { w: 1280, h: 650, dsf: 1.25 },
+];
+
+async function geometryRun(browser) {
+  for (const gc of GEO_CASES) {
+    for (const mode of ['qua-huong-dan', 'bo-qua', 'anh-cham']) {
+      const size = { w: gc.w, h: gc.h, touch: false, name: gc.w + 'x' + gc.h + '@' + gc.dsf + '-' + mode };
+      const ctx = await open(browser, size, { skipTutorial: mode !== 'qua-huong-dan', dsf: gc.dsf, delayImagesMs: mode === 'anh-cham' ? 2000 : 0 });
+      try {
+        await reachPlay(ctx, { viaTutorial: mode === 'qua-huong-dan' });
+        await boardGeometry(ctx, 'vừa vào đợt');
+        if (mode === 'qua-huong-dan') await shot(ctx.page, size.name, 'ban-trung');
+        // đổi cỡ cửa sổ giữa ván: canvas phải theo cột giữa mới
+        const other = gc.w === 1536 ? { width: 1280, height: 650 } : { width: 1536, height: 730 };
+        await ctx.page.setViewport({ ...other, deviceScaleFactor: gc.dsf });
+        await sleep(700);
+        await boardGeometry(ctx, 'đổi cỡ cửa sổ giữa ván -> ' + other.width + 'x' + other.height);
+        await ctx.page.setViewport({ width: gc.w, height: gc.h, deviceScaleFactor: gc.dsf });
+        await sleep(700);
+        await boardGeometry(ctx, 'đổi lại cỡ ban đầu');
+      } catch (e) {
+        check(size.name, 'chạy hết không lỗi', false, String(e?.message || e).slice(0, 160));
+      }
+      await ctx.page.close();
+    }
+  }
+}
+
 async function autoCompleteRun(browser, size) {
   const tag = `${size.name}-tu-hoan-thanh`;
   const page = await browser.newPage();
@@ -471,16 +599,18 @@ const SIZES = [
 
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new', args: ['--no-sandbox', '--disable-gpu-vsync'] });
 try {
-  for (const size of SIZES) {
+  for (const size of ONLY_GEO ? [] : SIZES) {
     console.log(`\n=== ${size.name} (${size.touch ? 'chạm giả lập' : 'chuột'}) ===`);
     const ctx = await open(browser, size);
     await playScenarios(ctx);
     await ctx.page.close();
   }
   console.log('\n=== Hướng dẫn làm thử (P8) ===');
-  await tutorialRun(browser, SIZES[0]);
+  if (!ONLY_GEO) await tutorialRun(browser, SIZES[0]);
+  console.log('\n=== Hình học bàn trứng: zoom, cỡ cửa sổ, ảnh chậm (lỗi bàn lệch) ===');
+  await geometryRun(browser);
   console.log('\n=== Tự hoàn thành ===');
-  await autoCompleteRun(browser, SIZES[0]);
+  if (!ONLY_GEO) await autoCompleteRun(browser, SIZES[0]);
 } catch (e) {
   check('script', 'chạy hết không lỗi', false, String(e?.stack || e).split('\n').slice(0, 3).join(' | '));
 } finally {
