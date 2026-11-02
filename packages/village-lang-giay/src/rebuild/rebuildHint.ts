@@ -7,7 +7,7 @@ import type { RebuildState } from './rebuildLogic';
 
 export type RebuildHintKey = NhacKey<3>;
 
-export function hintFor(s: Pick<RebuildState, 'phase' | 'deal' | 'chain' | 'fakeBinned' | 'keep'>): readonly RebuildHintKey[] {
+export function hintFor(s: Pick<RebuildState, 'phase' | 'deal' | 'chain' | 'fakeBinned'>): readonly RebuildHintKey[] {
   switch (s.phase) {
     case 'over':
       return ['hetVan'];
@@ -15,9 +15,6 @@ export function hintFor(s: Pick<RebuildState, 'phase' | 'deal' | 'chain' | 'fake
       return ['xongVong'];
     case 'villain':
       return ['nhetTrang'];
-    case 'keep':
-      if (!s.keep || !s.keep.running) return ['giuSoChuaChay'];
-      return [s.keep.slots.some((c) => c === null) ? 'oTrong' : 'giuSo'];
     default:
       if (s.deal.fake && !s.fakeBinned) return ['coTrangGia'];
       return [s.chain.length === 0 ? 'batDau' : 'ghep'];

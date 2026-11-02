@@ -589,19 +589,6 @@ const ARTS: Record<GuideArtId, () => ReactNode> = {
       <path d="M103 30 l6 6 l11 -12" fill="none" stroke="#fff" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
     </g>
   ),
-  'ro-trang': () => (
-    <g>
-      <rect x={0} y={0} width={ART_W} height={ART_H} fill="#efe0bd" />
-      <Card x={60} y={92} />
-      <g transform="translate(120 56)">
-        <Card x={0} y={0} rot={-8} color="#fde2dd" stroke={C.red} lift />
-      </g>
-      <path d="M170 44 Q210 52 224 96" fill="none" stroke={C.purple} strokeWidth={4} strokeLinecap="round" strokeDasharray="7 6" />
-      <polygon points="228,106 216,90 232,90" fill={C.purple} />
-      <path d="M200 110 L292 110 L278 168 L214 168 Z" fill="#c99a5b" stroke={C.wood} strokeWidth={3.5} strokeLinejoin="round" />
-      <path d="M205 128 H287 M209 146 H283 M232 112 L226 166 M258 112 L258 166 M280 112 L286 166" stroke={C.wood} strokeWidth={2.5} fill="none" />
-    </g>
-  ),
   sao: () => (
     <g>
       <rect x={0} y={0} width={ART_W} height={ART_H} fill="#fbf1d6" />

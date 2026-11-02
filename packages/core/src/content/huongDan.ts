@@ -39,7 +39,6 @@ export const GUIDE_ART_IDS = [
   'nhay-truot-vuot',
   'keo-the',
   'soi-the',
-  'ro-trang',
   'sao',
   'bong-den',
   'bon-trang',
