@@ -139,8 +139,8 @@ export const HUONG_DAN_GAME = {
       'Cứ 12 giây có một chuột vàng ❓ chạy lên. Đập trúng nó thì câu hỏi hiện ra và 4 chuột vàng mang nhãn A, B, C, D chạy lên: đập chuột mang đáp án đúng để được thêm điểm và xoá 2 vết mực; đập sai hoặc để chuột đúng chạy tới sổ thì thêm một vết mực.',
     ],
     dieuKhien: {
-      mayTinh: 'Phím D F J K (hoặc 1 2 3 4) hoặc bấm chuột vào làn để đập · bấm chuột vào đồng tiền để nhặt',
-      dienThoai: 'Chạm vào làn để đập · chạm vào đồng tiền để nhặt',
+      mayTinh: 'Phím D F J K (hoặc 1 2 3 4) hoặc bấm chuột vào làn để đập · bấm chuột vào đồng tiền để nhặt · Space (hoặc nút "Đọc xong") khi đã đọc xong câu hỏi',
+      dienThoai: 'Chạm vào làn để đập · chạm vào đồng tiền để nhặt · bấm nút "Đọc xong" khi đã đọc xong câu hỏi',
     },
     trang: [
       {
@@ -169,7 +169,7 @@ export const HUONG_DAN_GAME = {
       dongTien: 'Có đồng tiền trên sân: chạm vào nó trước khi biến mất để được thêm điểm.',
       soSapDay: 'Sổ sắp đầy mực! Ưu tiên chuột gần sổ nhất.',
       trumChay: 'Chuột vàng ❓ đang chạy lên! Đập nó khi vào vệt sáng để mở câu hỏi.',
-      trumHoi: 'Đọc câu hỏi rồi đập chuột vàng mang đáp án em chọn: đúng thì xoá 2 vết mực.',
+      trumHoi: 'Đọc câu hỏi rồi đập chuột vàng mang đáp án em chọn: đúng thì xoá 2 vết mực. Đọc xong thì bấm "Đọc xong" (hoặc Space) cho chuột chạy nhanh tới vùng đập.',
       ketQua: 'Đọc lời giải thích rồi bấm "Chơi tiếp".',
       hetVan: 'Ván này đã kết thúc.',
     },

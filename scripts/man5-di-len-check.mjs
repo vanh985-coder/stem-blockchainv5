@@ -245,6 +245,26 @@ async function playViewport(browser, vp) {
   check(`${tag} bấm vào đáp án trong cột không chọn được`, (await stat(page)).phase === 'answer');
   await shot(page, `${vp.name}-2-luot-dap-an`);
 
+  // nút "Đọc xong": chuột chạy nhanh ×3 tới đầu vùng đập rồi về tốc độ thường
+  const rd = await rectOf(page, '[data-testid="doc-xong"]');
+  check(`${tag} có nút "Đọc xong" trong cột câu hỏi`, !!rd && rd.width > 20);
+  const dx0 = await page.evaluate(() => ({ pos: window.__whack.answer.mice[0].pos, speed: window.__whack.answer.speed, score: window.__whack.score }));
+  await tapAt(page, vp, rd.left + rd.width / 2, rd.top + rd.height / 2);
+  await page.waitForFunction(() => window.__whack.answer.boost === true, { timeout: 2000 }).catch(() => {});
+  const t0 = Date.now();
+  await sleep(400);
+  const dx1 = await page.evaluate(() => ({ pos: window.__whack.answer.mice[0].pos, boost: window.__whack.answer.boost }));
+  const rate = (dx1.pos - dx0.pos) / ((Date.now() - t0 + 20) / 1000);
+  check(`${tag} "Đọc xong": chuột chạy nhanh khoảng ×3 (đo ${(rate / dx0.speed).toFixed(1)} lần tốc độ thường)`, dx1.boost && rate > dx0.speed * 2);
+  await page.waitForFunction(() => window.__whack.answer.boost === false, { timeout: 8000 });
+  const dx2 = await page.evaluate(() => ({ pos: window.__whack.answer.mice[0].pos, phase: window.__whack.phase }));
+  check(`${tag} "Đọc xong": tới đầu vùng đập (6,5) thì về tốc độ thường, chưa hết giờ`, dx2.phase === 'answer' && dx2.pos >= 6.49 && dx2.pos < 6.9, `pos ${dx2.pos.toFixed(3)}`);
+  await sleep(200);
+  check(`${tag} nút "Đọc xong" biến mất sau khi dùng`, (await rectOf(page, '[data-testid="doc-xong"]')) === null);
+  await sleep(300);
+  const dx3 = await page.evaluate(() => window.__whack.answer.mice[0].pos);
+  check(`${tag} sau "Đọc xong": tốc độ thường (≈${dx0.speed.toFixed(2)}/s)`, (dx3 - dx2.pos) / 0.5 < dx0.speed * 1.6, `${((dx3 - dx2.pos) / 0.5).toFixed(2)}/s`);
+
   // chuyển các chuột vào vùng đập (bỏ qua thời gian đọc), rồi đập chuột đúng
   await page.evaluate(() => window.__whack.answer.mice.forEach((m) => (m.pos = 7)));
   await sleep(150);
@@ -271,6 +291,12 @@ async function playViewport(browser, vp) {
   // ---- lượt đáp án SAI
   await quiet(page, 0);
   await startQuestion(page, vp, 2);
+  if (!vp.hasTouch) {
+    await page.keyboard.press('Space');
+    await sleep(150);
+    const sp = await page.evaluate(() => window.__whack.answer.boost);
+    check(`${tag} phím Space = "Đọc xong" (chuột chạy nhanh)`, sp === true);
+  }
   await page.evaluate(() => window.__whack.answer.mice.forEach((m) => (m.pos = 7)));
   await sleep(150);
   const badLane = await page.evaluate(() => window.__whack.answer.mice.find((m) => m.option !== window.__whack.answer.correct).lane);

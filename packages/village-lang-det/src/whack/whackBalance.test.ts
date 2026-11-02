@@ -5,16 +5,17 @@ import { AVERAGE_BOT, GOOD_BOT, ORACLE_BOT, percentile, simulateMany, simulateWh
 /**
  * Cân bằng màn 5 (spec 06): 300 ván mỗi bot, seed 1 đến 300. Bot "canh trước" (xem `whackBots.ts`): đập lúc chuột ở giữa vùng đập, lệch giờ theo phân phối chuẩn, một tay, chỉ dùng thao tác của học sinh.
  * Luật vết mực theo phương án A (cân bằng sau B6): sổ chịu tối đa 8 vết mực, đập đúng chuột đáp án xoá 2 vết.
- * P9 (chuột đi từ dưới lên, lượt đáp án): chuột câu hỏi phải bị đập trúng, rồi 4 chuột vàng A–D chạy lên (18 giây lần 1–5, 14 giây lần 6–10); điểm đáp án = 100 + 5 × số giây chuột còn cần để tới sổ.
- * Mốc đặt lại theo số liệu này (TẠM, chỉnh khi học sinh chơi thật): Đồng = p25 bot trung bình (1370) làm tròn xuống bội số 50 = 1350; Bạc = p75 bot trung bình (2595) làm tròn xuống bội số 50 = 2550;
- * Vàng = 2850 (p10 bot giỏi 2885; chọn 2850 thay vì 2800 vì điểm hai bot chồng lên nhau nhiều hơn trước: 2850 cho bot giỏi 94,0% và bot trung bình 3,7% Vàng; 2800 là 96,3% và 8,3%).
+ * P9 (chuột đi từ dưới lên, lượt đáp án): chuột câu hỏi phải bị đập trúng, rồi 4 chuột vàng A–D chạy lên (18 giây lần 1–5, 14 giây lần 6–10); điểm đáp án = 100 + 5 × số giây chuột còn cần để tới sổ (nút "Đọc xong" không đổi điểm: bot bấm sau `answerDelay` giây).
+ * P9b (chỉnh độ khó): nhịp sinh 1,3 → 0,7 giây (trước 1,2 → 0,55), chuột thường cần 3,2 → 2,2 giây tới đầu vùng đập (trước 3,0 → 1,8); tốc độ chuột đáp án giữ nguyên.
+ * Mốc đặt lại theo số liệu này (TẠM, chỉnh khi học sinh chơi thật): Đồng = p25 bot trung bình (1790) làm tròn xuống bội số 50 = 1750; Bạc = p75 bot trung bình (2440) làm tròn xuống bội số 50 = 2400;
+ * Vàng = p10 bot giỏi (2620) làm tròn xuống bội số 50 = 2600.
  *
- * Hai mục tiêu (assert): bot giỏi Vàng ≥ 90%; bot trung bình gặp trung bình ≥ 6 lượt trùm.
+ * Mục tiêu (assert): bot giỏi Vàng ≥ 90% và thua đầy sổ ≤ 2%; bot trung bình thua đầy sổ ≤ 40%, Vàng < 10%, gặp trung bình ≥ 6 lượt trùm.
  *
  * Kết quả đã chạy (xem cả bảng trong spec 06):
- *  - người chơi lý tưởng: điểm trung bình 3196,3 (3010 đến 3390), 143 chuột, đủ 10 lượt ở mọi ván, Vàng 100%;
- *  - bot giỏi: điểm trung bình 3026,9 (2660 đến 3270); chưa đạt 0%, Đồng 0%, Bạc 6,0%, Vàng 94,0%; thua 0%; 100% ván chơi hết 10 lượt; đúng 9,49 lượt;
- *  - bot trung bình: điểm trung bình 1960,1 (130 đến 2940); chưa đạt 24,0%, Đồng 45,0%, Bạc 27,3%, Vàng 3,7%; thua vì đầy sổ 63,0%; gặp trung bình 8,00 lượt, 39,0% ván chơi hết 10 lượt; lọt 12,3 chuột mỗi ván.
+ *  - người chơi lý tưởng: điểm trung bình 2919,3 (2775 đến 3075), 123 chuột, đủ 10 lượt ở mọi ván, Vàng 100%;
+ *  - bot giỏi: điểm trung bình 2752,4 (2350 đến 2960); chưa đạt 0%, Đồng 0,7%, Bạc 4,7%, Vàng 94,7%; thua 0%; 100% ván chơi hết 10 lượt; đúng 9,47 lượt;
+ *  - bot trung bình: điểm trung bình 2053,85 (245 đến 2735); chưa đạt 23,0%, Đồng 46,3%, Bạc 24,7%, Vàng 6,0%; thua vì đầy sổ 37,3%; gặp trung bình 8,97 lượt, 64,3% ván chơi hết 10 lượt; lọt 11,1 chuột mỗi ván.
  * Đổi cấu hình thì chạy lại và cập nhật các con số này.
  */
 describe('cân bằng màn 5', () => {
@@ -34,32 +35,34 @@ describe('cân bằng màn 5', () => {
     }
   });
 
-  it('mục tiêu 1: bot giỏi Vàng ≥ 90%', () => {
+  it('mục tiêu 1: bot giỏi Vàng ≥ 90%, thua đầy sổ ≤ 2%', () => {
     expect(good.medals.vang / good.games).toBeGreaterThanOrEqual(0.9);
+    expect(good.lost / good.games).toBeLessThanOrEqual(0.02);
   });
 
-  it('mục tiêu 2: bot trung bình gặp trung bình ≥ 6 lượt trùm', () => {
+  it('mục tiêu 2: bot trung bình thua đầy sổ ≤ 40%, gặp trung bình ≥ 6 lượt trùm', () => {
+    expect(avg.lost / avg.games).toBeLessThanOrEqual(0.4);
     expect(avg.meanBosses).toBeGreaterThanOrEqual(6);
   });
 
-  it('bot trung bình: Vàng rất ít (dưới 5%), chủ yếu Đồng và Bạc', () => {
-    expect(avg.medals.vang / avg.games).toBeLessThan(0.05);
-    expect((avg.medals.dong + avg.medals.bac) / avg.games).toBeGreaterThan(0.7);
+  it('bot trung bình: Vàng dưới 10%, chủ yếu Đồng và Bạc', () => {
+    expect(avg.medals.vang / avg.games).toBeLessThan(0.1);
+    expect((avg.medals.dong + avg.medals.bac) / avg.games).toBeGreaterThan(0.6);
   });
 
-  it('luật vết mực theo phương án A: đầy sổ 8 vết, đập đúng đáp án xoá 2 vết; nhịp sinh cuối ván vẫn 0,55 giây', () => {
+  it('luật vết mực theo phương án A: đầy sổ 8 vết, đập đúng đáp án xoá 2 vết; nhịp sinh cuối ván 0,7 giây', () => {
     expect(WHACK_SPEC.inkMax).toBe(8);
     expect(WHACK_SPEC.boss.inkOnCorrect).toBe(-2);
-    expect(WHACK_SPEC.spawnEnd).toBe(0.55);
+    expect(WHACK_SPEC.spawnEnd).toBe(0.7);
   });
 
-  it('mốc đặt theo số liệu: Đồng = p25 bot trung bình, Bạc = p75 bot trung bình (bội số 50), Vàng 2850; Đồng < Bạc < Vàng', () => {
+  it('mốc đặt theo số liệu: Đồng = p25 bot trung bình, Bạc = p75 bot trung bình (bội số 50), Vàng = p10 bot giỏi; Đồng < Bạc < Vàng', () => {
     const floorTo = (x: number, unit: number) => Math.floor(x / unit) * unit;
-    expect(percentile(avg.scores, 0.25)).toBe(1370);
-    expect(percentile(avg.scores, 0.75)).toBe(2595);
-    expect(percentile(good.scores, 0.1)).toBe(2885);
-    expect(medals).toEqual([floorTo(percentile(avg.scores, 0.25), 50), floorTo(percentile(avg.scores, 0.75), 50), 2850]);
-    expect(medals).toEqual([1350, 2550, 2850]);
+    expect(percentile(avg.scores, 0.25)).toBe(1790);
+    expect(percentile(avg.scores, 0.75)).toBe(2440);
+    expect(percentile(good.scores, 0.1)).toBe(2620);
+    expect(medals).toEqual([floorTo(percentile(avg.scores, 0.25), 50), floorTo(percentile(avg.scores, 0.75), 50), floorTo(percentile(good.scores, 0.1), 50)]);
+    expect(medals).toEqual([1750, 2400, 2600]);
     expect(medals[0]).toBeLessThan(medals[1]);
     expect(medals[1]).toBeLessThan(medals[2]);
   });
@@ -75,19 +78,19 @@ describe('cân bằng màn 5', () => {
     expect(oracle.meanBosses).toBe(10);
     expect(oracle.meanBossCorrect).toBe(10);
     expect(oracle.medals.vang).toBe(300);
-    expect(oracle.mean).toBeCloseTo(3196.3, 1);
+    expect(oracle.mean).toBeCloseTo(2919.3, 1);
   });
 
   it('con số đã ghi trong spec khớp lần chạy này', () => {
-    expect(good.mean).toBeCloseTo(3026.9, 1);
-    expect(good.medals).toEqual({ chua: 0, dong: 0, bac: 18, vang: 282 });
+    expect(good.mean).toBeCloseTo(2752.4, 1);
+    expect(good.medals).toEqual({ chua: 0, dong: 2, bac: 14, vang: 284 });
     expect(good.lost).toBe(0);
     expect(good.fullBosses).toBe(300);
-    expect(avg.mean).toBeCloseTo(1960.1, 1);
-    expect(avg.medals).toEqual({ chua: 72, dong: 135, bac: 82, vang: 11 });
-    expect(avg.lost).toBe(189);
-    expect(avg.fullBosses).toBe(117);
-    expect(avg.meanBosses).toBeCloseTo(8.0, 2);
-    expect(avg.meanLeaked).toBeCloseTo(12.26, 2);
+    expect(avg.mean).toBeCloseTo(2053.85, 2);
+    expect(avg.medals).toEqual({ chua: 69, dong: 139, bac: 74, vang: 18 });
+    expect(avg.lost).toBe(112);
+    expect(avg.fullBosses).toBe(193);
+    expect(avg.meanBosses).toBeCloseTo(8.97, 2);
+    expect(avg.meanLeaked).toBeCloseTo(11.08, 2);
   });
 });

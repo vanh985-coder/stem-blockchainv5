@@ -77,6 +77,8 @@ export interface AnswerRound {
   /** Đơn vị/giây */
   speed: number;
   correct: number;
+  /** Em bấm "Đọc xong": chuột chạy nhanh `readBoost` lần tới đầu vùng đập (điểm vẫn tính theo tốc độ thường) */
+  boost: boolean;
 }
 
 /** Kết quả lượt đáp án, chờ `answerBoss` áp dụng */
@@ -149,6 +151,7 @@ export type WhackEvent =
   | { type: 'bossStart'; boss: Boss }
   | { type: 'bossArrive'; boss: Boss }
   | { type: 'answerStart'; round: AnswerRound }
+  | { type: 'answerBoost' }
   | { type: 'bossQuiz'; boss: Boss; verdict: Verdict }
   | { type: 'hit'; lane: number; mouse: Mouse; killed: boolean; points: number }
   | { type: 'miss'; lane: number }
@@ -334,8 +337,19 @@ function stepOnce(s: WhackState, out: WhackEvent[]): void {
   if (s.phase === 'answer') {
     const a = s.answer!;
     let arrived = false;
+    let delta = a.speed * h;
+    if (a.boost) {
+      // "Đọc xong": chạy nhanh tới đầu vùng đập rồi về tốc độ thường
+      let lead = 0;
+      for (const m of a.mice) lead = Math.max(lead, m.pos);
+      delta *= WHACK_SPEC.boss.readBoost;
+      if (lead + delta >= WHACK_SPEC.zoneStart - EPS) {
+        delta = Math.max(0, WHACK_SPEC.zoneStart - lead);
+        a.boost = false;
+      }
+    }
     for (const m of a.mice) {
-      m.pos += a.speed * h;
+      m.pos += delta;
       if (m.pos >= WHACK_SPEC.laneLength - EPS) arrived = true;
     }
     if (arrived) {
@@ -515,10 +529,20 @@ function startAnswer(s: WhackState, boss: Boss): WhackEvent[] {
     mice: Array.from({ length: n }, (_, option) => ({ option, lane: boss.laneOf[option], pos: 0 })),
     speed: answerSpeed(boss.answerSeconds),
     correct: Math.min(Math.max(key.correct, 0), n - 1),
+    boost: false,
   };
   s.answer = round;
   s.phase = 'answer';
   return [{ type: 'answerStart', round }];
+}
+
+/** "Đọc xong": chuột đáp án chạy nhanh tới đầu vùng đập. Chỉ nhận trong lượt đáp án, chưa bấm và chuột chưa tới vùng đập. */
+export function readDone(s: WhackState): WhackEvent[] {
+  const a = s.answer;
+  if (s.phase !== 'answer' || !a || a.boost) return [];
+  if (a.mice.some((m) => m.pos >= WHACK_SPEC.zoneStart - EPS)) return [];
+  a.boost = true;
+  return [{ type: 'answerBoost' }];
 }
 
 /** Đập làn `lane` trong lượt đáp án: trúng chuột vàng THẤP NHẤT (pos lớn nhất) đang trong vùng đập của làn đó thì chọn đáp án đó; không có thì hụt (không phạt, làn nghỉ). */

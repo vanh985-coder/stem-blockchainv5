@@ -15,13 +15,13 @@ export const WHACK_SPEC = {
   /** Đập hụt thì làn đó nghỉ chừng này giây (không đập được) */
   hitRest: 0.2,
   /** Chuột cần `runSecondsStart` giây từ đầu làn tới đầu vùng đập (vị trí 6,5) lúc đồng hồ lịch = 0, giảm tuyến tính còn `runSecondsEnd` giây ở giây `rampSeconds` (rồi giữ nguyên) */
-  runSecondsStart: 3,
-  runSecondsEnd: 1.8,
+  runSecondsStart: 3.2,
+  runSecondsEnd: 2.2,
   rampSeconds: 120,
-  /** Nhịp sinh: 1,2 giây một con, giảm tuyến tính còn 0,55 giây ở giây `rampSeconds`. Con đầu tiên sinh ở giây `firstSpawn` (tự chọn: bằng nhịp đầu). */
-  spawnStart: 1.2,
-  spawnEnd: 0.55,
-  firstSpawn: 1.2,
+  /** Nhịp sinh: 1,3 giây một con, giảm tuyến tính còn 0,7 giây ở giây `rampSeconds`. Con đầu tiên sinh ở giây `firstSpawn` (tự chọn: bằng nhịp đầu). */
+  spawnStart: 1.3,
+  spawnEnd: 0.7,
+  firstSpawn: 1.3,
   /** Không sinh vào làn có con gần nhất còn dưới ngưỡng này (15% đầu làn) */
   spawnGuard: 1.5,
   /**
@@ -55,17 +55,17 @@ export const WHACK_SPEC = {
   coin: { every: 8, jitter: 1, life: 2.5, points: 5, xu: 1, posMin: 2, posMax: 6 },
   /**
    * Trùm: `count` lần, ở giây `every`, 2 × `every`, … của đồng hồ lịch (12, 24, …, 120). Lúc trùm ra chuột còn `slowFactor` tốc độ trong lúc {phanDien} chạy xuống (`runSeconds` giây, tự chọn, tới giữa vùng đập),
-   * rồi ĐỨNG CHỜ ở giữa vùng đập tới khi em đập trúng (P9: chuột đi từ dưới lên; đập trúng mới mở lượt đáp án). Lượt đáp án: 2 đến 4 chuột vàng mang nhãn A, B, C, D chạy từ đầu làn tới sổ trong `answerSeconds[0]` giây (lần 1–5) hay `answerSeconds[1]` giây (lần 6–10), chậm hơn chuột thường nhiều (tự chọn, để đọc kịp câu dài nhất); chuột thường đứng yên suốt lượt. Số giây còn lại để tính điểm = số giây chuột còn cần để tới sổ lúc em đập. Đúng: `base` + `perSecond` × số giây còn lại (làm tròn xuống), và xoá 2 vết mực nếu đang có (`inkOnCorrect`, không xuống dưới 0; cân bằng sau B6, phương án A: trước là 1 vết). Sai hoặc hết giờ: +1 vết mực.
+   * rồi ĐỨNG CHỜ ở giữa vùng đập tới khi em đập trúng (P9: chuột đi từ dưới lên; đập trúng mới mở lượt đáp án). Lượt đáp án: 2 đến 4 chuột vàng mang nhãn A, B, C, D chạy từ đầu làn tới sổ trong `answerSeconds[0]` giây (lần 1–5) hay `answerSeconds[1]` giây (lần 6–10), chậm hơn chuột thường nhiều (tự chọn, để đọc kịp câu dài nhất); chuột thường đứng yên suốt lượt. Nút "Đọc xong" (`readBoost`): chuột đáp án chạy nhanh `readBoost` lần tới đầu vùng đập rồi về tốc độ thường; điểm tính theo quãng còn lại ở tốc độ thường nên bấm không tăng điểm. Số giây còn lại để tính điểm = số giây chuột còn cần để tới sổ lúc em đập. Đúng: `base` + `perSecond` × số giây còn lại (làm tròn xuống), và xoá 2 vết mực nếu đang có (`inkOnCorrect`, không xuống dưới 0; cân bằng sau B6, phương án A: trước là 1 vết). Sai hoặc hết giờ: +1 vết mực.
    */
-  boss: { count: 10, every: 12, slowFactor: 0.2, runSeconds: 1.2, answerSeconds: [18, 14] as const, firstHalf: 5, base: 100, perSecond: 5, inkOnCorrect: -2 },
+  boss: { count: 10, every: 12, slowFactor: 0.2, runSeconds: 1.2, answerSeconds: [18, 14] as const, readBoost: 3, firstHalf: 5, base: 100, perSecond: 5, inkOnCorrect: -2 },
   /** Bước mô phỏng cố định (giây): `stepWhack` chia `dt` thành các bước này để kết quả không phụ thuộc tốc độ khung hình (tự chọn: 1/120) */
   tick: 1 / 120,
   /**
-   * Mốc điểm cả ván: Đồng, Bạc, Vàng (khai báo theo chuẩn màn 2, 3, 8, 12). TẠM, chỉnh khi học sinh chơi thật. Đặt lại sau P9 (chuột đi lên, lượt đáp án: điểm đáp án giảm vì tính theo quãng chuột còn phải chạy) theo số liệu 300 ván mỗi bot:
-   * Đồng = phân vị 25% điểm bot trung bình (1370) làm tròn xuống bội số 50; Bạc = phân vị 75% điểm bot trung bình (2595) làm tròn xuống bội số 50; Vàng = 2850 (bội số 50, thấp hơn p10 bot giỏi 2885; chọn 2850 thay vì 2800 của quy tắc cũ vì điểm hai bot chồng lên nhau nhiều hơn: ở 2850 bot giỏi Vàng 94,0%, bot trung bình 3,7%; ở 2800 là 96,3% và 8,3%).
+   * Mốc điểm cả ván: Đồng, Bạc, Vàng (khai báo theo chuẩn màn 2, 3, 8, 12). TẠM, chỉnh khi học sinh chơi thật. Đặt lại sau P9b (chỉnh độ khó: nhịp sinh 1,3 → 0,7 giây, chuột cần 3,2 → 2,2 giây tới vùng đập) và P9 (chuột đi lên, lượt đáp án: điểm đáp án giảm vì tính theo quãng chuột còn phải chạy) theo số liệu 300 ván mỗi bot:
+   * Đồng = phân vị 25% điểm bot trung bình (1790) làm tròn xuống bội số 50; Bạc = phân vị 75% điểm bot trung bình (2440) làm tròn xuống bội số 50; Vàng = phân vị 10% điểm bot giỏi (2620) làm tròn xuống bội số 50. Kết quả: bot giỏi Vàng 94,7%, bot trung bình Vàng 6,0%.
    * Phân vị theo hạng gần nhất (`percentile` ở `whackBots.ts`). Xem `whackBalance.test.ts` và spec 06.
    */
-  medals: [1350, 2550, 2850] as const,
+  medals: [1750, 2400, 2600] as const,
 } as const;
 
 export type MouseKind = 'thuong' | 'doiLan' | 'nhanh' | 'to';

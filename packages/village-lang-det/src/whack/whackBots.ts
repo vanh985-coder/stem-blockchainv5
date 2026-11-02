@@ -15,7 +15,7 @@
 import { medalOf, type MedalThresholds } from '@so-chung/core';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { WHACK_SPEC } from './whackConfig';
-import { answerBoss, bossInZone, collectCoin, createWhackGame, hitLane, lowestInZone, stepWhack, type Coin, type EndReason, type WhackPhase, type WhackState } from './whackLogic';
+import { answerBoss, bossInZone, collectCoin, createWhackGame, hitLane, lowestInZone, readDone, stepWhack, type Coin, type EndReason, type WhackPhase, type WhackState } from './whackLogic';
 
 export interface WhackBotProfile {
   name: string;
@@ -116,6 +116,7 @@ export function simulateWhack(seed: number, p: WhackBotProfile): WhackSimResult 
         answerStart = now;
         want = WHACK_SPEC.zoneStart + p.answerAt * (WHACK_SPEC.zoneEnd - WHACK_SPEC.zoneStart) + gaussian(bot) * p.sigma * a.speed;
       }
+      if (now - answerStart >= p.answerDelay) readDone(s);
       const m = a.mice.find((x) => x.option === pick)!;
       if (now - answerStart >= p.answerDelay && m.pos >= Math.max(WHACK_SPEC.zoneStart, want) && now - lastTap >= p.tapGap - 1e-9 && s.rest[m.lane] <= 0) {
         hitLane(s, m.lane);

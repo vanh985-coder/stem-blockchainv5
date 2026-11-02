@@ -20,7 +20,7 @@ import {
 import { PROBE } from '@so-chung/core/lib/dev';
 import { WHACK_SPEC, type MouseKind } from './whackConfig';
 import { hintFor } from './whackHint';
-import { answerBoss, bossInZone, bossPoints, collectCoin, createWhackGame, hitLane, inZone, tickWhack, type WhackEvent } from './whackLogic';
+import { answerBoss, bossInZone, bossPoints, collectCoin, createWhackGame, hitLane, inZone, readDone, tickWhack, type WhackEvent } from './whackLogic';
 
 const newSeed = (): number => (Math.random() * 2 ** 31) >>> 0;
 
@@ -139,6 +139,8 @@ interface PanelData {
   /** Đáp án đúng, và đáp án em đã chọn: chỉ có sau khi đập (hộp kết quả) */
   correct?: number;
   chosen?: number | null;
+  /** Nút "Đọc xong" (chỉ khi lượt đáp án còn chờ chuột tới vùng đập) */
+  onReadDone?: () => void;
 }
 
 /** Cột (hay dải) câu hỏi: chỉ để ĐỌC, các đáp án không bấm được. */
@@ -173,7 +175,20 @@ function QuestionPanel({ data }: { data: PanelData }) {
           );
         })}
       </ul>
-      {data.correct === undefined && <p className="text-[11px] font-semibold text-amber-200/90 sm:text-xs">{fmt(whackUi.docCauHoi)}</p>}
+      <div className="flex flex-col gap-1.5 portrait:flex-row portrait:items-center portrait:gap-2">
+        {data.correct === undefined && <p className="min-w-0 flex-1 text-[11px] font-semibold text-amber-200/90 sm:text-xs">{fmt(whackUi.docCauHoi)}</p>}
+        {data.onReadDone && (
+          <button
+            type="button"
+            onClick={data.onReadDone}
+            title={fmt(whackUi.docXongGoiY)}
+            className="min-h-9 shrink-0 rounded-lg border-2 border-amber-300 bg-amber-500 px-3 py-1 text-sm font-extrabold text-[#2b1810] active:bg-amber-400"
+            data-testid="doc-xong"
+          >
+            {fmt(whackUi.docXong)}
+          </button>
+        )}
+      </div>
     </section>
   );
 }
@@ -429,10 +444,27 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     [state, handleEvents, addEffect],
   );
 
+  // "Đọc xong": chuột đáp án chạy nhanh tới đầu vùng đập
+  const readNow = useCallback(() => {
+    if (holdRef.current) return;
+    const events = readDone(state);
+    if (events.length > 0) {
+      sound.playClick();
+      handleEvents(events);
+    }
+  }, [state, handleEvents]);
+
   // Điều khiển bằng bàn phím: chống key repeat và chặn nhấn giữ
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.code === 'Space' && state.phase === 'answer') {
+        const t = e.target as HTMLElement | null;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+        e.preventDefault();
+        readNow();
+        return;
+      }
       const lane = KEY_LANE[e.code];
       if (lane === undefined) return;
       const t = e.target as HTMLElement | null;
@@ -456,7 +488,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
     };
-  }, [hit]);
+  }, [hit, readNow, state]);
 
   // Câu hỏi của lượt đang mở (lượt đáp án hoặc hộp kết quả)
   const round = state.answer ?? null;
@@ -473,6 +505,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
           text: fmt(question.text),
           options: question.options.map((o) => fmt(o)),
           ...(verdict ? { correct: verdict.correct, chosen: verdict.option } : {}),
+          ...(state.phase === 'answer' && round && !round.boost && round.mice.every((m) => m.pos < WHACK_SPEC.zoneStart) ? { onReadDone: readNow } : {}),
         }
       : null;
 
@@ -628,7 +661,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
         <div className="flex min-h-0 w-full flex-col items-center landscape:max-w-[760px] landscape:flex-1">
           {/* Điện thoại dọc: dải trên (câu hỏi thay chỗ cuốn sổ trong lượt đáp án) */}
           {portrait ? (
-            <div className={`flex ${FIELD_W} h-[232px] shrink-0 items-center justify-center`} data-testid="dai-tren">
+            <div className={`flex ${FIELD_W} h-[252px] shrink-0 items-center justify-center`} data-testid="dai-tren">
               {roundOn && panel ? <QuestionPanel data={panel} /> : bookBlock}
             </div>
           ) : (

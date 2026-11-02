@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { WHACK_SPEC } from './whackConfig';
-import { answerBoss, answerSpeed, bossClock, bossPoints, createWhackGame, hitLane, spawnMouse, stepWhack, type WhackState } from './whackLogic';
+import { answerBoss, answerSpeed, bossClock, bossPoints, createWhackGame, hitLane, readDone, spawnMouse, stepWhack, type WhackState } from './whackLogic';
 
 /** Ván trống, có khóa câu hỏi (đáp án đúng là C) và chuột câu hỏi đã đứng chờ giữa vùng đập. */
 function atBoss(options = 4, correct = 2): WhackState {
@@ -121,5 +121,49 @@ describe('P9: lượt đáp án (chuột đi từ dưới lên)', () => {
     stepWhack(s, 5);
     expect(s.clock).toBe(clock);
     expect(s.phase).toBe('answer');
+  });
+
+  it('"Đọc xong": chỉ nhận trong lượt đáp án, chưa bấm, chuột chưa tới vùng đập', () => {
+    const s = atBoss();
+    expect(readDone(s)).toEqual([]);
+    hitLane(s, s.boss!.lane);
+    expect(readDone(s)[0]).toMatchObject({ type: 'answerBoost' });
+    expect(s.answer!.boost).toBe(true);
+    expect(readDone(s)).toEqual([]);
+    const t = atBoss();
+    hitLane(t, t.boss!.lane);
+    stepWhack(t, (WHACK_SPEC.zoneStart + 0.1) / t.answer!.speed);
+    expect(readDone(t)).toEqual([]);
+  });
+
+  it('"Đọc xong": chuột chạy nhanh ×3 tới đúng đầu vùng đập rồi về tốc độ thường', () => {
+    const s = atBoss();
+    hitLane(s, s.boss!.lane);
+    const v = s.answer!.speed;
+    readDone(s);
+    stepWhack(s, 1);
+    expect(s.answer!.mice[0].pos).toBeCloseTo(WHACK_SPEC.boss.readBoost * v, 6);
+    stepWhack(s, (WHACK_SPEC.zoneStart - WHACK_SPEC.boss.readBoost * v) / (WHACK_SPEC.boss.readBoost * v) + 0.03);
+    expect(s.answer!.boost).toBe(false);
+    for (const m of s.answer!.mice) expect(m.pos).toBeCloseTo(WHACK_SPEC.zoneStart, 1);
+    const before = s.answer!.mice[0].pos;
+    stepWhack(s, 1);
+    expect(s.answer!.mice[0].pos).toBeCloseTo(before + v, 5);
+  });
+
+  it('"Đọc xong" không tăng điểm: đập ở cùng vị trí thì cùng số giây còn lại như không bấm', () => {
+    const a = atBoss();
+    hitLane(a, a.boss!.lane);
+    stepWhack(a, WHACK_SPEC.zoneStart / a.answer!.speed + 0.5);
+    const b = atBoss();
+    hitLane(b, b.boss!.lane);
+    readDone(b);
+    stepWhack(b, WHACK_SPEC.zoneStart / (WHACK_SPEC.boss.readBoost * b.answer!.speed) + 0.5 / b.answer!.speed);
+    const pa = a.answer!.mice[0].pos;
+    // đưa hai bên về cùng vị trí rồi đập đáp án đúng
+    for (const m of b.answer!.mice) m.pos = pa;
+    hitLane(a, laneOfOption(a, 2));
+    hitLane(b, laneOfOption(b, 2));
+    expect(b.verdict!.secondsLeft).toBeCloseTo(a.verdict!.secondsLeft, 9);
   });
 });

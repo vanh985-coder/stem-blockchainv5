@@ -423,13 +423,13 @@ describe('đồng hồ lịch, lượt trùm và chuột đứng yên', () => {
 });
 
 describe('tốc độ, nhịp sinh, tỉ lệ loại', () => {
-  it('chuột chạy từ đầu làn tới đầu vùng đập mất 3,0 giây ở giây 0 và 1,8 giây ở giây 120; giữa chừng giảm tuyến tính', () => {
-    expect(runSeconds(0)).toBe(3);
-    expect(runSeconds(120)).toBeCloseTo(1.8, 12);
-    expect(runSeconds(60)).toBeCloseTo(2.4, 12);
-    expect(runSeconds(500)).toBeCloseTo(1.8, 12);
-    expect(mouseSpeed(0)).toBeCloseTo(6.5 / 3, 12);
-    for (const [clock, secs] of [[0, 3.0], [120, 1.8]] as const) {
+  it('chuột chạy từ đầu làn tới đầu vùng đập mất 3,2 giây ở giây 0 và 2,2 giây ở giây 120; giữa chừng giảm tuyến tính', () => {
+    expect(runSeconds(0)).toBe(3.2);
+    expect(runSeconds(120)).toBeCloseTo(2.2, 12);
+    expect(runSeconds(60)).toBeCloseTo(2.7, 12);
+    expect(runSeconds(500)).toBeCloseTo(2.2, 12);
+    expect(mouseSpeed(0)).toBeCloseTo(6.5 / 3.2, 12);
+    for (const [clock, secs] of [[0, 3.2], [120, 2.2]] as const) {
       const s = quiet();
       s.clock = clock;
       const m = spawnMouse(s, 'thuong', 0);
@@ -451,17 +451,17 @@ describe('tốc độ, nhịp sinh, tỉ lệ loại', () => {
     expect(b.speed / a.speed).toBeCloseTo(1.6, 12);
   });
 
-  it('nhịp sinh 1,2 giây ở giây 0 và 0,55 giây từ giây 120; tuyến tính', () => {
-    expect(spawnInterval(0)).toBe(1.2);
-    expect(spawnInterval(120)).toBeCloseTo(0.55, 12);
-    expect(spawnInterval(60)).toBeCloseTo(0.875, 12);
-    expect(spawnInterval(999)).toBeCloseTo(0.55, 12);
+  it('nhịp sinh 1,3 giây ở giây 0 và 0,7 giây từ giây 120; tuyến tính', () => {
+    expect(spawnInterval(0)).toBe(1.3);
+    expect(spawnInterval(120)).toBeCloseTo(0.7, 12);
+    expect(spawnInterval(60)).toBeCloseTo(1.0, 12);
+    expect(spawnInterval(999)).toBeCloseTo(0.7, 12);
   });
 
-  it('con đầu tiên sinh ở giây 1,2; các con sau theo nhịp', () => {
+  it('con đầu tiên sinh ở giây 1,3; các con sau theo nhịp', () => {
     const s = createWhackGame(11);
     s.coinIn = Infinity;
-    expect(stepWhack(s, 1.19).filter((e) => e.type === 'spawn')).toHaveLength(0);
+    expect(stepWhack(s, 1.29).filter((e) => e.type === 'spawn')).toHaveLength(0);
     expect(stepWhack(s, 0.02).filter((e) => e.type === 'spawn')).toHaveLength(1);
     expect(s.mice[0].kind).toBe('thuong');
   });
@@ -635,14 +635,14 @@ describe('sửa sau B6: trùm đúng xoá vết mực, thời gian trong vùng �
     expect(s.ended).toBe('complete');
   });
 
-  it('thời gian chuột nằm trong vùng đập (dài 2,5 đơn vị): thường 1,154 giây và nhanh 0,721 giây ở giây 0; 0,692 và 0,433 giây ở giây 120', () => {
+  it('thời gian chuột nằm trong vùng đập (dài 2,5 đơn vị): thường 1,231 giây và nhanh 0,769 giây ở giây 0; 0,846 và 0,529 giây ở giây 120', () => {
     const len = WHACK_SPEC.zoneEnd - WHACK_SPEC.zoneStart;
     expect(len).toBe(2.5);
-    expect(len / mouseSpeed(0)).toBeCloseTo(1.1538, 3);
-    expect(len / (mouseSpeed(0) * WHACK_SPEC.fastFactor)).toBeCloseTo(0.7212, 3);
-    expect(len / mouseSpeed(120)).toBeCloseTo(0.6923, 3);
-    expect(len / (mouseSpeed(120) * WHACK_SPEC.fastFactor)).toBeCloseTo(0.4327, 3);
-    // đo trong ván: chuột thường ở giây 0 ở trong vùng đập khoảng 1,15 giây
+    expect(len / mouseSpeed(0)).toBeCloseTo(1.2308, 3);
+    expect(len / (mouseSpeed(0) * WHACK_SPEC.fastFactor)).toBeCloseTo(0.7692, 3);
+    expect(len / mouseSpeed(120)).toBeCloseTo(0.8462, 3);
+    expect(len / (mouseSpeed(120) * WHACK_SPEC.fastFactor)).toBeCloseTo(0.5288, 3);
+    // đo trong ván: chuột thường ở giây 0 ở trong vùng đập khoảng 1,23 giây
     const s = quiet();
     const m = spawnMouse(s, 'thuong', 0, WHACK_SPEC.zoneStart);
     let t = 0;
@@ -650,7 +650,7 @@ describe('sửa sau B6: trùm đúng xoá vết mực, thời gian trong vùng �
       stepWhack(s, 0.01);
       t += 0.01;
     }
-    expect(t).toBeGreaterThan(1.14);
-    expect(t).toBeLessThan(1.17);
+    expect(t).toBeGreaterThan(1.22);
+    expect(t).toBeLessThan(1.25);
   });
 });

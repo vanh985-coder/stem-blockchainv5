@@ -50,7 +50,7 @@ describe('màn 5: câu nhắc của nút "?" (hintFor)', () => {
     expect(hintFor(s)).toEqual(['trumChay']);
     s.phase = 'answer';
     expect(hintFor(s)).toEqual(['trumHoi']);
-    expect(say(s)).toBe('Đọc câu hỏi rồi đập chuột vàng mang đáp án em chọn: đúng thì xoá 2 vết mực.');
+    expect(say(s)).toBe(h.trumHoi);
     s.phase = 'quiz';
     expect(hintFor(s)).toEqual(['ketQua']);
     s.phase = 'ended';

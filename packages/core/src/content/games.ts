@@ -244,6 +244,8 @@ export const whackUi = {
   /** Lượt đáp án (chuột câu hỏi bị đập trúng): tiêu đề cột câu hỏi, nhãn, kết quả */
   cauHoi: 'Câu hỏi {so}/{max}',
   docCauHoi: 'Đọc câu hỏi, rồi đập chuột vàng mang đáp án em chọn!',
+  docXong: 'Đọc xong',
+  docXongGoiY: 'Bấm khi đã đọc xong để chuột chạy nhanh tới vùng đập (hoặc nhấn phím Space).',
   cotCauHoi: 'Câu hỏi của {phanDien}',
   nhanDapAn: 'Chuột đáp án {nhan}',
   dapAnDung: 'Đáp án đúng: {dapAn}',
