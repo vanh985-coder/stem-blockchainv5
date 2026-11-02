@@ -190,12 +190,17 @@ export const tutorialTexts = {
   man5: {
     tieuDe: 'Làm thử: Đập {phanDien}',
     intro: '{phanDien} và lũ chuột đang tìm cách phá hoại cuốn Sổ Chung! Em hãy dùng búa đập tan lũ chuột khi chúng chạy vào vùng đập.',
-    lanes: '4 làn chạy mang sắc màu truyền thống của Làng Dệt. Chuột chạy từ trên xuống, và em CHỈ ĐƯỢC ĐẬP khi chuột đã chạy vào Vùng đập có viền sáng!',
-    soChung: 'Cuốn Sổ Chung nằm ở đáy 4 làn. Nếu để chuột lọt qua vùng đập, mỗi con sẽ làm loang 1 vết mực trên trang sổ. Đầy đủ 8 vết mực thì hỏng sổ!',
-    buttons: 'Điều khiển: Bấm 4 nút D, F, J, K ở chân làn, chạm thẳng vào làn/chuột trên màn hình cảm ứng, hoặc bấm phím D, F, J, K (hoặc 1, 2, 3, 4).',
-    practice: 'Em hãy bấm nút "Đập thử làn 1 (D)" hoặc nhấn phím D trên bàn phím để vung búa thử một nhịp nhé!',
+    lanes: '4 làn chạy mang sắc màu truyền thống của Làng Dệt. Chuột chạy từ dưới lên, và em CHỈ ĐƯỢC ĐẬP khi chuột đã chạy vào Vùng đập có viền sáng, gần cuốn sổ!',
+    soChung: 'Cuốn Sổ Chung nằm ở đỉnh 4 làn. Nếu để chuột chạy tới sổ, mỗi con sẽ làm loang 1 vết mực. Đầy đủ 8 vết mực thì hỏng sổ!',
+    buttons: 'Điều khiển: Bấm 4 nút D, F, J, K ở chân làn, chạm thẳng vào làn/chuột trên màn hình cảm ứng, hoặc bấm phím D, F, J, K (hoặc 1, 2, 3, 4). Nhân vật sẽ chạy ngang tới làn em chọn rồi vung búa.',
+    practice: 'Em hãy bấm nút "Đập thử làn 1 (D)" hoặc nhấn phím D trên bàn phím để nhân vật chạy tới làn 1 và đập con chuột mẫu nhé!',
     dapThu: 'Đập thử làn 1 (D)',
-    correct: 'Rất nhanh tay! Chú ý: Chuột to cần đập 2 lần, chuột có dấu ❓ là Chuột câu hỏi - hãy đập và trả lời đúng để xóa bớt vết mực nhé!',
+    practiceAnswer: 'Chuột vàng có dấu ❓ là Chuột câu hỏi. Đập trúng nó, câu hỏi hiện ra và 4 chuột vàng mang nhãn A, B, C, D chạy lên. Em hãy đập chuột mang đáp án ĐÚNG của câu mẫu!',
+    mau: { cauHoi: 'Câu mẫu: 2 + 3 bằng mấy?', dapAn: ['4', '5', '6', '7'], dung: 1 },
+    nutDapAn: 'Đập chuột {nhan} ({phim})',
+    sai: 'Chưa đúng rồi, em thử chuột khác nhé!',
+    dungMau: 'Đúng rồi! Chuột {nhan} mang đáp án đúng.',
+    correct: 'Rất nhanh tay! Chú ý: Chuột to cần đập 2 lần. Đập đúng chuột đáp án thì được điểm và xóa 2 vết mực; đập sai hoặc để chuột đáp án đúng chạy tới sổ thì thêm 1 vết mực nhé!',
   },
 
   man6: {

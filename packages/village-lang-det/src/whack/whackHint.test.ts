@@ -16,9 +16,11 @@ function randomState(seed: number): WhackState {
   const frames = Math.floor(rng() * 1800);
   for (let i = 0; i < frames && s.phase !== 'ended'; i++) {
     stepWhack(s, 1 / 60);
+    if (s.phase === 'bossRun' && s.boss!.arrived) hitLane(s, s.boss!.lane);
+    if (s.phase === 'answer' && rng() < 0.1) break; // dừng ngay giữa lượt đáp án
     if (s.phase === 'quiz') {
       if (rng() < 0.1) break; // dừng ngay giữa lượt trùm
-      answerBoss(s, rng() < 0.7 ? 'correct' : 'wrong', Math.floor(rng() * 15));
+      answerBoss(s, rng() < 0.7 ? 'correct' : 'wrong', Math.floor(rng() * 6));
     }
     if (rng() < 0.12) hitLane(s, Math.floor(rng() * WHACK_SPEC.lanes));
   }
@@ -29,7 +31,7 @@ describe('màn 5: câu nhắc của nút "?" (hintFor)', () => {
   it('đúng câu theo trạng thái: đầu ván, chạy, chuột to, đồng tiền, sổ sắp đầy, trùm chạy xuống, đang hỏi, hết ván', () => {
     const s = createWhackGame(3);
     expect(hintFor(s)).toEqual(['dauVan']);
-    expect(say(s)).toBe('Đập chuột giấy khi nó vào vệt sáng ở cuối làn: phím D F J K hoặc chạm vào làn.');
+    expect(say(s)).toBe('Đập chuột giấy khi nó vào vệt sáng gần sổ: phím D F J K hoặc chạm vào làn.');
     s.clock = FIRST_SECONDS + 1;
     expect(hintFor(s)).toEqual(['chay']);
     s.coin = { lane: 1, pos: 3, life: 2 };
@@ -46,9 +48,11 @@ describe('màn 5: câu nhắc của nút "?" (hintFor)', () => {
     expect(hintFor(s)).toEqual(['chuotTo']);
     s.phase = 'bossRun';
     expect(hintFor(s)).toEqual(['trumChay']);
-    s.phase = 'quiz';
+    s.phase = 'answer';
     expect(hintFor(s)).toEqual(['trumHoi']);
-    expect(say(s)).toBe('Đọc câu hỏi rồi chọn đáp án — đúng thì đét được Tí và xoá 2 vết mực.');
+    expect(say(s)).toBe(h.trumHoi);
+    s.phase = 'quiz';
+    expect(hintFor(s)).toEqual(['ketQua']);
     s.phase = 'ended';
     expect(hintFor(s)).toEqual(['hetVan']);
   });
@@ -82,7 +86,7 @@ describe('màn 5: câu nhắc của nút "?" (hintFor)', () => {
 
 describe('màn 5: tạm dừng thật', () => {
   it('tickWhack khi tạm dừng: không có gì đổi qua nhiều bước dt (chuột, đồng, đồng hồ lịch, đồng hồ trùm), kể cả giữa lượt trùm', () => {
-    for (const phase of ['play', 'bossRun', 'quiz'] as const) {
+    for (const phase of ['play', 'bossRun', 'answer', 'quiz'] as const) {
       const s = createWhackGame(11);
       stepWhack(s, 2.3);
       spawnMouse(s, 'nhanh', 1, 4);
@@ -90,7 +94,11 @@ describe('màn 5: tạm dừng thật', () => {
       if (phase !== 'play') {
         s.ticks = 1439;
         stepWhack(s, 0.01);
-        if (phase === 'quiz') stepWhack(s, 2);
+        if (phase === 'answer' || phase === 'quiz') {
+          stepWhack(s, 2);
+          hitLane(s, s.boss!.lane);
+        }
+        if (phase === 'quiz') stepWhack(s, 30);
         expect(s.phase).toBe(phase);
       }
       const before = JSON.stringify({ ...s, rng: undefined });

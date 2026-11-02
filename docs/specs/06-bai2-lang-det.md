@@ -97,7 +97,7 @@ Logic đặt trong `whackLogic.ts` (hàm thuần, có test).
 
 **Tốc độ và nhịp sinh:**
 - Chuột cần 3 giây để chạy từ đầu làn tới **đầu vùng đập**; giảm dần còn 1,8 giây ở giây thứ 120.
-- Nhịp sinh 1,2 giây một con, giảm dần còn 0,55 giây.
+- Nhịp sinh 1,3 giây một con, giảm dần còn 0,7 giây (P9b; trước đó 1,2 → 0,55).
 - Không sinh chuột vào làn nếu con gần nhất ở làn đó còn quá gần điểm xuất phát (dưới 15% chiều dài làn).
 
 **Tỉ lệ các loại chuột theo thời gian:**
@@ -143,7 +143,7 @@ Chỉ có logic (chưa có cảnh; màn 5 vẫn `coming-soon`). Đơn vị thờ
 - **Đồng hồ lịch** (dùng cho lịch trùm 12, 24, …, 120; tỉ lệ loại chuột; tốc độ; nhịp sinh) **dừng trong lượt trùm** (cả lúc {phanDien} chạy xuống lẫn lúc mở câu hỏi). Tiền đồng (hiện, biến mất) cũng đếm theo đồng hồ này nên dừng (tự chọn).
 - **Lượt trùm:** ngừng sinh chuột; chuột đang chạy còn 20% tốc độ trong lúc {phanDien} chạy xuống (1,2 giây, tự chọn); khi bảng câu hỏi mở thì chuột **đứng yên** và không nhận cú đập. Trả lời xong (hoặc hết giờ) thì {phanDien} rời đi, mọi thứ chạy lại. Trong lúc {phanDien} chạy xuống vẫn đập được chuột (tự chọn).
 - **Điểm trùm:** số giây còn lại **làm tròn xuống** (còn 7,0 đến 7,99 giây thì 7 → +135). Logic chỉ nhận kết quả `correct` / `wrong` / `timeout` kèm số giây còn lại; đếm giờ và chọn câu hỏi do `QuizCard` lo. Đúng thì **xoá 2 vết mực** nếu đang có (không xuống dưới 0); sai hoặc hết giờ +1 vết mực.
-- **Tốc độ:** chuột cần 3 giây từ 0 tới đầu vùng đập (vị trí 6,5; tốc độ 6,5/3 đơn vị/giây), giảm tuyến tính còn 1,8 giây ở giây 120 của đồng hồ lịch (rồi giữ). Tốc độ của mỗi con chốt lúc sinh. **Nhịp sinh** 1,2 giây giảm tuyến tính còn 0,55; con đầu tiên ở giây 1,2 (tự chọn). Không sinh vào làn có con gần nhất còn dưới 1,5; chọn làn đều trong các làn còn lại.
+- **Tốc độ:** chuột cần 3,2 giây từ 0 tới đầu vùng đập (vị trí 6,5; tốc độ 6,5/3,2 đơn vị/giây), giảm tuyến tính còn 2,2 giây ở giây 120 (P9b; trước đó 3 → 1,8) của đồng hồ lịch (rồi giữ). Tốc độ của mỗi con chốt lúc sinh. **Nhịp sinh** 1,3 giây giảm tuyến tính còn 0,7; con đầu tiên ở giây 1,3 (tự chọn; P9b). Không sinh vào làn có con gần nhất còn dưới 1,5; chọn làn đều trong các làn còn lại.
 - **Thời gian chuột nằm trong vùng đập** (2,5 đơn vị ÷ tốc độ): chuột thường **1,154 giây** ở giây 0 và **0,692 giây** ở giây 120; chuột nhanh (×1,6) **0,721 giây** ở giây 0 và **0,433 giây** ở giây 120.
 - **Đổi làn:** tới vị trí **5,0** (cách vùng đập 1,5) thì nhảy sang làn kề một lần, nhưng chỉ sang làn kề đang **trống trong khoảng ±1,5 quanh vị trí của nó** (không có chuột nào của làn đó ở vị trí cách nó ≤ 1,5). Làn 0 → 1, làn 3 → 2; làn giữa thử bên rng chọn, bị chiếm thì thử bên kia; không làn nào trống thì **không đổi** (không thử lại; vẫn là chuột đổi làn, vẫn 15 điểm). **Nhanh:** tốc độ ×1,6. **To:** đập 2 lần; sau lần đầu khựng 0,3 giây (đứng yên) và có cờ chớp sáng; hạ xong +30.
 - **Đập hụt:** làn nghỉ 0,2 giây (không nhận cú đập); đập trúng không nghỉ. **Tiền đồng:** hiện ở làn ngẫu nhiên, vị trí ngẫu nhiên trong [2; 6] (tự chọn), cách nhau 8 ± 1 giây, tồn tại 2,5 giây, chạm +5 điểm +1 xu. **Thua:** đủ 8 vết mực (xét trước); **thắng trọn:** xong lượt trùm thứ 10.
@@ -183,6 +183,8 @@ Chỉ có logic (chưa có cảnh; màn 5 vẫn `coming-soon`). Đơn vị thờ
 - **Chọn A vì là phương án đầu tiên đạt cả hai mục tiêu:** bot giỏi Vàng 91,3% (≥ 90%), bot trung bình gặp trung bình 8,31 lượt trùm (≥ 6). Lọt trung bình 12,4 chuột mỗi ván.
 - **Mốc mới 1650 / 2650 / 3100 (tạm, chỉnh khi học sinh chơi thật):** Đồng = p25 bot trung bình 1675 → 1650; Bạc = p75 bot trung bình 2675 → 2650; Vàng = p10 bot giỏi 3120 → 3100. Đồng < Bạc < Vàng. Với mốc này bot trung bình: 23,3% chưa đạt, 48,0% Đồng, 28,7% Bạc, không Vàng.
 - **Điểm tối đa lý thuyết ước tính khoảng 3580:** trùm 5 × (100 + 5 × 15) + 5 × (100 + 5 × 10) = 1625; khoảng 143 chuột (khoảng 1880 điểm); khoảng 14,5 đồng (khoảng 73 điểm).
+
+> **P9 (chuột đi từ dưới lên, lượt đáp án) thay mọi chỗ dưới đây nói chuột chạy "từ trên xuống", cuốn sổ "ở đáy", hộp câu hỏi của trùm và bảng 45% khung. Xem mục "P9" ngay trước phần Test.**
 
 ### Cảnh màn 5 (mốc 3, bước B7; nâng cấp P7a giao diện 2D thuần túy; P7b hoàn thiện điều khiển và kiểm lối chơi; P7c làm lại đồ họa hoạt hình bám sát ảnh mẫu bằng bộ 15 ảnh 2D; code ở `packages/village-lang-det/src/whack/`)
 
@@ -232,6 +234,83 @@ Chỉ có logic (chưa có cảnh; màn 5 vẫn `coming-soon`). Đơn vị thờ
 - **Tự chọn (spec chưa nói):** số ô pool (20 chuột); chuột nhanh vẽ nhỏ hơn 0,8 và chuột to to hơn 1,5 lần; học sinh cao 1,85 (nhỏ để vừa khoảng trống dưới đuôi các làn) và đứng lệch ra mép cuốn sổ nếu chân làn trùng sổ (làn 2 và 3); cô Chi cố định bên trái; trùm chờ ở pos 3 và bị đét ở pos 9,3; bảng câu hỏi 45% đổi bên theo làn của trùm; quạt nan là hình dựng bằng code (không có ảnh); khung dọc thì nhắc xoay ngang và dừng; tiền đồng nhặt bằng chạm hay bấm vào hình đồng (bán kính 0,95 đơn vị); HUD ghi "Trùm: số lượt đã qua/10".
 - **Số đo GPU (bản dev, Chrome thật, mức Thấp, bot chơi 100 giây, trùm đúng 8 lượt, 107 chuột trúng):** tam giác 36.770 (54.597 khi trùm hiện), draw call 14 đến 17, `geometries` 11, `textures` 20 ở giây 20 và 23 ở giây 100 (hai ảnh chuột lần đầu được đẩy lên GPU trễ; sau khi thêm bước đẩy trước lúc khởi động, từ giây 5 đến 100 đứng yên ở 23), programs 7. Dựng lại màn 6 lần bằng "Chơi lại": từ lần 2 trở đi mỗi lần đều `geometries` 3, `textures` 10, draw call 25, tam giác 54.611 (không tăng). Lần đầu khác lần sau (chưa tìm rõ nguyên nhân, nhiều khả năng do cách đọc `renderer.info` sau khi dựng lại Canvas); không có lần nào tăng dần.
 - **Kích thước chunk (`pnpm build`, apps/lang-det, trước, sau):** `index` 295,15 đến 299,05 kB; `Man4` 48,55 đến 43,93 kB; `Man5` mới 91,10 kB (gzip 28,49); chunk lõi 3D 1.017,28 đến 1.007,49 kB; module 229,22 kB không đổi. Thêm khoảng 80 kB, tải lười khi vào màn 5.
+
+### P9 — Chuột đi từ dưới lên và lượt đáp án (nhánh `feat/man5-chuot-di-len`; `WhackGame.tsx`, `whackLogic.ts`, `whackBots.ts`, test `whackAnswer.test.ts`; kiểm bằng `scripts/man5-di-len-check.mjs`)
+
+Giữ nguyên bộ 15 ảnh P7c (không ảnh mới). Luật chuột, điểm, tim/mực (8 vết), điều kiện kết thúc (đủ 8 vết hoặc xong 10 lượt), Tự hoàn thành, Trang Sổ Vàng, lưu tiến độ KHÔNG đổi.
+
+- **Hướng chạy:** chuột đi TỪ DƯỚI LÊN. Cuốn Sổ Chung và 8 chấm vết mực ở ĐỈNH sân; vùng đập là đoạn gần sổ (vị trí luật vẫn [6,5; 9] của làn dài 10, tức 10% đến 35% tính từ mép trên của làn, độ dài như cũ). Logic không đổi: `pos` là quãng đã chạy (0 chỗ xuất hiện, 10 là sổ), chỉ giao diện đảo chiều (`topPct` = (1 − pos/10) × 100%). Sprite chuột vốn quay mũi lên nên giữ hướng. Mọi loại chuột (thường, nhanh, đổi làn, to) giữ luật và điểm.
+- **Nhân vật:** đứng ở hàng giữa sổ và làn, CHẠY NGANG tới làn được đập (`left` trượt 120 ms, tức ≤ 0,15 giây; "Giảm chuyển động": nhảy thẳng) rồi vung búa (`hero-idle` khi chạy/đứng, `hero-hit` 180 ms khi đập; cùng điểm neo đáy). Cú đập tính NGAY lúc bấm (logic), nhân vật chạy chỉ là hoạt cảnh nên không làm chậm người chơi. Phím D F J K / 1–4, chạm làn, nút chân làn dùng như cũ.
+- **Chuột câu hỏi (vàng ❓, 10 lượt ở giây 12, 24, …, 120):** chuột thường chạy chậm 20% như cũ; chuột câu hỏi chạy lên (1,2 giây) tới giữa vùng đập rồi ĐỨNG CHỜ tới khi em đập trúng nó (từ lúc nó chạy qua đầu vùng đập đã đập được; đập làn của nó thì trúng nó trước chuột thường cùng làn). Không còn hộp câu hỏi tự mở.
+- **Lượt đáp án (phase `answer`):** đập trúng chuột câu hỏi thì mở lượt: đồng hồ lịch, sinh chuột và đồng dừng, chuột thường (mờ đi) đứng yên. Câu hỏi (`pickQuestions` bài 1–2 như cũ) hiện ở CỘT BÊN PHẢI sân (màn ngang, chừa chỗ sẵn nên sân không nhảy) hay DẢI TRÊN (điện thoại dọc, thay chỗ cuốn sổ, cao 232 điểm ảnh, 252 từ P9b); 2 đến 4 chuột vàng (ảnh `mouse-question`, nhãn A, B, C, D do code vẽ) chạy từ đầu làn lên sổ ở các làn khác nhau, thứ tự A–D theo làn TRỘN theo seed (Fisher–Yates rút ở bước cố định lúc chuột câu hỏi ra, `boss.laneOf`). Các đáp án trong cột chỉ để ĐỌC, không bấm được: phải ĐẬP chuột (trong vùng đập, như chuột thường).
+  - Đập đúng chuột mang đáp án đúng: xóa 2 vết mực (không âm) và điểm 100 + 5 × số giây chuột còn cần để tới sổ lúc đập (làm tròn xuống).
+  - Đập chuột sai, hoặc chuột (bốn chuột cùng tốc độ, tới sổ cùng lúc) chạy tới sổ mà em chưa đập: +1 vết mực, không điểm.
+  - Đập hụt (chưa vào vùng đập): làn nghỉ 0,2 giây, không phạt.
+  - Có kết quả thì hiện `FeedbackSheet` (đúng/sai bằng biểu tượng và chữ, đáp án đúng, lời giải thích); cột câu hỏi tô xanh (✓) đáp án đúng, đỏ (✗) đáp án em chọn. Bấm "Chơi tiếp" mới áp kết quả (`answerBoss`) và chạy lại ván. Giữ chống click ma (bỏ qua "Chơi tiếp" trong 450 ms đầu sau khi hộp mở) và chặn Enter lặp (của `FeedbackSheet`). Hộp "?" và Hướng dẫn tạm dừng thật trong lượt đáp án (đo: vị trí chuột vàng đứng yên khi hộp mở, chạy tiếp khi đóng).
+- **Nút "Đọc xong" (P9b, phím Space):** trong cột (hay dải) câu hỏi có nút "Đọc xong" (chữ ở `whackUi.docXong`). Bấm nút hay nhấn Space (khi lượt đáp án đang chạy, chuột vàng chưa tới đầu vùng đập, chưa bấm lần nào) thì 4 chuột vàng chạy nhanh ×3 (`boss.readBoost`) tới đúng đầu vùng đập (6,5) rồi về tốc độ thường; nút biến mất sau khi dùng. Không bấm thì chuột giữ tốc độ đọc cũ. Điểm không tăng nhờ bấm: số giây còn lại luôn tính theo quãng chuột còn phải chạy ÷ tốc độ thường, nên đập ở cùng một vị trí thì cùng điểm dù có bấm hay không. Hộp "?" và hướng dẫn vẫn tạm dừng thật (không nhận Space). Logic: `readDone(s)` trả sự kiện `answerBoost`; `AnswerRound.boost`.
+- **Logic mới (hàm thuần):** `createWhackGame(seed, keys)` với `keys[i] = { correct, options }` của câu thứ i (UI lấy từ `pickQuestions`); phase `answer`; `hitLane` mở lượt/chọn đáp án; `closeAnswer` đặt `verdict` và phase `quiz` (chờ "Chơi tiếp"); `answerBoss` giữ nguyên chữ ký. Sự kiện mới: `bossArrive`, `answerStart`; `bossQuiz` mang `verdict`.
+- **Hướng dẫn P8 (bản gọn, 7 bước, dữ liệu mẫu riêng không đụng ván thật):** giới thiệu, làn (chuột chạy từ dưới lên), cuốn sổ ở đỉnh, điều khiển, đập thử 1 chuột thường mẫu ở làn 1 (nhân vật chạy tới đập), lượt đáp án mẫu ("2 + 3 bằng mấy?", đáp án B đúng; 4 nút "Đập chuột A…D", đập sai thì nhắc và ở lại bước), bước cuối. Chữ ở `tutorialTexts.man5`; hướng dẫn chơi (luật, 4 trang, câu nhắc `ketQua` mới) ở `huongDanGame.ts` mục 5; thứ tự `GUIDE_SECTIONS` không đổi.
+- **Tự chọn (spec chưa nói):** chuột đáp án chạy hết làn trong 18 giây (lượt 1–5) và 14 giây (lượt 6–10): chậm hơn chuột thường khoảng 4 lần ở đầu ván, để đọc kịp câu dài nhất (201 ký tự kể cả 4 đáp án; đã thử vừa khung ở 360×800 và 844×390); chuột câu hỏi đứng chờ vô hạn (chuột thường quanh nó chỉ còn 20% tốc độ nên áp lực vết mực vẫn có); đập làn có chuột câu hỏi trong vùng thì trúng chuột câu hỏi trước chuột thường cùng làn; câu chỉ có 2 đáp án (2 câu trong ngân hàng bài 2) thì chỉ có 2 chuột vàng A, B ở 2 làn trộn; 4 chuột đáp án xuất phát cùng lúc cùng tốc độ; điểm đáp án tính theo quãng còn lại của chuột đúng lúc đập thay cho thời gian trả lời 15/10 giây cũ; cột câu hỏi rộng `clamp(210px, 34vw, 380px)`; cỡ chữ cột nhỏ hơn ở điện thoại dọc và khung thấp (< 520 px cao).
+- **Cân bằng sau P9b (`whackBalance.test.ts`, 300 ván mỗi bot, seed 1–300; bot giỏi đập chuột đáp án khi nó đi được 30% vùng đập, bot trung bình 50%, người lý tưởng 0%; chuột câu hỏi bot đập sau 0,3 giây + |lệch giờ|; bot bấm "Đọc xong" sau `answerDelay` giây, không đổi điểm).**
+
+  Yêu cầu P9b: chỉ chỉnh số trong `whackConfig.ts` (nhịp sinh, tốc độ chuột thường, tốc độ chuột đáp án), không đổi luật. Mục tiêu: bot giỏi Vàng ≥ 90% và thua đầy sổ ≤ 2%; bot trung bình thua đầy sổ ≤ 40%, Vàng < 10%, gặp ≥ 6 lượt.
+
+  Số cũ → mới: nhịp sinh 1,2 → 0,55 giây thành **1,3 → 0,7**; con đầu tiên giây 1,2 thành **1,3**; chuột cần 3,0 → 1,8 giây tới vùng đập thành **3,2 → 2,2**; tốc độ chuột đáp án giữ **18 / 14 giây** (đổi tốc độ này gần như không đổi tỉ lệ thua vì chuột thường đứng yên suốt lượt đáp án). Mốc: 1350 / 2550 / 2850 thành **1750 / 2400 / 2600**.
+
+  Các cấu hình đã thử (nhịp sinh đầu/cuối, giây chuột tới vùng đập đầu/cuối; chưa đổi `firstSpawn` 1,2; mốc đặt theo phân vị của chính cấu hình đó):
+
+  | Cấu hình | Giỏi: Vàng / thua | Trung bình: thua / Vàng / lượt gặp | Đạt? |
+  |---|---|---|---|
+  | 1,2/0,55 · 3,0/1,8 (cũ) | 94,0% / 0% | 63,0% / 3,7% / 8,00 | không (thua 63%) |
+  | 1,2/0,6 · 3,0/2,4 | 93,0% / 0% | 51,0% / 6,3% / 8,30 | không |
+  | 1,2/0,7 · 3,0/2,2 | 91,3% / 0% | 43,0% / 6,0% / 8,65 | không |
+  | 1,2/0,7 · 3,0/2,6 | 93,0% / 0% | 41,0% / 5,3% / 8,68 | không |
+  | 1,2/0,8 · 3,0/2,4 | 95,3% / 0% | 38,0% / 7,7% / 8,77 | đạt |
+  | 1,2/0,9 · 3,0/2,5 | 92,0% / 0% | 31,0% / 6,7% / 8,92 | đạt |
+  | 1,3/0,7 · 3,2/2,2 | 94,0% / 0% | 37,3% / 4,3% / 8,91 | đạt (**chọn**: đổi ít nhất mà Vàng bot trung bình thấp nhất) |
+  | 1,4/0,8 · 3,4/2,6 | 91,3% / 0% | 26,3% / 4,3% / 9,18 | đạt |
+
+  Cấu hình chọn chạy lại đủ (có `firstSpawn` 1,3) cho số cuối cùng dưới đây.
+
+  | Mốc (Đồng / Bạc / Vàng) | Bot | Chưa đạt | Đồng | Bạc | Vàng | Thua (đầy sổ) | Điểm trung bình (nhỏ nhất đến lớn nhất) | Lượt gặp (TB) | % ván hết 10 lượt |
+  |---|---|---|---|---|---|---|---|---|---|
+  | 1350 / 2550 / 2850 (trước P9b) | Lý tưởng | 0% | 0% | 0% | 100% | 0% | 3196,3 (3010 đến 3390) | 10 | 100% |
+  | | Giỏi | 0% | 0% | 6,0% | 94,0% | 0% | 3026,9 (2660 đến 3270) | 10 | 100% |
+  | | Trung bình | 24,0% | 45,0% | 27,3% | 3,7% | 63,0% | 1960,1 (130 đến 2940) | 8,00 | 39,0% |
+  | **1750 / 2400 / 2600 (P9b)** | Lý tưởng | 0% | 0% | 0% | 100% | 0% | 2919,3 (2775 đến 3075) | 10 | 100% |
+  | | Giỏi | 0% | 0,7% | 4,7% | **94,7%** | **0%** | 2752,4 (2350 đến 2960) | 10 | 100% |
+  | | Trung bình | 23,0% | 46,3% | 24,7% | **6,0%** | **37,3%** | 2053,9 (245 đến 2735) | 8,97 | 64,3% |
+
+  Lý do mốc: Đồng = phân vị 25% bot trung bình (1790) làm tròn xuống bội số 50; Bạc = phân vị 75% bot trung bình (2440) làm tròn xuống bội số 50; Vàng = phân vị 10% bot giỏi (2620) làm tròn xuống bội số 50. Mọi mục tiêu P9b đạt: bot giỏi Vàng 94,7% (≥ 90%), thua 0% (≤ 2%); bot trung bình thua 37,3% (≤ 40%), Vàng 6,0% (< 10%), gặp 8,97 lượt (≥ 6). Điểm tối đa lý thuyết khoảng 2920. Mốc vẫn TẠM, chỉnh khi học sinh chơi thật.
+- **Kích thước chunk (`pnpm build`, apps/lang-det, trước, sau):** `index` 295,15 đến 299,05 kB; `Man4` 48,55 đến 43,93 kB; `Man5` mới 91,10 kB (gzip 28,49); chunk lõi 3D 1.017,28 đến 1.007,49 kB; module 229,22 kB không đổi. Thêm khoảng 80 kB, tải lười khi vào màn 5.
+
+### P9 — Chuột đi từ dưới lên và lượt đáp án (nhánh `feat/man5-chuot-di-len`; `WhackGame.tsx`, `whackLogic.ts`, `whackBots.ts`, test `whackAnswer.test.ts`; kiểm bằng `scripts/man5-di-len-check.mjs`)
+
+Giữ nguyên bộ 15 ảnh P7c (không ảnh mới). Luật chuột, điểm, tim/mực (8 vết), điều kiện kết thúc (đủ 8 vết hoặc xong 10 lượt), Tự hoàn thành, Trang Sổ Vàng, lưu tiến độ KHÔNG đổi.
+
+- **Hướng chạy:** chuột đi TỪ DƯỚI LÊN. Cuốn Sổ Chung và 8 chấm vết mực ở ĐỈNH sân; vùng đập là đoạn gần sổ (vị trí luật vẫn [6,5; 9] của làn dài 10, tức 10% đến 35% tính từ mép trên của làn, độ dài như cũ). Logic không đổi: `pos` là quãng đã chạy (0 chỗ xuất hiện, 10 là sổ), chỉ giao diện đảo chiều (`topPct` = (1 − pos/10) × 100%). Sprite chuột vốn quay mũi lên nên giữ hướng. Mọi loại chuột (thường, nhanh, đổi làn, to) giữ luật và điểm.
+- **Nhân vật:** đứng ở hàng giữa sổ và làn, CHẠY NGANG tới làn được đập (`left` trượt 120 ms, tức ≤ 0,15 giây; "Giảm chuyển động": nhảy thẳng) rồi vung búa (`hero-idle` khi chạy/đứng, `hero-hit` 180 ms khi đập; cùng điểm neo đáy). Cú đập tính NGAY lúc bấm (logic), nhân vật chạy chỉ là hoạt cảnh nên không làm chậm người chơi. Phím D F J K / 1–4, chạm làn, nút chân làn dùng như cũ.
+- **Chuột câu hỏi (vàng ❓, 10 lượt ở giây 12, 24, …, 120):** chuột thường chạy chậm 20% như cũ; chuột câu hỏi chạy lên (1,2 giây) tới giữa vùng đập rồi ĐỨNG CHỜ tới khi em đập trúng nó (từ lúc nó chạy qua đầu vùng đập đã đập được; đập làn của nó thì trúng nó trước chuột thường cùng làn). Không còn hộp câu hỏi tự mở.
+- **Lượt đáp án (phase `answer`):** đập trúng chuột câu hỏi thì mở lượt: đồng hồ lịch, sinh chuột và đồng dừng, chuột thường (mờ đi) đứng yên. Câu hỏi (`pickQuestions` bài 1–2 như cũ) hiện ở CỘT BÊN PHẢI sân (màn ngang, chừa chỗ sẵn nên sân không nhảy) hay DẢI TRÊN (điện thoại dọc, thay chỗ cuốn sổ, cao 232 điểm ảnh); 2 đến 4 chuột vàng (ảnh `mouse-question`, nhãn A, B, C, D do code vẽ) chạy từ đầu làn lên sổ ở các làn khác nhau, thứ tự A–D theo làn TRỘN theo seed (Fisher–Yates rút ở bước cố định lúc chuột câu hỏi ra, `boss.laneOf`). Các đáp án trong cột chỉ để ĐỌC, không bấm được: phải ĐẬP chuột (trong vùng đập, như chuột thường).
+  - Đập đúng chuột mang đáp án đúng: xóa 2 vết mực (không âm) và điểm 100 + 5 × số giây chuột còn cần để tới sổ lúc đập (làm tròn xuống).
+  - Đập chuột sai, hoặc chuột (bốn chuột cùng tốc độ, tới sổ cùng lúc) chạy tới sổ mà em chưa đập: +1 vết mực, không điểm.
+  - Đập hụt (chưa vào vùng đập): làn nghỉ 0,2 giây, không phạt.
+  - Có kết quả thì hiện `FeedbackSheet` (đúng/sai bằng biểu tượng và chữ, đáp án đúng, lời giải thích); cột câu hỏi tô xanh (✓) đáp án đúng, đỏ (✗) đáp án em chọn. Bấm "Chơi tiếp" mới áp kết quả (`answerBoss`) và chạy lại ván. Giữ chống click ma (bỏ qua "Chơi tiếp" trong 450 ms đầu sau khi hộp mở) và chặn Enter lặp (của `FeedbackSheet`). Hộp "?" và Hướng dẫn tạm dừng thật trong lượt đáp án (đo: vị trí chuột vàng đứng yên khi hộp mở, chạy tiếp khi đóng).
+- **Nút "Đọc xong" (P9b, phím Space):** trong cột (hay dải) câu hỏi có nút "Đọc xong" (chữ ở `whackUi.docXong`). Bấm nút hay nhấn Space (khi lượt đáp án đang chạy, chuột vàng chưa tới đầu vùng đập, chưa bấm lần nào) thì 4 chuột vàng chạy nhanh ×3 (`boss.readBoost`) tới đúng đầu vùng đập (6,5) rồi về tốc độ thường; nút biến mất sau khi dùng. Không bấm thì chuột giữ tốc độ đọc cũ. Điểm không tăng nhờ bấm: số giây còn lại luôn tính theo quãng chuột còn phải chạy ÷ tốc độ thường, nên đập ở cùng một vị trí thì cùng điểm dù có bấm hay không. Hộp "?" và hướng dẫn vẫn tạm dừng thật (không nhận Space). Logic: `readDone(s)` trả sự kiện `answerBoost`; `AnswerRound.boost`.
+- **Logic mới (hàm thuần):** `createWhackGame(seed, keys)` với `keys[i] = { correct, options }` của câu thứ i (UI lấy từ `pickQuestions`); phase `answer`; `hitLane` mở lượt/chọn đáp án; `closeAnswer` đặt `verdict` và phase `quiz` (chờ "Chơi tiếp"); `answerBoss` giữ nguyên chữ ký. Sự kiện mới: `bossArrive`, `answerStart`; `bossQuiz` mang `verdict`.
+- **Hướng dẫn P8 (bản gọn, 7 bước, dữ liệu mẫu riêng không đụng ván thật):** giới thiệu, làn (chuột chạy từ dưới lên), cuốn sổ ở đỉnh, điều khiển, đập thử 1 chuột thường mẫu ở làn 1 (nhân vật chạy tới đập), lượt đáp án mẫu ("2 + 3 bằng mấy?", đáp án B đúng; 4 nút "Đập chuột A…D", đập sai thì nhắc và ở lại bước), bước cuối. Chữ ở `tutorialTexts.man5`; hướng dẫn chơi (luật, 4 trang, câu nhắc `ketQua` mới) ở `huongDanGame.ts` mục 5; thứ tự `GUIDE_SECTIONS` không đổi.
+- **Tự chọn (spec chưa nói):** chuột đáp án chạy hết làn trong 18 giây (lượt 1–5) và 14 giây (lượt 6–10): chậm hơn chuột thường khoảng 4 lần ở đầu ván, để đọc kịp câu dài nhất (201 ký tự kể cả 4 đáp án; đã thử vừa khung ở 360×800 và 844×390); chuột câu hỏi đứng chờ vô hạn (chuột thường quanh nó chỉ còn 20% tốc độ nên áp lực vết mực vẫn có); đập làn có chuột câu hỏi trong vùng thì trúng chuột câu hỏi trước chuột thường cùng làn; câu chỉ có 2 đáp án (2 câu trong ngân hàng bài 2) thì chỉ có 2 chuột vàng A, B ở 2 làn trộn; 4 chuột đáp án xuất phát cùng lúc cùng tốc độ; điểm đáp án tính theo quãng còn lại của chuột đúng lúc đập thay cho thời gian trả lời 15/10 giây cũ; cột câu hỏi rộng `clamp(210px, 34vw, 380px)`; cỡ chữ cột nhỏ hơn ở điện thoại dọc và khung thấp (< 520 px cao).
+- **Cân bằng sau P9 (`whackBalance.test.ts`, 300 ván mỗi bot, seed 1–300; bot giỏi đập chuột đáp án khi nó đi được 30% vùng đập, bot trung bình 50%, người lý tưởng 0%; chuột câu hỏi bot đập sau 0,3 giây + |lệch giờ|):**
+
+| Mốc (Đồng / Bạc / Vàng) | Bot | Chưa đạt | Đồng | Bạc | Vàng | Thua (đầy sổ) | Điểm trung bình (nhỏ nhất đến lớn nhất) | Lượt gặp (TB) | % ván hết 10 lượt |
+|---|---|---|---|---|---|---|---|---|---|
+| 1650 / 2650 / 3100 (cũ, chưa đổi mốc) | Giỏi | 0% | 0% | 73,7% | 26,3% | 0% | 3026,9 (2660 đến 3270) | 10 | 100% |
+| **1350 / 2550 / 2850 (mới)** | Lý tưởng | 0% | 0% | 0% | 100% | 0% | 3196,3 (3010 đến 3390) | 10 | 100% |
+| | Giỏi | 0% | 0% | 6,0% | **94,0%** | 0% | 3026,9 (2660 đến 3270) | 10 | 100% |
+| | Trung bình | 24,0% | 45,0% | 27,3% | **3,7%** | 63,0% | 1960,1 (130 đến 2940) | 8,00 | 39,0% |
+
+  Lý do đổi mốc: điểm đáp án giảm (trung bình 125 so với 140 trước) và chuột câu hỏi phải bị đập nên điểm bot rơi cả bảng; mốc cũ cho bot giỏi chỉ 26,3% Vàng. Đồng = phân vị 25% bot trung bình (1370) làm tròn xuống bội số 50; Bạc = phân vị 75% bot trung bình (2595) làm tròn xuống bội số 50; Vàng = 2850: p10 bot giỏi là 2885 (quy tắc cũ cho 2800, bot trung bình 8,3% Vàng); ở 2850 bot giỏi 94,0% và bot trung bình 3,7%, ở 2900 bot giỏi chỉ 88,0%. **Chưa đạt hoàn toàn quy tắc "bot trung bình hầu như không Vàng":** còn 3,7% vì điểm hai bot chồng lên nhau nhiều hơn trước (không đổi luật để khớp). Mục tiêu bot giỏi Vàng ≥ 90% và bot trung bình gặp ≥ 6 lượt (8,00) đạt. Điểm tối đa lý thuyết khoảng 3200.
+- **Kích thước chunk (`pnpm build`):** `Man5` 32,54 kB (gzip 10,50) ở apps/lang-det, 32,62 kB (gzip 10,54) ở apps/hub; trước P9 là 26,49 kB (gzip 8,76), thêm khoảng 6 kB (cột câu hỏi, chuột đáp án, hướng dẫn mẫu, `FeedbackSheet`). Sau P9b (nút "Đọc xong"): 33,62 kB (gzip 10,82) ở apps/lang-det, 33,70 kB (gzip 10,86) ở apps/hub; build dùng `pnpm -r --workspace-concurrency=1 build` vì build song song hết bộ nhớ trên máy này.
 
 ### Test (`whackLogic.ts`; ngoài 10 dòng dưới còn test đồng hồ lịch dừng, chuột đứng yên khi mở câu hỏi, tỉ lệ loại, tốc độ, nhịp sinh, chuột to khựng, làn nghỉ, tất định theo seed và theo dt)
 

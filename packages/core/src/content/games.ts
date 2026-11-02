@@ -211,20 +211,23 @@ export const climbUi = {
 /** Chữ trong màn 5 "Đập {phanDien}" (spec 06 mục Màn 5). Mọi câu đi qua fmt() ({phanDien}, {so}…). */
 export const whackUi = {
   /** Nhãn đọc màn hình của khung chơi */
-  khung: 'Sân dệt. Phím D F J K hoặc chạm vào làn để đập chuột giấy.',
+  khung: 'Sân dệt. Chuột giấy chạy từ dưới lên sổ. Phím D F J K hoặc chạm vào làn để đập chuột.',
   diem: 'Điểm: {so}',
   xu: 'Xu: {so}',
   trum: 'Trùm: {so}/{max}',
   /** Nhãn đọc màn hình của hàng chấm vết mực */
   muc: 'Vết mực trên sổ: {so}/{max}',
-  /** Lượt trùm: tiêu đề, thời gian, kết quả */
-  cauHoi: '{phanDien} chạy xuống! Câu hỏi {so}/{max}',
-  conGio: 'Còn {giay} giây',
-  hetGio: 'Hết giờ rồi!',
+  /** Lượt đáp án (chuột câu hỏi bị đập trúng): tiêu đề cột câu hỏi, nhãn, kết quả */
+  cauHoi: 'Câu hỏi {so}/{max}',
+  docCauHoi: 'Đọc câu hỏi, rồi đập chuột vàng mang đáp án em chọn!',
+  docXong: 'Đọc xong',
+  docXongGoiY: 'Bấm khi đã đọc xong để chuột chạy nhanh tới vùng đập (hoặc nhấn phím Space).',
+  cotCauHoi: 'Câu hỏi của {phanDien}',
+  nhanDapAn: 'Chuột đáp án {nhan}',
   dapAnDung: 'Đáp án đúng: {dapAn}',
-  uiDa: 'Ui da!',
-  quizDung: 'Trúng rồi! Em đét được {phanDien}: +{diem} điểm và xoá 2 vết mực.',
-  quizSai: '{phanDien} né được và chạy xuống sổ: thêm một vết mực.',
+  ketQuaDung: 'Trúng đáp án {nhan}! Em được +{diem} điểm và xoá 2 vết mực.',
+  ketQuaSai: 'Em đập chuột đáp án {nhan} nhưng chưa đúng: thêm một vết mực.',
+  ketQuaHet: 'Chuột đáp án đúng đã chạy tới sổ: thêm một vết mực.',
   tiepTuc: 'Chơi tiếp',
   /** Hết ván */
   hetMuc: 'Sổ đầy mực rồi! Mình thử lại nhé.',
