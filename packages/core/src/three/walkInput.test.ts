@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   MIN_TOUCH_TARGET,
+  isRunning,
+  toggleRun,
   RUN_THRESHOLD,
   STICK_DEADZONE,
   STICK_RADIUS,
@@ -145,5 +147,19 @@ describe('cần điều khiển động', () => {
   });
   it('vùng bấm tối thiểu 44px', () => {
     expect(MIN_TOUCH_TARGET).toBe(44);
+  });
+});
+
+describe('chạy nhanh', () => {
+  it('chạy khi giữ Shift, bật nút hoặc đẩy cần quá 80%', () => {
+    expect(isRunning(false, false, 0)).toBe(false);
+    expect(isRunning(true, false, 0)).toBe(true);
+    expect(isRunning(false, true, 0)).toBe(true);
+    expect(isRunning(false, false, 0.5)).toBe(false);
+    expect(isRunning(false, false, 0.9)).toBe(true);
+  });
+  it('nút bật tắt luân phiên', () => {
+    expect(toggleRun(false)).toBe(true);
+    expect(toggleRun(true)).toBe(false);
   });
 });

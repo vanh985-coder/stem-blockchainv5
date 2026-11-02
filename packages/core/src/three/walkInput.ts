@@ -117,6 +117,18 @@ export function runFromStick(magnitude: number): boolean {
   return magnitude > RUN_THRESHOLD;
 }
 
+/**
+ * Chạy nhanh hay không: giữ Shift, hoặc đang bật nút "Chạy nhanh", hoặc đẩy cần điều khiển quá 80%.
+ */
+export function isRunning(keyRun: boolean, runToggle: boolean, stickMag: number): boolean {
+  return keyRun || runToggle || runFromStick(stickMag);
+}
+
+/** Bật tắt nút "Chạy nhanh". */
+export function toggleRun(on: boolean): boolean {
+  return !on;
+}
+
 /** Vị trí núm cần (so với gốc cần, pixel) khi đã chặn trong bán kính `radius`: để vẽ núm. Ghi vào `out`. */
 export function knobOffset(dx: number, dy: number, radius: number, out: { x: number; y: number }): void {
   const len = Math.hypot(dx, dy);
