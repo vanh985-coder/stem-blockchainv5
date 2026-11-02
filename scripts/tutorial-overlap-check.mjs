@@ -159,7 +159,15 @@ async function pushPractice(page) {
       t.setStep(t.step + 1);
       return 'setStep';
     }
-    const btn = [...document.querySelectorAll('button[id^="tutorial-man"]')].find((b) => !/guide/.test(b.id) && b.getBoundingClientRect().width > 0);
+    // Bước chọn đáp án mẫu: bấm lần lượt từng nút tới khi bước chuyển (đáp án sai chỉ hiện nhắc, đáp án đúng sang bước kế)
+    const answers = [...document.querySelectorAll('[data-testid^="dap-mau-"]')];
+    if (answers.length) {
+      answers.forEach((b) => b.isConnected && b.click());
+      return 'answers';
+    }
+    const visible = (b) => b.getBoundingClientRect().width > 0 && !/guide/.test(b.id || '');
+    // Thanh nút làm thử của game (data-tutorial-obstacle) trước, rồi nút đáp án mẫu, rồi nút làm thử theo id
+    const btn = [document.querySelectorAll('[data-tutorial-obstacle] button'), document.querySelectorAll('[data-testid^="dap-mau-"]'), document.querySelectorAll('button[id^="tutorial-man"]')].flatMap((l) => [...l]).find(visible);
     if (btn) {
       btn.click();
       return 'practice-btn';
@@ -199,14 +207,14 @@ async function walkOverlap(page) {
     same = key === lastKey ? same + 1 : 0;
     lastKey = key;
     if (same === 0) steps.push(m);
-    if (same >= 3) {
+    if (same >= 6) {
       stuck = `bước ${m.step ?? i} chờ thao tác thật, cầu nối không đẩy được`;
       break;
     }
     const adv = await page.evaluate(advanceInfo);
     if (!adv || /Bắt đầu chơi|Quay lại bài/.test(adv.text)) {
       if (adv) break; // bước cuối có nút vào bài thật: không bấm để khỏi đóng
-      const how = (same === 0 ? await pushPractice(page) : null) ?? ((await typeIntoTarget(page)) ? 'type' : null);
+      const how = (await pushPractice(page)) ?? ((await typeIntoTarget(page)) ? 'type' : null);
       if (!how && same >= 1) {
         stuck = `bước ${m.step ?? i} chờ thao tác thật, không có cầu nối`;
         break;

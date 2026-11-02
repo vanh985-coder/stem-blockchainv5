@@ -56,3 +56,22 @@ describe('chooseTooltipPlacement', () => {
     expect(r.left).toBeCloseTo((1366 - 440) / 2);
   });
 });
+
+describe('chooseTooltipPlacement: vật cản (thanh nút làm thử)', () => {
+  it('né vật cản: hướng trên bị thanh nút chắn thì sang cạnh bên', () => {
+    const hole = { x1: -4, y1: 336, x2: 549, y2: 390 };
+    const bar = { x1: 283, y1: 246, x2: 561.3, y2: 310 };
+    const r = chooseTooltipPlacement({ vp: vp(844, 390), hole, width: 440, height: 216, obstacles: [bar] });
+    expect(r.placement).toBe('right');
+    const box = boxOf(r, 216);
+    expect(overlap(box, bar)).toBe(0);
+    expect(overlap(box, hole)).toBe(0);
+  });
+
+  it('không hướng nào tránh được vật cản thì vẫn trả vị trí hợp lệ không giao vùng sáng', () => {
+    const hole = { x1: 20, y1: 100, x2: 340, y2: 220 };
+    const bar = { x1: 0, y1: 230, x2: 360, y2: 800 };
+    const r = chooseTooltipPlacement({ vp: vp(360, 800), hole, width: 336, height: 200, obstacles: [bar] });
+    expect(overlap(boxOf(r, 200), hole)).toBe(0);
+  });
+});

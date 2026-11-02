@@ -120,7 +120,9 @@ export function chooseTooltipPlacement({ vp, hole, width, height, obstacles = []
     sideways('left', toLeft);
   }
 
-  const hits = (c: Candidate, o: PlacementHole) => c.left < o.x2 && c.left + c.width > o.x1 && c.top < o.y2 && c.top + c.height > o.y1;
+  // Chạm mép chưa tới 2px (làm tròn toạ độ) không tính là đè
+  const EDGE = 2;
+  const hits = (c: Candidate, o: PlacementHole) => c.left < o.x2 - EDGE && c.left + c.width > o.x1 + EDGE && c.top < o.y2 - EDGE && c.top + c.height > o.y1 + EDGE;
   const unblocked = candidates.filter((c) => !obstacles.some((o) => hits(c, o)));
   const pool = unblocked.length > 0 ? unblocked : candidates;
   const best = pool.find((c) => c.full) ?? pool.reduce<Candidate | null>((a, c) => (!a || c.width * c.height > a.width * a.height ? c : a), null);
