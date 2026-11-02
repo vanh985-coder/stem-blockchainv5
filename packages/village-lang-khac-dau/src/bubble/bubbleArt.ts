@@ -60,14 +60,15 @@ export function useBubbleImages(): BubbleImages {
 
 // ---------------------------------------------------------------- màu theo số
 
-/** Màu cố định của mỗi số: góc màu theo tỉ lệ vàng (hai số khác nhau luôn khác góc), sáng tối xen kẽ để thêm khác biệt */
-export function eggColor(v: number): { fill: string; edge: string; ink: string; hue: number } {
-  const hue = Math.round((v * 137.508) % 360);
-  const light = v % 2 === 0 ? 70 : 62;
+/** Màu của mỗi CHỖ trong đợt (xem bubbleSlots.ts): góc màu theo tỉ lệ vàng (hai chỗ khác nhau luôn khác góc), sáng tối xen kẽ để thêm khác biệt */
+export function eggColor(slot: number): { fill: string; edge: string; ink: string; hue: number } {
+  const hue = Math.round((slot * 137.508) % 360);
+  const light = slot % 2 === 0 ? 70 : 62;
   return { hue, fill: `hsl(${hue} 72% ${light}%)`, edge: `hsl(${hue} 55% ${light - 28}%)`, ink: '#2b1809' };
 }
 
-export const eggImageIndex = (v: number): number => v % EGG_IMAGES;
+/** Kiểu trứng (trung-1 đến trung-7) theo chỗ; chỗ từ 7 trở đi không có ảnh nên vẽ bằng code với màu riêng */
+export const eggImageIndex = (slot: number): number => (slot < EGG_IMAGES ? slot : -1);
 
 // ---------------------------------------------------------------- vẽ trứng
 
@@ -84,9 +85,9 @@ function eggPath(ctx: CanvasRenderingContext2D, cx: number, cy: number, d: numbe
   ctx.closePath();
 }
 
-/** Vẽ một quả trứng mang số `v`, đường kính `d` (điểm ảnh), tâm (cx, cy). `img` là kiểu trứng không số nếu đã nạp được. Chỉ gọi khi tạo hình trong bộ nhớ đệm hay ở các nút nhỏ */
-export function drawEgg(ctx: CanvasRenderingContext2D, cx: number, cy: number, d: number, v: number, img: HTMLImageElement | null, fontPx: number): void {
-  const col = eggColor(v);
+/** Vẽ một quả trứng mang số `v` ở chỗ màu `slot`, đường kính `d` (điểm ảnh), tâm (cx, cy). `img` là kiểu trứng không số nếu đã nạp được. Chỉ gọi khi tạo hình trong bộ nhớ đệm hay ở các nút nhỏ */
+export function drawEgg(ctx: CanvasRenderingContext2D, cx: number, cy: number, d: number, v: number, slot: number, img: HTMLImageElement | null, fontPx: number): void {
+  const col = eggColor(slot);
   ctx.save();
   if (img) {
     ctx.imageSmoothingQuality = 'high';
@@ -134,9 +135,9 @@ export function drawEgg(ctx: CanvasRenderingContext2D, cx: number, cy: number, d
 export class SpriteCache {
   private map = new Map<string, HTMLCanvasElement>();
 
-  get(v: number, d: number, fontPx: number, img: HTMLImageElement | null): HTMLCanvasElement | null {
+  get(v: number, slot: number, d: number, fontPx: number, img: HTMLImageElement | null): HTMLCanvasElement | null {
     if (typeof document === 'undefined') return null;
-    const key = `${v}|${Math.round(d)}|${fontPx}|${img ? 1 : 0}`;
+    const key = `${v}|${slot}|${Math.round(d)}|${fontPx}|${img ? 1 : 0}`;
     let c = this.map.get(key);
     if (!c) {
       const side = Math.ceil(d * 1.3);
@@ -144,7 +145,7 @@ export class SpriteCache {
       c.width = side;
       c.height = side;
       const ctx = c.getContext('2d');
-      if (ctx) drawEgg(ctx, side / 2, side / 2, d, v, img, fontPx);
+      if (ctx) drawEgg(ctx, side / 2, side / 2, d, v, slot, img, fontPx);
       this.map.set(key, c);
     }
     return c;

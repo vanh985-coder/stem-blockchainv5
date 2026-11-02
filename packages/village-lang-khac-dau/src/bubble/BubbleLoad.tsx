@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { Button, bubbleUi, fmt, plainPower, rich } from '@so-chung/core';
 import type { BubbleImages } from './bubbleArt';
 import { EggIcon } from './EggIcon';
+import { slotOf, slotsOfPlan } from './bubbleSlots';
 import { loadComplete, planOf, type BubbleState } from './bubbleLogic';
 
 export interface BubbleLoadProps {
@@ -19,6 +20,7 @@ export interface BubbleLoadProps {
  */
 export function BubbleLoad({ state, images, reduced, onPick, onStart }: BubbleLoadProps) {
   const plan = planOf(state);
+  const slots = slotsOfPlan(plan);
   const need = plan.keys.length;
   const done = loadComplete(state);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
@@ -74,7 +76,7 @@ export function BubbleLoad({ state, images, reduced, onPick, onStart }: BubbleLo
                 onClick={(ev) => pick(e.id, e.value, ev.currentTarget)}
                 className={`grid size-[4.25rem] min-h-11 min-w-11 cursor-pointer place-items-center rounded-2xl border-[3px] border-nau-go bg-giay outline-none focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-muc-tim ${taken ? 'invisible' : ''}`}
               >
-                <EggIcon value={e.value} size={56} images={images} />
+                <EggIcon value={e.value} slot={slotOf(slots, e.value)} size={56} images={images} />
               </button>
             );
           })}
@@ -99,7 +101,7 @@ export function BubbleLoad({ state, images, reduced, onPick, onStart }: BubbleLo
                 data-filled={egg ? '1' : '0'}
                 className={`grid size-[4.25rem] place-items-center rounded-full border-[3px] ${egg ? 'border-nau-go bg-giay' : 'border-dashed border-nau-go/60'}`}
               >
-                {egg && <EggIcon value={egg.value} size={56} images={images} />}
+                {egg && <EggIcon value={egg.value} slot={slotOf(slots, egg.value)} size={56} images={images} />}
               </span>
             );
           })}

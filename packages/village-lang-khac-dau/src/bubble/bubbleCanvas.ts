@@ -4,6 +4,7 @@
  */
 import { BUBBLE_SPEC } from './bubbleConfig';
 import { eggImageIndex, SpriteCache, type BubbleImages } from './bubbleArt';
+import { slotOf } from './bubbleSlots';
 import { LAUNCHER_ART, eggFontPx, frameRect, type Fit } from './bubbleLayout';
 import { cellCenter, launcherPoint, planOf, pointAlong, tracePath, type BubbleEvent, type BubbleState, type Point } from './bubbleLogic';
 
@@ -126,6 +127,8 @@ export interface DrawCtx {
   fit: Fit;
   art: BubbleImages;
   sprites: SpriteCache;
+  /** Chỗ màu của mỗi số trong đợt đang chơi (bubbleSlots.ts) */
+  slots: ReadonlyMap<number, number>;
 }
 
 const WOOD = '#8a5a2b';
@@ -133,7 +136,8 @@ const WOOD_DARK = '#5a3716';
 
 function sprite(d: DrawCtx, v: number): HTMLCanvasElement | null {
   const px = d.fit.scale * d.dpr;
-  return d.sprites.get(v, px, eggFontPx(d.fit.scale) * d.dpr, d.art.trung[eggImageIndex(v)]);
+  const slot = slotOf(d.slots, v);
+  return d.sprites.get(v, slot, px, eggFontPx(d.fit.scale) * d.dpr, d.art.trung[eggImageIndex(slot)] ?? null);
 }
 
 function putEgg(d: DrawCtx, x: number, y: number, v: number, alpha = 1, scale = 1): void {

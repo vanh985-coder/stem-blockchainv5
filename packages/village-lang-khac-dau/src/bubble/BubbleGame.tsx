@@ -18,6 +18,7 @@ import {
 } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { SpriteCache, useBubbleImages } from './bubbleArt';
+import { slotOf, slotsOfPlan } from './bubbleSlots';
 import { createView, drawBubble, refreshAim, resetView, spawnFx, stepView, type BubbleView } from './bubbleCanvas';
 import { BUBBLE_SPEC, type BubbleSpec } from './bubbleConfig';
 import { hintFor } from './bubbleHint';
@@ -265,7 +266,7 @@ export function BubbleGame({ paused, attempt, onFinish, setHint }: MiniGameRende
       }
       const geom = geo.current;
       if (document.visibilityState === 'hidden' || geom.cw < 2) return;
-      drawBubble({ g, cw: geom.cw, ch: geom.ch, dpr: geom.dpr, fit: geom.fit, art: imagesRef.current, sprites: cache }, s, v);
+      drawBubble({ g, cw: geom.cw, ch: geom.ch, dpr: geom.dpr, fit: geom.fit, art: imagesRef.current, sprites: cache, slots: slotsOfPlan(planOf(s)) }, s, v);
     };
     raf = requestAnimationFrame(tick);
     return () => {
@@ -445,6 +446,7 @@ export function BubbleGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   // ----- dữ liệu hiển thị
   const s = state;
   const plan = planOf(s);
+  const slots = slotsOfPlan(plan);
   const present = presentValues(s);
   const shotsLeft = shotsToDescend(s);
   const keyList = plan.keys;
@@ -521,7 +523,7 @@ export function BubbleGame({ paused, attempt, onFinish, setHint }: MiniGameRende
             }}
             className={`relative grid min-h-12 min-w-12 cursor-pointer place-items-center rounded-xl p-0.5 outline-none focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-muc-tim ${here ? '' : 'opacity-40'} ${sel ? 'border-[4px] border-[#e8a317] bg-white' : 'border-2 border-nau-go bg-giay'}`}
           >
-            <EggIcon value={v} size={tall ? 40 : 46} images={images} />
+            <EggIcon value={v} slot={slotOf(slots, v)} size={tall ? 40 : 46} images={images} />
             <span className="absolute left-0.5 top-0 text-[11px] font-extrabold leading-none text-nau-go-dam" aria-hidden="true">
               {i + 1}
             </span>

@@ -3,6 +3,8 @@ import { drawEgg, eggImageIndex, type BubbleImages } from './bubbleArt';
 
 export interface EggIconProps {
   value: number;
+  /** Chỗ màu của số trong đợt (bubbleSlots.ts) */
+  slot: number;
   /** Cạnh canvas (điểm ảnh CSS) */
   size: number;
   images?: BubbleImages;
@@ -11,9 +13,9 @@ export interface EggIconProps {
 }
 
 /** Quả trứng nhỏ vẽ bằng canvas 2D cho nút và khay (cùng hình với trứng trên bàn). Số luôn hiện rõ, không dưới 14 điểm ảnh. */
-export function EggIcon({ value, size, images, dim = false, className = '' }: EggIconProps) {
+export function EggIcon({ value, slot, size, images, dim = false, className = '' }: EggIconProps) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const img = images?.trung[eggImageIndex(value)] ?? null;
+  const img = images?.trung[eggImageIndex(slot)] ?? null;
   useEffect(() => {
     const c = ref.current;
     const g = c?.getContext('2d');
@@ -24,7 +26,7 @@ export function EggIcon({ value, size, images, dim = false, className = '' }: Eg
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.clearRect(0, 0, c.width, c.height);
     const d = size * dpr * 0.88;
-    drawEgg(g, c.width / 2, c.height / 2, d, value, img, Math.max(14, Math.round(size * 0.42)) * dpr);
-  }, [value, size, img]);
+    drawEgg(g, c.width / 2, c.height / 2, d, value, slot, img, Math.max(14, Math.round(size * 0.42)) * dpr);
+  }, [value, slot, size, img]);
   return <canvas ref={ref} width={size} height={size} aria-hidden="true" className={`${dim ? 'opacity-40' : ''} ${className}`} style={{ width: size, height: size }} />;
 }
