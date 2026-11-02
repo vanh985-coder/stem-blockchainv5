@@ -431,11 +431,11 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
 
   return (
     <TapOrDragContainer onDropOrPlace={handleDropOrPlace}>
-      <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-200">
+      <div className="max-w-5xl mx-auto space-y-2 animate-in fade-in duration-200 md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,8fr)] md:items-start md:gap-x-3 md:gap-y-2 md:space-y-0">
         {/* Bảng 8 giao dịch */}
-        <div id="tutorial-man10kho-table">
-          <Card variant="paper" className="p-4 sm:p-5">
-            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-3 border-b border-nau-go/30 pb-2">
+        <div id="tutorial-man10kho-table" className="md:col-span-2 md:row-start-1">
+          <Card variant="paper" className="p-2">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-1 border-b border-nau-go/30 pb-1">
               <div className="flex items-center gap-2">
                 <span className="text-lg">📋</span>
                 <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{T.bang8GiaoDichGoc}</h3>
@@ -455,20 +455,18 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
               </div>
             </div>
 
-            <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+            <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-8">
               {txs.map((tx) => (
                 <div
                   key={tx.id}
-                  className="p-2 rounded-[10px] border border-nau-go/30 bg-white/70 flex flex-col items-center text-center shadow-xs"
+                  className="px-1 py-0.5 rounded-[10px] border border-nau-go/30 bg-white/70 flex flex-col items-center text-center shadow-xs"
                 >
-                  <span className="font-display font-extrabold text-sm text-muc-tim-dam">
-                    {tx.id}
+                  <span className="flex w-full items-center justify-between gap-1">
+                    <span className="font-display font-extrabold text-sm text-muc-tim-dam">{tx.id}</span>
+                    <span className="font-display font-bold text-sm text-chu bg-giay px-1.5 rounded">{tx.value}</span>
                   </span>
                   <span className="text-sm text-nau-go-dam font-medium truncate w-full">
                     {tx.name}
-                  </span>
-                  <span className="font-display font-bold text-sm text-chu mt-0.5 bg-giay px-1.5 rounded">
-                    {tx.value}
                   </span>
                 </div>
               ))}
@@ -477,16 +475,15 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
         </div>
 
         {/* Khung hiển thị Cây Merkle 8 giao dịch */}
-        <div id="tutorial-man10kho-tree">
-          <Card className="p-4 sm:p-6 space-y-4">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 border-b border-nau-go/30 pb-3">
+        <div id="tutorial-man10kho-tree" className="md:col-start-2 md:row-span-2 md:row-start-2">
+          <Card className="p-2 space-y-2">
+            <div className="border-b border-nau-go/30 pb-1">
               <div>
-                <h3 className="first-letter:uppercase font-display font-extrabold text-lg text-chu">{T.cayMerkle8GiaoDich}</h3>
+                <div className="flex flex-wrap items-baseline gap-x-3">
+                  <h3 className="first-letter:uppercase font-display font-extrabold text-lg text-chu">{T.cayMerkle8GiaoDich}</h3>
+                  <span className="text-sm text-nau-go-dam font-semibold">{rich(T.luotKiemTra, { checkCount })}</span>
+                </div>
                 <p className="text-sm text-nau-go-dam">{T.keoHoacChamManhTu}</p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-nau-go-dam font-semibold">{rich(T.luotKiemTra, { checkCount })}</span>
               </div>
             </div>
 
@@ -504,22 +501,18 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
               </div>
             )}
 
-            {/* Nút bấm Kiểm tra */}
-            <div id="tutorial-man10kho-check" className="flex justify-center pt-2">
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={handleCheck}
-                className="min-w-[200px]"
-              >{T.kiemTraCayMerkle}</Button>
-            </div>
           </Card>
         </div>
 
+        {/* Nút bấm Kiểm tra: ngay sau cây khi màn hẹp; ở màn rộng nằm dưới khay (cột trái còn chỗ) để cả trạm gọn một màn hình */}
+        <div id="tutorial-man10kho-check" className="flex justify-center md:col-start-1 md:row-start-3">
+          <Button variant="primary" size="md" onClick={handleCheck} className="min-w-[200px]">{T.kiemTraCayMerkle}</Button>
+        </div>
+
         {/* Khay mảnh ghép */}
-        <div id="tutorial-man10kho-tray">
-          <Card variant="paper" className="p-4 sm:p-5 space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-nau-go/30 pb-2">
+        <div id="tutorial-man10kho-tray" className="md:col-start-1 md:row-start-2">
+          <Card variant="paper" className="p-2 space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-nau-go/30 pb-1">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🧩</span>
                 <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{fmt(T.khayManhGhepManh, { so: availableTrayPieces.length, so2: trayPieces.length })}</h3>
@@ -531,7 +524,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
             <DroppableSlot
               id="tray-zone"
               placeholder={T.thaManhVeKhayTai}
-              className="!p-3 !bg-white/60 !border-dashed !border-muc-tim/30 min-h-[90px]"
+              className="!p-2 !bg-white/60 !border-dashed !border-muc-tim/30 min-h-[64px]"
             >
               {availableTrayPieces.length === 0 ? (
                 <span className="text-sm text-nau-go-dam italic">{T.tatCaManhGhepDa}</span>
@@ -541,7 +534,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
                     <DraggableCard
                       key={`piece-${pieceVal}`}
                       id={`piece-${pieceVal}`}
-                      className="p-2.5 sm:p-3 rounded-[12px] bg-white/70 border-2 border-muc-tim text-muc-tim-dam flex items-center justify-center min-w-[70px] sm:min-w-[80px]"
+                      className="p-2 rounded-[12px] bg-white/70 border-2 border-muc-tim text-muc-tim-dam flex items-center justify-center min-w-[64px]"
                     >
                       <span className="font-display font-extrabold text-base sm:text-lg">
                         {formatNumber(pieceVal)}
@@ -555,7 +548,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
         </div>
 
         {/* Phản hồi FeedbackSheet */}
-        <FeedbackSheet
+        <div className="md:col-span-2"><FeedbackSheet
           isOpen={feedback.isOpen}
           isCorrect={feedback.isCorrect}
           title={feedback.title}
@@ -566,7 +559,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
             setFeedback((prev) => ({ ...prev, isOpen: false }));
           }}
           continueLabel={T.thuLai}
-        />
+        /></div>
 
         {/* Hướng dẫn Focus Spotlight (P8) */}
         <TutorialSpotlight

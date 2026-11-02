@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
+import { createContext, useContext, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
 import {
   DndContext,
   KeyboardSensor,
@@ -8,10 +8,12 @@ import {
   useDroppable,
   useSensor,
   useSensors,
+  type CollisionDetection,
   type DragEndEvent,
 } from '@dnd-kit/core';
 import { sound } from '../audio/sound';
 import { ui } from '../content/ui';
+import { layoutScale, pickDropSlot } from './dropTarget';
 
 interface TapOrDragContextValue {
   selectedId: string | null;
@@ -20,6 +22,20 @@ interface TapOrDragContextValue {
 }
 
 const TapOrDragContext = createContext<TapOrDragContextValue | null>(null);
+
+/**
+ * Ô nhận do vị trí của CHIẾC LÁ (thẻ đang kéo), không do con trỏ: giao ≥ 30% diện tích thẻ hoặc tâm thẻ trong ô, chọn ô giao
+ * nhiều nhất (`pickDropSlot`). Ô nào được chọn thì `isOver` của nó bật nên viền sáng khi thẻ đủ điều kiện thả.
+ */
+const byCardOverlap: CollisionDetection = ({ collisionRect, droppableRects, droppableContainers }) => {
+  const slots = droppableContainers.flatMap((c) => {
+    const r = droppableRects.get(c.id);
+    return r ? [{ id: String(c.id), rect: { left: r.left, top: r.top, width: r.width, height: r.height } }] : [];
+  });
+  const id = pickDropSlot({ left: collisionRect.left, top: collisionRect.top, width: collisionRect.width, height: collisionRect.height }, slots);
+  const container = id === null ? undefined : droppableContainers.find((c) => String(c.id) === id);
+  return container ? [{ id: container.id, data: { droppableContainer: container } }] : [];
+};
 
 export interface TapOrDragContainerProps {
   children: ReactNode;
@@ -58,7 +74,7 @@ export function TapOrDragContainer({ children, onDropOrPlace }: TapOrDragContain
 
   return (
     <TapOrDragContext.Provider value={{ selectedId, selectItem, placeInSlot }}>
-      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={byCardOverlap} onDragEnd={handleDragEnd}>
         {children}
       </DndContext>
     </TapOrDragContext.Provider>
@@ -84,7 +100,22 @@ export function DraggableCard({ id, disabled = false, children, className = '' }
   const { selectedId, selectItem } = useTapOrDrag();
   const isSelected = selectedId === id;
 
-  const style: CSSProperties = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, zIndex: 50 } : {};
+  // Thẻ nằm trong khối được phóng (zoom của trang bài học): `transform` tính theo px bố cục nên bị nhân thêm hệ số phóng,
+  // thẻ trôi xa con trỏ và khác chỗ dnd-kit dùng để xét ô nhận. Chia khoảng kéo cho hệ số đó để thẻ đi đúng theo con trỏ.
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+  const scale = useRef(1);
+  useLayoutEffect(() => {
+    const parent = nodeRef.current?.parentElement;
+    if (isDragging && parent) scale.current = layoutScale(parent.getBoundingClientRect().width, parent.offsetWidth);
+  }, [isDragging]);
+  const k = scale.current;
+
+  // Lá đang kéo to ra 5% bằng `scale(1.05)` TRONG chuỗi transform (sau translate). Trước đây lớp Tailwind `scale-105` dùng thuộc tính `scale` riêng,
+  // áp lên cả translate3d nên khoảng kéo bị nhân thêm 1,05: lá trôi xa con trỏ 5% quãng đường (thả lệch ô).
+  // Thẻ đang kéo không bắt con trỏ (pointer-events: none) để không che ô bên dưới.
+  const style: CSSProperties = transform
+    ? { transform: `translate3d(${transform.x / k}px, ${transform.y / k}px, 0)${isDragging ? ' scale(1.05)' : ''}`, zIndex: 50, pointerEvents: isDragging ? 'none' : undefined }
+    : {};
 
   const handleTap = () => {
     if (disabled) return;
@@ -100,7 +131,10 @@ export function DraggableCard({ id, disabled = false, children, className = '' }
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(el) => {
+        nodeRef.current = el;
+        setNodeRef(el);
+      }}
       style={style}
       {...listeners}
       {...attributes}
@@ -111,7 +145,7 @@ export function DraggableCard({ id, disabled = false, children, className = '' }
       onKeyDown={onKeyDown}
       className={[
         'touch-none select-none transition-shadow cursor-grab active:cursor-grabbing',
-        isDragging ? 'z-50 scale-105 opacity-80 shadow-[0_6px_0_0_var(--color-nau-go)]' : '',
+        isDragging ? 'z-50 opacity-80 shadow-[0_6px_0_0_var(--color-nau-go)]' : '',
         isSelected ? 'ring-4 ring-muc-tim ring-offset-2' : '',
         disabled ? 'cursor-default' : '',
         'focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim',

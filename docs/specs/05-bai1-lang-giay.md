@@ -68,6 +68,8 @@
 
 **Chấm sao, xu:** như giai đoạn 1. Mỗi sao mới được 10 xu.
 
+**Trang bài học gọn một màn hình ("vừa khung"):** Màn 1 bật `fit` của `LessonPage2D` (cơ chế ở spec 03, mục "Trang bài học trên màn hình lớn"): bỏ phóng cố định 1,35, tỉ lệ đo theo khung nhìn trong [tối thiểu, 1,6] nên cả trang (thanh trên, dải trang sổ, khung công thức) nằm gọn một màn hình ở 1366×768 và 1920×1080 kể cả khi zoom trình duyệt từ 67% đến 150%. Dải trang sổ dùng `dense` (bỏ chiều cao tối thiểu, đệm nhỏ), ô nhập mã cao 44px, hình nhân vật nhỏ lại; đề, luật, công thức, điểm và chữ không đổi. Điện thoại ngang/dọc (844×390, 360×800) vẫn cuộn dọc vì chữ không nhỏ hơn 14px.
+
 ## Màn 2 — Game phụ 1: "Đuổi theo {phanDien}" (kiểu Subway Surfers, có câu hỏi)
 
 Logic đặt trong `runnerLogic.ts` (hàm thuần, có test).

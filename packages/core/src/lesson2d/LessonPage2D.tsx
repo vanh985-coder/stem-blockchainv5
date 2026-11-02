@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { LessonPraise } from './LessonPraise';
 import { asset, useManifest } from '../assets/store';
 import { useNavigate } from 'react-router';
@@ -28,6 +28,8 @@ import { choiceReactions } from '../three/choiceReactions';
 import { useChoiceDelegation } from '../three/useReaction';
 import { GoldenPageScene } from './GoldenPageScene';
 import { LessonCharacters } from './LessonCharacters';
+import { FitBox } from './FitBox';
+import { FRAME_MARGIN } from './frames';
 import { useLessonFrames } from './useLessonFrames';
 import { STATION_ORDER, type LessonContent, type StationId, type StationResult } from './types';
 
@@ -57,6 +59,11 @@ export interface LessonPage2DProps {
    * `choiceReactions`, không cần dùng prop này; dành cho nơi khác muốn biết (ví dụ ghi số liệu).
    */
   onAnswer?: (dung: boolean) => void;
+  /**
+   * "Vừa khung": thay phóng cố định `.lesson-zoom` bằng tỉ lệ đo theo khung nhìn (`FitBox`, `fitScale.ts`) để cả trang
+   * gọn một màn hình ở mọi mức zoom trình duyệt. Hiện chỉ bật cho Màn 1 và Màn 10.
+   */
+  fit?: boolean;
 }
 
 type Stage =
@@ -81,7 +88,7 @@ const STATION_PRELOAD_DELAY_MS = 1500;
  * thanh trên (tên màn, 3 trạm kèm sao, nút "Về bản đồ"), lời người dẫn theo thời điểm,
  * ghi tiến độ từng trạm, màn hoàn thành và cảnh trao Trang Sổ Vàng.
  */
-export function LessonPage2D({ levelId, villageId, background, content, stations, onAnswer: onAnswerProp }: LessonPage2DProps) {
+export function LessonPage2D({ levelId, villageId, background, content, stations, onAnswer: onAnswerProp, fit = false }: LessonPage2DProps) {
   const level = levelById(levelId);
   const scrollArea = useRef<HTMLDivElement>(null);
   const villageIndex = VILLAGE_ORDER.indexOf(villageId);
@@ -190,7 +197,10 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   // Có khung thì bảng thu nhỏ để chừa chỗ (quyết định lúc mở trang, giữ nguyên khi khung bị ẩn về sau).
   const frames = useLessonFrames(stage.kind === 'award');
   const zoomStyle = frames.zoom === null ? undefined : ({ '--lz': frames.zoom } as CSSProperties);
-  const boardMax = frames.zoom === null ? 'max-w-4xl min-[1280px]:max-w-[calc(1200px/var(--lz))]' : 'max-w-4xl';
+  const boardMax = fit ? 'max-w-none' : frames.zoom === null ? 'max-w-4xl min-[1280px]:max-w-[calc(1200px/var(--lz))]' : 'max-w-4xl';
+  // Vừa khung: khung nhân vật sát mép màn hình, bảng chiếm phần giữa còn lại (FitBox đo chỗ này).
+  const fitReserveX = fit && frames.layout ? 2 * (frames.layout.width + FRAME_MARGIN) : 0;
+  const fitPlan = fit && frames.layout ? { ...frames, layout: { ...frames.layout, inset: FRAME_MARGIN / 2 } } : frames;
   useChoiceDelegation(playArea, stage.kind === 'play' && frames.visible);
 
   // Mã của trạm tải sau: nạp lúc rảnh khi em đang đọc lời thoại hoặc giới thiệu của trạm đó, để tới trạm không phải chờ.
@@ -239,7 +249,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
     if (PROBE) Object.assign(window, { __stationDone: (stars: 1 | 2 | 3 = 3) => onStationComplete(stage.idx, { stars, timeMs: 1000, learned: content.keyTakeaway }) });
     body = (
       <div ref={playArea}>
-        <Panel className="p-2 sm:p-6" key={`p${attempt}-${id}`}>
+        <Panel padded={!fit} className={fit ? 'p-1' : 'p-2 sm:p-6'} key={`p${attempt}-${id}`}>
           <Suspense fallback={<p role="status" className="p-6 text-center font-semibold">{ui.chung.dangTai}</p>}>
             {stations[id].render({
               onComplete: (r) => onStationComplete(stage.idx, r),
@@ -342,15 +352,15 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
       <div className="lesson-window">
       <div className="lesson-scroll" ref={scrollArea} data-testid="lesson-scroll">
     {/* isolate: để lớp nền trang trí (z âm) nằm trên ảnh nền của làng nhưng dưới bảng bài học. */}
-    <div className="isolate min-h-screen bg-giay bg-cover bg-center" style={bg ? { backgroundImage: `url("${bg}")` } : undefined}>
+    <div className={`isolate ${fit ? 'min-h-full' : 'min-h-screen'} bg-giay bg-cover bg-center`} style={bg ? { backgroundImage: `url("${bg}")` } : undefined}>
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-20 bg-giay/55" />
       {/* Icon của làng: chỉ ở 2 khoảng trống hai bên bảng (màn từ 1296px, tối đa 4 mỗi bên), không bao giờ sau bảng; cảnh trao Trang Sổ Vàng thì rải cả màn kèm tia sáng. */}
       <NenTrangTri theme={VILLAGE_THEME[villageId]} variant={stage.kind === 'award' ? 'full' : 'sides'} sparkle={stage.kind === 'award'} image={null} sideMax={frames.visible ? 2 : undefined} />
-      <LessonCharacters plan={frames} />
-      <div className="lesson-zoom min-h-[calc(100vh/var(--lz))]" style={zoomStyle}>
-        <div className="min-h-[calc(100vh/var(--lz))]">
-        <GuestBar compact />
-        <header className={`mx-auto flex w-full ${boardMax} flex-wrap items-center gap-x-3 gap-y-2 p-2 sm:p-3 max-[480px]:flex-nowrap max-[480px]:gap-1.5 max-[480px]:px-2 max-[480px]:py-1`}>
+      <LessonCharacters plan={fitPlan} />
+      <div className={fit ? undefined : 'lesson-zoom min-h-[calc(100vh/var(--lz))]'} style={fit ? undefined : zoomStyle}>
+        <FitSwitch fit={fit} hostRef={scrollArea} reserveX={fitReserveX}>
+        <GuestBar compact slim={fit} />
+        <header className={`mx-auto flex w-full ${boardMax} flex-wrap items-center gap-x-3 ${fit ? 'gap-y-1 px-2 py-0.5 sm:px-3' : 'gap-y-2 p-2 sm:p-3'} max-[480px]:flex-nowrap max-[480px]:gap-1.5 max-[480px]:px-2 max-[480px]:py-1`}>
           <div className="min-w-0 flex-1 basis-full sm:basis-auto max-[480px]:basis-0">
             <h1 className="truncate font-display text-xl font-extrabold sm:text-2xl max-[480px]:line-clamp-2 max-[480px]:whitespace-normal max-[480px]:text-sm max-[480px]:leading-tight">
               {level ? fmt(level.ten) : ''}
@@ -432,10 +442,10 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
           </p>
         )}
 
-        <main className={`mx-auto w-full ${boardMax} px-1 pb-10 pt-2 sm:px-3`}>
+        <main className={`mx-auto w-full ${boardMax} px-1 ${fit ? 'pb-1 pt-0' : 'pb-10 pt-2'} sm:px-3`}>
           {body}
         </main>
-      </div>
+      </FitSwitch>
 
       {twistOpen && content.twist && content.twist.length > 0 && (
         <div className="fixed inset-0 z-40 grid place-items-center overflow-y-auto bg-chu/30 p-3">
@@ -450,6 +460,17 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
     </div>
     </div>
     </div>
+  );
+}
+
+/** Bật "vừa khung" thì bọc nội dung trong FitBox; không thì giữ khối cao tối thiểu một màn như cũ (phóng do `.lesson-zoom` bên ngoài). */
+function FitSwitch({ fit, hostRef, reserveX, children }: { fit: boolean; hostRef: RefObject<HTMLElement | null>; reserveX: number; children: ReactNode }) {
+  return fit ? (
+    <FitBox hostRef={hostRef} reserveX={reserveX}>
+      {children}
+    </FitBox>
+  ) : (
+    <div className="min-h-[calc(100vh/var(--lz))]">{children}</div>
   );
 }
 

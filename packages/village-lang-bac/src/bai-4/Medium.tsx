@@ -423,14 +423,14 @@ export function Medium({
   }, []);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-200">
+    <div className="max-w-5xl mx-auto space-y-2 animate-in fade-in duration-200">
       {/* Tab chuyển đổi trạng thái 3 phần & nút Hướng dẫn */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-        <div className="flex items-center justify-between bg-white/70 p-2 rounded-[16px] border border-nau-go/30 text-sm font-bold flex-1 w-full">
+        <div className="flex items-center justify-between bg-white/70 p-1 rounded-[16px] border border-nau-go/30 text-sm font-bold flex-1 w-full">
           <button
             type="button"
             onClick={() => setPhase('phase_a')}
-            className={`flex-1 py-2 px-3 rounded-[10px] transition-all cursor-pointer text-center ${
+            className={`flex-1 min-h-11 py-1 px-3 rounded-[10px] transition-all cursor-pointer text-center ${
               phase === 'phase_a'
                 ? 'bg-muc-tim text-white shadow-xs'
                 : 'text-nau-go-dam hover:bg-giay'
@@ -439,7 +439,7 @@ export function Medium({
           <button
             type="button"
             onClick={() => setPhase('phase_b')}
-            className={`flex-1 py-2 px-3 rounded-[10px] transition-all cursor-pointer text-center ${
+            className={`flex-1 min-h-11 py-1 px-3 rounded-[10px] transition-all cursor-pointer text-center ${
               phase === 'phase_b'
                 ? 'bg-muc-tim text-white shadow-xs'
                 : 'text-nau-go-dam hover:bg-giay'
@@ -451,7 +451,7 @@ export function Medium({
               if (isRootSolved) setPhase('phase_c');
             }}
             disabled={!isRootSolved}
-            className={`flex-1 py-2 px-3 rounded-[10px] transition-all text-center ${
+            className={`flex-1 min-h-11 py-1 px-3 rounded-[10px] transition-all text-center ${
               phase === 'phase_c'
                 ? 'bg-muc-tim text-white shadow-xs cursor-pointer'
                 : isRootSolved
@@ -477,8 +477,8 @@ export function Medium({
       {/* PHẦN A: XEM DỰNG CÂY TỪNG BƯỚC */}
       {/* ========================================================= */}
       {phase === 'phase_a' && (
-        <Card className="p-6 sm:p-8 space-y-6">
-          <div className="text-center space-y-1">
+        <Card className="p-3 sm:p-4 space-y-3 md:grid md:grid-cols-2 md:items-center md:gap-x-4 md:gap-y-3 md:space-y-0">
+          <div className="text-center space-y-1 md:col-start-2 md:row-start-1">
             <span className="text-sm font-bold text-muc-tim-dam uppercase tracking-wider">{fmt(T.hoatCanhDungCayBuoc, { so: stepA + 1 })}</span>
             <h3 className="first-letter:uppercase font-display font-extrabold text-xl sm:text-2xl text-chu">
               {stepAInfo.title}
@@ -489,7 +489,7 @@ export function Medium({
           </div>
 
           {/* Cây Merkle SVG */}
-          <div id="tutorial-man10tb-tree">
+          <div id="tutorial-man10tb-tree" className="md:col-start-1 md:row-span-3 md:row-start-1">
             <CayMerkle
               treeValues={currentTreeA}
               caption={T.cayMerkle4GiaoDich}
@@ -497,7 +497,7 @@ export function Medium({
           </div>
 
           {/* Hộp hiển thị phép tính đã thế số */}
-          <div id="tutorial-man10tb-calc" className="p-4 rounded-[14px] bg-white/60 border border-muc-tim/10 text-center">
+          <div id="tutorial-man10tb-calc" className="p-3 rounded-[14px] bg-white/60 border border-muc-tim/10 text-center md:col-start-2">
             <div className="text-sm text-nau-go-dam font-semibold mb-1">{T.phepTinhTuongUng}</div>
             <div className="font-display font-bold text-base sm:text-lg text-muc-tim-dam">
               {stepAInfo.calc}
@@ -505,7 +505,7 @@ export function Medium({
           </div>
 
           {/* Nút điều khiển bước */}
-          <div id="tutorial-man10tb-controls" className="flex items-center justify-between pt-2">
+          <div id="tutorial-man10tb-controls" className="flex items-center justify-between pt-1 md:col-start-2">
             <Button
               variant="secondary"
               size="sm"
@@ -540,14 +540,15 @@ export function Medium({
       {/* PHẦN B: TỰ XÂY CÂY */}
       {/* ========================================================= */}
       {phase === 'phase_b' && (
-        <Card className="p-6 sm:p-8 space-y-6">
-          <div className="text-center space-y-1">
+        <Card className="p-3 sm:p-4 space-y-3 md:grid md:grid-cols-2 md:items-center md:gap-x-4 md:gap-y-3 md:space-y-0">
+          <div className="text-center space-y-1 md:col-start-2 md:row-start-1">
             <span className="text-sm font-bold text-muc-tim-dam uppercase tracking-wider">{T.thuThachTuXayCay}</span>
             <h3 className="first-letter:uppercase font-display font-extrabold text-xl sm:text-2xl text-chu">{T.nhapKetQuaTuCac}</h3>
             <p className="text-sm text-nau-go-dam max-w-md mx-auto">{T.chonOCanTinhRoi}</p>
           </div>
 
           {/* Cây Merkle SVG */}
+          <div className="md:col-start-1 md:row-span-3 md:row-start-1">
           <CayMerkle
             treeValues={currentTreeB}
             cellStatuses={cellStatusesB}
@@ -568,17 +569,18 @@ export function Medium({
             }}
             caption={T.chamVaoODeChon}
           />
+          </div>
 
           {/* Thông báo nếu bấm vào ô gốc bị khóa */}
           {lockedNotice && (
-            <div className="p-2.5 rounded-[10px] bg-do-son/10 border border-do-son text-sm font-bold text-do-son-dam text-center animate-in fade-in duration-200">
+            <div className="p-2.5 rounded-[10px] bg-do-son/10 border border-do-son text-sm font-bold text-do-son-dam text-center animate-in fade-in duration-200 md:col-start-2">
               ⚠️ {lockedNotice}
             </div>
           )}
 
           {/* Khu vực nhập số cho ô đang chọn */}
           {!isRootSolved ? (
-            <div className="p-4 rounded-[16px] bg-white/60 border border-muc-tim/10 flex flex-col items-center gap-3">
+            <div className="p-3 rounded-[16px] bg-white/60 border border-muc-tim/10 flex flex-col items-center gap-2 md:col-start-2">
               <div className="text-sm font-bold text-muc-tim-dam uppercase">{fmt(T.dangNhapChoO, { so: selectedSlot === 'root' ? T.goc : selectedSlot?.toUpperCase() })}</div>
 
               <div className="flex items-center gap-2">
@@ -605,7 +607,7 @@ export function Medium({
               )}
             </div>
           ) : (
-            <div className="p-4 rounded-[16px] bg-xanh-la/10 border-2 border-xanh-la-dam text-center space-y-3 animate-in zoom-in-95 duration-200">
+            <div className="p-3 rounded-[16px] bg-xanh-la/10 border-2 border-xanh-la-dam text-center space-y-2 animate-in zoom-in-95 duration-200 md:col-start-2">
               <div className="font-display font-extrabold text-lg text-xanh-la-dam">{T.xuatSacEmDaHoan}</div>
               <p className="text-sm text-chu">{T.hayTiepTucDeXem}</p>
               <Button
@@ -625,26 +627,26 @@ export function Medium({
       {/* PHẦN C: KHOẢNH KHẮC "À RA THẾ" */}
       {/* ========================================================= */}
       {phase === 'phase_c' && (
-        <Card className="p-3 sm:p-8 space-y-5">
+        <Card className="p-3 sm:p-4 space-y-2">
           <div className="text-center space-y-1">
             <span className="text-sm font-bold text-do-son-dam uppercase tracking-wider">{T.khoanhKhacARaThe}</span>
             <h3 className="first-letter:uppercase font-display font-extrabold text-xl sm:text-2xl text-chu">{T.giaoDichNaoBiSua}</h3>
           </div>
 
           {/* Lời {phanDien}: không nói lá nào bị sửa */}
-          <div className="p-4 rounded-[16px] bg-do-son/10 border border-do-son/30 flex items-center gap-3">
+          <div className="p-2 rounded-[16px] bg-do-son/10 border border-do-son/30 flex items-center gap-3">
             <Avatar portrait={portraitOf('ti')} size="md" />
             <div className="text-sm text-chu leading-snug">{rich(T.tinhNghichToVuaLen)}</div>
           </div>
 
           {/* Dòng đầu mối: số gốc tính lại không khớp số trong sổ */}
-          <div className="space-y-2">
-            <p className="rounded-[14px] border-2 border-xanh-la-dam bg-xanh-la/10 px-3 py-2 text-center font-display text-base text-xanh-la-dam">
+          <div className="grid gap-2 md:grid-cols-2">
+            <p className="rounded-[14px] border-2 border-xanh-la-dam bg-xanh-la/10 px-3 py-1 text-center font-display text-base text-xanh-la-dam">
               {rich(T.soGocDaGhi, { so: partBTree[2][0] })}
             </p>
             <p
               role="status"
-              className="rounded-[14px] border-2 border-do-son-dam bg-do-son/10 px-3 py-2 text-center font-display text-base text-do-son-dam"
+              className="rounded-[14px] border-2 border-do-son-dam bg-do-son/10 px-3 py-1 text-center font-display text-base text-do-son-dam"
             >
               {rich(T.soGocTinhLai, { so: tamperedTree[2][0] })}
             </p>
@@ -675,7 +677,7 @@ export function Medium({
 
           {/* Nút hành động */}
           {found && (
-            <div className="flex flex-col items-center gap-3 pt-1">
+            <div className="flex flex-col items-center gap-2">
               {tamperStep < 2 ? (
                 <Button variant="secondary" size="md" disabled>
                   {T.dangLanTruyenDoiGia}
