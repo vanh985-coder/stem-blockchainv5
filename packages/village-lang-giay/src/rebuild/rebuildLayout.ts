@@ -93,12 +93,6 @@ export interface VillainTiming {
   end: number;
 }
 
-/**
- * Nhịp của {phanDien} ở đoạn giữ sổ (cuối vòng 2), ngắn hơn vòng 2 vì ít nhất 4 giây lại có một lần tráo: chạy vào (1 giây) → đứng cười và ném trang thật ra bàn → tráo (`dropAt`, đúng giờ của
- * lần tráo trong luật) → chạy ra. Cả nhịp `end` = 2,9 giây, nhỏ hơn khoảng cách tráo nhỏ nhất (4 giây), nên hai nhịp không chồng nhau.
- */
-export const KEEP_VILLAIN_TIMING: VillainTiming = { enterEnd: 1.0, dropAt: 1.5, exitStart: 2.1, end: 2.9 };
-
 /** Chia thời gian khi bật "giảm chuyển động": rút ngắn còn một phần tư. */
 export const REDUCED_MOTION_SCALE = 0.25;
 
