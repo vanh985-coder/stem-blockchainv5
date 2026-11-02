@@ -1,11 +1,13 @@
 /**
  * Logic màn 5 "Đập {phanDien}" (spec 06, mục "Màn 5"). Hàm thuần (không React, không Three); ngẫu nhiên chỉ qua `rng` (createMulberry32) nên cùng seed cùng ván.
+ * (P9: chuột đi TỪ DƯỚI LÊN, cuốn sổ ở đỉnh sân: `pos` vẫn là quãng đã chạy, 0 là chỗ chuột xuất hiện, 10 là sổ; đảo chiều chỉ là việc của giao diện, luật không đổi.)
  * Đơn vị thời gian là GIÂY: `dt` của `stepWhack`, đồng hồ lịch `clock`, mọi bộ đếm đều tính bằng giây.
  *
  * Trạng thái ván:
  *  - `play`: chạy bình thường (đồng hồ lịch chạy, sinh chuột, đồng);
- *  - `bossRun`: trùm đang chạy xuống (đồng hồ lịch DỪNG, ngừng sinh chuột, chuột đang chạy còn 20% tốc độ);
- *  - `quiz`: bảng câu hỏi mở (mọi thứ đứng yên, không nhận cú đập; logic chỉ chờ `answerBoss`, việc đếm giờ trả lời và chọn câu hỏi do QuizCard lo);
+ *  - `bossRun`: chuột câu hỏi (vàng ❓, {phanDien}) chạy tới giữa vùng đập rồi đứng chờ em đập (đồng hồ lịch DỪNG, ngừng sinh chuột, chuột đang chạy còn 20% tốc độ);
+ *  - `answer` (P9): lượt đáp án. Chuột thường đứng yên, 2 đến 4 chuột vàng mang nhãn A, B, C, D chạy từ đầu làn tới sổ; đập chuột nào là chọn đáp án đó, để chạy tới sổ là hết giờ;
+ *  - `quiz`: đã có kết quả lượt đáp án (`verdict`), mọi thứ đứng yên, không nhận cú đập; logic chỉ chờ `answerBoss` (em bấm "Chơi tiếp" sau khi đọc lời giải thích);
  *  - `ended`: hết ván (`ended` là 'complete' hay 'ink').
  *
  * `stepWhack` chia `dt` thành các bước cố định `WHACK_SPEC.tick` (1/120 giây) nên kết quả sinh chuột không phụ thuộc tốc độ khung hình; mọi số ngẫu nhiên chỉ rút trong bước cố định, không rút lúc nhận cú đập.
@@ -43,15 +45,51 @@ export interface Coin {
 export interface Boss {
   index: number;
   lane: number;
-  /** Vị trí {phanDien} dọc làn: chạy từ 0 tới giữa vùng đập */
+  /** Vị trí chuột câu hỏi dọc làn: chạy từ 0 tới giữa vùng đập rồi đứng chờ */
   pos: number;
-  /** Giây đã chạy xuống */
+  /** Giây đã chạy */
   t: number;
-  /** Thời gian trả lời (giây): 15 cho lần 1–5, 10 cho lần 6–10 */
+  /** Chuột câu hỏi đã tới chỗ chờ (giữa vùng đập) */
+  arrived: boolean;
+  /** Số giây chuột đáp án chạy từ đầu làn tới sổ: 18 cho lần 1–5, 14 cho lần 6–10 */
   answerSeconds: number;
+  /** Làn của đáp án A, B, C, D (chốt lúc chuột câu hỏi ra, theo seed); dài 4, chỉ dùng `options` phần tử đầu */
+  laneOf: number[];
 }
 
-export type WhackPhase = 'play' | 'bossRun' | 'quiz' | 'ended';
+/** Câu hỏi của một lượt, logic chỉ cần biết: có bao nhiêu đáp án và đáp án đúng là cái nào (0 là A) */
+export interface RoundKey {
+  correct: number;
+  options: number;
+}
+
+/** Chuột vàng mang nhãn đáp án (lượt đáp án) */
+export interface AnswerMouse {
+  /** 0 là A, 1 là B, … */
+  option: number;
+  lane: number;
+  pos: number;
+}
+
+export interface AnswerRound {
+  index: number;
+  mice: AnswerMouse[];
+  /** Đơn vị/giây */
+  speed: number;
+  correct: number;
+}
+
+/** Kết quả lượt đáp án, chờ `answerBoss` áp dụng */
+export interface Verdict {
+  result: BossResult;
+  /** Số giây chuột còn cần để tới sổ lúc em đập (chỉ có nghĩa khi đúng) */
+  secondsLeft: number;
+  /** Đáp án em chọn (đập trúng chuột nhãn đó); hết giờ thì null */
+  option: number | null;
+  correct: number;
+}
+
+export type WhackPhase = 'play' | 'bossRun' | 'answer' | 'quiz' | 'ended';
 export type EndReason = 'complete' | 'ink';
 export type BossResult = 'correct' | 'wrong' | 'timeout';
 
@@ -92,6 +130,12 @@ export interface WhackState {
   /** Số lượt trùm đã trả lời xong (0–10); trùm đang chạy có `boss.index` = số này */
   bossesDone: number;
   boss: Boss | null;
+  /** Câu hỏi 10 lượt (đáp án đúng, số đáp án); thiếu thì đáp án đúng là A và có 4 đáp án */
+  keys: readonly RoundKey[];
+  /** Lượt đáp án đang chạy (phase `answer`) */
+  answer: AnswerRound | null;
+  /** Kết quả lượt đáp án (phase `quiz`) */
+  verdict: Verdict | null;
   nextId: number;
   stats: WhackStats;
 }
@@ -103,7 +147,9 @@ export type WhackEvent =
   | { type: 'coinAppear'; coin: Coin }
   | { type: 'coinGone' }
   | { type: 'bossStart'; boss: Boss }
-  | { type: 'bossQuiz'; boss: Boss }
+  | { type: 'bossArrive'; boss: Boss }
+  | { type: 'answerStart'; round: AnswerRound }
+  | { type: 'bossQuiz'; boss: Boss; verdict: Verdict }
   | { type: 'hit'; lane: number; mouse: Mouse; killed: boolean; points: number }
   | { type: 'miss'; lane: number }
   | { type: 'blocked'; lane: number; why: 'phase' | 'rest' }
@@ -185,7 +231,12 @@ export function lowestInZone(s: WhackState, lane: number): Mouse | null {
 // ---------------------------------------------------------------------------
 // Tạo ván
 
-export function createWhackGame(seed: number): WhackState {
+/** Khóa của lượt thứ `index` (đếm từ 0): thiếu thì đáp án đúng là A, 4 đáp án */
+export function roundKey(s: Pick<WhackState, 'keys'>, index: number): RoundKey {
+  return s.keys[index] ?? { correct: 0, options: 4 };
+}
+
+export function createWhackGame(seed: number, keys: readonly RoundKey[] = []): WhackState {
   const rng = createMulberry32(seed);
   const s: WhackState = {
     seed,
@@ -205,6 +256,9 @@ export function createWhackGame(seed: number): WhackState {
     coins: 0,
     bossesDone: 0,
     boss: null,
+    keys,
+    answer: null,
+    verdict: null,
     nextId: 1,
     stats: { spawned: 0, hits: 0, misses: 0, leaked: 0, coinsTaken: 0, bossCorrect: 0, micePoints: 0, coinPoints: 0, bossPoints: 0 },
   };
@@ -276,6 +330,21 @@ function stepOnce(s: WhackState, out: WhackEvent[]): void {
 
   for (let i = 0; i < s.rest.length; i++) if (s.rest[i] > 0) s.rest[i] = s.rest[i] <= h + EPS ? 0 : s.rest[i] - h;
 
+  // lượt đáp án: chỉ chuột vàng chạy; chạy tới sổ mà chưa bị đập là hết giờ
+  if (s.phase === 'answer') {
+    const a = s.answer!;
+    let arrived = false;
+    for (const m of a.mice) {
+      m.pos += a.speed * h;
+      if (m.pos >= WHACK_SPEC.laneLength - EPS) arrived = true;
+    }
+    if (arrived) {
+      for (const m of a.mice) m.pos = Math.min(m.pos, WHACK_SPEC.laneLength);
+      closeAnswer(s, { result: 'timeout', secondsLeft: 0, option: null, correct: a.correct }, out);
+    }
+    return;
+  }
+
   // chuột: khựng, chạy, đổi làn, lọt
   for (let i = s.mice.length - 1; i >= 0; i--) {
     const m = s.mice[i];
@@ -307,13 +376,15 @@ function stepOnce(s: WhackState, out: WhackEvent[]): void {
 
   if (boss) {
     const b = s.boss!;
-    b.t += h;
-    const stop = (WHACK_SPEC.zoneStart + WHACK_SPEC.zoneEnd) / 2;
-    b.pos = stop * Math.min(1, b.t / WHACK_SPEC.boss.runSeconds);
-    if (b.t >= WHACK_SPEC.boss.runSeconds - EPS) {
-      b.pos = stop;
-      s.phase = 'quiz';
-      out.push({ type: 'bossQuiz', boss: b });
+    if (!b.arrived) {
+      b.t += h;
+      const stop = (WHACK_SPEC.zoneStart + WHACK_SPEC.zoneEnd) / 2;
+      b.pos = stop * Math.min(1, b.t / WHACK_SPEC.boss.runSeconds);
+      if (b.t >= WHACK_SPEC.boss.runSeconds - EPS) {
+        b.pos = stop;
+        b.arrived = true;
+        out.push({ type: 'bossArrive', boss: b });
+      }
     }
     return;
   }
@@ -351,11 +422,35 @@ function stepOnce(s: WhackState, out: WhackEvent[]): void {
   }
 
   if (s.bossesDone < WHACK_SPEC.boss.count && s.ticks === Math.round(bossClock(s.bossesDone) / h)) {
-    const b: Boss = { index: s.bossesDone, lane: Math.floor(s.rng() * WHACK_SPEC.lanes), pos: 0, t: 0, answerSeconds: bossSeconds(s.bossesDone) };
+    const lane = Math.floor(s.rng() * WHACK_SPEC.lanes);
+    // đáp án A, B, C, D vào các làn theo thứ tự trộn (Fisher–Yates, rút số trong bước cố định)
+    const laneOf = Array.from({ length: WHACK_SPEC.lanes }, (_, i) => i);
+    for (let i = laneOf.length - 1; i > 0; i--) {
+      const j = Math.floor(s.rng() * (i + 1));
+      [laneOf[i], laneOf[j]] = [laneOf[j], laneOf[i]];
+    }
+    const b: Boss = { index: s.bossesDone, lane, pos: 0, t: 0, arrived: false, answerSeconds: bossSeconds(s.bossesDone), laneOf };
     s.boss = b;
     s.phase = 'bossRun';
     out.push({ type: 'bossStart', boss: b });
   }
+}
+
+/** Mở kết quả lượt đáp án: mọi thứ đứng yên chờ em bấm "Chơi tiếp" (`answerBoss`). */
+function closeAnswer(s: WhackState, verdict: Verdict, out: WhackEvent[]): void {
+  s.verdict = verdict;
+  s.phase = 'quiz';
+  out.push({ type: 'bossQuiz', boss: s.boss!, verdict });
+}
+
+/** Tốc độ chuột đáp án (đơn vị/giây) của lượt có `answerSeconds` giây từ đầu làn tới sổ. */
+export function answerSpeed(answerSeconds: number): number {
+  return WHACK_SPEC.laneLength / answerSeconds;
+}
+
+/** Chuột câu hỏi đang trong vùng đập chưa (đập được từ lúc nó chạy qua đầu vùng) */
+export function bossInZone(b: Boss): boolean {
+  return b.pos >= WHACK_SPEC.zoneStart - EPS && b.pos <= WHACK_SPEC.zoneEnd + EPS;
 }
 
 /** Chạy `dt` GIÂY của ván (chia thành các bước cố định `WHACK_SPEC.tick`); trả về các sự kiện xảy ra theo thứ tự. Khi bảng câu hỏi mở hay đã hết ván thì không có gì chạy. */
@@ -385,8 +480,11 @@ export function tickWhack(s: WhackState, dt: number, paused: boolean): WhackEven
  * Đập làn `lane`: trúng con THẤP NHẤT đang trong vùng đập của làn đó. Không có thì hụt (không phạt), làn đó nghỉ `hitRest` giây. Làn đang nghỉ, bảng câu hỏi đang mở hay hết ván thì không nhận (sự kiện `blocked`).
  */
 export function hitLane(s: WhackState, lane: number): WhackEvent[] {
-  if (s.phase !== 'play' && s.phase !== 'bossRun') return [{ type: 'blocked', lane, why: 'phase' }];
+  if (s.phase !== 'play' && s.phase !== 'bossRun' && s.phase !== 'answer') return [{ type: 'blocked', lane, why: 'phase' }];
   if (!(lane >= 0 && lane < WHACK_SPEC.lanes) || s.rest[lane] > 0) return [{ type: 'blocked', lane, why: 'rest' }];
+  if (s.phase === 'answer') return hitAnswer(s, lane);
+  const boss = s.boss;
+  if (s.phase === 'bossRun' && boss && boss.lane === lane && bossInZone(boss)) return startAnswer(s, boss);
   const m = lowestInZone(s, lane);
   if (!m) {
     s.rest[lane] = WHACK_SPEC.hitRest;
@@ -406,6 +504,37 @@ export function hitLane(s: WhackState, lane: number): WhackEvent[] {
   s.stats.hits++;
   s.mice.splice(s.mice.indexOf(m), 1);
   return [{ type: 'hit', lane, mouse: m, killed: true, points }];
+}
+
+/** Đập trúng chuột câu hỏi: mở lượt đáp án (chuột thường đứng yên, chuột vàng A–D chạy từ đầu làn). */
+function startAnswer(s: WhackState, boss: Boss): WhackEvent[] {
+  const key = roundKey(s, boss.index);
+  const n = Math.min(Math.max(key.options, 2), WHACK_SPEC.lanes);
+  const round: AnswerRound = {
+    index: boss.index,
+    mice: Array.from({ length: n }, (_, option) => ({ option, lane: boss.laneOf[option], pos: 0 })),
+    speed: answerSpeed(boss.answerSeconds),
+    correct: Math.min(Math.max(key.correct, 0), n - 1),
+  };
+  s.answer = round;
+  s.phase = 'answer';
+  return [{ type: 'answerStart', round }];
+}
+
+/** Đập làn `lane` trong lượt đáp án: trúng chuột vàng THẤP NHẤT (pos lớn nhất) đang trong vùng đập của làn đó thì chọn đáp án đó; không có thì hụt (không phạt, làn nghỉ). */
+function hitAnswer(s: WhackState, lane: number): WhackEvent[] {
+  const a = s.answer!;
+  let best: AnswerMouse | null = null;
+  for (const m of a.mice) if (m.lane === lane && m.pos >= WHACK_SPEC.zoneStart - EPS && m.pos <= WHACK_SPEC.zoneEnd + EPS && (best === null || m.pos > best.pos)) best = m;
+  if (!best) {
+    s.rest[lane] = WHACK_SPEC.hitRest;
+    s.stats.misses++;
+    return [{ type: 'miss', lane }];
+  }
+  const out: WhackEvent[] = [];
+  const correct = best.option === a.correct;
+  closeAnswer(s, { result: correct ? 'correct' : 'wrong', secondsLeft: correct ? (WHACK_SPEC.laneLength - best.pos) / a.speed : 0, option: best.option, correct: a.correct }, out);
+  return out;
 }
 
 /** Chạm tiền đồng đang hiện: +5 điểm, +1 xu. Không có đồng (hoặc đang mở câu hỏi) thì không có gì. */
@@ -439,6 +568,8 @@ export function answerBoss(s: WhackState, result: BossResult, secondsLeft = 0): 
   }
   s.bossesDone++;
   s.boss = null;
+  s.answer = null;
+  s.verdict = null;
   out.push({ type: 'bossAnswer', result, points, ink: s.ink });
   if (s.ink >= WHACK_SPEC.inkMax) endGame(s, 'ink', out);
   else if (s.bossesDone >= WHACK_SPEC.boss.count) endGame(s, 'complete', out);

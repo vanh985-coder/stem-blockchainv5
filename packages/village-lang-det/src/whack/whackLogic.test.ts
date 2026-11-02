@@ -40,6 +40,24 @@ function callBoss(s: WhackState): WhackEvent[] {
 function toQuiz(s: WhackState): void {
   callBoss(s);
   stepWhack(s, WHACK_SPEC.boss.runSeconds + 0.1);
+  // đập trúng chuột câu hỏi (đã đứng chờ giữa vùng đập) rồi đập đúng chuột đáp án A ngay khi nó vào vùng đập
+  hitLane(s, s.boss!.lane);
+  const a = s.answer!;
+  const m = a.mice.find((x) => x.option === a.correct)!;
+  stepWhack(s, (WHACK_SPEC.zoneStart + 0.1) / a.speed);
+  hitLane(s, m.lane);
+}
+
+/** Người chơi đập chuột câu hỏi khi nó đã đứng chờ, đập đúng chuột đáp án khi nó vào vùng đập, rồi bấm "Chơi tiếp" (đúng). */
+function driveBoss(s: WhackState): WhackEvent[] {
+  if (s.phase === 'bossRun' && s.boss!.arrived) return hitLane(s, s.boss!.lane);
+  if (s.phase === 'answer') {
+    const a = s.answer!;
+    const m = a.mice.find((x) => x.option === a.correct)!;
+    return m.pos >= WHACK_SPEC.zoneStart + 0.05 ? hitLane(s, m.lane) : [];
+  }
+  if (s.phase === 'quiz') return answerBoss(s, 'correct', s.verdict!.secondsLeft);
+  return [];
 }
 
 /** Người chơi hoàn hảo: mỗi khung đập mọi làn có chuột trong vùng, nhặt đồng, trả lời đúng còn 10 giây. */
@@ -48,8 +66,8 @@ function autoplay(seed: number, dt: number): { s: WhackState; events: WhackEvent
   const events: WhackEvent[] = [];
   for (let i = 0; i < 40000 && s.phase !== 'ended'; i++) {
     events.push(...stepWhack(s, dt));
-    if (s.phase === 'quiz') events.push(...answerBoss(s, 'correct', 10));
-    for (let lane = 0; lane < WHACK_SPEC.lanes; lane++) if (lowestInZone(s, lane)) events.push(...hitLane(s, lane));
+    events.push(...driveBoss(s));
+    if (s.phase === 'play' || s.phase === 'bossRun') for (let lane = 0; lane < WHACK_SPEC.lanes; lane++) if (lowestInZone(s, lane)) events.push(...hitLane(s, lane));
     events.push(...collectCoin(s));
   }
   return { s, events };
@@ -231,7 +249,7 @@ describe('bảng test của spec 06 (màn 5)', () => {
     const g = createWhackGame(3);
     for (let i = 0; i < 40000 && g.phase !== 'ended'; i++) {
       for (const e of stepWhack(g, 1 / 60)) if (e.type === 'bossStart') clocks.push(Math.round(g.clock * 1000) / 1000);
-      if (g.phase === 'quiz') answerBoss(g, 'correct', 5);
+      driveBoss(g);
       for (let lane = 0; lane < 4; lane++) if (lowestInZone(g, lane)) hitLane(g, lane);
     }
     expect(clocks).toEqual([12, 24, 36, 48, 60, 72, 84, 96, 108, 120]);
@@ -263,13 +281,13 @@ describe('bảng test của spec 06 (màn 5)', () => {
     }
   });
 
-  it('thời gian trả lời: 15 giây cho lần 1–5, 10 giây cho lần 6–10', () => {
-    expect([0, 1, 2, 3, 4].map(bossSeconds)).toEqual([15, 15, 15, 15, 15]);
-    expect([5, 6, 7, 8, 9].map(bossSeconds)).toEqual([10, 10, 10, 10, 10]);
+  it('thời gian chạy của chuột đáp án: 18 giây cho lần 1–5, 14 giây cho lần 6–10', () => {
+    expect([0, 1, 2, 3, 4].map(bossSeconds)).toEqual([18, 18, 18, 18, 18]);
+    expect([5, 6, 7, 8, 9].map(bossSeconds)).toEqual([14, 14, 14, 14, 14]);
     const s = quiet();
     const ev = callBoss(s);
     const start = ev.find((e) => e.type === 'bossStart');
-    expect(start && start.type === 'bossStart' && start.boss.answerSeconds).toBe(15);
+    expect(start && start.type === 'bossStart' && start.boss.answerSeconds).toBe(18);
   });
 
   it('sinh chuột: không sinh vào làn có con còn trong 15% đầu làn (vị trí < 1,5)', () => {
@@ -312,8 +330,12 @@ describe('đồng hồ lịch, lượt trùm và chuột đứng yên', () => {
     expect(s.phase).toBe('bossRun');
     expect(s.clock).toBe(clock);
     stepWhack(s, 1);
-    expect(s.phase).toBe('quiz');
+    expect(s.phase).toBe('bossRun');
+    expect(s.boss!.arrived).toBe(true);
+    hitLane(s, s.boss!.lane);
+    expect(s.phase).toBe('answer');
     stepWhack(s, 30);
+    expect(s.phase).toBe('quiz');
     expect(s.clock).toBe(clock);
     answerBoss(s, 'correct', 5);
     stepWhack(s, 1);
@@ -485,12 +507,12 @@ describe('tiền đồng', () => {
     s.spawnIn = Infinity;
     const appear: number[] = [];
     const gone: number[] = [];
-    for (let i = 0; i < 40 * 60; i++) {
+    for (let i = 0; i < 90 * 60; i++) {
       for (const e of stepWhack(s, 1 / 60)) {
         if (e.type === 'coinAppear') appear.push(s.clock);
         if (e.type === 'coinGone') gone.push(s.clock);
       }
-      if (s.phase === 'quiz') answerBoss(s, 'correct', 5);
+      driveBoss(s);
     }
     expect(appear.length).toBeGreaterThanOrEqual(3);
     expect(appear[0]).toBeGreaterThanOrEqual(7 - 0.02);

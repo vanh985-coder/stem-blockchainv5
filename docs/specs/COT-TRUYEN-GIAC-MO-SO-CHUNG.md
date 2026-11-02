@@ -90,8 +90,8 @@ Cổng Làng Dệt mở.
 - **Trạm Khó:** cụ Bình đặt luật **đặt cọc**. Tí gian ngay lượt đầu và mất cọc; cô Chi duyệt vội nên bị phạt.
 
 **Màn 5 · Game: Đập Tí** (kiểu Whack-A-Mouse của Talking Tom)
-- Tí gấp trang giả thành chuột giấy, thả cho chạy xuống 4 dải vải trên sân đình để bôi mực vào cuốn Sổ Chung. A cầm quạt nan đập chuột; 5 vết mực là thua.
-- Thỉnh thoảng chính Tí chạy xuống. A phải trả lời đúng câu hỏi mới đét trúng; sai thì Tí chạy thẳng xuống sổ.
+- Tí gấp trang giả thành chuột giấy, thả cho chạy từ dưới lên 4 dải vải trên sân đình để bôi mực vào cuốn Sổ Chung ở đỉnh sân. A cầm búa, chạy ngang tới làn và đập chuột; 8 vết mực là thua.
+- Thỉnh thoảng có chuột vàng ❓ chạy lên. Đập trúng nó thì câu hỏi hiện ra và 4 chuột vàng mang nhãn A, B, C, D chạy lên: A phải đập đúng chuột mang đáp án đúng; đập sai hoặc để chuột đúng chạy tới sổ thì thêm một vết mực.
 
 **Màn 6 · Game: Diều đưa sổ** (kiểu Flappy Bird)
 - A thả diều mang bản sao sổ mới tới các làng xa, để làng nào cũng có sổ giống nhau.

@@ -7,13 +7,15 @@
  *  - Một tay: hai cú đập cách nhau ít nhất `tapGap` giây (0,15 giây); nhiều con cùng sẵn sàng thì xếp hàng theo thứ tự tới vùng (con sẵn sàng trước đập trước). Chỉ đập con thấp nhất của làn (con mà cú đập sẽ trúng).
  *  - Chuột to: cú thứ hai vào lúc cú đầu cộng 0,3 giây khựng cộng độ lệch giờ (không sớm hơn `tapGap`).
  *  - Tiền đồng (tự chọn): bot ra tay sau 0,3 giây cộng |độ lệch giờ| kể từ lúc đồng hiện, sau mọi con chuột sẵn sàng.
- *  - Câu hỏi: bot trả lời sau `answerDelay` giây (còn lại = thời hạn − `answerDelay`; không còn thì hết giờ), đúng với xác suất `correct`.
+ *  - Chuột câu hỏi (P9): tới chỗ chờ thì bot đập nó sau 0,3 giây cộng |độ lệch giờ| (tự chọn; chuột câu hỏi luôn được để ý).
+ *  - Lượt đáp án (P9): bot chọn đáp án đúng với xác suất `correct` (còn lại: một đáp án sai ngẫu nhiên), rồi đập chuột vàng mang nhãn đó khi nó đã chạy được `answerAt` (0 đến 1) quãng vùng đập, cộng độ lệch giờ.
+ *    `answerDelay` giây đọc câu hỏi trước khi ra tay (chuột vàng chưa vào vùng đập trước đó nên thường không ảnh hưởng). Chạy tới sổ là hết giờ.
  * Số ngẫu nhiên của bot lấy từ rng riêng (không đụng rng của ván nên cùng seed vẫn cùng chuỗi chuột).
  */
 import { medalOf, type MedalThresholds } from '@so-chung/core';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { WHACK_SPEC } from './whackConfig';
-import { answerBoss, collectCoin, createWhackGame, hitLane, lowestInZone, stepWhack, type Coin, type EndReason, type WhackPhase, type WhackState } from './whackLogic';
+import { answerBoss, bossInZone, collectCoin, createWhackGame, hitLane, lowestInZone, stepWhack, type Coin, type EndReason, type WhackPhase, type WhackState } from './whackLogic';
 
 export interface WhackBotProfile {
   name: string;
@@ -23,18 +25,20 @@ export interface WhackBotProfile {
   skip: number;
   /** Xác suất trả lời đúng */
   correct: number;
-  /** Giây bot nghĩ trước khi trả lời */
+  /** Giây bot đọc câu hỏi trước khi ra tay đập chuột đáp án */
   answerDelay: number;
+  /** Bot đập chuột đáp án khi nó đã chạy được chừng này (0 đến 1) của vùng đập: 0 là vừa vào vùng, 0,5 là giữa vùng */
+  answerAt: number;
   /** Giây tối thiểu giữa hai cú đập (một tay) */
   tapGap: number;
 }
 
 /** Bot giỏi (theo lời giao sửa sau B6): σ 0,05 giây, bỏ sót 2% chuột, đúng câu hỏi 95%, trả lời sau 4 giây. */
-export const GOOD_BOT: WhackBotProfile = { name: 'good', sigma: 0.05, skip: 0.02, correct: 0.95, answerDelay: 4, tapGap: 0.15 };
+export const GOOD_BOT: WhackBotProfile = { name: 'good', sigma: 0.05, skip: 0.02, correct: 0.95, answerDelay: 4, answerAt: 0.3, tapGap: 0.15 };
 /** Bot trung bình (theo lời giao sửa sau B6): σ 0,12 giây, bỏ sót 10% chuột, đúng 70%, trả lời sau 7 giây. */
-export const AVERAGE_BOT: WhackBotProfile = { name: 'average', sigma: 0.12, skip: 0.1, correct: 0.7, answerDelay: 7, tapGap: 0.15 };
+export const AVERAGE_BOT: WhackBotProfile = { name: 'average', sigma: 0.12, skip: 0.1, correct: 0.7, answerDelay: 7, answerAt: 0.5, tapGap: 0.15 };
 /** Người chơi lý tưởng (chỉ để ước điểm tối đa lý thuyết, không phải bot cân bằng): đập đúng lúc chuột ở giữa vùng, không sót, đúng hết, trả lời ngay (còn trọn thời hạn). */
-export const ORACLE_BOT: WhackBotProfile = { name: 'oracle', sigma: 0, skip: 0, correct: 1, answerDelay: 0, tapGap: 0 };
+export const ORACLE_BOT: WhackBotProfile = { name: 'oracle', sigma: 0, skip: 0, correct: 1, answerDelay: 0, answerAt: 0, tapGap: 0 };
 
 export interface WhackSimResult {
   score: number;
@@ -82,17 +86,52 @@ export function simulateWhack(seed: number, p: WhackBotProfile): WhackSimResult 
   const coinSeen = new Map<Coin, { ignore: boolean; due: number }>();
   let now = 0;
   let lastTap = -Infinity;
+  /** Chuột câu hỏi: giờ ra tay (đặt khi nó tới chỗ chờ) */
+  let bossDue = Infinity;
+  /** Lượt đáp án: đáp án bot chọn, giờ bắt đầu lượt */
+  let pick = -1;
+  let answerStart = 0;
+  /** Vị trí chuột đáp án mà từ đó bot đập (đã cộng độ lệch giờ) */
+  let want = 0;
   for (let frame = 0; frame < 200000 && phaseOf(s) !== 'ended'; frame++) {
     if (phaseOf(s) === 'quiz') {
-      const left = s.boss!.answerSeconds - p.answerDelay;
-      if (left <= 0) answerBoss(s, 'timeout', 0);
-      else answerBoss(s, bot() < p.correct ? 'correct' : 'wrong', left);
+      // em đọc lời giải thích rồi bấm "Chơi tiếp"
+      const v = s.verdict!;
+      answerBoss(s, v.result, v.secondsLeft);
+      bossDue = Infinity;
+      pick = -1;
       continue;
     }
     stepWhack(s, FRAME);
     now += FRAME;
     // stepWhack đổi s.phase mà TypeScript không thấy: đọc qua hàm để không bị thu hẹp kiểu
     if (phaseOf(s) === 'ended' || phaseOf(s) === 'quiz') continue;
+
+    // lượt đáp án: chọn đáp án rồi đập chuột vàng mang nhãn đó khi tới chỗ đã định
+    if (phaseOf(s) === 'answer') {
+      const a = s.answer!;
+      if (pick < 0) {
+        const wrong = a.mice.map((m) => m.option).filter((o) => o !== a.correct);
+        pick = bot() < p.correct || wrong.length === 0 ? a.correct : wrong[Math.floor(bot() * wrong.length)];
+        answerStart = now;
+        want = WHACK_SPEC.zoneStart + p.answerAt * (WHACK_SPEC.zoneEnd - WHACK_SPEC.zoneStart) + gaussian(bot) * p.sigma * a.speed;
+      }
+      const m = a.mice.find((x) => x.option === pick)!;
+      if (now - answerStart >= p.answerDelay && m.pos >= Math.max(WHACK_SPEC.zoneStart, want) && now - lastTap >= p.tapGap - 1e-9 && s.rest[m.lane] <= 0) {
+        hitLane(s, m.lane);
+        lastTap = now;
+      }
+      continue;
+    }
+    // chuột câu hỏi tới chỗ chờ: ra tay đập nó
+    if (phaseOf(s) === 'bossRun' && s.boss!.arrived && bossInZone(s.boss!)) {
+      if (bossDue === Infinity) bossDue = now + 0.3 + Math.abs(gaussian(bot) * p.sigma);
+      if (now >= bossDue && now - lastTap >= p.tapGap - 1e-9 && s.rest[s.boss!.lane] <= 0) {
+        hitLane(s, s.boss!.lane);
+        lastTap = now;
+        continue;
+      }
+    }
 
     // ghi nhận chuột mới: bỏ sót hay không, lệch giờ bao nhiêu
     for (const m of s.mice) {

@@ -24,6 +24,12 @@ function callBoss(s: WhackState): WhackEvent[] {
 function toQuiz(s: WhackState): void {
   callBoss(s);
   stepWhack(s, WHACK_SPEC.boss.runSeconds + 0.1);
+  // đập trúng chuột câu hỏi (đã đứng chờ giữa vùng đập) rồi đập đúng chuột đáp án A ngay khi nó vào vùng đập
+  hitLane(s, s.boss!.lane);
+  const a = s.answer!;
+  const m = a.mice.find((x) => x.option === a.correct)!;
+  stepWhack(s, (WHACK_SPEC.zoneStart + 0.1) / a.speed);
+  hitLane(s, m.lane);
 }
 
 describe('P7b: Hoàn thiện và kiểm logic lối chơi Màn 5 2D', () => {

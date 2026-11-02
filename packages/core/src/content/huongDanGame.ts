@@ -134,9 +134,9 @@ export const HUONG_DAN_GAME = {
     nhan: 'Màn 5',
     tieuDe: 'Màn 5: Đập {phanDien}',
     luat: [
-      '{phanDien} gấp các trang giả thành chuột giấy, thả xuống sân để bôi mực vào cuốn Sổ Chung. Em cầm quạt nan đập chuột trước khi nó tới sổ.',
-      'Đập chuột khi nó vào vệt sáng ở cuối làn. Chuột đổi làn, chuột nhanh và chuột to khó hơn. Chuột lọt tới sổ làm loang một vết mực; đủ 8 vết mực là thua.',
-      'Cứ 12 giây {phanDien} chạy xuống kèm một câu hỏi: trả lời đúng thì đét được {phanDien}, được thêm điểm và xoá 2 vết mực; sai hoặc hết giờ thì thêm một vết mực.',
+      '{phanDien} gấp các trang giả thành chuột giấy, cho chạy từ dưới lên để bôi mực vào cuốn Sổ Chung ở đỉnh sân. Em cầm búa, chạy ngang tới làn và đập chuột trước khi nó tới sổ.',
+      'Đập chuột khi nó vào vệt sáng gần sổ. Chuột đổi làn, chuột nhanh và chuột to khó hơn. Chuột chạy tới sổ làm loang một vết mực; đủ 8 vết mực là thua.',
+      'Cứ 12 giây có một chuột vàng ❓ chạy lên. Đập trúng nó thì câu hỏi hiện ra và 4 chuột vàng mang nhãn A, B, C, D chạy lên: đập chuột mang đáp án đúng để được thêm điểm và xoá 2 vết mực; đập sai hoặc để chuột đúng chạy tới sổ thì thêm một vết mực.',
     ],
     dieuKhien: {
       mayTinh: 'Phím D F J K (hoặc 1 2 3 4) hoặc bấm chuột vào làn để đập · bấm chuột vào đồng tiền để nhặt',
@@ -146,8 +146,8 @@ export const HUONG_DAN_GAME = {
       {
         hinh: { art: 'dap-lan-phim' },
         hinhDt: { art: 'dap-lan-cham' },
-        may: 'Chuột giấy chạy xuống sổ. Khi nó vào vệt sáng ở cuối làn, bấm phím D F J K (hoặc 1 2 3 4) hay bấm chuột vào làn để đập.',
-        dt: 'Chuột giấy chạy xuống sổ. Khi nó vào vệt sáng ở cuối làn, chạm vào làn để đập.',
+        may: 'Chuột giấy chạy từ dưới lên sổ. Khi nó vào vệt sáng gần sổ, bấm phím D F J K (hoặc 1 2 3 4) hay bấm chuột vào làn để đập; nhân vật sẽ chạy tới làn đó và vung búa.',
+        dt: 'Chuột giấy chạy từ dưới lên sổ. Khi nó vào vệt sáng gần sổ, chạm vào làn để đập; nhân vật sẽ chạy tới làn đó và vung búa.',
       },
       {
         hinh: { art: 'chuot-loai' },
@@ -155,21 +155,22 @@ export const HUONG_DAN_GAME = {
       },
       {
         hinh: { art: 'so-muc' },
-        may: 'Chuột lọt tới sổ làm loang một vết mực. Đủ 8 vết mực là thua; trả lời đúng câu hỏi của {phanDien} thì được xoá 2 vết.',
+        may: 'Chuột chạy tới sổ làm loang một vết mực. Đủ 8 vết mực là thua; đập đúng chuột đáp án thì được xoá 2 vết.',
       },
       {
         hinh: { art: 'trum-hoi' },
-        may: 'Cứ 12 giây {phanDien} chạy xuống kèm một câu hỏi. Trả lời đúng thì em đét được {phanDien}, càng nhanh càng nhiều điểm.',
+        may: 'Cứ 12 giây có chuột vàng ❓ chạy lên: đập trúng nó để mở câu hỏi, rồi đập chuột A, B, C hay D mang đáp án đúng. Đáp án trong cột chỉ để đọc.',
       },
     ],
     nhac: {
-      dauVan: 'Đập chuột giấy khi nó vào vệt sáng ở cuối làn: phím D F J K hoặc chạm vào làn.',
-      chay: 'Đập mỗi chuột khi nó nằm trong vệt sáng của làn nó đang chạy. Chuột nào tới sổ sẽ làm loang một vết mực.',
+      dauVan: 'Đập chuột giấy khi nó vào vệt sáng gần sổ: phím D F J K hoặc chạm vào làn.',
+      chay: 'Đập mỗi chuột khi nó nằm trong vệt sáng của làn nó đang chạy. Chuột nào chạy tới sổ sẽ làm loang một vết mực.',
       chuotTo: 'Chuột to phải đập 2 lần.',
       dongTien: 'Có đồng tiền trên sân: chạm vào nó trước khi biến mất để được thêm điểm.',
       soSapDay: 'Sổ sắp đầy mực! Ưu tiên chuột gần sổ nhất.',
-      trumChay: '{phanDien} đang chạy xuống! Chuẩn bị đọc câu hỏi nhé.',
-      trumHoi: 'Đọc câu hỏi rồi chọn đáp án — đúng thì đét được {phanDien} và xoá 2 vết mực.',
+      trumChay: 'Chuột vàng ❓ đang chạy lên! Đập nó khi vào vệt sáng để mở câu hỏi.',
+      trumHoi: 'Đọc câu hỏi rồi đập chuột vàng mang đáp án em chọn: đúng thì xoá 2 vết mực.',
+      ketQua: 'Đọc lời giải thích rồi bấm "Chơi tiếp".',
       hetVan: 'Ván này đã kết thúc.',
     },
   },
