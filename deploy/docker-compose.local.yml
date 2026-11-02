@@ -1,0 +1,47 @@
+# Bản CHẠY THỬ localhost trên server: dựng riêng, KHÔNG đụng container của bản thật.
+# Cùng Dockerfile và deploy/Caddyfile, khác: project, image, container (so-chung-local) và cổng 127.0.0.1:19081–19086.
+# Chạy từ thư mục deploy/ (docs/DEPLOY.md mục l):
+#   docker compose -f docker-compose.local.yml --env-file .env.local up -d --build
+# Supabase để trống vẫn hợp lệ (chơi bằng khách); khai báo thiếu hẳn biến thì báo lỗi.
+# Caddyfile không ghi cứng tên miền: 4 site làng cũ chuyển hướng 302 về HUB_ORIGIN (ở đây là VITE_HUB_URL = http://localhost:19081), giữ đường dẫn.
+name: so-chung-local
+
+services:
+  web:
+    image: so-chung-local-web:latest
+    container_name: so-chung-local-web
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL?Thiếu VITE_SUPABASE_URL trong deploy/.env.local}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY?Thiếu VITE_SUPABASE_ANON_KEY trong deploy/.env.local}
+        VITE_USERNAME_EMAIL_DOMAIN: ${VITE_USERNAME_EMAIL_DOMAIN:?Thiếu VITE_USERNAME_EMAIL_DOMAIN trong deploy/.env.local}
+        VITE_COOKIE_DOMAIN: ${VITE_COOKIE_DOMAIN-}
+        VITE_ASSETS_URL: ${VITE_ASSETS_URL:-http://localhost:19086}
+        VITE_HUB_URL: ${VITE_HUB_URL:-http://localhost:19081}
+        VITE_LANG_GIAY_URL: ${VITE_LANG_GIAY_URL:-http://localhost:19082}
+        VITE_LANG_DET_URL: ${VITE_LANG_DET_URL:-http://localhost:19083}
+        VITE_LANG_KHAC_DAU_URL: ${VITE_LANG_KHAC_DAU_URL:-http://localhost:19084}
+        VITE_LANG_BAC_URL: ${VITE_LANG_BAC_URL:-http://localhost:19085}
+        VITE_MERGED: ${VITE_MERGED:-true}
+    restart: unless-stopped
+    environment:
+      HUB_ORIGIN: ${VITE_HUB_URL:-http://localhost:19081}
+    # Cổng bên TRONG container giữ nguyên 8081–8086 (Caddyfile); bên ngoài chỉ mở trên 127.0.0.1, dải 19081–19086.
+    ports:
+      - "127.0.0.1:${HUB_PORT:-19081}:8081" # hub
+      - "127.0.0.1:${LANG_GIAY_PORT:-19082}:8082" # lang-giay (chuyển hướng về hub)
+      - "127.0.0.1:${LANG_DET_PORT:-19083}:8083" # lang-det (chuyển hướng về hub)
+      - "127.0.0.1:${LANG_KHAC_DAU_PORT:-19084}:8084" # lang-khac-dau (chuyển hướng về hub)
+      - "127.0.0.1:${LANG_BAC_PORT:-19085}:8085" # lang-bac (chuyển hướng về hub)
+      - "127.0.0.1:${ASSETS_PORT:-19086}:8086" # assets
+    healthcheck:
+      # Chạy BÊN TRONG container nên dùng cổng trong (không đổi theo HUB_PORT…)
+      test:
+        - CMD-SHELL
+        - wget -q -O /dev/null http://127.0.0.1:8081/ && wget -q -O /dev/null http://127.0.0.1:8086/manifest.json
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
