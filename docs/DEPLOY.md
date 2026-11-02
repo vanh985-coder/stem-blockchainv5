@@ -403,6 +403,35 @@ Rồi mở http://localhost:18081 … 18086. Bản này dùng địa chỉ `loca
 
 ---
 
+## (l) Chạy thử localhost trên server
+
+Dùng khi muốn thử bản mới ngay trên server mà **không đụng bản thật**: dựng riêng (project, image, container đều tên `so-chung-local`), nghe ở `127.0.0.1:19081` đến `19086`, cùng `Dockerfile` và `deploy/Caddyfile`. Bản này không ảnh hưởng container `so-chung-web`, cổng 18081–18086 hay cấu hình cloudflared; hai bản chạy song song được. Caddyfile không ghi cứng tên miền: bốn cổng làng cũ chuyển hướng 302 về `HUB_ORIGIN` (ở đây `http://localhost:19081`), nên không cần Caddyfile riêng.
+
+Chạy trong thư mục `deploy` trên server:
+
+```powershell
+cd deploy
+cp .env.local.example .env.local
+notepad .env.local        # điền VITE_SUPABASE_URL và VITE_SUPABASE_ANON_KEY (khóa anon/publishable, KHÔNG dùng service role)
+docker compose -f docker-compose.local.yml --env-file .env.local up -d --build
+```
+
+Rồi mở http://localhost:19081 (trên chính server, hay qua Remote Desktop). Kiểm nhanh: `curl.exe -I http://localhost:19081` trả 200; `curl.exe -I http://localhost:19086/manifest.json` trả 200; `curl.exe -I http://localhost:19083/lang/lang-det/man/5` trả 302 về `http://localhost:19081/lang/lang-det/man/5`.
+
+Tắt và dọn bản thử (không đụng bản thật):
+
+```powershell
+docker compose -f docker-compose.local.yml --env-file .env.local down
+```
+
+Lưu ý:
+- Đăng nhập dựa vào cookie có thể **không chạy** trên `localhost` (không đặt `VITE_COOKIE_DOMAIN`, mỗi cổng là một nguồn riêng): thử bằng chế độ **chơi bằng khách**. Để trống hai dòng Supabase cũng được nếu chỉ chơi khách.
+- `.env.local` không được commit (đã có trong `.gitignore`); `.env.local.example` chỉ chứa giá trị mẫu.
+- Đổi biến trong `.env.local` thì phải `up -d --build` lại, vì biến `VITE_*` được đóng cứng lúc build. Build chạy cả `pnpm check:text` và `pnpm test` trong Docker nên lâu hơn vài phút.
+- Cổng 19081–19086 bị trùng thì đổi `HUB_PORT`… trong `.env.local` (nhớ đổi cả `VITE_*_URL` tương ứng).
+
+---
+
 ## Khi có sự cố
 
 | Triệu chứng | Cách xử lý |
