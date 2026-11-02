@@ -4,7 +4,7 @@
  */
 import { BUBBLE_SPEC } from './bubbleConfig';
 import { eggImageIndex, SpriteCache, type BubbleImages } from './bubbleArt';
-import { eggFontPx, type Fit } from './bubbleLayout';
+import { LAUNCHER_ART, eggFontPx, frameRect, type Fit } from './bubbleLayout';
 import { cellCenter, launcherPoint, planOf, pointAlong, tracePath, type BubbleEvent, type BubbleState, type Point } from './bubbleLogic';
 
 const FX_POOL = 160;
@@ -149,6 +149,7 @@ export function drawBubble(d: DrawCtx, state: BubbleState, view: BubbleView): vo
   const { g, fit } = d;
   const S = fit.scale;
   g.setTransform(d.dpr, 0, 0, d.dpr, 0, 0);
+  g.imageSmoothingQuality = 'high'; // ảnh gốc lớn gấp nhiều lần cỡ hiển thị: thu nhỏ chất lượng cao để khung, máy bắn, trứng vỡ không răng cưa
   g.clearRect(0, 0, d.cw, d.ch);
   const shakeX = view.shake > 0 ? Math.sin(view.time * 70) * 0.12 * S * (view.shake / 0.5) : 0;
   g.save();
@@ -158,7 +159,11 @@ export function drawBubble(d: DrawCtx, state: BubbleState, view: BubbleView): vo
 
   // khung bàn
   if (d.art.khung) {
-    g.drawImage(d.art.khung, fit.ox - 0.25 * S, fit.oy - 0.25 * S, fit.w + 0.5 * S, fit.h + 0.5 * S);
+    // lòng khung trong suốt: phủ một lớp tối mờ để nền sân đình không làm rối bàn, rồi vẽ khung đều tỉ lệ ảnh (lòng khớp vùng chơi)
+    g.fillStyle = 'rgba(40,24,10,0.3)';
+    g.fillRect(fit.ox, fit.oy, fit.w, fit.h);
+    const fr = frameRect(fit);
+    g.drawImage(d.art.khung, fr.x, fr.y, fr.w, fr.h);
   } else {
     g.fillStyle = 'rgba(255,243,208,0.92)';
     g.strokeStyle = WOOD_DARK;
@@ -227,17 +232,22 @@ export function drawBubble(d: DrawCtx, state: BubbleState, view: BubbleView): vo
   const a = (view.aim * Math.PI) / 180;
   g.save();
   g.translate(X(l.x), Y(l.y));
-  g.fillStyle = WOOD_DARK;
-  g.beginPath();
-  g.ellipse(0, S * 0.45, S * 1.35, S * 0.5, 0, 0, Math.PI * 2);
-  g.fill();
-  g.fillStyle = WOOD;
-  g.beginPath();
-  g.ellipse(0, S * 0.38, S * 1.2, S * 0.4, 0, 0, Math.PI * 2);
-  g.fill();
+  if (!d.art.may) {
+    g.fillStyle = WOOD_DARK;
+    g.beginPath();
+    g.ellipse(0, S * 0.45, S * 1.35, S * 0.5, 0, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = WOOD;
+    g.beginPath();
+    g.ellipse(0, S * 0.38, S * 1.2, S * 0.4, 0, 0, Math.PI * 2);
+    g.fill();
+  }
   g.rotate(Math.PI / 2 - a);
   if (d.art.may) {
-    g.drawImage(d.art.may, -S * 0.9, -S * 1.5, S * 1.8, S * 2.4);
+    // giữ tỉ lệ ảnh; tâm xoay là túi da giữ trứng (trùng điểm đặt trứng đã chọn)
+    const mh = LAUNCHER_ART.height * S;
+    const mw = mh * LAUNCHER_ART.aspect;
+    g.drawImage(d.art.may, -mw / 2, -mh * LAUNCHER_ART.pivotY, mw, mh);
   } else {
     g.fillStyle = WOOD_DARK;
     g.beginPath();

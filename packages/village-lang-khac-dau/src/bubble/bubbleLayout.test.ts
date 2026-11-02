@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BUBBLE_SPEC } from './bubbleConfig';
-import { FIELD_H, FIELD_W, angleFromPoint, eggFontPx, fitField, modeFor } from './bubbleLayout';
+import { FIELD_H, FIELD_W, FRAME_ART, LAUNCHER_ART, angleFromPoint, eggFontPx, fitField, frameRect, modeFor } from './bubbleLayout';
 import { launcherPoint } from './bubbleLogic';
 
 describe('bubbleLayout: bố cục khung chơi', () => {
@@ -38,6 +38,28 @@ describe('bubbleLayout: bố cục khung chơi', () => {
       expect(col / W).toBeLessThanOrEqual(0.45);
       expect(f.scale).toBeGreaterThan(40);
     }
+  });
+
+  it('khung bàn vẽ đều tỉ lệ ảnh, lòng khung khớp đúng vùng chơi (trứng không đè lên viền)', () => {
+    for (const [w, h] of [[585, 688], [829, 1000], [344, 415], [344, 600]] as const) {
+      const f = fitField(w, h);
+      const fr = frameRect(f);
+      expect(fr.w / fr.h).toBeCloseTo(FRAME_ART.aspect, 9);
+      expect(fr.x + FRAME_ART.innerL * fr.w).toBeCloseTo(f.ox, 6);
+      expect(fr.x + FRAME_ART.innerR * fr.w).toBeCloseTo(f.ox + f.w, 6);
+      expect(fr.y + FRAME_ART.innerT * fr.h).toBeCloseTo(f.oy, 6);
+      // lòng khung đủ cao để chứa các hàng tới dây giới hạn
+      const innerH = (FRAME_ART.innerB - FRAME_ART.innerT) * fr.h;
+      expect(innerH).toBeGreaterThan((BUBBLE_SPEC.limitRow * BUBBLE_SPEC.rowH + 0.5) * f.scale);
+    }
+  });
+
+  it('máy bắn giữ tỉ lệ ảnh và tâm xoay nằm trong ảnh (túi da giữ trứng)', () => {
+    expect(LAUNCHER_ART.aspect).toBeCloseTo(0.8, 2);
+    expect(LAUNCHER_ART.pivotY).toBeGreaterThan(0.3);
+    expect(LAUNCHER_ART.pivotY).toBeLessThan(0.6);
+    // đáy máy (sau khi đặt tâm xoay ở điểm đặt trứng) vẫn nằm trong vùng chơi
+    expect(launcherPoint().y + LAUNCHER_ART.height * (1 - LAUNCHER_ART.pivotY)).toBeLessThanOrEqual(FIELD_H + 1e-9);
   });
 
   it('góc ngắm: trỏ thẳng lên là 90 độ, sang trái lớn hơn, sang phải nhỏ hơn, kẹp trong 12 đến 168', () => {

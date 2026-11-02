@@ -272,11 +272,21 @@ async function sVong(browser, size) {
     const fp = await S(ctx, () => window.__climbUi.fontPx);
     check(ctx, `vòng ${round + 1}`, 'chữ số trên bậc ≥ 16 px', fp >= 16, `${fp.toFixed(1)} px`);
     check(ctx, `vòng ${round + 1}`, `${[8, 8, 16][round]} lá, ${[2, 2, 3][round]} lựa chọn mỗi tầng`, info.round === round && info.leaves === [8, 8, 16][round] && info.n === [2, 2, 3][round], JSON.stringify(info));
-    // bậc trượt: lấy hai mẫu cách nhau 150 ms
+    // bậc trượt: hai mẫu cách nhau 150 ms; tốc độ để so các vòng là tổng quãng trượt trong khoảng 1,35 giây (một lần lấy mẫu tức thời tùy pha của chuyển động nên lúc nhanh lúc chậm)
     const a = await S(ctx, () => window.__climbChoiceX(0));
     await sleep(150);
     const b = await S(ctx, () => window.__climbChoiceX(0));
-    const speed = Math.abs(b - a) / 0.15;
+    let travelled = Math.abs(b - a);
+    let prevX = b;
+    if (round > 0) {
+      for (let i = 0; i < 8; i++) {
+        await sleep(150);
+        const x = await S(ctx, () => window.__climbChoiceX(0));
+        travelled += Math.abs(x - prevX);
+        prevX = x;
+      }
+    }
+    const speed = round > 0 ? travelled / (0.15 * 9) : Math.abs(b - a) / 0.15;
     slideInfo.push(speed);
     if (round === 0) check(ctx, 'vòng 1', 'bậc đứng yên', Math.abs(b - a) < 1e-6, `${a} → ${b}`);
     else check(ctx, `vòng ${round + 1}`, 'bậc lựa chọn trượt qua lại', Math.abs(b - a) > 0.01 || speed > 0.2, `${a.toFixed(3)} → ${b.toFixed(3)}`);

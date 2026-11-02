@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CanvasTexture, LinearFilter, SRGBColorSpace, Texture } from 'three';
 import { ASSETS_URL, climbUi, lookupAsset, useManifest } from '@so-chung/core';
-import { CROPS, SIGN, STEP, labelFontPx } from './climbLayout';
+import { CROPS, SIGN, STEP, STEP_ART, labelFontPx } from './climbLayout';
 import { nodeValue, siblingValue, type ClimbTier, type ClimbTree } from './climbLogic';
 
 export const ART = {
@@ -185,7 +185,7 @@ export function drawRoundLabels(tree: ClimbTree, tiers: readonly ClimbTier[], pp
     probe.font = `800 100px ${FONT}`;
     for (const v of values) widest = Math.max(widest, probe.measureText(String(v)).width / 100);
   }
-  const fontPx = labelFontPx(ppu, largeText, widest || 4);
+  const fontPx = labelFontPx(ppu, largeText, widest || 4, plank !== null);
   const steps = new Map<number, CanvasTexture>();
   for (const v of values) {
     const c = document.createElement('canvas');
@@ -195,7 +195,7 @@ export function drawRoundLabels(tree: ClimbTree, tiers: readonly ClimbTier[], pp
     if (ctx) {
       if (plank) ctx.drawImage(plank, 0, 0, w, h);
       else paintPlank(ctx, w, h);
-      paintNumber(ctx, String(v), w / 2, h * 0.5, fontPx * dpr);
+      paintNumber(ctx, String(v), w / 2, h * (plank ? STEP_ART.plankMid : 0.5), fontPx * dpr);
     }
     steps.set(v, prepare(new CanvasTexture(c)) as CanvasTexture);
   }
@@ -209,7 +209,7 @@ export function drawRoundLabels(tree: ClimbTree, tiers: readonly ClimbTier[], pp
       const ctx = c.getContext('2d');
       if (ctx) {
         ctx.drawImage(crackedPlank, 0, 0, w, h);
-        paintNumber(ctx, String(v), w / 2, h * 0.5, fontPx * dpr);
+        paintNumber(ctx, String(v), w / 2, h * STEP_ART.plankMid, fontPx * dpr);
       }
       cracked.set(v, prepare(new CanvasTexture(c)) as CanvasTexture);
     }

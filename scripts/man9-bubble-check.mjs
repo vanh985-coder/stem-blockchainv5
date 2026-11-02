@@ -157,7 +157,7 @@ async function aimAndFire(ctx, angle) {
     const l = window.__bubbleApi.launcherPoint();
     const c = document.querySelector('[data-testid="ban-trung"]').getBoundingClientRect();
     const r = (a * Math.PI) / 180;
-    return { x: c.left + f.ox + (l.x + 3.5 * Math.cos(r)) * f.scale, y: c.top + f.oy + (l.y - 3.5 * Math.sin(r)) * f.scale };
+    return { x: c.left + f.ox + (l.x + 5 * Math.cos(r)) * f.scale, y: c.top + f.oy + (l.y - 5 * Math.sin(r)) * f.scale };
   }, angle);
   if (ctx.size.touch) {
     const l = await ctx.eval(() => {

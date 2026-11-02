@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CLIMB_SPEC } from './climbConfig';
 import { tierY } from './climbLogic';
-import { CROWN, PLAYER, ROOT, SIGN, STEP, TRUNK, WORLD, cameraY, crackAlpha, crownY, frameOf, labelFontPx, pxPerUnit, rootY, signY, trunkTiles, villainY } from './climbLayout';
+import { CROWN, PLAYER, ROOT, SIGN, STEP, STEP_ART, TRUNK, WORLD, cameraY, crackAlpha, crownY, frameOf, labelFontPx, pxPerUnit, rootY, signY, stepLift, trunkTiles, villainY } from './climbLayout';
 
 /** Bề rộng ở cỡ 1 px của chuỗi dài nhất có thể (6 chữ số của gốc vòng 3; ước 0,62 em mỗi chữ số cho phông đậm). */
 const WIDEST = 6 * 0.62;
@@ -52,6 +52,23 @@ describe('bố cục màn 12', () => {
     expect(labelFontPx(ppu, true, WIDEST)).toBeGreaterThanOrEqual(16);
     expect(labelFontPx(ppu, true, 2 * 0.62)).toBeGreaterThanOrEqual(16 * 1.15 - 1e-9);
     expect(labelFontPx(pxPerUnit('landscape', 1366), false, WIDEST)).toBeGreaterThan(30);
+  });
+
+  it('ảnh bậc gỗ: ván nằm trong khung ảnh, nâng hình lên cho mặt ván trùng mặt đứng, chữ trên ván không dưới 16 px và không lớn hơn chữ trên ván code', () => {
+    expect(STEP_ART.plankTop).toBeGreaterThan(0);
+    expect(STEP_ART.plankBottom).toBeLessThanOrEqual(1);
+    expect(STEP_ART.plankMid).toBeGreaterThan(STEP_ART.plankTop);
+    expect(STEP_ART.plankMid).toBeLessThan(STEP_ART.plankBottom);
+    expect(stepLift()).toBeCloseTo(STEP_ART.plankTop * STEP.height, 9);
+    for (const [frame, px] of [['portrait', 360], ['landscape', 844], ['landscape', 1366], ['landscape', 1920]] as const) {
+      const ppu = pxPerUnit(frame, px);
+      const onPlank = labelFontPx(ppu, false, WIDEST, true);
+      expect(onPlank).toBeGreaterThanOrEqual(16);
+      expect(onPlank).toBeLessThanOrEqual(labelFontPx(ppu, false, WIDEST, false) + 1e-9);
+      // chữ chỉ vượt bề dày ván khi đã chạm mức 16 px
+      const thickness = (STEP_ART.plankBottom - STEP_ART.plankTop) * STEP.height * ppu;
+      if (onPlank > 16 + 1e-9) expect(onPlank).toBeLessThanOrEqual(thickness * 1.2 + 1e-9);
+    }
   });
 
   it('chọn khung theo kích thước màn hình', () => {

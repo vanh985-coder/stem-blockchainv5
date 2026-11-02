@@ -26,6 +26,7 @@ Tài liệu này là hướng dẫn quy tắc đầy đủ nhất cho AI code; `
 ## 4. Đồ họa
 - Bản gốc nằm ở `assets/` (không đưa lên Git). Chạy `pnpm assets:build`, rồi commit `assets-build/`.
 - Tìm file theo đường dẫn không kèm đuôi file, có trong `manifest.json`. Danh sách chuẩn: `docs/danh-sach-assets3.txt`.
+- `assets:build` xóa khỏi `assets-build/` mọi ảnh không còn ảnh gốc trong `assets/`: thư mục `assets/sprites/<màn>` thiếu file mà code còn dùng (ví dụ `man-12-leo-cay/than-cay`) thì ảnh bị xóa theo; kiểm `git status assets-build` sau khi chạy. Ảnh cũ muốn bỏ nhưng giữ ảnh gốc thì thêm vào `RETIRED` ở `scripts/assets-build.mjs` (hiện: game gà màn 9).
 - Nhân vật: xem `docs/specs/03-dong-co-3d-giao-dien-chung.md` mục 3.
   - Chỉ hoc-sinh-nam, ti, dan-lang-ba-cu, dan-lang-nong-dan có xương Mixamo.
   - Clip tìm theo từ khóa.

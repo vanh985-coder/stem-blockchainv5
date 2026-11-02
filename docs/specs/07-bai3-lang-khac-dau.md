@@ -233,7 +233,7 @@ Hồ sơ trung bình mới ít bắn bừa hơn (bắn ẩu 20% → 12%, chọn 
 
 ### Đồ họa
 
-Vẽ bằng code (không dùng three.js): trứng oval có bóng mềm, dấu khắc tròn kiểu đóng dấu (vòng đôi), số ở giữa viền trắng; màu theo số (góc màu theo tỉ lệ vàng); máy bắn, khung bàn, tấm trần, dây giới hạn đỏ nét đứt, vạch ngắm, hiệu ứng vỡ (to ra, mờ dần, vòng sáng) và rơi (rơi và xoay) đều có hình thay thế bằng code. Nền tạm là dải màu ấm. Mỗi hình thử tải từ manifest trước (`sprites/man-09-ban-trung/...`), thiếu thì dùng hình code, không lỗi trang. Chủ dự án có thể vẽ thêm theo bảng sau (đặt ở `assets/sprites/man-09-ban-trung/`, rồi `pnpm assets:build`):
+Vẽ bằng code (không dùng three.js): trứng oval có bóng mềm, dấu khắc tròn kiểu đóng dấu (vòng đôi), số ở giữa viền trắng; màu theo số (góc màu theo tỉ lệ vàng); máy bắn, khung bàn, tấm trần, dây giới hạn đỏ nét đứt, vạch ngắm, hiệu ứng vỡ (to ra, mờ dần, vòng sáng) và rơi (rơi và xoay) đều có hình thay thế bằng code. Nền tạm là dải màu ấm. Mỗi hình thử tải từ manifest trước (`sprites/man-09-ban-trung/...`), thiếu thì dùng hình code, không lỗi trang. Chủ dự án đã vẽ đủ 11 file (02/11/2026, xem bảng "Ảnh thật" bên dưới); bảng sau là mô tả ban đầu (đặt ở `assets/sprites/man-09-ban-trung/`, rồi `pnpm assets:build`):
 
 #### Đồ họa cần tạo
 
@@ -244,6 +244,18 @@ Vẽ bằng code (không dùng three.js): trứng oval có bóng mềm, dấu kh
 | `trung-1` đến `trung-7` | 128×128 mỗi ảnh | Trong suốt | Bảy quả trứng, mỗi quả một màu khác nhau (đỏ, cam, vàng, xanh lá, xanh dương, tím, hồng), hình trứng oval hơi thon ở đỉnh, có bóng sáng, bóng mềm dưới đáy, chiếm khoảng 88% ảnh; ở giữa có dấu khắc tròn kiểu đóng dấu (vòng đôi nhạt) để code vẽ số lên; KHÔNG có số, KHÔNG có chữ. Code dùng ảnh `trung-(số mod 7 + 1)`. |
 | `may-ban` | 256×320 | Trong suốt | Máy bắn trứng bằng gỗ: nòng hướng thẳng LÊN, đế tròn ở dưới; tâm xoay ở khoảng 62% chiều cao tính từ trên xuống, chính giữa chiều ngang. Không chữ. |
 | `trung-vo` | 256×256 | Trong suốt | Hiệu ứng trứng vỡ: vỏ văng ra bốn phía, chút lòng trứng, tâm ảnh là chỗ trứng vỡ. Không chữ. |
+
+#### Ảnh thật (02/11/2026)
+
+| File | Ảnh gốc | Sau `assets:build` | Nền |
+|---|---|---|---|
+| `nen-pc` | 1672 × 941 (16 : 9) | 1672 × 941, nén như ảnh nền (không thu về 1024) | không trong suốt |
+| `khung-ban` | 1147 × 1371 (0,837, đúng 920 : 1100) | 1071 × 1280 | trong suốt thật, lòng khung trong suốt |
+| `may-ban` | 1122 × 1402 (0,80, đúng 256 : 320) | 512 × 640 | trong suốt thật |
+| `trung-1` đến `trung-7` | 1254 × 1254 | 256 × 256 | trong suốt thật |
+| `trung-vo` | 1254 × 1254 | 512 × 512 | trong suốt thật |
+
+Cách vẽ (chỉnh hiển thị, không đổi luật hay số liệu): khung vẽ ĐỀU tỉ lệ ảnh sao cho lòng khung (chiếm 66,8% bề rộng và 70,3% chiều cao ảnh, `FRAME_ART`) khớp đúng vùng chơi 10 quả, nên viền gỗ nằm ngoài và không đè lên trứng hàng đầu (bản trước kéo khung theo tỉ lệ vùng chơi 10 : 14,46 nên trứng tràn lên viền). `fitField` chừa viền khung quanh vùng chơi (0,7 quả hai bên, 2 quả phía trên; khung hẹp thì viền ngoài bị cắt bởi mép khung vẽ), nên trứng nhỏ hơn khoảng 12% so với trước: 25 px ở 360 × 800 (trước 28,7), 41,8 px ở 1366 × 768. Lòng khung phủ một lớp tối mờ cho nền sân đình không làm rối bàn. Máy bắn cao 2,7 quả, giữ tỉ lệ ảnh, tâm xoay ở túi da giữ trứng (48% chiều cao ảnh, `LAUNCHER_ART`) trùng điểm đặt trứng đã chọn. Mọi ảnh vẽ với `imageSmoothingQuality = 'high'`. Ảnh trứng thu về 256 px, hiệu ứng vỡ 512 px (hiển thị tối đa vài chục đến khoảng 120 px).
 
 ### Hướng dẫn và nút "?"
 

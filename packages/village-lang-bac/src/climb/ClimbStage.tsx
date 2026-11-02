@@ -2,7 +2,7 @@ import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import { MeshBasicMaterial, PlaneGeometry, type Group, type Mesh, type Texture } from 'three';
 import { Actor25D, Character, type ClipName } from '@so-chung/core/three/index';
-import { CROWN, LEAF_FAKE, PLAYER, ROOT, SIGN, STEP, TRUNK, VILLAIN, WORLD, cameraY, crackAlpha, crownY, rootY, signY, stepCenterY, trunkTiles, villainY, type ClimbFrame } from './climbLayout';
+import { CROWN, LEAF_FAKE, PLAYER, ROOT, SIGN, STEP, TRUNK, VILLAIN, WORLD, cameraY, crackAlpha, crownY, rootY, signY, stepCenterY, stepLift, trunkTiles, villainY, type ClimbFrame } from './climbLayout';
 import { makeCrackTexture, makeSkyTexture, type ClimbLabels, type ClimbTextures } from './climbArt';
 import { choiceX, nodeValue, siblingValue, siblingX, standX, tierY, type ClimbState } from './climbLogic';
 
@@ -94,6 +94,8 @@ export function ClimbStage({ state, anim, frame, textures, labels, version, redu
   useEffect(() => () => stepMats.forEach((m) => m.dispose()), [stepMats]);
   useEffect(() => () => crackMats.forEach((m) => m.dispose()), [crackMats]);
 
+  // dùng ảnh bậc gỗ thì nâng hình lên cho mặt ván trùng mặt đứng (chỗ đứng không đổi)
+  const lift = textures.step ? stepLift() : 0;
   const nodeMat = (k: number) => stepMats[2 * k];
   const sibMat = (k: number) => stepMats[2 * k + 1];
   const choiceMat = (i: number) => stepMats[(depth + 1) * 2 + i];
@@ -158,7 +160,7 @@ export function ClimbStage({ state, anim, frame, textures, labels, version, redu
       if (s) s.visible = k < depth && k <= state.level;
     }
     // bậc lựa chọn (tầng trên): vị trí theo logic, mờ dần khi nứt
-    const cy = stepCenterY(tierY(state.level + 1));
+    const cy = stepCenterY(tierY(state.level + 1)) + lift;
     for (let i = 0; i < MAX_CHOICES; i++) {
       const m = choiceRefs.current[i];
       const cr = crackRefs.current[i];
@@ -229,7 +231,7 @@ export function ClimbStage({ state, anim, frame, textures, labels, version, redu
               }}
               geometry={geo}
               material={nodeMat(k)}
-              position={[standX(state.tree, k), stepCenterY(tierY(k)), Z.step]}
+              position={[standX(state.tree, k), stepCenterY(tierY(k)) + lift, Z.step]}
               scale={[STEP.width, STEP.height, 1]}
               visible={k === 0}
             />
@@ -240,7 +242,7 @@ export function ClimbStage({ state, anim, frame, textures, labels, version, redu
                 }}
                 geometry={geo}
                 material={sibMat(k)}
-                position={[siblingX(state.tree, k), stepCenterY(tierY(k)), Z.step]}
+                position={[siblingX(state.tree, k), stepCenterY(tierY(k)) + lift, Z.step]}
                 scale={[STEP.width, STEP.height, 1]}
                 visible={k === 0}
               />

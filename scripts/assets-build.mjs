@@ -19,6 +19,9 @@ const OUT = path.join(ROOT, 'assets-build');
 const CACHE_FILE = path.join(SRC, '.build-cache.json'); // nằm cạnh ảnh gốc, không commit, không deploy
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp']);
 const SKIP_DIRS = new Set(['concept', 'source', 'models']);
+/** Hình đã nghỉ (game cũ không còn code nào dùng): ảnh gốc vẫn nằm trong assets/ nhưng không nén, không vào manifest, không vào assets-build/. Khóa không đuôi; kết thúc bằng "/" là cả thư mục. */
+const RETIRED = ['scenes/man-09-duong-lang', 'sprites/man-09-chua-ga/'];
+const isRetired = (key) => RETIRED.some((k) => (k.endsWith('/') ? key.startsWith(k) : key === k));
 const WARN_BYTES = 400 * 1024;
 const CONCURRENCY = 4;
 
@@ -32,6 +35,13 @@ const SCRIPT_HASH = createHash('sha256')
 
 /** Quy tắc nén theo đường dẫn không đuôi (dấu /). Trả null nếu chưa có quy tắc. */
 function classify(key) {
+  // Màn 9: hình rời hiển thị nhỏ (trứng cao tối đa vài chục điểm ảnh): thu về cỡ vừa đủ, tiết kiệm tải và bộ nhớ giải mã; khung bàn cần cao hơn vì phủ cả cột bàn ở 1920×1080
+  if (key.startsWith('sprites/man-09-ban-trung/trung-') && key !== 'sprites/man-09-ban-trung/trung-vo') return { kind: 'hinh-roi', box: 256, quality: 85, autoCutout: true };
+  if (key === 'sprites/man-09-ban-trung/trung-vo') return { kind: 'hinh-roi', box: 512, quality: 85, autoCutout: true };
+  if (key === 'sprites/man-09-ban-trung/may-ban') return { kind: 'hinh-roi', box: 640, quality: 85, autoCutout: true };
+  if (key === 'sprites/man-09-ban-trung/khung-ban') return { kind: 'hinh-roi', box: 1280, quality: 85, autoCutout: true };
+  // Màn 9: nền ngang phủ cả màn (không trong suốt, không phải hình rời): nén như ảnh nền, không thu về 1024
+  if (key === 'sprites/man-09-ban-trung/nen-pc') return { kind: 'nen', maxWidth: 1920, quality: 82, warnBig: true };
   if (/^(scenes|story)\//.test(key) || key === 'ui/ban-do' || key === 'ui/man-hinh-tai') {
     return { kind: 'nen', maxWidth: 1920, quality: 82, warnBig: true };
   }
@@ -312,6 +322,7 @@ const unclassified = [];
 const seen = new Map();
 for (const rel of files) {
   const key = rel.slice(0, rel.length - path.extname(rel).length);
+  if (isRetired(key)) continue;
   const rule = classify(key);
   if (!rule) {
     unclassified.push(rel);

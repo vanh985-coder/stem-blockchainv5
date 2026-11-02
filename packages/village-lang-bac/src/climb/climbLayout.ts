@@ -16,6 +16,12 @@ export const WORLD: Record<ClimbFrame, { width: number; height: number }> = {
 /** Bậc gỗ: bề rộng theo luật, dày `height` (mặt bậc ở y của tầng, thân bậc nằm dưới). */
 export const STEP = { width: CLIMB_SPEC.stepWidth, height: 0.8 } as const;
 export const stepCenterY = (surfaceY: number): number => surfaceY - STEP.height / 2;
+/**
+ * Ảnh `bac-go` và `bac-go-nut` (khung 1,7 × 0,8 như bậc): dây treo ở nửa trên, ván gỗ nằm từ 48% đến 80% chiều cao ảnh (đo từ ảnh gốc). Mặt trên ván phải trùng mặt đứng
+ * của bậc (chỗ chân em chạm), nên khi dùng ảnh thì dịch hình lên `stepLift` đơn vị; số ghi giữa ván (`plankMid`, hơi thấp để chân em đứng trên ván ít che số). Chỗ đứng và vùng va chạm không đổi.
+ */
+export const STEP_ART = { plankTop: 0.48, plankBottom: 0.795, plankMid: 0.65 } as const;
+export const stepLift = (): number => STEP_ART.plankTop * STEP.height;
 
 /** Nhân vật cao 1,9 đơn vị: đầu cách đáy bậc tầng trên 0,3 khi đứng thẳng. */
 export const PLAYER = { height: 1.9 } as const;
@@ -65,12 +71,13 @@ export const MIN_LABEL_PX = 16;
 export const LARGE_TEXT_SCALE = 1.15;
 
 /**
- * Cỡ chữ số trên bậc (px CSS): chữ chiếm khoảng 62% chiều cao bậc, không dưới 16 (Chữ to: 18,4); rồi thu cho vừa bề rộng chuỗi dài nhất (`widthAt1px`: bề rộng chuỗi ở cỡ 1 px)
- * nhưng vẫn không dưới 16.
+ * Cỡ chữ số trên bậc (px CSS): chữ chiếm khoảng 62% chiều cao bậc (ván vẽ bằng code phủ kín khung) hay 1,2 lần bề dày tấm ván của ảnh `bac-go` (`onPlank`: ván mỏng, chữ quá lớn thì chân em che mất số), không dưới 16 (Chữ to: 18,4);
+ * rồi thu cho vừa bề rộng chuỗi dài nhất (`widthAt1px`: bề rộng chuỗi ở cỡ 1 px) nhưng vẫn không dưới 16.
  */
-export function labelFontPx(ppu: number, largeText: boolean, widthAt1px: number): number {
+export function labelFontPx(ppu: number, largeText: boolean, widthAt1px: number, onPlank = false): number {
   const k = largeText ? LARGE_TEXT_SCALE : 1;
-  const want = Math.max(MIN_LABEL_PX * k, STEP.height * ppu * 0.62);
+  const ratio = onPlank ? (STEP_ART.plankBottom - STEP_ART.plankTop) * 1.2 : 0.62;
+  const want = Math.max(MIN_LABEL_PX * k, STEP.height * ppu * ratio);
   const fitW = (STEP.width * ppu * 0.9) / Math.max(widthAt1px, 1e-6);
   return Math.max(MIN_LABEL_PX, Math.min(want, fitW));
 }

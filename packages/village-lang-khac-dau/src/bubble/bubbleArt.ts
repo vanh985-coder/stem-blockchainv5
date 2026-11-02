@@ -89,6 +89,7 @@ export function drawEgg(ctx: CanvasRenderingContext2D, cx: number, cy: number, d
   const col = eggColor(v);
   ctx.save();
   if (img) {
+    ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, cx - d / 2, cy - d / 2, d, d);
   } else {
     // bóng mềm dưới trứng

@@ -16,6 +16,16 @@ export function modeFor(w: number, h: number): BubbleMode {
 export const FIELD_H = BUBBLE_SPEC.limitRow * BUBBLE_SPEC.rowH + 3.2;
 export const FIELD_W = BUBBLE_SPEC.width;
 
+/**
+ * Khung bàn `khung-ban` (1147×1371, tỉ lệ 0,837): phần lòng trong suốt chiếm các tỉ lệ dưới đây của ảnh (đo từ ảnh gốc). Vẽ ĐỀU (giữ tỉ lệ ảnh, không kéo méo) sao cho
+ * bề rộng lòng khung bằng đúng bề rộng bàn (10 quả), nên viền gỗ nằm ngoài vùng chơi và không đè lên trứng hàng đầu.
+ */
+export const FRAME_ART = { aspect: 1147 / 1371, innerL: 190 / 1147, innerR: 957 / 1147, innerT: 201 / 1371, innerB: 1165 / 1371 } as const;
+/** Máy bắn `may-ban` (1122×1402, tỉ lệ 0,8): vẽ cao `height` quả, giữ tỉ lệ ảnh; `pivotY` là chỗ trứng nằm trong túi da (tỉ lệ chiều cao từ trên xuống), trùng điểm đặt trứng và tâm xoay của máy */
+export const LAUNCHER_ART = { aspect: 1122 / 1402, height: 2.7, pivotY: 0.48 } as const;
+/** Viền khung ngoài vùng chơi cần chừa trong khung vẽ (đơn vị trứng): hai bên chỉ chừa một phần (khung hẹp thì viền ngoài bị cắt bởi mép khung vẽ, trứng vẫn đủ lớn), phía trên chừa đủ để thấy trọn viền */
+const FRAME_PAD = { side: 0.7, top: 2 } as const;
+
 export interface Fit {
   /** Điểm ảnh cho mỗi đơn vị trứng (đường kính một quả) */
   scale: number;
@@ -27,12 +37,19 @@ export interface Fit {
   h: number;
 }
 
-/** Đặt vùng chơi vừa khít (giữ tỉ lệ) vào canvas rộng `cw` cao `ch`, căn giữa ngang và sát trên */
+/** Đặt vùng chơi (giữ tỉ lệ) vào canvas rộng `cw` cao `ch`, căn giữa cùng phần viền khung chừa quanh nó (`FRAME_PAD`) */
 export function fitField(cw: number, ch: number): Fit {
-  const scale = Math.max(1, Math.min(cw / FIELD_W, ch / FIELD_H));
+  const scale = Math.max(1, Math.min(cw / (FIELD_W + 2 * FRAME_PAD.side), ch / (FIELD_H + FRAME_PAD.top)));
   const w = FIELD_W * scale;
   const h = FIELD_H * scale;
-  return { scale, ox: (cw - w) / 2, oy: Math.max(0, (ch - h) / 2), w, h };
+  return { scale, ox: (cw - w) / 2, oy: Math.max(0, (ch - h - FRAME_PAD.top * scale) / 2) + FRAME_PAD.top * scale, w, h };
+}
+
+/** Hình chữ nhật (điểm ảnh) để vẽ ảnh `khung-ban`: lòng khung khớp vùng chơi, giữ tỉ lệ ảnh */
+export function frameRect(fit: Fit): { x: number; y: number; w: number; h: number } {
+  const w = fit.w / (FRAME_ART.innerR - FRAME_ART.innerL);
+  const h = w / FRAME_ART.aspect;
+  return { x: fit.ox - FRAME_ART.innerL * w, y: fit.oy - FRAME_ART.innerT * h, w, h };
 }
 
 /** Góc ngắm (độ) khi trỏ vào điểm ảnh (px, py) của canvas; luôn nằm trong khoảng cho phép */
