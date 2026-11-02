@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { CLIMAX_QUERY, MiniGameLevel, canWatchClimax, climaxUi, goToMap, hasSeenClimax, progressManager, useProgress } from '@so-chung/core';
-import { CLIMB_SPEC } from '../climb/climbConfig';
+import { CLIMB_MAX_SCORE, CLIMB_SPEC } from '../climb/climbConfig';
 import { ClimbGame } from '../climb/ClimbGame';
 import { ClimaxScene } from '../climax/ClimaxScene';
 
 const CLIMAX_PARAM = CLIMAX_QUERY.split('=');
 
 /**
- * Màn 12 "Leo cây tìm lá giả": game leo cây trên Scene25D, bọc trong khung game phụ (thẻ bắt đầu, màn kết quả). Ngay sau ván (hết vòng 4, hoặc hết tim sau khi Bi nói "Để Bi giúp em!") và trước
+ * Màn 12 "Leo bậc gỗ": game leo bậc gỗ từ lá lên gốc trên Scene25D (như một bằng chứng Merkle), bọc trong khung game phụ (thẻ bắt đầu, màn kết quả). Ngay sau ván (hết vòng 4, hoặc hết tim sau khi Bi nói "Để Bi giúp em!") và trước
  * màn kết quả là cảnh cao trào, nhưng CHỈ khi em đã đủ 4 Trang Sổ Vàng (các làng vào độc lập nên màn 12 có thể xong trước: cảnh không được nói "đủ 4 trang" khi chưa đủ). Lần đầu tự chạy; những lần sau có
  * nút "Xem lại cảnh cuối" ở màn kết quả. Trang Sổ Vàng thứ tư đã được ghi cùng kết quả ván (chơi xong là đủ điều kiện) nên đóng tab giữa cảnh vẫn giữ trang.
  *
@@ -35,6 +35,7 @@ export default function Man12() {
     <MiniGameLevel
       levelId={12}
       medals={CLIMB_SPEC.medals}
+      maxScore={CLIMB_MAX_SCORE}
       renderGame={(p) => <ClimbGame {...p} />}
       finale={{
         auto: !seen,

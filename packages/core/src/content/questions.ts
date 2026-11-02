@@ -180,9 +180,9 @@ export const QUESTIONS: readonly Question[] = [
     id: "B3-05",
     bai: 3,
     text: "Từ mẫu công khai đoán ngược ra khuôn riêng, với số thật rất lớn, thì sao?",
-    options: ["Gần như không thể, lâu hơn cả tuổi vũ trụ", "Mất vài phút", "Chỉ cần máy tính mạnh", "Dễ như tính xuôi"],
+    options: ["Chưa có cách nào đủ nhanh; thử lần lượt thì lâu hơn cả tuổi vũ trụ", "Mất vài phút", "Chỉ cần máy tính mạnh", "Dễ như tính xuôi"],
     correctIndex: 0,
-    explanation: "Tính xuôi thì dễ, tính ngược thì cực khó.",
+    explanation: "Tính xuôi thì dễ. Thử tuần tự chỉ là cách minh họa; với số rất lớn, chưa có cách nào đủ nhanh để tìm ngược.",
   },
   {
     id: "B3-06",

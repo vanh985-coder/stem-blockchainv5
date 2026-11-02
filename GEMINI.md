@@ -81,11 +81,83 @@ Quy trình git của dự án (`CLAUDE.md` mục 12): chỉ commit khi bốn l�
    - Chạy 4 lệnh bắt buộc: `pnpm test --maxWorkers=2` (2267 pass, 5 skipped), `pnpm typecheck` (10 app/pkg pass), `pnpm check:text` (437 files clean), `pnpm build` (toàn bộ apps build thành công).
    - Kiểm tra hồi quy Puppeteer `scripts/p6b-regression-check.mjs` đạt 14/14 tests.
    - Merge vào nhánh `main` theo sự cho phép của chủ dự án.
+6. **P7a — hoàn thành bản chơi được Màn 5 "Đập {phanDien}" bằng 2D (30/10/2026):**
+   - Xây dựng 4 làn dọc 2D lấy cảm hứng Talking Tom, phong cách dải lụa truyền thống Làng Dệt.
+   - Phân biệt 2 loại chuột: Chuột thường (4 biến thể: thường, đổi làn, nhanh, to) và Chuột câu hỏi mang biểu tượng **DẤU HỎI VÀNG LỚN ❓**, hào quang sáng rực, nhãn accessibility nổi bật.
+   - Vùng đập [6.5, 9.0] có viền sáng, 4 nút đập chân làn D F J K (chiều cao ≥ 48px), bàn Sổ Chung ở đáy với 8 chấm tròn vết mực. Chuột lọt +1 mực, chuột câu hỏi đúng xoá 2 mực.
+   - Cơ chế tạm dừng: dừng mọi chuyển động và đồng hồ khi mở câu hỏi hoặc mở hộp "?". Chống click ma (`pointerDownInside`, `stopPropagation`), đập chuột không bị kích hoạt đúp khi chạm giữ.
+   - Giữ nguyên nút Tự hoàn thành (ẩn với khách release, hiện và hoạt động trên bản dev/teacher, dừng ván và không cộng điểm/sao/xu/sổ vàng).
+   - 4 lệnh kiểm tra bắt buộc đều đạt: `check:text` sạch 437 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2275 tests pass (bổ sung test mới `whack2d.test.ts` đạt 8/8 tests), `pnpm build` đạt (chunk Màn 5 giảm từ 91 kB Three.js xuống **20.75 kB**).
+   - Kiểm tra Puppeteer trên 1366×768, 360×800, 844×390 đạt đầy đủ, 27 ảnh chụp minh chứng lưu tại `docs/screenshots/p7a/BAO-CAO-P7A.md`.
+
+7. **P7b — hoàn thiện và kiểm lối chơi Đập Chuột 2D Màn 5 (30/10/2026):**
+   - Thống nhất quy tắc điều khiển giữa mọi phương thức thao tác (chạm chuột trên làn, nút chân làn, phím D/F/J/K hoặc 1/2/3/4): toàn bộ đều tuân thủ chặt chẽ vùng đập $[6.5, 9.0]$. Đập ngoài vùng đập bị trượt gió (`sound.playWhoosh()`), chuột không bị mất, hiển thị nhắc nhở.
+   - Chuột thường tính 1 lần; chuột to yêu cầu 2 lần kích hoạt riêng biệt (cooldown 140ms, chặn repeat/giữ phím). Nhiều chuột cùng làn ưu tiên đập con thấp nhất trong vùng đập (`lowestInZone`); chuột đổi làn nhận đòn chính xác tại làn mới (sau khi qua pos 5.0).
+   - Chống click ma triệt để bằng `onClickCapture` ở capture phase trên overlay modal câu hỏi: chạm giữ chuột câu hỏi > 600ms nhấc tay không bị chọn nhầm đáp án ở cả 3 kích thước 1366×768, 360×800, 844×390; bàn phím Space/Enter vẫn hoạt động trơn tru.
+   - Xử lý Enter giữ/lặp: gắn event listener `keydown`/`keyup` cho Enter trong modal; giữ Enter > 1s không tự "Chơi tiếp", bắt buộc thả phím rồi nhấn lại mới tiếp tục.
+   - Đo trực tiếp dừng thời gian và đối tượng đứng yên 100% khi mở "?" hoặc mở câu hỏi ($t_0 = t_1$), tiếp tục ván chạy mượt mà không nhảy cóc thời gian (reset mốc `lastTickTime`).
+   - Rà soát luật: Không có kết thúc ván do hết giờ (`EndReason = 'complete' | 'ink'`), chỉ kết thúc khi đầy 8 vết mực hoặc xong 10 trùm; đồng hồ lịch chạy qua 118s ván vẫn tiếp tục nếu chưa đầy mực.
+   - Kiểm tra các ca câu hỏi: Trả lời sai (cộng 1 vết mực, không cộng điểm trùm, Tí né chạy xuống sổ); Hết giờ câu hỏi (timeout đếm ngược về 0s, hiện cảnh báo "Hết giờ rồi!", đáp án đúng, cộng 1 vết mực).
+   - Kiểm tra chuyển trạng thái kết thúc ván có probe hỗ trợ (probe-assisted): Đặt trạng thái gần kết thúc rồi thao tác qua giao diện thật để chuyển sang màn kết quả thua (đầy 8 mực) và thắng (xong 10 trùm); bấm "Chơi lại" reset sạch ván mới.
+   - Kiểm tra tự hoàn thành: Xác minh trong cookie `sc_guest` chỉ ghi nhận cờ `ac = 16`, bản ghi Màn 5 là `[0, 0, 0, 0]`, xu và Trang Sổ Vàng không thay đổi.
+   - Cân bằng bot: bot 300 ván seed 1-300 (`whackBalance.test.ts`) đạt 9/9 tests, giữ nguyên mốc điểm 1650 / 2650 / 3100 (ghi rõ giới hạn: bot chạy logic thuần `tapGap = 0.15s`, chưa đo lường độ khó thao tác cơ học của cooldown 140ms trên component UI).
+   - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 437 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2282 tests pass (`whack2d.test.ts` 15/15 pass), `pnpm build` đạt (toàn bộ 5 apps build thành công; chunk `Man5` 22.17 kB). Bỏ khẳng định võ đoán 60 FPS / rò bộ nhớ khi chưa đo chuyên sâu.
+   - Kiểm tra Puppeteer `scripts/p7b-check.mjs` và `scripts/p7b-extra-check.mjs`: 31 ảnh minh chứng lưu tại `docs/screenshots/p7b/BAO-CAO-P7B.md`.
+
+8. **P7c — làm lại đồ họa 2D Màn 5 bằng bộ 15 ảnh hoạt hình (30/10/2026):**
+   - Tích hợp bộ 15 ảnh hoạt hình chuẩn trong `assets/man5-2d/` bám sát ảnh mẫu tham khảo `assets/references/man5-whack-reference.png` qua quy trình assets build (`scripts/assets-build.mjs`). Nén thành công 15 ảnh sang WebP trong `assets-build/man5-2d/` (tổng 596.7 kB, giảm hơn 25 lần so với 15.2 MB ảnh PNG gốc).
+   - Tái cấu trúc khung game: sử dụng `fixed inset-0 z-20` bao trùm toàn màn hình trình duyệt, xóa bỏ hoàn toàn hiện tượng game bị co ở nửa trên trang và khoảng nền kem trống lớn phía dưới.
+   - Sân chơi lớn, cân đối, tận dụng tối đa chiều cao PC: tỉ lệ chiếm chiều cao sân chơi đạt **> 91%** trên mọi độ phân giải PC (91.1% ở 1366×768, 92.1% ở 1536×864, 93.7% ở 1920×1080), không phát sinh thanh cuộn thừa (`docScrollHeight === windowHeight`).
+   - Dựng cấu trúc từng lớp độc lập: Nền phô mai vàng `background-pc`, hai cột gỗ sồi đinh tán `wood-border` (cột phải lật gương `scale-x-[-1]`), 4 làn hoa văn sao (`lane-blue`, `lane-yellow`, `lane-red`, `lane-green`), Hero cầm búa (`hero-idle` / `hero-hit` chung điểm neo căn đáy, vung búa 180ms), cuốn Sổ Chung `book` với 8 chấm mực dàn đều trên 2 trang sách mở (`px-10` đến `px-24`), 4 nút đập chân làn D F J K màu ăn khớp làn (cao 46–56px).
+   - 5 Sprite Chuột hoạt hình 2D sinh động: Chuột thường, chuột nhanh (⚡), chuột đổi làn (⇄), chuột to (2 vạch máu), chuột câu hỏi (biểu tượng ❓ vàng lớn nhấp nháy).
+   - Bảo toàn toàn vẹn cơ chế P7b: Vùng đập [6.5, 9.0], cooldown 140ms, tạm dừng 100% thời gian khi mở câu hỏi/?, chống click ma ở capture phase, chống Enter lặp, tự hoàn thành không trao thưởng gian lận.
+   - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 437 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2282 tests pass, `pnpm build` đạt (toàn bộ 5 apps build thành công; chunk `Man5` 26.49 kB).
+   - Đo lường và kiểm tra Puppeteer `scripts/p7c-check.mjs` và `scripts/p7c-user-preview.mjs`: Lưu ảnh chụp màn hình minh chứng tại `docs/screenshots/p7c/BAO-CAO-P7C.md` và `docs/screenshots/p7c/man5-preview-*.png`.
+   - Đã xử lý hoàn thiện chế độ Giảm chuyển động (`reducedMotion`: tắt bounce ❓, pulse ⚡ và vùng đập), xác minh container fixed không che các lớp phủ modal/result, và bản chạy riêng Làng Dệt (5175) tải ảnh WebP đầy đủ.
+   - **Nghiệm thu:** Chủ dự án đã xem và duyệt đồ họa Màn 5 (30/10/2026). Sẵn sàng bắt đầu P8a.
+9. **P8a — cơ chế hướng dẫn focus và làm thử dùng chung, tích hợp mẫu Màn 1 trạm Dễ (30/10/2026):**
+   - Xây dựng cơ chế dùng chung `TutorialSpotlight` (`packages/core/src/ui/TutorialSpotlight.tsx`): 4 khối che backdrop chuẩn xác bao quanh vùng target, viền sáng highlight, định vị tooltip thông minh (tự động đảo vị trí `top`/`bottom` không che mục tiêu và không tràn màn hình), focus trap bàn phím Tab, bám sát target khi cuộn và đổi kích thước.
+   - Xử lý chu kỳ phím Enter chống kích hoạt đúp: nộp bài bằng Enter tại ô nhập không tự ý kích hoạt chuyển tiếp hoặc bắt đầu bài thật; bắt buộc thả phím `keyup` rồi nhấn Enter chu kỳ mới mới tiếp tục.
+   - Tích hợp mẫu tại Màn 1 trạm Dễ (`packages/village-lang-giay/src/bai-1/Easy.tsx`) qua 6 bước: Giới thiệu mục tiêu ngắn -> Focus vùng số 12 và 5 -> Focus công thức gợi ý -> Focus ô nhập và cho học sinh tự gõ -> Focus nút Kiểm tra -> Phản hồi kết quả (đúng: xác nhận mã 29 và hiện nút "Bắt đầu chơi thật"; sai: báo lỗi, giải thích công thức và hiện nút "Thử lại").
+   - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: dữ liệu mẫu cố định 12 & 5, không gọi `record()`, không tính giờ/xu/sao/tiến độ/Trang Sổ Vàng. Bắt đầu bài thật bấm giờ sạch từ đầu.
+   - Nút "💡 Hướng dẫn" trên giao diện cho phép xem lại giữa bài; khi đóng quay lại đúng trạng thái bài đang làm dở.
+   - Toàn bộ nội dung hiển thị nằm trong `packages/core/src/content/tutorial.ts`, xưng "em", định dạng biến qua `fmt()`.
+   - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2294 tests pass (thêm test mới `TutorialSpotlight.test.tsx` và `man1EasyTutorial.test.tsx`), `pnpm build` đạt (toàn bộ 5 apps build thành công).
+   - Đo lường và kiểm tra Puppeteer `scripts/p8a-check.mjs`: Đạt cả 3 kích thước 1366×768, 360×800, 844×390 (21 ảnh chụp minh chứng lưu tại `docs/screenshots/p8a/` và `BAO-CAO-P8A.md`). Xác minh tiến độ không đổi (`progressUnchangedAfterPractice = true`), Enter không kích hoạt đúp (`enterHoldSafe = true`), bài thật hoàn thành bình thường sau hướng dẫn (`realStationDoneNormally = true`).
+
+10. **P8b — hướng dẫn focus và làm thử Màn 1 Trung bình và Khó (31/10/2026):**
+    - Trạm Trung bình (`Medium.tsx`): 6 bước hướng dẫn quan sát trang 2 bị Tí đổi từ 8 sang 9, gạch ngang số cũ, đối chiếu công thức $29 \times 2 + 9 = 67$, tự nhập 67 (hoặc nhập sai 15 $\to$ thử lại giữ nguyên số 15 để sửa $\to$ sửa đúng 67 $\to$ kích hoạt hiệu ứng domino $\to$ bắt đầu chơi thật). Cảnh báo ô trống khi bấm Cập nhật mã mà chưa nhập.
+    - Trạm Khó (`Hard.tsx`): 6 bước hướng dẫn tìm trang sai đầu tiên (trang 2), công thức $24 \times 2 + 7 = 55$, nhập đúng 55 (hoặc sai 20 $\to$ giữ số 20 $\to$ sửa 55). Tạm dừng đồng hồ (`CountdownTimer`) và mạng lưới 100% trong suốt hướng dẫn. Nút "💡 Hướng dẫn" giữa bài tạm dừng đồng hồ bảo lưu chính xác thời gian còn lại, đóng hướng dẫn tiếp tục chạy mượt mà.
+    - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: không ghi nhận xu, sao, điểm, tiến độ; cookie `sc_guest` được bảo toàn nguyên vẹn.
+    - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2300 tests pass (thêm 4 unit tests mới `man1MediumHardTutorial.test.tsx`), `pnpm build` đạt toàn bộ 5 apps.
+    - Kiểm tra E2E Puppeteer `scripts/p8b-e2e-check.mjs`: **Đạt 100% (20/20 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390). Lưu đầy đủ ảnh chụp minh chứng tại `docs/screenshots/p8b/` và `BAO-CAO-P8B.md`.
+
+11. **P8c — hướng dẫn focus và làm thử Màn 4 Làng Dệt đủ 3 trạm Dễ, Trung bình, Khó (31/10/2026):**
+    - Trạm Dễ (`Easy.tsx`): 6 bước hướng dẫn node giữ sổ, mã trang cuối $X = 40$, bạn Chi gửi trang mới $c = 15$, mã đề xuất $95$. Dùng máy tính $(40 \times 2 + 15) \bmod 100 = 95$ và biểu quyết Đồng ý / Từ chối (đáp án đúng: Đồng ý $\to$ nút "Bắt đầu chơi thật"; sai: Từ chối $\to$ giải thích công thức $\to$ nút "Thử lại").
+    - Trạm Trung bình (`Medium.tsx`): 6 bước hướng dẫn quan sát bố cục đối chiếu 2 cột trái - phải giữa Sổ của em và Sổ của Tí. Phát hiện trang 2 của Tí bị sửa lén từ 14 sang 15 dải lụa khiến chuỗi mã sau đó lệch ($74 \neq 72$). Nhận biết trang mới đề xuất dựa trên sổ sai là không hợp lệ và biểu quyết Từ chối (đáp án đúng: Từ chối; sai: Đồng ý $\to$ cảnh báo $\to$ thử lại).
+    - Trạm Khó (`Hard.tsx`): 5 bước hướng dẫn cơ chế đặt cọc Proof of Stake, bảng điểm cọc 4 người chơi (100 điểm ban đầu, cọc 30 điểm mỗi lượt). Lượt em tạo trang với $X = 25$, $c = 18$, tính nhẩm công thức $(25 \times 2 + 18) \bmod 100 = 68$. Ô nhập `NumberInput`, nút Ghi trang thật (nút Ghi trang gian bị vô hiệu hóa trong làm thử). Xử lý ô trống $\to$ cảnh báo `role="alert"`; nhập sai 50 $\to$ báo sai $\to$ thử lại **giữ nguyên số 50** để học sinh sửa lại thành 68 $\to$ chúc mừng $\to$ bắt đầu chơi thật.
+    - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: không ghi nhận xu, sao, điểm, tiến độ; cookie `sc_guest` được bảo toàn nguyên vẹn. Nút "💡 Hướng dẫn" giữa bài cho phép xem lại bất cứ lúc nào và bảo lưu nguyên vẹn trạng thái bài đang dở.
+    - 4 lệnh kiểm tra bắt buộc đạt sạch: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2306 tests pass (thêm 6 unit tests mới `man4Tutorial.test.tsx`), `pnpm build` đạt toàn bộ 5 apps.
+    - Kiểm tra E2E Puppeteer `scripts/p8c-e2e-check.mjs`: **Đạt 100% (22/22 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390). Lưu đầy đủ 22 ảnh chụp minh chứng tại `docs/screenshots/p8c/` và `BAO-CAO-P8C.md`.
+
+12. **P8d — hoàn thành và rà soát kỹ thuật hướng dẫn focus và làm thử cho TOÀN BỘ 12 MÀN (31/10/2026):**
+    - Hoàn tất tuần tự qua tất cả 6 nhóm theo chỉ đạo:
+      - Nhóm 1: Màn 7 Làng Khắc Dấu (Dễ, Trung bình, Khó) -> Commit `0bae0ad`.
+      - Nhóm 2: Màn 10 Làng Bạc (Dễ, Trung bình, Khó) -> Commit `e7d314a`.
+      - Nhóm 3: Mini-game Màn 2 & 3 Làng Giấy (Runner né cản, Rebuild ghép sổ chuỗi) -> Commit `cabfb2a`.
+      - Nhóm 4: Mini-game Màn 5 & 6 Làng Dệt (Whack 2D Talking Tom, Kite diều đưa sổ 2.5D) -> Commit `f8c7cea`.
+      - Nhóm 5: Mini-game Màn 8 & 9 Làng Khắc Dấu (Memory ghép cặp khóa, Chicken bắn thuốc giải mã) -> Commit `6c84597`.
+      - Nhóm 6: Mini-game Màn 11 & 12 Làng Bạc (Match-3 ghép lá Merkle, Climb leo cây tìm lá giả) -> Commit `4440bdc`.
+    - **Rà soát 5 điểm trọng tâm theo chỉ đạo:**
+      - *Màn 10:* Mã nguồn, logic thuần (`logic.ts`), content (`tutorial.ts`), hàm chấm (`Easy.tsx`) và script kiểm tra đều dùng chuẩn công thức $A \times 10 + B$ (`combine(a, b)`). Đính chính nhầm lẫn công thức $(A \times 3 + B) \bmod 100$ trong văn bản báo cáo cũ; giữ nguyên code game chuẩn.
+      - *Màn 7:* Rà soát phân biệt rõ ràng: Ký bằng khóa riêng của mình, xác minh bằng khóa công khai tra từ Danh bạ chuẩn của làng; trạm Khó là bài tập số mũ rời rạc $5^x \bmod 23$ minh họa tính một chiều. Tuyệt đối không có chuyện yêu cầu/cung cấp khóa riêng của người khác để xác minh.
+      - *8 Mini-game:* Toàn bộ thao tác làm thử gắn liền với phản ứng thực tế của engine (âm thanh, hoạt cảnh Three.js/2D), điều kiện hoàn thành gắn với thao tác thật (đặc biệt: Màn 3 soi và ghép thẻ vào chuỗi thật sự `placeCard`, Màn 8 lật thẻ thật 180° trên lưới `flipCard`, Màn 11 tráo ô hợp lệ trên bàn cờ 7x7 `swapCells`); khi vào ván thật khởi tạo lại ván sạch sẽ bằng hàm logic riêng.
+      - *Bằng chứng kiểm thử:* Con số 325 assertions là tổng số kiểm tra tích lũy qua các kịch bản Puppeteer E2E của 12 màn; các màn sửa đổi (Màn 3, 8, 11) đã được chạy lại kiểm tra trên mã cuối và đạt 100% (`p2-p3`: 48/48, `p8-p9`: 42/42, `p11-p12`: 42/42). Ghi rõ minh bạch toàn bộ kiểm thử chạy với Khách thật (`sc_guest`) và unit test; chưa nghiệm thu hay triển khai Supabase/RLS thật trên máy chủ production.
+      - *Chất lượng mã nguồn:* 4 lệnh bắt buộc đạt sạch 100%: `check:text` sạch 438 files, `typecheck` 10 packages pass, `pnpm test --maxWorkers=2` 2321 pass (5 skipped, 217 files), `pnpm build` cả 5 apps thành công.
+    - Báo cáo tổng hợp chi tiết lưu tại `C:\Users\Acer\.gemini\antigravity\brain\1e39ed0d-2120-4c6a-a44c-3cf2d34b3087\BAO-CAO-P8-TONG-HOP.md`. Máy chủ preview cổng 5193 và assets cổng 5180 tiếp tục chạy ổn định để chủ dự án trải nghiệm trực tiếp.
 
 ## 6. Việc để sau (không làm trước khi chủ dự án giao)
 
-- **P7:** làm lại màn 5 (Làng Dệt) thành game đập chuột 2D kiểu Whack-a-Mole; cần ảnh mẫu của chủ dự án. Chi tiết ở bảng ưu tiên của `TRANG-THAI.md`.
-- **P8:** hướng dẫn focus và làm thử cho **cả 12 màn** (đã duyệt, chưa triển khai, làm thành bước riêng sau khi chốt lối chơi màn 2, 3, 5). Mục P8 của `TRANG-THAI.md` phải được giữ nguyên.
 - **Việc dời từ mốc 3 và hội làng làm CUỐI mốc 4**, theo thứ tự ở mục "Việc dời từ mốc 3" của `TRANG-THAI.md`: deploy bản gộp (15b), kiểm tra toàn bộ (G2), thử với 5–10 học sinh, hội làng (`FESTIVAL_LAUNCHED` hiện `false`).
 - Chưa làm theo lời giao trước đó: sửa nút "?" ở màn 3, HUD che tên biển trong một số góc nhìn (ví dụ dòng nhiệm vụ che biển trái ở Làng Bạc), vòng tích che số cây đa đã được thu nhỏ ở P5.
 

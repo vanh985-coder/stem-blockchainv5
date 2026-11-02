@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-10-30T16:24:27.680Z",
+  "mode": "production_build_preview",
+  "port": 5193,
+  "checks": {
+    "step0Opened": true,
+    "wrongHandled": true,
+    "correctHandled": true,
+    "realGameClean": true,
+    "reviewToggle": true
+  },
+  "screenshots": [
+    "docs/screenshots/p8a/p8a-build-step0-intro.png",
+    "docs/screenshots/p8a/p8a-build-step-wrong.png",
+    "docs/screenshots/p8a/p8a-build-step-correct.png"
+  ]
+}

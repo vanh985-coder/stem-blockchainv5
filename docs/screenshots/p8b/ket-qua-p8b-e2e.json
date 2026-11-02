@@ -1,0 +1,82 @@
+[
+  {
+    "name": "[Trung bình] Test 1 (1366x768): Nhập đúng 67 -> vào bài thật",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 2 (1366x768): Nhập sai (15) -> Giữ số -> Sửa 67 thành công",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 3 (1366x768): Ô trống cảnh báo rõ & Mở lại giữa bài bảo toàn bài thật",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 1 (360x800): Nhập đúng 67 -> vào bài thật",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 2 (360x800): Nhập sai (15) -> Giữ số -> Sửa 67 thành công",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 3 (360x800): Ô trống cảnh báo rõ & Mở lại giữa bài bảo toàn bài thật",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 1 (844x390): Nhập đúng 67 -> vào bài thật",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 2 (844x390): Nhập sai (15) -> Giữ số -> Sửa 67 thành công",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 3 (844x390): Ô trống cảnh báo rõ & Mở lại giữa bài bảo toàn bài thật",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 1 (1366x768): Đồng hồ dừng trong hướng dẫn & Nhập đúng 55 -> vào bài thật",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 2 (1366x768): Nhập sai (20) -> Giữ số -> Sửa 55 thành công",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 3 (1366x768): Mở lại giữa bài tạm dừng đồng hồ & đóng tiếp tục đúng thời gian",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 1 (360x800): Đồng hồ dừng trong hướng dẫn & Nhập đúng 55 -> vào bài thật",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 2 (360x800): Nhập sai (20) -> Giữ số -> Sửa 55 thành công",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 3 (360x800): Mở lại giữa bài tạm dừng đồng hồ & đóng tiếp tục đúng thời gian",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 1 (844x390): Đồng hồ dừng trong hướng dẫn & Nhập đúng 55 -> vào bài thật",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 2 (844x390): Nhập sai (20) -> Giữ số -> Sửa 55 thành công",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 3 (844x390): Mở lại giữa bài tạm dừng đồng hồ & đóng tiếp tục đúng thời gian",
+    "pass": true
+  },
+  {
+    "name": "Hồi quy Màn 1 Dễ: Nhập đúng 29 hoạt động bình thường",
+    "pass": true
+  },
+  {
+    "name": "Kiểm tra cookie sc_guest: làm thử không tự ý cộng sao hay xu",
+    "pass": true
+  }
+]

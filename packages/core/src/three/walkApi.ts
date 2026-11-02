@@ -34,6 +34,8 @@ export interface WalkApi {
   camera: CameraAngles;
   /** Vị trí và hướng mặt của người chơi (`WalkWorld` gán đối tượng trạng thái có sẵn; null khi chưa có cảnh): bản đồ nhỏ ở phần DOM đọc để vẽ, không cần render lại React */
   player: { x: number; z: number; yaw: number } | null;
+  /** Dịch chuyển người chơi tới tọa độ an toàn và đặt hướng nhìn (yaw); `WalkWorld` gán khi có cảnh, không có cảnh thì không làm gì */
+  teleport: (x: number, z: number, yaw: number) => void;
 }
 
 export function createWalkApi(cameraYaw = 0): WalkApi {
@@ -44,6 +46,7 @@ export function createWalkApi(cameraYaw = 0): WalkApi {
     held: new Set(),
     camera: createCameraAngles(cameraYaw),
     player: null,
+    teleport: () => undefined,
   };
 }
 

@@ -32,7 +32,8 @@
 |---|---|
 | 3D đi lại | Chợ phiên, 4 làng, hội làng |
 | 3D chạy | Chỉ màn 2 |
-| 2.5D (nền và hình rời 2D, nhân vật 3D) | Màn 3, 5, 6, 8, 9, 11, 12 |
+| 2.5D (nền và hình rời 2D, nhân vật 3D) | Màn 3, 6, 8, 9, 11, 12 |
+| Game 2D bằng sprite (P7c) | Màn 5 |
 | Trang bài học 2D | Màn 1, 4, 7, 10. **Dùng lại bài 2D giai đoạn 1**, đặt trên nền ảnh của làng |
 
 **Nhân vật** (spec 03 mục 3):
@@ -89,3 +90,6 @@
 Mốc 1 — Lõi. Spec: 01 (kể cả phần ảnh của mục 5 và bảng đổi nội dung ở mục 3), 02, 09; giao diện theo 03 mục 1; chân dung theo 03 mục 3.6 (phần mốc 1); câu hỏi theo 03 mục 5; mở khóa theo 03 mục 6; trang chủ, truyện và bản đồ 2D theo 04 mục 1, 2, 7; phần bài học 2D trong 05–08. Đọc TRANG-THAI.md và các spec này, chia mốc 1 thành các bước nhỏ cho Claude Code, rồi đưa mình lời giao việc cho bước đầu tiên.
 ```
 
+## Tiếp nhận lại bằng Claude Code (01/11/2026)
+
+Đọc mục bàn giao mới nhất trong TRANG-THAI.md trước các câu mở đầu lịch sử. P1–P8 đã được triển khai theo báo cáo; P8 đủ 12 màn nhưng chờ người dùng kiểm, không làm lại từ P1. Đọc thêm P8-HUONG-DAN-FOCUS-LAM-THU.md và các bổ sung cuối spec 03, 05–08. Tiếp tục các việc tồn độc lập; việc dời mốc 3 và hội làng giữ ở cuối mốc 4. Không suy ra merge/deploy hay migration production đã hoàn thành từ commit/push nhánh.

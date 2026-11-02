@@ -1,0 +1,710 @@
+[
+  {
+    "area": "1366x768:lang-giay",
+    "name": "Nhiệm vụ dài: Khung nhiệm vụ mở rộng hiển thị đầy đủ ban đầu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-giay",
+    "name": "Nhiệm vụ dài: Bản đồ nhỏ (Minimap) không bị che khuất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-giay",
+    "name": "Bấm nút \"Thu gọn\": dòng nhiệm vụ thu nhỏ thành nút gọn gàng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-giay",
+    "name": "Nút mở nhiệm vụ đạt chuẩn touch target (chiều cao >= 44px)",
+    "ok": true,
+    "detail": "44px"
+  },
+  {
+    "area": "1366x768:lang-giay",
+    "name": "Bấm nút mở nhiệm vụ: khung nhiệm vụ mở rộng lại trọn vẹn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-giay",
+    "name": "Trạng thái đủ 4 Trang Sổ Vàng: nội dung nhiệm vụ chuẩn xác",
+    "ok": true,
+    "detail": "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở."
+  },
+  {
+    "area": "1366x768:lang-giay",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (mở rộng): docs/screenshots/hud-boards/hud-lang-giay-1366x768-golden-expanded.jpg (109714 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-giay",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (thu gọn): docs/screenshots/hud-boards/hud-lang-giay-1366x768-golden-collapsed.jpg (109117 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-giay",
+    "name": "Nút Menu & Nút Trợ giúp góc trên phải nằm trọn trong màn hình và không bị khung nhiệm vụ đè",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-det",
+    "name": "Nhiệm vụ dài: Khung nhiệm vụ mở rộng hiển thị đầy đủ ban đầu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-det",
+    "name": "Nhiệm vụ dài: Bản đồ nhỏ (Minimap) không bị che khuất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-det",
+    "name": "Bấm nút \"Thu gọn\": dòng nhiệm vụ thu nhỏ thành nút gọn gàng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-det",
+    "name": "Nút mở nhiệm vụ đạt chuẩn touch target (chiều cao >= 44px)",
+    "ok": true,
+    "detail": "44px"
+  },
+  {
+    "area": "1366x768:lang-det",
+    "name": "Bấm nút mở nhiệm vụ: khung nhiệm vụ mở rộng lại trọn vẹn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-det",
+    "name": "Trạng thái đủ 4 Trang Sổ Vàng: nội dung nhiệm vụ chuẩn xác",
+    "ok": true,
+    "detail": "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở."
+  },
+  {
+    "area": "1366x768:lang-det",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (mở rộng): docs/screenshots/hud-boards/hud-lang-det-1366x768-golden-expanded.jpg (95000 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-det",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (thu gọn): docs/screenshots/hud-boards/hud-lang-det-1366x768-golden-collapsed.jpg (93207 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-det",
+    "name": "Nút Menu & Nút Trợ giúp góc trên phải nằm trọn trong màn hình và không bị khung nhiệm vụ đè",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-khac-dau",
+    "name": "Nhiệm vụ dài: Khung nhiệm vụ mở rộng hiển thị đầy đủ ban đầu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-khac-dau",
+    "name": "Nhiệm vụ dài: Bản đồ nhỏ (Minimap) không bị che khuất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-khac-dau",
+    "name": "Bấm nút \"Thu gọn\": dòng nhiệm vụ thu nhỏ thành nút gọn gàng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-khac-dau",
+    "name": "Nút mở nhiệm vụ đạt chuẩn touch target (chiều cao >= 44px)",
+    "ok": true,
+    "detail": "44px"
+  },
+  {
+    "area": "1366x768:lang-khac-dau",
+    "name": "Bấm nút mở nhiệm vụ: khung nhiệm vụ mở rộng lại trọn vẹn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-khac-dau",
+    "name": "Trạng thái đủ 4 Trang Sổ Vàng: nội dung nhiệm vụ chuẩn xác",
+    "ok": true,
+    "detail": "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở."
+  },
+  {
+    "area": "1366x768:lang-khac-dau",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (mở rộng): docs/screenshots/hud-boards/hud-lang-khac-dau-1366x768-golden-expanded.jpg (92086 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-khac-dau",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (thu gọn): docs/screenshots/hud-boards/hud-lang-khac-dau-1366x768-golden-collapsed.jpg (90343 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-khac-dau",
+    "name": "Nút Menu & Nút Trợ giúp góc trên phải nằm trọn trong màn hình và không bị khung nhiệm vụ đè",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-bac",
+    "name": "Nhiệm vụ dài: Khung nhiệm vụ mở rộng hiển thị đầy đủ ban đầu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-bac",
+    "name": "Nhiệm vụ dài: Bản đồ nhỏ (Minimap) không bị che khuất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-bac",
+    "name": "Bấm nút \"Thu gọn\": dòng nhiệm vụ thu nhỏ thành nút gọn gàng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-bac",
+    "name": "Nút mở nhiệm vụ đạt chuẩn touch target (chiều cao >= 44px)",
+    "ok": true,
+    "detail": "44px"
+  },
+  {
+    "area": "1366x768:lang-bac",
+    "name": "Bấm nút mở nhiệm vụ: khung nhiệm vụ mở rộng lại trọn vẹn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-bac",
+    "name": "Trạng thái đủ 4 Trang Sổ Vàng: nội dung nhiệm vụ chuẩn xác",
+    "ok": true,
+    "detail": "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở."
+  },
+  {
+    "area": "1366x768:lang-bac",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (mở rộng): docs/screenshots/hud-boards/hud-lang-bac-1366x768-golden-expanded.jpg (107539 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-bac",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (thu gọn): docs/screenshots/hud-boards/hud-lang-bac-1366x768-golden-collapsed.jpg (109252 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "1366x768:lang-bac",
+    "name": "Nút Menu & Nút Trợ giúp góc trên phải nằm trọn trong màn hình và không bị khung nhiệm vụ đè",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-giay",
+    "name": "Nhiệm vụ dài: Khung nhiệm vụ mở rộng hiển thị đầy đủ ban đầu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-giay",
+    "name": "Nhiệm vụ dài: Bản đồ nhỏ (Minimap) không bị che khuất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-giay",
+    "name": "Bấm nút \"Thu gọn\": dòng nhiệm vụ thu nhỏ thành nút gọn gàng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-giay",
+    "name": "Nút mở nhiệm vụ đạt chuẩn touch target (chiều cao >= 44px)",
+    "ok": true,
+    "detail": "44px"
+  },
+  {
+    "area": "360x800:lang-giay",
+    "name": "Bấm nút mở nhiệm vụ: khung nhiệm vụ mở rộng lại trọn vẹn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-giay",
+    "name": "Trạng thái đủ 4 Trang Sổ Vàng: nội dung nhiệm vụ chuẩn xác",
+    "ok": true,
+    "detail": "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở."
+  },
+  {
+    "area": "360x800:lang-giay",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (mở rộng): docs/screenshots/hud-boards/hud-lang-giay-360x800-golden-expanded.jpg (54093 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-giay",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (thu gọn): docs/screenshots/hud-boards/hud-lang-giay-360x800-golden-collapsed.jpg (53353 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-giay",
+    "name": "Nút Menu & Nút Trợ giúp góc trên phải nằm trọn trong màn hình và không bị khung nhiệm vụ đè",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-giay",
+    "name": "Trên điện thoại: Joystick và nút Nhảy/Tương tác hiển thị đầy đủ, không bị che",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-det",
+    "name": "Nhiệm vụ dài: Khung nhiệm vụ mở rộng hiển thị đầy đủ ban đầu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-det",
+    "name": "Nhiệm vụ dài: Bản đồ nhỏ (Minimap) không bị che khuất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-det",
+    "name": "Bấm nút \"Thu gọn\": dòng nhiệm vụ thu nhỏ thành nút gọn gàng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-det",
+    "name": "Nút mở nhiệm vụ đạt chuẩn touch target (chiều cao >= 44px)",
+    "ok": true,
+    "detail": "44px"
+  },
+  {
+    "area": "360x800:lang-det",
+    "name": "Bấm nút mở nhiệm vụ: khung nhiệm vụ mở rộng lại trọn vẹn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-det",
+    "name": "Trạng thái đủ 4 Trang Sổ Vàng: nội dung nhiệm vụ chuẩn xác",
+    "ok": true,
+    "detail": "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở."
+  },
+  {
+    "area": "360x800:lang-det",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (mở rộng): docs/screenshots/hud-boards/hud-lang-det-360x800-golden-expanded.jpg (35713 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-det",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (thu gọn): docs/screenshots/hud-boards/hud-lang-det-360x800-golden-collapsed.jpg (34131 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-det",
+    "name": "Nút Menu & Nút Trợ giúp góc trên phải nằm trọn trong màn hình và không bị khung nhiệm vụ đè",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-det",
+    "name": "Trên điện thoại: Joystick và nút Nhảy/Tương tác hiển thị đầy đủ, không bị che",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-khac-dau",
+    "name": "Nhiệm vụ dài: Khung nhiệm vụ mở rộng hiển thị đầy đủ ban đầu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-khac-dau",
+    "name": "Nhiệm vụ dài: Bản đồ nhỏ (Minimap) không bị che khuất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-khac-dau",
+    "name": "Bấm nút \"Thu gọn\": dòng nhiệm vụ thu nhỏ thành nút gọn gàng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-khac-dau",
+    "name": "Nút mở nhiệm vụ đạt chuẩn touch target (chiều cao >= 44px)",
+    "ok": true,
+    "detail": "44px"
+  },
+  {
+    "area": "360x800:lang-khac-dau",
+    "name": "Bấm nút mở nhiệm vụ: khung nhiệm vụ mở rộng lại trọn vẹn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-khac-dau",
+    "name": "Trạng thái đủ 4 Trang Sổ Vàng: nội dung nhiệm vụ chuẩn xác",
+    "ok": true,
+    "detail": "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở."
+  },
+  {
+    "area": "360x800:lang-khac-dau",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (mở rộng): docs/screenshots/hud-boards/hud-lang-khac-dau-360x800-golden-expanded.jpg (35034 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-khac-dau",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (thu gọn): docs/screenshots/hud-boards/hud-lang-khac-dau-360x800-golden-collapsed.jpg (36521 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-khac-dau",
+    "name": "Nút Menu & Nút Trợ giúp góc trên phải nằm trọn trong màn hình và không bị khung nhiệm vụ đè",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-khac-dau",
+    "name": "Trên điện thoại: Joystick và nút Nhảy/Tương tác hiển thị đầy đủ, không bị che",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-bac",
+    "name": "Nhiệm vụ dài: Khung nhiệm vụ mở rộng hiển thị đầy đủ ban đầu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-bac",
+    "name": "Nhiệm vụ dài: Bản đồ nhỏ (Minimap) không bị che khuất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-bac",
+    "name": "Bấm nút \"Thu gọn\": dòng nhiệm vụ thu nhỏ thành nút gọn gàng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-bac",
+    "name": "Nút mở nhiệm vụ đạt chuẩn touch target (chiều cao >= 44px)",
+    "ok": true,
+    "detail": "44px"
+  },
+  {
+    "area": "360x800:lang-bac",
+    "name": "Bấm nút mở nhiệm vụ: khung nhiệm vụ mở rộng lại trọn vẹn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-bac",
+    "name": "Trạng thái đủ 4 Trang Sổ Vàng: nội dung nhiệm vụ chuẩn xác",
+    "ok": true,
+    "detail": "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở."
+  },
+  {
+    "area": "360x800:lang-bac",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (mở rộng): docs/screenshots/hud-boards/hud-lang-bac-360x800-golden-expanded.jpg (45914 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-bac",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (thu gọn): docs/screenshots/hud-boards/hud-lang-bac-360x800-golden-collapsed.jpg (45294 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-bac",
+    "name": "Nút Menu & Nút Trợ giúp góc trên phải nằm trọn trong màn hình và không bị khung nhiệm vụ đè",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "360x800:lang-bac",
+    "name": "Trên điện thoại: Joystick và nút Nhảy/Tương tác hiển thị đầy đủ, không bị che",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-giay",
+    "name": "Nhiệm vụ dài: Khung nhiệm vụ mở rộng hiển thị đầy đủ ban đầu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-giay",
+    "name": "Nhiệm vụ dài: Bản đồ nhỏ (Minimap) không bị che khuất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-giay",
+    "name": "Bấm nút \"Thu gọn\": dòng nhiệm vụ thu nhỏ thành nút gọn gàng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-giay",
+    "name": "Nút mở nhiệm vụ đạt chuẩn touch target (chiều cao >= 44px)",
+    "ok": true,
+    "detail": "44px"
+  },
+  {
+    "area": "844x390:lang-giay",
+    "name": "Bấm nút mở nhiệm vụ: khung nhiệm vụ mở rộng lại trọn vẹn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-giay",
+    "name": "Trạng thái đủ 4 Trang Sổ Vàng: nội dung nhiệm vụ chuẩn xác",
+    "ok": true,
+    "detail": "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở."
+  },
+  {
+    "area": "844x390:lang-giay",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (mở rộng): docs/screenshots/hud-boards/hud-lang-giay-844x390-golden-expanded.jpg (45527 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-giay",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (thu gọn): docs/screenshots/hud-boards/hud-lang-giay-844x390-golden-collapsed.jpg (46222 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-giay",
+    "name": "Nút Menu & Nút Trợ giúp góc trên phải nằm trọn trong màn hình và không bị khung nhiệm vụ đè",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-giay",
+    "name": "Trên điện thoại: Joystick và nút Nhảy/Tương tác hiển thị đầy đủ, không bị che",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-det",
+    "name": "Nhiệm vụ dài: Khung nhiệm vụ mở rộng hiển thị đầy đủ ban đầu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-det",
+    "name": "Nhiệm vụ dài: Bản đồ nhỏ (Minimap) không bị che khuất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-det",
+    "name": "Bấm nút \"Thu gọn\": dòng nhiệm vụ thu nhỏ thành nút gọn gàng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-det",
+    "name": "Nút mở nhiệm vụ đạt chuẩn touch target (chiều cao >= 44px)",
+    "ok": true,
+    "detail": "44px"
+  },
+  {
+    "area": "844x390:lang-det",
+    "name": "Bấm nút mở nhiệm vụ: khung nhiệm vụ mở rộng lại trọn vẹn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-det",
+    "name": "Trạng thái đủ 4 Trang Sổ Vàng: nội dung nhiệm vụ chuẩn xác",
+    "ok": true,
+    "detail": "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở."
+  },
+  {
+    "area": "844x390:lang-det",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (mở rộng): docs/screenshots/hud-boards/hud-lang-det-844x390-golden-expanded.jpg (37312 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-det",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (thu gọn): docs/screenshots/hud-boards/hud-lang-det-844x390-golden-collapsed.jpg (34977 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-det",
+    "name": "Nút Menu & Nút Trợ giúp góc trên phải nằm trọn trong màn hình và không bị khung nhiệm vụ đè",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-det",
+    "name": "Trên điện thoại: Joystick và nút Nhảy/Tương tác hiển thị đầy đủ, không bị che",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-khac-dau",
+    "name": "Nhiệm vụ dài: Khung nhiệm vụ mở rộng hiển thị đầy đủ ban đầu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-khac-dau",
+    "name": "Nhiệm vụ dài: Bản đồ nhỏ (Minimap) không bị che khuất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-khac-dau",
+    "name": "Bấm nút \"Thu gọn\": dòng nhiệm vụ thu nhỏ thành nút gọn gàng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-khac-dau",
+    "name": "Nút mở nhiệm vụ đạt chuẩn touch target (chiều cao >= 44px)",
+    "ok": true,
+    "detail": "44px"
+  },
+  {
+    "area": "844x390:lang-khac-dau",
+    "name": "Bấm nút mở nhiệm vụ: khung nhiệm vụ mở rộng lại trọn vẹn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-khac-dau",
+    "name": "Trạng thái đủ 4 Trang Sổ Vàng: nội dung nhiệm vụ chuẩn xác",
+    "ok": true,
+    "detail": "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở."
+  },
+  {
+    "area": "844x390:lang-khac-dau",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (mở rộng): docs/screenshots/hud-boards/hud-lang-khac-dau-844x390-golden-expanded.jpg (36635 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-khac-dau",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (thu gọn): docs/screenshots/hud-boards/hud-lang-khac-dau-844x390-golden-collapsed.jpg (34287 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-khac-dau",
+    "name": "Nút Menu & Nút Trợ giúp góc trên phải nằm trọn trong màn hình và không bị khung nhiệm vụ đè",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-khac-dau",
+    "name": "Trên điện thoại: Joystick và nút Nhảy/Tương tác hiển thị đầy đủ, không bị che",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-bac",
+    "name": "Nhiệm vụ dài: Khung nhiệm vụ mở rộng hiển thị đầy đủ ban đầu",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-bac",
+    "name": "Nhiệm vụ dài: Bản đồ nhỏ (Minimap) không bị che khuất",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-bac",
+    "name": "Bấm nút \"Thu gọn\": dòng nhiệm vụ thu nhỏ thành nút gọn gàng",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-bac",
+    "name": "Nút mở nhiệm vụ đạt chuẩn touch target (chiều cao >= 44px)",
+    "ok": true,
+    "detail": "44px"
+  },
+  {
+    "area": "844x390:lang-bac",
+    "name": "Bấm nút mở nhiệm vụ: khung nhiệm vụ mở rộng lại trọn vẹn",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-bac",
+    "name": "Trạng thái đủ 4 Trang Sổ Vàng: nội dung nhiệm vụ chuẩn xác",
+    "ok": true,
+    "detail": "Em đã có đủ 4 Trang Sổ Vàng! Hội làng sắp mở."
+  },
+  {
+    "area": "844x390:lang-bac",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (mở rộng): docs/screenshots/hud-boards/hud-lang-bac-844x390-golden-expanded.jpg (42917 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-bac",
+    "name": "Đã lưu ảnh chụp trạng thái đủ 4 trang (thu gọn): docs/screenshots/hud-boards/hud-lang-bac-844x390-golden-collapsed.jpg (44364 bytes)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-bac",
+    "name": "Nút Menu & Nút Trợ giúp góc trên phải nằm trọn trong màn hình và không bị khung nhiệm vụ đè",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "844x390:lang-bac",
+    "name": "Trên điện thoại: Joystick và nút Nhảy/Tương tác hiển thị đầy đủ, không bị che",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "area": "Tương tác biển",
+    "name": "Nhiệm vụ hiển thị đúng mục tiêu biển tiếp theo",
+    "ok": true,
+    "detail": "Đến biển \"Đuổi theo Tí\"."
+  },
+  {
+    "area": "Tương tác biển",
+    "name": "Đã lưu ảnh chụp toàn cảnh sân làng và 3 biển: docs/screenshots/hud-boards/hud-lang-giay-plaza-overview.jpg (110164 bytes)",
+    "ok": true,
+    "detail": ""
+  }
+]

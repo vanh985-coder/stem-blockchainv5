@@ -1,4 +1,94 @@
 {
+  "man5-2d/background-pc": {
+    "file": "man5-2d/background-pc.82a018ad.webp",
+    "bytes": 34022,
+    "width": 1672,
+    "height": 941
+  },
+  "man5-2d/book": {
+    "file": "man5-2d/book.d9225022.webp",
+    "bytes": 55398,
+    "width": 1024,
+    "height": 512
+  },
+  "man5-2d/coin": {
+    "file": "man5-2d/coin.3428abbf.webp",
+    "bytes": 23052,
+    "width": 384,
+    "height": 384
+  },
+  "man5-2d/hero-hit": {
+    "file": "man5-2d/hero-hit.0e898d5e.webp",
+    "bytes": 60812,
+    "width": 768,
+    "height": 768
+  },
+  "man5-2d/hero-idle": {
+    "file": "man5-2d/hero-idle.c982865a.webp",
+    "bytes": 63262,
+    "width": 768,
+    "height": 768
+  },
+  "man5-2d/lane-blue": {
+    "file": "man5-2d/lane-blue.53dfc606.webp",
+    "bytes": 44086,
+    "width": 724,
+    "height": 2172
+  },
+  "man5-2d/lane-green": {
+    "file": "man5-2d/lane-green.682f6394.webp",
+    "bytes": 44384,
+    "width": 724,
+    "height": 2172
+  },
+  "man5-2d/lane-red": {
+    "file": "man5-2d/lane-red.9cbc3cda.webp",
+    "bytes": 53880,
+    "width": 724,
+    "height": 2172
+  },
+  "man5-2d/lane-yellow": {
+    "file": "man5-2d/lane-yellow.c479dccd.webp",
+    "bytes": 35328,
+    "width": 724,
+    "height": 2172
+  },
+  "man5-2d/mouse-big": {
+    "file": "man5-2d/mouse-big.d4f6f1bf.webp",
+    "bytes": 29474,
+    "width": 512,
+    "height": 512
+  },
+  "man5-2d/mouse-fast": {
+    "file": "man5-2d/mouse-fast.e4253eca.webp",
+    "bytes": 22938,
+    "width": 512,
+    "height": 512
+  },
+  "man5-2d/mouse-normal": {
+    "file": "man5-2d/mouse-normal.646d42d7.webp",
+    "bytes": 23436,
+    "width": 512,
+    "height": 512
+  },
+  "man5-2d/mouse-question": {
+    "file": "man5-2d/mouse-question.1cd2fb1d.webp",
+    "bytes": 26370,
+    "width": 512,
+    "height": 512
+  },
+  "man5-2d/mouse-switch": {
+    "file": "man5-2d/mouse-switch.8c18e968.webp",
+    "bytes": 26570,
+    "width": 512,
+    "height": 512
+  },
+  "man5-2d/wood-border": {
+    "file": "man5-2d/wood-border.3c945149.webp",
+    "bytes": 53082,
+    "width": 724,
+    "height": 2172
+  },
   "models/characters/bac-an": {
     "file": "models/characters/bac-an.e9a09cbd.glb",
     "bytes": 1797384,
@@ -451,12 +541,6 @@
     "width": 1376,
     "height": 768
   },
-  "scenes/man-09-duong-lang": {
-    "file": "scenes/man-09-duong-lang.3d901b06.webp",
-    "bytes": 148946,
-    "width": 1376,
-    "height": 768
-  },
   "scenes/man-11-goc-da": {
     "file": "scenes/man-11-goc-da.9304b455.webp",
     "bytes": 54502,
@@ -523,29 +607,71 @@
     "width": 1024,
     "height": 572
   },
-  "sprites/man-09-chua-ga/ga-benh": {
-    "file": "sprites/man-09-chua-ga/ga-benh.4dc53501.webp",
-    "bytes": 23978,
-    "width": 1024,
-    "height": 572
+  "sprites/man-09-ban-trung/khung-ban": {
+    "file": "sprites/man-09-ban-trung/khung-ban.cb7ac95b.webp",
+    "bytes": 163774,
+    "width": 1071,
+    "height": 1280
   },
-  "sprites/man-09-chua-ga/ga-khoe": {
-    "file": "sprites/man-09-chua-ga/ga-khoe.27ea8a59.webp",
-    "bytes": 20418,
-    "width": 1024,
-    "height": 572
+  "sprites/man-09-ban-trung/may-ban": {
+    "file": "sprites/man-09-ban-trung/may-ban.4580314b.webp",
+    "bytes": 67596,
+    "width": 512,
+    "height": 640
   },
-  "sprites/man-09-chua-ga/ga-trum": {
-    "file": "sprites/man-09-chua-ga/ga-trum.7b910aaf.webp",
-    "bytes": 29674,
-    "width": 1024,
-    "height": 572
+  "sprites/man-09-ban-trung/nen-pc": {
+    "file": "sprites/man-09-ban-trung/nen-pc.c38e9c25.webp",
+    "bytes": 252570,
+    "width": 1672,
+    "height": 941
   },
-  "sprites/man-09-chua-ga/na-cao-su": {
-    "file": "sprites/man-09-chua-ga/na-cao-su.9362cba2.webp",
-    "bytes": 24484,
-    "width": 1024,
-    "height": 559
+  "sprites/man-09-ban-trung/trung-1": {
+    "file": "sprites/man-09-ban-trung/trung-1.fc4dda07.webp",
+    "bytes": 15732,
+    "width": 256,
+    "height": 256
+  },
+  "sprites/man-09-ban-trung/trung-2": {
+    "file": "sprites/man-09-ban-trung/trung-2.f2bada9a.webp",
+    "bytes": 17452,
+    "width": 256,
+    "height": 256
+  },
+  "sprites/man-09-ban-trung/trung-3": {
+    "file": "sprites/man-09-ban-trung/trung-3.cea44248.webp",
+    "bytes": 18900,
+    "width": 256,
+    "height": 256
+  },
+  "sprites/man-09-ban-trung/trung-4": {
+    "file": "sprites/man-09-ban-trung/trung-4.7a887714.webp",
+    "bytes": 18936,
+    "width": 256,
+    "height": 256
+  },
+  "sprites/man-09-ban-trung/trung-5": {
+    "file": "sprites/man-09-ban-trung/trung-5.1d8fd080.webp",
+    "bytes": 18538,
+    "width": 256,
+    "height": 256
+  },
+  "sprites/man-09-ban-trung/trung-6": {
+    "file": "sprites/man-09-ban-trung/trung-6.d84df8e9.webp",
+    "bytes": 17060,
+    "width": 256,
+    "height": 256
+  },
+  "sprites/man-09-ban-trung/trung-7": {
+    "file": "sprites/man-09-ban-trung/trung-7.dc7b6e7e.webp",
+    "bytes": 18612,
+    "width": 256,
+    "height": 256
+  },
+  "sprites/man-09-ban-trung/trung-vo": {
+    "file": "sprites/man-09-ban-trung/trung-vo.1e3579dd.webp",
+    "bytes": 103714,
+    "width": 512,
+    "height": 512
   },
   "sprites/man-11-ghep-la/cay-ghep-la": {
     "file": "sprites/man-11-ghep-la/cay-ghep-la.dc0e2010.webp",
@@ -553,11 +679,17 @@
     "width": 1024,
     "height": 559
   },
-  "sprites/man-12-leo-cay/canh-ngang": {
-    "file": "sprites/man-12-leo-cay/canh-ngang.f4a601f9.webp",
-    "bytes": 14892,
+  "sprites/man-12-leo-cay/bac-go": {
+    "file": "sprites/man-12-leo-cay/bac-go.9ee537bd.webp",
+    "bytes": 55174,
     "width": 1024,
-    "height": 559
+    "height": 481
+  },
+  "sprites/man-12-leo-cay/bac-go-nut": {
+    "file": "sprites/man-12-leo-cay/bac-go-nut.23591bbb.webp",
+    "bytes": 61320,
+    "width": 1024,
+    "height": 480
   },
   "sprites/man-12-leo-cay/goc-cay": {
     "file": "sprites/man-12-leo-cay/goc-cay.1b5f390a.webp",
@@ -570,12 +702,6 @@
     "bytes": 32476,
     "width": 1024,
     "height": 572
-  },
-  "sprites/man-12-leo-cay/tay-nam": {
-    "file": "sprites/man-12-leo-cay/tay-nam.5c178a53.webp",
-    "bytes": 19034,
-    "width": 1024,
-    "height": 559
   },
   "sprites/man-12-leo-cay/than-cay": {
     "file": "sprites/man-12-leo-cay/than-cay.4b663753.webp",
@@ -752,8 +878,8 @@
     "height": 540
   },
   "ui/huong-dan/man-3-ban": {
-    "file": "ui/huong-dan/man-3-ban.cf948c2d.webp",
-    "bytes": 69740,
+    "file": "ui/huong-dan/man-3-ban.d0d2a162.webp",
+    "bytes": 73498,
     "width": 960,
     "height": 540
   },

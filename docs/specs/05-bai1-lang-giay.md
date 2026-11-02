@@ -394,6 +394,30 @@ Thời gian danh nghĩa của giữ sổ: 90 giây → 45 giây (hết nửa); c
 
 **Chưa kiểm:** điện thoại và máy tính bảng thật (kéo thả, chạm, xoay), Safari/iPhone; FPS của GL phần mềm không dùng để kết luận hiệu năng thiết bị thật; cảm nhận độ khó thật của học sinh (mốc tạm).
 
+### Bỏ giữ sổ (02/11/2026)
+
+**Thiết kế:** Màn 3 "Ghép lại cuốn sổ" bỏ hoàn toàn đoạn giữ sổ 45 giây ở cuối vòng 2. Vòng 2 kết thúc ngay khi ghép xong chuỗi 7 trang → vào thẳng màn kết quả (`complete`). Vòng 1 (5 trang) và phần ghép của vòng 2 (7 trang, 1 trang giả nhét vào khay) giữ NGUYÊN (luật ghép, công thức mã trang, điểm ghép mỗi vòng 100 − 10 × lỗi, 3 tim, thưởng +30 khi bỏ đúng trang giả vào rổ, nút "Soi công thức", nút "?").
+
+**Điểm tối đa mới:** Vòng 1 tối đa 100, Vòng 2 tối đa 130 (+30 trang giả), không còn điểm giữ sổ (cũ: +125 điểm). Tổng điểm tối đa mới = 100 + 130 = **230 điểm** (trước P4b: 505; P4b: 355). `MiniGameLevel` nhận `maxScore = 230`: điểm cao nhất đã lưu từ phiên bản trước vượt 230 sẽ hiện chú thích "(Kỷ lục từ phiên bản trước)".
+
+**Mốc điểm mới:** Đồng **210**, Bạc **220**, Vàng **230** (tối đa 230). Với 2 vòng ghép ngắn (12 thẻ), điểm ván hoàn thành phân tầng rõ rệt theo số lỗi: 2 lỗi = 210 (Đồng), 1 lỗi = 220 (Bạc), 0 lỗi hoàn hảo = 230 (Vàng, p10 bot giỏi = 230).
+
+**Mốc THEO NGHĨA (ngoại lệ quy tắc phân vị, tự chọn):** ba mốc 210/220/230 là mốc theo nghĩa số lỗi ghép, không đặt theo phân vị bot: Vàng = 0 lỗi (230), Bạc = đúng 1 lỗi (220), Đồng = đúng 2 lỗi (210); từ 3 lỗi trở lên, hoặc hết tim, là chưa đạt. Vì thế quy tắc "bot trung bình hầu như không Vàng" KHÔNG áp cho màn 3 sau đợt này: bot trung bình chính được Vàng 36,0% là hệ quả của nghĩa mốc (đoạn giữ sổ vốn phân hóa người chơi đã bỏ), không phải lỗi cân bằng. Ván 300 seed mỗi bot vẫn là kiểm tra hồi quy: bot giỏi phải 100% Vàng, bot trung bình chính hết tim không quá 25%.
+
+**Bảng bot trước/sau (300 ván seed 1 đến 300 mỗi bot):**
+
+| Bot | Chỉ số | Trước (P4b: 2 vòng + giữ sổ 45s; tối đa 355; mốc 290/320/330) | Sau (Bỏ giữ sổ: 2 vòng ghép; tối đa 230; mốc 210/220/230) |
+|---|---|---|---|
+| **Giỏi** | Điểm TB (min; p10) | 355 (355; 355) | 230 (230; 230) |
+| | Vàng / Hết tim | 100% (300 ván) / 0 ván | **100%** (300 ván) / **0 ván** |
+| **Trung bình chính** | Điểm TB (min; p10; p25; p75) | 292,0 (200; 270; 290; 320) | 212,0 (80; 210; 220; 230) |
+| (8% nhầm thẻ, 15% nhầm trang giả) | Chưa đạt / Đồng / Bạc / Vàng | 13,7 / 44,3 / 25,3 / 16,7% (41 / 133 / 76 / 50 ván) | **7,7 / 15,7 / 40,7 / 36,0%** (23 / 47 / 122 / 108 ván) |
+| | Hết tim | 29 ván (9,7%) | **23 ván (7,7%)** (đạt ≤ 25%) |
+| **Trung bình hoàn hảo** | Điểm TB; Vàng; Hết tim | 316,5; Vàng 165 (55,0%); Hết tim 6 ván (2,0%) | 230; Vàng 300 (100%); Hết tim 0 ván (0%) |
+
+Đạt: bot giỏi 100% Vàng (≥ 90%); bot trung bình chính hết tim 7,7% (≤ 25%); Đồng + Bạc là đa số (56,4%).
+
+
 ## Kết thúc làng
 
 - Bác An trao **Trang Sổ Vàng thứ nhất**.
@@ -424,3 +448,9 @@ Thời gian danh nghĩa của giữ sổ: 90 giây → 45 giây (hết nửa); c
 - [x] Đống rơm ở màn 2 hiện đủ khối ở cả ba trạng thái (thấp, đang bay, đã rơi). (Bước 16.)
 - [ ] Màn 1 là bài 2D giai đoạn 1 đặt trên nền làng, lời bác An hiện đúng chỗ.
 - [ ] Ít nhất 30fps ở mức Thấp trên điện thoại tầm trung. (Bước 15a, bản build trên máy tính, mức Thấp: cảnh trao trang 546 fps, đi lại 604 fps; làm chậm CPU 4 lần còn 212 và 275 fps. Còn cần thử trên điện thoại thật.)
+
+## Bổ sung mốc 4 và bàn giao Claude — 01/11/2026
+
+- Màn 1 đủ ba trạm có focus/làm thử; Màn 2 nhảy thử; Màn 3 chọn/soi/ghép thẻ. Tuân thủ P8-HUONG-DAN-FOCUS-LAM-THU.md; triển khai không đồng nghĩa đã duyệt toàn bộ.
+- Nút “?” và “Soi công thức” Màn 3 đã tách theo báo cáo commit 6d573ac: AREAS.hud.x1=92, khoảng đệm phải tối thiểu 4.25rem, nút tối thiểu 44×44 px. Mở trợ giúp hoặc xoay dọc dừng ván; quay lại tiếp tục. Không đổi hai vòng và 45 giây giữ sổ.
+- Bằng chứng: docs/screenshots/man3-buttons/BAO-CAO-MAN3-BUTTONS.md (16 kiểm nút, 48 hồi quy Màn 2–3).

@@ -4,56 +4,47 @@ import { REBUILD_MAX_SCORE } from './rebuildLogic';
 import { AVERAGE_BOT, AVERAGE_BOT_CLEAN, GOOD_BOT, simulateMany, simulateRebuild } from './rebuildBots';
 
 /**
- * Cân bằng màn 3 sau P4b (HAI vòng; vòng 2 kèm đoạn giữ sổ 45 giây với 5 lần tráo, điểm tối đa 100 + 130 + 125 = 355): 300 ván mỗi bot, seed 1 đến 300.
- * Mốc: Đồng = p25 bot trung bình (290), Bạc = p75 bot trung bình (320) theo quy tắc phân vị; Vàng 330 là NGOẠI LỆ vì p10 bot giỏi = 355 = điểm tối đa (bot giỏi luôn được đủ 355): đặt 330 để cho phép sai sót nhỏ (dư 25 điểm). Mốc tạm.
+ * Cân bằng màn 3 sau khi bỏ giữ sổ (02/11/2026; HAI vòng ghép sổ, điểm tối đa 100 + 130 = 230): 300 ván mỗi bot, seed 1 đến 300.
+ * Mốc: Đồng = 210 (qua 2 vòng với 2 lỗi), Bạc = 220 (qua 2 vòng với 1 lỗi), Vàng = 230 (hoàn hảo 0 lỗi, p10 bot giỏi = 230 = điểm tối đa).
  *
- * Kết quả đã chạy (xem cả bảng trong spec 05, mục "P4b"):
- *  - bot giỏi (đoạn giữ sổ sửa trong 3 đến 4 giây, không sai): 355 ở cả 300 ván → 100% Vàng, không ván nào hết tim;
- *  - bot trung bình CHÍNH (có sai ở vòng 1, 2: 8% đặt nhầm thẻ, 15% đặt thẳng trang giả vào chuỗi; đoạn giữ sổ sửa trong 6 đến 9 giây, 15% kéo nhầm trang thật vào rổ):
- *    điểm trung bình 292,0 (p25 290, p75 320); chưa đạt 41 ván (13,7%), Đồng 133 (44,3%), Bạc 76 (25,3%), Vàng 50 (16,7%; điểm 330); hết tim 29 ván (9,7%);
- *  - bot trung bình chơi hoàn hảo vòng 1, 2: điểm trung bình 316,5; Đồng 135, Bạc 0, Vàng 165 (điểm 330); hết tim 6 ván (2,0%).
- * Trước P4b (3 vòng, vòng 3 giữ sổ 90 giây, mốc 200 / 400 / 475, tối đa 505): bot giỏi 100% Vàng; bot trung bình chính điểm trung bình 392,2, chưa 7,7%, Đồng 15,7%, Bạc 76,7%, Vàng 0%, hết tim 29,7% (89 ván).
- * Đổi cấu hình thì chạy lại và cập nhật các con số này.
+ * Kết quả mô phỏng (300 ván mỗi bot):
+ *  - bot giỏi (ghép hoàn hảo cả 2 vòng, bỏ đúng trang giả): 230 ở cả 300 ván → 100% Vàng, 0 ván hết tim;
+ *  - bot trung bình CHÍNH (8% đặt nhầm thẻ sai mã trước, 15% đặt thẳng trang giả vào chuỗi):
+ *    điểm trung bình 212,0 (min 80, p10 210, p25 220, p50 220, p75 230, p90 230);
+ *    chưa đạt 23 ván (7,7%), Đồng 47 ván (15,7%), Bạc 122 ván (40,7%), Vàng 108 ván (36,0%); hết tim 23 ván (7,7%, mục tiêu ≤ 25% đạt);
+ *  - bot trung bình chơi hoàn hảo vòng 1, 2: 300 ván đều 230 điểm (100% Vàng, 0 ván hết tim).
+ * Trước đó (P4b, kèm 45 giây giữ sổ, tối đa 355): mốc 290 / 320 / 330; bot giỏi 100% Vàng; bot trung bình chính điểm TB 292,0, chưa 13,7%, Đồng 44,3%, Bạc 25,3%, Vàng 16,7%, hết tim 9,7% (29 ván).
+ * Trước P4b (3 vòng, 90 giây giữ sổ, tối đa 505): mốc 200 / 400 / 475.
  */
-describe('cân bằng màn 3 (hai vòng, vòng 2 có đoạn giữ sổ)', () => {
+describe('cân bằng màn 3 (hai vòng ghép sổ, bỏ giữ sổ)', () => {
   const medals = REBUILD_SPEC.medals;
   const good = simulateMany(GOOD_BOT, 300, medals);
   const avg = simulateMany(AVERAGE_BOT, 300, medals);
   const clean = simulateMany(AVERAGE_BOT_CLEAN, 300, medals);
 
-  it('bot giỏi: ít nhất 90% ván đạt Vàng, không ván nào hết tim', () => {
-    expect(good.medals.vang / good.games).toBeGreaterThanOrEqual(0.9);
+  it('bot giỏi: 100% ván đạt Vàng, không ván nào hết tim', () => {
+    expect(good.medals.vang / good.games).toBe(1.0);
     expect(good.diedByHearts).toBe(0);
-    expect(good.min).toBeGreaterThanOrEqual(medals[2]);
+    expect(good.min).toBe(REBUILD_MAX_SCORE);
   });
 
-  it('bot trung bình chính: chủ yếu Đồng hoặc Bạc, Vàng dưới 20% (16,7%); hết tim 9,7% (mục tiêu ≤ 25% đạt)', () => {
-    expect((avg.medals.dong + avg.medals.bac) / avg.games).toBeGreaterThanOrEqual(0.6);
-    expect(avg.medals.vang / avg.games).toBeLessThan(0.2);
+  it('bot trung bình chính: chủ yếu Đồng hoặc Bạc (56,4%), hết tim 7,7% (đạt mục tiêu ≤ 25%)', () => {
+    expect((avg.medals.dong + avg.medals.bac) / avg.games).toBeGreaterThanOrEqual(0.5);
     expect(avg.diedByHearts / avg.games).toBeLessThanOrEqual(0.25);
   });
 
-  it('bot trung bình chơi hoàn hảo vòng 1, 2: hết tim không quá 25%', () => {
-    expect(clean.diedByHearts / clean.games).toBeLessThanOrEqual(0.25);
+  it('bot trung bình chơi hoàn hảo: 100% hoàn thành không hết tim', () => {
+    expect(clean.diedByHearts).toBe(0);
   });
 
-  it('mốc: Đồng = p25 và Bạc = p75 bot trung bình; Vàng 330 là ngoại lệ vì p10 bot giỏi = 355 = điểm tối đa (cho phép sai sót nhỏ)', () => {
-    const p = (xs: number[], q: number): number => xs.slice().sort((a, b) => a - b)[Math.min(xs.length - 1, Math.floor(q * xs.length))];
+  it('mốc điểm: Đồng 210, Bạc 220, Vàng 230 (= REBUILD_MAX_SCORE, p10 bot giỏi = 230)', () => {
     const avgScores = Array.from({ length: 300 }, (_, i) => simulateRebuild(i + 1, AVERAGE_BOT).score);
     const goodScores = Array.from({ length: 300 }, (_, i) => simulateRebuild(i + 1, GOOD_BOT).score);
-    expect([p(avgScores, 0.25), p(avgScores, 0.75)]).toEqual([medals[0], medals[1]]);
-    expect(p(goodScores, 0.1)).toBe(REBUILD_MAX_SCORE); // quy tắc gốc cho Vàng = 355
-    expect(medals[2]).toBe(330);
-    expect(REBUILD_MAX_SCORE - medals[2]).toBe(25);
-  });
-
-  it('hết tim giữa đoạn giữ sổ vẫn có điểm các ô đã sửa (bước X2b)', () => {
-    let withPoints = 0;
-    for (let seed = 1; seed <= 300; seed++) {
-      const r = simulateRebuild(seed, AVERAGE_BOT);
-      if (r.over === 'hearts' && r.reachedKeep && r.keepPoints > 0) withPoints++;
-    }
-    expect(withPoints).toBeGreaterThan(0);
+    const at = (xs: number[], q: number) => xs.slice().sort((a, b) => a - b)[Math.min(xs.length - 1, Math.floor(q * xs.length))];
+    expect(at(goodScores, 0.1)).toBe(REBUILD_MAX_SCORE);
+    expect(at(avgScores, 0.25)).toBe(220);
+    expect(at(avgScores, 0.75)).toBe(230);
+    expect(medals).toEqual([210, 220, 230]);
   });
 
   it('mô phỏng tất định: cùng seed, cùng hồ sơ bot thì cùng kết quả', () => {
@@ -61,14 +52,14 @@ describe('cân bằng màn 3 (hai vòng, vòng 2 có đoạn giữ sổ)', () =>
     expect(simulateMany(AVERAGE_BOT, 50, medals)).toEqual(simulateMany(AVERAGE_BOT, 50, medals));
   });
 
-  it('con số đã ghi trong spec khớp lần chạy này', () => {
-    expect(good.mean).toBe(355);
+  it('con số khớp với kết quả mô phỏng', () => {
+    expect(good.mean).toBe(230);
     expect(good.medals).toEqual({ chua: 0, dong: 0, bac: 0, vang: 300 });
-    expect(avg.mean).toBeCloseTo(292.03, 1);
-    expect(avg.medals).toEqual({ chua: 41, dong: 133, bac: 76, vang: 50 });
-    expect(avg.diedByHearts).toBe(29);
-    expect(clean.mean).toBeCloseTo(316.5, 1);
-    expect(clean.medals).toEqual({ chua: 0, dong: 135, bac: 0, vang: 165 });
-    expect(clean.diedByHearts).toBe(6);
+    expect(avg.mean).toBe(212);
+    expect(avg.medals).toEqual({ chua: 23, dong: 47, bac: 122, vang: 108 });
+    expect(avg.diedByHearts).toBe(23);
+    expect(clean.mean).toBe(230);
+    expect(clean.medals).toEqual({ chua: 0, dong: 0, bac: 0, vang: 300 });
+    expect(clean.diedByHearts).toBe(0);
   });
 });

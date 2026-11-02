@@ -1,0 +1,90 @@
+[
+  {
+    "name": "[Dễ] Test 1 (1366x768): Chọn đúng Đồng ý -> Vào bài thật sạch",
+    "pass": true
+  },
+  {
+    "name": "[Dễ] Test 2 (1366x768): Chọn sai (Từ chối) -> Thử lại -> Chọn Đồng ý thành công",
+    "pass": true
+  },
+  {
+    "name": "[Dễ] Test 3 (1366x768): Bỏ qua -> Mở lại giữa bài -> Bảo toàn nguyên vẹn",
+    "pass": true
+  },
+  {
+    "name": "[Dễ] Test 1 (360x800): Chọn đúng Đồng ý -> Vào bài thật sạch",
+    "pass": true
+  },
+  {
+    "name": "[Dễ] Test 2 (360x800): Chọn sai (Từ chối) -> Thử lại -> Chọn Đồng ý thành công",
+    "pass": true
+  },
+  {
+    "name": "[Dễ] Test 3 (360x800): Bỏ qua -> Mở lại giữa bài -> Bảo toàn nguyên vẹn",
+    "pass": true
+  },
+  {
+    "name": "[Dễ] Test 1 (844x390): Chọn đúng Đồng ý -> Vào bài thật sạch",
+    "pass": true
+  },
+  {
+    "name": "[Dễ] Test 2 (844x390): Chọn sai (Từ chối) -> Thử lại -> Chọn Đồng ý thành công",
+    "pass": true
+  },
+  {
+    "name": "[Dễ] Test 3 (844x390): Bỏ qua -> Mở lại giữa bài -> Bảo toàn nguyên vẹn",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 1 (1366x768): Chọn đúng Từ chối -> Vào bài thật sạch",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 2 (1366x768): Chọn sai (Đồng ý) -> Thử lại -> Chọn Từ chối thành công",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 1 (360x800): Chọn đúng Từ chối -> Vào bài thật sạch",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 2 (360x800): Chọn sai (Đồng ý) -> Thử lại -> Chọn Từ chối thành công",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 1 (844x390): Chọn đúng Từ chối -> Vào bài thật sạch",
+    "pass": true
+  },
+  {
+    "name": "[Trung bình] Test 2 (844x390): Chọn sai (Đồng ý) -> Thử lại -> Chọn Từ chối thành công",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 1 (1366x768): Nhập đúng 68 -> Vào bài thật sạch",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 2 (1366x768): Ô trống -> Sai (50) -> Giữ số -> Sửa 68 thành công",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 1 (360x800): Nhập đúng 68 -> Vào bài thật sạch",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 2 (360x800): Ô trống -> Sai (50) -> Giữ số -> Sửa 68 thành công",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 1 (844x390): Nhập đúng 68 -> Vào bài thật sạch",
+    "pass": true
+  },
+  {
+    "name": "[Khó] Test 2 (844x390): Ô trống -> Sai (50) -> Giữ số -> Sửa 68 thành công",
+    "pass": true
+  },
+  {
+    "name": "[Bảo toàn] Làm thử không tự ý trao thưởng hay ghi nhận tiến độ Màn 4",
+    "pass": true
+  }
+]

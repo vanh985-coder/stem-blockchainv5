@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AssetImage } from '../../assets/AssetImage';
 import { fmt } from '../../content/characters';
 import { huongDan } from '../../content/huongDan';
@@ -18,22 +18,81 @@ export interface MarketHudProps {
   onGuide?: () => void;
   /** Bản đồ nhỏ (bước X4): đặt ở góc trên trái, dòng nhiệm vụ nằm ngay dưới */
   map?: ReactNode;
+  /** Tự động thu gọn khi đang đứng gần biển chọn màn để không che tên biển */
+  nearBoard?: boolean;
 }
 
 /**
  * HUD của chợ phiên (spec 04 mục 3 "HUD"): góc trên trái dòng "Nhiệm vụ: …", góc trên phải 4 ô Trang Sổ Vàng (icon \`trang-vang\`; trang chưa có thì mờ) và nút menu. Các phần
  * tử có \`data-walk-ui\` nên bấm vào không bắt đầu kéo camera hay cần điều khiển. Lớp phủ không bắt chuột ngoài các phần tử này.
  */
-export function MarketHud({ quest, pages, glow, onMenu, onGuide, map }: MarketHudProps) {
+export function MarketHud({ quest, pages, glow, onMenu, onGuide, map, nearBoard = false }: MarketHudProps) {
+  const [userCollapsed, setUserCollapsed] = useState<boolean | null>(null);
+
+  // Nhiệm vụ mới hoặc vừa lại gần/rời biển: bỏ lựa chọn tay, để cờ nearBoard quyết định
+  // (lại gần biển thì tự thu gọn cho khỏi che tên biển, đi xa thì mở lại)
+  const prevQuest = useRef(quest);
+  const prevNear = useRef(nearBoard);
+  useEffect(() => {
+    if (prevQuest.current !== quest || prevNear.current !== nearBoard) {
+      prevQuest.current = quest;
+      prevNear.current = nearBoard;
+      setUserCollapsed(null);
+    }
+  }, [quest, nearBoard]);
+
+  // Trạng thái thu gọn thực tế: ưu tiên lựa chọn của người dùng nếu đã bấm;
+  // nếu chưa bấm thì tự thu gọn khi đứng gần biển (nearBoard)
+  const isCollapsed = userCollapsed !== null ? userCollapsed : nearBoard;
+
   return (
     <div data-hud className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-2">
       <div className="flex flex-col items-start gap-2">
         {map}
-        <p data-walk-ui role="status" className="pointer-events-auto max-w-[min(26rem,58vw)] rounded-bang border-2 border-nau-go/60 bg-giay/90 px-3 py-2 font-display text-sm font-extrabold leading-snug shadow-md sm:text-base">
-          {fmt(ui.cho.nhiemVu, { nd: quest })}
-        </p>
+        {isCollapsed ? (
+          <button
+            type="button"
+            data-walk-ui
+            data-testid="nut-mo-nhiem-vu"
+            onClick={() => setUserCollapsed(false)}
+            aria-label={fmt(ui.cho.nhiemVu, { nd: quest })}
+            title={ui.cho.moRongNhiemVu}
+            className="pointer-events-auto flex min-h-11 items-center gap-1.5 rounded-bang border-2 border-nau-go/60 bg-giay/95 px-3 py-1.5 font-display text-xs font-extrabold text-nau-dam transition-transform hover:bg-vang/30 active:scale-95 focus-visible:outline-2 focus-visible:outline-muc-tim sm:text-sm"
+          >
+            <span aria-hidden="true" className="pointer-events-none">📜</span>
+            <span className="pointer-events-none">{ui.cho.nhiemVuRutGon}</span>
+            <span aria-hidden="true" className="pointer-events-none text-[10px] text-nau-go">▼</span>
+          </button>
+        ) : (
+          <div
+            data-walk-ui
+            data-testid="hud-nhiem-vu"
+            className="pointer-events-auto max-w-[min(22rem,54vw)] rounded-bang border-2 border-nau-go/60 bg-giay/95 p-2 sm:p-2.5"
+          >
+            <div className="mb-1 flex items-center justify-between gap-2 border-b border-nau-go/20 pb-1">
+              <span className="flex items-center gap-1 font-display text-xs font-black uppercase tracking-wider text-nau-go">
+                <span aria-hidden="true">📜</span>
+                {ui.cho.nhiemVuRutGon}
+              </span>
+              <button
+                type="button"
+                data-testid="nut-thu-gon-nhiem-vu"
+                onClick={() => setUserCollapsed(true)}
+                aria-label={ui.cho.thuGonNhiemVu}
+                title={ui.cho.thuGonNhiemVu}
+                className="flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-1 rounded-nut border border-nau-go/40 bg-giay px-2 py-0.5 font-display text-xs font-bold text-nau-dam hover:bg-vang/30 active:scale-95 focus-visible:outline-2 focus-visible:outline-muc-tim"
+              >
+                <span aria-hidden="true" className="pointer-events-none text-[9px]">▲</span>
+                <span className="pointer-events-none">{ui.cho.thuGonNhiemVu}</span>
+              </button>
+            </div>
+            <p data-testid="dong-nhiem-vu" role="status" className="font-display text-xs font-extrabold leading-snug text-nau-dam sm:text-sm">
+              {quest}
+            </p>
+          </div>
+        )}
       </div>
-      <div data-walk-ui className="pointer-events-auto flex items-center gap-1.5 rounded-bang border-2 border-nau-go/60 bg-giay/90 p-1.5 shadow-md">
+      <div data-walk-ui className="pointer-events-auto flex min-w-0 flex-wrap items-center justify-end gap-1.5 rounded-bang border-2 border-nau-go/60 bg-giay/90 p-1.5 shadow-md">
         <ul className="flex items-center gap-1" aria-label={fmt(ui.moKhoa.trangSoVang, { so: pages, max: MAX_PAGES })}>
           {Array.from({ length: MAX_PAGES }, (_, i) => {
             const got = i < pages;

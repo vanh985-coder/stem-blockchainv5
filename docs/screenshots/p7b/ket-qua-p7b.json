@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-10-30T12:33:30.127Z",
+  "tests": [
+    {
+      "viewport": "1366x768",
+      "hitOutsideBlocked": true,
+      "hitInsideKilled": true,
+      "pausedExact": true,
+      "resumedSmooth": true,
+      "ghostClickPrevented": true,
+      "stillOpenAfterHoldEnter": true
+    },
+    {
+      "viewport": "360x800",
+      "hitOutsideBlocked": true,
+      "hitInsideKilled": true,
+      "pausedExact": true,
+      "resumedSmooth": true,
+      "ghostClickPrevented": true,
+      "stillOpenAfterHoldEnter": true
+    },
+    {
+      "viewport": "844x390",
+      "hitOutsideBlocked": true,
+      "hitInsideKilled": true,
+      "pausedExact": true,
+      "resumedSmooth": true,
+      "ghostClickPrevented": true,
+      "stillOpenAfterHoldEnter": true
+    }
+  ]
+}

@@ -2,6 +2,26 @@
 
 Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết quả đã xác minh. Bạn thay bản cũ trong project claude.ai và trong repo (`docs/specs/TRANG-THAI.md`).
 
+## Bàn giao sang Claude Code — 01/11/2026
+
+- **Người code tiếp theo: Claude Code chạy local**, đọc `CLAUDE.md`, file này, rồi spec của nhiệm vụ. `GEMINI.md` giữ làm tài liệu lịch sử bàn giao; không xóa kết quả Gemini đã làm.
+- Chủ dự án cho phép tự commit và push nhánh đang làm khi kiểm đạt; không force-push, chưa tự merge main hay deploy. Giữ thay đổi có sẵn. Người dùng sẽ kiểm P8 sau; không dừng các việc độc lập để chờ duyệt từng màn.
+- P1–P6 đã triển khai; ba sửa ưu tiên về tự hoàn thành, bố cục đối chiếu Màn 4 và máy tính Màn 8 đã báo cáo tại `ce4564c`, `936f24e`, `7684c96`, không làm lại. File Excel lời thoại đã xuất. P7 đồ họa Màn 5 đã được người dùng duyệt.
+- P8 đã triển khai 12/12 màn: bài học 1/4/7/10 đủ ba độ khó, tám mini-game có hướng dẫn/làm thử. **Chưa nghiệm thu toàn bộ bởi người dùng.** Commit rà soát và push được báo cáo: `466c640`.
+- Lỗi nút “?” che “Soi công thức” Màn 3 đã sửa, commit/push được báo cáo `6d573ac`. Báo cáo tại `docs/screenshots/man3-buttons/BAO-CAO-MAN3-BUTTONS.md`: 16/16 kiểm nút, 48/48 hồi quy Màn 2–3; bốn lệnh đạt với 2321 test, 5 bỏ qua. Đây là số liệu báo cáo trước, không phải chạy lại trong buổi cập nhật tài liệu.
+- **325 assertions P8 là tổng tích lũy qua nhiều lượt/commit**, không phải toàn bộ chạy lại trên commit cuối. Không dùng số này để kết luận thiết bị thật hay Supabase thật đã nghiệm thu.
+- Git trong lượt cập nhật tài liệu này không đọc được (`fatal: cannot change to ...`); các hash/push trên là từ báo cáo bàn giao, Claude phải kiểm lại Git thực tế trước khi làm. Không suy ra working tree sạch hoặc server còn chạy từ báo cáo cũ.
+
+### Việc tiếp theo và giới hạn
+
+1. **HUD nhiệm vụ che biển chọn màn: ĐÃ XONG (01/11/2026).** Dòng nhiệm vụ tự thu gọn thành nút khi đứng gần biển (`MarketHud.nearBoard`), bấm để mở/thu gọn; khối Trang Sổ Vàng + nút ? + Menu xuống dòng ở 360px để không tràn. Kiểm bản build 4 làng × 3 cỡ: 118/118, ảnh ở `docs/screenshots/hud-boards/` (`scripts/p5-hud-check.mjs`). Việc cũ: Rà cả bốn làng, nhất là dòng đủ 4 Trang Sổ Vàng. Không di chuyển biển/camera để né HUD; giữ minimap và điều khiển tiếp cận được. Xem bổ sung spec 03.
+2. **Màn 7:** rà câu “buộc phải vét cạn” và suy luận thời gian từ 256-bit trong content/báo cáo. Thử tuần tự chỉ là cách minh họa, không phải cách tìm ngược duy nhất. Không đổi luật bài học.
+3. **Phát hiện khi đọc mã ngày 01/11:** `packages/core/src/content/tutorial.ts`, `man10Tb.stepByStep` ghi `Gốc = T12 × 100 + T34`, trong khi `lessons/bai-4/logic.ts::combine` trả `a * 10 + b`. Claude cần sửa lời hướng dẫn thành ×10 và kiểm nơi sử dụng; buổi này chỉ cập nhật tài liệu, chưa sửa mã.
+4. Mục thiếu bốn lệnh sau sửa MemoryGame đã có báo cáo kế tiếp ở `6d573ac` (2321 test và text/type/build đạt). Không yêu cầu chạy lặp chỉ để có số mới; đối chiếu log/mã nếu cần xác nhận nguồn bằng chứng.
+5. Người dùng kiểm P8 khi thuận tiện; tiếp nhận lỗi rồi sửa theo phạm vi, không ghi đã duyệt cả 12 màn.
+6. Supabase TEST/JWT/RLS và giáo viên thật chưa nghiệm thu; migration `0003` chưa áp production. Không tự áp migration. Thiết bị thật, Safari/iPhone, bàn phím ảo, pointer lock thật và FPS điện thoại còn giới hạn.
+7. Sau các sửa ưu tiên: rà danh sách việc dời từ mốc 3 bên dưới; hội làng/thử thách cuối/bằng khen để cuối mốc 4. Merge/deploy bản cuối cần được giao riêng.
+
 ## Thông tin chung
 
 | Mục | Giá trị |
@@ -11,7 +31,7 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | Hosting | Windows Server, Docker Desktop (WSL2) + Caddy, cổng 18081–18086; Cloudflare Tunnel (dịch vụ Windows). `docs/DEPLOY.md` mục (h) deploy, (i) luật cache |
 | Supabase | Project `zlqxwbgcyudybxaynluf` (Singapore), migrations 0001, 0002; Edge Function `teacher-reset-password` |
 | Tài khoản thử | Giáo viên `gva`, `gvb`; học sinh `thu01`, `thu02` |
-| Người code | **Claude Code**, đọc **`CLAUDE.md`** (từ lượt sửa `FeedbackSheet` sau P2a). **Tự commit và tự push nhánh đang làm lên `origin`** khi `pnpm test`, `pnpm typecheck`, `pnpm check:text`, `pnpm build` đạt, không cần hỏi lại (từ P2b; thay cho "không push" trước đây). Không force-push, không tự merge vào `main`. P1a, P1b, P2a do Codex (đọc `AGENTS.md`) viết ban đầu, P2a hoàn thiện bởi Claude Code |
+| Người code | **Claude Code**, đọc **`CLAUDE.md`** (tiếp nhận lại từ Gemini ngày 01/11/2026). **Tự commit và tự push nhánh đang làm lên `origin`** khi `pnpm test`, `pnpm typecheck`, `pnpm check:text`, `pnpm build` đạt, không cần hỏi lại (từ P2b; thay cho "không push" trước đây). Không force-push, không tự merge vào `main`. P1a, P1b, P2a do Codex (đọc `AGENTS.md`) viết ban đầu, P2a hoàn thiện bởi Claude Code |
 | Ảnh chụp kiểm tra | Lưu vào `docs/screenshots/<bước>/` (< 300 KB mỗi ảnh); P1a: `docs/screenshots/p1a/` |
 
 ## Tiến độ
@@ -20,9 +40,9 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 |---|---|
 | 0–2 | ✅ Xong (mốc 2 chưa deploy) |
 | 3. Nhân rộng | ✅ **Chốt.** Đủ 12 màn, cả 4 làng dựng to, **đã gộp web** (≈2086 test xanh). Việc còn dở dời xuống **cuối mốc 4** |
-| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt (P3b chưa có Supabase thật); P5 đã chốt phần kiểm local; P6a đã duyệt và P6b (tích hợp 16 thẻ, rà Enter giữ/lặp, click ma, đối chiếu nguồn Bitcoin) đã hoàn thiện kiểm đạt 100%; Hoàn thiện nút Tự hoàn thành cả màn ở mọi vòng/trạm, Bố cục đối chiếu trái–phải (Màn 4) và Phóng to máy tính Màn 8 ĐÃ XONG (30/10/2026)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
+| 4. Trau chuốt | **P1a, P1b, P2a, P2b, P3a, P3b, P4a, P4b đã xong và kiểm đạt; P5 đã chốt; P6a, P6b đã xong; P7a, P7b, P7c đã nghiệm thu; P8 ĐÃ TRIỂN KHAI ĐỦ 12 MÀN (31/10/2026, 325/325 E2E tests đạt, 248 ảnh minh chứng, 28/28 unit tests đạt, đang chờ người dùng kiểm thử và nghiệm thu hoàn toàn)** (chi tiết dưới). Sau các việc ưu tiên mới tới "Việc để sau"; **cuối mốc** là các việc dời từ mốc 3 và hội làng |
 
-**⚠️ 15b vẫn chưa làm:** server có thể đang 530, mốc 2 và toàn bộ mốc 3 (≈60 commit, mới nhất `2bd76bf`) chưa push, chưa chạy trên máy thật. Cách làm: khôi phục `cloudflared` + Docker, deploy theo `DEPLOY.md` (h), Cache Rule (i), thử trên điện thoại.
+**15b — ghi chú lịch sử cần kiểm tra lại:** báo cáo cũ từng ghi server 530 và chưa push ở `2bd76bf`. Các báo cáo sau đã có push; không dùng dòng cũ để kết luận Git/server hiện tại. Deploy và kiểm thiết bị thật vẫn chưa được xác nhận trong bàn giao này.
 
 ## Ưu tiên mốc 4 (theo thứ tự; "mặc định" là cách hiểu đã chốt nếu chủ dự án không sửa)
 
@@ -34,28 +54,32 @@ Cuối mỗi cửa sổ chat, người code cập nhật file này theo kết qu
 | P4 | **P4a ĐÃ XONG (29/10/2026, mục "P4a" bên dưới): (7) Màn 2 nhanh hơn: +20% tốc độ mọi vòng (12 / 0,36 / 21,6), mốc đặt lại 216 / 499 / 638 theo phân vị bot.** **P4b ĐÃ XONG (29/10/2026, mục "P4b" bên dưới): (8b) Màn 3 bỏ vòng 3, còn 2 vòng (đoạn giữ sổ 45 giây ở cuối vòng 2), mốc 290 / 320 / 330.** (Yêu cầu gốc: vòng "giữ sổ" (Tí tráo trang) đang ở vòng 3 → mặc định chuyển cơ chế tráo trang vào cuối vòng 2 để không mất bài học phát hiện sửa lén; đặt lại mốc) | 1 |
 | P5 | **ĐÃ XONG (29/10/2026, mục "P5" bên dưới):** (1) Biển chọn màn trong làng làm thành cột sáng giống cuộn "Em có biết?" (mỗi màn một cột, dáng và chữ theo trạng thái, giữ chữ tên màn) | 1 |
 | P6 | (3) Sau khi đọc thẻ "Em có biết?": 1 ví dụ ngắn + 1 câu hỏi ABCD (hoặc điền số). Mặc định: trả lời sai vẫn nhận thẻ, hiện giải thích. **P6a (nội dung 16 câu) đã duyệt; P6b (tích hợp) ĐÃ XONG (30/10/2026, mục "P6b" bên dưới)** | 1–2 |
-| P7 | (11) Làm lại màn 5 thành game đập chuột 2D kiểu Whack-a-Mole (My Talking Tom): lưới hang, chuột thường và chuột câu hỏi (đập trúng thì hiện câu hỏi). Cần ảnh mẫu của chủ dự án. Logic + bot + cảnh + hướng dẫn mới | 3–4 |
-| P8 | **Hướng dẫn focus và làm thử cho cả 12 màn** (yêu cầu đã được chủ dự án duyệt, CHƯA triển khai, xem mục ngay dưới). Làm thành bước riêng SAU KHI chốt thay đổi lối chơi màn 2, 3, 5 (P4, P7) | 2–3 |
+| P7 | **P7a ĐÃ XONG (30/10/2026, mục "P7a" bên dưới):** Bản chơi được Màn 5 "Đập {phanDien}" bằng 2D 4 làn dọc (Talking Tom), 2 loại chuột (thường và câu hỏi ❓), chống click ma, dừng khi mở câu hỏi/?, tự hoàn thành. **P7b/P7c:** đã triển khai; đồ họa P7c được người dùng duyệt. | 3–4 |
+| P8 | **P8 ĐÃ TRIỂN KHAI ĐỦ 12 MÀN (31/10/2026, mục "P8" bên dưới):** Cơ chế dùng chung `TutorialSpotlight` và làm thử tương tác cho cả 12 màn (4 bài học × 3 trạm + 8 mini-game). Kiểm tra E2E Puppeteer đạt **325/325 tests (100%)**, 248 ảnh minh chứng, 28/28 unit tests, 4 lệnh bắt buộc xanh 100%. Đang chờ người dùng kiểm thử và nghiệm thu hoàn toàn. | 2–3 |
 
 Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mốc 3 và hội làng.
 
 
-### P8 — Hướng dẫn focus và làm thử cho cả 12 màn (đã duyệt, chưa triển khai)
+### P8 — Hướng dẫn focus và làm thử cho cả 12 màn (ĐÃ TRIỂN KHAI ĐỦ 12 MÀN, ĐANG CHỜ NGƯỜI DÙNG KIỂM THỬ, 31/10/2026)
 
-- Làm tối phần còn lại của màn hình, làm nổi vùng cần chú ý, hiện lời nhắc ngắn.
-- Cho học sinh thực hành một tình huống ngắn theo từng bước.
-- Lần đầu vào màn tự hiện; có nút "Bỏ qua"; mở lại được qua "Hướng dẫn chơi".
-- Lượt thử dùng dữ liệu riêng: không mất tim, không chạy giờ của lượt chính, không cộng điểm, không ghi hoàn thành.
-- Hỗ trợ chuột/bàn phím và cảm ứng; "Giảm chuyển động" thì đứng yên.
-- Mọi chữ nằm trong `packages/core/src/content/`.
-- Làm thành bước riêng sau khi chốt thay đổi lối chơi màn 2, 3, 5 (P4, P7). **Không triển khai trong P3b.**
+- **Cơ chế dùng chung `TutorialSpotlight`:** khoét sáng chính xác vùng target qua `#tutorial-*`, viền sáng vàng hào quang, tooltip thông minh 4 hướng không che target, focus trap Tab, chống click ma ở capture phase (`detail === 0` khi chưa arm sau 400ms), chống kích hoạt lặp khi giữ phím Enter (`keydown`/`keyup` cycle).
+- **Phủ kín toàn bộ 12 màn:**
+  - **4 Bài học (12 trạm):** Màn 1 (Làng Giấy - Dễ, TB, Khó), Màn 4 (Làng Dệt - Dễ, TB, Khó), Màn 7 (Làng Khắc Dấu - Dễ, TB, Khó), Màn 10 (Làng Bạc - Dễ, TB, Khó).
+  - **8 Mini-game:** Màn 2 (Runner), Màn 3 (Rebuild ghép sổ), Màn 5 (Whack đập chuột 2D), Màn 6 (Kite diều đưa sổ 2.5D), Màn 8 (Memory lật thẻ tìm khóa), Màn 9 (Chicken chữa đàn gà), Màn 11 (Match-3 ghép lá Merkle), Màn 12 (Climb leo cây tìm lá giả).
+- **Làm thử tương tác:** Mỗi màn có tình huống làm thử riêng biệt, yêu cầu thao tác thật (nhập số, bấm nút, nhảy bám, bắn thuốc, tráo lá). Tách biệt 100% khỏi ván thật (không cộng điểm/xu/sao/tiến độ/Trang Sổ Vàng).
+- **Nút "💡 Hướng dẫn":** Mở lại bất kỳ lúc nào giữa ván; khi mở dừng toàn bộ chuyển động/đồng hồ; khi đóng tiếp tục đúng ván đang dở; chỉ lần bắt đầu lượt mới mới khởi tạo ván sạch.
+- **Kiểm thử nghiệm thu:**
+  - E2E Puppeteer: **325 / 325 assertions tích lũy qua nhiều lượt/commit** trên cả 3 kích thước: 1366×768, 360×800 và 844×390.
+  - Ảnh minh chứng: **248 ảnh PNG** lưu tại `docs/screenshots/p8*` và `docs/screenshots/*-tutorial/`.
+  - Unit tests: **28 / 28 tests tutorial ĐẠT (100%)** qua 9 test files; Vitest tổng **2321 / 2321 tests passed**.
+  - `pnpm check:text` sạch 438 files; `pnpm typecheck` 10 packages đạt; `pnpm build` toàn bộ 5 apps thành công.
 ## Bổ sung đã chốt — hướng dẫn focus và làm thử (29/10/2026)
 
 - Áp dụng cho cả 12 màn: làm tối phần còn lại, làm nổi vùng cần chú ý và hiện lời nhắc ngắn cạnh vùng đó; sau phần giới thiệu, học sinh thực hành một tình huống ngắn theo từng bước rồi mới vào lượt chơi chính thức.
 - Lần đầu chơi tự hiện; có nút "Bỏ qua" và mở lại qua "Hướng dẫn chơi". Bước thực hành chuyển tiếp khi học sinh thực hiện đúng thao tác được yêu cầu.
 - Lượt thử dùng dữ liệu riêng, không mất tim, không chạy đồng hồ lượt chính, không cộng điểm hoặc lưu hoàn thành màn; không làm thay đổi tiến độ thật.
 - Hướng dẫn phù hợp chuột/bàn phím hoặc cảm ứng; bật giảm chuyển động thì vùng làm nổi đứng yên. Mọi chữ nằm trong `packages/core/src/content/`.
-- Chưa triển khai. Là một bước riêng của mốc 4: dựng khung dùng chung rồi tích hợp lần lượt từng màn. Hướng dẫn phải khớp lối chơi cuối sau các thay đổi màn 2, 3 và 5; việc dời từ mốc 3 và hội làng vẫn để cuối mốc 4.
+- Đã triển khai đủ 12 màn theo báo cáo P8; chờ người dùng kiểm tổng thể. Hướng dẫn phải khớp lối chơi cuối sau các thay đổi màn 2, 3 và 5; việc dời từ mốc 3 và hội làng vẫn để cuối mốc 4.
 
 
 ## P1a — đã xác minh (28/10/2026)
@@ -210,7 +234,7 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
   - Màn 2: "Đuổi theo {phanDien}" | Game chạy 3D (Runner 3D) | 4 vòng (25s/vòng, giữa các vòng có QuizOverlay z-30).
   - Màn 3: "Ghép lại cuốn sổ" | Game ghép trang 2D | 2 vòng: Vòng 1 (ghép 5 trang), Vòng 2 (ghép 7 trang + giữ sổ 45s).
   - Màn 4: "Cả làng cùng giữ sổ" (Bài 2) | Bài học 2D | 3 trạm: Dễ (Đa số thắng), Trung bình (So sổ trước khi duyệt), Khó (Đặt cọc ghi sổ).
-  - Màn 5: "Đập {phanDien}" | Game 4 làn 3D (bảo vệ cuốn sổ, gõ chuột theo làn, chặn trùm bằng câu hỏi; P7 2D chưa làm) | 1 ván sinh chuột liên tục (0-120s) kèm các lượt trùm.
+  - Màn 5: "Đập {phanDien}" | Game 4 làn dọc 2D phong cách Làng Dệt (bảo vệ cuốn sổ, gõ chuột theo làn, chặn trùm chuột câu hỏi ❓ bằng câu hỏi ôn tập; P7a 2D đã xong) | 1 ván sinh chuột liên tục (0-120s) kèm 10 lượt trùm câu hỏi.
   - Màn 6: "Diều đưa sổ" | Game bay 2.5D | 4 cổng làng (sau khe 6, 12, 18, 24 của tổng 24 khe; mỗi cổng có câu hỏi trắc nghiệm 20s; 5 tim).
   - Màn 7: "Khuôn riêng, mẫu chung" (Bài 3) | Bài học 2D | 3 trạm: Dễ (Khuôn và mẫu), Trung bình (Soi dấu giả), Khó (Ký phân tán).
   - Màn 8: "Lật thẻ tìm cặp khóa" | Game lật thẻ 2D (Memory) | 3 vòng: Vòng 1 (4 cặp), Vòng 2 (6 cặp), Vòng 3 (8 cặp + tráo thẻ).
@@ -306,9 +330,178 @@ Tổng khoảng 10–12 buổi. Sau đó mới tới các việc dời từ mố
 
 **Ngân sách đã đo** (Thấp / Vừa / Cao, tam giác xấu nhất): Dệt 222k / 936k / 1,12M; Khắc Dấu ≈ 204k / 813k / 1,02M; Bạc 211k / 959k / 1,14M. Vùng làng thêm 3–6 MB. Bộ nhớ vào ra làng đứng yên. **Mức Vừa chỉ vẽ nhà, lều, tre ở xa trong tầm 260** (sương đã phủ kín từ ~300).
 
+## P7a — Bản chơi được Màn 5 "Đập {phanDien}" bằng 2D (30/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, tự commit và push nhánh làm việc `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này (chờ chủ dự án xem xét bản chơi được).
+- **Đã làm:**
+  - Chuyển đổi Màn 5 từ Scene25D Three.js sang giao diện 2D thuần túy, phong cách các dải lụa Làng Dệt (4 làn dọc đặt cạnh nhau lấy cảm hứng Talking Tom).
+  - Phân biệt 2 loại chuột rõ ràng: Chuột thường (4 biến thể: thường +10, đổi làn +15, nhanh +15, to +30 đập 2 lần) và Chuột câu hỏi mang biểu tượng **DẤU HỎI VÀNG LỚN ❓**, hào quang sáng rực, nhãn "Chuột câu hỏi" nổi bật tiếp cận accessibility.
+  - Vùng đập [6.5, 9.0] có vệt sáng viền báo hiệu; 4 nút đập chân làn (D, F, J, K) to rõ (≥ 48px trên điện thoại); bàn Sổ Chung ở đáy với 8 chấm tròn vết mực. Chuột lọt tới sổ +1 vết mực, chuột câu hỏi đúng xoá 2 vết mực.
+  - Tạm dừng chuyển động và đồng hồ khi mở câu hỏi hoặc mở hộp "?". Chống click ma (`pointerDownInside`, `stopPropagation`) không kích hoạt nhầm đáp án. Đập chuột không bị kích hoạt đúp khi chạm giữ.
+  - Giữ nguyên nút "Tự hoàn thành" cả màn (thẻ bắt đầu và hộp "?", chỉ dev và giáo viên/admin, không trao điểm/sao/xu/sổ vàng).
+- **Kiểm tra đã đạt:**
+  - `pnpm check:text`: sạch (437 file). Toàn bộ chữ nằm trong `content/games.ts` (`whackUi`).
+  - `pnpm typecheck`: 10 package đạt 100%.
+  - `pnpm test --maxWorkers=2`: 206 test files passed, 2275 passed, 5 skipped (thêm test mới `whack2d.test.ts` đạt 8/8 tests).
+  - `pnpm build`: Đạt. Chunk `Man5` giảm từ 91 kB Three.js xuống **20.75 kB** (gzip 7.34 kB).
+  - Kiểm tra DOM Puppeteer `scripts/p7a-check.mjs` và `scripts/p7a-dev-check.mjs` trên 1366×768, 360×800, 844×390: đập chuột, chuột câu hỏi, mở câu hỏi, trả lời, hộp "?", nút tự hoàn thành (ẩn với khách release, hiện và chạy chuẩn trên dev). 27 ảnh và báo cáo lưu tại `docs/screenshots/p7a/BAO-CAO-P7A.md`.
+
+## P7b — Hoàn thiện và kiểm lối chơi Đập Chuột 2D Màn 5 (30/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, commit và push nhánh `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này.
+- **Đã làm và bổ sung bằng chứng:**
+  - Thống nhất điều khiển: chạm trực tiếp trên làn, nút chân làn, phím D/F/J/K hoặc 1/2/3/4 đều tuân thủ cùng quy tắc vùng đập `[6.5, 9.0]`. Chuột ngoài vùng đập bị đập hụt (phát âm thanh gió trượt `sound.playWhoosh()`, nổi thông báo nhắc nhở).
+  - Chuột thường chỉ tính 1 lần đập; chuột to yêu cầu 2 lần kích hoạt riêng biệt (cooldown 140ms, chặn repeat/giữ phím). Nhiều chuột cùng làn luôn đập con thấp nhất trong vùng đập (`lowestInZone`); chuột đổi làn nhận đòn chính xác tại làn mới (sau khi qua pos 5,0).
+  - Xử lý click ma triệt để bằng `onClickCapture` ở capture phase trên overlay modal câu hỏi: chạm giữ chuột câu hỏi > 600ms nhấc tay không bị chọn nhầm đáp án ở mọi kích thước màn hình; bàn phím Enter/Space vẫn hoạt động trơn tru.
+  - Xử lý Enter giữ/lặp: gắn keydown/keyup cho Enter trong modal; giữ Enter > 1s không tự bấm "Chơi tiếp", bắt buộc thả phím rồi nhấn lại mới tiếp tục ván.
+  - Đo trực tiếp dừng thời gian và đối tượng đứng yên 100% khi mở "?" hoặc mở câu hỏi ($t_0 = t_1$), tiếp tục ván chạy mượt mà không nhảy cóc thời gian (reset mốc `lastTickTime`).
+  - Rà soát luật: Không có kết thúc ván do hết giờ (`EndReason = 'complete' | 'ink'`), chỉ kết thúc khi đầy 8 vết mực hoặc xong 10 trùm; đồng hồ lịch chạy qua 118s ván vẫn tiếp tục nếu chưa đầy mực.
+  - Kiểm tra các ca câu hỏi: Trả lời sai (cộng 1 vết mực, không cộng điểm trùm, Tí né chạy xuống sổ); Hết giờ câu hỏi (timeout đếm ngược về 0s, hiện cảnh báo "Hết giờ rồi!", đáp án đúng, cộng 1 vết mực).
+  - Kiểm tra chuyển trạng thái kết thúc ván có probe hỗ trợ (probe-assisted): Đặt trạng thái gần kết thúc rồi thao tác qua giao diện thật để chuyển sang màn kết quả thua (đầy 8 mực) và thắng (xong 10 trùm); bấm "Chơi lại" reset sạch ván mới.
+  - Kiểm tra tự hoàn thành: Xác minh trong cookie `sc_guest` chỉ ghi nhận cờ `ac = 16`, bản ghi Màn 5 là `[0, 0, 0, 0]`, xu và Trang Sổ Vàng không thay đổi.
+- **Kiểm tra đã đạt:**
+  - `pnpm check:text`: sạch (437 files).
+  - `pnpm typecheck`: 10 package biên dịch TypeScript thành công.
+  - `pnpm test --maxWorkers=2`: 206 test files passed, 2282 tests passed, 5 skipped. Bộ test `whack2d.test.ts` đạt 15/15 tests chuyên sâu. Bot cân bằng `whackBalance.test.ts` (300 ván seed 1-300) đạt 9/9 tests, giữ nguyên mốc điểm 1650 / 2650 / 3100 (ghi rõ giới hạn: bot chạy logic thuần `tapGap = 0.15s`, chưa đo lường độ khó thao tác cơ học của cooldown 140ms trên component UI).
+  - `pnpm build`: Đạt toàn bộ 5 ứng dụng (`hub`, `lang-bac`, `lang-det`, `lang-giay`, `lang-khac-dau`). Chunk `Man5` là **22.17 kB** (gzip **7.74 kB**). Bỏ khẳng định võ đoán về 60 FPS / rò bộ nhớ khi chưa có công cụ đo chuyên sâu.
+  - Kiểm tra Puppeteer `scripts/p7b-check.mjs` và `scripts/p7b-extra-check.mjs`: 31 ảnh minh chứng lưu tại `docs/screenshots/p7b/BAO-CAO-P7B.md`.
+
+## P7c — Làm lại đồ họa 2D Màn 5 bằng bộ 15 ảnh hoạt hình (30/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, commit và push nhánh `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này.
+- **Đã làm:**
+  - Tích hợp bộ 15 ảnh hoạt hình chuẩn trong `assets/man5-2d/` bám sát ảnh mẫu tham khảo `assets/references/man5-whack-reference.png` qua quy trình assets build (`scripts/assets-build.mjs`). Nén thành công 15 ảnh sang WebP trong `assets-build/man5-2d/` (tổng 596.7 kB, giảm hơn 25 lần so với 15.2 MB ảnh PNG gốc).
+  - Tái cấu trúc khung game: sử dụng `fixed inset-0 z-20` bao trùm toàn màn hình trình duyệt, xóa bỏ hoàn toàn hiện tượng game bị co ở nửa trên trang và khoảng nền kem trống lớn phía dưới.
+  - Sân chơi lớn, cân đối, tận dụng tối đa chiều cao PC: tỉ lệ chiếm chiều cao sân chơi đạt **> 91%** trên mọi độ phân giải PC (91.1% ở 1366×768, 92.1% ở 1536×864, 93.7% ở 1920×1080), không phát sinh thanh cuộn thừa.
+  - Dựng cấu trúc từng lớp độc lập: Nền phô mai vàng `background-pc`, hai cột gỗ sồi đinh tán `wood-border` (cột phải lật gương `scale-x-[-1]`), 4 làn hoa văn sao (`lane-blue`, `lane-yellow`, `lane-red`, `lane-green`), Hero cầm búa (`hero-idle` / `hero-hit` chung điểm neo căn đáy, vung búa 180ms), cuốn Sổ Chung `book` với 8 chấm mực dàn đều trên 2 trang sách mở (`px-10` đến `px-24`), 4 nút đập chân làn D F J K màu ăn khớp làn (cao 46–56px).
+  - 5 Sprite Chuột hoạt hình 2D sinh động: Chuột thường, chuột nhanh (⚡), chuột đổi làn (⇄), chuột to (2 vạch máu), chuột câu hỏi (biểu tượng ❓ vàng lớn nhấp nháy).
+  - Bảo toàn toàn vẹn cơ chế P7b: Vùng đập [6.5, 9.0], cooldown 140ms, tạm dừng 100% thời gian khi mở câu hỏi/?, chống click ma ở capture phase, chống Enter lặp, tự hoàn thành không trao thưởng gian lận.
+  - Hoàn thiện chế độ Giảm chuyển động (`reducedMotion`): tắt animation bounce của dấu hỏi ❓, tắt pulse tia chớp và vùng đập. Xác minh container fixed không che nút "?", hộp thoại tự hoàn thành hay màn kết quả. Bản chạy riêng Làng Dệt nạp ảnh đầy đủ 200 OK.
+  - **Nghiệm thu:** Chủ dự án đã xem và duyệt đồ họa Màn 5 trên bản chạy thực tế (30/10/2026).
+- **Kiểm tra đã đạt:**
+  - `pnpm check:text`: sạch (437 files).
+  - `pnpm typecheck`: 10 package biên dịch thành công 100%.
+  - `pnpm test --maxWorkers=2`: 206 test files passed, 2282 tests passed, 5 skipped.
+  - `pnpm build`: Đạt toàn bộ 5 ứng dụng. Chunk `Man5` là **26.49 kB** (gzip **8.76 kB**).
+  - Đo lường và kiểm tra Puppeteer `scripts/p7c-check.mjs` và `scripts/p7c-user-preview.mjs`: Lưu ảnh chụp minh chứng tại `docs/screenshots/p7c/BAO-CAO-P7C.md` và `docs/screenshots/p7c/man5-preview-*.png`.
+
+## P8a — Cơ chế hướng dẫn focus và làm thử dùng chung, tích hợp mẫu Màn 1 trạm Dễ (30/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, commit và push nhánh `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này.
+- **Đã làm:**
+  - Cơ chế dùng chung `TutorialSpotlight` (`packages/core/src/ui/TutorialSpotlight.tsx`): 4 khối che backdrop chuẩn xác bao quanh vùng target, viền sáng highlight, định vị tooltip thông minh 4 hướng (`bottom`, `top`, `right`, `left`), focus trap bàn phím Tab, bám sát target khi cuộn và đổi kích thước.
+  - Sửa triệt để lỗi khung hướng dẫn focus bị trôi xuống đáy màn hình:
+    - Sử dụng React Portal (`createPortal(..., document.body)`) đưa toàn bộ backdrop và Tooltip ra trực tiếp `document.body`, hoàn toàn cách ly khỏi CSS `zoom: 1.35` của `.lesson-zoom` trên màn hình Desktop (≥ 1280px). Tọa độ `position: fixed` neo chính xác 100% theo viewport trình duyệt.
+    - Cấu trúc Tooltip chống tràn: Container flex-col `max-h-[calc(100vh-24px)]`, Header `shrink-0`, Thân chỉ dẫn `overflow-y-auto flex-1 min-h-0` (nội dung dài tự cuộn bên trong), Footer chứa các nút bấm `shrink-0 mt-2.5 pt-2 border-t` luôn luôn hiển thị và tiếp cận được 100%.
+    - Màn hình ngang thấp (844×390): Thuật toán tự động chuyển sang đặt bên cạnh (`right` hoặc `left`), không che ô nhập hay nút kiểm tra, không tràn mép dưới.
+    - Bắt sự kiện `resize`, `scroll` (capture phase) và `window.visualViewport` để cập nhật vị trí tức thì khi cuộn trang hay đổi kích thước cửa sổ.
+  - Xử lý chu kỳ phím Enter chống kích hoạt đúp: nộp bài bằng Enter tại ô nhập không tự ý kích hoạt chuyển tiếp hoặc bắt đầu bài thật; bắt buộc thả phím `keyup` rồi nhấn Enter chu kỳ mới mới tiếp tục.
+  - Sửa triệt để luồng thực hành làm thử (bước nhập số và bấm Kiểm tra):
+    - Vùng khoét sáng chung `[data-tutorial="practice-area"]` bao trùm cả dải trang sổ và khung công thức + nút Kiểm tra ở cả 3 bước 3, 4, 5. Xóa bỏ hoàn toàn tình trạng backdrop che chắn chéo giữa ô nhập và nút Kiểm tra.
+    - Highlight riêng biệt: ô nhập viền vàng ở bước 3, nút Kiểm tra viền vàng ở bước 4. Cả hai đều thao tác được ở cả 2 bước.
+    - Gỡ bỏ chuyển bước vội vã trong `onChange`, tránh cướp focus khiến học sinh không gõ được số 2 chữ số.
+    - Sửa `retryPractice`: giữ nguyên số đã nhập (không set `null`), tự động `focus()` và `select()` để học sinh sửa số nhanh chóng.
+    - Xử lý khi ô trống bấm Kiểm tra: hiển thị cảnh báo đỏ rõ ràng trong Tooltip (`tutorialTexts.man1De.chuaNhap`), viền đỏ ô nhập, chuyển về bước 3 và focus ô input, không kẹt vô tận.
+    - Chu kỳ phím Enter yêu cầu nhả phím rồi nhấn mới; click chuột/chạm thật (`e.detail > 0`) kích hoạt tức thì.
+  - Tích hợp mẫu tại Màn 1 trạm Dễ (`packages/village-lang-giay/src/bai-1/Easy.tsx`) qua 6 bước: Giới thiệu mục tiêu ngắn -> Focus vùng số 12 và 5 -> Focus công thức gợi ý -> Focus ô nhập và cho học sinh tự gõ -> Focus nút Kiểm tra -> Phản hồi kết quả (đúng: xác nhận mã 29 và hiện nút "Bắt đầu chơi thật"; sai: báo lỗi, giải thích công thức và hiện nút "Thử lại").
+  - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: dữ liệu mẫu cố định 12 & 5, không gọi `record()`, không tính giờ/xu/sao/tiến độ/Trang Sổ Vàng. Bắt đầu bài thật bấm giờ sạch từ đầu.
+  - Nút "💡 Hướng dẫn" trên giao diện cho phép xem lại giữa bài; khi đóng quay lại đúng trạng thái bài đang làm dở.
+  - Toàn bộ nội dung hiển thị nằm trong `packages/core/src/content/tutorial.ts`, xưng "em", định dạng biến qua `fmt()`.
+- **Kiểm tra đã đạt:**
+  - `pnpm check:text`: sạch (438 files).
+  - `pnpm typecheck`: 10 package biên dịch thành công 100%.
+  - `pnpm test --maxWorkers=2`: 209 test files passed, 2295 tests passed, 5 skipped (thêm test layout flex-col và footer shrink-0 trong `tutorialSpotlight.test.tsx`).
+  - `pnpm build`: Đạt toàn bộ 5 ứng dụng.
+  - Đo lường và kiểm tra Puppeteer trên bản build production preview (`scripts/p8a-viewport-fix-check.mjs` và `scripts/p8a-e2e-final-check.mjs`): Đạt 100% (13/13 test) tại cả 3 kích thước 1366×768, 360×800, 844×390 với các ca kiểm: nhập đúng 29 lần đầu $\to$ vào bài thật; nhập sai 2 lần (15 $\to$ 16) $\to$ giữ số khi thử lại $\to$ sửa 29 thành công; ô trống bấm Kiểm tra $\to$ cảnh báo rõ ràng $\to$ gõ tiếp không kẹt; bỏ qua và mở lại giữa bài; xác minh cookie `sc_guest` không trao thưởng hay tiến độ giả lập. Bằng chứng lưu tại `docs/screenshots/p8a/ket-qua-p8a-e2e.json` và `docs/screenshots/p8a/BAO-CAO-P8A.md`.
+
+## P8b — Hướng dẫn focus và làm thử Màn 1 Trung bình và Khó (31/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, commit và push nhánh `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này.
+- **Đã làm:**
+  - Tái sử dụng trọn vẹn cơ chế `TutorialSpotlight` (Portal, định vị thông minh, cấu trúc flex-col chống tràn, footer shrink-0 tiếp cận được 100%, chống Enter lặp).
+  - Trạm Trung bình (`packages/village-lang-giay/src/bai-1/Medium.tsx`):
+    - Dữ liệu làm thử cố định: Genesis 12, trang 1 (5, code 29), trang 2 bị Tí sửa trộm từ 8 sang 9 (mã cũ 66, công thức tính lại $29 \times 2 + 9 = 67$), domino sang các trang sau.
+    - Luồng 6 bước: Giới thiệu $\to$ Quan sát trang bị sửa $\to$ Công thức gợi ý $\to$ Nhập mã trang mới $\to$ Nút Cập nhật mã (hoặc gõ Enter) $\to$ Phản hồi kết quả.
+    - Nhập sai (15) $\to$ giải thích công thức $\to$ nút "Thử lại" giữ số 15 để học sinh sửa $\to$ sửa đúng 67 $\to$ nút "Bắt đầu chơi thật".
+    - Ô trống bấm Cập nhật mã: cảnh báo đỏ rõ ràng, viền đỏ, focus lại input.
+  - Trạm Khó (`packages/village-lang-giay/src/bai-1/Hard.tsx`):
+    - Dữ liệu làm thử cố định: Genesis 10, trang 1 (4, code 24), trang 2 (7, mã sai 50, công thức $24 \times 2 + 7 = 55$), tổng 6 trang, cần sửa 5 trang.
+    - Tạm dừng đồng hồ và mạng lưới tuyệt đối: `CountdownTimer` đứng yên 100% trong suốt hướng dẫn; mạng lưới sinh trang mới bị ngắt.
+    - Nhập sai (20) $\to$ giải thích $\to$ thử lại giữ số $\to$ sửa đúng 55 $\to$ bấm "Bắt đầu chơi thật" $\to$ đồng hồ bắt đầu đếm ngược từ 60s sạch sẽ.
+    - Nút "💡 Hướng dẫn" xem lại giữa bài: mở lại thì đồng hồ tạm dừng bảo lưu mốc thời gian; đóng thì tiếp tục chạy đúng mốc đó, không trôi giây.
+  - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: không ghi nhận sao/xu/điểm/tiến độ; cookie `sc_guest` được bảo toàn nguyên vẹn.
+  - Toàn bộ chuỗi hiển thị nằm trong `packages/core/src/content/tutorial.ts`, xưng "em", định dạng biến `{phanDien}` qua `fmt()`.
+- **Kiểm tra đã đạt:**
+  - `pnpm check:text`: sạch (438 files).
+  - `pnpm typecheck`: 10 package biên dịch thành công 100%.
+  - `pnpm test --maxWorkers=2`: 210 test files passed, 2300 tests passed, 5 skipped (thêm 4 unit tests mới trong `apps/hub/src/man1MediumHardTutorial.test.tsx`).
+  - `pnpm build`: Đạt toàn bộ 5 ứng dụng.
+  - Kiểm tra E2E Puppeteer trên Production Preview 5193 (`scripts/p8b-e2e-check.mjs`): **Đạt 100% (20/20 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390) cho mọi luồng: đúng lần đầu, sai $\to$ giữ số $\to$ sửa đúng, cảnh báo ô trống, tạm dừng đồng hồ, mở lại giữa bài, hồi quy Màn 1 Dễ và bảo toàn cookie tiến độ.
+  - Lưu ảnh chụp minh chứng tại `docs/screenshots/p8b/` và `docs/screenshots/p8b/BAO-CAO-P8B.md`.
+
+## P8c — Hướng dẫn focus và làm thử Màn 4 Làng Dệt (Đủ Dễ, Trung bình, Khó) (31/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md` và `CLAUDE.md`, commit và push nhánh `claude/wonderful-dijkstra-x092dj` khi 4 lệnh đạt.** Chưa merge main ở buổi này.
+- **Đã làm:**
+  - Tái sử dụng trọn vẹn cơ chế `TutorialSpotlight` (Portal, định vị tooltip thông minh, backdrop khoét sáng target, focus trap, chống Enter lặp, chống click ma).
+  - Trạm Dễ (`packages/village-lang-det/src/bai-2/Easy.tsx`):
+    - Dữ liệu làm thử cố định: Sổ của em có mã cuối $X = 40$, bạn Chi gửi trang mới có nội dung $c = 15$ dải lụa, mã đề xuất $95$. Phép tính: $(40 \times 2 + 15) \bmod 100 = 95$.
+    - Luồng 6 bước: Giới thiệu $\to$ Sổ của em $\to$ Trang đề xuất của Chi $\to$ Máy tính $\to$ Biểu quyết Đồng ý/Từ chối $\to$ Phản hồi kết quả.
+    - Quyết định đúng: Đồng ý $\to$ Nút "Bắt đầu chơi thật" vào ván 1 sạch với 3 tim.
+    - Quyết định sai: Từ chối $\to$ giải thích công thức $\to$ nút "Thử lại" đưa về bước biểu quyết để học sinh chọn lại.
+  - Trạm Trung bình (`packages/village-lang-det/src/bai-2/Medium.tsx`):
+    - Dữ liệu làm thử cố định: Sổ của em có mã cuối 72. Sổ của Tí bị sửa lén ở trang 2 từ 14 sang 15 dải lụa khiến mã chuỗi sau đó lệch ($74 \neq 72$). Trang mới Tí gửi có mã trước $prevCode = 74$ sai lệch với sổ em.
+    - Bố cục đối chiếu 2 cột trái - phải rõ ràng: Sổ của em (trái) và Sổ của Tí (phải), nổi bật vết sửa lén.
+    - Quyết định đúng: Từ chối $\to$ Chúc mừng $\to$ Nút "Bắt đầu chơi thật".
+    - Quyết định sai: Đồng ý $\to$ Cảnh báo sổ người gửi đã bị sửa lén $\to$ nút "Thử lại".
+  - Trạm Khó (`packages/village-lang-det/src/bai-2/Hard.tsx`):
+    - Dữ liệu làm thử cố định: Bảng điểm cọc 4 người chơi (mỗi người 100 điểm ban đầu, cọc 30 điểm mỗi lượt).
+    - Lượt em tạo trang: Mã trước $X = 25$, nội dung $c = 18$. Mã đúng: $(25 \times 2 + 18) \bmod 100 = 68$.
+    - Ô nhập số `NumberInput`, nút "Gửi trang". Nút "Ghi trang gian" bị vô hiệu hóa trong làm thử.
+    - Ô trống bấm Gửi trang: hiện cảnh báo đỏ `role="alert"` rõ ràng, viền đỏ, giữ focus.
+    - Nhập sai (ví dụ 50): báo sai $\to$ nút "Thử lại" quay lại bước nhập và **giữ nguyên số 50 trong ô** để học sinh sửa lại thành 68.
+    - Nhập đúng 68: chúc mừng và nút "Bắt đầu chơi thật".
+  - Tách biệt hoàn toàn làm thử khỏi tiến độ thật: không ghi nhận sao/xu/điểm/tiến độ; cookie `sc_guest` được bảo toàn nguyên vẹn.
+  - Nút "💡 Hướng dẫn" xem lại giữa bài: mở lại thì đồng hồ và ván bài thật dừng; đóng thì bảo lưu nguyên vẹn trạng thái bài đang dở.
+  - Toàn bộ chuỗi hiển thị nằm trong `packages/core/src/content/tutorial.ts`, xưng "em", định dạng biến `{phanDien}` qua `fmt()`.
+- **Kiểm tra đã đạt:**
+  - `pnpm check:text`: sạch (438 files).
+  - `pnpm typecheck`: 10 package biên dịch thành công 100%.
+  - `pnpm test --maxWorkers=2`: 211 test files passed, 2306 tests passed, 5 skipped (thêm 6 unit tests mới trong `apps/hub/src/man4Tutorial.test.tsx`).
+  - `pnpm build`: Đạt toàn bộ monorepo (hub merged `VITE_MERGED=true`).
+  - Kiểm tra E2E Puppeteer trên Production Preview 5193 (`scripts/p8c-e2e-check.mjs`): **Đạt 100% (22/22 test)** trên cả 3 độ phân giải (1366×768, 360×800, 844×390) cho mọi luồng: đúng lần đầu, sai $\to$ giữ số $\to$ sửa đúng, cảnh báo ô trống, mở lại giữa bài, và bảo toàn cookie tiến độ khách.
+  - Lưu 22 ảnh chụp minh chứng tại `docs/screenshots/p8c/` và `docs/screenshots/p8c/BAO-CAO-P8C.md`.
+
+## P8 — Hướng dẫn Focus và Làm thử đủ 12 màn — đã hoàn thiện và rà soát kỹ thuật (31/10/2026)
+
+- **Người code: Gemini, đọc `GEMINI.md`, `CLAUDE.md`, tự commit và tự push nhánh `claude/wonderful-dijkstra-x092dj` lên `origin` khi 4 lệnh kiểm tra bắt buộc đạt.**
+- **Phạm vi triển khai toàn diện đủ 12 màn (4 bài học × 3 độ khó + 8 mini-game):**
+  - Màn 1 (Bài 1 Giấy): Focus công thức, tự tính $12 \times 2 + 5 = 29$, so chuỗi phát hiện trang sửa lén, sửa chuỗi bị đứt gãy.
+  - Màn 2 (Runner): Focus 3 tim, phím chạy/nhảy; thao tác phím Space/↑/W hoặc nút "Nhảy thử" kích hoạt nhân vật nhảy né vật cản trong Scene 3D.
+  - Màn 3 (Rebuild): Focus chuỗi trang và khay thẻ; thao tác chọn thẻ, soi công thức và ghép thử trang vào chuỗi thật sự (`placeCard`), âm thanh pickup, Tí reo vui `cheer`.
+  - Màn 4 (Bài 2 Dệt): Bố cục đối chiếu 2 cột trái-phải; thực hành dùng máy tính mod, so sổ người gửi và biểu quyết đồng ý/từ chối trang mới.
+  - Màn 5 (Whack 2D): Focus 4 làn lụa, vùng đập $[6.5, 9.0]$, 8 chấm mực; thao tác vung búa đập thử làn 1 (phím D / nút bấm) kèm anim hero đập 180ms.
+  - Màn 6 (Kite): Focus HUD tim/trang sổ/cổng làng; thao tác phím Space hoặc chạm ngón tay vỗ cánh nâng diều bay lượn vút lên trong Scene 2.5D.
+  - Màn 7 (Bài 3 Khắc Dấu): Focus nguyên tắc chữ ký số (ký bằng Khóa riêng của mình, xác minh bằng Khóa công khai từ Danh bạ chuẩn); trạm Khó minh họa tính một chiều của hàm số mũ rời rạc $5^x \bmod 23$.
+  - Màn 8 (Memory): Focus lưới thẻ và máy tính mod; thao tác click lật thử cặp thẻ trên lưới (thẻ xoay 180°), hoặc bấm nút "Lật thử một cặp thẻ", hoặc dùng máy tính mod.
+  - Màn 9 (Chicken): Focus khay nạp thuốc và ná bắn; thao tác bấm phím 1/Space hoặc nút bắn thử giương ná bắn viên thuốc giải mã về phía đàn gà.
+  - Màn 10 (Bài 4 Bạc): Focus cây Merkle, nút băm gốc; thực hành tính nhẩm ghép 2 nút lá chuẩn công thức $A \times 10 + B$ (`combine(a, b)`).
+  - Màn 11 (Match-3): Focus bàn cờ 7×7 và cành cây Merkle; thao tác chạm tráo trực tiếp cặp lá hợp lệ trên bàn cờ hoặc bấm nút "Tráo thử một nước" (`swapCells`), lá khớp hàng bay lên cây Merkle.
+  - Màn 12 (Climb): Focus cặp tay nắm trượt và so sánh mã Sổ/Nay; thao tác bấm phím Space hoặc nút nhảy bám thử vươn tay bám chắc vào cành cây Merkle.
+- **Rà soát 5 điểm trọng tâm:**
+  1. *Màn 10 logic:* Khẳng định mã nguồn, spec, logic thuần, content, hàm chấm và script kiểm tra đều dùng chuẩn công thức $A \times 10 + B$, không đổi code; đính chính nhầm lẫn công thức trong văn bản báo cáo cũ.
+  2. *Màn 7 bảo mật:* Phân biệt rành mạch ký bằng khóa riêng của mình, kiểm tra bằng khóa công khai của người gửi tra từ Danh bạ làng; trạm Khó là bài tập số mũ rời rạc minh họa tính một chiều. Tuyệt đối không yêu cầu/cung cấp khóa riêng của người khác để xác minh.
+  3. *8 Mini-game:* Toàn bộ thao tác làm thử gắn liền với phản ứng thực tế của engine (âm thanh, hoạt cảnh 3D/2D), điều kiện hoàn thành gắn với thao tác thật; khi vào ván thật khởi tạo lại ván sạch sẽ bằng hàm logic riêng.
+  4. *Bằng chứng kiểm thử:* 325 assertions là tổng số kiểm tra tích lũy qua các kịch bản Puppeteer E2E của 12 màn; các màn sửa đổi (Màn 3, 8, 11) đã được chạy lại kiểm tra trên mã cuối và đạt 100%. Ghi rõ toàn bộ kiểm thử chạy với Khách thật (`sc_guest`) và unit test; chưa nghiệm thu hay triển khai Supabase/RLS thật trên máy chủ production.
+  5. *Chất lượng mã nguồn:* 4 lệnh kiểm tra cốt lõi đạt sạch 100%: `check:text` (438 file), `typecheck` (10 package), `pnpm test --maxWorkers=2` (2321 passed / 2321 tests, 5 skipped), `pnpm build` (5 app monorepo).
+- Báo cáo tổng hợp chi tiết lưu tại `BAO-CAO-P8-TONG-HOP.md`. Máy chủ preview cổng 5193 và assets cổng 5180 tiếp tục chạy ổn định để chủ dự án trải nghiệm trực tiếp.
+- **Trạng thái P8:** P8 ở trạng thái đã triển khai đủ 12 màn, đang chờ người dùng kiểm thử; chưa ghi nghiệm thu hoàn toàn.
+
 ## Việc để sau / cần theo dõi
 
-- **Màn 3:** nút “?” đè chữ “Soi công thức”; ghi nhận để sửa riêng, không sửa trong P2a.
+- **Màn 7:** Rà diễn đạt về tìm ngược khóa; không khẳng định bắt buộc vét cạn (làm rõ hàm một chiều và độ phức tạp tính toán, phân biệt mô hình bài tập số mũ rời rạc $5^x \bmod 23$ với hệ mật mã thực tế, tránh ngộ nhận là chỉ có duy nhất thuật toán vét cạn).
+- **Mã nguồn sau sửa `MemoryGame.tsx`:** Xác nhận đủ bốn lệnh kiểm trên mã cuối sau khi sửa (đã chạy và đạt 2321 unit tests, 0 lỗi text/type/build).
+- **Màn 3:** ĐÃ XONG (31/10/2026): nút “?” và nút “Soi công thức” đã tách biệt hoàn toàn (khoảng cách 57.56px ở 1366×768, 91.34px ở 844×390), diện tích chạm $\ge 44 \times 44$ px, không che nút/chữ hay spotlight, dừng khi mở trợ giúp và xoay dọc, 16/16 E2E assertions đạt (chi tiết: `docs/screenshots/man3-buttons/BAO-CAO-MAN3-BUTTONS.md`).
 
 - Sau gộp web, số nút DOM nhích 588 → 598 ở 2 vòng cuối một lượt đo; theo dõi.
 - Bạc mức Vừa: 1 trong 5 lượt có 1 khung 55,6 ms. Số đo Bạc mức Thấp/Cao chạy trên bản trước khi đặt tầm 260 (đường mã hai mức này không đổi).
@@ -328,6 +521,6 @@ Từ `docs/specs/` trong repo: 00, 01, 03, 04, 06, 07, 08, 10 (đều đã đư�
 
 ## Câu mở đầu cho cửa sổ tiếp theo
 
-```
-Tiếp tục mốc 4 (trau chuốt). Đọc CLAUDE.md, tự commit và tự push nhánh đang làm khi kiểm tra đạt (không force-push, không tự merge vào main). Đọc TRANG-THAI.md: P1a và P1b đã xong, không làm lại. Yêu cầu 10 là máy tính màn 4 – Làng Dệt, không phải Bài 4/màn 10 – Làng Bạc. Chờ lời giao việc tiếp theo. Các việc dời từ mốc 3 và hội làng để cuối mốc 4.
+```text
+Tiếp tục local bằng Claude Code. Đọc CLAUDE.md, TRANG-THAI.md mục bàn giao 01/11/2026 và spec liên quan. P8 đã triển khai đủ 12 màn, người dùng sẽ kiểm sau. Không làm lại P1–P8. Kiểm Git, giữ thay đổi có sẵn; xử lý HUD nhiệm vụ che biển, rà nội dung Màn 7 và lỗi chữ ×100 ở hướng dẫn Màn 10 Trung bình theo danh sách tồn. Tự commit/push khi kiểm đạt; không force-push, chưa merge main/deploy/migration production. Việc dời mốc 3 và hội làng để cuối mốc 4.
 ```

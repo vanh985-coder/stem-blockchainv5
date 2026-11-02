@@ -90,8 +90,8 @@ Cổng Làng Dệt mở.
 - **Trạm Khó:** cụ Bình đặt luật **đặt cọc**. Tí gian ngay lượt đầu và mất cọc; cô Chi duyệt vội nên bị phạt.
 
 **Màn 5 · Game: Đập Tí** (kiểu Whack-A-Mouse của Talking Tom)
-- Tí gấp trang giả thành chuột giấy, thả cho chạy xuống 4 dải vải trên sân đình để bôi mực vào cuốn Sổ Chung. A cầm quạt nan đập chuột; 5 vết mực là thua.
-- Thỉnh thoảng chính Tí chạy xuống. A phải trả lời đúng câu hỏi mới đét trúng; sai thì Tí chạy thẳng xuống sổ.
+- Tí gấp trang giả thành chuột giấy, thả cho chạy từ dưới lên 4 dải vải trên sân đình để bôi mực vào cuốn Sổ Chung ở đỉnh sân. A cầm búa, chạy ngang tới làn và đập chuột; 8 vết mực là thua.
+- Thỉnh thoảng có chuột vàng ❓ chạy lên. Đập trúng nó thì câu hỏi hiện ra và 4 chuột vàng mang nhãn A, B, C, D chạy lên: A phải đập đúng chuột mang đáp án đúng; đập sai hoặc để chuột đúng chạy tới sổ thì thêm một vết mực.
 
 **Màn 6 · Game: Diều đưa sổ** (kiểu Flappy Bird)
 - A thả diều mang bản sao sổ mới tới các làng xa, để làng nào cũng có sổ giống nhau.
@@ -115,11 +115,11 @@ Cổng Làng Dệt mở.
 - Tí trộn lung tung **bộ khuôn tập** của chú Dũng (khuôn chú khắc cho thợ học việc luyện tay, không phải khuôn riêng thật của ai). A lật thẻ, tính 5^x mod 23 để ghép mỗi khuôn với mẫu công khai của nó.
 - Ở vòng cuối, Tí lén tráo chỗ các thẻ đang úp.
 
-**Màn 9 · Game: Chữa đàn gà**
-- Tí lùa một đàn gà bệnh vào làng để phá phiên chợ. Mỗi con đeo một thẻ số (khóa công khai).
-- A dùng ná bắn **viên thuốc** có khóa riêng tương ứng để chữa cho gà: trúng là gà khỏe lại, chạy về chuồng.
-- Trước mỗi đợt có bước "nạp đạn": tính xuôi từ khóa riêng ra khóa công khai.
-- Đợt cuối, Tí cưỡi con gà trùm xông vào.
+**Màn 9 · Game: Bắn trứng khắc dấu**
+- Tí trộn trứng gà bệnh khắc dấu giả vào ổ trứng của làng. Mỗi quả trứng mang một số, là mẫu công khai.
+- Trước mỗi đợt A nạp trứng: tính xuôi từ khóa riêng ra mẫu công khai (5^x mod 23), chọn đúng trứng khắc mẫu đó cho máy bắn.
+- A chọn loại trứng trong máy bắn rồi bắn gom các trứng cùng mẫu: từ ba trứng cùng số liền nhau thì vỡ, trứng mất chỗ bám thì rơi. Cứ vài phát cả bàn hạ xuống một hàng; trứng giả chạm dây đỏ thì A mất một tim.
+- Sạch ba đợt là ổ trứng của làng đã sạch.
 
 **Kết chương.** Chú Dũng trao **Trang Sổ Vàng thứ ba**:
 
@@ -142,10 +142,10 @@ Ba trạm:
 - A ghép các lá giao dịch cùng loại cho chúng bay lên cây, đủ cặp thì thành cành, đủ cành thì thành gốc.
 - Tí rải **lá giả** chắn khắp bàn; A ghép lá ngay cạnh lá giả để phá nó.
 
-**Màn 12 · Game: Leo cây tìm lá giả** (cao trào)
+**Màn 12 · Game: Leo bậc gỗ** (cao trào)
 - Lái buôn phương xa vừa trả một khoản bạc lớn, và **Tí tráo một chiếc lá giao dịch** trên cây gộp sổ để khoản bạc chảy về túi mình. Số gốc lập tức báo lệch.
-- A leo từ gốc cây lên, ở mỗi tầng chọn nhánh có hai số lệch nhau. Chỉ vài tầng là tới đúng chiếc lá giả.
-- Tí đang ôm lá giả trên ngọn cây định trốn, và bị bắt quả tang.
+- A đứng trên bậc gỗ của chiếc lá bị tráo, bên cạnh là bậc anh em đã biết số. Ở mỗi tầng, A ghép số của mình với số của bậc anh em (đúng thứ tự trái rồi phải) rồi nhảy lên bậc ghi số đó: nhảy nhầm thì bậc nứt, A rơi xuống và mất một tim; nhảy hụt thì thử lại.
+- Leo tới ngọn, gốc A tính ra khác gốc trong sổ: lá giả lộ ra. Chỉ vài phép ghép là tới gốc, thay vì phải kiểm tra cả cây. Tí đang ôm lá giả trên ngọn cây định trốn, và bị bắt quả tang.
 
 **Tí hối cải:**
 

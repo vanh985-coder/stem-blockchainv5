@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Button,
   ChainStrip,
@@ -9,10 +9,13 @@ import {
   fmt,
   sound,
   useAuth,
+  TutorialSpotlight,
   type ChainPageData,
   type StationResult,
+  type TutorialStep,
 } from '@so-chung/core';
 import { bai2Texts } from '@so-chung/core/content/lessons/bai-2';
+import { tutorialTexts } from '@so-chung/core/content/tutorial';
 import { GAME_CONFIG } from '@so-chung/core/config/gameConfig';
 import { buildChain, pageCode } from '@so-chung/core/lib/chain';
 import { formatNumber } from '@so-chung/core/lib/format';
@@ -40,6 +43,11 @@ const T = bai2Texts.kho;
 const CFG = GAME_CONFIG.lesson2.hard;
 const PLAYERS: readonly PlayerId[] = ['em', 'binh', 'chi', 'ti'];
 const LAST_TURN = CFG.order.length;
+
+// Dữ liệu làm thử cho Trạm Khó (P8c)
+const PRACTICE_X = 25;
+const PRACTICE_C = 18;
+const PRACTICE_EXPECTED_CODE = 68; // (25 * 2 + 18) % 100 = 68
 
 type TurnStage = 'creator-choice' | 'voting' | 'revealed' | 'skipped';
 
@@ -93,9 +101,16 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
   const playerName = profile?.display_name;
   const nameOf = (id: PlayerId) => tenNguoiChoi(id, playerName);
 
-  const startTime = useRef(performance.now()).current;
+  const realStartTime = useRef(performance.now());
   const mounted = useRef(true);
   const timers = useRef<number[]>([]);
+
+  // Quản lý trạng thái Hướng dẫn focus và Làm thử (P8c)
+  const [tutorialOpen, setTutorialOpen] = useState(true);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [practiceVal, setPracticeVal] = useState<number | null>(null);
+  const [practiceError, setPracticeError] = useState<string | null>(null);
+  const [practiceResult, setPracticeResult] = useState<'correct' | 'wrong' | null>(null);
 
   // Đề của lượt chơi này: bộ sinh số ngẫu nhiên, mã bìa và 2 trang đầu của sổ chung
   const [initial] = useState(() => {
@@ -151,7 +166,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
 
   const addTimer = (fn: () => void, ms: number) => {
     const t = window.setTimeout(() => {
-      if (mounted.current) fn();
+      if (mounted.current && !tutorialOpen) fn();
     }, ms);
     timers.current.push(t);
   };
@@ -233,6 +248,69 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
 
     setTurnState({ creator, pageNo, content, truth, proposal, tiReason: reason, stage: 'voting', votes: {}, botThinking: {} });
   };
+
+  // Điều khiển Hướng dẫn và Làm thử (P8c)
+  const finishTutorial = useCallback(() => {
+    setTutorialOpen(false);
+    setTutorialStep(0);
+    setPracticeVal(null);
+    setPracticeError(null);
+    setPracticeResult(null);
+    realStartTime.current = performance.now();
+    startTurn(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const openTutorialReview = useCallback(() => {
+    setTutorialOpen(true);
+    setTutorialStep(0);
+    setPracticeVal(null);
+    setPracticeError(null);
+    setPracticeResult(null);
+  }, []);
+
+  const retryPractice = useCallback(() => {
+    setPracticeResult(null);
+    setPracticeError(null);
+    setTutorialStep(3); // Quay lại bước nhập mã trang
+  }, []);
+
+  const handlePracticeSubmit = useCallback(() => {
+    if (practiceVal === null || isNaN(practiceVal) || practiceVal < 0 || practiceVal > 99) {
+      setPracticeError(tutorialTexts.man4Kho.chuaNhap);
+      sound.playClick();
+      setTutorialStep(3);
+      return;
+    }
+
+    setPracticeError(null);
+    if (practiceVal === PRACTICE_EXPECTED_CODE) {
+      sound.playCorrect();
+      setPracticeResult('correct');
+      setTutorialStep(4);
+    } else {
+      sound.playWrong();
+      setPracticeResult('wrong');
+      setTutorialStep(4);
+    }
+  }, [practiceVal]);
+
+  // Cầu nối probe phục vụ kiểm tra tự động
+  if (typeof window !== 'undefined') {
+    Object.assign(window, {
+      __tutorial: {
+        isOpen: tutorialOpen,
+        step: tutorialStep,
+        practiceVal,
+        practiceResult,
+        setStep: (s: number) => setTutorialStep(s),
+        skip: finishTutorial,
+        review: openTutorialReview,
+        setPracticeVal: (v: number | null) => setPracticeVal(v),
+        checkPractice: handlePracticeSubmit,
+      },
+    });
+  }
 
   // Lượt đầu tiên bắt đầu ngay khi vào trạm
   useEffect(() => {
@@ -350,7 +428,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
   const handleFinish = () => {
     onComplete({
       stars: hardStars(scores, emAgreedCheat),
-      timeMs: Math.round(performance.now() - startTime),
+      timeMs: Math.round(performance.now() - realStartTime.current),
       learned: bai2Texts.kho.hocDuoc,
     });
   };
@@ -359,15 +437,86 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
   const truthLabel = (t: TurnState) =>
     t.truth === 'valid' ? T.trangThat : t.truth === 'miscalc' ? T.trangNham : t.proposal.type === 'A' ? T.gianKhongKhop : T.gianMaBia;
 
+  // Định nghĩa các bước Hướng dẫn focus (P8c)
+  const tutorialSteps: TutorialStep[] = [
+    {
+      id: 'intro',
+      targetSelector: '[data-tutorial="stake-panel"]',
+      title: tutorialTexts.man4Kho.tieuDe,
+      content: tutorialTexts.man4Kho.intro,
+      nextLabel: tutorialTexts.chung.tiep,
+    },
+    {
+      id: 'stake',
+      targetSelector: '[data-tutorial="stake-panel"]',
+      title: tutorialTexts.man4Kho.tieuDe,
+      content: tutorialTexts.man4Kho.stake,
+      nextLabel: tutorialTexts.chung.daHieu,
+    },
+    {
+      id: 'create',
+      targetSelector: '[data-tutorial="create-info"]',
+      title: tutorialTexts.man4Kho.tieuDe,
+      content: fmt(tutorialTexts.man4Kho.create, { x: PRACTICE_X, c: PRACTICE_C, dung: PRACTICE_EXPECTED_CODE }),
+      nextLabel: tutorialTexts.chung.thuTinhNgay,
+    },
+    {
+      id: 'input',
+      targetSelector: '[data-tutorial="honest-card"]',
+      title: tutorialTexts.man4Kho.tieuDe,
+      content: fmt(tutorialTexts.man4Kho.input, { dung: PRACTICE_EXPECTED_CODE }),
+      interactive: true,
+      hideNextButton: true,
+    },
+    {
+      id: 'result',
+      targetSelector: '[data-tutorial="honest-card"]',
+      title: tutorialTexts.man4Kho.tieuDe,
+      content:
+        practiceResult === 'correct'
+          ? fmt(tutorialTexts.man4Kho.correct, { dung: PRACTICE_EXPECTED_CODE })
+          : fmt(tutorialTexts.man4Kho.wrong, { x: PRACTICE_X, c: PRACTICE_C, dung: PRACTICE_EXPECTED_CODE }),
+      interactive: practiceResult !== 'correct',
+    },
+  ];
+
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
       {/* Lượt chơi và bảng điểm 4 người trên một hàng */}
-      <div className="flex flex-col gap-3 rounded-bang border-2 border-nau-go/50 bg-white/60 p-3">
-        <div className="flex flex-wrap items-center gap-x-2">
-          <span className="rounded-nut bg-muc-tim/15 px-3 py-1 font-display text-sm font-extrabold text-muc-tim-dam">
-            {fmt(T.luot, { n: Math.min(turnIndex + 1, LAST_TURN), tong: LAST_TURN })}
-          </span>
-          <span className="hidden text-sm text-nau-go-dam sm:inline">{T.phu}</span>
+      <div
+        data-tutorial="stake-panel"
+        className={`flex flex-col gap-3 rounded-bang border-2 border-nau-go/50 bg-white/60 p-3 transition-all ${
+          tutorialOpen && (tutorialStep === 0 || tutorialStep === 1)
+            ? 'ring-4 ring-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]'
+            : ''
+        }`}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-x-2">
+            <span className="rounded-nut bg-muc-tim/15 px-3 py-1 font-display text-sm font-extrabold text-muc-tim-dam">
+              {fmt(T.luot, { n: Math.min(turnIndex + 1, LAST_TURN), tong: LAST_TURN })}
+            </span>
+            {tutorialOpen ? (
+              <span className="rounded-full bg-muc-tim/10 px-3 py-0.5 text-xs font-bold text-muc-tim-dam">
+                {tutorialTexts.man4Kho.tieuDe}
+              </span>
+            ) : (
+              <span className="hidden text-sm text-nau-go-dam sm:inline">{T.phu}</span>
+            )}
+          </div>
+
+          {!tutorialOpen && (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={openTutorialReview}
+              className="flex items-center gap-1.5"
+              aria-label={tutorialTexts.chung.huongDan}
+            >
+              <span aria-hidden="true">💡</span>
+              <span className="hidden sm:inline">{tutorialTexts.chung.huongDan}</span>
+            </Button>
+          )}
         </div>
         <div className="grid grid-cols-4 gap-1.5 border-t-2 border-nau-go/30 pt-3 sm:gap-3">
           {PLAYERS.map((id) => {
@@ -408,7 +557,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
             <span aria-hidden="true">📚</span> {T.soChungTieuDe}
           </h2>
           <span className="text-sm">
-            {T.maCuoi} <strong className="text-muc-tim-dam">{lastLedgerCode}</strong>
+            {T.maCuoi} <strong className="text-muc-tim-dam">{tutorialOpen ? PRACTICE_X : lastLedgerCode}</strong>
           </span>
         </div>
         <ChainStrip
@@ -423,9 +572,9 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
       </div>
 
       {/* Lượt chơi hiện tại */}
-      {!gameFinished && turnState && (
+      {(!gameFinished || tutorialOpen) && (tutorialOpen || turnState) && (
         <div className="flex flex-col gap-4 rounded-bang border-2 border-muc-tim/40 bg-white/70 p-3 sm:p-5">
-          {turnState.stage === 'skipped' ? (
+          {!tutorialOpen && turnState?.stage === 'skipped' ? (
             <div className="flex flex-col items-center gap-3 py-4 text-center">
               <Chan id={turnState.creator} size={64} />
               <div className="font-display text-xl font-extrabold text-do-son-dam">{T.khongDuCoc}</div>
@@ -434,32 +583,46 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
               </p>
               <Button onClick={handleNextTurn}>{T.sangLuotTiep}</Button>
             </div>
-          ) : turnState.creator === 'em' ? (
+          ) : (tutorialOpen || turnState?.creator === 'em') ? (
             /* Lượt em tạo trang */
             <div>
               <div className="mb-4 flex items-center gap-3 border-b-2 border-nau-go/30 pb-3">
                 <Chan id="em" size={44} />
                 <div>
                   <span className="text-sm font-bold text-muc-tim-dam">{T.luotCuaEm}</span>
-                  <h3 className="text-lg">{fmt(T.emTaoTrang, { n: turnState.pageNo })}</h3>
+                  <h3 className="text-lg">{fmt(T.emTaoTrang, { n: tutorialOpen ? ledgerPages.length + 1 : (turnState?.pageNo ?? 3) })}</h3>
                 </div>
               </div>
 
-              <div className="mb-4 space-y-1 rounded-2xl border-2 border-nau-go/40 bg-giay p-3 text-base">
+              <div
+                data-tutorial="create-info"
+                className={`mb-4 space-y-1 rounded-2xl border-2 border-nau-go/40 bg-giay p-3 text-base transition-all ${
+                  tutorialOpen && tutorialStep === 2
+                    ? 'ring-4 ring-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]'
+                    : ''
+                }`}
+              >
                 <div>
-                  {T.maCuoiSoChung} <strong className="text-lg text-muc-tim-dam">{lastLedgerCode}</strong>
+                  {T.maCuoiSoChung} <strong className="text-lg text-muc-tim-dam">{tutorialOpen ? PRACTICE_X : lastLedgerCode}</strong>
                 </div>
                 <div>
-                  {T.noiDungDuocGiao} <strong className="text-lg">{turnState.content}</strong>
+                  {T.noiDungDuocGiao} <strong className="text-lg">{tutorialOpen ? PRACTICE_C : (turnState?.content ?? 18)}</strong>
                 </div>
               </div>
 
-              {turnState.stage === 'creator-choice' && (
+              {(tutorialOpen || turnState?.stage === 'creator-choice') && (
                 <div className="flex flex-col gap-3">
                   <div className="text-base font-semibold">{T.emMuonGhi}</div>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {/* Ghi trang thật */}
-                    <div className="flex flex-col justify-between gap-3 rounded-2xl border-2 border-xanh-la-dam bg-xanh-la/10 p-4">
+                    <div
+                      data-tutorial="honest-card"
+                      className={`flex flex-col justify-between gap-3 rounded-2xl border-2 border-xanh-la-dam bg-xanh-la/10 p-4 transition-all ${
+                        tutorialOpen && (tutorialStep === 3 || tutorialStep === 4)
+                          ? 'ring-4 ring-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]'
+                          : ''
+                      }`}
+                    >
                       <div>
                         <div className="mb-1 font-display text-lg font-extrabold text-xanh-la-dam">{T.ghiThat}</div>
                         <p className="text-sm leading-relaxed">{T.ghiThatMoTa}</p>
@@ -468,20 +631,25 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
                         <div className="text-sm font-bold">{T.maTrangMoi}</div>
                         <div className="flex flex-wrap items-start gap-2">
                           <NumberInput
-                            value={emInputCode}
+                            value={tutorialOpen ? practiceVal : emInputCode}
                             onChange={(v) => {
-                              setEmInputCode(v);
-                              setEmInputError(null);
+                              if (tutorialOpen) {
+                                setPracticeVal(v);
+                                setPracticeError(null);
+                              } else {
+                                setEmInputCode(v);
+                                setEmInputError(null);
+                              }
                             }}
-                            onEnter={handleEmSubmitHonest}
+                            onEnter={tutorialOpen ? handlePracticeSubmit : handleEmSubmitHonest}
                             min={0}
                             max={99}
                             showButtons={false}
-                            error={emInputError || undefined}
+                            error={tutorialOpen ? (practiceError || undefined) : (emInputError || undefined)}
                             placeholder="0–99"
                             ariaLabel={T.maTrangMoi}
                           />
-                          <Button size="sm" onClick={handleEmSubmitHonest}>
+                          <Button size="sm" onClick={tutorialOpen ? handlePracticeSubmit : handleEmSubmitHonest}>
                             {T.guiTrang}
                           </Button>
                         </div>
@@ -494,7 +662,13 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
                         <div className="mb-1 font-display text-lg font-extrabold text-do-son-dam">{T.ghiGianTieuDe}</div>
                         <p className="text-sm leading-relaxed">{T.ghiGianMoTa}</p>
                       </div>
-                      <Button variant="danger" size="sm" fullWidth onClick={() => setShowCheatConfirm(true)}>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        fullWidth
+                        onClick={() => setShowCheatConfirm(true)}
+                        disabled={tutorialOpen}
+                      >
                         {T.nutGhiGian}
                       </Button>
                     </div>
@@ -502,7 +676,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
                 </div>
               )}
 
-              {(turnState.stage === 'voting' || turnState.stage === 'revealed') && (
+              {!tutorialOpen && (turnState?.stage === 'voting' || turnState?.stage === 'revealed') && (
                 <div className="mt-4 border-t-2 border-nau-go/30 pt-4">
                   <div className="mb-3 text-sm font-bold text-nau-go-dam">{T.nodeBoPhieuChoEm}</div>
                   <div className="grid grid-cols-3 gap-2 sm:gap-3">
@@ -511,8 +685,8 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
                         key={bot}
                         id={bot}
                         name={nameOf(bot)}
-                        thinking={turnState.botThinking[bot]}
-                        vote={turnState.votes[bot]}
+                        thinking={turnState?.botThinking[bot]}
+                        vote={turnState?.votes[bot]}
                         waitText={T.choLuot}
                       />
                     ))}
@@ -520,7 +694,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
                 </div>
               )}
             </div>
-          ) : (
+          ) : turnState ? (
             /* Lượt bot tạo trang */
             <div>
               <div className="mb-4 flex items-center gap-3 border-b-2 border-nau-go/30 pb-3">
@@ -596,10 +770,10 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
                 </div>
               )}
             </div>
-          )}
+          ) : null}
 
           {/* Lật mở sự thật */}
-          {turnState.stage === 'revealed' && (
+          {turnState?.stage === 'revealed' && (
             <div className="flex flex-col gap-3 rounded-2xl border-2 border-muc-tim/40 bg-giay p-3 sm:p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
@@ -731,6 +905,41 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
           </Panel>
         </div>
       )}
+
+      {/* Lớp phủ Spotlight và Tooltip Hướng dẫn (P8c) */}
+      <TutorialSpotlight
+        isOpen={tutorialOpen}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => setTutorialStep((s) => Math.min(tutorialSteps.length - 1, s + 1))}
+        onPrev={() => setTutorialStep((s) => Math.max(0, s - 1))}
+        onSkip={finishTutorial}
+        feedbackMessage={
+          practiceResult === 'correct'
+            ? fmt(tutorialTexts.man4Kho.correct, { dung: PRACTICE_EXPECTED_CODE })
+            : practiceResult === 'wrong'
+              ? fmt(tutorialTexts.man4Kho.wrong, { x: PRACTICE_X, c: PRACTICE_C, dung: PRACTICE_EXPECTED_CODE })
+              : undefined
+        }
+        feedbackType={practiceResult === 'correct' ? 'success' : practiceResult === 'wrong' ? 'error' : undefined}
+        actionButton={
+          tutorialStep === 4
+            ? practiceResult === 'correct'
+              ? {
+                  label: tutorialTexts.chung.batDauChoi,
+                  onClick: finishTutorial,
+                  variant: 'primary',
+                }
+              : practiceResult === 'wrong'
+                ? {
+                    label: tutorialTexts.chung.thuLai,
+                    onClick: retryPractice,
+                    variant: 'secondary',
+                  }
+                : undefined
+            : undefined
+        }
+      />
     </div>
   );
 }

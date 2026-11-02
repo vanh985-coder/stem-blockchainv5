@@ -1,0 +1,56 @@
+{
+  "timestamp": "2026-10-30T11:12:04.415Z",
+  "viewports": [
+    {
+      "viewport": "1366x768",
+      "startCard": true,
+      "autoBtnStart": false,
+      "gameFrame": true,
+      "lanesCount": 4,
+      "hitButtonsCount": 4,
+      "inkDots": true,
+      "bossMouse": true,
+      "bossText": "❓Chuột câu hỏi",
+      "quizModal": true,
+      "quizTimeText": "Còn 15 giây",
+      "answered": false,
+      "helpModal": true,
+      "autoBtnInside": false,
+      "autoDone": false
+    },
+    {
+      "viewport": "360x800",
+      "startCard": true,
+      "autoBtnStart": false,
+      "gameFrame": true,
+      "lanesCount": 4,
+      "hitButtonsCount": 4,
+      "inkDots": true,
+      "bossMouse": true,
+      "bossText": "❓Chuột câu hỏi",
+      "quizModal": true,
+      "quizTimeText": "Còn 15 giây",
+      "answered": false,
+      "helpModal": true,
+      "autoBtnInside": false,
+      "autoDone": false
+    },
+    {
+      "viewport": "844x390",
+      "startCard": true,
+      "autoBtnStart": false,
+      "gameFrame": true,
+      "lanesCount": 4,
+      "hitButtonsCount": 4,
+      "inkDots": true,
+      "bossMouse": true,
+      "bossText": "❓Chuột câu hỏi",
+      "quizModal": true,
+      "quizTimeText": null,
+      "answered": false,
+      "helpModal": true,
+      "autoBtnInside": false,
+      "autoDone": false
+    }
+  ]
+}

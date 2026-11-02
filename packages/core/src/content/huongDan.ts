@@ -39,7 +39,6 @@ export const GUIDE_ART_IDS = [
   'nhay-truot-vuot',
   'keo-the',
   'soi-the',
-  'ro-trang',
   'sao',
   'bong-den',
   'bon-trang',
@@ -51,11 +50,11 @@ export const GUIDE_ART_IDS = [
   'may-tinh-mod',
   'tran-the',
   // màn 12 (bước HD)
-  'den-long-so-nay',
-  'bat-len-phim',
-  'bat-len-cham',
-  'tim-dong',
-  'tang-la',
+  'bac-go-cap',
+  'di-nhay-phim',
+  'di-nhay-cham',
+  'bac-nut',
+  'goc-tren-ngon',
   // màn 5 (bước B7)
   'dap-lan-phim',
   'dap-lan-cham',
@@ -68,12 +67,12 @@ export const GUIDE_ART_IDS = [
   'dieu-khe',
   'dieu-den',
   'cong-lang',
-  // màn 9 (bước B11)
-  'nap-nhan',
-  'nhan-bay',
-  'ban-ga-phim',
-  'ban-ga-cham',
-  'ga-trum',
+  // màn 9 (Bắn trứng khắc dấu)
+  'nap-trung',
+  'chon-trung-may',
+  'ngam-phim',
+  'ngam-cham',
+  'ha-ban',
   // màn 11 (bước B13)
   'doi-o-phim',
   'doi-o-vuot',

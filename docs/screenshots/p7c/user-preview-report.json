@@ -1,0 +1,27 @@
+{
+  "checks": {
+    "helpButtonNotCovered": true,
+    "autoCompleteClickable": true,
+    "quizModalNotCovered": true,
+    "resultScreenVisible": true,
+    "reducedMotionProperlyDisabled": true,
+    "langDetStandaloneLoadsAssets": true
+  },
+  "images": [
+    {
+      "viewport": "1366x768",
+      "file": "man5-preview-1366x768.png",
+      "path": "C:\\Users\\Acer\\.gemini\\antigravity\\brain\\1e39ed0d-2120-4c6a-a44c-3cf2d34b3087\\man5-preview-1366x768.png"
+    },
+    {
+      "viewport": "1920x1080",
+      "file": "man5-preview-1920x1080.png",
+      "path": "C:\\Users\\Acer\\.gemini\\antigravity\\brain\\1e39ed0d-2120-4c6a-a44c-3cf2d34b3087\\man5-preview-1920x1080.png"
+    },
+    {
+      "viewport": "360x800",
+      "file": "man5-preview-360x800.png",
+      "path": "C:\\Users\\Acer\\.gemini\\antigravity\\brain\\1e39ed0d-2120-4c6a-a44c-3cf2d34b3087\\man5-preview-360x800.png"
+    }
+  ]
+}

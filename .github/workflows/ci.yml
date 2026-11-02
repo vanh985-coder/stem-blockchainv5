@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Giá trị giả chỉ để build; CI không dùng secrets và không nối Supabase thật.
+      VITE_MERGED: 'true'
+      VITE_HUB_URL: https://hub.example.test
+      VITE_LANG_GIAY_URL: https://lang-giay.example.test
+      VITE_LANG_DET_URL: https://lang-det.example.test
+      VITE_LANG_KHAC_DAU_URL: https://lang-khac-dau.example.test
+      VITE_LANG_BAC_URL: https://lang-bac.example.test
+      VITE_ASSETS_URL: https://assets.example.test
+      VITE_COOKIE_DOMAIN: .example.test
+      VITE_SUPABASE_URL: https://placeholder.supabase.test
+      VITE_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+      VITE_USERNAME_EMAIL_DOMAIN: hs.example.test
+    steps:
+      - uses: actions/checkout@v4
+
+      # Phiên bản pnpm lấy từ trường packageManager trong package.json
+      - uses: pnpm/action-setup@v4
+
+      # package.json chỉ có engines.node ">=20", không có .nvmrc: dùng Node 22
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Cài thư viện
+        run: pnpm install --frozen-lockfile
+
+      - name: Kiểm chữ tiếng Việt (check:text)
+        run: pnpm check:text
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test --maxWorkers=2
+
+      - name: Build
+        run: pnpm build

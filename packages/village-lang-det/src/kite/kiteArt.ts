@@ -50,7 +50,8 @@ function mirrorX(t: Texture): Texture {
   return t;
 }
 
-function canvasOf(w: number, h: number): [HTMLCanvasElement, CanvasRenderingContext2D | null] {
+function canvasOf(w: number, h: number): [HTMLCanvasElement | null, CanvasRenderingContext2D | null] {
+  if (typeof document === 'undefined') return [null, null];
   const c = document.createElement('canvas');
   c.width = w;
   c.height = h;
@@ -60,36 +61,35 @@ function canvasOf(w: number, h: number): [HTMLCanvasElement, CanvasRenderingCont
 /** Trang bản sao (hình vẽ bằng code, không chữ): tờ giấy dó có vài dòng kẻ, góc gấp, viền nâu. */
 export function makePageTexture(): CanvasTexture {
   const [c, g] = canvasOf(128, 160);
-  if (g) {
-    g.fillStyle = '#f8ecc9';
-    g.strokeStyle = '#8a5a36';
-    g.lineWidth = 7;
+  if (!c || !g) return new CanvasTexture(c as any);
+  g.fillStyle = '#f8ecc9';
+  g.strokeStyle = '#8a5a36';
+  g.lineWidth = 7;
+  g.beginPath();
+  g.moveTo(14, 10);
+  g.lineTo(92, 10);
+  g.lineTo(116, 34);
+  g.lineTo(116, 150);
+  g.lineTo(14, 150);
+  g.closePath();
+  g.fill();
+  g.stroke();
+  g.fillStyle = '#e3c98a';
+  g.beginPath();
+  g.moveTo(92, 10);
+  g.lineTo(92, 34);
+  g.lineTo(116, 34);
+  g.closePath();
+  g.fill();
+  g.stroke();
+  g.strokeStyle = '#a77d4b';
+  g.lineWidth = 6;
+  g.lineCap = 'round';
+  for (const y of [62, 84, 106, 128]) {
     g.beginPath();
-    g.moveTo(14, 10);
-    g.lineTo(92, 10);
-    g.lineTo(116, 34);
-    g.lineTo(116, 150);
-    g.lineTo(14, 150);
-    g.closePath();
-    g.fill();
+    g.moveTo(32, y);
+    g.lineTo(y === 128 ? 70 : 98, y);
     g.stroke();
-    g.fillStyle = '#e3c98a';
-    g.beginPath();
-    g.moveTo(92, 10);
-    g.lineTo(92, 34);
-    g.lineTo(116, 34);
-    g.closePath();
-    g.fill();
-    g.stroke();
-    g.strokeStyle = '#a77d4b';
-    g.lineWidth = 6;
-    g.lineCap = 'round';
-    for (const y of [62, 84, 106, 128]) {
-      g.beginPath();
-      g.moveTo(32, y);
-      g.lineTo(y === 128 ? 70 : 98, y);
-      g.stroke();
-    }
   }
   return prepare(new CanvasTexture(c)) as CanvasTexture;
 }
@@ -97,7 +97,7 @@ export function makePageTexture(): CanvasTexture {
 /** Cuốn sổ giao cho làng (hình vẽ bằng code): bìa tím, gáy, mép giấy. */
 export function makeBookTexture(): CanvasTexture {
   const [c, g] = canvasOf(160, 128);
-  if (g) {
+  if (!c || !g) return new CanvasTexture(c as any);
     g.fillStyle = '#5b3fd6';
     g.strokeStyle = '#2d1f73';
     g.lineWidth = 7;
@@ -117,7 +117,6 @@ export function makeBookTexture(): CanvasTexture {
     g.beginPath();
     g.roundRect(62, 40, 62, 40, 8);
     g.fill();
-  }
   return prepare(new CanvasTexture(c)) as CanvasTexture;
 }
 

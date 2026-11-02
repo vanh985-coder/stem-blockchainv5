@@ -1,0 +1,173 @@
+{
+  "timestamp": "2026-10-30T14:59:37.627Z",
+  "pcLayout": [
+    {
+      "viewport": "1366x768",
+      "metrics": {
+        "windowWidth": 1366,
+        "windowHeight": 768,
+        "docScrollHeight": 768,
+        "hasScrollbar": false,
+        "lanesRect": {
+          "w": 604,
+          "h": 420,
+          "top": 188
+        },
+        "heroRect": {
+          "w": 208,
+          "h": 160
+        },
+        "bookRect": {
+          "w": 700,
+          "h": 96
+        },
+        "footerRect": {
+          "w": 700,
+          "h": 56,
+          "bottom": 760
+        },
+        "totalGameHeight": 700,
+        "heightOccupancyRatio": 0.911
+      },
+      "noScrollbar": true,
+      "heightRatioPass": true
+    },
+    {
+      "viewport": "1536x864",
+      "metrics": {
+        "windowWidth": 1536,
+        "windowHeight": 864,
+        "docScrollHeight": 864,
+        "hasScrollbar": false,
+        "lanesRect": {
+          "w": 604,
+          "h": 516,
+          "top": 188
+        },
+        "heroRect": {
+          "w": 208,
+          "h": 160
+        },
+        "bookRect": {
+          "w": 700,
+          "h": 96
+        },
+        "footerRect": {
+          "w": 700,
+          "h": 56,
+          "bottom": 856
+        },
+        "totalGameHeight": 796,
+        "heightOccupancyRatio": 0.921
+      },
+      "noScrollbar": true,
+      "heightRatioPass": true
+    },
+    {
+      "viewport": "1920x1080",
+      "metrics": {
+        "windowWidth": 1920,
+        "windowHeight": 1080,
+        "docScrollHeight": 1080,
+        "hasScrollbar": false,
+        "lanesRect": {
+          "w": 604,
+          "h": 732,
+          "top": 188
+        },
+        "heroRect": {
+          "w": 208,
+          "h": 160
+        },
+        "bookRect": {
+          "w": 700,
+          "h": 96
+        },
+        "footerRect": {
+          "w": 700,
+          "h": 56,
+          "bottom": 1072
+        },
+        "totalGameHeight": 1012,
+        "heightOccupancyRatio": 0.937
+      },
+      "noScrollbar": true,
+      "heightRatioPass": true
+    }
+  ],
+  "mobileLayout": [
+    {
+      "viewport": "360x800",
+      "metrics": {
+        "windowWidth": 360,
+        "windowHeight": 800,
+        "hasHScroll": false,
+        "lanesRect": {
+          "w": 292,
+          "h": 554
+        },
+        "buttons": [
+          {
+            "lane": 0,
+            "width": 79,
+            "height": 46
+          },
+          {
+            "lane": 1,
+            "width": 79,
+            "height": 46
+          },
+          {
+            "lane": 2,
+            "width": 79,
+            "height": 46
+          },
+          {
+            "lane": 3,
+            "width": 79,
+            "height": 46
+          }
+        ]
+      },
+      "buttonHeightPass": true,
+      "noHorizontalScroll": true
+    },
+    {
+      "viewport": "844x390",
+      "metrics": {
+        "windowWidth": 844,
+        "windowHeight": 390,
+        "hasHScroll": false,
+        "lanesRect": {
+          "w": 480,
+          "h": 58
+        },
+        "buttons": [
+          {
+            "lane": 0,
+            "width": 129,
+            "height": 56
+          },
+          {
+            "lane": 1,
+            "width": 129,
+            "height": 56
+          },
+          {
+            "lane": 2,
+            "width": 129,
+            "height": 56
+          },
+          {
+            "lane": 3,
+            "width": 129,
+            "height": 56
+          }
+        ]
+      },
+      "buttonHeightPass": true,
+      "noHorizontalScroll": true
+    }
+  ],
+  "gameplay": []
+}

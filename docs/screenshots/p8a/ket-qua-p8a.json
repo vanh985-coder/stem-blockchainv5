@@ -1,0 +1,54 @@
+{
+  "timestamp": "2026-10-30T16:00:06.286Z",
+  "viewports": {
+    "1366x768": {
+      "initialTutorial": true,
+      "wrongHandled": true,
+      "correctHandled": true,
+      "realGameClean": true,
+      "reviewToggle": true
+    },
+    "360x800": {
+      "initialTutorial": true,
+      "wrongHandled": true,
+      "correctHandled": true,
+      "realGameClean": true,
+      "reviewToggle": true
+    },
+    "844x390": {
+      "initialTutorial": true,
+      "wrongHandled": true,
+      "correctHandled": true,
+      "realGameClean": true,
+      "reviewToggle": true
+    }
+  },
+  "checks": {
+    "progressUnchangedAfterPractice": true,
+    "enterHoldSafe": true,
+    "realStationDoneNormally": true
+  },
+  "screenshots": [
+    "docs/screenshots/p8a/p8a-1366x768-step0-intro.png",
+    "docs/screenshots/p8a/p8a-1366x768-step1-numbers.png",
+    "docs/screenshots/p8a/p8a-1366x768-step2-formula.png",
+    "docs/screenshots/p8a/p8a-1366x768-step3-input.png",
+    "docs/screenshots/p8a/p8a-1366x768-step-wrong.png",
+    "docs/screenshots/p8a/p8a-1366x768-step-correct.png",
+    "docs/screenshots/p8a/p8a-1366x768-real-game.png",
+    "docs/screenshots/p8a/p8a-360x800-step0-intro.png",
+    "docs/screenshots/p8a/p8a-360x800-step1-numbers.png",
+    "docs/screenshots/p8a/p8a-360x800-step2-formula.png",
+    "docs/screenshots/p8a/p8a-360x800-step3-input.png",
+    "docs/screenshots/p8a/p8a-360x800-step-wrong.png",
+    "docs/screenshots/p8a/p8a-360x800-step-correct.png",
+    "docs/screenshots/p8a/p8a-360x800-real-game.png",
+    "docs/screenshots/p8a/p8a-844x390-step0-intro.png",
+    "docs/screenshots/p8a/p8a-844x390-step1-numbers.png",
+    "docs/screenshots/p8a/p8a-844x390-step2-formula.png",
+    "docs/screenshots/p8a/p8a-844x390-step3-input.png",
+    "docs/screenshots/p8a/p8a-844x390-step-wrong.png",
+    "docs/screenshots/p8a/p8a-844x390-step-correct.png",
+    "docs/screenshots/p8a/p8a-844x390-real-game.png"
+  ]
+}

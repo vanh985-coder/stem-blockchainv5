@@ -105,7 +105,7 @@ const CLEARANCE_OUT_RATE = 3;
  * Camera bám sau lưng người chơi, cách 7 cao 4, mượt; góc xoay lấy từ `api.camera`. Có vật cản thì kéo camera lại gần (xem
  * `cameraClearance`): vào nhanh, ra chậm, và kiểm tra lại vị trí đã làm mượt để chắc chắn không xuyên tường. Không cấp phát trong useFrame.
  */
-function ChaseCamera({ api, player, blockers }: { api: WalkApi; player: PlayerState; blockers: readonly CameraBlocker[] }) {
+function ChaseCamera({ api, player, blockers, snap }: { api: WalkApi; player: PlayerState; blockers: readonly CameraBlocker[]; snap: { current: boolean } }) {
   const camera = useThree((st) => st.camera);
   if (PROBE) (window as unknown as { __walkCamera?: typeof camera }).__walkCamera = camera;
   const tmp = useMemo(() => ({ off: { x: 0, y: 0, z: 0 } as Vec3Out, want: new Vector3(), look: new Vector3(), lookWant: new Vector3(), focus: new Vector3(), init: false, scale: 1 }), []);
@@ -129,10 +129,11 @@ function ChaseCamera({ api, player, blockers }: { api: WalkApi; player: PlayerSt
       wz = fz + (wz - fz) * tmp.scale;
     }
     tmp.want.set(wx, wy, wz);
-    if (!tmp.init) {
+    if (!tmp.init || snap.current) {
       camera.position.copy(tmp.want);
       tmp.look.copy(tmp.lookWant);
       tmp.init = true;
+      snap.current = false;
     } else {
       const k = dampFactor(Math.min(dt, 0.1), CAMERA_FOLLOW_RATE);
       camera.position.lerp(tmp.want, k);
@@ -210,18 +211,33 @@ export function WalkWorld({ api, paused, obstacles, boundsRadius, interactables,
   const player = useMemo(() => createPlayerState(start[0], start[1], startYaw), []); // eslint-disable-line react-hooks/exhaustive-deps
   // Chỉ khi chạy dev: mở trạng thái người chơi ra window để kiểm tra bằng trình duyệt.
   if (PROBE) (window as unknown as { __walkPlayer?: PlayerState }).__walkPlayer = player;
+  const snapCamera = useRef(false); // dịch chuyển xong thì camera nhảy thẳng tới chỗ mới, không lướt qua cả bản đồ
   useEffect(() => {
     api.player = player;
+    api.teleport = (x: number, z: number, yaw: number) => {
+      player.x = x;
+      player.z = z;
+      player.y = groundHeight ? groundHeight(x, z) : 0;
+      player.vx = 0;
+      player.vz = 0;
+      player.vy = 0;
+      player.grounded = true;
+      player.jumpBuffer = 0;
+      player.yaw = yaw;
+      api.camera.yaw = yaw;
+      snapCamera.current = true;
+    };
     return () => {
       api.player = null;
+      api.teleport = () => undefined;
     };
-  }, [api, player]);
+  }, [api, player, groundHeight]);
   const world = useMemo<World>(() => ({ obstacles, boundsRadius, groundHeight }), [obstacles, boundsRadius, groundHeight]);
   return (
     <>
       {showGround && <Ground radius={boundsRadius} url={groundUrl} />}
       <Player api={api} paused={paused} world={world} interactables={interactables} onNearestChange={onNearestChange} player={player} start={start} startYaw={startYaw} biTrack={biTrack} />
-      {!freeCamera && <ChaseCamera api={api} player={player} blockers={cameraBlockers} />}
+      {!freeCamera && <ChaseCamera api={api} player={player} blockers={cameraBlockers} snap={snapCamera} />}
       <PlayerStateContext.Provider value={player}>{children}</PlayerStateContext.Provider>
     </>
   );

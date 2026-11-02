@@ -1,0 +1,174 @@
+{
+  "total": 42,
+  "passed": 42,
+  "results": [
+    {
+      "test": "Màn 11 - 1366x768 - Bước 0 Intro",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 1366x768 - Bước 1 Bàn ghép",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 1366x768 - Bước 2 Thanh HUD",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 1366x768 - Bước 3 Nút tráo thử",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 1366x768 - Bước 4 Hoàn thành",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 1366x768 - Đóng spotlight vào ván thật",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 1366x768 - Mở lại hướng dẫn giữa ván",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 1366x768 - Bước 0 Intro",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 1366x768 - Bước 1 Thân cây",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 1366x768 - Bước 2 Thanh HUD",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 1366x768 - Bước 3 Nút nhảy thử",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 1366x768 - Bước 4 Hoàn thành",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 1366x768 - Đóng spotlight vào ván thật",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 1366x768 - Mở lại hướng dẫn giữa ván",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 360x800 - Bước 0 Intro",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 360x800 - Bước 1 Bàn ghép",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 360x800 - Bước 2 Thanh HUD",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 360x800 - Bước 3 Nút tráo thử",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 360x800 - Bước 4 Hoàn thành",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 360x800 - Đóng spotlight vào ván thật",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 360x800 - Mở lại hướng dẫn giữa ván",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 360x800 - Bước 0 Intro",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 360x800 - Bước 1 Thân cây",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 360x800 - Bước 2 Thanh HUD",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 360x800 - Bước 3 Nút nhảy thử",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 360x800 - Bước 4 Hoàn thành",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 360x800 - Đóng spotlight vào ván thật",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 360x800 - Mở lại hướng dẫn giữa ván",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 844x390 - Bước 0 Intro",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 844x390 - Bước 1 Bàn ghép",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 844x390 - Bước 2 Thanh HUD",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 844x390 - Bước 3 Nút tráo thử",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 844x390 - Bước 4 Hoàn thành",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 844x390 - Đóng spotlight vào ván thật",
+      "passed": true
+    },
+    {
+      "test": "Màn 11 - 844x390 - Mở lại hướng dẫn giữa ván",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 844x390 - Bước 0 Intro",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 844x390 - Bước 1 Thân cây",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 844x390 - Bước 2 Thanh HUD",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 844x390 - Bước 3 Nút nhảy thử",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 844x390 - Bước 4 Hoàn thành",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 844x390 - Đóng spotlight vào ván thật",
+      "passed": true
+    },
+    {
+      "test": "Màn 12 - 844x390 - Mở lại hướng dẫn giữa ván",
+      "passed": true
+    }
+  ]
+}

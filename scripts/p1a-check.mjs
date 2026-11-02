@@ -191,13 +191,8 @@ try {
         }
         await activate(page, '[data-testid="nut-tiep"]', touch);
       }
-      await activate(page, '[data-testid="nut-bat-dau-giu-so"]', touch);
-      await page.waitForSelector('[data-testid="dong-ho"]');
-      row.clock = await page.$eval('[data-testid="dong-ho"]', el => ({ font: getComputedStyle(el).fontSize, width: el.getBoundingClientRect().width, height: el.getBoundingClientRect().height }));
-      row.clock.clearOfCards = await page.evaluate(() => document.querySelector('[data-testid="hud"]').getBoundingClientRect().bottom <= document.querySelector('[data-testid="chuoi"]').getBoundingClientRect().top);
-      assert.equal(row.clock.clearOfCards, true);
-      await shot(page, `man3-${width}x${height}`);
-      row.rebuild = 'rounds 1/2 placed by real clicks/taps, keep clock visible';
+      // Đoạn giữ sổ và đồng hồ giữ sổ đã bỏ (xem spec 05): ván kết thúc ngay khi ghép xong vòng 2.
+      row.rebuild = 'rounds 1/2 placed by real clicks/taps';
     }
     await page.goto(`${base}/lang/lang-bac/man/10`, { waitUntil: 'networkidle0' });
     await page.waitForSelector('ol button');

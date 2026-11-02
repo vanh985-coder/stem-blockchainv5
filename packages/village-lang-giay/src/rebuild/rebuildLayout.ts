@@ -14,7 +14,7 @@ export interface Box {
 
 /** Vùng của từng phần: x tính theo phần trăm bề rộng khung, y theo phần trăm bề cao khung. */
 export const AREAS = {
-  hud: { x0: 1, x1: 99, y0: 1, y1: 10 },
+  hud: { x0: 1, x1: 92, y0: 1, y1: 10 },
   chain: { x0: 18, x1: 96, y0: 14, y1: 34 },
   /** Dải giữa: nhân vật đứng, lời Bi, ô soi công thức, banner hết vòng */
   mid: { x0: 18, x1: 78, y0: 35, y1: 65 },
@@ -92,12 +92,6 @@ export interface VillainTiming {
   exitStart: number;
   end: number;
 }
-
-/**
- * Nhịp của {phanDien} ở đoạn giữ sổ (cuối vòng 2), ngắn hơn vòng 2 vì ít nhất 4 giây lại có một lần tráo: chạy vào (1 giây) → đứng cười và ném trang thật ra bàn → tráo (`dropAt`, đúng giờ của
- * lần tráo trong luật) → chạy ra. Cả nhịp `end` = 2,9 giây, nhỏ hơn khoảng cách tráo nhỏ nhất (4 giây), nên hai nhịp không chồng nhau.
- */
-export const KEEP_VILLAIN_TIMING: VillainTiming = { enterEnd: 1.0, dropAt: 1.5, exitStart: 2.1, end: 2.9 };
 
 /** Chia thời gian khi bật "giảm chuyển động": rút ngắn còn một phần tư. */
 export const REDUCED_MOTION_SCALE = 0.25;

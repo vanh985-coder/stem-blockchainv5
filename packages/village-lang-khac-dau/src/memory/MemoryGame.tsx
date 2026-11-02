@@ -1,6 +1,23 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { CanvasTexture, LinearFilter, SRGBColorSpace, type Texture } from 'three';
-import { ASSETS_URL, Button, fmt, lookupAsset, memoryUi, sound, plainPower, rich, useGameHint, useManifest, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
+import {
+  ASSETS_URL,
+  Button,
+  fmt,
+  lookupAsset,
+  memoryUi,
+  sound,
+  plainPower,
+  rich,
+  useGameHint,
+  useManifest,
+  useSettings,
+  TutorialSpotlight,
+  tutorialTexts,
+  type MiniGameRenderProps,
+  type ScorePart,
+  type TutorialStep,
+} from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { Scene25D, isQualityChoice, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
@@ -146,6 +163,11 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   const finished = useRef(false);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
 
+  // Trạng thái hướng dẫn focus và làm thử (P8)
+  const [tutorialActive, setTutorialActive] = useState(attempt <= 1);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [, setTutorialPracticeDone] = useState(false);
+
   // Ván mới: dọn trạng thái hiện hình
   useEffect(() => {
     finished.current = false;
@@ -162,6 +184,83 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   const grid = useMemo(() => gridLayout(frame, spec.cols, spec.rows), [frame, spec.cols, spec.rows]);
   const cardPx = framePx > 0 ? grid.card * pxPerUnit(frame, framePx) : 0;
   const atlas = useFaceAtlas(art, cardPx, settings.largeText);
+
+  const doPracticeFlipPair = useCallback(() => {
+    if (state.cards.length >= 2) {
+      flipCard(state, 0);
+      sound.playClick();
+      bump();
+      setTimeout(() => {
+        const r = flipCard(state, 1);
+        if (r.kind === 'mismatch') {
+          sound.playWrong();
+          setLine({ kind: 'sai', n: Date.now() });
+        } else if (r.kind === 'match') {
+          sound.playCorrect();
+          const [k, m] = r.cards[0].type === 'khuon' ? r.cards : [r.cards[1], r.cards[0]];
+          setLine({ kind: 'khop', x: k.value, y: m.value, n: Date.now() });
+        }
+        setTutorialPracticeDone(true);
+        setTutorialStep(4);
+        bump();
+      }, 300);
+    }
+  }, [state]);
+
+  // Thao tác làm thử ở bước 3: mở máy tính Mod hoặc lật thử một cặp thẻ
+  const doPracticeCalc = useCallback(() => {
+    setCalcOpen(true);
+    sound.playClick();
+    doPracticeFlipPair();
+  }, [doPracticeFlipPair]);
+
+  const startRealGame = useCallback(() => {
+    setTutorialActive(false);
+    setCalcOpen(false);
+    const fresh = createMemoryGame(newSeed());
+    Object.assign(state, fresh);
+    setShown(ids(state));
+    setLine(null);
+    setCursor(0);
+    roundErrors.current = [];
+    bump();
+  }, [state]);
+
+  // Danh sách các bước hướng dẫn focus Màn 8
+  const tutorialSteps: TutorialStep[] = useMemo(() => [
+    {
+      id: 'intro',
+      title: fmt(tutorialTexts.man8.tieuDe),
+      content: fmt(tutorialTexts.man8.intro),
+    },
+    {
+      id: 'grid',
+      targetSelector: '#tutorial-man8-grid',
+      title: fmt(tutorialTexts.man8.tieuDe),
+      content: tutorialTexts.man8.grid,
+      nextLabel: tutorialTexts.chung.daHieu,
+    },
+    {
+      id: 'calculator',
+      targetSelector: '#tutorial-man8-calc',
+      title: fmt(tutorialTexts.man8.tieuDe),
+      content: tutorialTexts.man8.calculator,
+      nextLabel: tutorialTexts.chung.thuTinhNgay,
+    },
+    {
+      id: 'practice',
+      targetSelector: '#tutorial-man8-grid',
+      title: fmt(tutorialTexts.man8.tieuDe),
+      content: tutorialTexts.man8.practice,
+      interactive: true,
+      hideNextButton: true,
+    },
+    {
+      id: 'ready',
+      title: fmt(tutorialTexts.man8.tieuDe),
+      content: fmt(tutorialTexts.man8.correct),
+    },
+  ], []);
 
   // Nạp trước clip cười của {phanDien} lúc màn hình tải còn che cảnh (lần đầu mỗi chuyển động tốn vài chục mili giây)
   const warmUp = useCallback(() => {
@@ -193,7 +292,7 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
     [],
   );
   useEffect(() => {
-    if (paused || !warm) return;
+    if (paused || !warm || tutorialActive) return;
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
@@ -207,7 +306,7 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [paused, warm, state, handleEvents]);
+  }, [paused, warm, tutorialActive, state, handleEvents]);
 
   // Hoạt cảnh tráo: vệt tím ở chỗ cũ, rồi hai thẻ trượt sang chỗ mới, rồi {phanDien} nấp lại
   const swapN = swapShow?.n ?? 0;
@@ -222,11 +321,12 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [swapN]);
 
-  const playing = state.phase === 'playing' && !paused && warm && !swapShow;
+  const playing = state.phase === 'playing' && !paused && warm && !swapShow && !tutorialActive;
 
   const onFlip = useCallback(
     (id: string) => {
-      if (!playing) return;
+      const isPractice = tutorialActive && tutorialStep === 3;
+      if (!playing && !isPractice) return;
       const r = flipCard(
         state,
         state.cards.findIndex((c) => c.id === id),
@@ -236,18 +336,25 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
       else if (r.kind === 'mismatch') {
         sound.playWrong();
         setLine((l) => ({ kind: 'sai', n: (l?.n ?? 0) + 1 }));
+        if (isPractice) {
+          setTutorialPracticeDone(true);
+          setTutorialStep(4);
+        }
       } else {
         const [k, m] = r.cards[0].type === 'khuon' ? r.cards : [r.cards[1], r.cards[0]];
         sound.playCorrect();
         setLine((l) => ({ kind: 'khop', x: k.value, y: m.value, n: (l?.n ?? 0) + 1 }));
-        if (r.roundDone) {
+        if (isPractice) {
+          setTutorialPracticeDone(true);
+          setTutorialStep(4);
+        } else if (r.roundDone) {
           roundErrors.current.push(state.errors);
           sound.playLevelComplete();
         }
       }
       bump();
     },
-    [playing, state],
+    [playing, state, tutorialActive, tutorialStep],
   );
 
   const finish = useCallback(() => {
@@ -302,7 +409,18 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   const textSize = portrait ? 'max(3.6cqw, 0.875rem)' : 'max(1.6cqw, 0.875rem)';
   const ready = warm && !!atlas && art.done;
 
-  if (PROBE) Object.assign(window, { __memory: state, __memoryUi: { shown, swapShow, cardPx } });
+  if (PROBE && typeof window !== 'undefined') {
+    Object.assign(window, {
+      __memory: state,
+      __memoryUi: { shown, swapShow, cardPx },
+      __memoryTutorial: {
+        active: tutorialActive,
+        step: tutorialStep,
+        setStep: setTutorialStep,
+        setActive: setTutorialActive,
+      },
+    });
+  }
 
   const onModeChange = useCallback((m: FrameMode) => setFrame(m === 'portrait' ? 'portrait' : 'landscape'), []);
 
@@ -310,7 +428,7 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
     line?.kind === 'khop' ? `${memoryUi.khopLoi} ${fmt(memoryUi.khop, { x: line.x, y: line.y })}` : line?.kind === 'sai' ? memoryUi.saiLoi : line?.kind === 'trao' ? fmt(memoryUi.trao) : '';
 
   return (
-    <div className="fixed inset-0 select-none bg-black" data-testid="man8">
+    <div id="tutorial-man8-game" className="fixed inset-0 select-none bg-black" data-testid="man8">
       <Scene25D
         background={BACKGROUND}
         quality={forced}
@@ -327,6 +445,20 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
                   <span data-testid="diem">{fmt(memoryUi.diem, { so: score })}</span>
                   <span data-testid="sai">{fmt(memoryUi.sai, { so: state.phase === 'playing' ? state.errors : (roundErrors.current[state.round] ?? 0) })}</span>
                 </div>
+                <button
+                  type="button"
+                  aria-label={tutorialTexts.chung.huongDan}
+                  onClick={() => {
+                    setTutorialActive(true);
+                    setTutorialStep(0);
+                    setTutorialPracticeDone(true);
+                  }}
+                  className="flex items-center gap-1 rounded-2xl border-2 border-nau-go bg-giay px-2 py-0.5 text-xs font-bold text-nau-go shadow transition-colors hover:bg-giay/90 active:scale-95"
+                  data-testid="btn-open-tutorial"
+                >
+                  <span>💡</span>
+                  <span className="hidden sm:inline">{tutorialTexts.chung.huongDan}</span>
+                </button>
               </div>
               <p role="status" aria-live="polite" className={`rounded-2xl border-2 px-3 py-1 font-display font-extrabold ${lineText ? '' : 'invisible'} ${line?.kind === 'khop' ? 'border-xanh-la bg-giay text-xanh-la-dam' : line?.kind === 'trao' ? 'border-muc-tim bg-giay text-muc-tim-dam' : 'border-do-son bg-giay text-do-son-dam'}`} data-testid="dong-ket-qua">
                 <span className="sr-only">{plainPower(lineText)}</span>
@@ -334,11 +466,13 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
               </p>
             </div>
 
-            <ModCalculator inline open={calcOpen} onOpenChange={setCalcOpen} className="absolute z-10" style={portrait
-              ? { left: '2%', bottom: '1.5%', width: '74%', fontSize: '16px' }
-              : { left: '0.8%', bottom: '2%', width: '21.5%', fontSize: 'clamp(16px, 1.8cqw, 20px)' }} />
+            <div id="tutorial-man8-calc" className="contents">
+              <ModCalculator inline open={calcOpen} onOpenChange={setCalcOpen} className="absolute z-10" style={portrait
+                ? { left: '2%', bottom: '1.5%', width: '74%', fontSize: '16px' }
+                : { left: '0.8%', bottom: '2%', width: '21.5%', fontSize: 'clamp(16px, 1.8cqw, 20px)' }} />
+            </div>
 
-            <div role="group" aria-label={memoryUi.luoi} onKeyDown={onGridKey} className="absolute" style={{ left: `${areaTL.left}%`, top: `${areaTL.top}%`, width: `${areaBR.left - areaTL.left}%`, height: `${areaBR.top - areaTL.top}%` }}>
+            <div id="tutorial-man8-grid" role="group" aria-label={memoryUi.luoi} onKeyDown={onGridKey} className="absolute" style={{ left: `${areaTL.left}%`, top: `${areaTL.top}%`, width: `${areaBR.left - areaTL.left}%`, height: `${areaBR.top - areaTL.top}%` }}>
               {shown.map((id, slot) => {
                 const card = byId.get(id);
                 const p = grid.slots[slot];
@@ -360,7 +494,7 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
                     type="button"
                     tabIndex={slot === cursor ? 0 : -1}
                     aria-label={label}
-                    aria-disabled={!playing || up}
+                    aria-disabled={(!playing && !(tutorialActive && tutorialStep === 3)) || up}
                     data-testid="the"
                     data-slot={slot}
                     data-id={id}
@@ -391,6 +525,58 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
         <MemoryBoard items={items} cardSize={grid.card} atlas={atlas} reduced={reduced} />
         <MemoryVillain frame={frame} peek={warmPeek || !!swapShow} n={swapN + (warmPeek ? 1000 : 0)} reduced={reduced && !warmPeek} />
       </Scene25D>
+
+      {/* Hướng dẫn focus và làm thử (P8) */}
+      <TutorialSpotlight
+        isOpen={tutorialActive}
+        steps={tutorialSteps}
+        currentStepIndex={tutorialStep}
+        onNext={() => {
+          if (tutorialStep < tutorialSteps.length - 1) {
+            setTutorialStep((prev) => prev + 1);
+          } else {
+            startRealGame();
+          }
+        }}
+        onPrev={() => {
+          if (tutorialStep > 0) {
+            setTutorialStep((prev) => prev - 1);
+          }
+        }}
+        onSkip={startRealGame}
+        actionButton={
+          tutorialStep === tutorialSteps.length - 1
+            ? {
+                label: tutorialTexts.chung.batDauChoi,
+                onClick: startRealGame,
+                variant: 'primary',
+              }
+            : undefined
+        }
+      >
+        {tutorialActive && tutorialStep === 3 && (
+          <div data-tutorial-obstacle className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-3 pointer-events-auto">
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={doPracticeCalc}
+              className="shadow-xl"
+            >
+              <span>🧮</span>
+              <span>{tutorialTexts.man8.moMayTinh}</span>
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={doPracticeFlipPair}
+              className="shadow-xl animate-bounce"
+            >
+              <span>🃏</span>
+              <span>{tutorialTexts.man8.latThu}</span>
+            </Button>
+          </div>
+        )}
+      </TutorialSpotlight>
     </div>
   );
 }

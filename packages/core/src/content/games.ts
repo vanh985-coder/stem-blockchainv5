@@ -25,9 +25,9 @@ export const GAMES: Readonly<Partial<Record<number, GameText>>> = {
   5: textOf(5, 'Đập {phanDien}'),
   6: textOf(6, 'Diều đưa sổ'),
   8: textOf(8, 'Lật thẻ tìm cặp khóa'),
-  9: textOf(9, 'Chữa đàn gà'),
+  9: textOf(9, 'Bắn trứng khắc dấu'),
   11: textOf(11, 'Ghép lá cây sổ'),
-  12: textOf(12, 'Leo cây tìm lá giả'),
+  12: textOf(12, 'Leo bậc gỗ'),
 };
 
 /** Tên các phần điểm ở màn kết quả của màn 2 (điểm = trang × 10 + tiền đồng + quãng đường ÷ 10 + câu đúng × 30). */
@@ -136,30 +136,6 @@ export const rebuildUi = {
   /** Phần điểm ở màn kết quả: số lần sai và trang giả */
   phanVong: 'Vòng {so} (số lần sai)',
   phanTrangGia: 'Vòng {so}: bỏ đúng trang giả vào rổ',
-  /** Đoạn "giữ sổ" ở cuối vòng 2 (P4b; bước X2 là vòng 3): {phanDien} liên tục tráo trang, em sửa liên tục */
-  giuSoTieuDe: 'Giữ sổ',
-  giuSoLoi: 'Chuỗi em vừa ghép xong chưa yên đâu! {phanDien} sẽ liên tục chạy vào và tráo trang thật trong chuỗi thành trang giả suốt {giay} giây. Em soi công thức, bỏ trang giả vào rổ, rồi đặt đúng trang thật vào chỗ trống. Sửa trong {nhanh} giây thì được thêm điểm.',
-  giuSoBatDau: 'Bắt đầu giữ sổ',
-  /** Bác An động viên trước đoạn giữ sổ, kèm việc hồi đủ tim (bước X3) */
-  bacAnDongVien: 'Bác An: "Cố lên con! Cuốn sổ này nhờ con giữ đấy. Bác hồi lại đủ sức cho con rồi, các tim của con đầy cả."',
-  chuoiGiuSo: 'Chuỗi trang. Mỗi ô là một chỗ đặt trang.',
-  chuoiLech: 'Chuỗi đang lệch',
-  chuoiDung: 'Chuỗi đúng',
-  dongHo: 'Còn {giay} giây',
-  oChuoiTrong: 'Ô số {so} của chuỗi, đang trống. Bấm vào đây để đặt thẻ đang chọn.',
-  oChuoiCoThe: 'Ô số {so} của chuỗi: {the}',
-  biDaBat: 'Đúng trang giả rồi! Giờ em đặt trang thật vào chỗ trống nhé.',
-  biSuaXong: 'Sửa xong một ô! Em được thêm {diem} điểm.',
-  biChuoiDungLai: 'Chuỗi lại đúng rồi! Giữ vững nhé.',
-  biOCoTrang: 'Ô này đang có trang rồi. Nếu em nghĩ đó là trang giả, hãy bỏ nó vào rổ trước.',
-  biLechQua: 'Chuỗi lệch quá nhiều! {phanDien} cười khoái chí. Em mất 1 tim.',
-  biGoiYTrai: 'Bi thấy có gì lạ ở nửa bên trái của chuỗi.',
-  biGoiYPhai: 'Bi thấy có gì lạ ở nửa bên phải của chuỗi.',
-  hetGio: 'Hết giờ giữ sổ! Em sửa được {sua} ô, còn lệch {lech} ô. Đoạn giữ sổ được {diem} điểm.',
-  /** Phần điểm của đoạn giữ sổ ở màn kết quả */
-  phanSua: 'Giữ sổ: ô đã sửa xong (+{diem} mỗi ô)',
-  phanNhanh: 'Giữ sổ: sửa trong {giay} giây (thêm +{diem} mỗi ô)',
-  phanConLech: 'Giữ sổ: ô còn lệch khi hết giờ (−{diem} mỗi ô)',
 } as const;
 
 /** Chữ trong màn 8 "Lật thẻ tìm cặp khóa" (spec 07 mục Màn 8). Thẻ chỉ ghi số: không tên, không chân dung. */
@@ -198,53 +174,60 @@ export const modCalcUi = {
   dong: 'Đóng',
 } as const;
 
-/** Chữ trong màn 12 "Leo cây tìm lá giả" (spec 08 mục Màn 12). Số trên tay nắm do code vẽ: hai dòng, không tô màu, không đánh dấu nhánh nào lệch. */
+/** Chữ trong màn 12 "Leo bậc gỗ" (spec 08 mục Màn 12). Số trên bậc gỗ do code vẽ. */
 export const climbUi = {
   vong: 'Vòng {so}/{max}',
-  dong: 'Tiền đồng: {so}',
-  /** Hai dòng trên tay nắm: số trong sổ và số bây giờ (vòng 3–4 là mã 4 chữ số) */
-  so: 'Sổ: {so}',
-  nay: 'Nay: {so}',
   /** Nhãn đọc cho người dùng đọc màn hình */
-  khung: 'Cây đa. Chạm, bấm chuột hoặc phím Space để bật lên.',
-  tayNam: 'Tay nắm {nhan}: số trong sổ {so}, số bây giờ {so2}',
-  trai: 'bên trái',
-  phai: 'bên phải',
-  nguCut: 'Ngõ cụt!',
-  truot: 'Hụt rồi, em canh lại nhé.',
+  khung: 'Cây đa. Đi sang trái, sang phải và nhảy lên bậc ghi số đúng.',
+  /** Nút cảm ứng ở đáy màn hình */
+  nutTrai: 'Đi sang trái',
+  nutPhai: 'Đi sang phải',
+  nutNhay: 'Nhảy',
+  /** Đọc cho trình đọc màn hình mỗi khi lên tầng mới: số của em và số bậc anh em */
+  docTang: 'Em đứng ở bậc ghi {so}. Bậc anh em bên {nhan} ghi {so2}.',
+  trai: 'trái',
+  phai: 'phải',
+  /** Chữ khắc trên ngọn cây (số gốc trong sổ do code vẽ cạnh chữ này) */
+  gocTrongSo: 'Gốc trong sổ',
+  /** Hiện khi lên tới gốc: gốc em tính ra */
+  gocEmTinh: 'Gốc em tính là {so}, khác gốc trong sổ là {so2}.',
+  nguCut: 'Bậc này nứt rồi!',
+  truot: 'Hụt rồi, em thử lại nhé.',
   /** Bi giải thích lần đầu vào màn (spec 08) */
   biGocCay: 'Trên bảng thì gốc vẽ ở trên cùng; còn ở cây thật thì gốc ở dưới. Vẫn là một cây thôi!',
   hieuRoi: 'Em hiểu rồi',
-  /** Bắt được {phanDien} ở lá trên cùng: hết vòng */
+  /** Lên tới gốc, gốc em tính khác gốc trong sổ: lộ lá giả, bắt được {phanDien}, hết vòng */
   batDuoc: 'Bắt được {phanDien}!',
-  vongXong: 'Em chỉ leo {so} tầng thay vì kiểm tra cả {so2} lá!',
+  vongXong: 'Em chỉ cần {so} phép ghép thay vì kiểm tra cả {so2} lá!',
   vongTiep: 'Vòng tiếp theo',
   xemKetQua: 'Xem kết quả',
   /** Hết tim */
   biGiup: 'Để Bi giúp em!',
   /** Phần điểm ở màn kết quả */
   phanVong: 'Vòng leo xong (× {diem})',
-  phanDong: 'Tiền đồng',
   phanTim: 'Tim còn lại (× {diem})',
 } as const;
 
 /** Chữ trong màn 5 "Đập {phanDien}" (spec 06 mục Màn 5). Mọi câu đi qua fmt() ({phanDien}, {so}…). */
 export const whackUi = {
   /** Nhãn đọc màn hình của khung chơi */
-  khung: 'Sân dệt. Phím D F J K hoặc chạm vào làn để đập chuột giấy.',
+  khung: 'Sân dệt. Chuột giấy chạy từ dưới lên sổ. Phím D F J K hoặc chạm vào làn để đập chuột.',
   diem: 'Điểm: {so}',
   xu: 'Xu: {so}',
   trum: 'Trùm: {so}/{max}',
   /** Nhãn đọc màn hình của hàng chấm vết mực */
   muc: 'Vết mực trên sổ: {so}/{max}',
-  /** Lượt trùm: tiêu đề, thời gian, kết quả */
-  cauHoi: '{phanDien} chạy xuống! Câu hỏi {so}/{max}',
-  conGio: 'Còn {giay} giây',
-  hetGio: 'Hết giờ rồi!',
+  /** Lượt đáp án (chuột câu hỏi bị đập trúng): tiêu đề cột câu hỏi, nhãn, kết quả */
+  cauHoi: 'Câu hỏi {so}/{max}',
+  docCauHoi: 'Đọc câu hỏi, rồi đập chuột vàng mang đáp án em chọn!',
+  docXong: 'Đọc xong',
+  docXongGoiY: 'Bấm khi đã đọc xong để chuột chạy nhanh tới vùng đập (hoặc nhấn phím Space).',
+  cotCauHoi: 'Câu hỏi của {phanDien}',
+  nhanDapAn: 'Chuột đáp án {nhan}',
   dapAnDung: 'Đáp án đúng: {dapAn}',
-  uiDa: 'Ui da!',
-  quizDung: 'Trúng rồi! Em đét được {phanDien}: +{diem} điểm và xoá 2 vết mực.',
-  quizSai: '{phanDien} né được và chạy xuống sổ: thêm một vết mực.',
+  ketQuaDung: 'Trúng đáp án {nhan}! Em được +{diem} điểm và xoá 2 vết mực.',
+  ketQuaSai: 'Em đập chuột đáp án {nhan} nhưng chưa đúng: thêm một vết mực.',
+  ketQuaHet: 'Chuột đáp án đúng đã chạy tới sổ: thêm một vết mực.',
   tiepTuc: 'Chơi tiếp',
   /** Hết ván */
   hetMuc: 'Sổ đầy mực rồi! Mình thử lại nhé.',
@@ -255,6 +238,25 @@ export const whackUi = {
   phanDong: 'Tiền đồng nhặt được',
   phanTrum: 'Lượt trùm trả lời đúng',
   phanMuc: 'Vết mực trên sổ',
+  /** Nhãn giao diện 2D */
+  chuotCauHoi: 'Chuột câu hỏi',
+  chuotThuong: 'Chuột thường',
+  chuotDoiLan: 'Chuột đổi làn',
+  chuotNhanh: 'Chuột nhanh',
+  chuotTo: 'Chuột to',
+  nhanThuong: 'Giấy',
+  nhanDoiLan: 'Đổi',
+  nhanNhanh: 'Nhanh',
+  nhanTo: 'To',
+  tenSo: 'Sổ Chung Làng Dệt',
+  lanNhan: 'Làn {so}',
+  nutDap: 'Đập làn {so}',
+  nhacVungDap: 'Vùng đập',
+  nhanVat: 'Học sinh nam',
+  soChung: 'Sổ Chung',
+  tienDong: 'Tiền đồng',
+  sanChoi: 'Sân chơi 4 làn',
+  nenPc: 'Bối cảnh Làng Dệt',
 } as const;
 
 /** Chữ trong màn 6 "Diều đưa sổ" (spec 06 mục Màn 6). Mọi câu đi qua fmt() ({phanDien}, {so}…). */
@@ -287,53 +289,62 @@ export const kiteUi = {
   phanCong: 'Cổng làng đã qua',
 } as const;
 
-/** Chữ trong màn 9 "Chữa đàn gà" (spec 07 mục Màn 9). Mọi câu đi qua fmt() ({phanDien}, {so}…); ^^x^^ là số mũ nhỏ (qua rich()). Thẻ số trên gà do code vẽ, chỉ có con số. */
-export const chickenUi = {
+/** Chữ trong màn 9 "Bắn trứng khắc dấu" (spec 07 mục Màn 9). Mọi câu đi qua fmt() ({phanDien}, {so}…); ^^x^^ là số mũ nhỏ (qua rich()). Số trên trứng do code vẽ, chỉ có con số. */
+export const bubbleUi = {
   /** Nhãn đọc màn hình của khung chơi */
-  khung: 'Đường vào làng. Phím 1 đến 4 chọn thuốc, phím mũi tên trái phải chọn con gà, Enter hoặc Space để bắn; hoặc chạm vào con gà để bắn.',
-  /** Bước nạp đạn */
-  napTieuDe: 'Nạp đạn: đợt {so}/{max}',
-  napHuongDan: 'Kéo mỗi nhãn vào đúng lọ thuốc: lọ Thuốc x cần nhãn bằng {congThuc}. Nhãn nào dùng không tới thì để lại khay.',
-  thuoc: 'Thuốc {x}',
-  loTrong: 'Kéo nhãn vào đây',
-  loTrongDoc: 'Lọ Thuốc {x}, chưa có nhãn. Bấm vào đây để nạp nhãn đang chọn, hoặc nhấn phím {so}.',
-  loCoNhan: 'Lọ Thuốc {x}, đã nạp nhãn {y}',
-  khay: 'Khay nhãn',
-  khayDoc: 'Khay nhãn. Tab để chọn nhãn, rồi nhấn phím 1 đến 4 để đưa vào lọ thuốc.',
-  nhanDoc: 'Nhãn {y}',
-  nhanChon: 'Nhãn {y}, đang chọn',
-  napDung: 'Đúng rồi! Lọ Thuốc {x} đã có nhãn {y}.',
-  napSai: 'Chưa đúng: 5^^x^^ mod 23 của thuốc này không ra số đó',
-  napChonTruoc: 'Em chọn một nhãn ở khay trước nhé.',
-  napXong: 'Đủ nhãn rồi! Bấm "Bắt đầu đợt {so}" khi em sẵn sàng.',
+  khung: 'Bàn trứng khắc dấu. Phím mũi tên trái phải để ngắm, Space hoặc Enter để bắn, phím 1 đến 5 để chọn loại trứng; hoặc rê chuột rồi bấm, hoặc kéo ngón tay trên bàn rồi thả tay để bắn.',
+  banTrung: 'Bàn trứng',
+  /** Bước nạp trứng */
+  napTieuDe: 'Nạp trứng: đợt {so}/{max}',
+  napHuongDan: 'Mỗi khóa riêng cần một trứng khắc đúng mẫu công khai {congThuc}. Bấm vào trứng đúng ở khay; trứng không dùng tới thì để lại.',
+  khay: 'Khay trứng',
+  khayDoc: 'Khay trứng. Bấm vào trứng ghi mẫu công khai đúng của một khóa riêng.',
+  trungKhay: 'Trứng ghi số {y}',
+  trungKhayNap: 'Trứng ghi số {y}, đã nạp vào máy bắn',
+  mayBan: 'Máy bắn',
+  chonNap: 'Chỗ nạp {so}: {y}',
+  chonTrong: 'Chỗ nạp {so}: còn trống',
+  napDung: 'Đúng rồi! Trứng ghi {y} đã vào máy bắn.',
+  napSai: 'Chưa đúng: không khóa nào của đợt này có 5^^x^^ mod 23 bằng {y}. Đợt này mất thưởng nạp.',
+  napCon: 'Còn {so} trứng cần nạp.',
+  napXong: 'Đủ trứng rồi! Bấm "Bắt đầu đợt {so}" khi em sẵn sàng.',
   batDau: 'Bắt đầu đợt {so}',
-  /** Đợt gà */
+  /** Cột khóa riêng */
+  khoaTieuDe: 'Khóa riêng của đợt',
+  khoaMuc: 'Khóa {x}',
+  khoaDoc: 'Các khóa riêng của đợt: {ds}',
+  /** Đợt chơi */
   dot: 'Đợt {so}/{max}',
-  dotTrum: 'Gà trùm',
   diem: 'Điểm: {so}',
-  chua: 'Gà đã chữa: {so}',
   tim: 'Tim: {so}/{max}',
-  trumChua: 'Chữa gà trùm: {so}/{max}',
-  thuocNut: 'Thuốc {x}, nhãn {y}. Phím {so}.',
-  thuocNutChon: 'Thuốc {x}, nhãn {y}, đang chọn. Phím {so}.',
-  nhomThuoc: 'Bảng thuốc',
-  gaThe: 'Gà có thẻ số {so}',
-  gaDangChon: 'Đang chọn con gà có thẻ số {so}. Nhấn Enter để bắn.',
-  khongDung: 'Không đúng thuốc!',
-  khoi: 'Gà khỏi bệnh rồi! Cộng {so} điểm.',
-  mat: 'Một con gà lọt vào làng, em mất 1 tim.',
-  oi: 'Ối!',
-  trumDoiThe: 'Gà trùm đã được chữa một lần, thẻ trên gà đổi số.',
+  haBan: 'Hạ bàn sau {so} phát',
+  haBanDoc: 'Còn {so} phát nữa thì cả bàn hạ một hàng.',
+  trungCon: 'Trứng còn: {so}',
+  loaiTrung: 'Chọn loại trứng',
+  nutTrung: 'Trứng ghi {y}. Phím {so}.',
+  nutTrungChon: 'Trứng ghi {y}, đang chọn. Phím {so}.',
+  nutTrungHet: 'Trứng ghi {y}, không còn trên bàn.',
+  nutBan: 'Bắn',
+  nutBanKhoa: 'Chọn loại trứng trước',
+  chonTruoc: 'Em chọn loại trứng trong máy bắn trước đã.',
+  vaoBanThu: 'Làm thử, không tính điểm',
+  /** Lời nói ngắn khi chơi */
+  trungVo: 'Vỡ {so} trứng!',
+  trungRoi: 'Rơi thêm {so} trứng!',
+  haBanLoi: 'Cả bàn hạ xuống một hàng.',
+  timMat: 'Trứng chạm dây đỏ! Em mất 1 tim và hai hàng dưới cùng được dọn.',
+  dotXong: 'Sạch bàn rồi! Sang đợt kế tiếp.',
   /** Hết ván */
-  xongTrum: '{phanDien} ngã nhào khỏi lưng gà trùm! Cả đàn gà đã khỏi bệnh.',
-  hetTim: 'Em hết tim rồi, đàn gà lọt vào làng. Mình thử lại nhé.',
-  trumToiCong: 'Gà trùm đã chạy tới cổng làng! Mình thử lại nhé.',
+  xongThang: '{phanDien} hết đường trộn trứng giả! Ổ trứng của làng đã sạch.',
+  hetTim: 'Em hết tim rồi, trứng giả đã chạm dây đỏ. Mình thử lại nhé.',
   xemKetQua: 'Xem kết quả',
+  phanDienNoi: '{phanDien} đang trộn trứng giả!',
   /** Phần điểm ở màn kết quả: số lượng, điểm */
-  phanGa: 'Gà đã chữa khỏi',
-  phanSai: 'Phát bắn sai',
-  phanNap: 'Đợt nạp đạn không sai',
-  phanTrum: 'Chữa xong gà trùm (1 là đã chữa)',
+  phanVo: 'Trứng vỡ',
+  phanRoi: 'Trứng rơi',
+  phanNap: 'Đợt nạp không sai',
+  phanDot: 'Đợt đã dọn sạch',
+  phanTim: 'Tim còn lại',
 } as const;
 
 /**

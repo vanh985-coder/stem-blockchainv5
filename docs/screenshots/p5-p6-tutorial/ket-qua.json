@@ -1,0 +1,182 @@
+[
+  {
+    "name": "[Màn 5 - 1366x768] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 1366x768] Bước 1 Khung 4 làn",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 1366x768] Bước 2 Cuốn Sổ Chung",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 1366x768] Bước 3 Nút chân làn",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 1366x768] Bước 4 Nút Đập thử",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 1366x768] Bước 5 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 1366x768] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 1366x768] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 1366x768] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 1366x768] Bước 1 Thanh HUD",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 1366x768] Bước 2 Điều khiển",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 1366x768] Bước 3 Nút Vỗ cánh thử",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 1366x768] Bước 4 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 1366x768] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 1366x768] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 360x800] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 360x800] Bước 1 Khung 4 làn",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 360x800] Bước 2 Cuốn Sổ Chung",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 360x800] Bước 3 Nút chân làn",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 360x800] Bước 4 Nút Đập thử",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 360x800] Bước 5 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 360x800] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 360x800] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 360x800] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 360x800] Bước 1 Thanh HUD",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 360x800] Bước 2 Điều khiển",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 360x800] Bước 3 Nút Vỗ cánh thử",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 360x800] Bước 4 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 360x800] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 360x800] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 844x390] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 844x390] Bước 1 Khung 4 làn",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 844x390] Bước 2 Cuốn Sổ Chung",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 844x390] Bước 3 Nút chân làn",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 844x390] Bước 4 Nút Đập thử",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 844x390] Bước 5 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 844x390] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Màn 5 - 844x390] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 844x390] Bước 0 intro",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 844x390] Bước 1 Thanh HUD",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 844x390] Bước 2 Điều khiển",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 844x390] Bước 3 Nút Vỗ cánh thử",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 844x390] Bước 4 Nút Bắt đầu chơi thật",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 844x390] Bắt đầu bài thật thành công",
+    "pass": true
+  },
+  {
+    "name": "[Màn 6 - 844x390] Mở lại hướng dẫn giữa bài",
+    "pass": true
+  }
+]

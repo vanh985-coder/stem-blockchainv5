@@ -131,6 +131,8 @@ async function run() {
   });
 
   try {
+    // ONLY=12 chỉ chạy phần màn 12 (các màn khác có thể cần GPU thật)
+    if (process.env.ONLY !== "12") {
     // -------------------------------------------------------------
     // MÀN 2: Game Runner 3D (Đuổi theo phản diện)
     // -------------------------------------------------------------
@@ -258,9 +260,9 @@ async function run() {
     }
 
     // -------------------------------------------------------------
-    // MÀN 9: Game Chạy 3 làn 2D (Chữa đàn gà)
+    // MÀN 9: Game bắn trứng canvas 2D (Bắn trứng khắc dấu)
     // -------------------------------------------------------------
-    console.log('\n=== Màn 9: Chữa đàn gà 2D ===');
+    console.log('\n=== Màn 9: Bắn trứng khắc dấu (canvas 2D) ===');
     // Ca 1: Trạng thái nạp đạn (phase === 'load')
     {
       const ctx = await newPageCtx(browser, 9);
@@ -274,8 +276,8 @@ async function run() {
       const ctx = await newPageCtx(browser, 9);
       await openGame(ctx, 'lang-khac-dau', 9);
       await testAutoInState(ctx, 'Màn 9 (Đợt 3 có gà trùm cuối đường)', () => {
-        if (window.__chicken) {
-          window.__chicken.round = 2;
+        if (window.__bubble) {
+          window.__bubble.round = 2; window.__bubble.phase = 'load';
         }
       });
       await ctx.page.close();
@@ -305,25 +307,35 @@ async function run() {
       await ctx.page.close();
     }
 
+    }
     // -------------------------------------------------------------
-    // MÀN 12: Game Leo cây 2.5D (Leo cây tìm lá giả)
+    // MÀN 12: Game Leo bậc gỗ (2.5D; hướng dẫn làm thử luôn chạy khi vào màn nên bỏ qua trước; ván thật là window.__climbReal)
     // -------------------------------------------------------------
-    console.log('\n=== Màn 12: Leo cây 2.5D ===');
-    // Ca 1: Vòng 1 (8 lá, depth 3)
+    console.log('\n=== Màn 12: Leo bậc gỗ 2.5D ===');
+    const skipClimbTutorial = async (ctx) => {
+      await ctx.page.waitForSelector('[data-testid="tutorial-tooltip"]', { timeout: 15000 });
+      const skip = await ctx.page.evaluateHandle(() => [...document.querySelectorAll('[data-testid="tutorial-tooltip"] button')].find((b) => /Bỏ qua/.test(b.innerText)) ?? null);
+      await tap(ctx, skip.asElement());
+      await ctx.page.waitForFunction(() => !document.querySelector('[data-testid="tutorial-spotlight"]'), { timeout: 5000 });
+      await sleep(400);
+    };
+    // Ca 1: Vòng 1 (8 lá, 3 tầng, 2 lựa chọn)
     {
       const ctx = await newPageCtx(browser, 12);
       await openGame(ctx, 'lang-bac', 12);
-      await testAutoInState(ctx, 'Màn 12 (Vòng 1 - 8 lá depth 3)');
+      await skipClimbTutorial(ctx);
+      await testAutoInState(ctx, 'Màn 12 (Vòng 1 - 8 lá, 2 lựa chọn)');
       await ctx.page.close();
     }
 
-    // Ca 2: Vòng 4 (Vòng cuối, 64 lá, depth 6, codes)
+    // Ca 2: Vòng 3 (vòng cuối, 16 lá, 4 tầng, 3 lựa chọn, bậc trượt nhanh)
     {
       const ctx = await newPageCtx(browser, 12);
       await openGame(ctx, 'lang-bac', 12);
-      await testAutoInState(ctx, 'Màn 12 (Vòng 4 - vòng cuối 64 lá depth 6)', () => {
-        if (window.__climb) {
-          window.__climb.round = 3;
+      await skipClimbTutorial(ctx);
+      await testAutoInState(ctx, 'Màn 12 (Vòng 3 - vòng cuối 16 lá, 3 lựa chọn)', () => {
+        if (window.__climbReal) {
+          window.__climbReal.round = 2;
         }
       });
       await ctx.page.close();

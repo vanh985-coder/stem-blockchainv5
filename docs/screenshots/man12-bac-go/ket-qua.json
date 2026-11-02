@@ -1,0 +1,1523 @@
+{
+ "results": [
+  {
+   "size": "1366x768",
+   "area": "hướng dẫn",
+   "name": "bước 0 giới thiệu cây mẫu 4 lá",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "hướng dẫn",
+   "name": "bước 1 chỉ bậc của em, bậc anh em, bậc lựa chọn",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "hướng dẫn",
+   "name": "bước 2 nói tim: nhầm mất tim, hụt không mất",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "hướng dẫn",
+   "name": "bước 3 (đi trái/phải): chờ thao tác thật, không có nút Tiếp",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "hướng dẫn",
+   "name": "cây mẫu 4 lá [3,7,5,2], lá thứ hai bị tráo thành 8",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "hướng dẫn",
+   "name": "đi sang một bên thì sang bước 4 (nhảy lên bậc ghi 38)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "hướng dẫn",
+   "name": "nhảy lên đúng bậc thì sang bước cuối",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "hướng dẫn",
+   "name": "ván thật chưa bị đụng trong lúc làm thử",
+   "ok": true,
+   "detail": "{\"level\":0,\"hearts\":3,\"time\":0,\"rounds\":0}"
+  },
+  {
+   "size": "1366x768",
+   "area": "hướng dẫn",
+   "name": "xong thì spotlight đóng, vào ván thật vòng 1",
+   "ok": true,
+   "detail": "{\"active\":false,\"practice\":false,\"tip\":false,\"skipBtn\":false}"
+  },
+  {
+   "size": "1366x768",
+   "area": "hướng dẫn",
+   "name": "không cộng điểm hay tiến độ: cookie giữ nguyên lv[12], gp",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "hướng dẫn",
+   "name": "mở lại hướng dẫn giữa ván: ván thật tạm dừng thật (đồng hồ đứng yên)",
+   "ok": true,
+   "detail": "0.5203000000000004 → 0.5273000000000004"
+  },
+  {
+   "size": "1366x768",
+   "area": "hướng dẫn",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "bố cục",
+   "name": "khung ngang: cảnh nhận đúng khung",
+   "ok": true,
+   "detail": "landscape"
+  },
+  {
+   "size": "1366x768",
+   "area": "bố cục",
+   "name": "chữ số trên bậc ≥ 16 px",
+   "ok": true,
+   "detail": "41.7 px, ppu 85.3125"
+  },
+  {
+   "size": "1366x768",
+   "area": "bố cục",
+   "name": "vòng 1: 8 lá (3 tầng), 2 lựa chọn, 3 tim",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "điều khiển",
+   "name": "máy tính không hiện nút cảm ứng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "nhảy đúng",
+   "name": "nhảy lên đúng bậc: lên tầng 1, giữ 3 tim",
+   "ok": true,
+   "detail": "{\"level\":1,\"hearts\":3,\"mode\":\"free\"}"
+  },
+  {
+   "size": "1366x768",
+   "area": "nhảy đúng",
+   "name": "hiện các lựa chọn tầng trên (2 bậc)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "nhảy đúng",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "nhảy sai",
+   "name": "nhảy vào bậc sai: bậc nứt (mode crack), mất 1 tim ngay",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "nhảy sai",
+   "name": "đang nứt: đúng 1 bậc nứt, còn dưới 0,4 giây",
+   "ok": true,
+   "detail": "{\"left\":0.20569999999999972,\"ch\":1}"
+  },
+  {
+   "size": "1366x768",
+   "area": "nhảy sai",
+   "name": "nứt xong bậc biến mất, em rơi về bậc vừa đứng (mode fall)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "nhảy sai",
+   "name": "rơi về bậc cũ, vẫn ở tầng 0, còn 2 tim",
+   "ok": true,
+   "detail": "{\"level\":0,\"y\":0,\"grounded\":true,\"hearts\":2,\"mistakes\":1,\"values\":[24,28],\"slots\":[0,1]}"
+  },
+  {
+   "size": "1366x768",
+   "area": "nhảy sai",
+   "name": "làm lại tầng: các lựa chọn giữ số, đổi chỗ",
+   "ok": true,
+   "detail": "1,0 → 0,1"
+  },
+  {
+   "size": "1366x768",
+   "area": "nhảy sai",
+   "name": "hiện lời báo \"Bậc này nứt rồi!\"",
+   "ok": true,
+   "detail": "Bậc này nứt rồi!"
+  },
+  {
+   "size": "1366x768",
+   "area": "nhảy sai",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "nhảy hụt",
+   "name": "không chạm bậc nào: về bậc cũ, không mất tim, bị khóa nhảy",
+   "ok": true,
+   "detail": "{\"hearts\":3,\"level\":0,\"locked\":true,\"grounded\":true}"
+  },
+  {
+   "size": "1366x768",
+   "area": "nhảy hụt",
+   "name": "đang khóa thì bấm nhảy không có tác dụng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "rơi khỏi mép",
+   "name": "bước ra khỏi mép: rơi về bậc cũ, không mất tim, khóa nhảy",
+   "ok": true,
+   "detail": "{\"hearts\":3,\"level\":0,\"y\":0,\"x\":1.1}"
+  },
+  {
+   "size": "1366x768",
+   "area": "rơi khỏi mép",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 1",
+   "name": "chữ số trên bậc ≥ 16 px",
+   "ok": true,
+   "detail": "41.7 px"
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 1",
+   "name": "8 lá, 2 lựa chọn mỗi tầng",
+   "ok": true,
+   "detail": "{\"round\":0,\"depth\":3,\"n\":2,\"leaves\":8}"
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 1",
+   "name": "bậc đứng yên",
+   "ok": true,
+   "detail": "2.2 → 2.2"
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 1",
+   "name": "leo hết cây đến gốc rồi hiện bảng xong vòng",
+   "ok": true,
+   "detail": "banner"
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 1",
+   "name": "hiện \"Em chỉ cần 3 phép ghép thay vì kiểm tra cả 8 lá!\" và gốc em tính khác gốc trong sổ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 2",
+   "name": "chữ số trên bậc ≥ 16 px",
+   "ok": true,
+   "detail": "41.7 px"
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 2",
+   "name": "8 lá, 2 lựa chọn mỗi tầng",
+   "ok": true,
+   "detail": "{\"round\":1,\"depth\":3,\"n\":2,\"leaves\":8}"
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 2",
+   "name": "bậc lựa chọn trượt qua lại",
+   "ok": true,
+   "detail": "-2.249 → -2.360"
+  },
+  {
+   "size": "1366x768",
+   "area": "\"?\" tạm dừng",
+   "name": "mở hộp \"?\": đồng hồ, bậc trượt và người chơi đứng yên (kể cả khi bấm phím)",
+   "ok": true,
+   "detail": "{\"t\":1.1378,\"c\":1.1378,\"x\":-2.399324735201001,\"px\":-1.1} → {\"t\":1.1445999999999992,\"c\":1.1445999999999992,\"x\":-2.4040847352010006,\"px\":-1.1}"
+  },
+  {
+   "size": "1366x768",
+   "area": "\"?\" tạm dừng",
+   "name": "câu nhắc theo trạng thái, không lộ đáp án (không có số của bậc)",
+   "ok": true,
+   "detail": "Việc của em lúc này: Ghép số của em với số bậc anh em: số bên trái nhân 10 rồi cộng số bên phải. Rồi đi tới gần bậc có số đó và nhảy."
+  },
+  {
+   "size": "1366x768",
+   "area": "\"?\" tạm dừng",
+   "name": "đóng hộp thì chạy tiếp",
+   "ok": true,
+   "detail": "1.1445999999999992 → 1.6580999999999977"
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 2",
+   "name": "leo hết cây đến gốc rồi hiện bảng xong vòng",
+   "ok": true,
+   "detail": "banner"
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 2",
+   "name": "hiện \"Em chỉ cần 3 phép ghép thay vì kiểm tra cả 8 lá!\" và gốc em tính khác gốc trong sổ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 3",
+   "name": "chữ số trên bậc ≥ 16 px",
+   "ok": true,
+   "detail": "41.7 px"
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 3",
+   "name": "16 lá, 3 lựa chọn mỗi tầng",
+   "ok": true,
+   "detail": "{\"round\":2,\"depth\":4,\"n\":3,\"leaves\":16}"
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 3",
+   "name": "bậc lựa chọn trượt qua lại",
+   "ok": true,
+   "detail": "0.182 → -0.042"
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 3",
+   "name": "leo hết cây đến gốc rồi hiện bảng xong vòng",
+   "ok": true,
+   "detail": "banner"
+  },
+  {
+   "size": "1366x768",
+   "area": "vòng 3",
+   "name": "hiện \"Em chỉ cần 4 phép ghép thay vì kiểm tra cả 16 lá!\" và gốc em tính khác gốc trong sổ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "bậc trượt",
+   "name": "vòng 3 trượt nhanh hơn vòng 2",
+   "ok": true,
+   "detail": "0.00 / 0.74 / 1.49"
+  },
+  {
+   "size": "1366x768",
+   "area": "FPS",
+   "name": "mẫu 3 giây giữa vòng 2: 144 khung/giây (trình duyệt không đầu, WebGL phần mềm; chỉ để tham khảo)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "cao trào",
+   "name": "thắng vẫn vào cảnh cao trào (đủ 4 Trang Sổ Vàng)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "kết quả",
+   "name": "không nhầm lần nào: 450 điểm (3 vòng × 100 + 3 tim × 50)",
+   "ok": true,
+   "detail": "Điểm: 450"
+  },
+  {
+   "size": "1366x768",
+   "area": "kết quả",
+   "name": "điểm từng phần: vòng leo xong và tim còn lại, không còn tiền đồng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "kết quả",
+   "name": "ghi tiến độ: màn 12 đã chơi, đủ 4 Trang Sổ Vàng",
+   "ok": true,
+   "detail": "[1,1,3,450]"
+  },
+  {
+   "size": "1366x768",
+   "area": "kết quả",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "hết tim",
+   "name": "nhảy sai 3 lần thì hiện lời Bi giúp",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "hết tim",
+   "name": "logic: thua, 0 tim, 3 lần nhầm",
+   "ok": true,
+   "detail": "{\"phase\":\"lost\",\"hearts\":0,\"mistakes\":3}"
+  },
+  {
+   "size": "1366x768",
+   "area": "hết tim",
+   "name": "hết tim vẫn vào cảnh cao trào",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "hết tim",
+   "name": "điểm 0 (chưa xong vòng nào)",
+   "ok": true,
+   "detail": "Điểm: 0"
+  },
+  {
+   "size": "1366x768",
+   "area": "hết tim",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tự hoàn thành",
+   "name": "thẻ bắt đầu có nút \"Tự hoàn thành cả màn\" (bản dev)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tự hoàn thành",
+   "name": "bấm: hiện khung \"Đã tự hoàn thành\"",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "1366x768",
+   "area": "tự hoàn thành",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "hướng dẫn",
+   "name": "bước 0 giới thiệu cây mẫu 4 lá",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "hướng dẫn",
+   "name": "bước 1 chỉ bậc của em, bậc anh em, bậc lựa chọn",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "hướng dẫn",
+   "name": "bước 2 nói tim: nhầm mất tim, hụt không mất",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "hướng dẫn",
+   "name": "bước 3 (đi trái/phải): chờ thao tác thật, không có nút Tiếp",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "hướng dẫn",
+   "name": "cây mẫu 4 lá [3,7,5,2], lá thứ hai bị tráo thành 8",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "hướng dẫn",
+   "name": "đi sang một bên thì sang bước 4 (nhảy lên bậc ghi 38)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "hướng dẫn",
+   "name": "nhảy lên đúng bậc thì sang bước cuối",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "hướng dẫn",
+   "name": "ván thật chưa bị đụng trong lúc làm thử",
+   "ok": true,
+   "detail": "{\"level\":0,\"hearts\":3,\"time\":0,\"rounds\":0}"
+  },
+  {
+   "size": "360x800",
+   "area": "hướng dẫn",
+   "name": "xong thì spotlight đóng, vào ván thật vòng 1",
+   "ok": true,
+   "detail": "{\"active\":false,\"practice\":false,\"tip\":false,\"skipBtn\":false}"
+  },
+  {
+   "size": "360x800",
+   "area": "hướng dẫn",
+   "name": "không cộng điểm hay tiến độ: cookie giữ nguyên lv[12], gp",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "hướng dẫn",
+   "name": "mở lại hướng dẫn giữa ván: ván thật tạm dừng thật (đồng hồ đứng yên)",
+   "ok": true,
+   "detail": "0.5134000000000007 → 0.5480000000000003"
+  },
+  {
+   "size": "360x800",
+   "area": "hướng dẫn",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "bố cục",
+   "name": "khung dọc: cảnh nhận đúng khung",
+   "ok": true,
+   "detail": "portrait"
+  },
+  {
+   "size": "360x800",
+   "area": "bố cục",
+   "name": "chữ số trên bậc ≥ 16 px",
+   "ok": true,
+   "detail": "19.8 px, ppu 40"
+  },
+  {
+   "size": "360x800",
+   "area": "bố cục",
+   "name": "vòng 1: 8 lá (3 tầng), 2 lựa chọn, 3 tim",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "điều khiển",
+   "name": "có 3 nút cảm ứng ◀ ▶ Nhảy, mỗi nút ≥ 48 px",
+   "ok": true,
+   "detail": "[[60,60],[60,60],[88,60]]"
+  },
+  {
+   "size": "360x800",
+   "area": "điều khiển",
+   "name": "nút nằm ở đáy khung",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "nhảy đúng",
+   "name": "nhảy lên đúng bậc: lên tầng 1, giữ 3 tim",
+   "ok": true,
+   "detail": "{\"level\":1,\"hearts\":3,\"mode\":\"free\"}"
+  },
+  {
+   "size": "360x800",
+   "area": "nhảy đúng",
+   "name": "hiện các lựa chọn tầng trên (2 bậc)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "nhảy đúng",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "nhảy sai",
+   "name": "nhảy vào bậc sai: bậc nứt (mode crack), mất 1 tim ngay",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "nhảy sai",
+   "name": "đang nứt: đúng 1 bậc nứt, còn dưới 0,4 giây",
+   "ok": true,
+   "detail": "{\"left\":0.21299999999999988,\"ch\":1}"
+  },
+  {
+   "size": "360x800",
+   "area": "nhảy sai",
+   "name": "nứt xong bậc biến mất, em rơi về bậc vừa đứng (mode fall)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "nhảy sai",
+   "name": "rơi về bậc cũ, vẫn ở tầng 0, còn 2 tim",
+   "ok": true,
+   "detail": "{\"level\":0,\"y\":0,\"grounded\":true,\"hearts\":2,\"mistakes\":1,\"values\":[78,87],\"slots\":[0,1]}"
+  },
+  {
+   "size": "360x800",
+   "area": "nhảy sai",
+   "name": "làm lại tầng: các lựa chọn giữ số, đổi chỗ",
+   "ok": true,
+   "detail": "1,0 → 0,1"
+  },
+  {
+   "size": "360x800",
+   "area": "nhảy sai",
+   "name": "hiện lời báo \"Bậc này nứt rồi!\"",
+   "ok": true,
+   "detail": "Bậc này nứt rồi!"
+  },
+  {
+   "size": "360x800",
+   "area": "nhảy sai",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "nhảy hụt",
+   "name": "không chạm bậc nào: về bậc cũ, không mất tim, bị khóa nhảy",
+   "ok": true,
+   "detail": "{\"hearts\":3,\"level\":0,\"locked\":true,\"grounded\":true}"
+  },
+  {
+   "size": "360x800",
+   "area": "nhảy hụt",
+   "name": "đang khóa thì bấm nhảy không có tác dụng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "rơi khỏi mép",
+   "name": "bước ra khỏi mép: rơi về bậc cũ, không mất tim, khóa nhảy",
+   "ok": true,
+   "detail": "{\"hearts\":3,\"level\":0,\"y\":0,\"x\":-1.1}"
+  },
+  {
+   "size": "360x800",
+   "area": "rơi khỏi mép",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 1",
+   "name": "chữ số trên bậc ≥ 16 px",
+   "ok": true,
+   "detail": "19.8 px"
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 1",
+   "name": "8 lá, 2 lựa chọn mỗi tầng",
+   "ok": true,
+   "detail": "{\"round\":0,\"depth\":3,\"n\":2,\"leaves\":8}"
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 1",
+   "name": "bậc đứng yên",
+   "ok": true,
+   "detail": "2.2 → 2.2"
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 1",
+   "name": "leo hết cây đến gốc rồi hiện bảng xong vòng",
+   "ok": true,
+   "detail": "banner"
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 1",
+   "name": "hiện \"Em chỉ cần 3 phép ghép thay vì kiểm tra cả 8 lá!\" và gốc em tính khác gốc trong sổ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 2",
+   "name": "chữ số trên bậc ≥ 16 px",
+   "ok": true,
+   "detail": "19.8 px"
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 2",
+   "name": "8 lá, 2 lựa chọn mỗi tầng",
+   "ok": true,
+   "detail": "{\"round\":1,\"depth\":3,\"n\":2,\"leaves\":8}"
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 2",
+   "name": "bậc lựa chọn trượt qua lại",
+   "ok": true,
+   "detail": "-2.002 → -1.890"
+  },
+  {
+   "size": "360x800",
+   "area": "\"?\" tạm dừng",
+   "name": "mở hộp \"?\": đồng hồ, bậc trượt và người chơi đứng yên (kể cả khi bấm phím)",
+   "ok": true,
+   "detail": "{\"t\":1.1240000000000006,\"c\":1.1240000000000006,\"x\":-1.8608412869989872,\"px\":-1.1} → {\"t\":1.158600000000001,\"c\":1.158600000000001,\"x\":-1.8366212869989869,\"px\":-1.1}"
+  },
+  {
+   "size": "360x800",
+   "area": "\"?\" tạm dừng",
+   "name": "câu nhắc theo trạng thái, không lộ đáp án (không có số của bậc)",
+   "ok": true,
+   "detail": "Việc của em lúc này: Ghép số của em với số bậc anh em: số bên trái nhân 10 rồi cộng số bên phải. Rồi đi tới gần bậc có số đó và nhảy."
+  },
+  {
+   "size": "360x800",
+   "area": "\"?\" tạm dừng",
+   "name": "đóng hộp thì chạy tiếp",
+   "ok": true,
+   "detail": "1.158600000000001 → 1.6654999999880788"
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 2",
+   "name": "leo hết cây đến gốc rồi hiện bảng xong vòng",
+   "ok": true,
+   "detail": "banner"
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 2",
+   "name": "hiện \"Em chỉ cần 3 phép ghép thay vì kiểm tra cả 8 lá!\" và gốc em tính khác gốc trong sổ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 3",
+   "name": "chữ số trên bậc ≥ 16 px",
+   "ok": true,
+   "detail": "19.8 px"
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 3",
+   "name": "16 lá, 3 lựa chọn mỗi tầng",
+   "ok": true,
+   "detail": "{\"round\":2,\"depth\":4,\"n\":3,\"leaves\":16}"
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 3",
+   "name": "bậc lựa chọn trượt qua lại",
+   "ok": true,
+   "detail": "-0.041 → 0.182"
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 3",
+   "name": "leo hết cây đến gốc rồi hiện bảng xong vòng",
+   "ok": true,
+   "detail": "banner"
+  },
+  {
+   "size": "360x800",
+   "area": "vòng 3",
+   "name": "hiện \"Em chỉ cần 4 phép ghép thay vì kiểm tra cả 16 lá!\" và gốc em tính khác gốc trong sổ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "bậc trượt",
+   "name": "vòng 3 trượt nhanh hơn vòng 2",
+   "ok": true,
+   "detail": "0.00 / 0.74 / 1.49"
+  },
+  {
+   "size": "360x800",
+   "area": "FPS",
+   "name": "mẫu 3 giây giữa vòng 2: 144 khung/giây (trình duyệt không đầu, WebGL phần mềm; chỉ để tham khảo)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "cao trào",
+   "name": "thắng vẫn vào cảnh cao trào (đủ 4 Trang Sổ Vàng)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "kết quả",
+   "name": "không nhầm lần nào: 450 điểm (3 vòng × 100 + 3 tim × 50)",
+   "ok": true,
+   "detail": "Điểm: 450"
+  },
+  {
+   "size": "360x800",
+   "area": "kết quả",
+   "name": "điểm từng phần: vòng leo xong và tim còn lại, không còn tiền đồng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "kết quả",
+   "name": "ghi tiến độ: màn 12 đã chơi, đủ 4 Trang Sổ Vàng",
+   "ok": true,
+   "detail": "[1,1,3,450]"
+  },
+  {
+   "size": "360x800",
+   "area": "kết quả",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "hết tim",
+   "name": "nhảy sai 3 lần thì hiện lời Bi giúp",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "hết tim",
+   "name": "logic: thua, 0 tim, 3 lần nhầm",
+   "ok": true,
+   "detail": "{\"phase\":\"lost\",\"hearts\":0,\"mistakes\":3}"
+  },
+  {
+   "size": "360x800",
+   "area": "hết tim",
+   "name": "hết tim vẫn vào cảnh cao trào",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "hết tim",
+   "name": "điểm 0 (chưa xong vòng nào)",
+   "ok": true,
+   "detail": "Điểm: 0"
+  },
+  {
+   "size": "360x800",
+   "area": "hết tim",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "tự hoàn thành",
+   "name": "thẻ bắt đầu có nút \"Tự hoàn thành cả màn\" (bản dev)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "tự hoàn thành",
+   "name": "bấm: hiện khung \"Đã tự hoàn thành\"",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "360x800",
+   "area": "tự hoàn thành",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hướng dẫn",
+   "name": "bước 0 giới thiệu cây mẫu 4 lá",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hướng dẫn",
+   "name": "bước 1 chỉ bậc của em, bậc anh em, bậc lựa chọn",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hướng dẫn",
+   "name": "bước 2 nói tim: nhầm mất tim, hụt không mất",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hướng dẫn",
+   "name": "bước 3 (đi trái/phải): chờ thao tác thật, không có nút Tiếp",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hướng dẫn",
+   "name": "cây mẫu 4 lá [3,7,5,2], lá thứ hai bị tráo thành 8",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hướng dẫn",
+   "name": "đi sang một bên thì sang bước 4 (nhảy lên bậc ghi 38)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hướng dẫn",
+   "name": "nhảy lên đúng bậc thì sang bước cuối",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hướng dẫn",
+   "name": "ván thật chưa bị đụng trong lúc làm thử",
+   "ok": true,
+   "detail": "{\"level\":0,\"hearts\":3,\"time\":0,\"rounds\":0}"
+  },
+  {
+   "size": "844x390",
+   "area": "hướng dẫn",
+   "name": "xong thì spotlight đóng, vào ván thật vòng 1",
+   "ok": true,
+   "detail": "{\"active\":false,\"practice\":false,\"tip\":false,\"skipBtn\":false}"
+  },
+  {
+   "size": "844x390",
+   "area": "hướng dẫn",
+   "name": "không cộng điểm hay tiến độ: cookie giữ nguyên lv[12], gp",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hướng dẫn",
+   "name": "mở lại hướng dẫn giữa ván: ván thật tạm dừng thật (đồng hồ đứng yên)",
+   "ok": true,
+   "detail": "0.5200999999999998 → 0.5548000000000006"
+  },
+  {
+   "size": "844x390",
+   "area": "hướng dẫn",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "bố cục",
+   "name": "khung ngang: cảnh nhận đúng khung",
+   "ok": true,
+   "detail": "landscape"
+  },
+  {
+   "size": "844x390",
+   "area": "bố cục",
+   "name": "chữ số trên bậc ≥ 16 px",
+   "ok": true,
+   "detail": "19.8 px, ppu 43.3125"
+  },
+  {
+   "size": "844x390",
+   "area": "bố cục",
+   "name": "vòng 1: 8 lá (3 tầng), 2 lựa chọn, 3 tim",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "điều khiển",
+   "name": "có 3 nút cảm ứng ◀ ▶ Nhảy, mỗi nút ≥ 48 px",
+   "ok": true,
+   "detail": "[[60,60],[60,60],[88,60]]"
+  },
+  {
+   "size": "844x390",
+   "area": "điều khiển",
+   "name": "nút nằm ở đáy khung",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "nhảy đúng",
+   "name": "nhảy lên đúng bậc: lên tầng 1, giữ 3 tim",
+   "ok": true,
+   "detail": "{\"level\":1,\"hearts\":3,\"mode\":\"free\"}"
+  },
+  {
+   "size": "844x390",
+   "area": "nhảy đúng",
+   "name": "hiện các lựa chọn tầng trên (2 bậc)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "nhảy đúng",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "nhảy sai",
+   "name": "nhảy vào bậc sai: bậc nứt (mode crack), mất 1 tim ngay",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "nhảy sai",
+   "name": "đang nứt: đúng 1 bậc nứt, còn dưới 0,4 giây",
+   "ok": true,
+   "detail": "{\"left\":0.2126999999999997,\"ch\":1}"
+  },
+  {
+   "size": "844x390",
+   "area": "nhảy sai",
+   "name": "nứt xong bậc biến mất, em rơi về bậc vừa đứng (mode fall)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "nhảy sai",
+   "name": "rơi về bậc cũ, vẫn ở tầng 0, còn 2 tim",
+   "ok": true,
+   "detail": "{\"level\":0,\"y\":0,\"grounded\":true,\"hearts\":2,\"mistakes\":1,\"values\":[35,39],\"slots\":[1,0]}"
+  },
+  {
+   "size": "844x390",
+   "area": "nhảy sai",
+   "name": "làm lại tầng: các lựa chọn giữ số, đổi chỗ",
+   "ok": true,
+   "detail": "0,1 → 1,0"
+  },
+  {
+   "size": "844x390",
+   "area": "nhảy sai",
+   "name": "hiện lời báo \"Bậc này nứt rồi!\"",
+   "ok": true,
+   "detail": "Bậc này nứt rồi!"
+  },
+  {
+   "size": "844x390",
+   "area": "nhảy sai",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "nhảy hụt",
+   "name": "không chạm bậc nào: về bậc cũ, không mất tim, bị khóa nhảy",
+   "ok": true,
+   "detail": "{\"hearts\":3,\"level\":0,\"locked\":true,\"grounded\":true}"
+  },
+  {
+   "size": "844x390",
+   "area": "nhảy hụt",
+   "name": "đang khóa thì bấm nhảy không có tác dụng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "rơi khỏi mép",
+   "name": "bước ra khỏi mép: rơi về bậc cũ, không mất tim, khóa nhảy",
+   "ok": true,
+   "detail": "{\"hearts\":3,\"level\":0,\"y\":0,\"x\":-1.1}"
+  },
+  {
+   "size": "844x390",
+   "area": "rơi khỏi mép",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 1",
+   "name": "chữ số trên bậc ≥ 16 px",
+   "ok": true,
+   "detail": "19.8 px"
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 1",
+   "name": "8 lá, 2 lựa chọn mỗi tầng",
+   "ok": true,
+   "detail": "{\"round\":0,\"depth\":3,\"n\":2,\"leaves\":8}"
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 1",
+   "name": "bậc đứng yên",
+   "ok": true,
+   "detail": "-2.2 → -2.2"
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 1",
+   "name": "leo hết cây đến gốc rồi hiện bảng xong vòng",
+   "ok": true,
+   "detail": "banner"
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 1",
+   "name": "hiện \"Em chỉ cần 3 phép ghép thay vì kiểm tra cả 8 lá!\" và gốc em tính khác gốc trong sổ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 2",
+   "name": "chữ số trên bậc ≥ 16 px",
+   "ok": true,
+   "detail": "19.8 px"
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 2",
+   "name": "8 lá, 2 lựa chọn mỗi tầng",
+   "ok": true,
+   "detail": "{\"round\":1,\"depth\":3,\"n\":2,\"leaves\":8}"
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 2",
+   "name": "bậc lựa chọn trượt qua lại",
+   "ok": true,
+   "detail": "2.242 → 2.135"
+  },
+  {
+   "size": "844x390",
+   "area": "\"?\" tạm dừng",
+   "name": "mở hộp \"?\": đồng hồ, bậc trượt và người chơi đứng yên (kể cả khi bấm phím)",
+   "ok": true,
+   "detail": "{\"t\":1.109900000000001,\"c\":1.109900000000001,\"x\":2.1058439845961328,\"px\":-1.1} → {\"t\":1.1446000000000014,\"c\":1.1446000000000014,\"x\":2.0815539845961326,\"px\":-1.1}"
+  },
+  {
+   "size": "844x390",
+   "area": "\"?\" tạm dừng",
+   "name": "câu nhắc theo trạng thái, không lộ đáp án (không có số của bậc)",
+   "ok": true,
+   "detail": "Việc của em lúc này: Ghép số của em với số bậc anh em: số bên trái nhân 10 rồi cộng số bên phải. Rồi đi tới gần bậc có số đó và nhảy."
+  },
+  {
+   "size": "844x390",
+   "area": "\"?\" tạm dừng",
+   "name": "đóng hộp thì chạy tiếp",
+   "ok": true,
+   "detail": "1.1446000000000014 → 1.657999999999999"
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 2",
+   "name": "leo hết cây đến gốc rồi hiện bảng xong vòng",
+   "ok": true,
+   "detail": "banner"
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 2",
+   "name": "hiện \"Em chỉ cần 3 phép ghép thay vì kiểm tra cả 8 lá!\" và gốc em tính khác gốc trong sổ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 3",
+   "name": "chữ số trên bậc ≥ 16 px",
+   "ok": true,
+   "detail": "19.8 px"
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 3",
+   "name": "16 lá, 3 lựa chọn mỗi tầng",
+   "ok": true,
+   "detail": "{\"round\":2,\"depth\":4,\"n\":3,\"leaves\":16}"
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 3",
+   "name": "bậc lựa chọn trượt qua lại",
+   "ok": true,
+   "detail": "2.488 → 2.274"
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 3",
+   "name": "leo hết cây đến gốc rồi hiện bảng xong vòng",
+   "ok": true,
+   "detail": "banner"
+  },
+  {
+   "size": "844x390",
+   "area": "vòng 3",
+   "name": "hiện \"Em chỉ cần 4 phép ghép thay vì kiểm tra cả 16 lá!\" và gốc em tính khác gốc trong sổ",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "bậc trượt",
+   "name": "vòng 3 trượt nhanh hơn vòng 2",
+   "ok": true,
+   "detail": "0.00 / 0.71 / 1.42"
+  },
+  {
+   "size": "844x390",
+   "area": "FPS",
+   "name": "mẫu 3 giây giữa vòng 2: 144 khung/giây (trình duyệt không đầu, WebGL phần mềm; chỉ để tham khảo)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "cao trào",
+   "name": "thắng vẫn vào cảnh cao trào (đủ 4 Trang Sổ Vàng)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "kết quả",
+   "name": "không nhầm lần nào: 450 điểm (3 vòng × 100 + 3 tim × 50)",
+   "ok": true,
+   "detail": "Điểm: 450"
+  },
+  {
+   "size": "844x390",
+   "area": "kết quả",
+   "name": "điểm từng phần: vòng leo xong và tim còn lại, không còn tiền đồng",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "kết quả",
+   "name": "ghi tiến độ: màn 12 đã chơi, đủ 4 Trang Sổ Vàng",
+   "ok": true,
+   "detail": "[1,1,3,450]"
+  },
+  {
+   "size": "844x390",
+   "area": "kết quả",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hết tim",
+   "name": "nhảy sai 3 lần thì hiện lời Bi giúp",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hết tim",
+   "name": "logic: thua, 0 tim, 3 lần nhầm",
+   "ok": true,
+   "detail": "{\"phase\":\"lost\",\"hearts\":0,\"mistakes\":3}"
+  },
+  {
+   "size": "844x390",
+   "area": "hết tim",
+   "name": "hết tim vẫn vào cảnh cao trào",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "hết tim",
+   "name": "điểm 0 (chưa xong vòng nào)",
+   "ok": true,
+   "detail": "Điểm: 0"
+  },
+  {
+   "size": "844x390",
+   "area": "hết tim",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "tự hoàn thành",
+   "name": "thẻ bắt đầu có nút \"Tự hoàn thành cả màn\" (bản dev)",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "tự hoàn thành",
+   "name": "bấm: hiện khung \"Đã tự hoàn thành\"",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "size": "844x390",
+   "area": "tự hoàn thành",
+   "name": "không lỗi trình duyệt",
+   "ok": true,
+   "detail": ""
+  }
+ ],
+ "shots": [
+  {
+   "file": "man12-huong-dan-0-1366x768.jpg",
+   "bytes": 27761
+  },
+  {
+   "file": "man12-huong-dan-nhay-1366x768.jpg",
+   "bytes": 37687
+  },
+  {
+   "file": "man12-huong-dan-xong-1366x768.jpg",
+   "bytes": 45992
+  },
+  {
+   "file": "man12-bat-dau-1366x768.jpg",
+   "bytes": 28624
+  },
+  {
+   "file": "man12-len-tang-1-1366x768.jpg",
+   "bytes": 29452
+  },
+  {
+   "file": "man12-bac-nut-1366x768.jpg",
+   "bytes": 31037
+  },
+  {
+   "file": "man12-roi-khoi-mep-1366x768.jpg",
+   "bytes": 32084
+  },
+  {
+   "file": "man12-vong-1-xong-1366x768.jpg",
+   "bytes": 49280
+  },
+  {
+   "file": "man12-vong-2-bac-truot-1366x768.jpg",
+   "bytes": 28550
+  },
+  {
+   "file": "man12-hop-goi-y-1366x768.jpg",
+   "bytes": 41444
+  },
+  {
+   "file": "man12-vong-3-xong-1366x768.jpg",
+   "bytes": 49822
+  },
+  {
+   "file": "man12-cao-trao-1366x768.jpg",
+   "bytes": 58332
+  },
+  {
+   "file": "man12-ket-qua-1366x768.jpg",
+   "bytes": 54500
+  },
+  {
+   "file": "man12-het-tim-1366x768.jpg",
+   "bytes": 37730
+  },
+  {
+   "file": "man12-tu-hoan-thanh-1366x768.jpg",
+   "bytes": 35140
+  },
+  {
+   "file": "man12-huong-dan-0-360x800.jpg",
+   "bytes": 19310
+  },
+  {
+   "file": "man12-huong-dan-nhay-360x800.jpg",
+   "bytes": 25795
+  },
+  {
+   "file": "man12-huong-dan-xong-360x800.jpg",
+   "bytes": 29601
+  },
+  {
+   "file": "man12-bat-dau-360x800.jpg",
+   "bytes": 18126
+  },
+  {
+   "file": "man12-len-tang-1-360x800.jpg",
+   "bytes": 20845
+  },
+  {
+   "file": "man12-bac-nut-360x800.jpg",
+   "bytes": 18358
+  },
+  {
+   "file": "man12-roi-khoi-mep-360x800.jpg",
+   "bytes": 18452
+  },
+  {
+   "file": "man12-vong-1-xong-360x800.jpg",
+   "bytes": 21259
+  },
+  {
+   "file": "man12-vong-2-bac-truot-360x800.jpg",
+   "bytes": 18405
+  },
+  {
+   "file": "man12-hop-goi-y-360x800.jpg",
+   "bytes": 32308
+  },
+  {
+   "file": "man12-vong-3-xong-360x800.jpg",
+   "bytes": 22012
+  },
+  {
+   "file": "man12-cao-trao-360x800.jpg",
+   "bytes": 22417
+  },
+  {
+   "file": "man12-ket-qua-360x800.jpg",
+   "bytes": 33133
+  },
+  {
+   "file": "man12-het-tim-360x800.jpg",
+   "bytes": 19535
+  },
+  {
+   "file": "man12-tu-hoan-thanh-360x800.jpg",
+   "bytes": 27570
+  },
+  {
+   "file": "man12-huong-dan-0-844x390.jpg",
+   "bytes": 19432
+  },
+  {
+   "file": "man12-huong-dan-nhay-844x390.jpg",
+   "bytes": 24016
+  },
+  {
+   "file": "man12-huong-dan-xong-844x390.jpg",
+   "bytes": 25384
+  },
+  {
+   "file": "man12-bat-dau-844x390.jpg",
+   "bytes": 19209
+  },
+  {
+   "file": "man12-len-tang-1-844x390.jpg",
+   "bytes": 19366
+  },
+  {
+   "file": "man12-bac-nut-844x390.jpg",
+   "bytes": 20583
+  },
+  {
+   "file": "man12-roi-khoi-mep-844x390.jpg",
+   "bytes": 21221
+  },
+  {
+   "file": "man12-vong-1-xong-844x390.jpg",
+   "bytes": 25417
+  },
+  {
+   "file": "man12-vong-2-bac-truot-844x390.jpg",
+   "bytes": 19045
+  },
+  {
+   "file": "man12-hop-goi-y-844x390.jpg",
+   "bytes": 30625
+  },
+  {
+   "file": "man12-vong-3-xong-844x390.jpg",
+   "bytes": 26273
+  },
+  {
+   "file": "man12-cao-trao-844x390.jpg",
+   "bytes": 26026
+  },
+  {
+   "file": "man12-ket-qua-844x390.jpg",
+   "bytes": 29909
+  },
+  {
+   "file": "man12-het-tim-844x390.jpg",
+   "bytes": 21743
+  },
+  {
+   "file": "man12-tu-hoan-thanh-844x390.jpg",
+   "bytes": 29428
+  }
+ ]
+}

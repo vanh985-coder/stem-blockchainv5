@@ -13,7 +13,8 @@ export type WhackHintKey = NhacKey<5>;
 
 export function hintFor(s: Pick<WhackState, 'phase' | 'ink' | 'mice' | 'coin' | 'clock' | 'stats'>): readonly WhackHintKey[] {
   if (s.phase === 'ended') return ['hetVan'];
-  if (s.phase === 'quiz') return ['trumHoi'];
+  if (s.phase === 'answer') return ['trumHoi'];
+  if (s.phase === 'quiz') return ['ketQua'];
   if (s.phase === 'bossRun') return ['trumChay'];
   const room = WHACK_SPEC.inkMax - s.ink;
   if (room >= 1 && room <= 2) return ['soSapDay'];
