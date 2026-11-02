@@ -69,3 +69,24 @@ describe('gộp lệnh phím và cần điều khiển', () => {
     expect(api.camera.pitch).toBe(0.9);
   });
 });
+
+describe('nút Chạy nhanh', () => {
+  it('bật nút thì chạy dù không giữ Shift, cả khi có cần điều khiển nhẹ', () => {
+    const api = createWalkApi();
+    api.input.keyAxis.y = 1;
+    api.input.runToggle = true;
+    const o = out();
+    combineInput(api.input, o);
+    expect(o.run).toBe(true);
+    api.input.stick.y = 0.4;
+    api.input.stickMag = 0.4;
+    combineInput(api.input, o);
+    expect(o.run).toBe(true);
+  });
+  it('tạm dừng (resetWalkInput) thì tự tắt', () => {
+    const api = createWalkApi();
+    api.input.runToggle = true;
+    resetWalkInput(api);
+    expect(api.input.runToggle).toBe(false);
+  });
+});

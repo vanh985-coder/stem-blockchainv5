@@ -3,7 +3,7 @@
  * Chỉ là các đối tượng thường (không import React hay three) nên hai bên, dù chạy ở hai bộ dựng hình khác nhau, dùng chung được.
  */
 import { createCameraAngles, type CameraAngles } from './cameraRig';
-import { clearKeys, createKeyState, runFromStick, type Axis, type KeyState } from './walkInput';
+import { clearKeys, createKeyState, isRunning, type Axis, type KeyState } from './walkInput';
 import type { MoveInput } from './playerMotion';
 
 export interface WalkInput {
@@ -11,6 +11,8 @@ export interface WalkInput {
   keyAxis: Axis;
   /** Đang giữ Shift */
   keyRun: boolean;
+  /** Nút "Chạy nhanh" đang bật (tự tắt khi tạm dừng) */
+  runToggle: boolean;
   /** Vectơ từ cần điều khiển trên điện thoại (độ lớn tối đa 1) */
   stick: Axis;
   /** Độ lớn đẩy cần (0 là không đẩy) */
@@ -41,7 +43,7 @@ export interface WalkApi {
 export function createWalkApi(cameraYaw = 0): WalkApi {
   return {
     lock: { request: () => undefined, exit: () => undefined },
-    input: { keyAxis: { x: 0, y: 0 }, keyRun: false, stick: { x: 0, y: 0 }, stickMag: 0, jump: false },
+    input: { keyAxis: { x: 0, y: 0 }, keyRun: false, runToggle: false, stick: { x: 0, y: 0 }, stickMag: 0, jump: false },
     keys: createKeyState(),
     held: new Set(),
     camera: createCameraAngles(cameraYaw),
@@ -58,6 +60,7 @@ export function resetWalkInput(api: WalkApi): void {
   i.keyAxis.x = 0;
   i.keyAxis.y = 0;
   i.keyRun = false;
+  i.runToggle = false;
   i.stick.x = 0;
   i.stick.y = 0;
   i.stickMag = 0;
@@ -66,17 +69,17 @@ export function resetWalkInput(api: WalkApi): void {
 
 /**
  * Gộp lệnh của một khung hình vào `out`: đang đẩy cần điều khiển thì theo cần (chạy khi quá 80%), không thì theo phím.
- * Giữ Shift luôn là chạy. Lệnh nhảy chờ được tiêu thụ. Không cấp phát.
+ * Giữ Shift hoặc bật nút "Chạy nhanh" luôn là chạy. Lệnh nhảy chờ được tiêu thụ. Không cấp phát.
  */
 export function combineInput(w: WalkInput, out: MoveInput): void {
   if (w.stickMag > 0) {
     out.x = w.stick.x;
     out.y = w.stick.y;
-    out.run = w.keyRun || runFromStick(w.stickMag);
+    out.run = isRunning(w.keyRun, w.runToggle, w.stickMag);
   } else {
     out.x = w.keyAxis.x;
     out.y = w.keyAxis.y;
-    out.run = w.keyRun;
+    out.run = isRunning(w.keyRun, w.runToggle, 0);
   }
   out.jump = w.jump;
   w.jump = false;

@@ -328,10 +328,11 @@ Mỗi người lệch pha ngẫu nhiên để không nhún đồng loạt. Hàm 
 
 | Thiết bị | Điều khiển |
 |---|---|
-| Máy tính | **Bấm vào khung để khóa chuột** (pointer lock), rê chuột xoay camera quanh nhân vật (kiểu PUBG); W/↑ đi về phía camera nhìn, A/D/S (và ←/→/↓) quay người đi về hướng đó; Shift chạy; Space nhảy; E tương tác; **Esc nhả chuột và mở menu**; **M mở bản đồ lớn** (mục 3.10) |
-| Điện thoại | Cần điều khiển động ở nửa trái màn hình (đẩy quá 80% là chạy); nút nhảy và nút ✋ ở góc phải |
+| Máy tính | **Bấm vào khung để khóa chuột** (pointer lock), rê chuột xoay camera quanh nhân vật (kiểu PUBG); W/↑ đi về phía camera nhìn, A/D/S (và ←/→/↓) quay người đi về hướng đó; Shift (giữ) chạy nhanh, hoặc nút "Chạy nhanh" ở góc phải màn hình (bật/tắt); Space nhảy; E tương tác; **Esc nhả chuột và mở menu**; **M mở bản đồ lớn** (mục 3.10) |
+| Điện thoại | Cần điều khiển động ở nửa trái màn hình (đẩy quá 80% là chạy); nút nhảy, nút ✋ và nút "Chạy nhanh" (bật/tắt, `aria-pressed`) ở góc phải |
 
-- **Tốc độ:** đi 4, chạy 7. **Nhảy:** vận tốc đầu 6, trọng lực 18.
+- **Tốc độ:** đi 4, chạy 7.
+- **Chạy nhanh (tự chọn hệ số 1,75 = 7 / 4, nằm trong khoảng 1,6–1,8):** chạy khi giữ Shift, khi nút "Chạy nhanh" đang bật (`WalkInput.runToggle`) hoặc đẩy cần quá 80% (`walkInput.isRunning`). Nút nằm ở góc dưới phải, trên nút nhảy ở điện thoại; bấm nút không khóa/nhả chuột và không kéo camera (`data-walk-ui`). Nút bật thì sáng (`aria-pressed`). Tự tắt khi tạm dừng (hộp thoại, bản đồ lớn, hướng dẫn, menu, mất focus): `resetWalkInput`. Máy tính khi đã khóa chuột không bấm được nút, dùng Shift. Va chạm chia bước con (`collisionSubsteps`: mỗi bước ≤ 0,5 × bán kính 0,4, tối đa 8) nên khung hình 0,05 giây ở tốc độ 7 (0,35 đơn vị) đi 2 bước, không xuyên tường mỏng. Clip `run` của hoc-sinh-nam phát theo `locomotionTimeScale(RUN_SPEED, runSpeed)`. Giảm chuyển động vẫn cho chạy nhanh (cảnh đi lại không có rung camera). Kiểm: `scripts/chay-nhanh-check.mjs`. **Nhảy:** vận tốc đầu 6, trọng lực 18.
 - **Camera:** ở sau lưng, cách 7, cao 4.
 - **Va chạm** (hàm thuần, có test):
 
@@ -345,13 +346,13 @@ Mỗi người lệch pha ngẫu nhiên để không nhún đồng loạt. Hàm 
 
 **Cách làm (mốc 2, bước 6)** — logic là hàm thuần có test, trong `packages/core/src/three/`:
 - `collision.ts`: `resolveCollisions` (vật tròn, hộp, biên bán kính; bán kính nhân vật 0,4). Đẩy ra theo điểm gần nhất của vật cản nên đi xéo vào hộp là trượt dọc mặt hộp, vòng qua góc; đâm đúng vào góc thì dừng yên, không rung.
-- `playerMotion.ts`: `stepPlayer` (đi 4, chạy 7, nhảy vận tốc đầu 6, trọng lực 18, đỉnh nhảy 1 đơn vị, ở trên không 2/3 giây). Tăng và giảm tốc mượt (~0,2 giây), mặt quay mượt 10 rad/giây về hướng đi, nhảy không đôi, bấm nhảy sớm ≤ 0,12 giây vẫn tính. Tạm dừng (`paused`): bỏ lệnh đi và nhảy. `animationFor`: idle/walk/run/jump; `locomotionTimeScale` và `jumpTimeScale` chỉnh tốc độ phát clip cho khớp tốc độ đi (kẹp 0,6–2,4).
+- `playerMotion.ts`: `stepPlayer` (đi 4, chạy 7 = 1,75 lần, chia bước va chạm khi đi nhanh, nhảy vận tốc đầu 6, trọng lực 18, đỉnh nhảy 1 đơn vị, ở trên không 2/3 giây). Tăng và giảm tốc mượt (~0,2 giây), mặt quay mượt 10 rad/giây về hướng đi, nhảy không đôi, bấm nhảy sớm ≤ 0,12 giây vẫn tính. Tạm dừng (`paused`): bỏ lệnh đi và nhảy. `animationFor`: idle/walk/run/jump; `locomotionTimeScale` và `jumpTimeScale` chỉnh tốc độ phát clip cho khớp tốc độ đi (kẹp 0,6–2,4).
 - `cameraRig.ts`: camera ở phía sau theo hướng nhìn, cách ngang 7, cao 4 (quỹ đạo bán kính √65, góc ngẩng mặc định ≈ 29,7°); bám mượt (độ gắt 7). "Tiến lên" là hướng camera nhìn.
   - **Máy tính (khóa chuột):** `lookCamera(cam, movementX, movementY, độ nhạy)`: rê sang phải thì camera nhìn sang phải (yaw giảm), rê lên thì ngước (góc ngẩng giảm, camera hạ), rê xuống thì cúi (camera nâng lên); góc ngẩng kẹp trong **5°–60°**; 0,0025 rad mỗi pixel nhân với "Độ nhạy chuột"; mỗi sự kiện chuột chặn tối đa 150px (Chrome thỉnh thoảng báo cú nhảy vọt). Không còn giữ chuột trái để kéo (chỉ còn là cách dự phòng khi trình duyệt không có khóa chuột).
   - **Điện thoại:** vuốt nửa phải màn hình bằng `dragCamera` (kéo sang phải thì cảnh trượt sang phải, giới hạn 0,12–1,2 rad), không đổi.
   - **"Độ nhạy chuột"** là một thanh trượt trong Cài đặt (`Settings.mouseSensitivity`, 0,3 đến 3, bước 0,1, mặc định 1, lưu cùng các cài đặt khác; `clampMouseSensitivity` là hàm thuần có test), cũng có trong hộp menu của /dev/walk.
 - `interaction.ts`: `nearestInteractable`, bán kính 2,2.
-- `walkInput.ts`, `walkApi.ts`: ánh xạ phím (WASD, mũi tên, Shift, Space, E, Esc), cần điều khiển động (bán kính 56px, vùng chết 12%, quá 80% là chạy), gộp lệnh phím/cần mỗi khung hình.
+- `walkInput.ts`, `walkApi.ts`: ánh xạ phím (WASD, mũi tên, Shift, Space, E, Esc), `isRunning`/`toggleRun`, cần điều khiển động (bán kính 56px, vùng chết 12%, quá 80% là chạy), gộp lệnh phím/cần mỗi khung hình.
 - `WalkControls.tsx` (DOM) ghi vào `WalkApi`; `WalkWorld.tsx` (trong Scene3D) đọc mỗi khung hình: nền đất tròn, người chơi (học sinh), camera, Bi. Hai bên chỉ trao đổi qua `WalkApi` (đối tượng thường) nên không cấp phát trong `useFrame`.
 - **Điện thoại:** `touch-action: none`, chặn `touchmove`/`gesturestart`, khóa cuộn trang khi đang chơi; nút nhảy 76px, nút ✋ 64px (≥ 44px). Chạm nửa trái hiện cần điều khiển tại điểm chạm; vuốt nửa phải xoay camera. Phần tử đánh dấu `data-walk-ui` (bảng thông tin, nút) không bắt đầu kéo camera hay cần điều khiển.
 - **Khóa chuột, hộp thoại và menu (máy tính):** `WalkControls` nhận `lockMode` (trình duyệt có `requestPointerLock` và con trỏ là chuột), `onLockChange`, `onLockError`; `WalkApi.lock.request/exit` cho nơi dùng xin hoặc nhả khóa.

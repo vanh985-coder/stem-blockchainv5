@@ -10,6 +10,28 @@ import { turnToward } from './staticMotion';
 /** Tốc độ đi và chạy (đơn vị/giây). */
 export const WALK_SPEED = 4;
 export const RUN_SPEED = 7;
+/** Hệ số chạy nhanh so với đi thường (7 / 4 = 1,75). */
+export const RUN_FACTOR = RUN_SPEED / WALK_SPEED;
+/** Mỗi bước va chạm đi tối đa bằng ngần này lần bán kính nhân vật (nhỏ hơn bề dày vật cản mỏng nhất mà vẫn đẩy ra đúng phía). */
+export const MAX_STEP_RADIUS_RATIO = 0.5;
+/** Chặn số bước con mỗi khung hình (khung hình rất dài đã bị cắt ở `dt` ≤ 0,05 nên thực tế chỉ 1 đến 2). */
+export const MAX_SUBSTEPS = 8;
+
+/** Tốc độ mong muốn (đơn vị/giây): đứng yên 0, đi `WALK_SPEED`, chạy nhanh `RUN_SPEED`. */
+export function moveSpeed(moving: boolean, run: boolean): number {
+  if (!moving) return 0;
+  return run ? RUN_SPEED : WALK_SPEED;
+}
+
+/**
+ * Số bước con va chạm cho một khung hình đi `distance` đơn vị: mỗi bước không vượt `radius × MAX_STEP_RADIUS_RATIO`, nên
+ * chạy nhanh không xuyên được vật cản mỏng. Ít nhất 1, nhiều nhất `MAX_SUBSTEPS`.
+ */
+export function collisionSubsteps(distance: number, radius: number): number {
+  const limit = radius * MAX_STEP_RADIUS_RATIO;
+  if (!(distance > limit) || !(limit > 0)) return 1;
+  return Math.min(MAX_SUBSTEPS, Math.ceil(distance / limit));
+}
 /** Nhảy: vận tốc đầu và trọng lực (đơn vị/giây, đơn vị/giây²). Đỉnh nhảy cao 6²/(2 × 18) = 1 đơn vị, ở trên không 2/3 giây. */
 export const JUMP_VELOCITY = 6;
 export const GRAVITY = 18;
@@ -114,7 +136,7 @@ export function stepPlayer(s: PlayerState, input: MoveInput, camYaw: number, dt:
     dir.z = 0;
   }
   const moving = mag > 0;
-  const speed = moving ? (input.run ? RUN_SPEED : WALK_SPEED) : 0;
+  const speed = moveSpeed(moving, input.run);
   s.moving = moving;
   s.running = moving && input.run;
 
@@ -128,9 +150,14 @@ export function stepPlayer(s: PlayerState, input: MoveInput, camYaw: number, dt:
   }
   if (moving) s.yaw = turnToward(s.yaw, Math.atan2(dir.x, dir.z), TURN_RATE * dt);
 
-  s.x += s.vx * dt;
-  s.z += s.vz * dt;
-  resolveCollisions(s, world.radius ?? PLAYER_RADIUS, world.obstacles, world.boundsRadius);
+  const radius = world.radius ?? PLAYER_RADIUS;
+  const steps = collisionSubsteps(Math.hypot(s.vx, s.vz) * dt, radius);
+  const sub = dt / steps;
+  for (let i = 0; i < steps; i++) {
+    s.x += s.vx * sub;
+    s.z += s.vz * sub;
+    resolveCollisions(s, radius, world.obstacles, world.boundsRadius);
+  }
 
   // nhảy
   if (!paused && input.jump) s.jumpBuffer = JUMP_BUFFER;

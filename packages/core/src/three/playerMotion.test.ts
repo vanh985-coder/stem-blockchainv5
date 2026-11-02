@@ -5,11 +5,15 @@ import {
   GRAVITY,
   JUMP_BUFFER,
   JUMP_VELOCITY,
+  MAX_SUBSTEPS,
+  RUN_FACTOR,
   RUN_SPEED,
   TIME_SCALE_MAX,
   TIME_SCALE_MIN,
   WALK_SPEED,
   animationFor,
+  collisionSubsteps,
+  moveSpeed,
   createPlayerState,
   jumpTimeScale,
   locomotionTimeScale,
@@ -180,6 +184,46 @@ describe('nhảy', () => {
     expect(GRAVITY).toBe(18);
     expect(WALK_SPEED).toBe(4);
     expect(RUN_SPEED).toBe(7);
+  });
+});
+
+describe('chạy nhanh', () => {
+  it('hệ số 1,75 nằm trong khoảng 1,6 đến 1,8', () => {
+    expect(RUN_FACTOR).toBeCloseTo(1.75, 9);
+    expect(RUN_FACTOR).toBeGreaterThanOrEqual(1.6);
+    expect(RUN_FACTOR).toBeLessThanOrEqual(1.8);
+  });
+  it('tốc độ mong muốn: đứng yên 0, đi 4, chạy 7', () => {
+    expect(moveSpeed(false, true)).toBe(0);
+    expect(moveSpeed(true, false)).toBe(WALK_SPEED);
+    expect(moveSpeed(true, true)).toBe(RUN_SPEED);
+  });
+  it('chia bước va chạm: mỗi bước không vượt nửa bán kính, tối đa MAX_SUBSTEPS', () => {
+    expect(collisionSubsteps(0, 0.4)).toBe(1);
+    expect(collisionSubsteps(0.2, 0.4)).toBe(1);
+    expect(collisionSubsteps(0.35, 0.4)).toBe(2);
+    expect(collisionSubsteps(0.41, 0.4)).toBe(3);
+    expect(collisionSubsteps(1000, 0.4)).toBe(MAX_SUBSTEPS);
+    expect(collisionSubsteps(5, 0)).toBe(1);
+  });
+  it('chạy nhanh với khung hình dài nhất (0,05 giây) vẫn không xuyên tường mỏng', () => {
+    const wall: World = { obstacles: [box(-50, 50, 10, 10.1)], boundsRadius: Infinity };
+    for (const run of [false, true]) {
+      const s = createPlayerState(0, 0);
+      for (let i = 0; i < 100; i++) stepPlayer(s, { ...none, y: 1, run }, 0, 0.05, wall);
+      expect(s.z).toBeLessThanOrEqual(10 - 0.4 + 1e-6);
+    }
+  });
+  it('mỗi bước con đi không quá bán kính va chạm', () => {
+    const s = createPlayerState();
+    let prev = 0;
+    let worst = 0;
+    for (let i = 0; i < 60; i++) {
+      stepPlayer(s, { ...none, y: 1, run: true }, 0, 0.05, FREE);
+      worst = Math.max(worst, s.z - prev);
+      prev = s.z;
+    }
+    expect(worst / collisionSubsteps(worst, 0.4)).toBeLessThanOrEqual(0.4 * 0.5 + 1e-9);
   });
 });
 
