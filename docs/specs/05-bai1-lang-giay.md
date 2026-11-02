@@ -402,6 +402,8 @@ Thời gian danh nghĩa của giữ sổ: 90 giây → 45 giây (hết nửa); c
 
 **Mốc điểm mới:** Đồng **210**, Bạc **220**, Vàng **230** (tối đa 230). Với 2 vòng ghép ngắn (12 thẻ), điểm ván hoàn thành phân tầng rõ rệt theo số lỗi: 2 lỗi = 210 (Đồng), 1 lỗi = 220 (Bạc), 0 lỗi hoàn hảo = 230 (Vàng, p10 bot giỏi = 230).
 
+**Mốc THEO NGHĨA (ngoại lệ quy tắc phân vị, tự chọn):** ba mốc 210/220/230 là mốc theo nghĩa số lỗi ghép, không đặt theo phân vị bot: Vàng = 0 lỗi (230), Bạc = đúng 1 lỗi (220), Đồng = đúng 2 lỗi (210); từ 3 lỗi trở lên, hoặc hết tim, là chưa đạt. Vì thế quy tắc "bot trung bình hầu như không Vàng" KHÔNG áp cho màn 3 sau đợt này: bot trung bình chính được Vàng 36,0% là hệ quả của nghĩa mốc (đoạn giữ sổ vốn phân hóa người chơi đã bỏ), không phải lỗi cân bằng. Ván 300 seed mỗi bot vẫn là kiểm tra hồi quy: bot giỏi phải 100% Vàng, bot trung bình chính hết tim không quá 25%.
+
 **Bảng bot trước/sau (300 ván seed 1 đến 300 mỗi bot):**
 
 | Bot | Chỉ số | Trước (P4b: 2 vòng + giữ sổ 45s; tối đa 355; mốc 290/320/330) | Sau (Bỏ giữ sổ: 2 vòng ghép; tối đa 230; mốc 210/220/230) |

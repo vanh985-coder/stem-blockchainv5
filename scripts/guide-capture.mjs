@@ -193,8 +193,7 @@ async function runnerShots(browser) {
 }
 
 async function rebuildShots(browser) {
-  // Ảnh màn 3 chụp ở vòng giữ sổ (bước X2b): vòng 3 có chuỗi 6 trang, {phanDien} vừa tráo một trang (chuỗi đang lệch) và hai thẻ mới rơi ra bàn.
-  // Nhảy thẳng tới vòng 3 bằng cách đặt trạng thái 'vòng 2 xong' (cầu nối window.__rebuild có ở bản dev) rồi bấm 'Vòng tiếp theo' như người chơi.
+  // Ảnh màn 3 chụp ở vòng 2 (đoạn giữ sổ đã bỏ, xem spec 05): nhảy thẳng tới vòng 2 bằng cách đặt trạng thái 'vòng 1 xong' (cầu nối window.__rebuild có ở bản dev) rồi bấm 'Vòng tiếp theo'.
   const page = await newPage(browser, 'oneGolden');
   await page.goto(`${LANG}/lang/lang-giay/man/3?q=high`, { waitUntil: 'load' });
   await sleep(1500);
@@ -203,18 +202,16 @@ async function rebuildShots(browser) {
   await sleep(2500);
   await page.evaluate(() => {
     const s = window.__rebuild;
-    s.round = 1;
+    s.round = 0;
     s.phase = 'roundDone';
-    s.parts.push({ round: 0, errors: 0, fakeBinned: false, points: 100 }, { round: 1, errors: 0, fakeBinned: true, points: 130 });
-    document.querySelector('[data-testid=nut-soi]')?.click(); // vẽ lại để hiện bảng 'Vòng 2 xong'
+    s.parts.push({ round: 0, errors: 0, fakeBinned: false, points: 100 });
+    document.querySelector('[data-testid=nut-soi]')?.click(); // vẽ lại để hiện bảng 'Vòng 1 xong'
   });
   await sleep(500);
   await page.evaluate(() => document.querySelector('[data-testid=nut-tiep]')?.click());
   await page.evaluate(() => document.querySelector('[data-testid=nut-soi]')?.click()); // đóng lại ô soi công thức đã bật ở trên
-  await page.waitForFunction(() => window.__rebuild?.phase === 'keep', { timeout: 10000 });
+  await page.waitForFunction(() => window.__rebuild?.phase === 'play' && window.__rebuild.round === 1, { timeout: 10000 });
   await sleep(500);
-  await page.evaluate(() => document.querySelector('[data-testid=nut-bat-dau-giu-so]')?.click());
-  await page.waitForFunction(() => (window.__rebuild?.keep?.swapCount ?? 0) >= 1, { timeout: 20000 });
   await save(page, 'man-3-ban');
   await page.browserContext().close();
 }
