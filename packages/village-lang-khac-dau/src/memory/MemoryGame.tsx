@@ -555,7 +555,7 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
         }
       >
         {tutorialActive && tutorialStep === 3 && (
-          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-3 pointer-events-auto">
+          <div data-tutorial-obstacle className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-3 pointer-events-auto">
             <Button
               variant="secondary"
               size="lg"

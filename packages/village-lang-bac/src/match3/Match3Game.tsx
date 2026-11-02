@@ -617,7 +617,7 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
         }
       >
         {tutorialActive && tutorialStep === 3 && (
-          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
+          <div data-tutorial-obstacle className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
             <Button
               id="tutorial-man11-swap-btn"
               variant="primary"

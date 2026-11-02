@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from './Button';
 import { useSettings } from '../settings/SettingsProvider';
 import { tutorialTexts } from '../content/tutorial';
+import { chooseTooltipPlacement } from './tutorialPlacement';
+import { allowKeyboardClick, createEnterTracker, trackEnterDown, trackEnterUp } from './enterGuard';
 
 export interface TutorialStep {
   id: string;
@@ -53,13 +55,16 @@ interface RectState {
   bottom: number;
 }
 
-export type TooltipPlacement = 'bottom' | 'top' | 'right' | 'left';
+export type { TooltipPlacement } from './tutorialPlacement';
 
 interface TooltipPosition {
   top: number;
   left: number;
-  placement: TooltipPlacement;
+  /** Rộng đặt thẳng; 0 = để CSS tự quyết (lần đầu, chưa đo) */
+  width: number;
   maxAvailableHeight: number;
+  /** false: vùng sáng quá lớn, tooltip buộc phải nằm trên nó (khi đó vùng sáng được cắt bỏ phần dưới tooltip) */
+  clear: boolean;
 }
 
 function getViewportDimensions() {
@@ -90,49 +95,50 @@ export function TutorialSpotlight({
   const [tooltipPos, setTooltipPos] = useState<TooltipPosition>({
     top: 0,
     left: 0,
-    placement: 'bottom',
+    width: 0,
     maxAvailableHeight: 320,
+    clear: true,
   });
 
   const step = steps[currentStepIndex];
   const tooltipRef = useRef<HTMLDivElement>(null);
   const skipBtnRef = useRef<HTMLButtonElement>(null);
 
-  // Xử lý chu kỳ phím Enter chống kích hoạt đúp chuyển tiếp / bắt đầu bài thật
-  const actionArmedRef = useRef(false);
+  // Enter giữ lặp (từ trước khi bước hiện ra, hoặc đang giữ) không được bấm thay mọi nút của tooltip: chỉ lần nhấn MỚI tính
+  // (keydown không repeat và đã có keyup trước), giống FeedbackSheet. Chuột, chạm và đọc màn hình (click không do Enter) vẫn ăn ngay.
+  const enterRef = useRef(createEnterTracker());
+  const actionRef = useRef(actionButton);
+  actionRef.current = actionButton;
+  const hasAction = Boolean(actionButton);
   useEffect(() => {
-    if (!actionButton) {
-      actionArmedRef.current = false;
-      return;
-    }
-
-    actionArmedRef.current = false;
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        actionArmedRef.current = true;
-      }
-    };
-
-    // Cho phép sau 400ms đối với thao tác bàn phím nếu phím Enter đã nhả
-    const timer = setTimeout(() => {
-      actionArmedRef.current = true;
-    }, 400);
-
+    if (!isOpen) return;
+    const tracker = enterRef.current;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && actionArmedRef.current) {
-        e.preventDefault();
-        actionButton.onClick();
-      }
+      if (e.key !== 'Enter') return;
+      trackEnterDown(tracker, e);
+      // Nút đang focus tự nhận Enter qua click; ở nơi khác thì Enter mới bấm nút hành động (vào bài thật)
+      if (!hasAction || !tracker.fresh || e.target instanceof HTMLButtonElement) return;
+      tracker.fresh = false;
+      e.preventDefault();
+      actionRef.current?.onClick();
     };
-
-    window.addEventListener('keyup', handleKeyUp);
-    window.addEventListener('keydown', handleKeyDown);
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') trackEnterUp(tracker);
+    };
+    window.addEventListener('keydown', handleKeyDown, true);
+    window.addEventListener('keyup', handleKeyUp, true);
     return () => {
-      clearTimeout(timer);
-      window.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown, true);
+      window.removeEventListener('keyup', handleKeyUp, true);
     };
-  }, [actionButton]);
+  }, [isOpen, hasAction]);
+  // Mỗi bước hay nút mới: lần nhấn Enter còn dở của bước trước không được chuyển sang
+  useEffect(() => {
+    enterRef.current.fresh = false;
+  }, [currentStepIndex, step?.id, actionButton?.label]);
+  const guarded = (fn: (() => void) | undefined) => (e: MouseEvent<HTMLButtonElement>) => {
+    if (allowKeyboardClick(enterRef.current, e)) fn?.();
+  };
 
   // Tính toán và cập nhật bounding rect của target element
   const updateRect = useCallback(() => {
@@ -224,103 +230,39 @@ export function TutorialSpotlight({
     };
   }, [isOpen, updateRect]);
 
-  // Tính toán vị trí hiển thị Tooltip thông minh: 4 hướng (bottom, top, right, left), không che target và không tràn màn hình
+  // Vị trí tooltip: thử 4 hướng, chọn hướng không giao vùng sáng (xem tutorialPlacement.ts)
   useLayoutEffect(() => {
     if (!isOpen) return;
 
     const tooltipEl = tooltipRef.current;
-    // Chiều cao TỰ NHIÊN (nội dung không bị kẹp bởi maxHeight của lần trước): nếu đo offsetHeight đã bị kẹp thì vị trí tính ra sai, rồi tự sửa dần qua nhiều lần đo (tooltip nhảy chỗ ~1 giây, chạm vào nút lúc đó trượt)
-    const body = tooltipEl?.querySelector<HTMLElement>('[data-tooltip-body]');
-    const ttHeight = tooltipEl ? (body ? tooltipEl.offsetHeight - body.clientHeight + body.scrollHeight : tooltipEl.offsetHeight) : 180;
-    const ttWidth = tooltipEl ? tooltipEl.offsetWidth : 360;
-
-    const vp = getViewportDimensions();
-    const margin = 12;
-    const gap = 12;
-
-    if (!targetRect) {
-      // Khi không có target, đặt tooltip ở trung tâm màn hình, giới hạn maxAvailableHeight
-      const maxAvailableHeight = Math.min(420, vp.height - margin * 2);
-      setTooltipPos({
-        top: vp.offsetTop + Math.max(margin, (vp.height - ttHeight) / 2),
-        left: vp.offsetLeft + Math.max(margin, (vp.width - ttWidth) / 2),
-        placement: 'bottom',
-        maxAvailableHeight,
-      });
-      return;
+    // Đo kích thước TỰ NHIÊN: gỡ tạm rộng và cao tối đa của lần trước (nếu đo khi đang bị kẹp thì vị trí sai, tooltip nhảy chỗ và chạm vào nút trượt), đo xong trả lại
+    let ttWidth = 360;
+    let ttHeight = 180;
+    if (tooltipEl) {
+      const prevWidth = tooltipEl.style.width;
+      const prevMaxHeight = tooltipEl.style.maxHeight;
+      tooltipEl.style.width = '';
+      tooltipEl.style.maxHeight = 'none';
+      ttWidth = tooltipEl.offsetWidth;
+      ttHeight = tooltipEl.offsetHeight;
+      tooltipEl.style.width = prevWidth;
+      tooltipEl.style.maxHeight = prevMaxHeight;
     }
 
     const pad = padding;
-    const x1 = targetRect.left - pad;
-    const y1 = targetRect.top - pad;
-    const x2 = targetRect.right + pad;
-    const y2 = targetRect.bottom + pad;
-
-    // Khoảng trống ở 4 phía
-    const spaceBelow = vp.height - y2 - gap - margin;
-    const spaceAbove = y1 - gap - margin;
-    const spaceRight = vp.width - x2 - gap - margin;
-    const spaceLeft = x1 - gap - margin;
-
-    let placement: TooltipPlacement = 'bottom';
-    let maxAvailableHeight = 320;
-
-    // 1. Nếu màn hình ngang rất thấp (chiều cao <= 450px)
-    if (vp.height <= 450) {
-      if (spaceRight >= 240 && spaceRight >= spaceLeft) {
-        placement = 'right';
-      } else if (spaceLeft >= 240) {
-        placement = 'left';
-      } else if (spaceBelow >= spaceAbove) {
-        placement = 'bottom';
-      } else {
-        placement = 'top';
-      }
-    } else {
-      // 2. Màn hình bình thường: ưu tiên bottom nếu đủ chỗ
-      if (spaceBelow >= ttHeight + 8) {
-        placement = 'bottom';
-      } else if (spaceAbove >= ttHeight + 8) {
-        placement = 'top';
-      } else if (spaceRight >= 260 && spaceRight >= spaceLeft) {
-        placement = 'right';
-      } else if (spaceLeft >= 260) {
-        placement = 'left';
-      } else if (spaceBelow >= spaceAbove) {
-        placement = 'bottom';
-      } else {
-        placement = 'top';
-      }
-    }
-
-    let top = 0;
-    let left = 0;
-
-    if (placement === 'bottom') {
-      top = y2 + gap + vp.offsetTop;
-      left = targetRect.left + (targetRect.width - ttWidth) / 2 + vp.offsetLeft;
-      maxAvailableHeight = Math.min(380, Math.max(140, vp.height - (y2 + gap) - margin));
-    } else if (placement === 'top') {
-      top = y1 - gap - ttHeight + vp.offsetTop;
-      left = targetRect.left + (targetRect.width - ttWidth) / 2 + vp.offsetLeft;
-      maxAvailableHeight = Math.min(380, Math.max(140, y1 - gap - margin));
-    } else if (placement === 'right') {
-      left = x2 + gap + vp.offsetLeft;
-      top = targetRect.top + (targetRect.height - ttHeight) / 2 + vp.offsetTop;
-      maxAvailableHeight = Math.min(380, vp.height - margin * 2);
-    } else {
-      // placement === 'left'
-      left = x1 - gap - ttWidth + vp.offsetLeft;
-      top = targetRect.top + (targetRect.height - ttHeight) / 2 + vp.offsetTop;
-      maxAvailableHeight = Math.min(380, vp.height - margin * 2);
-    }
-
-    // Đảm bảo không tràn viewport theo cả 2 trục
-    const effectiveHeight = Math.min(ttHeight, maxAvailableHeight);
-    top = Math.max(margin + vp.offsetTop, Math.min(vp.offsetTop + vp.height - effectiveHeight - margin, top));
-    left = Math.max(margin + vp.offsetLeft, Math.min(vp.offsetLeft + vp.width - ttWidth - margin, left));
-
-    setTooltipPos({ top, left, placement, maxAvailableHeight });
+    const hole = targetRect
+      ? { x1: targetRect.left - pad, y1: targetRect.top - pad, x2: targetRect.right + pad, y2: targetRect.bottom + pad }
+      : null;
+    const obstacles = [...document.querySelectorAll<HTMLElement>('[data-tutorial-obstacle]')]
+      .map((el) => el.getBoundingClientRect())
+      .filter((o) => o.width > 0 && o.height > 0)
+      .map((o) => ({ x1: o.left, y1: o.top, x2: o.right, y2: o.bottom }));
+    const r = chooseTooltipPlacement({ vp: getViewportDimensions(), hole, width: ttWidth, height: ttHeight, obstacles });
+    setTooltipPos((prev) =>
+      prev.top === r.top && prev.left === r.left && prev.width === r.width && prev.maxAvailableHeight === r.maxHeight && prev.clear === r.clear
+        ? prev
+        : { top: r.top, left: r.left, width: r.width, maxAvailableHeight: r.maxHeight, clear: r.clear },
+    );
   }, [isOpen, targetRect, padding, step, feedbackMessage]);
 
   // Focus trap và xử lý phím bấm (Escape, Tab)
@@ -380,9 +322,16 @@ export function TutorialSpotlight({
   const vp = getViewportDimensions();
   const pad = padding;
   const x1 = targetRect ? Math.max(0, targetRect.left - pad) : 0;
-  const y1 = targetRect ? Math.max(0, targetRect.top - pad) : 0;
+  let y1 = targetRect ? Math.max(0, targetRect.top - pad) : 0;
   const x2 = targetRect ? Math.min(vp.width, targetRect.right + pad) : 0;
-  const y2 = targetRect ? Math.min(vp.height, targetRect.bottom + pad) : 0;
+  let y2 = targetRect ? Math.min(vp.height, targetRect.bottom + pad) : 0;
+  if (targetRect && !tooltipPos.clear) {
+    // Vùng sáng gần kín khung hình: nhường phần tooltip đang đứng, chỉ sáng phần còn lại để tooltip không đè lên vùng sáng
+    const ttTop = tooltipPos.top;
+    const ttBottom = tooltipPos.top + tooltipPos.maxAvailableHeight;
+    if (ttTop + tooltipPos.maxAvailableHeight / 2 > vp.height / 2) y2 = Math.min(y2, ttTop - 8);
+    else y1 = Math.max(y1, ttBottom + 8);
+  }
   const cutW = Math.max(0, x2 - x1);
   const cutH = Math.max(0, y2 - y1);
 
@@ -462,6 +411,7 @@ export function TutorialSpotlight({
           top: tooltipPos.top,
           left: tooltipPos.left,
           maxHeight: tooltipPos.maxAvailableHeight ? `${tooltipPos.maxAvailableHeight}px` : 'calc(100vh - 24px)',
+          ...(tooltipPos.width > 0 ? { width: `${tooltipPos.width}px` } : {}),
         }}
       >
         {/* Header tooltip: Huy hiệu bước + Nút Bỏ qua (shrink-0) */}
@@ -479,7 +429,7 @@ export function TutorialSpotlight({
           <button
             ref={skipBtnRef}
             type="button"
-            onClick={onSkip}
+            onClick={guarded(onSkip)}
             className="shrink-0 text-xs font-semibold text-chu/70 underline-offset-2 hover:text-chu hover:underline focus-visible:outline-2 focus-visible:outline-muc-tim"
           >
             {tutorialTexts.chung.boQua}
@@ -509,7 +459,7 @@ export function TutorialSpotlight({
         {/* Nút hành động ở chân Tooltip (shrink-0): luôn cố định ở footer tooltip, không bao giờ bị tràn */}
         <div className="shrink-0 mt-2.5 pt-2 border-t border-nau-go/20 flex flex-wrap items-center justify-end gap-2">
           {onPrev && currentStepIndex > 0 && !actionButton && (
-            <Button size="sm" variant="secondary" onClick={onPrev}>
+            <Button size="sm" variant="secondary" onClick={guarded(onPrev)}>
               {tutorialTexts.chung.quayLai}
             </Button>
           )}
@@ -518,15 +468,12 @@ export function TutorialSpotlight({
               size="sm"
               variant={actionButton.variant || 'primary'}
               autoFocus={false}
-              onClick={(e) => {
-                if (e.detail === 0 && !actionArmedRef.current) return;
-                actionButton.onClick();
-              }}
+              onClick={guarded(actionButton.onClick)}
             >
               {actionButton.label}
             </Button>
           ) : !step?.hideNextButton ? (
-            <Button size="sm" variant="primary" onClick={onNext}>
+            <Button size="sm" variant="primary" onClick={guarded(onNext)}>
               {step?.nextLabel || tutorialTexts.chung.tiep}
             </Button>
           ) : null}

@@ -655,7 +655,7 @@ export function BubbleGame({ paused, attempt, onFinish, setHint }: MiniGameRende
         actionButton={tutorialStep === tutorialSteps.length - 1 ? { label: tutorialTexts.chung.batDauChoi, onClick: closeTutorial, variant: 'primary' } : undefined}
       >
         {tutorialActive && tutorialStep === 4 && (
-          <div className="pointer-events-auto fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center justify-center">
+          <div data-tutorial-obstacle className="pointer-events-auto fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center justify-center">
             <Button variant="primary" size="lg" onClick={practiceShoot} data-testid="nut-ban-thu">
               <span aria-hidden="true">🎯</span>
               <span>{tutorialTexts.man9.banThu}</span>

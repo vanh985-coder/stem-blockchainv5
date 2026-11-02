@@ -1105,7 +1105,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
         }
       >
         {tutorialActive && tutorialStep === 4 && (
-          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
+          <div data-tutorial-obstacle className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
             <Button
               variant="primary"
               size="lg"

@@ -355,7 +355,7 @@ export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRende
         }
       >
         {tutorialActive && tutorialStep === 3 && (
-          <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
+          <div data-tutorial-obstacle className="fixed bottom-12 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center pointer-events-auto">
             <Button
               variant="primary"
               size="lg"
