@@ -14,6 +14,7 @@ const Hard = lazy(() => loadHard().then((m) => ({ default: m.Hard })));
 export default function Man10() {
   return (
     <LessonPage2D
+      fit
       levelId={10}
       villageId="lang-bac"
       background={BAI4_BACKGROUND}

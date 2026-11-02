@@ -83,6 +83,11 @@ Thay cho nút "Sửa giao dịch & xem gốc đổi" ở bản cũ. Công thức
 - Cuối phần: "Em soi {so} ô. Đi theo nhánh đỏ thì chỉ cần 2 ô mỗi tầng." ({so} đếm các ô em đã bấm; gốc hiện sẵn không tính.)
 - Logic soi là hàm thuần trong `lessons/bai-4/inspect.ts` (dùng `combine`, `buildTree`): soi từng ô, ô nào bấm được theo trạng thái soi, trúng lá bị sửa thì xong, đếm số lần soi. Có test.
 
+### Trang bài học gọn một màn hình ("vừa khung") và kéo lá ở trạm Khó
+
+- Màn 10 bật `fit` của `LessonPage2D` (cơ chế ở spec 03): cả 3 trạm nằm gọn một màn hình ở 1366×768 và 1920×1080, zoom trình duyệt 67% đến 150%. Từ `md` (768px) các trạm xếp **2 cột**: trạm Dễ (bảng giao dịch + tiến độ | thẻ ghép cặp + ô nhập), trạm Trung bình phần A và B (cây | chữ, phép tính, ô nhập), trạm Khó (bảng 8 giao dịch trên cùng; khay + nút "Kiểm tra cây Merkle" | cây). Đề, luật, điểm, chữ không đổi.
+- **Trạm Khó, kéo lá vào ô "?" — nguyên nhân lỗi cũ:** lá kéo gán `transform: translate3d` theo khoảng kéo của con trỏ nhưng khoảng dịch bị nhân thêm hai lần: hệ số phóng `zoom` của khối chứa (1,35 trên màn rộng) và lớp `scale-105` của lá đang kéo (thuộc tính `scale` riêng của Tailwind áp lên cả `translate3d`, nhân 1,05). Lá trôi xa con trỏ và lệch khỏi hình chữ nhật dnd-kit dùng để xét ô nhận, nên thả lá đè lên ô mà ô không nhận (chỉ trúng khi con trỏ nằm sát tâm ô). Đã sửa ở `ui/TapOrDrag.tsx` (chia khoảng kéo cho hệ số phóng thực; thẻ đang kéo `pointer-events: none`) và đổi cách chọn ô sang hàm thuần `ui/dropTarget.ts`: ô nhận khi phần giao ≥ 30% diện tích lá hoặc tâm lá trong ô, chồng nhiều ô thì lấy ô giao nhiều nhất; ô sáng viền khi đủ điều kiện, thả ngoài thì lá về khay; chuột, chạm và bàn phím (chọn lá rồi chọn ô) đều dùng được.
+
 ### Sau màn 10 (đã thay ở mốc 3, bước B5)
 
 Cảnh trao trang tạm của mốc 1 (`LessonPage2D`: "Thầy Linh trao Trang Sổ Vàng thứ tư…", nút "Về bản đồ") đã bỏ (`bai4Lesson.award` không còn). Xong màn 10 mở màn 11 (từ bước B13 màn 11 đã ra mắt; trước đó còn `coming-soon` nên mở thẳng màn 12); nút "Chơi tiếp" của bài trỏ tới game đã ra mắt kế tiếp, tức màn 11. Xong màn 11 thì mở màn 12. Trang Sổ Vàng thứ tư vẫn chỉ trao sau cảnh cao trào của màn 12 (mục "Cảnh cao trào"); xong màn 10 và 11 mà chưa chơi màn 12 thì mới có 3 trang.
