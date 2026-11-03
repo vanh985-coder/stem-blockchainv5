@@ -239,6 +239,35 @@ async function run() {
     const offSp = speedOf(log, t, 0.4, 0.8);
     check('may', 'nút tắt: về ≈ 4 đơn vị/giây', Math.abs(offSp - 4) < 0.5, offSp.toFixed(2));
 
+    // Phím R bật/tắt chạy nhanh (chuột khóa thì con trỏ ẩn, không bấm được nút): nhãn nút có "(R)", giữ phím không lặp
+    check('may', 'nhãn nút trên máy tính có phím tắt "(R)"', /\(R\)/.test(await page.$eval(btn, (b) => b.textContent || '')));
+    await page.keyboard.press('KeyR');
+    await sleep(150);
+    check('may', 'bấm R: bật chạy nhanh (aria-pressed=true, dữ liệu runToggle)', (await pressed(page)) === 'true' && (await page.evaluate(() => window.__walkApi.input.runToggle)) === true);
+    t = await now(page);
+    await page.keyboard.down('KeyW');
+    await sleep(900);
+    await page.keyboard.up('KeyW');
+    log = await page.evaluate(() => window.__log);
+    const rSp = speedOf(log, t, 0.4, 0.8);
+    check('may', 'bật bằng R (không giữ Shift): ≈ 7 đơn vị/giây', Math.abs(rSp - 7) < 0.7, rSp.toFixed(2));
+    // giữ R (phím lặp) chỉ đổi một lần
+    await page.keyboard.down('KeyR');
+    for (let i = 0; i < 4; i++) {
+      await page.keyboard.down('KeyR');
+      await sleep(40);
+    }
+    await page.keyboard.up('KeyR');
+    await sleep(150);
+    check('may', 'giữ R (lặp phím) chỉ đổi một lần: tắt (không nhấp nháy bật tắt)', (await pressed(page)) === 'false' && (await page.evaluate(() => window.__walkApi.input.runToggle)) === false);
+    // Shift vẫn là giữ để chạy khi R đang tắt
+    await page.keyboard.down('ShiftLeft');
+    await sleep(120);
+    check('may', 'R tắt, giữ Shift: vẫn chạy nhanh (aria-pressed=true), nhả Shift thì tắt', (await pressed(page)) === 'true');
+    await page.keyboard.up('ShiftLeft');
+    await sleep(120);
+    check('may', 'nhả Shift: về đi thường', (await pressed(page)) === 'false');
+
     // Mở bản đồ lớn thì tự tắt
     await page.click(btn);
     await sleep(100);

@@ -101,6 +101,10 @@ export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockCh
       api.input.keyRun = api.keys.run > 0;
       if (action === 'run') setShiftHeld(api.input.keyRun);
       if (down && acted === 'jump') api.input.jump = true;
+      if (down && acted === 'runToggle') {
+        api.input.runToggle = toggleRun(api.input.runToggle);
+        setRunToggle(api.input.runToggle);
+      }
       if (down && acted === 'interact') live.current.onInteract();
     };
     const keyDown = (e: KeyboardEvent) => onKey(e, true);
@@ -306,7 +310,7 @@ export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockCh
         className={`absolute cursor-pointer rounded-nut border-2 px-4 font-display text-base font-extrabold leading-none ${runOn ? 'border-white bg-xanh-la text-white ring-4 ring-white/60' : 'border-white/70 bg-black/45 text-white'}`}
         style={{ right, bottom: touchMode ? `calc(${bottom} + ${Math.max(MIN_TOUCH_TARGET, JUMP_SIZE) + GAP}px)` : bottom, minWidth: MIN_TOUCH_TARGET, minHeight: Math.max(MIN_TOUCH_TARGET, RUN_BTN_HEIGHT), touchAction: 'none' }}
       >
-        {ui.dungDi.nutChayNhanh}
+        {touchMode ? ui.dungDi.nutChayNhanh : ui.dungDi.nutChayNhanhPhim}
       </button>
       {touchMode && (
         <>
