@@ -20,6 +20,7 @@ import { GAME_CONFIG } from '@so-chung/core/config/gameConfig';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { generateEasy, combine, type EasyTx } from '@so-chung/core/lessons/bai-4/logic';
 import { portraitOf } from './nguoi';
+import { demoProbe } from '@so-chung/core/demo/probe';
 
 const T = bai4Texts.tramDe;
 
@@ -337,6 +338,8 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
     ];
   }, [txA, txB, pairLabel, expectedValue]);
 
+  // Bot demo (chỉ bản build VITE_DEMO): đáp án của cặp đang ghép, tính bằng `combine` của bài
+  demoProbe('man10', { station: 'de', tutorialActive, expected: !tutorialActive && !isMerging ? expectedValue : null });
   return (
     <div className="mx-auto max-w-5xl space-y-2 animate-in fade-in duration-200 md:grid md:grid-cols-2 md:items-start md:gap-3 md:space-y-0">
       <div className="space-y-2">
@@ -501,6 +504,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
             variant="primary"
             size="md"
             fullWidth
+            data-demo="check"
             onClick={handleCheck}
             disabled={isMerging}
           >{T.ghepGiaoDich}</Button>

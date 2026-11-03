@@ -78,59 +78,69 @@ interface MouseRec {
   readyAt: number;
 }
 
-/** Chơi trọn một ván với `seed` và hồ sơ bot `p`. */
-export function simulateWhack(seed: number, p: WhackBotProfile): WhackSimResult {
-  const s = createWhackGame(seed);
-  const bot = createMulberry32(((seed * 2654435761) ^ 0x9e3779b9) >>> 0);
-  const recs = new Map<number, MouseRec>();
-  const coinSeen = new Map<Coin, { ignore: boolean; due: number }>();
-  let now = 0;
-  let lastTap = -Infinity;
-  /** Chuột câu hỏi: giờ ra tay (đặt khi nó tới chỗ chờ) */
-  let bossDue = Infinity;
-  /** Lượt đáp án: đáp án bot chọn, giờ bắt đầu lượt */
-  let pick = -1;
-  let answerStart = 0;
-  /** Vị trí chuột đáp án mà từ đó bot đập (đã cộng độ lệch giờ) */
-  let want = 0;
-  for (let frame = 0; frame < 200000 && phaseOf(s) !== 'ended'; frame++) {
-    if (phaseOf(s) === 'quiz') {
-      // em đọc lời giải thích rồi bấm "Chơi tiếp"
-      const v = s.verdict!;
-      answerBoss(s, v.result, v.secondsLeft);
-      bossDue = Infinity;
-      pick = -1;
-      continue;
-    }
-    stepWhack(s, FRAME);
-    now += FRAME;
-    // stepWhack đổi s.phase mà TypeScript không thấy: đọc qua hàm để không bị thu hẹp kiểu
-    if (phaseOf(s) === 'ended' || phaseOf(s) === 'quiz') continue;
+/** Thao tác của bot: ván mô phỏng gọi thẳng hàm logic; demo bấm vào giao diện. */
+export interface WhackIo {
+  hit: (lane: number) => void;
+  read: () => void;
+  collect: () => void;
+}
 
+/**
+ * Bộ não của bot (tách khỏi vòng mô phỏng để demo dùng lại): mỗi bước (khung 1/60 giây) gọi `act(s, now, io)`, bot quyết định đập làn nào, bấm "Đọc xong" hay nhặt đồng. Chỉ biết
+ * những gì học sinh nhìn thấy. Hết một lượt trùm (hộp kết quả) thì gọi `endRound()`.
+ */
+export class WhackBrain {
+  private readonly bot: () => number;
+  private readonly recs = new Map<number, MouseRec>();
+  private readonly coinSeen = new Map<Coin, { ignore: boolean; due: number }>();
+  private lastTap = -Infinity;
+  /** Chuột câu hỏi: giờ ra tay (đặt khi nó tới chỗ chờ) */
+  private bossDue = Infinity;
+  /** Lượt đáp án: đáp án bot chọn, giờ bắt đầu lượt */
+  private pick = -1;
+  private answerStart = 0;
+  /** Vị trí chuột đáp án mà từ đó bot đập (đã cộng độ lệch giờ) */
+  private want = 0;
+
+  constructor(
+    seed: number,
+    private readonly p: WhackBotProfile,
+  ) {
+    this.bot = createMulberry32(((seed * 2654435761) ^ 0x9e3779b9) >>> 0);
+  }
+
+  /** Hết một lượt trùm (đã xem kết quả): quên lượt cũ. */
+  endRound(): void {
+    this.bossDue = Infinity;
+    this.pick = -1;
+  }
+
+  act(s: WhackState, now: number, io: WhackIo): void {
+    const { p, bot, recs, coinSeen } = this;
     // lượt đáp án: chọn đáp án rồi đập chuột vàng mang nhãn đó khi tới chỗ đã định
     if (phaseOf(s) === 'answer') {
       const a = s.answer!;
-      if (pick < 0) {
+      if (this.pick < 0) {
         const wrong = a.mice.map((m) => m.option).filter((o) => o !== a.correct);
-        pick = bot() < p.correct || wrong.length === 0 ? a.correct : wrong[Math.floor(bot() * wrong.length)];
-        answerStart = now;
-        want = WHACK_SPEC.zoneStart + p.answerAt * (WHACK_SPEC.zoneEnd - WHACK_SPEC.zoneStart) + gaussian(bot) * p.sigma * a.speed;
+        this.pick = bot() < p.correct || wrong.length === 0 ? a.correct : wrong[Math.floor(bot() * wrong.length)];
+        this.answerStart = now;
+        this.want = WHACK_SPEC.zoneStart + p.answerAt * (WHACK_SPEC.zoneEnd - WHACK_SPEC.zoneStart) + gaussian(bot) * p.sigma * a.speed;
       }
-      if (now - answerStart >= p.answerDelay) readDone(s);
-      const m = a.mice.find((x) => x.option === pick)!;
-      if (now - answerStart >= p.answerDelay && m.pos >= Math.max(WHACK_SPEC.zoneStart, want) && now - lastTap >= p.tapGap - 1e-9 && s.rest[m.lane] <= 0) {
-        hitLane(s, m.lane);
-        lastTap = now;
+      if (now - this.answerStart >= p.answerDelay) io.read();
+      const m = a.mice.find((x) => x.option === this.pick)!;
+      if (now - this.answerStart >= p.answerDelay && m.pos >= Math.max(WHACK_SPEC.zoneStart, this.want) && now - this.lastTap >= p.tapGap - 1e-9 && s.rest[m.lane] <= 0) {
+        io.hit(m.lane);
+        this.lastTap = now;
       }
-      continue;
+      return;
     }
     // chuột câu hỏi tới chỗ chờ: ra tay đập nó
     if (phaseOf(s) === 'bossRun' && s.boss!.arrived && bossInZone(s.boss!)) {
-      if (bossDue === Infinity) bossDue = now + 0.3 + Math.abs(gaussian(bot) * p.sigma);
-      if (now >= bossDue && now - lastTap >= p.tapGap - 1e-9 && s.rest[s.boss!.lane] <= 0) {
-        hitLane(s, s.boss!.lane);
-        lastTap = now;
-        continue;
+      if (this.bossDue === Infinity) this.bossDue = now + 0.3 + Math.abs(gaussian(bot) * p.sigma);
+      if (now >= this.bossDue && now - this.lastTap >= p.tapGap - 1e-9 && s.rest[s.boss!.lane] <= 0) {
+        io.hit(s.boss!.lane);
+        this.lastTap = now;
+        return;
       }
     }
 
@@ -162,11 +172,11 @@ export function simulateWhack(seed: number, p: WhackBotProfile): WhackSimResult 
         bestLane = lane;
       }
     }
-    if (now - lastTap < p.tapGap - 1e-9) continue;
+    if (now - this.lastTap < p.tapGap - 1e-9) return;
     if (bestLane >= 0) {
-      hitLane(s, bestLane);
-      lastTap = now;
-      continue;
+      io.hit(bestLane);
+      this.lastTap = now;
+      return;
     }
     if (s.coin) {
       let rec = coinSeen.get(s.coin);
@@ -175,10 +185,32 @@ export function simulateWhack(seed: number, p: WhackBotProfile): WhackSimResult 
         coinSeen.set(s.coin, rec);
       }
       if (!rec.ignore && now >= rec.due) {
-        collectCoin(s);
-        lastTap = now;
+        io.collect();
+        this.lastTap = now;
       }
     }
+  }
+}
+
+/** Chơi trọn một ván với `seed` và hồ sơ bot `p`. */
+export function simulateWhack(seed: number, p: WhackBotProfile): WhackSimResult {
+  const s = createWhackGame(seed);
+  const brain = new WhackBrain(seed, p);
+  const io: WhackIo = { hit: (lane) => void hitLane(s, lane), read: () => void readDone(s), collect: () => void collectCoin(s) };
+  let now = 0;
+  for (let frame = 0; frame < 200000 && phaseOf(s) !== 'ended'; frame++) {
+    if (phaseOf(s) === 'quiz') {
+      // em đọc lời giải thích rồi bấm "Chơi tiếp"
+      const v = s.verdict!;
+      answerBoss(s, v.result, v.secondsLeft);
+      brain.endRound();
+      continue;
+    }
+    stepWhack(s, FRAME);
+    now += FRAME;
+    // stepWhack đổi s.phase mà TypeScript không thấy: đọc qua hàm để không bị thu hẹp kiểu
+    if (phaseOf(s) === 'ended' || phaseOf(s) === 'quiz') continue;
+    brain.act(s, now, io);
   }
   return {
     score: s.score,

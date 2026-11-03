@@ -6,6 +6,8 @@ import { clickEl, dragEl, q, typeInto, type Ctx } from '../actions';
 import { getProbe } from '../probe';
 import { buttonByText, dwell, playVnDialogs } from '../ui';
 import { demoWorld, engageWorld, walkAndInteract, waitWorldReady } from '../world';
+import { DEMO_MEN } from '../config';
+import { finishMiniGame, nextFrame, onPath, startMiniGame } from './common';
 import { answerReflection, driveLesson, lessonStage, skipTutorial } from './lesson';
 
 interface Man1Probe {
@@ -16,7 +18,6 @@ interface Man1Probe {
   timeUp?: boolean;
 }
 const man1Probe = () => getProbe<Man1Probe>('man1');
-const onPath = (p: string) => location.pathname === p;
 
 /** Từ làng đi tới biển màn `level` và nhấn E để vào màn (nếu chưa ở trang màn). */
 async function enterLevelFromVillage(ctx: Ctx, village: 'lang-giay', level: number): Promise<void> {
@@ -87,26 +88,6 @@ export async function giayMan1(ctx: Ctx): Promise<void> {
   await ctx.ctl.sleep(2500);
 }
 
-/** Thẻ bắt đầu của game phụ: đọc luật một lúc rồi bấm Bắt đầu. */
-async function startMiniGame(ctx: Ctx): Promise<void> {
-  await ctx.ctl.waitFor(() => q('[data-testid="the-bat-dau"]'), 'game start card', 30000);
-  await dwell(ctx, q('[data-testid="the-luat"]')?.textContent ?? '');
-  await ctx.ctl.sleep(1200);
-  const start = await ctx.ctl.waitFor(() => q<HTMLButtonElement>('[data-demo="game-start"]'), 'start button', 5000);
-  await clickEl(ctx, start, { settle: 600 });
-}
-
-/** Màn kết quả của game phụ: xem điểm một lúc rồi sang màn kế (nút "Chơi tiếp") nếu có. */
-async function finishMiniGame(ctx: Ctx, expectPath: string | null): Promise<void> {
-  await ctx.ctl.waitFor(() => q('[data-testid="diem"]'), 'result screen', 60000);
-  await ctx.ctl.sleep(4000);
-  if (expectPath) {
-    const next = await ctx.ctl.waitFor(() => q<HTMLButtonElement>('[data-testid="choi-tiep"]'), 'next level button', 5000);
-    await clickEl(ctx, next, { settle: 600 });
-    await ctx.ctl.waitFor(() => onPath(expectPath), `route ${expectPath}`, 15000);
-  }
-}
-
 interface RunnerSessionLike {
   state: { phase: string };
   score?: number;
@@ -163,8 +144,6 @@ function installRunnerAutopilot(ctx: Ctx, session: RunnerSessionLike, brain: Run
   };
 }
 
-const nextFrame = (ctx: Ctx): Promise<void> => new Promise<void>((r) => requestAnimationFrame(() => r())).then(() => ctx.ctl.checkpoint());
-
 /** Câu hỏi giữa vòng: đọc, chọn đáp án đúng, đọc giải thích, bấm Chạy tiếp. */
 async function answerRunnerQuiz(ctx: Ctx): Promise<void> {
   const { ctl } = ctx;
@@ -208,7 +187,7 @@ export async function giayMan2(ctx: Ctx): Promise<void> {
     if (s?.phase === 'quiz') await answerRunnerQuiz(ctx);
   }
   console.info(`[demo] man-2 end ${JSON.stringify({ ...probe.session.state, rows: undefined, items: undefined, score: probe.session.score })}`.slice(0, 600));
-  await finishMiniGame(ctx, '/lang/lang-giay/man/3');
+  await finishMiniGame(ctx, DEMO_MEN ? null : '/lang/lang-giay/man/3');
 }
 
 interface Man3Probe {

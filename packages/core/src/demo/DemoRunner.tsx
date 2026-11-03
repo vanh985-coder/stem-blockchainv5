@@ -4,12 +4,13 @@ import { useNavigate } from 'react-router';
 import { fmt } from '../content/characters';
 import { demoUi } from '../content/demo';
 import { useProgress } from '../progress/ProgressProvider';
-import { DEMO_SPEED, DEMO_START, exposeForDemo } from './config';
+import { DEMO_MEN, DEMO_SPEED, DEMO_START, exposeForDemo } from './config';
 import { DemoController } from './controller';
 import { removeCursor } from './cursor';
 import { runDirector, type SceneLog } from './director';
 import { installFakePointerLock } from './pointerLock';
 import { buildScenes } from './scenes';
+import { buildListScenes } from './scenes/levels';
 
 const COUNTDOWN_S = 5;
 
@@ -53,7 +54,7 @@ export default function DemoRunner() {
       started.current = true;
       window.__demoLog = [];
       window.__demoDone = false;
-      const all = buildScenes();
+      const all = DEMO_MEN ? buildListScenes(DEMO_MEN) : buildScenes();
       const from = DEMO_START ? all.findIndex((s) => s.id === DEMO_START) : 0;
       void runDirector(all.slice(Math.max(0, from)), { ctl: c, navigate: (to) => nav.current(to) }, (l) => {
         window.__demoLog?.push(l);

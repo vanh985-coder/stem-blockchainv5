@@ -32,6 +32,7 @@ import {
 import { CayMerkle, type CellStatus } from './CayMerkle';
 import { SoiCay } from './SoiCay';
 import { portraitOf } from './nguoi';
+import { demoProbe } from '@so-chung/core/demo/probe';
 
 const T = bai4Texts.tramTb;
 
@@ -422,6 +423,17 @@ export function Medium({
     ];
   }, []);
 
+  // Bot demo (chỉ bản build VITE_DEMO)
+  demoProbe('man10', {
+    station: 'tb',
+    tutorialActive,
+    phase,
+    expectB: { t12: partBTree[1][0], t34: partBTree[1][1], root: partBTree[2][0] },
+    solved: { t12: isT12Solved, t34: isT34Solved, root: isRootSolved },
+    tamperedLeaf: tamperedLeafIndex,
+    found,
+    tamperStep,
+  });
   return (
     <div className="max-w-5xl mx-auto space-y-2 animate-in fade-in duration-200">
       {/* Tab chuyển đổi trạng thái 3 phần & nút Hướng dẫn */}
@@ -599,7 +611,7 @@ export function Medium({
                   autoFocus
                   className="w-36 text-center"
                 />
-                <Button variant="primary" size="md" onClick={handleCheckPartB}>{T.xacNhan}</Button>
+                <Button variant="primary" size="md" data-demo="check" onClick={handleCheckPartB}>{T.xacNhan}</Button>
               </div>
 
               {selectedSlot === 'root' && !isChildrenReady && (
@@ -688,6 +700,7 @@ export function Medium({
                   <Button
                     variant="primary"
                     size="lg"
+                    data-demo="station-finish"
                     onClick={() => {
                       const totalMistakes = mistakesB;
                       const stars = starsFromMistakes(totalMistakes);

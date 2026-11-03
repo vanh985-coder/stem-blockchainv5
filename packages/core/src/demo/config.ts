@@ -22,6 +22,20 @@ export function parseSpeed(raw: string | null | undefined): number {
 /** `?canh=<id cảnh>`: bắt đầu từ cảnh đó (để quay lại một đoạn, hoặc kiểm một cảnh riêng); không xóa tiến độ. */
 export const DEMO_START: string | null = DEMO_ACTIVE ? (readQuery()?.get('canh') ?? null) : null;
 
+/** Chuỗi `?man=1,2,5,10` thành danh sách số màn (1 đến 12): bỏ mục không hợp lệ và trùng, giữ thứ tự. Rỗng thì null (chạy trọn như đợt 1). */
+export function parseManList(raw: string | null | undefined): number[] | null {
+  if (!raw) return null;
+  const out: number[] = [];
+  for (const part of raw.split(',')) {
+    const n = Number(part.trim());
+    if (Number.isInteger(n) && n >= 1 && n <= 12 && !out.includes(n)) out.push(n);
+  }
+  return out.length > 0 ? out : null;
+}
+
+/** Chế độ danh sách màn: `?man=1,2,5,10` bot chơi lần lượt đúng các màn đó (vào thẳng route, tiến độ đặt sẵn). */
+export const DEMO_MEN: number[] | null = DEMO_ACTIVE ? parseManList(readQuery()?.get('man')) : null;
+
 export const DEMO_SPEED: number = parseSpeed(readQuery()?.get('tocdo'));
 
 /** Đưa vài đối tượng ra `window` cho demo và script kiểm (chỉ khi build demo). */

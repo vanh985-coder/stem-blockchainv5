@@ -18,9 +18,10 @@ import {
   type TutorialStep,
 } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
+import { demoProbe } from '@so-chung/core/demo/probe';
 import { WHACK_SPEC, type MouseKind } from './whackConfig';
 import { hintFor } from './whackHint';
-import { answerBoss, bossInZone, bossPoints, collectCoin, createWhackGame, hitLane, inZone, readDone, tickWhack, type WhackEvent } from './whackLogic';
+import { answerBoss, bossInZone, bossPoints, collectCoin, createWhackGame, hitLane, inZone, readDone, tickWhack, type WhackEvent, type WhackState } from './whackLogic';
 
 const newSeed = (): number => (Math.random() * 2 ** 31) >>> 0;
 
@@ -232,6 +233,8 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   const holdRef = useRef(holdLoop);
   holdRef.current = holdLoop;
   const lastTickTime = useRef(performance.now());
+  // Bot demo (chỉ bản build VITE_DEMO): bộ lái chạy sau mỗi bước mô phỏng nhỏ (1/60 giây) để quyết định không bị trễ theo khung hình vẽ
+  const autopilot = useRef<{ step: (s: WhackState, dt: number) => void; paused: () => boolean } | null>(null);
 
   useGameHint(setHint, 5, () => hintFor(state));
 
@@ -314,6 +317,19 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
       // Đứng yên hoàn toàn khi paused từ ngoài (MiniGameLevel), khi hộp kết quả mở hay khi hết ván
       if (holdRef.current || state.phase === 'ended' || state.phase === 'quiz') return;
 
+      const ap = autopilot.current;
+      if (ap) {
+        if (ap.paused()) return;
+        const n = Math.max(1, Math.ceil(dt * 60));
+        for (let i = 0; i < n; i++) {
+          const ev = tickWhack(state, dt / n, false);
+          if (ev.length > 0) handleEvents(ev);
+          if ((state.phase as string) === 'ended' || (state.phase as string) === 'quiz') break;
+          ap.step(state, dt / n);
+        }
+        bump();
+        return;
+      }
       const events = tickWhack(state, dt, false);
       if (events.length > 0) handleEvents(events);
       bump();
@@ -531,6 +547,18 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     onFinish(state.score, parts);
   }, [onFinish, state]);
 
+  demoProbe('man5', {
+    state,
+    seed,
+    tutorialActive,
+    setAutopilot: (ap: { step: (s: WhackState, dt: number) => void; paused: () => boolean } | null) => {
+      autopilot.current = ap;
+    },
+    makeBrain: async () => {
+      const m = await import('./whackBots');
+      return new m.WhackBrain(seed, { ...m.GOOD_BOT, correct: 1, skip: 0 });
+    },
+  });
   // Probe phục vụ tự động kiểm thử Puppeteer
   if (PROBE && typeof window !== 'undefined') {
     Object.assign(window, {

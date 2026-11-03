@@ -106,3 +106,51 @@ export function removeCursor(): void {
   ring = null;
   pos = { x: -100, y: -100 };
 }
+
+let chase: Pt | null = null;
+let chasing = false;
+
+/** Con trỏ bám dần tới `to` (không chặn): dùng khi bot quyết định theo từng bước mô phỏng, con trỏ đuổi theo sau. */
+export function chaseCursor(to: Pt): void {
+  show();
+  chase = to;
+  if (pos.x < 0) place({ x: to.x, y: to.y + 80 });
+  if (chasing) return;
+  chasing = true;
+  const tick = () => {
+    if (!chase || !el) {
+      chasing = false;
+      return;
+    }
+    const dx = chase.x - pos.x;
+    const dy = chase.y - pos.y;
+    if (Math.hypot(dx, dy) < 1) {
+      place(chase);
+      chase = null;
+      chasing = false;
+      return;
+    }
+    place({ x: pos.x + dx * 0.3, y: pos.y + dy * 0.3 });
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+/** Hiệu ứng nhấn không chặn. */
+export function tapEffect(): void {
+  const c = ensure();
+  show();
+  c.style.scale = '0.78';
+  if (ring) {
+    ring.style.transition = 'none';
+    ring.style.opacity = '0.9';
+    ring.style.scale = '0.4';
+    void ring.offsetWidth;
+    ring.style.transition = 'opacity 380ms, scale 380ms';
+    ring.style.opacity = '0';
+    ring.style.scale = '1.1';
+  }
+  setTimeout(() => {
+    c.style.scale = '1';
+  }, 110);
+}

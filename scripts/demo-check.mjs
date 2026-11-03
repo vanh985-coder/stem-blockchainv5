@@ -19,7 +19,8 @@ if (!CHROME) {
 }
 const TOCDO = process.env.TOCDO || '1';
 const CANH = process.env.CANH || ''; // bắt đầu từ cảnh này (đặt sẵn tiến độ khách), để kiểm riêng một đoạn
-const EXPECTED = ['gioi-thieu', 'cho-den-lang-giay', 'giay-the', 'giay-man-1', 'giay-man-2', 'giay-man-3', 'giay-trao-trang'];
+const MAN = (process.env.MAN || '').split(',').map(Number).filter(Boolean); // chế độ danh sách màn: MAN=1,2,5,10
+const EXPECTED = MAN.length ? MAN.flatMap((n) => [`chuyen-${n}`, `man-${n}`]) : ['gioi-thieu', 'cho-den-lang-giay', 'giay-the', 'giay-man-1', 'giay-man-2', 'giay-man-3', 'giay-trao-trang'];
 const TOTAL_MS = Number(process.env.TOTAL_MS || 25 * 60 * 1000);
 
 let failed = 0;
@@ -52,6 +53,9 @@ page.on('console', (m) => {
   if (t.startsWith('[demo]')) console.log(`   ${t}`);
   else if (m.type() === 'error') errors.push(t);
 });
+page.on('framenavigated', (f) => {
+  if (f === page.mainFrame()) console.log(`   (điều hướng cả trang: ${f.url()})`);
+});
 page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
 await page.evaluateOnNewDocument((canh) => {
   if (canh) {
@@ -66,14 +70,15 @@ await page.evaluateOnNewDocument((canh) => {
 
 console.log(`\n--- Demo đợt 1, nhịp ${TOCDO} ---`);
 const t0 = Date.now();
-await page.goto(`${BASE}${CANH ? '/cho?tu=lang-giay&' : '/?'}demo=1&tocdo=${TOCDO}${CANH ? `&canh=${CANH}` : ''}`, { waitUntil: 'domcontentloaded' });
+await page.goto(`${BASE}${CANH ? '/cho?tu=lang-giay&' : '/?'}demo=1&tocdo=${TOCDO}${CANH ? `&canh=${CANH}` : ''}${MAN.length ? `&man=${MAN.join(',')}` : ''}`, { waitUntil: 'domcontentloaded' });
 
 const shots = new Set();
 let lastCount = 0;
-const SHOT_AT = { 'gioi-thieu': 'cho-vua-vao', 'cho-den-lang-giay': 'trong-lang', 'giay-the': 'sau-the', 'giay-man-1': 'sau-man-1', 'giay-man-2': 'sau-man-2', 'giay-man-3': 'sau-man-3' };
+const SHOT_AT = MAN.length ? Object.fromEntries(MAN.map((n) => [`man-${n}`, `list-man-${n}-xong`])) : { 'gioi-thieu': 'cho-vua-vao', 'cho-den-lang-giay': 'trong-lang', 'giay-the': 'sau-the', 'giay-man-1': 'sau-man-1', 'giay-man-2': 'sau-man-2', 'giay-man-3': 'sau-man-3' };
 for (;;) {
   await sleep(1000);
-  const st = await page.evaluate(() => ({ log: window.__demoLog ?? [], done: window.__demoDone === true, path: location.pathname }));
+  const st = await page.evaluate(() => ({ log: window.__demoLog ?? [], done: window.__demoDone === true, path: location.pathname })).catch(() => null);
+  if (!st) continue; // trang đang tải lại
   if (st.log.length > lastCount) {
     const l = st.log[st.log.length - 1];
     const tag = SHOT_AT[l.id];
@@ -112,13 +117,21 @@ const prog = await page.evaluate(() => {
   };
   return {
     pages: p?.goldenPages,
-    done: [1, 2, 3].map(done),
+    done: [1, 2, 3, 5, 10].map(done),
     know: p?.progress?.game?.data?.kc ?? p?.progress?.game?.data?.knowCards ?? null,
     knowRaw: JSON.stringify(p?.progress?.game?.data ?? {}).slice(0, 400),
-    stars: Object.fromEntries([1, 2, 3].map((id) => [id, lv(id)?.stars ?? null])),
+    stars: Object.fromEntries([1, 2, 3, 5, 10].map((id) => [id, lv(id)?.stars ?? null])),
   };
 });
 console.log(`   tiến độ: ${JSON.stringify(prog)}`);
+if (MAN.length) {
+  const need = { 1: 'lesson', 2: 'game', 5: 'game', 10: 'lesson' };
+  for (const n of MAN) {
+    const st = Object.values(prog.stars[n] ?? {}).filter((v) => typeof v === 'number');
+    const want = need[n] === 'lesson' ? st.length >= 3 && st.every((v) => v === 3) : st.some((v) => v === 3);
+    check(`Màn ${n} đạt ${need[n] === 'lesson' ? '3 sao cả 3 trạm' : 'Vàng'}`, want, JSON.stringify(prog.stars[n]));
+  }
+} else {
 check('Màn 1, 2, 3 đã xong', prog.done.every(Boolean));
 check('có 1 Trang Sổ Vàng', prog.pages === 1, String(prog.pages));
 const starVals = (id) => Object.values(prog.stars[id] ?? {}).filter((v) => typeof v === 'number');
@@ -126,9 +139,10 @@ check('Màn 1: cả 3 trạm đạt 3 sao', starVals(1).length >= 3 && starVals(
 check('Màn 2 và 3 đạt huy chương Vàng', [2, 3].every((id) => starVals(id).some((v) => v === 3)), JSON.stringify([prog.stars[2], prog.stars[3]]));
 const mask = await page.evaluate(() => window.__progress?.progress?.game?.data?.knowCards?.['lang-giay'] ?? null);
 check('đủ 4 thẻ Em có biết? của Làng Giấy', mask === 15, `mặt nạ ${JSON.stringify(mask)}`);
+}
 const critical = errors.filter((e) => !/favicon|manifest|404|Failed to load resource/i.test(e));
 check('không lỗi console', critical.length === 0, critical.slice(0, 3).join(' | '));
-await shot(page, 'cuoi-dot-1');
+await shot(page, MAN.length ? 'list-cuoi' : 'cuoi-dot-1');
 
 await browser.close();
 console.log(failed ? `\n${failed} ca hỏng` : '\nTất cả đạt');

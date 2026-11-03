@@ -17,3 +17,11 @@ export const SCENE_META: readonly SceneMeta[] = [
 ] as const;
 
 export const SCENE_IDS: readonly string[] = SCENE_META.map((s) => s.id);
+
+/** Cảnh của chế độ danh sách màn (`?man=`): mỗi màn gồm màn chuyển 2 giây rồi cảnh chơi. */
+export function listSceneMeta(levels: readonly number[]): SceneMeta[] {
+  return levels.flatMap((n) => [
+    { id: `chuyen-${n}`, title: `Transition to level ${n}`, timeoutMs: 15_000 },
+    { id: `man-${n}`, title: `Level ${n}`, timeoutMs: 900_000 },
+  ]);
+}

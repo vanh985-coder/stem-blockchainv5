@@ -22,6 +22,24 @@ Khi bắt đầu: xóa tiến độ chơi thử cũ (cookie `sc_guest`), ẩn n�
 
 Tham số địa chỉ: `?tocdo=0.75|1|1.5` chỉnh nhịp (chậm, thường, nhanh); `?canh=<id cảnh>` bắt đầu từ một cảnh (không xóa tiến độ, nên cần tiến độ đủ để vào cảnh đó): `gioi-thieu`, `cho-den-lang-giay`, `giay-the`, `giay-man-1`, `giay-man-2`, `giay-man-3`, `giay-trao-trang`.
 
+## Chế độ danh sách màn (`?man=`)
+
+Quay riêng từng màn, không đi bộ qua chợ hay làng:
+
+```
+http://localhost:5873/?demo=1&man=1,2,5,10
+http://localhost:5873/?demo=1&man=5
+```
+
+- Bot chơi lần lượt đúng các màn trong danh sách rồi dừng. Hiện bot chơi được màn 1, 2, 5, 10; màn khác trong danh sách bị bỏ qua.
+- Mỗi màn: màn chuyển 2 giây (màn đen, "Màn N" và tên màn chữ to) để dễ cắt video, rồi vào thẳng route của màn.
+- Tiến độ khách đặt sẵn tối thiểu (thẻ "Em có biết?" của làng đã nhặt đủ, các màn đứng trước trong làng đã xong), chỉ trong cookie của trình duyệt đang quay; không gọi Supabase.
+- Không có `&man=` thì chạy trọn như đợt 1. `?tocdo=` dùng được ở cả hai chế độ.
+- Màn 5: bot giỏi `WhackBrain` (tách từ `whackBots`) quyết định theo từng bước mô phỏng; con trỏ giả đuổi theo nút chân làn, bấm "Đọc xong" rồi đập chuột đáp án đúng.
+- Màn 10: trạm Dễ gõ kết quả ghép cặp (đáp án từ `combine`); trạm Trung bình dựng cây rồi soi từ gốc xuống lá bị sửa, ánh đỏ chạy lên gốc; trạm Khó kéo lá bằng con trỏ giả thả (hơi lệch tâm) vào ô "?".
+
+Kiểm: `MAN=1,2,5,10 node scripts/demo-check.mjs` (trình duyệt sạch, kiểm không kẹt, không lỗi console, mỗi màn đạt Vàng hoặc 3 sao, in thời lượng từng màn và tổng).
+
 ## Cấu trúc mã (`packages/core/src/demo/`)
 
 - `config.ts` (cờ bật, nhịp, cảnh bắt đầu), `reset.ts` (xóa tiến độ), `pointerLock.ts` (khóa chuột giả để đi lại được khi không có cú bấm thật), `DemoRunner.tsx` (đếm ngược, phím P/N/Esc, chạy đạo diễn).
