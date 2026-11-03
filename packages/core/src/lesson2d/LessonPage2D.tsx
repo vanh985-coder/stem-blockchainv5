@@ -292,6 +292,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
         <Button
           size="lg"
           autoFocus
+          data-demo="station-next"
           onClick={() => (last ? setStage({ kind: 'saving' }) : setStage({ kind: 'dialogue', idx: stage.idx + 1 }))}
         >
           {last ? ui.baiHoc.xongBai : ui.baiHoc.tramTiepTheo}
@@ -347,7 +348,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
   const onHard = currentIdx === STATION_ORDER.length - 1 && stage.kind !== 'complete';
 
   return (
-    <div className="lesson-screen">
+    <div className="lesson-screen" data-demo-stage={stage.kind}>
       <LessonPraise key={`${levelId}-${attempt}-${currentIdx}`} onResult={onAnswerProp} />
       <div className="lesson-window">
       <div className="lesson-scroll" ref={scrollArea} data-testid="lesson-scroll">

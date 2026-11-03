@@ -29,6 +29,7 @@ import {
   type Lesson1Data,
 } from '@so-chung/core/lessons/bai-1/logic';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
+import { demoProbe } from '@so-chung/core/demo/probe';
 
 const T = bai1Texts;
 
@@ -259,6 +260,8 @@ export function Medium({ onComplete, saved }: { onComplete: (r: StationResult) =
 
   const prevForInvalid = currentFirstInvalid <= 0 ? genesisCode : (pages[currentFirstInvalid - 1].code ?? 0);
   const contentForInvalid = currentFirstInvalid !== -1 ? pages[currentFirstInvalid].content : 0;
+  // Bot demo (chỉ bản build VITE_DEMO)
+  demoProbe('man1', { station: 'tb', tutorialOpen, expected: !tutorialOpen && !isTampering && currentFirstInvalid !== -1 ? pageCode(prevForInvalid, contentForInvalid ?? 0) : null, reflection: showReflection && !tutorialOpen });
 
   // Dữ liệu chuỗi hiển thị: làm thử hoặc bài thật
   const displayPracticePages: ChainPageData[] = [

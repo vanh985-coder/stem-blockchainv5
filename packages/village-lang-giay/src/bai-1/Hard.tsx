@@ -28,6 +28,7 @@ import {
   spawnDelayMs,
 } from '@so-chung/core/lessons/bai-1/logic';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
+import { demoProbe } from '@so-chung/core/demo/probe';
 
 const T = bai1Texts;
 const C = GAME_CONFIG.lesson1;
@@ -312,6 +313,8 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
 
   const prevForInvalid = currentFirstInvalid <= 0 ? genesisCode : (pages[currentFirstInvalid - 1].code ?? 0);
   const contentForInvalid = currentFirstInvalid !== -1 ? pages[currentFirstInvalid].content : 0;
+  // Bot demo (chỉ bản build VITE_DEMO)
+  demoProbe('man1', { station: 'kho', tutorialOpen, timeUp: isTimeUp, expected: !tutorialOpen && !isTimeUp && currentFirstInvalid !== -1 ? pageCode(prevForInvalid, contentForInvalid ?? 0) : null });
 
   // Dữ liệu hiển thị làm thử hoặc bài thật
   const displayPracticePages: ChainPageData[] = [

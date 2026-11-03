@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { BiAvatar, Button, Hearts, TutorialSpotlight, fmt, rebuildUi, sound, tutorialTexts, useGameHint, useSettings, type MiniGameRenderProps, type ScorePart, type TutorialStep } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
+import { demoProbe } from '@so-chung/core/demo/probe';
 import { Scene25D, isQualityChoice, type QualityChoice, type Sprite25D } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
 import { REBUILD_SPEC as SPEC } from './rebuildConfig';
@@ -11,13 +12,16 @@ import { AREAS, REDUCED_MOTION_SCALE, VILLAIN_TIMING, cardHeight, cardWidth, cen
 import {
   advance,
   binCard,
+  checkPlacement,
   createRebuild,
+  formulaHolds,
   insertFake,
   inspectionLine,
   placeCard,
   rebuildScore,
   roundScore,
   scoreParts,
+  tailCode,
   type Card,
   type RebuildState,
   type ScorePartRow,
@@ -385,6 +389,13 @@ export function RebuildGame({ paused: pausedByFrame, attempt, onFinish, setHint 
         : null;
 
   if (PROBE && typeof window !== 'undefined') Object.assign(window, { __rebuild: state, __rebuildUi: { overlay: overlayRef } });
+  // Bot demo (chỉ bản build VITE_DEMO): chỉ đọc những gì học sinh nhìn thấy trên thẻ (công thức, mã trước của ô cuối chuỗi)
+  demoProbe('man3', {
+    phase,
+    tutorialActive,
+    fakeId: () => state.tray.find((c) => !formulaHolds(c))?.id ?? null,
+    rightId: () => state.tray.find((c) => formulaHolds(c) && checkPlacement(tailCode(state), c) === 'ok')?.id ?? null,
+  });
 
   const sprites = useMemo(basketSprites, []);
   const actors = useMemo(

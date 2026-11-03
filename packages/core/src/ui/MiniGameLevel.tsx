@@ -315,7 +315,7 @@ export function MiniGameLevel({ levelId, medals, maxScore, renderGame, onLeave, 
                   {gameUi.choiTiep}
                 </Button>
               )}
-              <Button size="lg" variant="secondary" onClick={leave}>
+              <Button size="lg" variant="secondary" data-demo="game-leave" onClick={leave}>
                 {gameUi.veLang}
               </Button>
               {finale && (finale.ready?.() ?? true) && (
@@ -370,7 +370,7 @@ export function MiniGameLevel({ levelId, medals, maxScore, renderGame, onLeave, 
             {huongDan.nut}
           </Button>
           <AutoCompleteButton levelId={levelId} onDone={toAuto} className="min-h-12 w-full sm:w-auto" />
-          <Button size="lg" fullWidth className="sm:w-auto" onClick={start}>
+          <Button size="lg" fullWidth data-demo="game-start" className="sm:w-auto" onClick={start}>
             {gameUi.batDau}
           </Button>
         </div>

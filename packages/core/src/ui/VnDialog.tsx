@@ -272,6 +272,7 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
         {!noSkip && (
           <button
             type="button"
+            data-demo="vn-skip"
             onClick={() => handlers.current.skip()}
             className={`${smallBtn} absolute right-2 top-2 text-sm [@media(max-height:500px)]:static [@media(max-height:500px)]:order-3 [@media(max-height:500px)]:whitespace-nowrap`}
           >
@@ -284,7 +285,7 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
         >
           {fmt(ui.vn.tienTrinh, { x: index + 1, n: turns.length })}
         </span>
-        <Button ref={nextRef} onClick={() => handlers.current.next()} className="[@media(max-height:500px)]:order-4 [@media(max-height:500px)]:whitespace-nowrap">
+        <Button ref={nextRef} data-demo="vn-next" onClick={() => handlers.current.next()} className="[@media(max-height:500px)]:order-4 [@media(max-height:500px)]:whitespace-nowrap">
           {isLast && finishLabel ? finishLabel : ui.vn.tiep}
         </Button>
       </div>

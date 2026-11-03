@@ -15,6 +15,7 @@ import {
   type TutorialStep,
 } from '@so-chung/core';
 import { bai1Texts } from '@so-chung/core/content/lessons/bai-1';
+import { demoProbe } from '@so-chung/core/demo/probe';
 import { easyRound, pageCode, solutionSteps, type Lesson1Data } from '@so-chung/core/lessons/bai-1/logic';
 
 const T = bai1Texts;
@@ -203,6 +204,8 @@ export function Easy({
     }
   }, [contents, codeVal, activeIdx, genesisCode, pages, mistakes, pageMistakes, onChainBuilt, onComplete]);
 
+  // Bot demo (chỉ bản build VITE_DEMO): đáp án của trang đang làm, tính bằng đúng công thức của bài
+  demoProbe('man1', { station: 'de', tutorialOpen, expected: !tutorialOpen && activeIdx < 5 && (activeIdx === 0 || pages[activeIdx - 1].code !== null) ? pageCode(activeIdx === 0 ? genesisCode : (pages[activeIdx - 1].code as number), contents[activeIdx]) : null });
   // Cầu nối kiểm thử probe phục vụ script tự động
   if (typeof window !== 'undefined') {
     Object.assign(window, {

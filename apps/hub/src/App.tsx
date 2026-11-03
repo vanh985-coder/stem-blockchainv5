@@ -1,6 +1,7 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react';
 import { Route, Routes } from 'react-router';
 import { MERGED, RequireStory, accountRoutes, ui } from '@so-chung/core';
+import { DEMO_ACTIVE } from '@so-chung/core/demo/config';
 import { Home } from './pages/Home';
 import { villageRouteObjects } from './villageRoutes';
 
@@ -24,6 +25,9 @@ const Dev25D = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/ind
 const DevWalk = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.DevWalk }))) : null;
 const DevPortraits = import.meta.env.DEV ? lazy(() => import('@so-chung/core/three/index').then((m) => ({ default: m.DevPortraits }))) : null;
 
+// Demo: chỉ có khi bản build có VITE_DEMO và địa chỉ có ?demo=1 (nếu không, mã demo bị loại khỏi bản build)
+const DemoRunner = import.meta.env.VITE_DEMO === 'true' ? lazy(() => import('@so-chung/core/demo/index').then((m) => ({ default: m.DemoRunner }))) : null;
+
 function Lazy({ page: Page }: { page: LazyExoticComponent<ComponentType> }) {
   return (
     <Suspense fallback={<p className="p-6">{ui.chung.dangTai}</p>}>
@@ -34,6 +38,12 @@ function Lazy({ page: Page }: { page: LazyExoticComponent<ComponentType> }) {
 
 export function App() {
   return (
+    <>
+    {DemoRunner && DEMO_ACTIVE && (
+      <Suspense fallback={null}>
+        <DemoRunner />
+      </Suspense>
+    )}
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/truyen" element={<Lazy page={Story} />} />
@@ -67,5 +77,6 @@ export function App() {
       {DevHotspots && <Route path="/dev/ban-do-hotspots" element={<Lazy page={DevHotspots} />} />}
       <Route path="*" element={<Home />} />
     </Routes>
+    </>
   );
 }

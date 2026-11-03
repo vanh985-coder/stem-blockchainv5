@@ -136,7 +136,7 @@ export function LevelComplete({
             {ui.hoanThanh.choiLai}
           </Button>
           {hasNextLevel ? (
-            <Button onClick={onNextLevel} fullWidth className="sm:w-auto">
+            <Button data-demo="complete-next" onClick={onNextLevel} fullWidth className="sm:w-auto">
               {nextLabel || ui.hoanThanh.manTiepTheo}
             </Button>
           ) : (
@@ -145,7 +145,7 @@ export function LevelComplete({
             </Button>
           )}
           {extraAction && (
-            <Button onClick={extraAction.onClick} fullWidth className="sm:w-auto">
+            <Button data-demo="complete-extra" onClick={extraAction.onClick} fullWidth className="sm:w-auto">
               {extraAction.label}
             </Button>
           )}

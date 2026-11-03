@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as
 import { AssetImage, Button, Hearts, Panel, ProgressBar, QuizCard, TutorialSpotlight, fmt, gameUi, pickQuestions, runnerScoreLabels, runnerUi, sound, tutorialTexts, useGameHint, type MiniGameRenderProps, type Question, type ScorePart, type TutorialStep } from '@so-chung/core';
 import { Scene3D, isQualityChoice, type QualityChoice } from '@so-chung/core/three/index';
 import { PROBE } from '@so-chung/core/lib/dev';
+import { demoProbe } from '@so-chung/core/demo/probe';
 import { RUNNER_SPEC as SPEC } from './runnerConfig';
 import { SWIPE_MIN_PX, keyToCommand, swipeToCommand } from './runnerCommands';
 import { hintFor } from './runnerHint';
@@ -159,6 +160,16 @@ export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   const [tutorialActive, setTutorialActive] = useState(attempt <= 1);
   const [tutorialStep, setTutorialStep] = useState(0);
   const [, setJumpedPractice] = useState(false);
+  // Bot demo (chỉ bản build VITE_DEMO): ván, bộ não bot giỏi (tải khi cần) và câu hỏi đang hiện
+  demoProbe('man2', {
+    session,
+    makeBrain: async () => {
+      const m = await import('./testBots');
+      return new m.BotBrain(session.seed, m.GOOD_BOT);
+    },
+    tutorialActive,
+    correctIndex: quiz && questions[quiz.round] ? questions[quiz.round].correctIndex : null,
+  });
 
   useEffect(() => {
     setHud(INITIAL_HUD);

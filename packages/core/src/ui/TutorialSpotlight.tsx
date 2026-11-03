@@ -429,6 +429,7 @@ export function TutorialSpotlight({
           <button
             ref={skipBtnRef}
             type="button"
+            data-demo="tut-skip"
             onClick={guarded(onSkip)}
             className="shrink-0 text-xs font-semibold text-chu/70 underline-offset-2 hover:text-chu hover:underline focus-visible:outline-2 focus-visible:outline-muc-tim"
           >
