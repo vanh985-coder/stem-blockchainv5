@@ -4,6 +4,7 @@ import { tutorialTexts } from '../../content/tutorial';
 import { clickEl, fire, q, type Ctx } from '../actions';
 import { chaseCursor, tapEffect } from '../cursor';
 import { getProbe } from '../probe';
+import { pace } from '../pacing';
 import { buttonByText, dwell } from '../ui';
 import { finishMiniGame, nextFrame, onPath, startMiniGame } from './common';
 
@@ -53,7 +54,7 @@ export async function man5(ctx: Ctx): Promise<void> {
   const probe = await ctl.waitFor(() => man5Probe(), 'whack probe', 60000);
   if (probe.tutorialActive) {
     const tut = await ctl.waitFor(() => buttonByText(tutorialTexts.chung.boQua), 'whack tutorial', 60000);
-    await ctl.sleep(2500);
+    await ctl.sleep(pace(2500));
     await clickEl(ctx, tut, { settle: 800 });
   }
   const brain = await probe.makeBrain();
@@ -97,14 +98,14 @@ export async function man5(ctx: Ctx): Promise<void> {
       // kết quả lượt đáp án: đọc lời giải rồi "Chơi tiếp"
       const next = await ctl.waitFor(() => buttonByText(whackUi.tiepTuc), 'whack quiz continue', 10000);
       await dwell(ctx, document.querySelector('[role="dialog"]')?.textContent ?? '');
-      await ctl.sleep(1200);
+      await ctl.sleep(pace(1200));
       await clickEl(ctx, next, { settle: 600 });
       brain.endRound();
       continue;
     }
     const end = q<HTMLButtonElement>('[data-testid="nut-ket-qua"]');
     if (end) {
-      await ctl.sleep(1800);
+      await ctl.sleep(pace(1800));
       await clickEl(ctx, end, { settle: 600 });
     }
   }

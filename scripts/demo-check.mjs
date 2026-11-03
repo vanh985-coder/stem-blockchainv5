@@ -21,6 +21,10 @@ const TOCDO = process.env.TOCDO || '1';
 const CANH = process.env.CANH || ''; // bắt đầu từ cảnh này (đặt sẵn tiến độ khách), để kiểm riêng một đoạn
 const MAN = (process.env.MAN || '').split(',').map(Number).filter(Boolean); // chế độ danh sách màn: MAN=1,2,5,10
 const EXPECTED = MAN.length ? MAN.flatMap((n) => [`chuyen-${n}`, `man-${n}`]) : ['gioi-thieu', 'cho-den-lang-giay', 'giay-the', 'giay-man-1', 'giay-man-2', 'giay-man-3', 'giay-trao-trang'];
+const DAY = process.env.DAY === '1'; // ?day=1: chế độ danh sách chạy bản đầy đủ như trước (không nhịp video)
+const VIDEO = MAN.length > 0 && !DAY; // nhịp video: mỗi màn 30–40 giây (tính cả màn chuyển 2 giây và 3 giây xem kết quả)
+const LEVEL_MIN_S = Number(process.env.LEVEL_MIN_S || 30);
+const LEVEL_MAX_S = Number(process.env.LEVEL_MAX_S || 40);
 const TOTAL_MS = Number(process.env.TOTAL_MS || 25 * 60 * 1000);
 
 let failed = 0;
@@ -70,7 +74,7 @@ await page.evaluateOnNewDocument((canh) => {
 
 console.log(`\n--- Demo đợt 1, nhịp ${TOCDO} ---`);
 const t0 = Date.now();
-await page.goto(`${BASE}${CANH ? '/cho?tu=lang-giay&' : '/?'}demo=1&tocdo=${TOCDO}${CANH ? `&canh=${CANH}` : ''}${MAN.length ? `&man=${MAN.join(',')}` : ''}`, { waitUntil: 'domcontentloaded' });
+await page.goto(`${BASE}${CANH ? '/cho?tu=lang-giay&' : '/?'}demo=1&tocdo=${TOCDO}${CANH ? `&canh=${CANH}` : ''}${MAN.length ? `&man=${MAN.join(',')}` : ''}${DAY ? '&day=1' : ''}`, { waitUntil: 'domcontentloaded' });
 
 const shots = new Set();
 let lastCount = 0;
@@ -97,11 +101,20 @@ for (;;) {
 }
 
 const log = await page.evaluate(() => window.__demoLog ?? []);
+const levelSecs = {};
 console.log('\n--- Thời lượng từng cảnh ---');
 let total = 0;
 for (const l of log) {
   total += l.ms;
   console.log(`   ${l.id.padEnd(22)} ${(l.ms / 1000).toFixed(1).padStart(7)} s  ${l.status}${l.error ? `  ${l.error}` : ''}`);
+}
+if (MAN.length) {
+  console.log('\n--- Thời lượng từng màn (màn chuyển + chơi + kết quả) ---');
+  for (const n of MAN) {
+    const s2 = log.filter((l) => l.id === `chuyen-${n}` || l.id === `man-${n}`).reduce((a, l) => a + l.ms, 0);
+    levelSecs[n] = s2 / 1000;
+    console.log(`   Màn ${String(n).padEnd(17)} ${(s2 / 1000).toFixed(1).padStart(7)} s`);
+  }
 }
 console.log(`   ${'TỔNG'.padEnd(22)} ${(total / 1000).toFixed(1).padStart(7)} s  (${Math.floor(total / 60000)} phút ${Math.round((total % 60000) / 1000)} giây)`);
 
@@ -124,7 +137,18 @@ const prog = await page.evaluate(() => {
   };
 });
 console.log(`   tiến độ: ${JSON.stringify(prog)}`);
-if (MAN.length) {
+if (VIDEO) {
+  // nhịp video: ván ngắn nên không cần Vàng, chỉ cần màn chạy xong và không thua
+  for (const n of MAN) check(`Màn ${n} dài ${LEVEL_MIN_S}–${LEVEL_MAX_S} giây`, levelSecs[n] >= LEVEL_MIN_S && levelSecs[n] <= LEVEL_MAX_S, `${levelSecs[n]?.toFixed(1)} s`);
+  const stats = await page.evaluate(() => window.__demoStats ?? {});
+  console.log(`   thống kê demo: ${JSON.stringify(stats)}`);
+  if (MAN.includes(1)) {
+    const gap = stats.man1Hard?.gap;
+    check('Màn 1 trạm Khó: làng hơn bot 10–20 trang lúc hết giờ', typeof gap === 'number' && gap >= 10 && gap <= 20, `${gap} trang`);
+  }
+  const doneAll = await page.evaluate((men) => men.map((id) => window.__progress?.unlock?.levels?.find((u) => u.id === id)?.state === 'done'), MAN);
+  check('mọi màn trong danh sách ghi nhận xong', doneAll.every(Boolean), JSON.stringify(doneAll));
+} else if (MAN.length) {
   const need = { 1: 'lesson', 2: 'game', 5: 'game', 10: 'lesson' };
   for (const n of MAN) {
     const st = Object.values(prog.stars[n] ?? {}).filter((v) => typeof v === 'number');

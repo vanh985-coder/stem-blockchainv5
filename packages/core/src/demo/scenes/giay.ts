@@ -7,6 +7,7 @@ import { getProbe } from '../probe';
 import { buttonByText, dwell, playVnDialogs } from '../ui';
 import { demoWorld, engageWorld, walkAndInteract, waitWorldReady } from '../world';
 import { DEMO_MEN } from '../config';
+import { pace, PACING } from '../pacing';
 import { finishMiniGame, nextFrame, onPath, startMiniGame } from './common';
 import { answerReflection, driveLesson, lessonStage, skipTutorial } from './lesson';
 
@@ -16,6 +17,10 @@ interface Man1Probe {
   expected: number | null;
   reflection?: boolean;
   timeUp?: boolean;
+  /** Trạm Khó: số trang mạng đã đi trước phần sổ đúng (khoảng cách) */
+  remaining?: number;
+  fixed?: number;
+  networkAdded?: number;
 }
 const man1Probe = () => getProbe<Man1Probe>('man1');
 
@@ -32,12 +37,12 @@ async function enterLevelFromVillage(ctx: Ctx, village: 'lang-giay', level: numb
 }
 
 /** Nhập đáp án đúng của trang đang làm rồi bấm Kiểm tra (hoặc Enter ở trạm Khó cho kịp giờ). Trả false nếu chưa có đề. */
-async function answerPage(ctx: Ctx, fast: boolean): Promise<boolean> {
+async function answerPage(ctx: Ctx, fast: boolean, range?: readonly [number, number]): Promise<boolean> {
   const p = man1Probe();
   if (!p || p.expected === null) return false;
   const input = q<HTMLInputElement>('[data-tutorial="code-input"] input');
   if (!input) return false;
-  await typeInto(ctx, input, String(p.expected), { noClick: fast });
+  await typeInto(ctx, input, String(p.expected), { noClick: fast, range });
   if (fast) {
     input.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, code: 'Enter', key: 'Enter' }));
     await ctx.ctl.sleep(500);
@@ -53,7 +58,7 @@ async function playMan1Station(ctx: Ctx, idx: number): Promise<void> {
   const name = (['de', 'tb', 'kho'] as const)[idx];
   await ctl.waitFor(() => man1Probe()?.station === name, `man 1 probe ${name}`, 15000);
   if (man1Probe()?.tutorialOpen) await skipTutorial(ctx);
-  await ctl.sleep(1200);
+  await ctl.sleep(pace(1200));
   if (idx === 0) {
     // trạm Dễ: 5 trang, mỗi trang một đáp án
     while (lessonStage() === 'play') {
@@ -63,29 +68,59 @@ async function playMan1Station(ctx: Ctx, idx: number): Promise<void> {
   }
   if (idx === 1) {
     // trạm Trung bình: chờ kẻ gian sửa trộm rồi sửa dây chuyền các trang lệch
-    await ctl.sleep(1500);
+    await ctl.sleep(pace(1500));
     while (!man1Probe()?.reflection) {
       if (!(await answerPage(ctx, false))) await ctl.sleep(300);
     }
-    await answerReflection(ctx);
+    // nhịp video: bỏ câu suy ngẫm (nút xong trạm không phụ thuộc vào nó)
+    if (!PACING) await answerReflection(ctx);
     const done = await ctl.waitFor(() => buttonByText(bai1Texts.tb.xongTram), 'station finish button', 5000);
     await clickEl(ctx, done, { settle: 600 });
     return;
   }
-  // trạm Khó: cuộc đua 60 giây, sửa liên tục tới khi hết giờ
-  while (!man1Probe()?.timeUp) {
-    if (!(await answerPage(ctx, true))) await ctx.ctl.sleep(200);
+  if (PACING) {
+    await raceAndLose(ctx);
+  } else {
+    // trạm Khó: cuộc đua 60 giây, sửa liên tục tới khi hết giờ
+    while (!man1Probe()?.timeUp) {
+      if (!(await answerPage(ctx, true))) await ctx.ctl.sleep(200);
+    }
   }
-  await answerReflection(ctx);
+  // nhịp video: bỏ câu suy ngẫm (nút xong trạm không phụ thuộc vào nó)
+    if (!PACING) await answerReflection(ctx);
   const done = await ctl.waitFor(() => buttonByText(bai1Texts.kho.xongTram), 'station finish button', 5000);
   await clickEl(ctx, done, { settle: 600 });
+}
+
+/**
+ * Nhịp video, trạm Khó: bot cố tình sửa chậm (nghỉ giữa hai lần sửa, gõ chậm, bấm nút) trong khi mạng sinh trang nhanh, để lúc hết giờ chuỗi của làng dài hơn chuỗi của bot 10 đến 20 trang.
+ * Bot không sửa khi khoảng cách đã xuống sát mức thấp nhất. Hết giờ thì ghi khoảng cách vào `window.__demoStats` và dừng trên khung tổng kết để người xem thấy.
+ */
+async function raceAndLose(ctx: Ctx): Promise<void> {
+  const { ctl } = ctx;
+  const L = PACING!.lesson1;
+  while (!man1Probe()?.timeUp) {
+    const p = man1Probe();
+    if (!p || p.expected === null || ((p.fixed ?? 0) >= 1 && (p.remaining ?? 0) <= L.gapMin + 3)) {
+      await ctl.sleep(150);
+      continue;
+    }
+    await ctl.sleep(L.botPauseMs);
+    if (man1Probe()?.timeUp) break;
+    await answerPage(ctx, false, L.botTypeMs);
+  }
+  const end = man1Probe();
+  const stats = { gap: end?.remaining ?? -1, fixed: end?.fixed ?? 0, networkAdded: end?.networkAdded ?? 0 };
+  (window as unknown as { __demoStats?: Record<string, unknown> }).__demoStats = { ...((window as unknown as { __demoStats?: Record<string, unknown> }).__demoStats ?? {}), man1Hard: stats };
+  console.info(`[demo] man-1 hard gap ${JSON.stringify(stats)}`);
+  await ctl.sleep(L.gapHoldMs);
 }
 
 export async function giayMan1(ctx: Ctx): Promise<void> {
   await enterLevelFromVillage(ctx, 'lang-giay', 1);
   await ctx.ctl.waitFor(() => lessonStage(), 'lesson page', 30000);
   await driveLesson(ctx, { playStation: playMan1Station });
-  await ctx.ctl.sleep(2500);
+  await ctx.ctl.sleep(PACING ? 3000 : 2500);
 }
 
 interface RunnerSessionLike {
@@ -153,7 +188,7 @@ async function answerRunnerQuiz(ctx: Ctx): Promise<void> {
     return b.length > 0 && man2Probe()?.correctIndex != null ? b : null;
   }, 'quiz options', 8000);
   await dwell(ctx, panel.querySelector('h2')?.textContent ?? '');
-  await ctl.sleep(800);
+  await ctl.sleep(pace(800));
   const idx = man2Probe()?.correctIndex ?? 0;
   await clickEl(ctx, opts[idx], { settle: 500 });
   await dwell(ctx, q('[data-testid="quiz-giai-thich"]')?.textContent ?? '');
@@ -175,7 +210,7 @@ export async function giayMan2(ctx: Ctx): Promise<void> {
   // hướng dẫn làm thử (nếu có): xem nhanh rồi Bỏ qua
   if (probe.tutorialActive) {
     const tut = await ctl.waitFor(() => buttonByText(tutorialTexts.chung.boQua), 'runner tutorial', 60000);
-    await ctl.sleep(2500);
+    await ctl.sleep(pace(2500));
     await clickEl(ctx, tut, { settle: 800 });
   }
   const brain = await probe.makeBrain();

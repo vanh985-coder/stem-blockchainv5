@@ -2,12 +2,13 @@
 import { tutorialTexts } from '../../content/tutorial';
 import { ui } from '../../content/ui';
 import { clickEl, q, type Ctx } from '../actions';
+import { pace, PACING } from '../pacing';
 import { buttonByText, dwell, playVnDialogs } from '../ui';
 
 export const lessonStage = (): string | undefined => q('.lesson-screen')?.dataset.demoStage;
 
 /** Hướng dẫn làm thử (P8) của trạm: cho xem một lúc rồi bấm "Bỏ qua". */
-export async function skipTutorial(ctx: Ctx, watchMs = 3200): Promise<void> {
+export async function skipTutorial(ctx: Ctx, watchMs = PACING ? PACING.tutorialWatchMs : 3200): Promise<void> {
   const skip = await ctx.ctl.waitFor(() => buttonByText(tutorialTexts.chung.boQua), 'tutorial skip button', 10000);
   await ctx.ctl.sleep(watchMs);
   await clickEl(ctx, skip, { settle: 700 });
@@ -23,14 +24,20 @@ export interface LessonDrive {
 export async function driveLesson(ctx: Ctx, drive: LessonDrive): Promise<void> {
   const { ctl } = ctx;
   let station = 0;
+  let lastStage = '';
+  const t0 = performance.now();
   for (;;) {
     const stage = await ctl.waitFor(() => lessonStage(), 'lesson stage', 30000);
+    if (stage !== lastStage) {
+      lastStage = stage;
+      console.info(`[demo] stage ${stage} t=${Math.round(performance.now() - t0)}ms`);
+    }
     if (stage === 'complete') return;
     if (stage === 'failed') throw new Error('lesson station failed');
     if (stage === 'dialogue' || stage === 'outro') {
       await playVnDialogs(ctx);
     } else if (stage === 'intro') {
-      await ctl.sleep(2200);
+      await ctl.sleep(pace(2200));
       const start = q<HTMLButtonElement>('[data-demo="intro-start"]');
       if (start) await clickEl(ctx, start, { settle: 500 });
     } else if (stage === 'play') {
@@ -38,8 +45,8 @@ export async function driveLesson(ctx: Ctx, drive: LessonDrive): Promise<void> {
       station = idx >= 0 ? idx : station;
       await drive.playStation(ctx, station);
     } else if (stage === 'stationDone') {
-      await dwell(ctx, q('.lesson-screen h2')?.textContent ?? '');
-      await ctl.sleep(1500);
+      if (!PACING) await dwell(ctx, q('.lesson-screen h2')?.textContent ?? '');
+      await ctl.sleep(pace(1500));
       const next = q<HTMLButtonElement>('[data-demo="station-next"]');
       if (next) await clickEl(ctx, next, { settle: 500 });
     } else {
@@ -55,7 +62,7 @@ export async function answerReflection(ctx: Ctx): Promise<void> {
     const r = [...document.querySelectorAll<HTMLElement>('[role="radio"]')];
     return r.length > 0 ? r : null;
   }, 'reflection options', 8000);
-  await ctl.sleep(1200);
+  await ctl.sleep(pace(1200));
   await clickEl(ctx, radios[0], { settle: 500 });
   const chot = await ctl.waitFor(() => buttonByText(ui.suyNgam.chot), 'reflection submit', 4000);
   await clickEl(ctx, chot, { settle: 500 });

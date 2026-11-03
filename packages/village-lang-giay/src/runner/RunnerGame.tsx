@@ -3,6 +3,7 @@ import { AssetImage, Button, Hearts, Panel, ProgressBar, QuizCard, TutorialSpotl
 import { Scene3D, isQualityChoice, type QualityChoice } from '@so-chung/core/three/index';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { demoProbe } from '@so-chung/core/demo/probe';
+import { PACING } from '@so-chung/core/demo/pacing';
 import { RUNNER_SPEC as SPEC } from './runnerConfig';
 import { SWIPE_MIN_PX, keyToCommand, swipeToCommand } from './runnerCommands';
 import { hintFor } from './runnerHint';
@@ -21,6 +22,9 @@ function forcedQuality(): QualityChoice | undefined {
 /** Hạt giống của ván: khác nhau mỗi lần (ngẫu nhiên chỉ ở đây; mọi luật trong `runnerLogic` đều tất định theo hạt giống). */
 const newSeed = (): number => (Math.random() * 2 ** 31) >>> 0;
 
+// Nhịp video (chỉ demo): 1 vòng ngắn + 1 câu hỏi; ngoài demo là số của spec
+const ROUNDS: number = PACING ? PACING.runner.rounds : SPEC.rounds;
+const ROUND_SEC: number = PACING ? PACING.runner.roundSec : SPEC.roundSec;
 const INITIAL_HUD: RunnerHud = { hearts: SPEC.hearts, pages: 0, coins: 0, meters: 0, round: 0, shield: 0, boots: 0, magnet: 0 };
 
 /** Trang sổ: biểu tượng nhỏ cho thanh trên (tờ giấy có gáy tím). */
@@ -71,7 +75,7 @@ function RunnerHudBar({ hud }: { hud: RunnerHud }) {
           {fmt(gameUi.quangDuong, { so: hud.meters })}
         </span>
         <span className="font-display text-lg font-bold text-nau-go-dam" data-testid="vong">
-          {fmt(runnerUi.vong, { so: Math.min(SPEC.rounds, hud.round + 1), max: SPEC.rounds })}
+          {fmt(runnerUi.vong, { so: Math.min(ROUNDS, hud.round + 1), max: ROUNDS })}
         </span>
       </div>
       {(hud.shield > 0 || hud.boots > 0 || hud.magnet > 0) && (
@@ -96,7 +100,7 @@ function QuizOverlay({ session, question, quiz, hearts }: { session: RunnerSessi
     const id = setInterval(() => setTimeLeft(session.state.quiz?.timeLeft ?? 0), 100);
     return () => clearInterval(id);
   }, [session, quiz.answered, quiz.round]);
-  const last = quiz.round + 1 >= SPEC.rounds || hearts <= 0;
+  const last = quiz.round + 1 >= ROUNDS || hearts <= 0;
   const onAnswer = useCallback((ok: boolean) => session.answerQuiz(ok), [session]);
   const resume = useCallback(() => session.resumeQuiz(), [session]);
   const label = last ? runnerUi.xemKetQua : runnerUi.chayTiep;
@@ -123,7 +127,7 @@ function QuizOverlay({ session, question, quiz, hearts }: { session: RunnerSessi
           </Panel>
         ) : (
           <>
-            <QuizCard key={quiz.round} question={question} levelId={2} caption={fmt(runnerUi.cauSo, { so: quiz.round + 1, max: SPEC.rounds })} onAnswer={onAnswer} onContinue={resume} continueLabel={label} className="max-w-none" />
+            <QuizCard key={quiz.round} question={question} levelId={2} caption={fmt(runnerUi.cauSo, { so: quiz.round + 1, max: ROUNDS })} onAnswer={onAnswer} onContinue={resume} continueLabel={label} className="max-w-none" />
             {quiz.answered !== null && (
               <p className="shrink-0 rounded-nut bg-giay/95 px-4 py-2 [@media(max-height:520px)]:py-1 text-center font-semibold [@media(max-height:520px)]:text-sm shadow-md" data-testid="ket-qua-cau">
                 {quiz.answered ? fmt(runnerUi.quizDung, { so: SPEC.quizPages }) : runnerUi.quizSai}
@@ -143,9 +147,9 @@ function QuizOverlay({ session, question, quiz, hearts }: { session: RunnerSessi
 export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRenderProps) {
   const forced = useMemo(forcedQuality, []);
   // mỗi lần chơi (attempt) là một ván mới với hạt giống mới
-  const session = useMemo(() => new RunnerSession({ seed: newSeed() }), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
+  const session = useMemo(() => new RunnerSession({ seed: newSeed(), rounds: ROUNDS, roundSec: ROUND_SEC }), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
   // 4 câu hỏi Bài 1 cho ván này (không lặp, đã trộn thứ tự đáp án)
-  const questions = useMemo(() => pickQuestions({ bai: 1, soCau: SPEC.rounds, seed: session.seed }), [session]);
+  const questions = useMemo(() => pickQuestions({ bai: 1, soCau: ROUNDS, seed: session.seed }), [session]);
   // chỉ bản dev và bản đo `VITE_PROBE`: để script kiểm đọc trạng thái ván (tốc độ, tim, điểm)
   if (PROBE && typeof window !== 'undefined') Object.assign(window, { __runner: session, __runnerQuestions: questions, __makeCell: makeCell });
   const pausedRef = useRef(paused);

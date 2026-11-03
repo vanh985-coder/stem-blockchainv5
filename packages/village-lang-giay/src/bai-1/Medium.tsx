@@ -30,6 +30,7 @@ import {
 } from '@so-chung/core/lessons/bai-1/logic';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { demoProbe } from '@so-chung/core/demo/probe';
+import { PACING } from '@so-chung/core/demo/pacing';
 
 const T = bai1Texts;
 
@@ -72,7 +73,7 @@ export function Medium({ onComplete, saved }: { onComplete: (r: StationResult) =
   const initialCodes = useRef(isValidSaved ? [...(saved as Lesson1Data).codes] : buildChain(genesisCode, initialContents)).current;
 
   // Trang k (trang 2 hoặc trang 3) bị sửa trộm, độ chênh an toàn
-  const tamperIndex = useRef(rng() < 0.5 ? 1 : 2).current;
+  const tamperIndex = useRef(PACING ? PACING.lesson1.tamperIndex : rng() < 0.5 ? 1 : 2).current;
   const originalOld = initialContents[tamperIndex];
   const tamperedNew = useRef(pickSafeContent(originalOld, rng)).current;
 
@@ -201,7 +202,7 @@ export function Medium({ onComplete, saved }: { onComplete: (r: StationResult) =
     const timer = setTimeout(() => {
       sound.playWrong();
       apply();
-    }, GAME_CONFIG.lesson1.tamperAnimMs);
+    }, PACING ? PACING.lesson1.tamperAnimMs : GAME_CONFIG.lesson1.tamperAnimMs);
     return () => clearTimeout(timer);
   }, [reducedMotion, tamperIndex, tamperedNew, originalOld, initialCodes]);
 

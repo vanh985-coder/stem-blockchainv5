@@ -21,6 +21,7 @@ import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { generateEasy, combine, type EasyTx } from '@so-chung/core/lessons/bai-4/logic';
 import { portraitOf } from './nguoi';
 import { demoProbe } from '@so-chung/core/demo/probe';
+import { PACING } from '@so-chung/core/demo/pacing';
 
 const T = bai4Texts.tramDe;
 
@@ -44,7 +45,8 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
   }, []);
 
   const [txs] = useState<EasyTx[]>(data.txs);
-  const [questions] = useState<[string, string][]>(data.questions);
+  // Nhịp video (chỉ demo): chỉ 1 cặp để ghép
+  const [questions] = useState<[string, string][]>(PACING ? data.questions.slice(0, PACING.man10.easyQuestions) : data.questions);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [inputValue, setInputValue] = useState<number | null>(null);

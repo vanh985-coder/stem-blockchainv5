@@ -29,9 +29,12 @@ import {
 } from '@so-chung/core/lessons/bai-1/logic';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { demoProbe } from '@so-chung/core/demo/probe';
+import { PACING } from '@so-chung/core/demo/pacing';
 
 const T = bai1Texts;
 const C = GAME_CONFIG.lesson1;
+// Nhịp video (chỉ demo): ván ngắn, mạng sinh trang đều và nhanh
+const HARD_DURATION_MS = PACING ? PACING.lesson1.hardDurationMs : C.hardDurationMs;
 
 // Dữ liệu làm thử cố định cho trạm Khó (P8b)
 const PRACTICE_GENESIS = 10;
@@ -250,7 +253,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
   // Mạng thêm trang bằng chuỗi setTimeout (không dùng setInterval), dọn sạch khi rời màn hoặc khi mở hướng dẫn.
   const scheduleNextSpawn = useCallback(() => {
     if (timeUpRef.current || tutorialOpen) return;
-    const delay = spawnDelayMs(spawnIndex.current, isFast.current);
+    const delay = PACING ? PACING.lesson1.hardSpawnMs : spawnDelayMs(spawnIndex.current, isFast.current);
     spawnIndex.current += 1;
     spawnTimeout.current = setTimeout(() => {
       if (timeUpRef.current || tutorialOpen) return;
@@ -314,7 +317,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
   const prevForInvalid = currentFirstInvalid <= 0 ? genesisCode : (pages[currentFirstInvalid - 1].code ?? 0);
   const contentForInvalid = currentFirstInvalid !== -1 ? pages[currentFirstInvalid].content : 0;
   // Bot demo (chỉ bản build VITE_DEMO)
-  demoProbe('man1', { station: 'kho', tutorialOpen, timeUp: isTimeUp, expected: !tutorialOpen && !isTimeUp && currentFirstInvalid !== -1 ? pageCode(prevForInvalid, contentForInvalid ?? 0) : null });
+  demoProbe('man1', { station: 'kho', tutorialOpen, timeUp: isTimeUp, remaining, fixed: fixedCount, networkAdded: networkAdded.current, expected: !tutorialOpen && !isTimeUp && currentFirstInvalid !== -1 ? pageCode(prevForInvalid, contentForInvalid ?? 0) : null });
 
   // Dữ liệu hiển thị làm thử hoặc bài thật
   const displayPracticePages: ChainPageData[] = [
@@ -426,7 +429,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
         data-tutorial="stats-bar"
       >
         <CountdownTimer
-          durationMs={C.hardDurationMs}
+          durationMs={HARD_DURATION_MS}
           onTimeUp={handleTimeUp}
           isPaused={isTimeUp || tutorialOpen}
           resetTrigger={gameResetTrigger}

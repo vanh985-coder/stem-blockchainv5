@@ -19,6 +19,7 @@ import {
 } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
 import { demoProbe } from '@so-chung/core/demo/probe';
+import { PACING } from '@so-chung/core/demo/pacing';
 import { WHACK_SPEC, type MouseKind } from './whackConfig';
 import { hintFor } from './whackHint';
 import { answerBoss, bossInZone, bossPoints, collectCoin, createWhackGame, hitLane, inZone, readDone, tickWhack, type WhackEvent, type WhackState } from './whackLogic';
@@ -556,7 +557,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
     },
     makeBrain: async () => {
       const m = await import('./whackBots');
-      return new m.WhackBrain(seed, { ...m.GOOD_BOT, correct: 1, skip: 0 });
+      return new m.WhackBrain(seed, { ...m.GOOD_BOT, correct: 1, skip: 0, ...(PACING ? { answerDelay: 0.5 } : {}) });
     },
   });
   // Probe phục vụ tự động kiểm thử Puppeteer

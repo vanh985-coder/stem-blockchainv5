@@ -36,6 +36,9 @@ export function parseManList(raw: string | null | undefined): number[] | null {
 /** Chế độ danh sách màn: `?man=1,2,5,10` bot chơi lần lượt đúng các màn đó (vào thẳng route, tiến độ đặt sẵn). */
 export const DEMO_MEN: number[] | null = DEMO_ACTIVE ? parseManList(readQuery()?.get('man')) : null;
 
+/** `?day=1`: chế độ danh sách màn chạy bản đầy đủ (nhịp như trước), không dùng nhịp video rút gọn. */
+export const DEMO_DAY: boolean = DEMO_ACTIVE && readQuery()?.get('day') === '1';
+
 export const DEMO_SPEED: number = parseSpeed(readQuery()?.get('tocdo'));
 
 /** Đưa vài đối tượng ra `window` cho demo và script kiểm (chỉ khi build demo). */

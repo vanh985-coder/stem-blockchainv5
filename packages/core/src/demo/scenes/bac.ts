@@ -3,6 +3,7 @@ import { bai4Texts } from '../../content/lessons/bai-4';
 import { clickEl, dragEl, q, typeInto, type Ctx } from '../actions';
 import { getProbe } from '../probe';
 import { buttonByText, dwell, playVnDialogs, vnNext } from '../ui';
+import { pace, PACING } from '../pacing';
 import { onPath } from './common';
 import { driveLesson, lessonStage, skipTutorial } from './lesson';
 
@@ -48,8 +49,10 @@ async function playMedium(ctx: Ctx): Promise<void> {
       continue;
     }
     await dwell(ctx, q('[data-testid="lesson-scroll"] h3')?.textContent ?? '');
-    await ctl.sleep(1200);
-    await clickEl(ctx, next, { settle: 500 });
+    await ctl.sleep(pace(1200));
+    // nhịp video: xem một bước dựng cây rồi sang phần tự xây
+    const skipA = PACING ? buttonByText(TB.tabTuXayCay) : null;
+    await clickEl(ctx, skipA ?? next, { settle: 500 });
   }
   // phần B: tự xây cây, nhập T12, T34 rồi gốc
   for (const [slot, cellId] of [['t12', '1-0'], ['t34', '1-1'], ['root', '2-0']] as const) {
@@ -58,32 +61,32 @@ async function playMedium(ctx: Ctx): Promise<void> {
     const c = await ctl.waitFor(() => cell(cellId), `tree cell ${cellId}`, 5000);
     await clickEl(ctx, c, { settle: 500 });
     const input = await ctl.waitFor(() => q<HTMLInputElement>('[data-testid="lesson-scroll"] input'), 'build input', 5000);
-    await typeInto(ctx, input, String(probe()?.expectB?.[slot]));
+    await typeInto(ctx, input, String(probe()?.expectB?.[slot]), { noClick: !!PACING });
     const check = await ctl.waitFor(() => q<HTMLButtonElement>('[data-demo="check"]'), 'confirm button', 5000);
     await clickEl(ctx, check, { settle: 800 });
     await ctl.waitFor(() => probe()?.solved?.[slot], `slot ${slot} solved`, 6000);
   }
   const reveal = await ctl.waitFor(() => buttonByText(TB.khamPhaKhoanhKhacA), 'reveal button', 8000);
-  await ctl.sleep(1500);
+  await ctl.sleep(pace(1500));
   await clickEl(ctx, reveal, { settle: 800 });
   // phần C: soi từ gốc xuống tới lá bị sửa, rồi xem ánh đỏ chạy ngược lên gốc
   await ctl.waitFor(() => probe()?.phase === 'phase_c', 'phase C', 10000);
   await dwell(ctx, q('[data-testid="lesson-scroll"] h3')?.textContent ?? '');
-  await ctl.sleep(2000);
+  await ctl.sleep(pace(2000));
   const leaf = probe()?.tamperedLeaf ?? 0;
   for (const id of [`1-${leaf >> 1}`, `0-${leaf}`]) {
     const c = await ctl.waitFor(() => cell(id), `inspect cell ${id}`, 6000);
-    await clickEl(ctx, c, { settle: 1200 });
+    await clickEl(ctx, c, { settle: pace(1200) });
   }
   await ctl.waitFor(() => probe()?.found && (probe()?.tamperStep ?? 0) >= 2, 'red pulse reaches the root', 15000);
-  await ctl.sleep(3000);
+  await ctl.sleep(pace(3000));
   const done = await ctl.waitFor(() => q<HTMLButtonElement>('[data-demo="station-finish"]'), 'finish button', 5000);
   await clickEl(ctx, done, { settle: 600 });
 }
 
 async function playHard(ctx: Ctx): Promise<void> {
   const { ctl } = ctx;
-  await ctl.sleep(1500);
+  await ctl.sleep(pace(1500));
   while (lessonStage() === 'play') {
     // lời thầy Linh (lật tình huống ở trạm Trung bình) còn phủ lên: xem hết rồi mới làm
     if (vnNext()) {
@@ -121,7 +124,7 @@ async function playMan10Station(ctx: Ctx, idx: number): Promise<void> {
   const name = (['de', 'tb', 'kho'] as const)[idx];
   await ctx.ctl.waitFor(() => probe()?.station === name, `man 10 probe ${name}`, 20000);
   if (probe()?.tutorialActive) await skipTutorial(ctx);
-  await ctx.ctl.sleep(1200);
+  await ctx.ctl.sleep(pace(1200));
   if (idx === 0) await playEasy(ctx);
   else if (idx === 1) await playMedium(ctx);
   else await playHard(ctx);
@@ -131,5 +134,5 @@ export async function man10(ctx: Ctx): Promise<void> {
   if (!onPath('/lang/lang-bac/man/10')) throw new Error('not on the level 10 route');
   await ctx.ctl.waitFor(() => lessonStage(), 'lesson page', 30000);
   await driveLesson(ctx, { playStation: playMan10Station });
-  await ctx.ctl.sleep(2500);
+  await ctx.ctl.sleep(PACING ? 3000 : 2500);
 }

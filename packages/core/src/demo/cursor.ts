@@ -1,5 +1,6 @@
 /** Con trỏ giả của demo: chấm tròn sáng, di chuyển mượt, có hiệu ứng nhấn. Vẽ bằng nền phẳng và viền (không đổ bóng, không filter). */
 import type { DemoController } from './controller';
+import { PACING } from './pacing';
 import { cursorDuration, cursorPath, type Pt } from './timing';
 
 let el: HTMLDivElement | null = null;
@@ -72,7 +73,7 @@ export async function moveCursor(ctl: DemoController, to: Pt): Promise<void> {
   show();
   if (pos.x < 0) place({ x: Math.max(40, to.x - 200), y: Math.min(window.innerHeight - 40, to.y + 120) });
   const from = pos;
-  const dur = cursorDuration(from, to, ctl.speed);
+  const dur = cursorDuration(from, to, ctl.speed * (PACING?.cursorBoost ?? 1));
   const steps = Math.max(2, Math.round(dur / 16));
   for (const p of cursorPath(from, to, steps)) {
     place(p);
@@ -95,7 +96,7 @@ export async function pressEffect(ctl: DemoController): Promise<void> {
     ring.style.opacity = '0';
     ring.style.scale = '1.1';
   }
-  await ctl.sleep(110);
+  await ctl.sleep(PACING ? 50 : 110);
   c.style.scale = '1';
 }
 

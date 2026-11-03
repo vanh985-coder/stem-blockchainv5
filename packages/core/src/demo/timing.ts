@@ -5,9 +5,9 @@ export const TYPE_MIN_MS = 120;
 export const TYPE_MAX_MS = 200;
 
 /** Độ trễ (mili giây) trước mỗi ký tự khi gõ `length` ký tự: trong [120, 200], tất định theo `seed`. */
-export function typingDelays(length: number, seed = 1): number[] {
+export function typingDelays(length: number, seed = 1, range: readonly [number, number] = [TYPE_MIN_MS, TYPE_MAX_MS]): number[] {
   const rnd = createMulberry32(seed);
-  return Array.from({ length: Math.max(0, length) }, () => Math.round(TYPE_MIN_MS + rnd() * (TYPE_MAX_MS - TYPE_MIN_MS)));
+  return Array.from({ length: Math.max(0, length) }, () => Math.round(range[0] + rnd() * (range[1] - range[0])));
 }
 
 /** Tổng thời gian gõ chuỗi (mili giây). */
@@ -18,8 +18,8 @@ export function typingDuration(length: number, seed = 1): number {
 export const READ_MIN_MS = 1000;
 export const READ_MAX_MS = 2000;
 /** Thời gian "đọc" một đoạn chữ: 1 đến 2 giây, dài chữ thì lâu hơn (chia cho nhịp `speed`). */
-export function readTime(text: string, speed = 1): number {
-  const raw = READ_MIN_MS + Math.min(1, text.length / 160) * (READ_MAX_MS - READ_MIN_MS);
+export function readTime(text: string, speed = 1, range: readonly [number, number] = [READ_MIN_MS, READ_MAX_MS]): number {
+  const raw = range[0] + Math.min(1, text.length / 160) * (range[1] - range[0]);
   return Math.round(raw / speed);
 }
 

@@ -4,6 +4,7 @@ import { knowQuizOf } from '../lib/knowQuiz';
 import { parseNumberAnswer } from '../lib/knowQuiz';
 import type { VillageId } from '../village';
 import { clickEl, q, qa, typeInto, type Ctx } from './actions';
+import { PACING } from './pacing';
 import { readTime } from './timing';
 
 /** Tìm nút theo chữ (so khớp nguyên văn đã bỏ khoảng trắng thừa) trong `root`. */
@@ -18,7 +19,7 @@ export function buttonByPrefix(prefix: string, root: ParentNode = document): HTM
 
 /** Dừng "đọc" một đoạn chữ. */
 export function dwell(ctx: Ctx, text: string): Promise<void> {
-  return ctx.ctl.sleep(readTime(text));
+  return ctx.ctl.sleep(readTime(text, 1, PACING?.readMs));
 }
 
 export const vnNext = (): HTMLButtonElement | null => q<HTMLButtonElement>('[data-demo="vn-next"]:not([disabled])');
@@ -27,7 +28,8 @@ export const vnNext = (): HTMLButtonElement | null => q<HTMLButtonElement>('[dat
 export async function playVnDialogs(ctx: Ctx, opts: { extraDwell?: number } = {}): Promise<number> {
   let turns = 0;
   let idle = 0;
-  while (idle < 8) {
+  const idleMax = PACING ? 2 : 8;
+  while (idle < idleMax) {
     const next = vnNext();
     if (!next) {
       idle++;
@@ -36,7 +38,8 @@ export async function playVnDialogs(ctx: Ctx, opts: { extraDwell?: number } = {}
     }
     idle = 0;
     const text = q('[data-testid="vn-text"]')?.textContent ?? '';
-    await dwell(ctx, text);
+    if (PACING) await ctx.ctl.sleep(PACING.dialogMs);
+    else await dwell(ctx, text);
     if (opts.extraDwell) await ctx.ctl.sleep(opts.extraDwell);
     await clickEl(ctx, next, { settle: 300 });
     turns++;

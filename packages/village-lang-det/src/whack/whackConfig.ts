@@ -5,7 +5,9 @@
  * Những chỗ spec chưa nói (đã chốt trong lời giao bước B6, ghi cả trong spec 06): vị trí vùng đập, đồng hồ lịch dừng trong lượt trùm, lượt trùm làm chuột còn 20% tốc độ rồi đứng yên khi mở câu hỏi,
  * làm tròn xuống số giây còn lại. Số "tự chọn" của bước này được ghi chú riêng ngay tại chỗ.
  */
-export const WHACK_SPEC = {
+import { PACING, withOverrides } from '@so-chung/core/demo/pacing';
+
+export const WHACK_SPEC_REAL = {
   /** 4 làn */
   lanes: 4,
   /** Chiều dài làn, và hai đầu vùng đập (vị trí tính từ đầu làn) */
@@ -67,6 +69,19 @@ export const WHACK_SPEC = {
    */
   medals: [1750, 2350, 2550] as const,
 } as const;
+
+/**
+ * Số liệu đang dùng. Ngoài demo là đúng `WHACK_SPEC_REAL` (cùng đối tượng). Nhịp video của demo (`?man=` không có `?day=1`) rút ván còn khoảng 20 giây chơi: chuột sinh nhanh hơn, chỉ 1 lượt trùm.
+ */
+export const WHACK_SPEC: typeof WHACK_SPEC_REAL = withOverrides(
+  WHACK_SPEC_REAL,
+  PACING && {
+    spawnStart: PACING.whack.spawnStart,
+    spawnEnd: PACING.whack.spawnEnd,
+    firstSpawn: PACING.whack.spawnStart,
+    boss: { count: PACING.whack.bossCount, every: PACING.whack.bossEvery },
+  },
+);
 
 export type MouseKind = 'thuong' | 'doiLan' | 'nhanh' | 'to';
 /** Thứ tự các loại trong `WHACK_SPEC.mix[].weights` */

@@ -1,6 +1,7 @@
 /** Thao tác như người chơi: bấm, gõ số từng ký tự, nhấn phím, kéo thả. Mọi thao tác di con trỏ giả tới trước rồi gửi sự kiện pointer/mouse/click/keyboard thật. */
 import type { DemoController } from './controller';
 import { moveCursor, placeCursor, pressEffect } from './cursor';
+import { PACING } from './pacing';
 import { typingDelays } from './timing';
 
 export interface Ctx {
@@ -23,7 +24,7 @@ export async function clickEl(ctx: Ctx, el: Element, opts: { settle?: number } =
   (el as HTMLElement).scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
   const p = centerOf(el);
   await moveCursor(ctl, p);
-  await ctl.sleep(120);
+  await ctl.sleep(PACING ? 40 : 120);
   const hit = document.elementFromPoint(p.x, p.y);
   const target = hit && (el === hit || el.contains(hit)) ? hit : el;
   await pressEffect(ctl);
@@ -34,7 +35,8 @@ export async function clickEl(ctx: Ctx, el: Element, opts: { settle?: number } =
   fire(target, 'pointerup', p.x, p.y);
   fire(target, 'mouseup', p.x, p.y);
   fire(target, 'click', p.x, p.y);
-  await ctl.sleep(opts.settle ?? 250);
+  const settle = opts.settle ?? 250;
+  await ctl.sleep(PACING ? Math.min(settle, 150) : settle);
 }
 
 const nativeValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
@@ -49,12 +51,12 @@ export function keyEvent(target: EventTarget, type: 'keydown' | 'keyup', code: s
 }
 
 /** Gõ từng ký tự vào ô nhập (120–200 ms mỗi ký tự). */
-export async function typeInto(ctx: Ctx, input: HTMLInputElement, text: string, opts: { seed?: number; noClick?: boolean } = {}): Promise<void> {
+export async function typeInto(ctx: Ctx, input: HTMLInputElement, text: string, opts: { seed?: number; noClick?: boolean; range?: readonly [number, number] } = {}): Promise<void> {
   const { ctl } = ctx;
   if (opts.noClick) input.focus({ preventScroll: true });
   else await clickEl(ctx, input, { settle: 150 });
   if (input.value !== '') setInputValue(input, '');
-  const delays = typingDelays(text.length, opts.seed ?? text.length + 7);
+  const delays = typingDelays(text.length, opts.seed ?? text.length + 7, opts.range ?? PACING?.typeMs);
   let acc = '';
   for (let i = 0; i < text.length; i++) {
     await ctl.sleep(delays[i]);
@@ -94,7 +96,7 @@ export async function dragEl(ctx: Ctx, from: Element, to: { x: number; y: number
     const x = Math.round(a.x + (b.x - a.x) * t);
     const y = Math.round(a.y + (b.y - a.y) * t - Math.sin(Math.PI * t) * 24);
     placeCursor({ x, y });
-    await ctl.sleep(26);
+    await ctl.sleep(PACING ? 14 : 26);
     // như khi chuột được "bắt" (pointer capture): sự kiện đi tới phần tử đang kéo
     fire(src, 'pointermove', x, y, { buttons: 1 });
     fire(src, 'mousemove', x, y, { buttons: 1 });
@@ -103,7 +105,7 @@ export async function dragEl(ctx: Ctx, from: Element, to: { x: number; y: number
   fire(src, 'pointerup', b.x, b.y);
   fire(src, 'mouseup', b.x, b.y);
   await pressEffect(ctl);
-  await ctl.sleep(350);
+  await ctl.sleep(PACING ? 150 : 350);
 }
 
 export function q<T extends Element = HTMLElement>(sel: string): T | null {

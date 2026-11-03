@@ -16,7 +16,8 @@ import {
 } from '@so-chung/core';
 import { bai1Texts } from '@so-chung/core/content/lessons/bai-1';
 import { demoProbe } from '@so-chung/core/demo/probe';
-import { easyRound, pageCode, solutionSteps, type Lesson1Data } from '@so-chung/core/lessons/bai-1/logic';
+import { PACING } from '@so-chung/core/demo/pacing';
+import { buildChain, easyRound, pageCode, solutionSteps, type Lesson1Data } from '@so-chung/core/lessons/bai-1/logic';
 
 const T = bai1Texts;
 
@@ -48,8 +49,13 @@ export function Easy({
   const { genesisCode, contents } = useRef(easyRound(Date.now())).current;
 
   // Trạng thái bài thật
-  const [pages, setPages] = useState<ChainPageData[]>(() => contents.map((content) => ({ content, code: null })));
-  const [activeIdx, setActiveIdx] = useState(0);
+  // Nhịp video (chỉ demo): các trang đầu điền sẵn, bot làm 1 lượt ở trang cuối
+  const prefilled = PACING ? Math.min(PACING.lesson1.easyPrefilled, contents.length - 1) : 0;
+  const [pages, setPages] = useState<ChainPageData[]>(() => {
+    const codes = prefilled > 0 ? buildChain(genesisCode, contents) : [];
+    return contents.map((content, i) => ({ content, code: i < prefilled ? codes[i] : null }));
+  });
+  const [activeIdx, setActiveIdx] = useState(prefilled);
   const [codeVal, setCodeVal] = useState<number | null>(null);
   const [codeError, setCodeError] = useState<string | undefined>();
   const [mistakes, setMistakes] = useState(0);

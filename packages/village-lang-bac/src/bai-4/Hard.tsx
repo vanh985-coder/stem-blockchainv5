@@ -20,6 +20,7 @@ import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { generateHard, type CellCoord, type HardTx } from '@so-chung/core/lessons/bai-4/logic';
 import { CayMerkle } from './CayMerkle';
 import { demoProbe } from '@so-chung/core/demo/probe';
+import { PACING } from '@so-chung/core/demo/pacing';
 
 const T = bai4Texts.tramKho;
 
@@ -47,13 +48,16 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
   const [distractors] = useState<number[]>(challenge.distractors);
 
   // Lưu trạng thái các ô bị ẩn: key `slot-${lvl}-${idx}` -> giá trị đang đặt (hoặc null)
-  const [placedPieces, setPlacedPieces] = useState<Record<string, number | null>>(() => {
+  // Nhịp video (chỉ demo): các ô đầu đã điền đúng sẵn, bot chỉ đặt vài ô cuối
+  const initialPlaced = useCallback((): Record<string, number | null> => {
     const init: Record<string, number | null> = {};
-    challenge.hidden.forEach((h) => {
-      init[`slot-${h.level}-${h.index}`] = null;
+    const keep = PACING ? Math.max(0, challenge.hidden.length - PACING.man10.hardPlace) : 0;
+    challenge.hidden.forEach((h, i) => {
+      init[`slot-${h.level}-${h.index}`] = i < keep ? challenge.tree[h.level][h.index] : null;
     });
     return init;
-  });
+  }, [challenge]);
+  const [placedPieces, setPlacedPieces] = useState<Record<string, number | null>>(initialPlaced);
 
   // Các ô đã kiểm tra và đúng (bị khóa lại)
   const [lockedSlots, setLockedSlots] = useState<Record<string, boolean>>({});
@@ -81,16 +85,12 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
     setTutorialActive(false);
     setIsRevisitingTutorial(false);
     // Reset lại bàn cờ về trạng thái ban đầu sạch
-    const init: Record<string, number | null> = {};
-    challenge.hidden.forEach((h) => {
-      init[`slot-${h.level}-${h.index}`] = null;
-    });
-    setPlacedPieces(init);
+    setPlacedPieces(initialPlaced());
     setLockedSlots({});
     setCheckCount(0);
     setNotice(null);
     startTimeRef.current = Date.now();
-  }, [challenge.hidden]);
+  }, [initialPlaced]);
 
   const handleOpenTutorial = useCallback(() => {
     sound.playClick();
