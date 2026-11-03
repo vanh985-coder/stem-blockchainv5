@@ -9,7 +9,7 @@ export function decideInPage(want, SPEC) {
   if (!s || s.phase !== 'playing' || s.mode !== 'free') return { move: 0, jump: false, idle: true };
   if (!want.practice && (window.__climbUi?.tutorialActive || window.__climbUi?.banner)) return { move: 0, jump: false, idle: true };
   const p = s.player;
-  const idx = want.wrong ? s.choices.findIndex((c) => !c.correct) : s.choices.findIndex((c) => c.correct);
+  const idx = want.wrong ? s.choices.findIndex((c) => !c.correct && c.crack === null) : s.choices.findIndex((c) => c.correct);
   if (idx < 0) return { move: 0, jump: false };
   if (p.grounded) {
     if (s.time < s.lockUntil) return { move: 0, jump: false };

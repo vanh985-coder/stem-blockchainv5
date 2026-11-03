@@ -338,7 +338,8 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
   }, [txA, txB, pairLabel, expectedValue]);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-200">
+    <div className="mx-auto max-w-5xl space-y-2 animate-in fade-in duration-200 md:grid md:grid-cols-2 md:items-start md:gap-3 md:space-y-0">
+      <div className="space-y-2">
       <div className="space-y-1">
         <div className="flex items-center justify-between text-sm text-nau-go-dam font-semibold">
           <span>{T.tienDoGhepCap}</span>
@@ -364,8 +365,8 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
 
       {/* Bảng giao dịch tra cứu */}
       <div id="tutorial-man10de-table">
-        <Card variant="paper" className="p-4 sm:p-5">
-          <div className="flex items-center justify-between mb-3 border-b border-nau-go/30 pb-2">
+        <Card variant="paper" className="p-3">
+          <div className="flex items-center justify-between mb-2 border-b border-nau-go/30 pb-1">
             <div className="flex items-center gap-2">
               <span className="text-lg">📋</span>
               <h3 className="first-letter:uppercase font-display font-extrabold text-sm sm:text-base text-chu">{T.bangGiaoDich}</h3>
@@ -373,11 +374,11 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
             <span className="text-sm text-nau-go-dam">{T.bangTraCuuGiaTri}</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div className="grid grid-cols-2 gap-2">
             {txs.map((tx) => (
               <div
                 key={tx.id}
-                className={`p-2.5 rounded-[12px] border-2 transition-all flex flex-col items-center text-center ${
+                className={`p-2 rounded-[12px] border-2 transition-all flex flex-col items-center text-center ${
                   tx.id === txA.id || tx.id === txB.id
                     ? 'border-muc-tim bg-white/60'
                     : 'border-nau-go/30 bg-white/70 opacity-80'
@@ -401,14 +402,16 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
         </Card>
       </div>
 
+      </div>
+
       {/* Khu vực ghép thẻ */}
-      <Card className="p-6 sm:p-8 flex flex-col items-center text-center relative overflow-hidden">
+      <Card className="p-3 sm:p-4 flex flex-col items-center text-center relative overflow-hidden">
         <div className="text-sm font-bold text-muc-tim-dam uppercase tracking-wider mb-2">{fmt(T.cauGhepCap, { so: currentIndex + 1, pairLabel })}</div>
-        <p className="text-sm text-nau-go-dam mb-6">{T.hayGhepGiaTriCua}{' '}<code className="bg-white/60 text-muc-tim-dam px-1.5 py-0.5 rounded border border-muc-tim/10 font-mono">{rich(T.congThucGhepCap)}</code>
+        <p className="text-sm text-nau-go-dam mb-3">{T.hayGhepGiaTriCua}{' '}<code className="bg-white/60 text-muc-tim-dam px-1.5 py-0.5 rounded border border-muc-tim/10 font-mono">{rich(T.congThucGhepCap)}</code>
         </p>
 
         {/* Khung hiển thị hai thẻ trượt vào nhau */}
-        <div id="tutorial-man10de-pair" className="min-h-[120px] flex items-center justify-center relative w-full mb-6">
+        <div id="tutorial-man10de-pair" className="min-h-[100px] flex items-center justify-center relative w-full mb-3">
           {mergedCard ? (
             <div className="animate-in zoom-in-95 duration-200 p-4 rounded-[16px] border-2 border-xanh-la-dam bg-xanh-la/10 flex flex-col items-center min-w-[140px]">
               <span className="text-sm font-bold text-xanh-la-dam uppercase">{fmt(T.theGop, { label: mergedCard.label })}</span>
@@ -505,7 +508,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
       </Card>
 
       {/* Phản hồi giải thích */}
-      <FeedbackSheet
+      <div className="md:col-span-2"><FeedbackSheet
         isOpen={feedback.isOpen}
         isCorrect={feedback.isCorrect}
         title={feedback.title}
@@ -516,7 +519,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
           setFeedback((prev) => ({ ...prev, isOpen: false }));
         }}
         continueLabel={T.thuLai}
-      />
+      /></div>
 
       {/* Hướng dẫn Focus Spotlight (P8) */}
       <TutorialSpotlight

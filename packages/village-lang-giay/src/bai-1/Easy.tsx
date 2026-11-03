@@ -301,11 +301,11 @@ export function Easy({
   ];
 
   return (
-    <div className="mx-auto max-w-4xl space-y-5">
+    <div className="mx-auto max-w-5xl space-y-2">
       {/* Tiêu đề trạm và nút Xem lại hướng dẫn */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-nau-go/20 pb-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-nau-go/20 pb-1">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold">{T.de.tieuDe}</h2>
+          <h2 className="text-xl font-bold">{T.de.tieuDe}</h2>
           <p className="text-base text-chu/80">
             {tutorialOpen ? (
               <span className="font-semibold text-muc-tim-dam">{tutorialTexts.man1De.tieuDe}</span>
@@ -333,7 +333,7 @@ export function Easy({
       </div>
 
       {/* Vùng làm thử bao trùm dải trang sổ và khung công thức + nút Kiểm tra (P8a) */}
-      <div data-tutorial="practice-area" className="space-y-4">
+      <div data-tutorial="practice-area" className="space-y-2">
         {/* Dải trang sổ: hiển thị làm thử hoặc bài thật */}
         <div
           className="overflow-hidden rounded-bang border-2 border-nau-go/50 bg-white/50"
@@ -341,6 +341,7 @@ export function Easy({
         >
           <div data-tutorial={tutorialOpen && tutorialStep === 1 ? 'numbers-source' : undefined}>
             <ChainStrip
+              dense
               genesisCode={displayGenesis}
               pages={displayPages}
               firstInvalidIndex={-1}
@@ -368,7 +369,7 @@ export function Easy({
                         showButtons={false}
                         placeholder={tutorialTexts.man1De.inputPlaceholder}
                         ariaLabel={fmt(T.de.nhanMaTrang, { n: 1 })}
-                        inputClassName="!h-10 !w-full !text-lg"
+                        inputClassName="!h-11 !w-full !text-lg"
                         onChange={(v) => {
                           setPracticeVal(v);
                           setPracticeError(undefined);
@@ -392,7 +393,7 @@ export function Easy({
                       showButtons={false}
                       placeholder={T.chung.khoangSo}
                       ariaLabel={fmt(T.de.nhanMaTrang, { n: activeIdx + 1 })}
-                      inputClassName="!h-10 !w-full !text-lg"
+                      inputClassName="!h-11 !w-full !text-lg"
                       onChange={(v) => {
                         setCodeVal(v);
                         setCodeError(undefined);
@@ -408,10 +409,10 @@ export function Easy({
         </div>
 
         {/* Khung gợi ý công thức và nút Kiểm tra */}
-        <div className="flex flex-col items-center justify-between gap-4 rounded-bang border-2 border-nau-go/50 bg-white/60 p-4 sm:flex-row min-[1280px]:sticky min-[1280px]:bottom-3 min-[1280px]:z-20 min-[1280px]:bg-giay/95">
+        <div className="flex flex-col items-center justify-between gap-2 rounded-bang border-2 border-nau-go/50 bg-white/60 p-2 sm:flex-row min-[1280px]:sticky min-[1280px]:bottom-3 min-[1280px]:z-20 min-[1280px]:bg-giay/95">
           <div className="flex items-center gap-3" data-tutorial="formula-box">
-            <PortraitFrame portrait="bi" size={72} />
-            <div className="rounded-2xl border-2 border-nau-go/50 bg-giay p-3">
+            <PortraitFrame portrait="bi" size={44} />
+            <div className="rounded-2xl border-2 border-nau-go/50 bg-giay p-2">
               <span className="mb-0.5 block text-sm font-semibold text-nau-go-dam">
                 <span aria-hidden="true">💡 </span>
                 {fmt(T.chung.congThuc, { n: tutorialOpen ? 1 : activeIdx + 1 })}

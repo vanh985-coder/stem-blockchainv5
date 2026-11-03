@@ -251,7 +251,7 @@ export const tutorialTexts = {
     tieuDe: 'Làm thử: Leo bậc gỗ',
     intro: 'Em sẽ leo từ lá bị {phanDien} tráo lên tới gốc cây. Mình tập trên một cây nhỏ có 4 lá trước nhé!',
     tree: 'Em đứng trên bậc của lá bị tráo. Bên cạnh là bậc anh em đã biết số, phía trên là các bậc lựa chọn.',
-    hud: 'Em có 3 tim. Nhảy nhầm bậc thì bậc nứt, em rơi xuống và mất 1 tim. Nhảy hụt thì không mất tim.',
+    hud: 'Em có 3 tim. Nhảy nhầm bậc thì bậc nứt rồi biến mất tới hết tầng đó, em rơi xuống và mất 1 tim; các bậc còn lại vẫn đứng yên. Nhảy hụt thì không mất tim.',
     di: 'Trước hết em tập đi: bấm ← → hoặc A D (điện thoại: nút ◀ ▶) để đi sang trái, sang phải trên bậc.',
     practice: 'Bậc của em ghi 8, bậc anh em bên trái ghi 3. Ghép theo thứ tự trái rồi phải: 3 × 10 + 8 = 38. Hãy nhảy lên bậc ghi 38 (Space hoặc nút Nhảy)!',
     correct: 'Em nhảy đúng rồi! Cứ ghép từng tầng như vậy tới gốc là bắt được {phanDien}.',

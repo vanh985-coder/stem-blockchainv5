@@ -18,6 +18,7 @@ export default function Man1() {
 
   return (
     <LessonPage2D
+      fit
       levelId={1}
       villageId="lang-giay"
       background={BAI1_BACKGROUND}

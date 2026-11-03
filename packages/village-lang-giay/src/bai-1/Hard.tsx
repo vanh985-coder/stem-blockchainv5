@@ -394,11 +394,11 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
   ];
 
   return (
-    <div className="mx-auto max-w-4xl space-y-5">
+    <div className="mx-auto max-w-5xl space-y-2">
       {/* Tiêu đề trạm và nút Xem lại hướng dẫn */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-nau-go/20 pb-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-nau-go/20 pb-1">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold">{fmt(T.kho.tieuDe)}</h2>
+          <h2 className="text-xl font-bold">{fmt(T.kho.tieuDe)}</h2>
           {tutorialOpen && (
             <p className="text-base font-semibold text-muc-tim-dam">{tutorialTexts.man1Kho.tieuDe}</p>
           )}
@@ -419,7 +419,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
       </div>
 
       <div
-        className="flex flex-wrap items-center justify-between gap-3 rounded-bang border-2 border-nau-go/50 bg-white/60 p-4"
+        className="flex flex-wrap items-center justify-between gap-3 rounded-bang border-2 border-nau-go/50 bg-white/60 p-2"
         data-tutorial="stats-bar"
       >
         <CountdownTimer
@@ -449,9 +449,10 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
       </div>
 
       {/* Vùng làm thử bao trùm dải trang sổ và khung công thức + nút Kiểm tra (P8b) */}
-      <div data-tutorial="practice-area" className="space-y-4">
+      <div data-tutorial="practice-area" className="space-y-2">
         <div className="overflow-hidden rounded-bang border-2 border-nau-go/50 bg-white/50" data-tutorial="chain-strip">
           <ChainStrip
+              dense
             genesisCode={displayGenesis}
             pages={displayPages}
             firstInvalidIndex={displayFirstInvalid}
@@ -494,7 +495,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
                       showButtons={false}
                       placeholder={tutorialTexts.man1Kho.inputPlaceholder}
                       ariaLabel={fmt(T.de.nhanMaTrang, { n: PRACTICE_TAMPER_PAGE })}
-                      inputClassName="!h-10 !w-full !text-lg"
+                      inputClassName="!h-11 !w-full !text-lg"
                       onChange={(v) => {
                         setPracticeVal(v);
                         setPracticeError(undefined);
@@ -518,7 +519,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
                     showButtons={false}
                     placeholder={T.chung.khoangSo}
                     ariaLabel={fmt(T.de.nhanMaTrang, { n: idx + 1 })}
-                    inputClassName="!h-10 !w-full !text-lg"
+                    inputClassName="!h-11 !w-full !text-lg"
                     onChange={setCodeInput}
                     onEnter={check}
                     autoFocus
@@ -531,10 +532,10 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
 
         {/* Khung gợi ý công thức và nút Kiểm tra/Cập nhật mã */}
         {(tutorialOpen || (!isTimeUp && currentFirstInvalid !== -1)) && (
-          <div className="flex flex-col items-center justify-between gap-4 rounded-bang border-2 border-nau-go/50 bg-white/60 p-4 sm:flex-row">
+          <div className="flex flex-col items-center justify-between gap-2 rounded-bang border-2 border-nau-go/50 bg-white/60 p-2 sm:flex-row">
             <div className="flex items-center gap-3" data-tutorial="formula-box">
-              <PortraitFrame portrait="bi" size={72} />
-              <div className="rounded-2xl border-2 border-nau-go/50 bg-giay p-3">
+              <PortraitFrame portrait="bi" size={44} />
+              <div className="rounded-2xl border-2 border-nau-go/50 bg-giay p-2">
                 <span className="mb-0.5 block text-sm font-semibold text-nau-go-dam">
                   <span aria-hidden="true">💡 </span>
                   {fmt(T.chung.congThuc, { n: tutorialOpen ? PRACTICE_TAMPER_PAGE : currentFirstInvalid + 1 })}
@@ -562,7 +563,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
       </div>
 
       {isTimeUp && !tutorialOpen && (
-        <div className="space-y-6 rounded-bang border-2 border-nau-go/50 bg-white/60 p-4 sm:p-6">
+        <div className="space-y-3 rounded-bang border-2 border-nau-go/50 bg-white/60 p-3">
           <h3 className="text-center text-3xl text-do-son-dam">{T.kho.hetGio}</h3>
 
           <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">

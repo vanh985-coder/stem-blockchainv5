@@ -23,6 +23,8 @@ export interface TrangSoProps {
   contentSlot?: ReactNode;
   codeSlot?: ReactNode;
   invalidBadgeText?: string;
+  /** Gọn chiều cao (trang bài học "vừa khung"): bỏ chiều cao tối thiểu, đệm và khoảng cách nhỏ hơn. */
+  dense?: boolean;
 }
 
 const SIZE_CLASS = {
@@ -64,6 +66,7 @@ export function TrangSo({
   contentSlot,
   codeSlot,
   invalidBadgeText,
+  dense = false,
 }: TrangSoProps) {
   // Ưu tiên hiển thị: sai lệch (đỏ) > sẽ phải tính lại (vàng nét đứt) > đã xác nhận (xanh) > bình thường
   const border = isInvalid
@@ -112,6 +115,7 @@ export function TrangSo({
         bg-o-ly-grid relative select-none overflow-hidden rounded-2xl border-2 ${border}
         shadow-[0_3px_0_0_var(--color-nau-go-dam)] transition-all duration-200
         ${SIZE_CLASS[size]}
+        ${dense ? '!min-h-0' : ''}
         ${isDimmed ? 'pointer-events-none opacity-[0.45]' : ''}
         ${isInteractive && !isDimmed ? 'cursor-pointer hover:-translate-y-1' : ''}
         ${className}
@@ -120,9 +124,9 @@ export function TrangSo({
       {/* Đường kẻ lề đỏ của vở ô ly */}
       <div aria-hidden="true" className={`pointer-events-none absolute bottom-0 top-0 z-0 w-[1.5px] bg-do-son/40 ${marginLine}`} />
 
-      <div className={`relative z-10 flex h-full min-h-[240px] flex-col justify-between ${margin}`}>
+      <div className={`relative z-10 flex h-full ${dense ? 'min-h-0' : 'min-h-[240px]'} flex-col justify-between ${margin}`}>
         <div>
-          <div className="flex flex-wrap items-center justify-between gap-1 border-b border-nau-go/30 pb-2">
+          <div className={`flex flex-wrap items-center justify-between gap-1 border-b border-nau-go/30 ${dense ? 'pb-1' : 'pb-2'}`}>
             <span className="whitespace-nowrap font-display text-base font-extrabold text-muc-tim-dam sm:text-lg">
               {isCover ? ui.trangSo.bia : fmt(ui.trangSo.trang, { n: pageNumber })}
             </span>
@@ -130,14 +134,14 @@ export function TrangSo({
           </div>
 
           {!isCover && prevCode !== undefined && (
-            <div className="mt-2 rounded-xl border border-nau-go/30 bg-white/90 p-2">
+            <div className={`${dense ? 'mt-1' : 'mt-2'} rounded-xl border border-nau-go/30 bg-white/90 p-2`}>
               <div className="text-xs font-semibold text-nau-go-dam">{ui.trangSo.maTrangTruoc}</div>
               <div className="mt-0.5 truncate font-display text-sm font-bold">{num(prevCode)}</div>
             </div>
           )}
 
           {!isCover && (
-            <div className="mt-2 rounded-xl border border-nau-go/30 bg-white/90 p-2 sm:p-2.5">
+            <div className={`${dense ? 'mt-1 p-1.5' : 'mt-2 p-2 sm:p-2.5'} rounded-xl border border-nau-go/30 bg-white/90`}>
               <div className="text-xs font-semibold text-nau-go-dam">{ui.trangSo.noiDung}</div>
               {contentSlot ? (
                 <div className="mt-1">{contentSlot}</div>
@@ -159,8 +163,8 @@ export function TrangSo({
           )}
         </div>
 
-        <div className="mt-2">
-          <div className="rounded-xl border border-nau-go/30 bg-white/90 p-2 sm:p-2.5">
+        <div className={dense ? 'mt-1' : 'mt-2'}>
+          <div className={`rounded-xl border border-nau-go/30 bg-white/90 ${dense ? 'p-1.5' : 'p-2 sm:p-2.5'}`}>
             <div className="text-xs font-semibold text-nau-go-dam">{ui.trangSo.maTrang}</div>
             {codeSlot ? (
               <div className="mt-1 flex items-center justify-center">{codeSlot}</div>
@@ -179,7 +183,7 @@ export function TrangSo({
             ) : (
               <div
                 className={`flex items-center justify-center font-display font-extrabold text-muc-tim-dam ${
-                  size === 'xs' ? 'h-12 text-lg' : size === 'sm' ? 'h-14 text-xl' : size === 'lg' ? 'h-20 text-3xl' : 'h-16 text-2xl'
+                  size === 'xs' ? (dense ? 'h-10 text-lg' : 'h-12 text-lg') : size === 'sm' ? 'h-14 text-xl' : size === 'lg' ? 'h-20 text-3xl' : 'h-16 text-2xl'
                 }`}
               >
                 {isValidating ? <span className="animate-pulse text-xs">{ui.trangSo.dangTinh}</span> : formattedCode}

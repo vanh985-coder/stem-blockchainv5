@@ -124,8 +124,8 @@ export const GUIDE_SECTIONS = [
       {
         hinh: art('phim-di-chuyen'),
         hinhDt: art('can-dieu-khien'),
-        may: 'Đi bằng phím W A S D hoặc các phím mũi tên. Giữ Shift để chạy, bấm Space để nhảy.',
-        dt: 'Chạm và giữ nửa trái màn hình rồi đẩy cần điều khiển để đi. Đẩy thật mạnh thì em chạy. Nút nhảy ở góc phải.',
+        may: 'Đi bằng phím W A S D hoặc các phím mũi tên. Giữ Shift để chạy nhanh, hoặc bấm R (hay nút "Chạy nhanh (R)") để bật tắt. Bấm Space để nhảy.',
+        dt: 'Chạm và giữ nửa trái màn hình rồi đẩy cần điều khiển để đi. Đẩy thật mạnh hoặc bấm nút "Chạy nhanh" thì em chạy. Nút nhảy ở góc phải.',
       },
       {
         hinh: art('chuot-camera'),

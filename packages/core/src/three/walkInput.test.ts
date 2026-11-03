@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  KEY_MAP,
   MIN_TOUCH_TARGET,
+  isRunning,
+  toggleRun,
   RUN_THRESHOLD,
   STICK_DEADZONE,
   STICK_RADIUS,
@@ -145,5 +148,72 @@ describe('cần điều khiển động', () => {
   });
   it('vùng bấm tối thiểu 44px', () => {
     expect(MIN_TOUCH_TARGET).toBe(44);
+  });
+});
+
+describe('chạy nhanh', () => {
+  it('chạy khi giữ Shift, bật nút hoặc đẩy cần quá 80%', () => {
+    expect(isRunning(false, false, 0)).toBe(false);
+    expect(isRunning(true, false, 0)).toBe(true);
+    expect(isRunning(false, true, 0)).toBe(true);
+    expect(isRunning(false, false, 0.5)).toBe(false);
+    expect(isRunning(false, false, 0.9)).toBe(true);
+  });
+  it('nút bật tắt luân phiên', () => {
+    expect(toggleRun(false)).toBe(true);
+    expect(toggleRun(true)).toBe(false);
+  });
+});
+
+describe('phím R bật/tắt chạy nhanh', () => {
+  it('KeyR ánh xạ thành runToggle', () => {
+    expect(actionForKey('KeyR')).toBe('runToggle');
+  });
+
+  it('không trùng phím có sẵn: mỗi mã phím chỉ một hành động, và các phím cũ giữ nguyên hành động', () => {
+    const old: Record<string, string> = {
+      KeyW: 'forward',
+      ArrowUp: 'forward',
+      KeyS: 'back',
+      ArrowDown: 'back',
+      KeyA: 'left',
+      ArrowLeft: 'left',
+      KeyD: 'right',
+      ArrowRight: 'right',
+      ShiftLeft: 'run',
+      ShiftRight: 'run',
+      Space: 'jump',
+      KeyE: 'interact',
+      Escape: 'menu',
+      KeyM: 'map',
+    };
+    for (const [code, action] of Object.entries(old)) expect(actionForKey(code)).toBe(action);
+    // R là phím duy nhất của runToggle; H (câu nhắc của game) không bị walk chiếm
+    expect(Object.entries(KEY_MAP).filter(([, a]) => a === 'runToggle').map(([c]) => c)).toEqual(['KeyR']);
+    expect(actionForKey('KeyH')).toBeNull();
+  });
+
+  it('một lần nhấn trả runToggle một lần: giữ phím (lặp) không đổi thêm, nhả rồi nhấn lại thì đổi tiếp', () => {
+    const k = createKeyState();
+    const held = new Set<string>();
+    expect(applyKey(k, held, 'KeyR', true)).toBe('runToggle');
+    expect(applyKey(k, held, 'KeyR', true)).toBeNull();
+    expect(applyKey(k, held, 'KeyR', true)).toBeNull();
+    expect(applyKey(k, held, 'KeyR', false)).toBe('runToggle');
+    expect(applyKey(k, held, 'KeyR', false)).toBeNull();
+    expect(applyKey(k, held, 'KeyR', true)).toBe('runToggle');
+    // runToggle không phải phím giữ: không làm đổi bộ đếm Shift hay hướng
+    expect(k).toEqual(createKeyState());
+  });
+
+  it('bật bằng R rồi tắt bằng R (qua toggleRun) kết hợp Shift: isRunning đúng ở từng trạng thái', () => {
+    let on = false;
+    on = toggleRun(on);
+    expect(isRunning(false, on, 0)).toBe(true);
+    expect(isRunning(true, on, 0)).toBe(true);
+    on = toggleRun(on);
+    expect(isRunning(false, on, 0)).toBe(false);
+    // Shift vẫn là giữ để chạy khi R đang tắt
+    expect(isRunning(true, on, 0)).toBe(true);
   });
 });

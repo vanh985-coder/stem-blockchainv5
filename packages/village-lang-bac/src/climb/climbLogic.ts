@@ -148,7 +148,7 @@ export interface ClimbChoice {
   slot: number;
   /** Pha trượt (0 tới 4) */
   phase: number;
-  /** Số giây còn lại trước khi biến mất khi đã bị nhảy trúng sai; null nếu chưa nứt */
+  /** null: bậc còn nguyên. Số giây còn lại trước khi biến mất khi vừa bị nhảy trúng sai (đang nứt). 0: đã biến mất HẲN cho tới hết tầng này (không đáp được, không vẽ); sang tầng kế thì bậc mới tạo lại, crack null */
   crack: number | null;
 }
 
@@ -235,7 +235,7 @@ export type ClimbEvent =
   | { kind: 'wrong'; choice: number; hearts: number }
   /** Bậc sai biến mất, em bắt đầu rơi về bậc vừa đứng */
   | { kind: 'vanish'; choice: number }
-  /** Rơi về xong, làm lại tầng (các lựa chọn đổi chỗ) */
+  /** Rơi về xong, làm lại tầng: bậc sai đã biến mất hẳn tới hết tầng, các bậc còn lại GIỮ NGUYÊN chỗ và pha trượt */
   | { kind: 'retry' }
   /** Nhảy hụt, không chạm bậc nào, đáp về bậc cũ */
   | { kind: 'miss' }
@@ -248,20 +248,6 @@ export type ClimbEvent =
 function layoutChoices(tier: ClimbTier, rng: () => number): ClimbChoice[] {
   const slots = shuffle(tier.options.map((_, i) => i), rng);
   return tier.options.map((value, i) => ({ value, correct: i === 0, slot: slots[i], phase: rng() * 4, crack: null }));
-}
-
-/** Đổi chỗ các bậc lựa chọn (giữ số): khác thứ tự cũ nếu có từ 2 bậc. */
-function reshuffleChoices(s: ClimbState): void {
-  const n = s.choices.length;
-  const old = s.choices.map((c) => c.slot);
-  let slots = shuffle(old.map((_, i) => i), s.rng);
-  for (let tries = 0; tries < 20 && n > 1 && slots.every((v, i) => v === old[i]); tries++) slots = shuffle(old.map((_, i) => i), s.rng);
-  if (n > 1 && slots.every((v, i) => v === old[i])) slots = [...old.slice(1), old[0]];
-  s.choices.forEach((c, i) => {
-    c.slot = slots[i];
-    c.phase = s.rng() * 4;
-    c.crack = null;
-  });
 }
 
 function startRound(s: ClimbState, tree: ClimbTree, spec: ClimbRoundSpec): void {
@@ -450,6 +436,8 @@ function stepFree(s: ClimbState, h: number, out: ClimbEvent[]): void {
 
 function stepCrack(s: ClimbState, h: number, out: ClimbEvent[]): void {
   s.crackLeft -= h;
+  // `crack` của bậc nứt là số giây còn lại (cảnh mờ dần theo nó): giảm cùng đồng hồ nứt, về 0 thì bậc biến mất và nằm yên ở 0 tới hết tầng
+  for (const c of s.choices) if (c.crack !== null) c.crack = Math.max(0, s.crackLeft);
   if (s.crackLeft > 0) return;
   const ci = s.choices.findIndex((c) => c.crack !== null);
   out.push({ kind: 'vanish', choice: ci });
@@ -476,7 +464,6 @@ function stepFall(s: ClimbState, h: number, out: ClimbEvent[]): void {
     out.push({ kind: 'lost' });
     return;
   }
-  reshuffleChoices(s);
   out.push({ kind: 'retry' });
 }
 

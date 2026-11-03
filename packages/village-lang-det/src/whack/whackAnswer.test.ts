@@ -47,8 +47,9 @@ describe('P9: lượt đáp án (chuột đi từ dưới lên)', () => {
     const a = s.answer!;
     expect(new Set(a.mice.map((m) => m.lane)).size).toBe(4);
     expect(a.mice.every((m) => m.pos === 0)).toBe(true);
-    expect(a.speed).toBeCloseTo(answerSpeed(18), 12);
-    expect(a.speed).toBeLessThan(WHACK_SPEC.zoneStart / WHACK_SPEC.runSecondsStart / 3);
+    expect(a.speed).toBeCloseTo(answerSpeed(11), 12);
+    // P9c: chạy hết làn 11 giây (trước 18): vẫn chậm hơn chuột thường quá một nửa ở đầu ván (0,91 so với 2,03 đơn vị/giây)
+    expect(a.speed).toBeLessThan(WHACK_SPEC.zoneStart / WHACK_SPEC.runSecondsStart / 2);
   });
 
   it('thứ tự A–D theo làn trộn theo seed: cùng seed cùng thứ tự, seed khác (thường) khác', () => {

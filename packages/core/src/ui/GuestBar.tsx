@@ -6,12 +6,15 @@ import { useProgress } from '../progress/ProgressProvider';
 /**
  * Thanh trên cùng khi chơi thử (chưa đăng nhập): báo tiến độ chỉ lưu trên máy này, kèm nút "Đăng nhập để lưu".
  * `compact`: ở màn hình hẹp (dưới 480px) chỉ còn một dòng, chữ ngắn và nút ngắn.
+ * `slim`: bớt đệm trên dưới (trang bài học vừa khung cần mọi chiều cao có thể); nút vẫn cao 44px.
  */
-export function GuestBar({ compact = false }: { compact?: boolean }) {
+export function GuestBar({ compact = false, slim = false }: { compact?: boolean; slim?: boolean }) {
   const { mode } = useProgress();
   const here = useLocation();
   if (mode !== 'guest') return null;
-  const wrap = compact
+  const wrap = slim
+    ? 'flex flex-wrap items-center justify-center gap-x-4 gap-y-0 border-b-2 border-nau-go bg-vang/30 px-4 py-0.5 text-center font-semibold max-[480px]:flex-nowrap max-[480px]:justify-between max-[480px]:gap-2 max-[480px]:px-2 max-[480px]:text-sm'
+    : compact
     ? 'flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-b-4 border-nau-go bg-vang/30 px-4 py-2 text-center font-semibold max-[480px]:flex-nowrap max-[480px]:justify-between max-[480px]:gap-2 max-[480px]:border-b-2 max-[480px]:px-2 max-[480px]:py-0.5 max-[480px]:text-sm'
     : 'flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-b-4 border-nau-go bg-vang/30 px-4 py-2 text-center font-semibold';
   return (

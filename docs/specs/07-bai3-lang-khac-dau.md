@@ -280,6 +280,7 @@ Cách vẽ (chỉnh hiển thị, không đổi luật hay số liệu): khung v
 - Cảm ứng: bấm nhanh một chấm trên bàn cũng bắn theo hướng chấm đó (kéo rồi thả là cùng một thao tác); chuột: mỗi lần bấm (nhấn rồi nhả) bắn một phát tại góc đang trỏ.
 - Hết ván còn điểm "tim còn × 50" chỉ cộng khi ván kết thúc (khi chưa kết thúc, điểm đang hiện chưa gồm phần này).
 - Đã bỏ trang dev `/dev/man-09-lanes` (chọn 3 làn của game gà) và ảnh `scenes/man-09-duong-lang`, `sprites/man-09-chua-ga/*` không còn được dùng (file gốc còn ở `assets/`, chưa xóa).
+- Sửa lỗi bàn trứng lệch (02/11/2026): canvas bàn bị gỡ ở bước nạp trứng rồi dựng lại (sau hướng dẫn làm thử, đổi đợt), nhưng bộ nhớ cỡ canvas (`geo`) chỉ so kích thước nên bỏ qua việc đặt cỡ cho canvas MỚI: canvas mới giữ cỡ mặc định 300×150 và bàn chỉ hiện một mẩu ở góc cột giữa. Nay `geo` nhớ cả phần tử canvas (`BubbleGame.tsx`, hàm `resize`). `scripts/man9-bubble-check.mjs` có thêm phần "Hình học bàn trứng": tỉ lệ điểm ảnh 0,8 đến 1,5, cửa sổ 1536×730 và 1280×650, đổi cỡ giữa ván, ảnh tải trễ 2 giây; ảnh trước và sau ở `docs/screenshots/man9-sua-ban-lech/`.
 
 ### Kích thước chunk
 

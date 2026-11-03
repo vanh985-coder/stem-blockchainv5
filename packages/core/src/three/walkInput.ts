@@ -12,7 +12,7 @@ export const STICK_RADIUS = 56;
 /** Vùng bấm tối thiểu của nút trên điện thoại (pixel). */
 export const MIN_TOUCH_TARGET = 44;
 
-export type KeyAction = 'forward' | 'back' | 'left' | 'right' | 'run' | 'jump' | 'interact' | 'menu' | 'map';
+export type KeyAction = 'forward' | 'back' | 'left' | 'right' | 'run' | 'runToggle' | 'jump' | 'interact' | 'menu' | 'map';
 
 /** Phím (KeyboardEvent.code) → hành động. */
 export const KEY_MAP: Readonly<Record<string, KeyAction>> = {
@@ -26,6 +26,8 @@ export const KEY_MAP: Readonly<Record<string, KeyAction>> = {
   ArrowRight: 'right',
   ShiftLeft: 'run',
   ShiftRight: 'run',
+  /** R bật/tắt chạy nhanh (khi khóa chuột con trỏ bị ẩn nên không bấm được nút); Shift vẫn là giữ để chạy */
+  KeyR: 'runToggle',
   Space: 'jump',
   KeyE: 'interact',
   Escape: 'menu',
@@ -115,6 +117,18 @@ export function stickFromDrag(dx: number, dy: number, radius: number, out: Axis)
 /** Đẩy cần quá 80% thì chạy. */
 export function runFromStick(magnitude: number): boolean {
   return magnitude > RUN_THRESHOLD;
+}
+
+/**
+ * Chạy nhanh hay không: giữ Shift, hoặc đang bật nút "Chạy nhanh", hoặc đẩy cần điều khiển quá 80%.
+ */
+export function isRunning(keyRun: boolean, runToggle: boolean, stickMag: number): boolean {
+  return keyRun || runToggle || runFromStick(stickMag);
+}
+
+/** Bật tắt nút "Chạy nhanh". */
+export function toggleRun(on: boolean): boolean {
+  return !on;
 }
 
 /** Vị trí núm cần (so với gốc cần, pixel) khi đã chặn trong bán kính `radius`: để vẽ núm. Ghi vào `out`. */

@@ -172,7 +172,13 @@ export function ClimbStage({ state, anim, frame, textures, labels, version, redu
         continue;
       }
       const cx = choiceX(state, c);
-      m.visible = true;
+      // bậc sai đã biến mất hẳn (crack về 0) thì ẩn tới hết tầng
+      const gone = c.crack !== null && c.crack <= 0;
+      m.visible = !gone;
+      if (gone) {
+        cr.visible = false;
+        continue;
+      }
       m.position.x = cx;
       m.position.y = cy;
       const cracked = c.crack !== null;

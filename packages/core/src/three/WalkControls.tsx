@@ -3,7 +3,7 @@ import { ui } from '../content/ui';
 import { fmt } from '../content/characters';
 import { dragCamera, lookCamera } from './cameraRig';
 import { resetWalkInput, type WalkApi } from './walkApi';
-import { MIN_TOUCH_TARGET, STICK_RADIUS, actionForKey, applyKey, isLeftHalf, keyAxis, knobOffset, stickFromDrag } from './walkInput';
+import { MIN_TOUCH_TARGET, STICK_RADIUS, actionForKey, applyKey, isLeftHalf, keyAxis, knobOffset, stickFromDrag, toggleRun } from './walkInput';
 
 export interface WalkControlsProps {
   /** Cầu nối với cảnh 3D (đọc mỗi khung hình) */
@@ -39,6 +39,8 @@ const HAND_SIZE = 64;
 const EDGE = 20;
 const STICK_DIAMETER = STICK_RADIUS * 2;
 const KNOB_SIZE = 52;
+const RUN_BTN_HEIGHT = 48;
+const GAP = 12;
 
 function isTyping(target: EventTarget | null): boolean {
   return target instanceof Element && target.closest('input, textarea, select, [contenteditable="true"]') !== null;
@@ -49,13 +51,16 @@ function isTyping(target: EventTarget | null): boolean {
  * - Máy tính: WASD/mũi tên đi theo hướng camera, Shift chạy, Space nhảy, E tương tác, Esc báo mở menu, kéo chuột xoay camera.
  * - Điện thoại: chạm nửa trái màn hình hiện cần điều khiển động (đẩy quá 80% là chạy), vuốt nửa phải xoay camera, nút nhảy và
  *   nút ✋ ở góc phải (vùng bấm ≥ 44px). Chặn cuộn và phóng to trang khi chạm vào khung chơi.
- * Tạm dừng thì thả hết phím và cần điều khiển.
+ * - Nút "Chạy nhanh" (cả hai loại máy) bật tắt chạy nhanh; tạm dừng (hộp thoại, bản đồ lớn, hướng dẫn, menu) thì tự tắt.
+ * Tạm dừng thì thả hết phím, cần điều khiển và tắt chạy nhanh.
  */
 export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockChange, onLockError, interactLabel, onInteract, onMenu, onMap, className = '', children }: WalkControlsProps) {
   const root = useRef<HTMLDivElement>(null);
   const base = useRef<HTMLDivElement>(null);
   const knob = useRef<HTMLDivElement>(null);
   const [touchMode, setTouchMode] = useState(() => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches);
+  const [runToggle, setRunToggle] = useState(false);
+  const [shiftHeld, setShiftHeld] = useState(false);
   const live = useRef({ paused, lockMode, mouseSensitivity, onLockChange, onLockError, onInteract, onMenu, onMap });
   live.current = { paused, lockMode, mouseSensitivity, onLockChange, onLockError, onInteract, onMenu, onMap };
 
@@ -63,6 +68,8 @@ export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockCh
   useEffect(() => {
     if (!paused) return;
     resetWalkInput(api);
+    setRunToggle(false);
+    setShiftHeld(false);
     if (base.current) base.current.dataset.active = 'false';
     if (knob.current) knob.current.style.transform = 'translate(0px, 0px)';
   }, [paused, api]);
@@ -92,12 +99,21 @@ export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockCh
       if (!acted) return;
       keyAxis(api.keys, api.input.keyAxis);
       api.input.keyRun = api.keys.run > 0;
+      if (action === 'run') setShiftHeld(api.input.keyRun);
       if (down && acted === 'jump') api.input.jump = true;
+      if (down && acted === 'runToggle') {
+        api.input.runToggle = toggleRun(api.input.runToggle);
+        setRunToggle(api.input.runToggle);
+      }
       if (down && acted === 'interact') live.current.onInteract();
     };
     const keyDown = (e: KeyboardEvent) => onKey(e, true);
     const keyUp = (e: KeyboardEvent) => onKey(e, false);
-    const blur = () => resetWalkInput(api);
+    const blur = () => {
+      resetWalkInput(api);
+      setRunToggle(false);
+      setShiftHeld(false);
+    };
     window.addEventListener('keydown', keyDown);
     window.addEventListener('keyup', keyUp);
     window.addEventListener('blur', blur);
@@ -270,12 +286,32 @@ export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockCh
   }, [api]);
 
   const ready = interactLabel !== null;
+  const runOn = runToggle || shiftHeld;
   const bottom = `calc(env(safe-area-inset-bottom, 0px) + ${EDGE}px)`;
   const right = `calc(env(safe-area-inset-right, 0px) + ${EDGE}px)`;
 
   return (
     <div ref={root} className={`relative select-none overflow-hidden ${className}`} style={{ touchAction: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', overscrollBehavior: 'none' }}>
       {children}
+      <button
+        type="button"
+        data-walk-ui
+        data-hud
+        data-testid="nut-chay-nhanh"
+        tabIndex={-1}
+        aria-pressed={runOn}
+        onPointerDown={(e) => {
+          // Không nhận tiêu điểm (Space còn là phím nhảy) và không để cú bấm chạm tới khung điều khiển.
+          e.preventDefault();
+          e.stopPropagation();
+          api.input.runToggle = toggleRun(api.input.runToggle);
+          setRunToggle(api.input.runToggle);
+        }}
+        className={`absolute cursor-pointer rounded-nut border-2 px-4 font-display text-base font-extrabold leading-none ${runOn ? 'border-white bg-xanh-la text-white ring-4 ring-white/60' : 'border-white/70 bg-black/45 text-white'}`}
+        style={{ right, bottom: touchMode ? `calc(${bottom} + ${Math.max(MIN_TOUCH_TARGET, JUMP_SIZE) + GAP}px)` : bottom, minWidth: MIN_TOUCH_TARGET, minHeight: Math.max(MIN_TOUCH_TARGET, RUN_BTN_HEIGHT), touchAction: 'none' }}
+      >
+        {touchMode ? ui.dungDi.nutChayNhanh : ui.dungDi.nutChayNhanhPhim}
+      </button>
       {touchMode && (
         <>
           <div

@@ -355,7 +355,7 @@ export const HUONG_DAN_GAME = {
     luat: [
       '{phanDien} vừa tráo một lá trên cây đa nên số gốc bị lệch. Em đứng trên bậc của lá bị tráo, leo từng tầng lên gốc để bắt {phanDien}!',
       'Ở mỗi tầng, em ghép số của em với số của bậc anh em bên cạnh theo đúng thứ tự trái rồi phải, rồi nhảy lên bậc ghi số đó.',
-      'Nhảy nhầm bậc thì bậc nứt, em rơi xuống và mất 1 tim. Nhảy hụt thì không mất tim.',
+      'Nhảy nhầm bậc thì bậc nứt rồi biến mất tới hết tầng đó, em rơi xuống bậc cũ và mất 1 tim. Các bậc còn lại vẫn đứng yên chỗ cũ. Nhảy hụt thì không mất tim.',
       'Em có 3 tim cho cả ván, gồm 3 vòng, cây cao dần.',
     ],
     dieuKhien: {
@@ -375,7 +375,7 @@ export const HUONG_DAN_GAME = {
       },
       {
         hinh: { art: 'bac-nut' },
-        may: 'Số mới là số bên trái nhân 10 rồi cộng số bên phải. Nhảy nhầm bậc thì bậc nứt và em mất 1 tim; nhảy hụt thì chỉ phải thử lại.',
+        may: 'Số mới là số bên trái nhân 10 rồi cộng số bên phải. Nhảy nhầm bậc thì bậc nứt, biến mất tới hết tầng và em mất 1 tim; bậc khác giữ chỗ; nhảy hụt thì thử lại.',
       },
       {
         hinh: { art: 'goc-tren-ngon' },
@@ -385,7 +385,7 @@ export const HUONG_DAN_GAME = {
     nhac: {
       soSanh: 'Ghép số của em với số bậc anh em: số bên trái nhân 10 rồi cộng số bên phải. Rồi đi tới gần bậc có số đó và nhảy.',
       laiTrenKhong: 'Giữ phím ← → (hay nút ◀ ▶) khi đang bay để lái xuống đúng bậc em chọn.',
-      lamLai: 'Em đang rơi về bậc cũ. Chờ một chút rồi thử lại tầng này nhé.',
+      lamLai: 'Em đang rơi về bậc cũ. Bậc sai đã biến mất, các bậc còn lại vẫn ở chỗ cũ: chờ một chút rồi thử lại tầng này nhé.',
       motTim: 'Em chỉ còn một tim. Kiểm tra kỹ thứ tự trái rồi phải trước khi nhảy.',
       tangGoc: 'Gần tới gốc rồi: ghép nốt hai số rồi nhảy lên bậc cuối.',
       xongVong: 'Em leo xong rồi! Bấm nút để sang vòng kế tiếp.',

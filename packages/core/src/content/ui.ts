@@ -577,6 +577,10 @@ export const ui = {
     nutTuongTac: 'Tương tác với {vat}',
     nutTuongTacTrong: 'Tương tác',
     nutNhay: 'Nhảy',
+    /** Nút bật tắt chạy nhanh (máy tính và điện thoại) */
+    nutChayNhanh: 'Chạy nhanh',
+    /** Nhãn nút trên máy tính: kèm phím tắt R (bật/tắt chạy nhanh) */
+    nutChayNhanhPhim: 'Chạy nhanh (R)',
     canDieuKhien: 'Cần điều khiển: chạm nửa trái màn hình rồi kéo',
     bieuTuongTuongTac: '✋',
     bieuTuongNhay: '⬆',

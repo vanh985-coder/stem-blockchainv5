@@ -83,6 +83,11 @@ Thay cho nút "Sửa giao dịch & xem gốc đổi" ở bản cũ. Công thức
 - Cuối phần: "Em soi {so} ô. Đi theo nhánh đỏ thì chỉ cần 2 ô mỗi tầng." ({so} đếm các ô em đã bấm; gốc hiện sẵn không tính.)
 - Logic soi là hàm thuần trong `lessons/bai-4/inspect.ts` (dùng `combine`, `buildTree`): soi từng ô, ô nào bấm được theo trạng thái soi, trúng lá bị sửa thì xong, đếm số lần soi. Có test.
 
+### Trang bài học gọn một màn hình ("vừa khung") và kéo lá ở trạm Khó
+
+- Màn 10 bật `fit` của `LessonPage2D` (cơ chế ở spec 03): cả 3 trạm nằm gọn một màn hình ở 1366×768 và 1920×1080, zoom trình duyệt 67% đến 150%. Từ `md` (768px) các trạm xếp **2 cột**: trạm Dễ (bảng giao dịch + tiến độ | thẻ ghép cặp + ô nhập), trạm Trung bình phần A và B (cây | chữ, phép tính, ô nhập), trạm Khó (bảng 8 giao dịch trên cùng; khay + nút "Kiểm tra cây Merkle" | cây). Đề, luật, điểm, chữ không đổi.
+- **Trạm Khó, kéo lá vào ô "?" — nguyên nhân lỗi cũ:** lá kéo gán `transform: translate3d` theo khoảng kéo của con trỏ nhưng khoảng dịch bị nhân thêm hai lần: hệ số phóng `zoom` của khối chứa (1,35 trên màn rộng) và lớp `scale-105` của lá đang kéo (thuộc tính `scale` riêng của Tailwind áp lên cả `translate3d`, nhân 1,05). Lá trôi xa con trỏ và lệch khỏi hình chữ nhật dnd-kit dùng để xét ô nhận, nên thả lá đè lên ô mà ô không nhận (chỉ trúng khi con trỏ nằm sát tâm ô). Đã sửa ở `ui/TapOrDrag.tsx` (chia khoảng kéo cho hệ số phóng thực; thẻ đang kéo `pointer-events: none`) và đổi cách chọn ô sang hàm thuần `ui/dropTarget.ts`: ô nhận khi phần giao ≥ 30% diện tích lá hoặc tâm lá trong ô, chồng nhiều ô thì lấy ô giao nhiều nhất; ô sáng viền khi đủ điều kiện, thả ngoài thì lá về khay; chuột, chạm và bàn phím (chọn lá rồi chọn ô) đều dùng được.
+
 ### Sau màn 10 (đã thay ở mốc 3, bước B5)
 
 Cảnh trao trang tạm của mốc 1 (`LessonPage2D`: "Thầy Linh trao Trang Sổ Vàng thứ tư…", nút "Về bản đồ") đã bỏ (`bai4Lesson.award` không còn). Xong màn 10 mở màn 11 (từ bước B13 màn 11 đã ra mắt; trước đó còn `coming-soon` nên mở thẳng màn 12); nút "Chơi tiếp" của bài trỏ tới game đã ra mắt kế tiếp, tức màn 11. Xong màn 11 thì mở màn 12. Trang Sổ Vàng thứ tư vẫn chỉ trao sau cảnh cao trào của màn 12 (mục "Cảnh cao trào"); xong màn 10 và 11 mà chưa chơi màn 12 thì mới có 3 trang.
@@ -358,7 +363,8 @@ Làm lại toàn bộ lối chơi ngày 01/11/2026 (nhánh `feat/man12-bac-go`; 
 1. **Cây mỗi vòng:** lá là chữ số 1–9. {phanDien} đã tráo đúng 1 lá (sang chữ số 1–9 khác). Em bắt đầu đứng trên bậc của lá bị tráo; bên cạnh, cùng tầng, là **bậc anh em** đã biết giá trị. Phía trên là các **bậc lựa chọn**.
 2. **Bậc lựa chọn:** đúng 1 bậc ghi `combine(trái, phải)` theo đúng thứ tự trái–phải của hai nút (nút ở bên trái nếu là con có chỉ số chẵn). Bậc nhiễu lấy từ: **đảo thứ tự** `combine(phải, trái)`, **trái + phải**, **số đúng lệch đúng 1 chữ số**; các số khác nhau và khác đáp án (vòng 3 luôn có bậc đảo thứ tự nếu nó khác đáp án).
 3. **Nhảy lên đúng bậc:** bậc đó thành nút hiện tại (em và bậc trượt về chỗ nút trong 0,16 giây), hiện bậc anh em của nó (giá trị lấy từ cây) cùng các lựa chọn tầng trên, cứ thế tới gốc. Ở ngọn cây khắc sẵn "Gốc trong sổ". Gốc em tính ra khác gốc trong sổ thì lộ lá giả, {phanDien} bị bắt, xong vòng, hiện **"Em chỉ cần d phép ghép thay vì kiểm tra cả 2^d lá!"** (d là số tầng, 2^d là số lá) cùng dòng "Gốc em tính là X, khác gốc trong sổ là Y." (gốc em tính luôn khác gốc trong sổ: mỗi bước lên một tầng độ lệch bị nhân 10 hoặc giữ nguyên, không bao giờ về 0).
-4. **Nhảy vào bậc sai:** em đứng lên bậc, bậc **nứt rồi biến mất sau 0,4 giây**, em rơi về bậc vừa đứng và **mất 1 tim**, rồi **làm lại tầng đó** (các lựa chọn giữ số nhưng đổi chỗ). Hết tim thì sau khi rơi về xong là thua (Bi vào giúp, vẫn sang cao trào).
+4. **Nhảy vào bậc sai:** em đứng lên bậc, bậc **nứt rồi biến mất sau 0,4 giây**, em rơi về bậc vừa đứng và **mất 1 tim**, rồi **làm lại tầng đó**. **Luật mới (02/11/2026, chủ dự án):** bậc sai **biến mất HẲN cho tới hết tầng đó** (không đáp được, không vẽ; sang tầng kế thì bậc mới tạo lại đủ) và các bậc còn lại **GIỮ NGUYÊN chỗ** (không đổi chỗ khi làm lại tầng; ở vòng 2–3 chúng vẫn trượt như cũ, pha trượt không đổi). Vòng 1, 2 có 2 bậc nên sai một lần là chỉ còn bậc đúng; vòng 3 có 3 bậc nên sai tối đa 2 lần. **Lý do bỏ đổi chỗ:** khi các bậc đổi chỗ sau mỗi lần sai, người chơi thấy số trên bậc nhảy chỗ và tưởng mọi bậc đều bị tính sai (không phân biệt được bậc đã thử với bậc chưa thử); để nguyên chỗ và cho bậc sai biến mất thì bậc nào còn lại là bậc chưa thử, loại trừ rõ ràng. Hết tim thì sau khi rơi về xong là thua (Bi vào giúp, vẫn sang cao trào).
+   *(Sửa 02/11/2026)* `crack` của bậc nứt là số giây còn lại và giảm cùng `crackLeft` (trước đó đứng yên ở 0,4 nên cảnh, vốn mờ theo `crack`, không bao giờ làm bậc sai mờ đi). Hồi quy "nhảy sai rồi nhảy đúng phải lên tầng" (sai 1 lần ở vòng 1, 2; sai 1 và 2 lần ở vòng 3; kể cả sai tiếp ở tầng kế; sau luật mới: bậc sai mất hẳn, bậc còn lại giữ chỗ): `climbLogic.test.ts`, `scripts/man12-bac-go-check.mjs --only=saidung`.
 5. **Nhảy hụt** (không chạm bậc nào) **hay bước ra khỏi mép bậc:** rơi về bậc cũ, **không mất tim**, **khóa nhảy 0,6 giây**.
 6. **Vòng:**
 
@@ -422,7 +428,7 @@ Chạy ngay sau khi màn 12 kết thúc (hết vòng 4, hoặc hết tim sau khi
 | Bậc nhiễu | Có đủ ba loại: đảo thứ tự, trái + phải, lệch đúng 1 chữ số; 3 lựa chọn luôn có bậc đảo thứ tự; hai nút bằng nhau vẫn đủ bậc nhiễu khác nhau |
 | Nhảy lên đúng bậc | Lên tầng +1, giữ tim, đứng ở chỗ nút, hiện các lựa chọn tầng trên |
 | Leo hết cây | Xong vòng; sự kiện `roundDone` báo gốc em tính khác gốc trong sổ (`mismatch`) |
-| Nhảy vào bậc sai | `wrong` → (0,4 giây) `vanish` → rơi → `retry`; mất 1 tim; ở lại tầng cũ; lựa chọn giữ số, đổi chỗ |
+| Nhảy vào bậc sai | `wrong` → (0,4 giây) `vanish` → rơi → `retry`; mất 1 tim; ở lại tầng cũ; bậc sai `crack` = 0 (biến mất hẳn tới hết tầng), bậc còn lại giữ `slot` và `phase`; lựa chọn giữ số, đổi chỗ |
 | Nhảy sai khi còn 1 tim | `wrong`, `vanish`, `lost`; điểm 0 |
 | Nhảy hụt | Sự kiện `miss`, tim không đổi, khóa nhảy đúng 0,6 giây (đang khóa thì không nhảy được) |
 | Bước ra khỏi mép bậc | Sự kiện `fell`, về bậc cũ, tim không đổi, khóa nhảy 0,6 giây |
@@ -441,9 +447,10 @@ Chạy ngay sau khi màn 12 kết thúc (hết vòng 4, hoặc hết tim sau khi
 | Bot | Điểm trung bình | Chưa đạt | Đồng | Bạc | Vàng | Hết tim |
 |---|---|---|---|---|---|---|
 | Giỏi: tính đúng, canh đúng, không nhầm, không hụt | 450 | 0% | 0% | 0% | 100% | 0% |
-| Trung bình: nhầm thứ tự 15%, nhảy hụt 10% mỗi lần thử | 317,8 (0 đến 450) | 12,0% | 19,0% | 54,0% | 15,0% | 31,0% |
+| Trung bình: nhầm thứ tự 15%, nhảy hụt 10% mỗi lần thử (luật cũ: đổi chỗ khi làm lại tầng) | 317,8 (0 đến 450) | 12,0% | 19,0% | 54,0% | 15,0% | 31,0% |
+| **Trung bình, luật mới (bậc sai biến mất hẳn, giữ chỗ; bot không nhắm bậc đã mất)** | **340,2** | **4,3%** | **19,3%** | **61,3%** | **15,0%** | **23,7%** |
 
-Bot trung bình nhầm 1,74 lần và hụt 0,86 lần mỗi ván. Bot giỏi 100% Vàng (có assert); bot trung bình chỉ in bảng tỉ lệ, KHÔNG assert ngưỡng (mốc màn 12 theo nghĩa, không áp quy tắc "hầu như không Vàng"; ngưỡng chỉnh khi học sinh chơi thật). Bot chỉ dùng thao tác của học sinh (`setMove`, `jump`) và chạy từng khung 1/60 giây (`climbBots.ts`).
+Bot trung bình nhầm 1,74 lần và hụt 0,86 lần mỗi ván (luật cũ); luật mới: nhầm 1,63 và hụt 0,97 lần. Mốc 200 / 350 / 450 theo nghĩa giữ nguyên (Đồng = xong 2 vòng; Bạc = xong cả 3 vòng, nhầm tối đa 2; Vàng = không nhầm), vẫn hợp: bot giỏi vẫn 100% Vàng. Bot giỏi 100% Vàng (có assert); bot trung bình chỉ in bảng tỉ lệ, KHÔNG assert ngưỡng (mốc màn 12 theo nghĩa, không áp quy tắc "hầu như không Vàng"; ngưỡng chỉnh khi học sinh chơi thật). Bot chỉ dùng thao tác của học sinh (`setMove`, `jump`) và chạy từng khung 1/60 giây (`climbBots.ts`).
 
 ### Tự chọn (lời giao chưa nói; có thể chỉnh ở `climbConfig.ts`)
 

@@ -26,6 +26,8 @@ export interface ChainStripProps {
   /** Vị trí trang vừa được mạng thêm vào (trượt vào từ bên phải) */
   slideInFromIndex?: number;
   className?: string;
+  /** Gọn chiều cao (xem `TrangSo.dense`) */
+  dense?: boolean;
 }
 
 // Từng trang bọc memo để không vẽ lại cả dải khi chỉ một trang đổi.
@@ -44,6 +46,7 @@ const PageItem = memo(function PageItem(props: {
   invalidBadgeText?: string;
   slideIn: boolean;
   itemRef?: Ref<HTMLDivElement>;
+  dense?: boolean;
 }) {
   return (
     <div ref={props.itemRef} className={`shrink-0 snap-center ${props.slideIn ? 'animate-slide-in-right' : ''}`}>
@@ -61,6 +64,7 @@ const PageItem = memo(function PageItem(props: {
         contentSlot={props.contentSlot}
         codeSlot={props.codeSlot}
         invalidBadgeText={props.invalidBadgeText}
+        dense={props.dense}
       />
     </div>
   );
@@ -81,6 +85,7 @@ export function ChainStrip({
   renderCodeSlot,
   slideInFromIndex,
   className = '',
+  dense = false,
 }: ChainStripProps) {
   const { settings } = useSettings();
   const reducedMotion = settings.reducedMotion;
@@ -92,11 +97,11 @@ export function ChainStrip({
 
   return (
     <div
-      className={`flex w-full snap-x snap-mandatory items-center gap-2 overflow-x-auto px-3 py-4 sm:gap-3 sm:px-6 ${className}`}
+      className={`flex w-full snap-x snap-mandatory items-center gap-2 overflow-x-auto px-3 ${dense ? 'py-1' : 'py-4'} sm:gap-3 sm:px-6 ${className}`}
       style={{ WebkitOverflowScrolling: 'touch' }}
     >
       <div className="shrink-0 snap-center">
-        <TrangSo size="xs" isCover pageNumber={0} content={0} pageCode={genesisCode} isConfirmed />
+        <TrangSo size="xs" isCover pageNumber={0} content={0} pageCode={genesisCode} isConfirmed dense={dense} />
       </div>
 
       {pages.map((p, idx) => {
@@ -126,6 +131,7 @@ export function ChainStrip({
               codeSlot={renderCodeSlot ? renderCodeSlot(idx) : undefined}
               invalidBadgeText={getPageInvalidBadgeText ? getPageInvalidBadgeText(idx) : undefined}
               slideIn={!reducedMotion && slideInFromIndex !== undefined && idx >= slideInFromIndex}
+              dense={dense}
             />
           </Fragment>
         );

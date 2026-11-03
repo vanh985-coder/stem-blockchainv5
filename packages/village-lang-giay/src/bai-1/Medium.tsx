@@ -347,11 +347,11 @@ export function Medium({ onComplete, saved }: { onComplete: (r: StationResult) =
   ];
 
   return (
-    <div className="mx-auto max-w-4xl space-y-5">
+    <div className="mx-auto max-w-5xl space-y-2">
       {/* Tiêu đề trạm và nút Xem lại hướng dẫn */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-nau-go/20 pb-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-nau-go/20 pb-1">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold">{fmt(T.tb.tieuDe)}</h2>
+          <h2 className="text-xl font-bold">{fmt(T.tb.tieuDe)}</h2>
           {tutorialOpen ? (
             <p className="text-base font-semibold text-muc-tim-dam">{tutorialTexts.man1Tb.tieuDe}</p>
           ) : isFromSaved ? (
@@ -377,8 +377,8 @@ export function Medium({ onComplete, saved }: { onComplete: (r: StationResult) =
       </div>
 
       {tutorialOpen ? (
-        <div className="flex items-center gap-3 rounded-bang border-2 border-do-son bg-do-son/10 p-4">
-          <PortraitFrame portrait="ti" size={72} />
+        <div className="flex items-center gap-3 rounded-bang border-2 border-do-son bg-do-son/10 p-2">
+          <PortraitFrame portrait="ti" size={44} />
           <div className="text-base">
             <span className="block font-bold text-do-son-dam">
               <span aria-hidden="true">✗ </span>
@@ -398,8 +398,8 @@ export function Medium({ onComplete, saved }: { onComplete: (r: StationResult) =
           <p className="text-base">{fmt(T.tb.dangSuaChiTiet, { n: tamperIndex + 1 })}</p>
         </div>
       ) : (
-        <div className="flex items-center gap-3 rounded-bang border-2 border-do-son bg-do-son/10 p-4">
-          <PortraitFrame portrait="ti" size={72} />
+        <div className="flex items-center gap-3 rounded-bang border-2 border-do-son bg-do-son/10 p-2">
+          <PortraitFrame portrait="ti" size={44} />
           <div className="text-base">
             <span className="block font-bold text-do-son-dam">
               <span aria-hidden="true">✗ </span>
@@ -413,9 +413,10 @@ export function Medium({ onComplete, saved }: { onComplete: (r: StationResult) =
       )}
 
       {/* Vùng làm thử bao trùm dải trang sổ và khung công thức + nút Kiểm tra (P8b) */}
-      <div data-tutorial="practice-area" className="space-y-4">
+      <div data-tutorial="practice-area" className="space-y-2">
         <div className="overflow-hidden rounded-bang border-2 border-nau-go/50 bg-white/50" data-tutorial="chain-strip">
           <ChainStrip
+              dense
             genesisCode={displayGenesis}
             pages={displayPages}
             firstInvalidIndex={displayFirstInvalid}
@@ -457,7 +458,7 @@ export function Medium({ onComplete, saved }: { onComplete: (r: StationResult) =
                       showButtons={false}
                       placeholder={tutorialTexts.man1Tb.inputPlaceholder}
                       ariaLabel={fmt(T.de.nhanMaTrang, { n: PRACTICE_TAMPER_PAGE })}
-                      inputClassName="!h-10 !w-full !text-lg"
+                      inputClassName="!h-11 !w-full !text-lg"
                       onChange={(v) => {
                         setPracticeVal(v);
                         setPracticeError(undefined);
@@ -481,7 +482,7 @@ export function Medium({ onComplete, saved }: { onComplete: (r: StationResult) =
                     showButtons={false}
                     placeholder={T.chung.khoangSo}
                     ariaLabel={fmt(T.de.nhanMaTrang, { n: idx + 1 })}
-                    inputClassName="!h-10 !w-full !text-lg"
+                    inputClassName="!h-11 !w-full !text-lg"
                     onChange={(v) => {
                       setCodeInput(v);
                       setCodeError(undefined);
@@ -497,18 +498,18 @@ export function Medium({ onComplete, saved }: { onComplete: (r: StationResult) =
         </div>
 
         {showFirstDomino && !tutorialOpen && currentFirstInvalid !== -1 && (
-          <div className="flex items-center gap-3 rounded-bang border-2 border-muc-tim bg-muc-tim/10 p-4" role="status">
-            <PortraitFrame portrait="bi" size={72} />
+          <div className="flex items-center gap-3 rounded-bang border-2 border-muc-tim bg-muc-tim/10 p-2" role="status">
+            <PortraitFrame portrait="bi" size={44} />
             <p className="text-base font-semibold">{fmt(T.tb.domino, { n: currentFirstInvalid + 1, truoc: currentFirstInvalid })}</p>
           </div>
         )}
 
         {/* Khung gợi ý công thức và nút Kiểm tra/Cập nhật mã */}
         {(tutorialOpen || (!isTampering && currentFirstInvalid !== -1)) && (
-          <div className="flex flex-col items-center justify-between gap-4 rounded-bang border-2 border-nau-go/50 bg-white/60 p-4 sm:flex-row">
+          <div className="flex flex-col items-center justify-between gap-2 rounded-bang border-2 border-nau-go/50 bg-white/60 p-2 sm:flex-row">
             <div className="flex items-center gap-3" data-tutorial="formula-box">
-              <PortraitFrame portrait="bi" size={72} />
-              <div className="rounded-2xl border-2 border-nau-go/50 bg-giay p-3">
+              <PortraitFrame portrait="bi" size={44} />
+              <div className="rounded-2xl border-2 border-nau-go/50 bg-giay p-2">
                 <span className="mb-0.5 block text-sm font-semibold text-nau-go-dam">
                   <span aria-hidden="true">💡 </span>
                   {fmt(T.tb.tinhLai, { n: tutorialOpen ? PRACTICE_TAMPER_PAGE : currentFirstInvalid + 1 })}
