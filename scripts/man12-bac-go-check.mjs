@@ -203,9 +203,9 @@ async function sSai(browser, size) {
   const fall = await S(ctx, () => window.__climbReal.mode);
   check(ctx, 'nhảy sai', 'nứt xong bậc biến mất, em rơi về bậc vừa đứng (mode fall)', fall === 'fall' || fall === 'free');
   await waitFor(ctx, () => window.__climbReal.mode === 'free', 5000);
-  const after = await S(ctx, () => ({ level: window.__climbReal.level, y: window.__climbReal.player.y, grounded: window.__climbReal.player.grounded, hearts: window.__climbReal.hearts, mistakes: window.__climbReal.mistakes, values: window.__climbReal.choices.map((c) => c.value).sort((a, b) => a - b), slots: window.__climbReal.choices.map((c) => c.slot) }));
+  const after = await S(ctx, () => ({ gone: window.__climbReal.choices.filter((c) => c.crack === 0).length, goneWrong: window.__climbReal.choices.filter((c) => c.crack === 0).every((c) => !c.correct), level: window.__climbReal.level, y: window.__climbReal.player.y, grounded: window.__climbReal.player.grounded, hearts: window.__climbReal.hearts, mistakes: window.__climbReal.mistakes, values: window.__climbReal.choices.map((c) => c.value).sort((a, b) => a - b), slots: window.__climbReal.choices.map((c) => c.slot) }));
   check(ctx, 'nhảy sai', 'rơi về bậc cũ, vẫn ở tầng 0, còn 2 tim', after.level === 0 && after.y === 0 && after.grounded && after.hearts === 2 && after.mistakes === 1, JSON.stringify(after));
-  check(ctx, 'nhảy sai', 'làm lại tầng: các lựa chọn giữ số, đổi chỗ', JSON.stringify(after.values) === JSON.stringify(before.values) && JSON.stringify(after.slots) !== JSON.stringify(before.slots), `${before.slots} → ${after.slots}`);
+  check(ctx, 'nhảy sai', 'làm lại tầng: giữ số và GIỮ NGUYÊN chỗ (không đổi chỗ); bậc sai biến mất hẳn, bậc đúng còn', JSON.stringify(after.values) === JSON.stringify(before.values) && JSON.stringify(after.slots) === JSON.stringify(before.slots) && after.gone === 1 && after.goneWrong, `${before.slots} → ${after.slots}, gone=${after.gone}`);
   check(ctx, 'nhảy sai', 'hiện lời báo "Bậc này nứt rồi!"', /nứt rồi/.test(said), said);
   check(ctx, 'nhảy sai', 'không lỗi trình duyệt', ctx.errors.length === 0, ctx.errors.join(' | '));
   await ctx.page.close();
@@ -353,8 +353,15 @@ async function sHetTim(browser, size) {
   const ctx = await openGame(browser, size);
   await start(ctx);
   await skipTutorial(ctx);
+  // Luật mới: bậc sai biến mất hẳn tới hết tầng, nên mỗi tầng chỉ sai được một lần (vòng 1 chỉ 2 bậc): sai ở tầng 0, đúng lên tầng 1, sai, đúng lên tầng 2, sai lần thứ 3.
+  for (let t = 0; t < 2; t++) {
+    await S(ctx, () => { window.__lvKeep = window.__climbReal.level; });
+    await autoplay(ctx, { want: { wrong: true }, until: () => window.__climbReal.mode === 'crack', timeoutMs: 30000 });
+    await waitFor(ctx, () => window.__climbReal.mode === 'free', 6000);
+    await autoplay(ctx, { until: () => window.__climbReal.level > window.__lvKeep, timeoutMs: 30000 });
+  }
   const why = await autoplay(ctx, { want: { wrong: true }, timeoutMs: 90000 });
-  check(ctx, 'hết tim', 'nhảy sai 3 lần thì hiện lời Bi giúp', why === 'banner' && /Để Bi giúp em/.test(await bodyText(ctx)));
+  check(ctx, 'hết tim', 'nhảy sai 3 lần (mỗi tầng một lần) thì hiện lời Bi giúp', why === 'banner' && /Để Bi giúp em/.test(await bodyText(ctx)));
   const s = await S(ctx, () => ({ phase: window.__climbReal.phase, hearts: window.__climbReal.hearts, mistakes: window.__climbReal.mistakes }));
   check(ctx, 'hết tim', 'logic: thua, 0 tim, 3 lần nhầm', s.phase === 'lost' && s.hearts === 0 && s.mistakes === 3, JSON.stringify(s));
   await shot(ctx, 'het-tim');
@@ -386,14 +393,14 @@ async function sAuto(browser, size) {
 
 
 /**
- * Hồi quy "nhảy sai rồi mọi bậc đều bị tính sai": ở CẢ 3 vòng, nhảy sai (1 hay 2 lần) → bậc nứt → rơi → làm lại tầng → nhảy đúng PHẢI lên tầng,
+ * Hồi quy "nhảy sai rồi mọi bậc đều bị tính sai": ở CẢ 3 vòng, nhảy sai (1 lần; 2 lần ở vòng 3) → bậc nứt rồi biến mất hẳn → rơi → các bậc còn lại giữ nguyên chỗ → nhảy đúng PHẢI lên tầng,
  * không mất thêm tim, rồi nhảy sai tiếp ở tầng 1 và vẫn nhảy đúng lên tầng 2. Tim được hồi về 3 giữa các đợt thử (chỉ trong kịch bản này) để thử đủ số lần.
  */
 async function sSaiRoiDung(browser, size) {
   const ctx = await openGame(browser, size);
   await start(ctx);
   await skipTutorial(ctx);
-  const wrongPlan = [1, 2, 2];
+  const wrongPlan = [1, 1, 2]; // vòng 1, 2 chỉ có 2 bậc nên chỉ sai được 1 lần; vòng 3 có 3 bậc nên sai được 2 lần
   for (let round = 0; round < 3; round++) {
     const area = `sai rồi đúng, vòng ${round + 1}`;
     for (const [phase, wrongs] of [['tầng 0', wrongPlan[round]], ['tầng 1', 1]]) {
@@ -403,17 +410,19 @@ async function sSaiRoiDung(browser, size) {
       });
       const before = await S(ctx, () => ({ level: window.__climbReal.level, mistakes: window.__climbReal.mistakes }));
       let allWrongOk = true;
+      let slotsKeep = '';
       const wrongDetail = [];
       for (let k = 0; k < wrongs; k++) {
         const why = await autoplay(ctx, { want: { wrong: true }, until: () => window.__climbReal.mode === 'crack', timeoutMs: 25000 });
         await waitFor(ctx, () => window.__climbReal.mode === 'free', 6000).catch(() => {});
-        const st = await S(ctx, () => ({ mode: window.__climbReal.mode, level: window.__climbReal.level, grounded: window.__climbReal.player.grounded, cracks: window.__climbReal.choices.filter((c) => c.crack !== null).length }));
-        if (!(why === 'until' && st.mode === 'free' && st.level === before.level && st.grounded && st.cracks === 0)) {
+        const st = await S(ctx, () => ({ mode: window.__climbReal.mode, level: window.__climbReal.level, grounded: window.__climbReal.player.grounded, cracking: window.__climbReal.choices.filter((c) => c.crack !== null && c.crack > 0).length, gone: window.__climbReal.choices.filter((c) => c.crack === 0).length, slots: window.__climbReal.choices.map((c) => c.slot).join(',') }));
+        if (k === 0) slotsKeep = st.slots;
+        if (!(why === 'until' && st.mode === 'free' && st.level === before.level && st.grounded && st.cracking === 0 && st.gone === k + 1 && st.slots === slotsKeep)) {
           allWrongOk = false;
           wrongDetail.push(JSON.stringify({ k, why, st, before }));
         }
       }
-      check(ctx, area, `${phase}: nhảy sai ${wrongs} lần: nứt, rơi, làm lại tầng, không còn bậc nào đang nứt`, allWrongOk, wrongDetail.join(' | '));
+      check(ctx, area, `${phase}: nhảy sai ${wrongs} lần: nứt, biến mất hẳn, rơi, các bậc còn lại giữ chỗ`, allWrongOk, wrongDetail.join(' | '));
       const mid = await S(ctx, () => ({ hearts: window.__climbReal.hearts, mistakes: window.__climbReal.mistakes }));
       await S(ctx, () => { window.__lvKeep = window.__climbReal.level; });
       const why2 = await autoplay(ctx, { until: () => window.__climbReal.level > window.__lvKeep || window.__climbReal.phase !== 'playing', timeoutMs: 25000, want: {} });

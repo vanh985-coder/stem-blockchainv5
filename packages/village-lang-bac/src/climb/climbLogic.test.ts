@@ -231,7 +231,7 @@ describe('ván chơi: luật nhảy', () => {
     expect(s.choices).toHaveLength(0);
   });
 
-  it('nhảy vào bậc sai: bậc nứt 0,4 giây rồi biến mất, rơi về bậc vừa đứng, mất 1 tim, làm lại tầng (giữ số, đổi chỗ)', () => {
+  it('nhảy vào bậc sai: bậc nứt 0,4 giây rồi biến mất HẲN, rơi về bậc vừa đứng, mất 1 tim; các bậc còn lại giữ nguyên chỗ (không đổi chỗ)', () => {
     const s = createClimbGame(5);
     const values = s.choices.map((c) => c.value).sort();
     const wrong = s.choices.findIndex((c) => !c.correct);
@@ -243,8 +243,11 @@ describe('ván chơi: luật nhảy', () => {
     expect(s.mode).toBe('free');
     expect(s.player.y).toBe(tierY(0));
     expect(s.choices.map((c) => c.value).sort()).toEqual(values);
-    expect(s.choices.map((c) => c.slot)).not.toEqual(slotsBefore);
-    expect(s.choices.every((c) => c.crack === null)).toBe(true);
+    // giữ nguyên chỗ: không đổi chỗ khi làm lại tầng
+    expect(s.choices.map((c) => c.slot)).toEqual(slotsBefore);
+    // bậc sai biến mất hẳn (crack 0), bậc đúng còn nguyên
+    expect(s.choices[wrong].crack).toBe(0);
+    expect(s.choices.filter((c) => c.correct).every((c) => c.crack === null)).toBe(true);
   });
 
   it('chuỗi sự kiện khi nhầm: wrong → (0,4 giây) vanish → rơi → retry; đứng yên trên bậc nứt đúng 0,4 giây', () => {
@@ -462,15 +465,19 @@ describe('hồi quy: nhảy sai rồi nhảy đúng (mọi vòng)', () => {
     return s;
   }
   const wrongThenUp = (s: ClimbState, wrongs: number): void => {
+    const slotsKeep = s.choices.map((c) => c.slot);
     for (let k = 0; k < wrongs; k++) {
       s.slideClock = 0;
-      const wi = s.choices.findIndex((c) => !c.correct);
+      const wi = s.choices.findIndex((c) => !c.correct && c.crack === null);
       const ev = kinds(jumpOnto(s, wi));
       expect(ev).toContain('wrong');
       expect(ev).toContain('retry');
       expect(s.mode).toBe('free');
-      expect(s.choices.every((c) => c.crack === null)).toBe(true);
       expect(s.level).toBe(0);
+      // mọi bậc sai đã nhảy trúng biến mất hẳn; bậc còn lại (kể cả bậc đúng) vẫn nguyên và không đổi chỗ
+      expect(s.choices.filter((c) => !c.correct && c.crack === 0).length).toBe(k + 1);
+      expect(s.choices.filter((c) => c.correct).every((c) => c.crack === null)).toBe(true);
+      expect(s.choices.map((c) => c.slot)).toEqual(slotsKeep);
     }
     const level = s.level;
     s.slideClock = 0;
@@ -483,14 +490,15 @@ describe('hồi quy: nhảy sai rồi nhảy đúng (mọi vòng)', () => {
 
   for (const round of [0, 1, 2]) {
     it(`vòng ${round + 1}: sai 1 lần rồi nhảy đúng thì lên tầng`, () => wrongThenUp(atRound(round), 1));
-    it(`vòng ${round + 1}: sai 2 lần rồi nhảy đúng thì lên tầng`, () => wrongThenUp(atRound(round), 2));
+    // vòng 1, 2 chỉ có 2 bậc nên chỉ sai được 1 lần (bậc sai biến mất, còn đúng bậc đúng); vòng 3 có 3 bậc nên sai được 2 lần
+    if (round === 2) it(`vòng ${round + 1}: sai 2 lần rồi nhảy đúng thì lên tầng`, () => wrongThenUp(atRound(round), 2));
     it(`vòng ${round + 1}: sai ở mọi tầng, mỗi tầng sau đó nhảy đúng đều lên được tới gốc`, () => {
       const s = atRound(round);
       let guard = 0;
       while (s.phase === 'playing' && s.hearts > 0 && guard++ < 40) {
         const before = s.level;
         s.slideClock = 0;
-        const wi = s.choices.findIndex((c) => !c.correct);
+        const wi = s.choices.findIndex((c) => !c.correct && c.crack === null);
         if (s.hearts > 1 && wi >= 0) jumpOnto(s, wi);
         s.slideClock = 0;
         const ev = kinds(jumpOnto(s, s.choices.findIndex((c) => c.correct)));
@@ -524,5 +532,77 @@ describe('bậc nứt mờ dần theo đồng hồ nứt', () => {
     run(t, 0.25);
     expect(['fall', 'free']).toContain(t.mode);
     if (t.mode === 'fall') expect(bad.crack).toBe(0);
+  });
+});
+
+describe('luật mới: bậc sai biến mất hẳn tới hết tầng, bậc còn lại giữ chỗ', () => {
+  function atRound3(): ClimbState {
+    const s = createClimbGame(5);
+    for (let r = 0; r < 2; r++) {
+      while (s.phase === 'playing') {
+        s.slideClock = 0;
+        jumpOnto(s, s.choices.findIndex((c) => c.correct));
+      }
+      advanceRound(s);
+    }
+    expect(s.round).toBe(2);
+    expect(s.choices.length).toBe(3);
+    return s;
+  }
+
+  it('vòng 3: sai 2 lần thì chỉ còn đúng bậc đúng, các bậc đã mất không còn bị chạm, vị trí và pha trượt không đổi', () => {
+    const s = atRound3();
+    s.hearts = 3;
+    const keep = s.choices.map((c) => ({ slot: c.slot, phase: c.phase, value: c.value }));
+    for (let k = 0; k < 2; k++) {
+      s.slideClock = 0;
+      const wi = s.choices.findIndex((c) => !c.correct && c.crack === null);
+      expect(wi).toBeGreaterThanOrEqual(0);
+      expect(kinds(jumpOnto(s, wi))).toContain('wrong');
+      expect(s.mode).toBe('free');
+    }
+    expect(s.hearts).toBe(1);
+    expect(s.choices.map((c) => ({ slot: c.slot, phase: c.phase, value: c.value }))).toEqual(keep);
+    expect(s.choices.filter((c) => c.crack === null).length).toBe(1);
+    expect(s.choices.find((c) => c.crack === null)!.correct).toBe(true);
+    // nhảy lên đúng chỗ bậc đã biến mất: không đáp được (không thêm lỗi, không mất tim), rơi về như nhảy hụt
+    s.slideClock = 0;
+    const gone = s.choices.findIndex((c) => c.crack === 0);
+    const ev = kinds(jumpOnto(s, gone));
+    expect(ev).not.toContain('wrong');
+    expect(ev).not.toContain('up');
+    expect(s.hearts).toBe(1);
+    expect(s.mistakes).toBe(2);
+    // bậc còn lại là bậc đúng: nhảy lên thì lên tầng
+    s.slideClock = 0;
+    const left = s.choices.findIndex((c) => c.crack === null);
+    s.player.grounded = true;
+    s.lockUntil = 0;
+    expect(kinds(jumpOnto(s, left))).toContain('up');
+    expect(s.level).toBe(1);
+    // tầng mới: các bậc tạo lại đủ, không bậc nào biến mất
+    expect(s.choices.length).toBe(3);
+    expect(s.choices.every((c) => c.crack === null)).toBe(true);
+  });
+
+  it('vòng 2 (hai bậc, trượt): sai một lần thì còn bậc đúng đứng nguyên chỗ gốc, vẫn trượt như cũ', () => {
+    const s = createClimbGame(7);
+    while (s.phase === 'playing') {
+      s.slideClock = 0;
+      jumpOnto(s, s.choices.findIndex((c) => c.correct));
+    }
+    advanceRound(s);
+    expect(s.round).toBe(1);
+    s.slideClock = 0;
+    const survivor = s.choices.findIndex((c) => c.correct);
+    const before = { slot: s.choices[survivor].slot, phase: s.choices[survivor].phase };
+    const wi = s.choices.findIndex((c) => !c.correct);
+    jumpOnto(s, wi);
+    expect(s.choices[wi].crack).toBe(0);
+    expect({ slot: s.choices[survivor].slot, phase: s.choices[survivor].phase }).toEqual(before);
+    // vẫn trượt: độ lệch đổi theo đồng hồ
+    const x0 = choiceX(s, s.choices[survivor]);
+    s.slideClock += 0.5;
+    expect(choiceX(s, s.choices[survivor])).not.toBeCloseTo(x0, 3);
   });
 });

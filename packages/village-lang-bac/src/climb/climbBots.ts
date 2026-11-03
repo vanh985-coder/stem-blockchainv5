@@ -69,7 +69,7 @@ export function simulateClimb(seed: number, profile: ClimbBotProfile, trace?: st
       if (s.time >= waitUntil && s.time >= s.lockUntil) {
         if (!plan || planLevel !== s.level) {
           const correct = s.choices.findIndex((c) => c.correct);
-          const wrongs = s.choices.map((_, i) => i).filter((i) => i !== correct);
+          const wrongs = s.choices.map((_, i) => i).filter((i) => i !== correct && s.choices[i].crack === null);
           const pickWrong = rnd() < profile.misorder && wrongs.length > 0;
           plan = { target: pickWrong ? wrongs[Math.floor(rnd() * wrongs.length)] : correct, hole: rnd() < profile.miss };
           planLevel = s.level;
