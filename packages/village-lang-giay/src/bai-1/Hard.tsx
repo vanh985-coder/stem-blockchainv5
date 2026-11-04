@@ -30,6 +30,7 @@ import {
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { demoProbe } from '@so-chung/core/demo/probe';
 import { PACING } from '@so-chung/core/demo/pacing';
+import { timeScale } from '@so-chung/core/demo/timeScale';
 
 const T = bai1Texts;
 const C = GAME_CONFIG.lesson1;
@@ -82,7 +83,8 @@ function CountdownTimer({
     lastTickRef.current = performance.now();
     const interval = setInterval(() => {
       const now = performance.now();
-      const delta = lastTickRef.current ? now - lastTickRef.current : 0;
+      // Demo (video hướng dẫn): đồng hồ chạy theo hệ số thời gian chung (ngoài demo là 1)
+      const delta = (lastTickRef.current ? now - lastTickRef.current : 0) * timeScale();
       lastTickRef.current = now;
 
       remainingMsRef.current = Math.max(0, remainingMsRef.current - delta);
@@ -253,7 +255,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
   // Mạng thêm trang bằng chuỗi setTimeout (không dùng setInterval), dọn sạch khi rời màn hoặc khi mở hướng dẫn.
   const scheduleNextSpawn = useCallback(() => {
     if (timeUpRef.current || tutorialOpen) return;
-    const delay = PACING ? PACING.lesson1.hardSpawnMs : spawnDelayMs(spawnIndex.current, isFast.current);
+    const delay = (PACING ? PACING.lesson1.hardSpawnMs : spawnDelayMs(spawnIndex.current, isFast.current)) / timeScale();
     spawnIndex.current += 1;
     spawnTimeout.current = setTimeout(() => {
       if (timeUpRef.current || tutorialOpen) return;

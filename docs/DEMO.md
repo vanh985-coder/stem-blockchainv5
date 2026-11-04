@@ -41,6 +41,25 @@ http://localhost:5873/?demo=1&man=5
 
 Kiểm: `MAN=1,2,5,10 node scripts/demo-check.mjs` (trình duyệt sạch, kiểm không kẹt, không lỗi console, mỗi màn đạt Vàng hoặc 3 sao, in thời lượng từng màn và tổng).
 
+## Chế độ video hướng dẫn (`?kieu=huongdan`)
+
+Chế độ THÊM, dùng cùng `?man=` (nhiều màn hoặc một màn); `?man=` thường (nhịp 30 đến 40 giây) và `&day=1` giữ nguyên. Luật game thật không đổi.
+
+```
+http://localhost:5873/?demo=1&man=1,2,5,10&kieu=huongdan
+```
+
+Mỗi màn là một video riêng 55 đến 65 giây; giữa hai màn vẫn là màn đen 2 giây ghi tên màn để cắt thành 4 video:
+
+1. **Hướng dẫn**: bot làm hướng dẫn làm thử P8 có sẵn từng bước (`scenes/tutorial.ts`): con trỏ giả chỉ vào vùng sáng (`data-demo="tut-focus"`), dừng 2,5 đến 4 giây theo độ dài chữ, làm thao tác của bước (gõ mã mẫu, Nhảy thử, Đập thử...) rồi bấm nút tiếp. Bài học (Màn 1, 10) chỉ làm thử đủ ở trạm Dễ; hai trạm sau bỏ qua nhanh.
+2. **Chơi thường** tới khoảng 30% ván: bài học hết trạm Dễ; Màn 2 tới 30% vòng đầu; Màn 5 tới 30% đồng hồ ván.
+3. **Tua nhanh ×2,5** (góc trên phải hiện "⏩ ×2,5", ẩn khi hết tua): hệ số thời gian chung `packages/core/src/demo/timeScale.ts`. Mỗi game nhân `dt` với `timeScale()` (ngoài demo luôn là 1): `RunnerWorld.tsx` (Màn 2), `WhackGame.tsx` (Màn 5), `Hard.tsx` (đồng hồ và nhịp sinh trang của Màn 1 trạm Khó); nhịp bot (`DemoController.sleep`) cũng chia cho hệ số này. Câu hỏi và lượt đáp án KHÔNG tua (game gọi `setDemoQuestion`).
+4. **Kết quả** tốc độ thường, giữ 4 giây.
+
+Màn 1 trạm Khó: bot vẫn bị bỏ lại 10 đến 20 trang, phần đua 9 giây (đồng hồ game, trước tua; xấp xỉ 3,6 giây thật sau tua). Nhịp riêng của chế độ này là `HD_PACING` ở `pacing.ts` (ván Màn 2 dài 28 giây).
+
+Kiểm: `MAN=1,2,5,10 KIEU=huongdan node scripts/demo-check.mjs`. In bảng mỗi màn: hướng dẫn / chơi thường / tua / kết quả / tổng (giây), kiểm tổng 55 đến 65 giây, biểu tượng tua hiện rồi ẩn, không kẹt, không lỗi console. Mốc thời gian ghi ở `hdStats.ts` (`window.__demoStats.hd`).
+
 ## Cấu trúc mã (`packages/core/src/demo/`)
 
 - `config.ts` (cờ bật, nhịp, cảnh bắt đầu), `reset.ts` (xóa tiến độ), `pointerLock.ts` (khóa chuột giả để đi lại được khi không có cú bấm thật), `DemoRunner.tsx` (đếm ngược, phím P/N/Esc, chạy đạo diễn).

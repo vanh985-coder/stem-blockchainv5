@@ -6,10 +6,12 @@ import { clickEl, dragEl, q, typeInto, type Ctx } from '../actions';
 import { getProbe } from '../probe';
 import { buttonByText, dwell, playVnDialogs } from '../ui';
 import { demoWorld, engageWorld, walkAndInteract, waitWorldReady } from '../world';
-import { DEMO_MEN } from '../config';
+import { DEMO_HD, DEMO_MEN } from '../config';
+import { startFastForward, stopFastForward } from '../hdStats';
 import { pace, PACING } from '../pacing';
 import { finishMiniGame, nextFrame, onPath, startMiniGame } from './common';
 import { answerReflection, driveLesson, lessonStage, skipTutorial } from './lesson';
+import { man1Acts, man2Acts, walkTutorial } from './tutorial';
 
 interface Man1Probe {
   station: 'de' | 'tb' | 'kho';
@@ -57,7 +59,11 @@ async function playMan1Station(ctx: Ctx, idx: number): Promise<void> {
   const { ctl } = ctx;
   const name = (['de', 'tb', 'kho'] as const)[idx];
   await ctl.waitFor(() => man1Probe()?.station === name, `man 1 probe ${name}`, 15000);
-  if (man1Probe()?.tutorialOpen) await skipTutorial(ctx);
+  if (man1Probe()?.tutorialOpen) {
+    // video hướng dẫn: làm thử trọn bộ ở trạm Dễ; hai trạm sau bỏ qua nhanh
+    if (DEMO_HD && idx === 0) await walkTutorial(ctx, man1Acts);
+    else await skipTutorial(ctx);
+  }
   await ctl.sleep(pace(1200));
   if (idx === 0) {
     // trạm Dễ: 5 trang, mỗi trang một đáp án
@@ -120,11 +126,11 @@ export async function giayMan1(ctx: Ctx): Promise<void> {
   await enterLevelFromVillage(ctx, 'lang-giay', 1);
   await ctx.ctl.waitFor(() => lessonStage(), 'lesson page', 30000);
   await driveLesson(ctx, { playStation: playMan1Station });
-  await ctx.ctl.sleep(PACING ? 3000 : 2500);
+  await ctx.ctl.sleep(DEMO_HD ? 4000 : PACING ? 3000 : 2500);
 }
 
 interface RunnerSessionLike {
-  state: { phase: string };
+  state: { phase: string; roundTime: number; roundSec: number };
   score?: number;
   over: boolean;
   queue: { length: number };
@@ -209,9 +215,13 @@ export async function giayMan2(ctx: Ctx): Promise<void> {
   const probe = await ctl.waitFor(() => man2Probe(), 'runner probe', 60000);
   // hướng dẫn làm thử (nếu có): xem nhanh rồi Bỏ qua
   if (probe.tutorialActive) {
-    const tut = await ctl.waitFor(() => buttonByText(tutorialTexts.chung.boQua), 'runner tutorial', 60000);
-    await ctl.sleep(pace(2500));
-    await clickEl(ctx, tut, { settle: 800 });
+    if (DEMO_HD) {
+      await walkTutorial(ctx, man2Acts);
+    } else {
+      const tut = await ctl.waitFor(() => buttonByText(tutorialTexts.chung.boQua), 'runner tutorial', 60000);
+      await ctl.sleep(pace(2500));
+      await clickEl(ctx, tut, { settle: 800 });
+    }
   }
   const brain = await probe.makeBrain();
   installRunnerAutopilot(ctx, probe.session, brain);
@@ -219,8 +229,11 @@ export async function giayMan2(ctx: Ctx): Promise<void> {
   while (!q('[data-testid="diem"]')) {
     await nextFrame(ctx);
     const s = man2Probe()?.session.state;
+    // video hướng dẫn: chơi thường tới 30% vòng đầu rồi tua nhanh (câu hỏi giữ tốc độ thường)
+    if (DEMO_HD && s?.phase === 'run' && s.roundTime >= 0.3 * s.roundSec) startFastForward();
     if (s?.phase === 'quiz') await answerRunnerQuiz(ctx);
   }
+  stopFastForward();
   console.info(`[demo] man-2 end ${JSON.stringify({ ...probe.session.state, rows: undefined, items: undefined, score: probe.session.score })}`.slice(0, 600));
   await finishMiniGame(ctx, DEMO_MEN ? null : '/lang/lang-giay/man/3');
 }

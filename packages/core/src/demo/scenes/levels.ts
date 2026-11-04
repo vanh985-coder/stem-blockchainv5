@@ -2,7 +2,9 @@
 import { fmt } from '../../content/characters';
 import { demoUi } from '../../content/demo';
 import { levelById } from '../../content/levels';
+import { DEMO_HD } from '../config';
 import type { DemoContext } from '../context';
+import { hdBegin, hdEnd } from '../hdStats';
 import type { SceneDef } from '../director';
 import { hideTransition, showTransition } from '../transition';
 import { man10 } from './bac';
@@ -39,6 +41,20 @@ export function buildListScenes(levels: readonly number[]): SceneDef<DemoContext
             await ctx.ctl.sleep(TRANSITION_MS - 300);
           } finally {
             hideTransition();
+          }
+        },
+      };
+    }
+    // video hướng dẫn: ghi mốc thời gian từng màn (bảng thời lượng của script kiểm)
+    if (DEMO_HD) {
+      return {
+        ...m,
+        run: async (ctx: DemoContext) => {
+          hdBegin(n);
+          try {
+            await PLAY[n](ctx);
+          } finally {
+            hdEnd();
           }
         },
       };

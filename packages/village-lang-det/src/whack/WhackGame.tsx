@@ -20,6 +20,7 @@ import {
 import { PROBE } from '@so-chung/core/lib/dev';
 import { demoProbe } from '@so-chung/core/demo/probe';
 import { PACING } from '@so-chung/core/demo/pacing';
+import { setDemoQuestion, timeScale } from '@so-chung/core/demo/timeScale';
 import { WHACK_SPEC, type MouseKind } from './whackConfig';
 import { hintFor } from './whackHint';
 import { answerBoss, bossInZone, bossPoints, collectCoin, createWhackGame, hitLane, inZone, readDone, tickWhack, type WhackEvent, type WhackState } from './whackLogic';
@@ -312,7 +313,9 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
 
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
-      const dt = Math.min(0.1, (now - lastTickTime.current) / 1000);
+      // Demo (video hướng dẫn): tua nhanh nhân dt với hệ số chung (ngoài demo là 1); lượt đáp án và kết quả câu hỏi không tua
+      setDemoQuestion(state.phase === 'answer' || state.phase === 'quiz');
+      const dt = Math.min(0.1, (now - lastTickTime.current) / 1000) * timeScale();
       lastTickTime.current = now;
 
       // Đứng yên hoàn toàn khi paused từ ngoài (MiniGameLevel), khi hộp kết quả mở hay khi hết ván

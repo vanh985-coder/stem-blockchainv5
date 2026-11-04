@@ -10,6 +10,8 @@ export class StopDemo extends Error {
   }
 }
 
+import { timeScale } from './timeScale';
+
 const SLICE_MS = 40;
 
 export class DemoController {
@@ -51,12 +53,13 @@ export class DemoController {
 
   /** Chờ `ms` (đã chia cho nhịp); thời gian tạm dừng không tính. */
   async sleep(ms: number): Promise<void> {
+    // đang tua (video hướng dẫn): nhịp bot nhanh bằng hệ số thời gian của game; hệ số đọc lại mỗi lát để đổi giữa chừng
     let left = ms / this.speed;
     while (left > 0) {
       await this.checkpoint();
       const step = Math.min(SLICE_MS, left);
       await new Promise((r) => setTimeout(r, step));
-      left -= step;
+      left -= step * timeScale();
     }
     await this.checkpoint();
   }

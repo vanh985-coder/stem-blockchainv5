@@ -3,9 +3,11 @@ import { bai4Texts } from '../../content/lessons/bai-4';
 import { clickEl, dragEl, q, typeInto, type Ctx } from '../actions';
 import { getProbe } from '../probe';
 import { buttonByText, dwell, playVnDialogs, vnNext } from '../ui';
+import { DEMO_HD } from '../config';
 import { pace, PACING } from '../pacing';
 import { onPath } from './common';
 import { driveLesson, lessonStage, skipTutorial } from './lesson';
+import { man10Acts, walkTutorial } from './tutorial';
 
 const TB = bai4Texts.tramTb;
 
@@ -123,7 +125,11 @@ async function playHard(ctx: Ctx): Promise<void> {
 async function playMan10Station(ctx: Ctx, idx: number): Promise<void> {
   const name = (['de', 'tb', 'kho'] as const)[idx];
   await ctx.ctl.waitFor(() => probe()?.station === name, `man 10 probe ${name}`, 20000);
-  if (probe()?.tutorialActive) await skipTutorial(ctx);
+  if (probe()?.tutorialActive) {
+    // video hướng dẫn: làm thử trọn bộ ở trạm Dễ; hai trạm sau bỏ qua nhanh
+    if (DEMO_HD && idx === 0) await walkTutorial(ctx, man10Acts);
+    else await skipTutorial(ctx);
+  }
   await ctx.ctl.sleep(pace(1200));
   if (idx === 0) await playEasy(ctx);
   else if (idx === 1) await playMedium(ctx);
@@ -134,5 +140,5 @@ export async function man10(ctx: Ctx): Promise<void> {
   if (!onPath('/lang/lang-bac/man/10')) throw new Error('not on the level 10 route');
   await ctx.ctl.waitFor(() => lessonStage(), 'lesson page', 30000);
   await driveLesson(ctx, { playStation: playMan10Station });
-  await ctx.ctl.sleep(PACING ? 3000 : 2500);
+  await ctx.ctl.sleep(DEMO_HD ? 4000 : PACING ? 3000 : 2500);
 }

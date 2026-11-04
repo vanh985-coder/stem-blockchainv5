@@ -2,7 +2,7 @@
  * Lớp "ghi đè demo" riêng cho nhịp video (`?man=...` mà không có `?day=1`): mỗi màn dài 30 đến 40 giây. Cấu hình và luật game thật KHÔNG đổi: mọi chỗ dùng đi qua `PACING`
  * (null ở bản không demo, hoặc `?day=1`) và `withOverrides` trả lại đúng đối tượng gốc khi không có ghi đè.
  */
-import { DEMO_ACTIVE, DEMO_DAY, DEMO_MEN } from './config';
+import { DEMO_ACTIVE, DEMO_DAY, DEMO_HD, DEMO_MEN } from './config';
 
 export interface VideoPacing {
   /** Nhịp gõ mỗi ký tự (mili giây) */
@@ -69,13 +69,29 @@ export const VIDEO_PACING: VideoPacing = {
   man10: { easyQuestions: 1, hardPlace: 1 },
 };
 
+/**
+ * Nhịp "video hướng dẫn" (`?kieu=huongdan`): ván vẫn ngắn như nhịp video nhưng bot chậm rãi hơn (gõ, đọc, hộp thoại) để người xem theo kịp; phần tua nhanh do `timeScale` lo.
+ * Trạm Khó của Màn 1 đua 9 giây trong đồng hồ game (trước tua).
+ */
+export const HD_PACING: VideoPacing = {
+  ...VIDEO_PACING,
+  typeMs: [110, 150],
+  readMs: [1800, 3200],
+  dialogMs: 1200,
+  sleepScale: 0.3,
+  cursorBoost: 3,
+  shortWaitMs: 600,
+  runner: { rounds: 1, roundSec: 28 },
+  lesson1: { ...VIDEO_PACING.lesson1, hardDurationMs: 9000, hardSpawnMs: 800, gapHoldMs: 1500 },
+};
+
 /** Hàm thuần: nhịp video khi `on`, ngược lại null. */
 export function videoPacing(on: boolean): VideoPacing | null {
   return on ? VIDEO_PACING : null;
 }
 
 /** Nhịp video đang dùng: chỉ khi chạy demo ở chế độ danh sách màn và không có `?day=1`. */
-export const PACING: VideoPacing | null = videoPacing(DEMO_ACTIVE && DEMO_MEN !== null && !DEMO_DAY);
+export const PACING: VideoPacing | null = DEMO_HD ? HD_PACING : videoPacing(DEMO_ACTIVE && DEMO_MEN !== null && !DEMO_DAY);
 
 /** Chờ trang trí: nhịp video thì rút ngắn, ngoài ra giữ nguyên. */
 export const pace = (ms: number): number => (PACING ? Math.round(ms * PACING.sleepScale) : ms);

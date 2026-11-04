@@ -2,14 +2,18 @@
 import { whackUi } from '../../content/games';
 import { tutorialTexts } from '../../content/tutorial';
 import { clickEl, fire, q, type Ctx } from '../actions';
+import { DEMO_HD } from '../config';
+import { startFastForward, stopFastForward } from '../hdStats';
 import { chaseCursor, tapEffect } from '../cursor';
 import { getProbe } from '../probe';
-import { pace } from '../pacing';
+import { pace, PACING } from '../pacing';
 import { buttonByText, dwell } from '../ui';
 import { finishMiniGame, nextFrame, onPath, startMiniGame } from './common';
+import { man5Acts, walkTutorial } from './tutorial';
 
 interface WhackStateLike {
   phase: string;
+  clock: number;
 }
 interface WhackIo {
   hit: (lane: number) => void;
@@ -53,9 +57,13 @@ export async function man5(ctx: Ctx): Promise<void> {
   await startMiniGame(ctx);
   const probe = await ctl.waitFor(() => man5Probe(), 'whack probe', 60000);
   if (probe.tutorialActive) {
-    const tut = await ctl.waitFor(() => buttonByText(tutorialTexts.chung.boQua), 'whack tutorial', 60000);
-    await ctl.sleep(pace(2500));
-    await clickEl(ctx, tut, { settle: 800 });
+    if (DEMO_HD) {
+      await walkTutorial(ctx, man5Acts);
+    } else {
+      const tut = await ctl.waitFor(() => buttonByText(tutorialTexts.chung.boQua), 'whack tutorial', 60000);
+      await ctl.sleep(pace(2500));
+      await clickEl(ctx, tut, { settle: 800 });
+    }
   }
   const brain = await probe.makeBrain();
   let now = 0;
@@ -81,6 +89,8 @@ export async function man5(ctx: Ctx): Promise<void> {
   probe.setAutopilot({
     step: (s, dt) => {
       now += dt;
+      // video hướng dẫn: chơi thường tới 30% thời gian ván (đồng hồ ván tới lượt trùm) rồi tua nhanh; lượt đáp án giữ tốc độ thường
+      if (DEMO_HD && PACING && s.clock >= 0.3 * PACING.whack.bossEvery) startFastForward();
       // lượt đáp án: con trỏ nằm ở cột câu hỏi bên phải trong lúc "đọc"
       if (s.phase === 'answer' && now - lastAct > 0.8) {
         const col = q('[data-testid="cot-cau-hoi"]');
@@ -107,6 +117,7 @@ export async function man5(ctx: Ctx): Promise<void> {
     if (end) {
       await ctl.sleep(pace(1800));
       await clickEl(ctx, end, { settle: 600 });
+      stopFastForward();
     }
   }
   probe.setAutopilot(null);

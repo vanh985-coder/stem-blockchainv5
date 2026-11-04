@@ -1,5 +1,6 @@
 /** Việc chung của các cảnh màn chơi. */
 import { q, clickEl, type Ctx } from '../actions';
+import { DEMO_HD } from '../config';
 import { pace, PACING } from '../pacing';
 import { dwell } from '../ui';
 
@@ -17,7 +18,7 @@ export async function startMiniGame(ctx: Ctx): Promise<void> {
 /** Màn kết quả của game phụ: xem điểm một lúc rồi sang màn kế (nút "Chơi tiếp") nếu có. */
 export async function finishMiniGame(ctx: Ctx, expectPath: string | null): Promise<void> {
   await ctx.ctl.waitFor(() => q('[data-testid="diem"]'), 'result screen', 60000);
-  await ctx.ctl.sleep(PACING ? 3000 : 4000);
+  await ctx.ctl.sleep(PACING && !DEMO_HD ? 3000 : 4000);
   if (expectPath) {
     const next = await ctx.ctl.waitFor(() => q<HTMLButtonElement>('[data-testid="choi-tiep"]'), 'next level button', 5000);
     await clickEl(ctx, next, { settle: 600 });

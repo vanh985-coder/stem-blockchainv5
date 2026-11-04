@@ -39,6 +39,9 @@ export const DEMO_MEN: number[] | null = DEMO_ACTIVE ? parseManList(readQuery()?
 /** `?day=1`: chế độ danh sách màn chạy bản đầy đủ (nhịp như trước), không dùng nhịp video rút gọn. */
 export const DEMO_DAY: boolean = DEMO_ACTIVE && readQuery()?.get('day') === '1';
 
+/** `?kieu=huongdan` (cùng `?man=`): chế độ "video hướng dẫn": làm thử P8 từng bước, chơi thường tới ~30% ván rồi tua nhanh ×2,5. Chỉ là chế độ thêm; không đổi luật game thật. */
+export const DEMO_HD: boolean = DEMO_ACTIVE && DEMO_MEN !== null && readQuery()?.get('kieu') === 'huongdan';
+
 export const DEMO_SPEED: number = parseSpeed(readQuery()?.get('tocdo'));
 
 /** Đưa vài đối tượng ra `window` cho demo và script kiểm (chỉ khi build demo). */

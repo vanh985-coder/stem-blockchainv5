@@ -22,7 +22,10 @@ const CANH = process.env.CANH || ''; // bắt đầu từ cảnh này (đặt s�
 const MAN = (process.env.MAN || '').split(',').map(Number).filter(Boolean); // chế độ danh sách màn: MAN=1,2,5,10
 const EXPECTED = MAN.length ? MAN.flatMap((n) => [`chuyen-${n}`, `man-${n}`]) : ['gioi-thieu', 'cho-den-lang-giay', 'giay-the', 'giay-man-1', 'giay-man-2', 'giay-man-3', 'giay-trao-trang'];
 const DAY = process.env.DAY === '1'; // ?day=1: chế độ danh sách chạy bản đầy đủ như trước (không nhịp video)
-const VIDEO = MAN.length > 0 && !DAY; // nhịp video: mỗi màn 30–40 giây (tính cả màn chuyển 2 giây và 3 giây xem kết quả)
+const HD = MAN.length > 0 && process.env.KIEU === 'huongdan'; // ?kieu=huongdan: video hướng dẫn (làm thử, 30% thường, tua ×2,5, kết quả)
+const HD_MIN_S = Number(process.env.HD_MIN_S || 55);
+const HD_MAX_S = Number(process.env.HD_MAX_S || 65);
+const VIDEO = MAN.length > 0 && !DAY && !HD; // nhịp video: mỗi màn 30–40 giây (tính cả màn chuyển 2 giây và 3 giây xem kết quả)
 const LEVEL_MIN_S = Number(process.env.LEVEL_MIN_S || 30);
 const LEVEL_MAX_S = Number(process.env.LEVEL_MAX_S || 40);
 const TOTAL_MS = Number(process.env.TOTAL_MS || 25 * 60 * 1000);
@@ -74,15 +77,17 @@ await page.evaluateOnNewDocument((canh) => {
 
 console.log(`\n--- Demo đợt 1, nhịp ${TOCDO} ---`);
 const t0 = Date.now();
-await page.goto(`${BASE}${CANH ? '/cho?tu=lang-giay&' : '/?'}demo=1&tocdo=${TOCDO}${CANH ? `&canh=${CANH}` : ''}${MAN.length ? `&man=${MAN.join(',')}` : ''}${DAY ? '&day=1' : ''}`, { waitUntil: 'domcontentloaded' });
+await page.goto(`${BASE}${CANH ? '/cho?tu=lang-giay&' : '/?'}demo=1&tocdo=${TOCDO}${CANH ? `&canh=${CANH}` : ''}${MAN.length ? `&man=${MAN.join(',')}` : ''}${DAY ? '&day=1' : ''}${HD ? '&kieu=huongdan' : ''}`, { waitUntil: 'domcontentloaded' });
 
 const shots = new Set();
 let lastCount = 0;
+let ffSeen = false; // biểu tượng tua hiện ra ít nhất một lần
 const SHOT_AT = MAN.length ? Object.fromEntries(MAN.map((n) => [`man-${n}`, `list-man-${n}-xong`])) : { 'gioi-thieu': 'cho-vua-vao', 'cho-den-lang-giay': 'trong-lang', 'giay-the': 'sau-the', 'giay-man-1': 'sau-man-1', 'giay-man-2': 'sau-man-2', 'giay-man-3': 'sau-man-3' };
 for (;;) {
   await sleep(1000);
-  const st = await page.evaluate(() => ({ log: window.__demoLog ?? [], done: window.__demoDone === true, path: location.pathname })).catch(() => null);
+  const st = await page.evaluate(() => ({ log: window.__demoLog ?? [], done: window.__demoDone === true, path: location.pathname, ff: !!document.querySelector('[data-demo-ff]') })).catch(() => null);
   if (!st) continue; // trang đang tải lại
+  if (st.ff) ffSeen = true;
   if (st.log.length > lastCount) {
     const l = st.log[st.log.length - 1];
     const tag = SHOT_AT[l.id];
@@ -137,7 +142,30 @@ const prog = await page.evaluate(() => {
   };
 });
 console.log(`   tiến độ: ${JSON.stringify(prog)}`);
-if (VIDEO) {
+if (HD) {
+  const stats = await page.evaluate(() => window.__demoStats ?? {});
+  const rows = stats.hd ?? [];
+  console.log('\n--- Video hướng dẫn: thời lượng từng màn (giây, thời gian thật; chưa tính màn chuyển 2 giây) ---');
+  console.log('   Màn | hướng dẫn | chơi thường | tua | kết quả | tổng');
+  for (const r of rows) console.log(`   ${String(r.level).padStart(3)} | ${r.guide.toFixed(1).padStart(9)} | ${r.normal.toFixed(1).padStart(11)} | ${r.ff.toFixed(1).padStart(3)} | ${r.result.toFixed(1).padStart(7)} | ${r.total.toFixed(1).padStart(5)}`);
+  const sum = rows.reduce((a, r) => a + r.total, 0);
+  console.log(`   Tổng 4 màn: ${sum.toFixed(1)} s`);
+  check('có bảng cho mọi màn trong danh sách', rows.length === MAN.length, `${rows.length}/${MAN.length}`);
+  for (const r of rows) {
+    check(`Màn ${r.level} dài ${HD_MIN_S}–${HD_MAX_S} giây`, r.total >= HD_MIN_S && r.total <= HD_MAX_S, `${r.total} s`);
+    check(`Màn ${r.level}: kết quả giữ 4 giây tốc độ thường`, r.result >= 3.5 && r.result <= 5.5, `${r.result} s`);
+  }
+  check('biểu tượng ⏩ ×2,5 đã hiện khi tua', ffSeen);
+  const ffLeft = await page.evaluate(() => !!document.querySelector('[data-demo-ff]'));
+  check('biểu tượng tua đã ẩn khi hết', !ffLeft);
+  console.log(`   thống kê demo: ${JSON.stringify(stats)}`);
+  if (MAN.includes(1)) {
+    const gap = stats.man1Hard?.gap;
+    check('Màn 1 trạm Khó: làng hơn bot 10–20 trang lúc hết giờ', typeof gap === 'number' && gap >= 10 && gap <= 20, `${gap} trang`);
+  }
+  const doneAll = await page.evaluate((men) => men.map((id) => window.__progress?.unlock?.levels?.find((u) => u.id === id)?.state === 'done'), MAN);
+  check('mọi màn trong danh sách ghi nhận xong', doneAll.every(Boolean), JSON.stringify(doneAll));
+} else if (VIDEO) {
   // nhịp video: ván ngắn nên không cần Vàng, chỉ cần màn chạy xong và không thua
   for (const n of MAN) check(`Màn ${n} dài ${LEVEL_MIN_S}–${LEVEL_MAX_S} giây`, levelSecs[n] >= LEVEL_MIN_S && levelSecs[n] <= LEVEL_MAX_S, `${levelSecs[n]?.toFixed(1)} s`);
   const stats = await page.evaluate(() => window.__demoStats ?? {});
