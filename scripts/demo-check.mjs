@@ -152,10 +152,26 @@ if (HD) {
   console.log(`   Tổng 4 màn: ${sum.toFixed(1)} s`);
   check('có bảng cho mọi màn trong danh sách', rows.length === MAN.length, `${rows.length}/${MAN.length}`);
   for (const r of rows) {
-    check(`Màn ${r.level} dài ${HD_MIN_S}–${HD_MAX_S} giây`, r.total >= HD_MIN_S && r.total <= HD_MAX_S, `${r.total} s`);
+    const lesson = r.level === 1 || r.level === 10; // bài học: không tua, 90–120 giây
+    const lo = lesson ? 90 : HD_MIN_S;
+    const hi = lesson ? 120 : HD_MAX_S;
+    check(`Màn ${r.level} dài ${lo}–${hi} giây`, r.total >= lo && r.total <= hi, `${r.total} s`);
+    if (lesson) {
+      check(`Màn ${r.level}: không tua (⏩)`, r.ff === 0, `${r.ff} s`);
+      for (const [k, v] of Object.entries(r.stations ?? {})) console.log(`      trạm ${k.padEnd(4)} ${String(v.sec).padStart(6)} s  ${v.turns} lượt`);
+      const t = (k) => r.stations?.[k]?.turns ?? 0;
+      if (r.level === 1) check('Màn 1: Dễ 3 lượt, Trung bình 3 lượt, Khó sửa ≥ 3 trang', t('de') >= 3 && t('tb') >= 3 && t('kho') >= 3, `${t('de')}/${t('tb')}/${t('kho')}`);
+      if (r.level === 10) check('Màn 10: Dễ 2–3 cặp, Trung bình dựng 3 nút + soi, Khó kéo đủ ô', t('de') >= 2 && t('tb') >= 3 && t('kho') >= 2, `${t('de')}/${t('tb')}/${t('kho')}`);
+    }
     check(`Màn ${r.level}: kết quả giữ 4 giây tốc độ thường`, r.result >= 3.5 && r.result <= 5.5, `${r.result} s`);
   }
-  check('biểu tượng ⏩ ×2,5 đã hiện khi tua', ffSeen);
+  if (MAN.some((n) => n === 2 || n === 5)) check('biểu tượng ⏩ ×2,5 đã hiện khi tua', ffSeen);
+  else check('không hiện ⏩ (không màn nào tua)', !ffSeen);
+  for (const n of MAN.filter((x) => x === 1 || x === 10)) {
+    const st = Object.values(prog.stars[n] ?? {});
+    const s = prog.stars[n] ?? {};
+    check(`Màn ${n}: trạm Dễ và Trung bình đạt 3 sao`, s.de === 3 && s.tb === 3, JSON.stringify(s));
+  }
   const ffLeft = await page.evaluate(() => !!document.querySelector('[data-demo-ff]'));
   check('biểu tượng tua đã ẩn khi hết', !ffLeft);
   console.log(`   thống kê demo: ${JSON.stringify(stats)}`);

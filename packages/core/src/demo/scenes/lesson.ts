@@ -2,8 +2,7 @@
 import { tutorialTexts } from '../../content/tutorial';
 import { ui } from '../../content/ui';
 import { clickEl, q, type Ctx } from '../actions';
-import { DEMO_HD } from '../config';
-import { startFastForward, stopFastForward } from '../hdStats';
+import { stopFastForward } from '../hdStats';
 import { pace, PACING } from '../pacing';
 import { buttonByText, dwell, playVnDialogs } from '../ui';
 
@@ -50,8 +49,6 @@ export async function driveLesson(ctx: Ctx, drive: LessonDrive): Promise<void> {
       const idx = [...document.querySelectorAll('.lesson-screen ol li')].findIndex((li) => li.querySelector('[aria-current="step"]'));
       station = idx >= 0 ? idx : station;
       await drive.playStation(ctx, station);
-      // video hướng dẫn: hết trạm Dễ (khoảng 30% bài) thì tua nhanh
-      if (DEMO_HD && station === 0) startFastForward();
     } else if (stage === 'stationDone') {
       if (!PACING) await dwell(ctx, q('.lesson-screen h2')?.textContent ?? '');
       await ctl.sleep(pace(1500));

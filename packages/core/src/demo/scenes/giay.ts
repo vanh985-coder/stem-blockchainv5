@@ -7,10 +7,11 @@ import { getProbe } from '../probe';
 import { buttonByText, dwell, playVnDialogs } from '../ui';
 import { demoWorld, engageWorld, walkAndInteract, waitWorldReady } from '../world';
 import { DEMO_HD, DEMO_MEN } from '../config';
-import { startFastForward, stopFastForward } from '../hdStats';
+import { hdStationEnd, hdStationStart, hdTurn, startFastForward, stopFastForward } from '../hdStats';
 import { pace, PACING } from '../pacing';
 import { finishMiniGame, nextFrame, onPath, startMiniGame } from './common';
 import { answerReflection, driveLesson, lessonStage, skipTutorial } from './lesson';
+import { afterCheck, hdLesson, pointAt } from './hdLesson';
 import { man1Acts, man2Acts, walkTutorial } from './tutorial';
 
 interface Man1Probe {
@@ -39,11 +40,17 @@ async function enterLevelFromVillage(ctx: Ctx, village: 'lang-giay', level: numb
 }
 
 /** Nhập đáp án đúng của trang đang làm rồi bấm Kiểm tra (hoặc Enter ở trạm Khó cho kịp giờ). Trả false nếu chưa có đề. */
-async function answerPage(ctx: Ctx, fast: boolean, range?: readonly [number, number]): Promise<boolean> {
+async function answerPage(ctx: Ctx, fast: boolean, range?: readonly [number, number], slow = false): Promise<boolean> {
   const p = man1Probe();
   if (!p || p.expected === null) return false;
   const input = q<HTMLInputElement>('[data-tutorial="code-input"] input');
   if (!input) return false;
+  // video hướng dẫn (trạm Dễ, Trung bình): chỉ vào công thức, gõ chậm, dừng đọc phản hồi
+  const hd = slow ? hdLesson() : null;
+  if (hd) {
+    await pointAt(ctx, [q('[data-tutorial="formula-box"]')]);
+    range = hd.typeMs;
+  }
   await typeInto(ctx, input, String(p.expected), { noClick: fast, range });
   if (fast) {
     input.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, code: 'Enter', key: 'Enter' }));
@@ -52,6 +59,8 @@ async function answerPage(ctx: Ctx, fast: boolean, range?: readonly [number, num
     const check = q<HTMLButtonElement>('[data-tutorial="check-button"] button');
     if (check) await clickEl(ctx, check, { settle: 900 });
   }
+  if (hd) await afterCheck(ctx);
+  hdTurn();
   return true;
 }
 
@@ -68,7 +77,7 @@ async function playMan1Station(ctx: Ctx, idx: number): Promise<void> {
   if (idx === 0) {
     // trạm Dễ: 5 trang, mỗi trang một đáp án
     while (lessonStage() === 'play') {
-      if (!(await answerPage(ctx, false))) await ctl.sleep(250);
+      if (!(await answerPage(ctx, false, undefined, true))) await ctl.sleep(250);
     }
     return;
   }
@@ -76,7 +85,7 @@ async function playMan1Station(ctx: Ctx, idx: number): Promise<void> {
     // trạm Trung bình: chờ kẻ gian sửa trộm rồi sửa dây chuyền các trang lệch
     await ctl.sleep(pace(1500));
     while (!man1Probe()?.reflection) {
-      if (!(await answerPage(ctx, false))) await ctl.sleep(300);
+      if (!(await answerPage(ctx, false, undefined, true))) await ctl.sleep(300);
     }
     // nhịp video: bỏ câu suy ngẫm (nút xong trạm không phụ thuộc vào nó)
     if (!PACING) await answerReflection(ctx);
@@ -107,7 +116,7 @@ async function raceAndLose(ctx: Ctx): Promise<void> {
   const L = PACING!.lesson1;
   while (!man1Probe()?.timeUp) {
     const p = man1Probe();
-    if (!p || p.expected === null || ((p.fixed ?? 0) >= 1 && (p.remaining ?? 0) <= L.gapMin + 3)) {
+    if (!p || p.expected === null || ((p.fixed ?? 0) >= L.hardMinFixed && (p.remaining ?? 0) <= L.gapMin + 3)) {
       await ctl.sleep(150);
       continue;
     }
@@ -125,7 +134,16 @@ async function raceAndLose(ctx: Ctx): Promise<void> {
 export async function giayMan1(ctx: Ctx): Promise<void> {
   await enterLevelFromVillage(ctx, 'lang-giay', 1);
   await ctx.ctl.waitFor(() => lessonStage(), 'lesson page', 30000);
-  await driveLesson(ctx, { playStation: playMan1Station });
+  await driveLesson(ctx, {
+    playStation: async (c, i) => {
+      hdStationStart((['de', 'tb', 'kho'] as const)[i]);
+      try {
+        await playMan1Station(c, i);
+      } finally {
+        hdStationEnd();
+      }
+    },
+  });
   await ctx.ctl.sleep(DEMO_HD ? 4000 : PACING ? 3000 : 2500);
 }
 

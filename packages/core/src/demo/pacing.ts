@@ -37,6 +37,19 @@ export interface VideoPacing {
     /** Bot sửa chậm: nghỉ giữa hai lần sửa (mili giây) và nhịp gõ riêng */
     botPauseMs: number;
     botTypeMs: readonly [number, number];
+    /** Bot không dừng sửa trước khi đã sửa ít nhất chừng này trang */
+    hardMinFixed: number;
+  };
+  /** Chỉ video hướng dẫn, bài học (Màn 1, 10): nhịp chậm cho dễ theo dõi */
+  hd?: {
+    /** Gõ số (mili giây mỗi ký tự) */
+    typeMs: readonly [number, number];
+    /** Con trỏ chỉ vào các số dùng để tính trước mỗi lần nhập */
+    pointMs: readonly [number, number];
+    /** Dừng sau khi kiểm tra / biểu quyết để đọc phản hồi */
+    afterMs: readonly [number, number];
+    /** Một lần kéo lá */
+    dragMs: readonly [number, number];
   };
   runner: { rounds: number; roundSec: number };
   whack: { bossCount: number; bossEvery: number; spawnStart: number; spawnEnd: number };
@@ -63,6 +76,7 @@ export const VIDEO_PACING: VideoPacing = {
     gapHoldMs: 2000,
     botPauseMs: 500,
     botTypeMs: [260, 360],
+    hardMinFixed: 1,
   },
   runner: { rounds: 1, roundSec: 17 },
   whack: { bossCount: 1, bossEvery: 17, spawnStart: 0.85, spawnEnd: 0.85 },
@@ -71,7 +85,7 @@ export const VIDEO_PACING: VideoPacing = {
 
 /**
  * Nhịp "video hướng dẫn" (`?kieu=huongdan`): ván vẫn ngắn như nhịp video nhưng bot chậm rãi hơn (gõ, đọc, hộp thoại) để người xem theo kịp; phần tua nhanh do `timeScale` lo.
- * Trạm Khó của Màn 1 đua 9 giây trong đồng hồ game (trước tua).
+ * Bài học (Màn 1, 10) không tua; trạm Khó của Màn 1 đua 9 giây thật.
  */
 export const HD_PACING: VideoPacing = {
   ...VIDEO_PACING,
@@ -82,7 +96,10 @@ export const HD_PACING: VideoPacing = {
   cursorBoost: 3,
   shortWaitMs: 600,
   runner: { rounds: 1, roundSec: 28 },
-  lesson1: { ...VIDEO_PACING.lesson1, hardDurationMs: 9000, hardSpawnMs: 800, gapHoldMs: 1500 },
+  // bài học (Màn 1, 10) chạy tốc độ thường, nhiều lượt hơn: Dễ 3 trang, Trung bình sửa 3 trang kéo theo, Khó đua 9 giây thật và sửa ít nhất 3 trang
+  lesson1: { ...VIDEO_PACING.lesson1, easyPrefilled: 2, tamperIndex: 2, hardDurationMs: 9000, hardSpawnMs: 640, gapHoldMs: 2000, hardMinFixed: 3 },
+  man10: { easyQuestions: 3, hardPlace: 99 },
+  hd: { typeMs: [150, 220], pointMs: [1000, 1500], afterMs: [1500, 2000], dragMs: [800, 1200] },
 };
 
 /** Hàm thuần: nhịp video khi `on`, ngược lại null. */

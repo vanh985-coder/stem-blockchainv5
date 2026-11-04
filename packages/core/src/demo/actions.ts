@@ -78,7 +78,7 @@ export async function pressKey(ctx: Ctx, code: string, holdMs = 90, target: Even
 }
 
 /** Kéo thả bằng con trỏ giả: pointerdown ở `from`, đi qua nhiều điểm (pointermove), pointerup ở `to`. */
-export async function dragEl(ctx: Ctx, from: Element, to: { x: number; y: number } | Element): Promise<void> {
+export async function dragEl(ctx: Ctx, from: Element, to: { x: number; y: number } | Element, opts: { durationMs?: number } = {}): Promise<void> {
   const { ctl } = ctx;
   (from as HTMLElement).scrollIntoView?.({ block: 'nearest' });
   const a = centerOf(from);
@@ -96,7 +96,7 @@ export async function dragEl(ctx: Ctx, from: Element, to: { x: number; y: number
     const x = Math.round(a.x + (b.x - a.x) * t);
     const y = Math.round(a.y + (b.y - a.y) * t - Math.sin(Math.PI * t) * 24);
     placeCursor({ x, y });
-    await ctl.sleep(PACING ? 14 : 26);
+    await ctl.sleep(opts.durationMs ? opts.durationMs / steps : PACING ? 14 : 26);
     // như khi chuột được "bắt" (pointer capture): sự kiện đi tới phần tử đang kéo
     fire(src, 'pointermove', x, y, { buttons: 1 });
     fire(src, 'mousemove', x, y, { buttons: 1 });

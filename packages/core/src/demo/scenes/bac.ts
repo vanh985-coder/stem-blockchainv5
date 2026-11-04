@@ -7,6 +7,8 @@ import { DEMO_HD } from '../config';
 import { pace, PACING } from '../pacing';
 import { onPath } from './common';
 import { driveLesson, lessonStage, skipTutorial } from './lesson';
+import { hdStationEnd, hdStationStart, hdTurn } from '../hdStats';
+import { afterCheck, hdLesson, pointAt } from './hdLesson';
 import { man10Acts, walkTutorial } from './tutorial';
 
 const TB = bai4Texts.tramTb;
@@ -35,9 +37,13 @@ async function playEasy(ctx: Ctx): Promise<void> {
       await ctl.sleep(250);
       continue;
     }
-    await typeInto(ctx, input, String(p.expected));
+    // video hướng dẫn: chỉ vào cặp giao dịch, gõ chậm, dừng đọc phản hồi
+    await pointAt(ctx, [q('#tutorial-man10de-pair')]);
+    await typeInto(ctx, input, String(p.expected), { range: hdLesson()?.typeMs });
     const check = q<HTMLButtonElement>('[data-demo="check"]');
     if (check) await clickEl(ctx, check, { settle: 1400 });
+    await afterCheck(ctx);
+    hdTurn();
   }
 }
 
@@ -61,12 +67,17 @@ async function playMedium(ctx: Ctx): Promise<void> {
     await ctl.waitFor(() => probe()?.phase === 'phase_b', 'phase B', 10000);
     if (probe()?.solved?.[slot]) continue;
     const c = await ctl.waitFor(() => cell(cellId), `tree cell ${cellId}`, 5000);
+    // video hướng dẫn: chỉ vào hai nút con dùng để tính
+    const [lvl, idx] = cellId.split('-').map(Number);
+    await pointAt(ctx, [cell(`${lvl - 1}-${idx * 2}`), cell(`${lvl - 1}-${idx * 2 + 1}`)]);
     await clickEl(ctx, c, { settle: 500 });
     const input = await ctl.waitFor(() => q<HTMLInputElement>('[data-testid="lesson-scroll"] input'), 'build input', 5000);
-    await typeInto(ctx, input, String(probe()?.expectB?.[slot]), { noClick: !!PACING });
+    await typeInto(ctx, input, String(probe()?.expectB?.[slot]), { noClick: !!PACING, range: hdLesson()?.typeMs });
     const check = await ctl.waitFor(() => q<HTMLButtonElement>('[data-demo="check"]'), 'confirm button', 5000);
     await clickEl(ctx, check, { settle: 800 });
     await ctl.waitFor(() => probe()?.solved?.[slot], `slot ${slot} solved`, 6000);
+    await afterCheck(ctx);
+    hdTurn();
   }
   const reveal = await ctl.waitFor(() => buttonByText(TB.khamPhaKhoanhKhacA), 'reveal button', 8000);
   await ctl.sleep(pace(1500));
@@ -79,6 +90,8 @@ async function playMedium(ctx: Ctx): Promise<void> {
   for (const id of [`1-${leaf >> 1}`, `0-${leaf}`]) {
     const c = await ctl.waitFor(() => cell(id), `inspect cell ${id}`, 6000);
     await clickEl(ctx, c, { settle: pace(1200) });
+    await afterCheck(ctx);
+    hdTurn();
   }
   await ctl.waitFor(() => probe()?.found && (probe()?.tamperStep ?? 0) >= 2, 'red pulse reaches the root', 15000);
   await ctl.sleep(pace(3000));
@@ -112,12 +125,15 @@ async function playHard(ctx: Ctx): Promise<void> {
       const r = slot.getBoundingClientRect();
       const dx = Math.min(6, r.width * 0.12);
       const dy = Math.min(4, r.height * 0.1);
-      await dragEl(ctx, piece, { x: Math.round(r.left + r.width / 2 + dx), y: Math.round(r.top + r.height / 2 - dy) });
+      const hd = hdLesson();
+      await dragEl(ctx, piece, { x: Math.round(r.left + r.width / 2 + dx), y: Math.round(r.top + r.height / 2 - dy) }, { durationMs: hd ? Math.round(hd.dragMs[0] + Math.random() * (hd.dragMs[1] - hd.dragMs[0])) : undefined });
+      hdTurn();
       await ctl.sleep(500);
       continue;
     }
     const check = q<HTMLButtonElement>('[data-demo="check"]');
     if (check) await clickEl(ctx, check, { settle: 1500 });
+    await afterCheck(ctx);
     await ctl.sleep(500);
   }
 }
@@ -139,6 +155,15 @@ async function playMan10Station(ctx: Ctx, idx: number): Promise<void> {
 export async function man10(ctx: Ctx): Promise<void> {
   if (!onPath('/lang/lang-bac/man/10')) throw new Error('not on the level 10 route');
   await ctx.ctl.waitFor(() => lessonStage(), 'lesson page', 30000);
-  await driveLesson(ctx, { playStation: playMan10Station });
+  await driveLesson(ctx, {
+    playStation: async (c, i) => {
+      hdStationStart((['de', 'tb', 'kho'] as const)[i]);
+      try {
+        await playMan10Station(c, i);
+      } finally {
+        hdStationEnd();
+      }
+    },
+  });
   await ctx.ctl.sleep(DEMO_HD ? 4000 : PACING ? 3000 : 2500);
 }

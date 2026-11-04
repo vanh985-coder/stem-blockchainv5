@@ -58,6 +58,8 @@ Mỗi màn là một video riêng 55 đến 65 giây; giữa hai màn vẫn là 
 
 Màn 1 trạm Khó: bot vẫn bị bỏ lại 10 đến 20 trang, phần đua 9 giây (đồng hồ game, trước tua; xấp xỉ 3,6 giây thật sau tua). Nhịp riêng của chế độ này là `HD_PACING` ở `pacing.ts` (ván Màn 2 dài 28 giây).
 
+**Bài học (Màn 1, 10) khác Màn 2, 5**: KHÔNG tua (hệ số thời gian luôn 1, không hiện ⏩), mỗi video khoảng 90 đến 120 giây, nhiều lượt hơn: Màn 1 Dễ 3 trang, Trung bình sửa 3 trang kéo theo, Khó đua 9 giây thật và sửa ít nhất 3 trang trước khi bị bỏ lại 10 đến 20 trang; Màn 10 Dễ 3 cặp, Trung bình dựng 3 nút rồi soi lá bị sửa, Khó kéo đủ các ô (không điền sẵn). Nhịp chậm (`PACING.hd` ở `pacing.ts`, `scenes/hdLesson.ts`): gõ 150 đến 220 ms mỗi ký tự, con trỏ chỉ vào các số dùng để tính 1 đến 1,5 giây trước khi nhập, dừng 1,5 đến 2 giây sau khi kiểm tra, mỗi lần kéo lá 0,8 đến 1,2 giây. Trạm Khó của Màn 1 giữ nhịp nhanh. Bảng của script in thêm giây và số lượt từng trạm (`hdStationStart/End/Turn` ở `hdStats.ts`).
+
 Kiểm: `MAN=1,2,5,10 KIEU=huongdan node scripts/demo-check.mjs`. In bảng mỗi màn: hướng dẫn / chơi thường / tua / kết quả / tổng (giây), kiểm tổng 55 đến 65 giây, biểu tượng tua hiện rồi ẩn, không kẹt, không lỗi console. Mốc thời gian ghi ở `hdStats.ts` (`window.__demoStats.hd`).
 
 ## Cấu trúc mã (`packages/core/src/demo/`)
