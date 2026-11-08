@@ -1,10 +1,19 @@
-// Nén âm thanh cho assets:build: giải mã mp3 gốc (mpg123, WASM) rồi mã hóa lại bằng lamejs (thuần JS), không cần ffmpeg.
-import { MPEGDecoder } from 'mpg123-decoder';
-import lamejs from '@breezystack/lamejs';
+// Nén âm thanh cho assets:build bằng ffmpeg (gói ffmpeg-static, có sẵn file chạy): -codec:a libmp3lame -b:a <kbps> -ar 44100.
+// Kiểm đầu ra: node scripts/check-audio.mjs (giải mã lại, so thời lượng, kênh, tần số mẫu và RMS với file gốc).
+import { execFile } from 'node:child_process';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { promisify } from 'node:util';
+import ffmpegPath from 'ffmpeg-static';
+
+const run = promisify(execFile);
 
 /** Nhạc nền (nhac-*) về 96 kbps, đoạn ngắn (am-*) về 64 kbps. */
 export const MUSIC_KBPS = 96;
 export const SFX_KBPS = 64;
+/** Tần số mẫu của mọi file đầu ra. */
+export const SAMPLE_RATE = 44100;
 /** Bài dài hơn mức này thì chỉ ghi tên vào báo cáo, không tự cắt. */
 export const LONG_TRACK_SEC = 180;
 
@@ -15,37 +24,27 @@ export function audioRule(name) {
   return null;
 }
 
-const toInt16 = (f32) => {
-  const out = new Int16Array(f32.length);
-  for (let i = 0; i < f32.length; i++) {
-    const v = Math.max(-1, Math.min(1, f32[i]));
-    out[i] = v < 0 ? v * 0x8000 : v * 0x7fff;
-  }
-  return out;
-};
+/** Thời lượng (giây) đọc từ dòng "Duration: hh:mm:ss.xx" của ffmpeg; 0 nếu không đọc được. */
+export function parseDuration(stderr) {
+  const m = /Duration: (\d+):(\d+):(\d+(?:\.\d+)?)/.exec(stderr);
+  return m ? Number(m[1]) * 3600 + Number(m[2]) * 60 + Number(m[3]) : 0;
+}
 
-/** Giải mã mp3 rồi mã hóa lại ở `kbps`. Trả { data: Buffer, duration (giây), sampleRate, channels }. */
+/**
+ * Nén mp3 ở `kbps`. Trả { data: Buffer, duration (giây), method: 'ffmpeg' }.
+ * Nếu ffmpeg không chạy được trên máy này thì chép nguyên file gốc (method: 'goc', kèm `warning`) để vẫn có nhạc.
+ */
 export async function recompressMp3(srcBytes, kbps) {
-  const decoder = new MPEGDecoder();
-  await decoder.ready;
+  const dir = await mkdtemp(path.join(tmpdir(), 'sc-audio-'));
+  const inFile = path.join(dir, 'in.mp3');
+  const outFile = path.join(dir, 'out.mp3');
   try {
-    const { channelData, sampleRate, samplesDecoded } = decoder.decode(new Uint8Array(srcBytes));
-    if (!samplesDecoded) throw new Error('không giải mã được mp3');
-    const channels = Math.min(2, channelData.length);
-    const left = toInt16(channelData[0]);
-    const right = channels === 2 ? toInt16(channelData[1]) : null;
-    const enc = new lamejs.Mp3Encoder(channels, sampleRate, kbps);
-    const chunks = [];
-    const BLOCK = 1152 * 8;
-    for (let i = 0; i < left.length; i += BLOCK) {
-      const l = left.subarray(i, i + BLOCK);
-      const buf = right ? enc.encodeBuffer(l, right.subarray(i, i + BLOCK)) : enc.encodeBuffer(l);
-      if (buf.length) chunks.push(Buffer.from(buf));
-    }
-    const tail = enc.flush();
-    if (tail.length) chunks.push(Buffer.from(tail));
-    return { data: Buffer.concat(chunks), duration: samplesDecoded / sampleRate, sampleRate, channels };
+    await writeFile(inFile, srcBytes);
+    const { stderr } = await run(ffmpegPath, ['-v', 'info', '-y', '-i', inFile, '-vn', '-map_metadata', '-1', '-codec:a', 'libmp3lame', '-b:a', `${kbps}k`, '-ar', String(SAMPLE_RATE), outFile], { encoding: 'utf8' });
+    return { data: await readFile(outFile), duration: parseDuration(stderr), method: 'ffmpeg' };
+  } catch (e) {
+    return { data: srcBytes, duration: 0, method: 'goc', warning: `ffmpeg không chạy được (${e.code ?? e.message}): giữ nguyên file gốc, không nén` };
   } finally {
-    decoder.free();
+    await rm(dir, { recursive: true, force: true });
   }
 }

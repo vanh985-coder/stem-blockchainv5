@@ -530,12 +530,13 @@ const audioReport = [];
     } else entry = undefined;
     if (!entry) {
       const r = await recompressMp3(srcBytes, rule.kbps);
+      if (r.warning) console.log(`  CẢNH BÁO audio/${fileName}: ${r.warning}`);
       // Bản nén không nhỏ hơn bản gốc (gốc đã thấp bitrate) thì giữ nguyên bản gốc.
       const data = r.data.length < srcBytes.length ? r.data : srcBytes;
       const file = `audio/${name}.${sha(data, 8)}.mp3`;
       await mkdir(path.join(OUT, 'audio'), { recursive: true });
       await writeFile(path.join(OUT, file), data);
-      entry = { sig, file, bytes: data.length, width: 0, height: 0, kind: 'audio', duration: Math.round(r.duration * 100) / 100, srcBytes: srcBytes.length, kbps: rule.kbps };
+      entry = { sig, file, bytes: data.length, width: 0, height: 0, kind: 'audio', duration: Math.round(r.duration * 100) / 100, method: data === srcBytes ? 'goc' : r.method, srcBytes: srcBytes.length, kbps: rule.kbps };
       console.log(`  nén  audio/${fileName}  ->  ${file}  (${fmt(data.length)})`);
     }
     newCache[key] = entry;
@@ -544,7 +545,7 @@ const audioReport = [];
   }
   if (audioReport.length) {
     console.log('Âm thanh (assets/audio -> assets-build/audio):');
-    for (const a of audioReport) console.log(`  ${a.name.padEnd(20)} ${fmt(a.srcBytes).padStart(10)} -> ${fmt(a.bytes).padStart(10)}  (${a.kbps} kbps, ${a.duration.toFixed(1)} giây)`);
+    for (const a of audioReport) console.log(`  ${a.name.padEnd(20)} ${fmt(a.srcBytes).padStart(10)} -> ${fmt(a.bytes).padStart(10)}  (${a.method === 'goc' ? 'giữ gốc' : a.kbps + ' kbps'}, ${a.duration.toFixed(1)} giây)`);
     const longOnes = audioReport.filter((a) => a.duration > LONG_TRACK_SEC);
     console.log(longOnes.length ? `  CẢNH BÁO: dài hơn ${LONG_TRACK_SEC / 60} phút (không tự cắt): ${longOnes.map((a) => a.name).join(', ')}` : `  => không bài nào dài hơn ${LONG_TRACK_SEC / 60} phút`);
   }
