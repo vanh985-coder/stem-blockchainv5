@@ -1,4 +1,76 @@
 {
+  "audio/am-cau-hoi": {
+    "file": "audio/am-cau-hoi.df33adb6.mp3",
+    "bytes": 44138,
+    "width": 0,
+    "height": 0,
+    "kind": "audio",
+    "duration": 5.45
+  },
+  "audio/am-thang": {
+    "file": "audio/am-thang.db63bbb7.mp3",
+    "bytes": 9657,
+    "width": 0,
+    "height": 0,
+    "kind": "audio",
+    "duration": 1.13
+  },
+  "audio/am-thua": {
+    "file": "audio/am-thua.55e89ea5.mp3",
+    "bytes": 14045,
+    "width": 0,
+    "height": 0,
+    "kind": "audio",
+    "duration": 1.68
+  },
+  "audio/nhac-bai-hoc": {
+    "file": "audio/nhac-bai-hoc.36574573.mp3",
+    "bytes": 1720991,
+    "width": 0,
+    "height": 0,
+    "kind": "audio",
+    "duration": 143.36
+  },
+  "audio/nhac-ban-do": {
+    "file": "audio/nhac-ban-do.e30ce5b7.mp3",
+    "bytes": 2065494,
+    "width": 0,
+    "height": 0,
+    "kind": "audio",
+    "duration": 172.06
+  },
+  "audio/nhac-chay": {
+    "file": "audio/nhac-chay.d6515042.mp3",
+    "bytes": 913808,
+    "width": 0,
+    "height": 0,
+    "kind": "audio",
+    "duration": 76.09
+  },
+  "audio/nhac-hoi-hop": {
+    "file": "audio/nhac-hoi-hop.dd815990.mp3",
+    "bytes": 983085,
+    "width": 0,
+    "height": 0,
+    "kind": "audio",
+    "duration": 81.87
+  },
+  "audio/nhac-hoi-lang": {
+    "file": "audio/nhac-hoi-lang.b706caf5.mp3",
+    "bytes": 1777729,
+    "width": 0,
+    "height": 0,
+    "kind": "audio",
+    "duration": 148.09
+  },
+  "audio/nhac-vui": {
+    "file": "audio/nhac-vui.d37ef774.mp3",
+    "bytes": 1498742,
+    "width": 0,
+    "height": 0,
+    "kind": "audio",
+    "duration": 124.82
+  },
   "man5-2d/background-pc": {
     "file": "man5-2d/background-pc.82a018ad.webp",
     "bytes": 34022,

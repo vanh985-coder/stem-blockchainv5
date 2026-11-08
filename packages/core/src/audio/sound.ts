@@ -5,6 +5,7 @@
  */
 
 import { emitAnswer } from './answerSignal';
+import { music } from './musicManager';
 
 class SoundManager {
   private ctx: AudioContext | null = null;
@@ -148,6 +149,8 @@ class SoundManager {
    * Hoàn thành màn: arpeggio 4 nốt rực rỡ (C5 -> E5 -> G5 -> C6)
    */
   public playLevelComplete(): void {
+    // Có file am-thang thì phát file (một lần), không thì dùng âm tổng hợp bên dưới.
+    if (music.playSfx('thang')) return;
     const ctx = this.ensureContext();
     if (!ctx) return;
 

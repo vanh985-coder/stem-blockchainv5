@@ -15,6 +15,7 @@ const TYPES = {
   '.jpg': 'image/jpeg',
   '.json': 'application/json; charset=utf-8',
   '.glb': 'model/gltf-binary',
+  '.mp3': 'audio/mpeg',
 };
 const HASHED = /\.[0-9a-f]{8}\.[a-z0-9]+$/;
 

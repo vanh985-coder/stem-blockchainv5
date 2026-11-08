@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import { fmt } from '../content/characters';
 import { ui } from '../content/ui';
+import { MUSIC_VOLUME_STEP, clampMusicVolume } from '../audio/musicLogic';
 import { MOUSE_SENSITIVITY_MAX, MOUSE_SENSITIVITY_MIN, MOUSE_SENSITIVITY_STEP, clampMouseSensitivity } from '../settings/settings';
 import { useSettings } from '../settings/SettingsProvider';
 import { QUALITY_CHOICES, type QualityChoice } from '../three/quality';
@@ -91,6 +92,38 @@ function QualityRow({ value, onChange }: { value: QualityChoice; onChange: (valu
   );
 }
 
+/** Thanh trượt "Âm lượng nhạc nền" (0 đến 100%). Dùng được riêng, ví dụ trong menu tạm dừng. */
+export function MusicVolumeRow({ value, disabled = false, onChange }: { value: number; disabled?: boolean; onChange: (value: number) => void }) {
+  const id = useId();
+  return (
+    <div className={`py-2 ${disabled ? 'opacity-60' : ''}`}>
+      <div className="flex items-baseline justify-between gap-2">
+        <label htmlFor={id} className="font-display text-lg font-extrabold">
+          {ui.caiDat.nhacNenAmLuong}
+        </label>
+        <output htmlFor={id} className="font-bold">
+          {fmt(ui.caiDat.nhacNenAmLuongGiaTri, { so: Math.round(value * 100) })}
+        </output>
+      </div>
+      <p id={`${id}-d`} className="mb-1 text-sm text-nau-go-dam">
+        {ui.caiDat.nhacNenAmLuongGhiChu}
+      </p>
+      <input
+        id={id}
+        type="range"
+        min={0}
+        max={1}
+        step={MUSIC_VOLUME_STEP}
+        value={value}
+        disabled={disabled}
+        aria-describedby={`${id}-d`}
+        onChange={(e) => onChange(clampMusicVolume(Number(e.target.value)))}
+        className="h-11 w-full cursor-pointer accent-muc-tim"
+      />
+    </div>
+  );
+}
+
 /** Thanh trượt "Độ nhạy chuột" (xoay camera ở cảnh đi lại trên máy tính). Dùng được riêng, ví dụ trong menu tạm dừng. */
 export function MouseSensitivityRow({ value, onChange }: { value: number; onChange: (value: number) => void }) {
   const id = useId();
@@ -140,6 +173,13 @@ export function SettingsPanel({ className = '' }: { className?: string }) {
         checked={settings.soundEnabled}
         onChange={(v) => update({ soundEnabled: v })}
       />
+      <SwitchRow
+        label={ui.caiDat.nhacNen}
+        hint={ui.caiDat.nhacNenGhiChu}
+        checked={settings.musicEnabled}
+        onChange={(v) => update({ musicEnabled: v })}
+      />
+      <MusicVolumeRow value={settings.musicVolume} disabled={!settings.musicEnabled} onChange={(v) => update({ musicVolume: v })} />
       <SwitchRow
         label={ui.caiDat.chuTo}
         hint={ui.caiDat.chuToGhiChu}

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { music } from '../audio/musicManager';
 import { sound } from '../audio/sound';
 import { ui } from '../content/ui';
 import { Button } from './Button';
@@ -15,7 +16,7 @@ export interface LevelFailedProps {
 /** Màn hết tim: lời động viên, mẹo cho lần sau, nút "Thử lại" và "Về bản đồ". */
 export function LevelFailed({ tip, onRetry, onExit }: LevelFailedProps) {
   useEffect(() => {
-    sound.playWrong();
+    if (!music.playSfx('thua')) sound.playWrong();
   }, []);
 
   return (

@@ -2,6 +2,7 @@ import { useRoutes, type RouteObject } from 'react-router';
 import type { VillageModule } from '../village';
 import { HUB_MAP_URL, URLS, villageWorldUrl } from '../config/urls';
 import { accountRoutes } from '../auth/routes';
+import { useSceneMusic } from '../audio/useMusic';
 import { ExternalRedirect } from './ExternalRedirect';
 
 /**
@@ -22,5 +23,6 @@ export function shellRoutes(village: Pick<VillageModule, 'id' | 'routes'>): Rout
 }
 
 export function VillageApp({ village }: { village: VillageModule }) {
+  useSceneMusic();
   return useRoutes(shellRoutes(village));
 }

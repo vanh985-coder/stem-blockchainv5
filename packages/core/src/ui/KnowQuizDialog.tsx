@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type FormEvent, type MouseEvent } from 'react';
 import { sound } from '../audio/sound';
+import { useMusicDuck, useSfxOnMount } from '../audio/useMusic';
 import { fmt } from '../content/characters';
 import { knowQuizUi, type KnowQuiz } from '../content/knowQuiz';
 import { knowScrollUi } from '../content/knowScrolls';
@@ -36,6 +37,8 @@ const OPEN_GUARD_MS = 450;
  */
 export function KnowQuizDialog({ card, quiz, index, total, mode, onCollect, onClose }: KnowQuizDialogProps) {
   const review = mode === 'review';
+  useMusicDuck();
+  useSfxOnMount('cauHoi');
   const [s, setS] = useState(initialQuizState);
   const collected = useRef(false);
   /** Lúc hộp hiện (cùng đồng hồ với `event.timeStamp`) và lúc hiện đáp án */

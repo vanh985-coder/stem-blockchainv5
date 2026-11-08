@@ -5,15 +5,16 @@ export interface ManifestEntry {
   /** Điểm ảnh; model .glb ghi 0 (không có ý nghĩa). */
   width: number;
   height: number;
-  /** Chỉ có ở model .glb: `kind` là 'model', `tris` là số tam giác sau nén. */
-  kind?: 'model';
+  /** Chỉ có ở model .glb ('model', `tris` là số tam giác sau nén) và âm thanh .mp3 ('audio', `duration` là giây). */
+  kind?: 'model' | 'audio';
   tris?: number;
+  duration?: number;
 }
 
 /** Khóa là đường dẫn không đuôi, ví dụ "scenes/bai-hoc-lang-giay". */
 export type Manifest = Record<string, ManifestEntry>;
 
-const KNOWN_EXT = /\.(png|jpe?g|webp|gif|glb)$/i;
+const KNOWN_EXT = /\.(png|jpe?g|webp|gif|glb|mp3)$/i;
 
 /** Đưa đường dẫn về dạng khóa manifest: bỏ "/" đầu, đổi "\" thành "/", bỏ đuôi file. */
 export function normalizeAssetPath(path: string): string {

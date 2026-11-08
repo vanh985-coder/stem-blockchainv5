@@ -606,6 +606,11 @@ Dùng ở mọi chỗ có lựa chọn: câu hỏi, Đồng ý/Từ chối, lự
 
 Web Audio tự tạo: đúng, sai, bấm, nhặt, đập, hoàn thành. Có nút tắt.
 
+**Nhạc nền và âm ngắn (nhánh feat/nhac-nen).** MỘT bộ quản lý duy nhất: `packages/core/src/audio/musicManager.ts` (`music`); logic thuần có test ở `musicLogic.ts`; gắn vào ứng dụng bằng `useSceneMusic()` (gốc `App` của hub và `VillageApp` của vỏ làng), `useMusicDuck()`, `useSfxOnMount()` (`useMusic.ts`). File gốc ở `assets/audio/` (nguồn và giấy phép: `docs/NGUON-NHAC.md`), `pnpm assets:build` nén (nhạc nền 96 kbps, `am-*` 64 kbps; bài dài hơn 3 phút chỉ báo, không cắt) vào `assets-build/audio/`, khóa manifest `audio/<tên>` (`kind: 'audio'`, `duration`).
+- Chọn bài theo đường dẫn (`trackForPath`): `/cho`, `/ban-do`, `/lang/<id>` bản đồ; màn 1, 4, 7, 10 bài học; màn 2 chạy; màn 12 hồi hộp; màn 5, 9 và các màn còn lại vui; `/hoi-lang` hội làng (route chưa có, `FESTIVAL_LAUNCHED=false`); trang khác không có nhạc.
+- Chỉ phát sau cử chỉ đầu tiên (pointerdown, keydown, touchend, click). Chuyển bài: bài cũ giảm dần, bài mới tăng dần 1 giây; cùng bài thì không phát lại. Chỉ tải bài của cảnh hiện tại; ba đoạn `am-*` tải sẵn. Ẩn tab thì tạm dừng, quay lại phát tiếp. Thiếu file hoặc không có Web Audio: im lặng.
+- Cài đặt (`musicEnabled`, `musicVolume`, mặc định bật và 40%, lưu cùng `sochung.v3.settings`): công tắc "Nhạc nền" và thanh "Âm lượng nhạc nền" ở `SettingsPanel`. `VnDialog` (lời thoại), `QuizCard`, `ReflectionQuestion`, `KnowQuizDialog` làm nhạc nhỏ còn 30%; ba hộp câu hỏi phát `am-cau-hoi`. `am-thang` thay âm tổng hợp ở `sound.playLevelComplete()`, `am-thua` thay `playWrong` ở `LevelFailed`; cả hai theo công tắc "Âm thanh" cũ, thiếu file thì dùng lại âm tổng hợp.
+
 ## 9. Hiệu năng
 
 - **Dung lượng:** trang đầu ≤ 150 KB JS (gzip). Lõi 3D chỉ tải khi vào cảnh 3D. Mỗi màn tải riêng. **Trang bài học 2D:** mã của 3 trạm (cùng `motion` và `@dnd-kit` mà chúng dùng) **tải sau** bằng `lazy(() => import(...))` ở từng trang `ManN`, và được nạp lúc rảnh (khoảng 1,5 giây sau khi trang hiện) cho trạm sắp tới; nhờ đó JS lúc mở trang bài học của cả 4 làng còn khoảng 117–125 KB (trước đó 152–181 KB).
