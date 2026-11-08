@@ -1,3 +1,4 @@
+import { MUSIC_VOLUME_DEFAULT, clampMusicVolume } from '../audio/musicLogic';
 import { isQualityChoice, type QualityChoice } from '../three/quality';
 
 /** Cài đặt của máy này (không phải tiến độ học). Lưu ở localStorage. */
@@ -21,6 +22,10 @@ export interface Settings {
   largeText: boolean;
   /** Âm thanh (tiếng bấm, đúng/sai, chúc mừng) */
   soundEnabled: boolean;
+  /** Nhạc nền bật/tắt (mặc định bật) */
+  musicEnabled: boolean;
+  /** Âm lượng nhạc nền 0 đến 1 (mặc định 0,4), xem `clampMusicVolume` */
+  musicVolume: number;
   /** Chất lượng đồ họa 3D: "auto" để máy tự chọn (spec 03 mục 2) */
   quality: QualityChoice;
   /** Độ nhạy chuột khi xoay camera (máy tính), xem `clampMouseSensitivity` */
@@ -43,6 +48,8 @@ export function parseStored(raw: string | null | undefined): StoredSettings {
     if (typeof o.reducedMotion === 'boolean') out.reducedMotion = o.reducedMotion;
     if (typeof o.largeText === 'boolean') out.largeText = o.largeText;
     if (typeof o.soundEnabled === 'boolean') out.soundEnabled = o.soundEnabled;
+    if (typeof o.musicEnabled === 'boolean') out.musicEnabled = o.musicEnabled;
+    if (typeof o.musicVolume === 'number' && Number.isFinite(o.musicVolume)) out.musicVolume = clampMusicVolume(o.musicVolume);
     if (isQualityChoice(o.quality)) out.quality = o.quality;
     if (typeof o.rotateMap === 'boolean') out.rotateMap = o.rotateMap;
     if (typeof o.mouseSensitivity === 'number' && Number.isFinite(o.mouseSensitivity)) out.mouseSensitivity = clampMouseSensitivity(o.mouseSensitivity);
@@ -58,6 +65,8 @@ export function resolveSettings(stored: StoredSettings, prefersReducedMotion: bo
     reducedMotion: stored.reducedMotion ?? prefersReducedMotion,
     largeText: stored.largeText ?? false,
     soundEnabled: stored.soundEnabled ?? true,
+    musicEnabled: stored.musicEnabled ?? true,
+    musicVolume: stored.musicVolume ?? MUSIC_VOLUME_DEFAULT,
     quality: stored.quality ?? 'auto',
     mouseSensitivity: stored.mouseSensitivity ?? MOUSE_SENSITIVITY_DEFAULT,
     rotateMap: stored.rotateMap ?? false,

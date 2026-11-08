@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useMusicDuck } from '../audio/useMusic';
 import { AssetImage } from '../assets/AssetImage';
 import { asset, useManifest } from '../assets/store';
 import { fmt } from '../content/characters';
@@ -98,6 +99,7 @@ const smallBtn =
  */
 export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel, background, overlay, label, decor, backdrop, onTurnChange, className = '', warm = false, flat = false }: VnDialogProps) {
   const [index, setIndex] = useState(0);
+  useMusicDuck(!warm); // lời thoại đang hiện: nhạc nền nhỏ xuống (hộp làm ấm ẩn thì không)
   const wide = useMedia(WIDE);
   const low = useMedia(LOW);
   const manifest = useManifest();

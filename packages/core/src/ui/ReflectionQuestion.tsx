@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { sound } from '../audio/sound';
+import { useMusicDuck, useSfxOnMount } from '../audio/useMusic';
 import { ui } from '../content/ui';
 import { Button } from './Button';
 import { Panel } from './Panel';
@@ -15,6 +16,8 @@ export interface ReflectionQuestionProps {
 /** Câu hỏi suy ngẫm cuối trạm: chọn gì cũng được, không tính điểm; chốt xong hiện lời giải thích. */
 export function ReflectionQuestion({ question, options, explanation, onAnswered, className = '' }: ReflectionQuestionProps) {
   const [selected, setSelected] = useState<number | null>(null);
+  useMusicDuck();
+  useSfxOnMount('cauHoi');
   const [submitted, setSubmitted] = useState(false);
 
   const submit = () => {

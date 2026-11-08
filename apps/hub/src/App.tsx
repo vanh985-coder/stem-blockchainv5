@@ -1,6 +1,6 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react';
 import { Route, Routes } from 'react-router';
-import { MERGED, RequireStory, accountRoutes, ui } from '@so-chung/core';
+import { MERGED, RequireStory, accountRoutes, ui, useSceneMusic } from '@so-chung/core';
 import { Home } from './pages/Home';
 import { villageRouteObjects } from './villageRoutes';
 
@@ -33,6 +33,7 @@ function Lazy({ page: Page }: { page: LazyExoticComponent<ComponentType> }) {
 }
 
 export function App() {
+  useSceneMusic();
   return (
     <Routes>
       <Route path="/" element={<Home />} />

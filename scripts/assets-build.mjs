@@ -10,6 +10,7 @@ import { cleanSparkle, forceCleanSparkle, sparkleGeometry } from './lib/watermar
 
 /** Ảnh mà dấu ngôi sao quá mờ để nhận dạng chắc chắn: luôn tô lại vùng ngôi sao ở ô góc từ điểm ảnh xung quanh (khóa manifest, không đuôi). */
 const FORCE_SPARKLE = new Set(['story/06-lang-giay', 'ui/portraits/lan', 'ui/textures/san-gach']);
+import { audioRule, LONG_TRACK_SEC, recompressMp3 } from './lib/audio.mjs';
 import { checkCharacter, largestTexture, REQUIRED_CLIPS, textureBytes } from './lib/glb.mjs';
 import { buildModelSet, classifyModel, LOD_SUFFIX, LOD_TEXTURE, LOD_TRIS, MID_MAX_TRIS, MID_MIN_MAIN_TRIS, MID_SUFFIX, MID_TRIS } from './lib/model-build.mjs';
 
@@ -496,6 +497,56 @@ for (const rel of modelFiles) {
     newCache[k] = e;
     manifest[k] = { file: e.file, bytes: e.bytes, width: 0, height: 0, kind: 'model', tris: e.tris };
     modelEntries.push({ key: k, lod: tier === 'lod', mid: tier === 'mid', ...e });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Âm thanh: assets/audio/*.mp3 (nhac-* nhạc nền, am-* hiệu ứng ngắn). Giữ nguyên file gốc; ghi bản nén vào assets-build/audio/ và manifest (khóa audio/<tên>, kind 'audio').
+// Chỉ lấy file .mp3 có tên nhac-* hoặc am-*: NGUON-NHAC.txt (nguồn và giấy phép) bị bỏ qua, bản lưu trên Git là docs/NGUON-NHAC.md.
+const AUDIO_CODE_HASH = createHash('sha256').update(await readFile(path.join(path.dirname(fileURLToPath(import.meta.url)), 'lib', 'audio.mjs'))).digest('hex').slice(0, 12);
+const audioReport = [];
+{
+  const AUDIO_SRC = path.join(SRC, 'audio');
+  let names = [];
+  try {
+    names = (await readdir(AUDIO_SRC)).filter((n) => n.toLowerCase().endsWith('.mp3')).sort();
+  } catch {
+    console.log('Không có assets/audio/: bỏ qua phần âm thanh.');
+  }
+  for (const fileName of names) {
+    const name = fileName.slice(0, -4);
+    const rule = audioRule(name);
+    if (!rule) continue;
+    const key = `audio/${name}`;
+    const srcBytes = await readFile(path.join(AUDIO_SRC, fileName));
+    const sig = `${AUDIO_CODE_HASH}:${rule.kbps}:${sha(srcBytes)}`;
+    let entry = cache[key];
+    if (entry && entry.sig === sig) {
+      try {
+        await stat(path.join(OUT, entry.file));
+      } catch {
+        entry = undefined;
+      }
+    } else entry = undefined;
+    if (!entry) {
+      const r = await recompressMp3(srcBytes, rule.kbps);
+      // Bản nén không nhỏ hơn bản gốc (gốc đã thấp bitrate) thì giữ nguyên bản gốc.
+      const data = r.data.length < srcBytes.length ? r.data : srcBytes;
+      const file = `audio/${name}.${sha(data, 8)}.mp3`;
+      await mkdir(path.join(OUT, 'audio'), { recursive: true });
+      await writeFile(path.join(OUT, file), data);
+      entry = { sig, file, bytes: data.length, width: 0, height: 0, kind: 'audio', duration: Math.round(r.duration * 100) / 100, srcBytes: srcBytes.length, kbps: rule.kbps };
+      console.log(`  nén  audio/${fileName}  ->  ${file}  (${fmt(data.length)})`);
+    }
+    newCache[key] = entry;
+    manifest[key] = { file: entry.file, bytes: entry.bytes, width: 0, height: 0, kind: 'audio', duration: entry.duration };
+    audioReport.push({ name: fileName, ...entry });
+  }
+  if (audioReport.length) {
+    console.log('Âm thanh (assets/audio -> assets-build/audio):');
+    for (const a of audioReport) console.log(`  ${a.name.padEnd(20)} ${fmt(a.srcBytes).padStart(10)} -> ${fmt(a.bytes).padStart(10)}  (${a.kbps} kbps, ${a.duration.toFixed(1)} giây)`);
+    const longOnes = audioReport.filter((a) => a.duration > LONG_TRACK_SEC);
+    console.log(longOnes.length ? `  CẢNH BÁO: dài hơn ${LONG_TRACK_SEC / 60} phút (không tự cắt): ${longOnes.map((a) => a.name).join(', ')}` : `  => không bài nào dài hơn ${LONG_TRACK_SEC / 60} phút`);
   }
 }
 

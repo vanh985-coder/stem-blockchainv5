@@ -6,7 +6,7 @@ const kb = (b: number) => (b / 1024).toFixed(1);
 export default function DevAssets() {
   const manifest = useManifest();
   const entries = manifest ? Object.entries(manifest) : [];
-  const images = entries.filter(([, m]) => m.kind !== 'model'); // model .glb không vẽ được bằng <img>
+  const images = entries.filter(([, m]) => m.kind !== 'model' && m.kind !== 'audio'); // model .glb và nhạc .mp3 không vẽ được bằng <img>
   const total = entries.reduce((s, [, m]) => s + m.bytes, 0);
 
   return (

@@ -7,13 +7,22 @@ describe('cài đặt', () => {
   });
 
   it('chưa lưu gì: giảm chuyển động theo máy, chữ to tắt', () => {
-    expect(resolveSettings({}, true)).toEqual({ reducedMotion: true, largeText: false, soundEnabled: true, quality: 'auto', mouseSensitivity: 1, rotateMap: false });
-    expect(resolveSettings({}, false)).toEqual({ reducedMotion: false, largeText: false, soundEnabled: true, quality: 'auto', mouseSensitivity: 1, rotateMap: false });
+    expect(resolveSettings({}, true)).toEqual({ reducedMotion: true, largeText: false, soundEnabled: true, musicEnabled: true, musicVolume: 0.4, quality: 'auto', mouseSensitivity: 1, rotateMap: false });
+    expect(resolveSettings({}, false)).toEqual({ reducedMotion: false, largeText: false, soundEnabled: true, musicEnabled: true, musicVolume: 0.4, quality: 'auto', mouseSensitivity: 1, rotateMap: false });
   });
 
   it('đã chọn rõ thì ưu tiên lựa chọn, kể cả khi ngược với máy', () => {
     expect(resolveSettings({ reducedMotion: false }, true).reducedMotion).toBe(false);
-    expect(resolveSettings({ reducedMotion: true, largeText: true }, false)).toEqual({ reducedMotion: true, largeText: true, soundEnabled: true, quality: 'auto', mouseSensitivity: 1, rotateMap: false });
+    expect(resolveSettings({ reducedMotion: true, largeText: true }, false)).toEqual({ reducedMotion: true, largeText: true, soundEnabled: true, musicEnabled: true, musicVolume: 0.4, quality: 'auto', mouseSensitivity: 1, rotateMap: false });
+  });
+
+  it('nhạc nền: mặc định bật, âm lượng 40%; đã chọn thì giữ; giá trị lạ thì bỏ qua hoặc kẹp', () => {
+    expect(resolveSettings({}, false).musicEnabled).toBe(true);
+    expect(resolveSettings({}, false).musicVolume).toBe(0.4);
+    expect(resolveSettings({ musicEnabled: false, musicVolume: 0.7 }, false)).toMatchObject({ musicEnabled: false, musicVolume: 0.7 });
+    expect(parseStored('{"musicEnabled":false,"musicVolume":0.25}')).toEqual({ musicEnabled: false, musicVolume: 0.25 });
+    expect(parseStored('{"musicVolume":9}')).toEqual({ musicVolume: 1 });
+    expect(parseStored('{"musicVolume":"to","musicEnabled":"có"}')).toEqual({});
   });
 
   it('đọc dữ liệu hỏng thì bỏ qua', () => {
@@ -54,7 +63,7 @@ describe('cài đặt', () => {
   });
 
   it('lưu rồi đọc lại ra như cũ', () => {
-    const s = { reducedMotion: false, largeText: true, soundEnabled: false, quality: 'medium' as const, mouseSensitivity: 1.7 };
+    const s = { reducedMotion: false, largeText: true, soundEnabled: false, musicEnabled: false, musicVolume: 0.65, quality: 'medium' as const, mouseSensitivity: 1.7 };
     expect(parseStored(serializeStored(s))).toEqual(s);
   });
 });

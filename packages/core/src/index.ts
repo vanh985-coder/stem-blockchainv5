@@ -1,4 +1,6 @@
 export type { VillageModule, VillageId } from './village';
+export { useSceneMusic, useMusicDuck, useSfxOnMount } from './audio/useMusic';
+export { music } from './audio/musicManager';
 export { URLS, HUB_MAP_URL, MERGED, VILLAGE_IDS, resolveUrls, levelUrl, levelPath, openLevel, CLIMAX_QUERY, climaxPath, openClimax, villageWorldUrl, hubMapUrl, hubPageUrl } from './config/urls';
 export type { AppUrls, UrlEnv } from './config/urls';
 export { goToMap } from './auth/pages/shared';

@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { sound } from '../audio/sound';
+import { useMusicDuck, useSfxOnMount } from '../audio/useMusic';
 import { fmt, type FmtVars } from '../content/characters';
 import type { Question } from '../content/questions';
 import { ui } from '../content/ui';
@@ -45,6 +46,8 @@ function useShortScreen(): boolean {
 /** Thẻ câu hỏi: đáp án là nút (bấm bằng chuột, chạm hoặc bàn phím). Đúng/sai có biểu tượng và chữ, không chỉ màu. */
 export function QuizCard({ question, onAnswer, onContinue, continueLabel, vars, caption, levelId, compact = false, className = '' }: QuizCardProps) {
   const [chosen, setChosen] = useState<number | null>(null);
+  useMusicDuck();
+  useSfxOnMount('cauHoi');
   const titleId = useId();
   const answered = chosen !== null;
   // chiều cao màn hình ngắn (điện thoại nằm ngang): dùng kiểu gọn như `compact`

@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { music } from '../audio/musicManager';
 import { sound } from '../audio/sound';
 import { SETTINGS_KEY, parseStored, resolveSettings, serializeStored, type Settings, type StoredSettings } from './settings';
 
@@ -9,7 +10,7 @@ interface SettingsContextValue {
 }
 
 const DEFAULT_VALUE: SettingsContextValue = {
-  settings: { reducedMotion: false, largeText: false, soundEnabled: true, quality: 'auto', mouseSensitivity: 1, rotateMap: false },
+  settings: { reducedMotion: false, largeText: false, soundEnabled: true, musicEnabled: true, musicVolume: 0.4, quality: 'auto', mouseSensitivity: 1, rotateMap: false },
   update: () => {},
 };
 
@@ -53,6 +54,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     applyToDocument(settings);
     sound.setEnabled(settings.soundEnabled);
+    music.init();
+    music.setSfxEnabled(settings.soundEnabled);
+    music.setEnabled(settings.musicEnabled);
+    music.setVolume(settings.musicVolume);
   }, [settings]);
 
   const update = useCallback((patch: Partial<Settings>) => {
