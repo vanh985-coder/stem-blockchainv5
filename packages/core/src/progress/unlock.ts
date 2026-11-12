@@ -1,3 +1,4 @@
+import { unlockConfig } from '../config/unlockConfig';
 import { LEVELS, VILLAGE_ORDER, type LevelDef, type LevelStatus } from '../content/levels';
 
 /** Trạng thái hiện của một màn. */
@@ -20,6 +21,8 @@ export interface UnlockInput {
   isTeacher?: boolean;
   /** Ghi đè trạng thái của từng màn (dùng trong test và khi một màn đổi sang 'ready'). Không có thì dùng LEVELS. */
   statuses?: Readonly<Partial<Record<number, LevelStatus>>>;
+  /** Mở mọi màn (trừ 'coming-soon'). Mặc định lấy từ `unlockConfig.moKhoaTatCa`. */
+  openAll?: boolean;
   /** Bảng màn thay thế (mặc định LEVELS). */
   levels?: readonly LevelDef[];
 }
@@ -51,6 +54,7 @@ export interface UnlockResult {
  */
 export function computeUnlock(input: UnlockInput): UnlockResult {
   const levels = input.levels ?? LEVELS;
+  const openAll = input.openAll ?? unlockConfig.moKhoaTatCa;
   const done = new Set(input.doneLevels);
   const statusOf = (l: LevelDef): LevelStatus => input.statuses?.[l.id] ?? l.status;
   const autoSet = new Set((input.autoLevels ?? []).filter((id) => !done.has(id)));
@@ -76,7 +80,7 @@ export function computeUnlock(input: UnlockInput): UnlockResult {
         out.push({ id: l.id, state: 'done' });
       } else if (autoSet.has(l.id)) {
         out.push({ id: l.id, state: 'done', auto: true });
-      } else if (input.isTeacher) {
+      } else if (input.isTeacher || openAll) {
         out.push({ id: l.id, state: 'open' });
       } else {
         const blocker = list.slice(0, i).find((p) => !isOpened(p));
@@ -86,4 +90,14 @@ export function computeUnlock(input: UnlockInput): UnlockResult {
   });
   out.sort((a, b) => a.id - b.id);
   return { levels: out, goldenPages: golden, villageOpen };
+}
+
+/**
+ * Hàm thuần: màn có được vào không. 'coming-soon' không bao giờ vào được; 'locked' chỉ vào được khi mở khóa tất cả
+ * (`openAll`, mặc định `unlockConfig.moKhoaTatCa`). Màn không có trong danh sách (undefined) coi như khóa.
+ */
+export function canEnterLevel(state: LevelUnlock | undefined, openAll: boolean = unlockConfig.moKhoaTatCa): boolean {
+  if (!state) return openAll;
+  if (state.state === 'coming-soon') return false;
+  return state.state !== 'locked' || openAll;
 }

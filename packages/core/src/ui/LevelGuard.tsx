@@ -5,6 +5,7 @@ import { goToMap } from '../auth/pages/shared';
 import { fmt } from '../content/characters';
 import { levelById } from '../content/levels';
 import { ui } from '../content/ui';
+import { canEnterLevel } from '../progress/unlock';
 import { useProgress } from '../progress/ProgressProvider';
 import { Button } from './Button';
 import { Panel } from './Panel';
@@ -34,7 +35,7 @@ export function LevelGuard({ levelId, children }: { levelId: number; children: R
   }
 
   const state = unlock.levels.find((l) => l.id === levelId);
-  if (state?.state !== 'locked') return <>{children}</>;
+  if (state?.state !== 'locked' || canEnterLevel(state)) return <>{children}</>;
 
   const blocker = state.lockedBy ? levelById(state.lockedBy) : undefined;
   return (

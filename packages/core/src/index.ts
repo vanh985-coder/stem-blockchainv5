@@ -102,7 +102,7 @@ export type { MiniGameLevelProps, MiniGameRenderProps, ScorePart } from './ui/Mi
 export type { Medal, MedalThresholds } from './games/medals';
 export type { MiniGameFinale } from './ui/MiniGameLevel';
 export type { LevelDef, LevelKind, LevelStatus } from './content/levels';
-export { computeUnlock } from './progress/unlock';
+export { computeUnlock, canEnterLevel } from './progress/unlock';
 export type { LevelState, LevelUnlock, UnlockInput, UnlockResult } from './progress/unlock';
 export { AuthProvider, AuthContext, useAuth } from './auth/AuthProvider';
 export { canSeeTeacherPage, canUseAutoComplete, IS_DEV_BUILD } from './auth/roles';
@@ -148,6 +148,7 @@ export { VILLAGE_INTRO, villageIntroTexts } from './content/villageIntro';
 export { recordLevelResult, doneLevels, withGoldenPages, unlockOf } from './progress/record';
 export { encodeProgress, decodeProgress } from './progress/compact';
 export type { Progress, LevelProgress, GameState, LevelResult, Stars as StarMap } from './progress/types';
+export { unlockConfig } from './config/unlockConfig';
 export { LevelGuard } from './ui/LevelGuard';
 export { guardedRoute } from './ui/guardedRoute';
 export { STORY } from './content/story';
