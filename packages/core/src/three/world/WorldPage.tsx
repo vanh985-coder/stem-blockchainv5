@@ -36,6 +36,7 @@ import { useQuality } from '../useQuality';
 import { useWalkSession } from '../useWalkSession';
 import { createWalkApi } from '../walkApi';
 import { MarketHud } from '../cho/MarketHud';
+import { WorldCurtain, preloadCurtainImage, useSettled } from './WorldCurtain';
 import { MarketMenu } from '../cho/MarketMenu';
 import { GATE_OPENING_CEREMONY, GATE_VILLAGE, biQuestLine, gateOpenedAfter, gateStates, previousVillage, questGate, questLine } from '../cho/marketQuest';
 import { densityFor, type GateId } from '../cho/marketLayout';
@@ -94,6 +95,13 @@ function forcedSpawn(world: ReturnType<typeof assembleWorld>) {
   const gate = mo ? gateOpenedAfter(mo) : null;
   if (gate) return gateApproachSpawn(world, gate);
   return villageSpawn(world, q.get('tu'));
+}
+
+/** Làng nơi người chơi xuất hiện lúc mở trang (`?tu=<làng>`); không có thì chợ phiên (null). Chỉ để chọn tên và ảnh màn chờ. */
+function initialPlace(): VillageId | null {
+  if (typeof location === 'undefined') return null;
+  const tu = new URLSearchParams(location.search).get('tu');
+  return VILLAGE_ORDER.find((v) => v === tu) ?? null;
 }
 
 /** Hội thoại đang mở. */
@@ -162,6 +170,19 @@ export function WorldPage() {
   const giverRef = useRef(giver);
   giverRef.current = giver;
   const entering = inside !== null && !zoneReady.has(inside);
+  // Màn chờ che kín cảnh: lúc tải lần đầu, và khi bước vào làng mà vùng làng chưa dựng xong. Chỉ ẩn khi cảnh đã tải xong và camera, người chơi đã đặt chỗ (thêm 2 khung hình).
+  const startPlace = useMemo(initialPlace, []);
+  const [zoneStage, setZoneStage] = useState<{ village: VillageId; percent: number } | null>(null);
+  const onZoneStage = useCallback((village: VillageId, stage: number, total: number) => setZoneStage({ village, percent: total > 0 ? Math.round((stage / total) * 100) : 100 }), []);
+  const curtainSettled = useSettled(ready && !entering);
+  const curtainShown = !ready || entering || !curtainSettled;
+  // tên và ảnh của màn chờ chỉ đổi khi màn đang hiện (không đổi trong lúc mờ dần); lần tải đầu theo `?tu=`
+  const bootDone = useRef(false);
+  const placeRef = useRef<VillageId | null>(startPlace);
+  if (!curtainShown) bootDone.current = true;
+  if (curtainShown) placeRef.current = inside ?? (bootDone.current ? null : startPlace);
+  const curtainPlace = placeRef.current;
+  const curtainZonePercent = entering && zoneStage && zoneStage.village === inside ? zoneStage.percent : entering ? 0 : null;
   const [bigMap, setBigMap] = useState(false);
   const [mapPlayer, setMapPlayer] = useState<{ x: number; z: number; yaw: number } | null>(null);
   const session = useWalkSession(api, dialog !== null || know !== null || collection !== null || guide !== null || entering || bigMap);
@@ -522,6 +543,10 @@ export function WorldPage() {
       });
     }
   }, [ready, flagKnown, prewarmZones, data]);
+  useEffect(() => {
+    if (!manifest) return;
+    for (const id of VILLAGE_ORDER) if (prewarmZones[id]) preloadCurtainImage(id);
+  }, [manifest, prewarmZones]);
   const warmVillage = warmQueue[0] ?? null;
   useEffect(() => {
     if (warmVillage === null) return;
@@ -556,9 +581,11 @@ export function WorldPage() {
         onMenu={session.toggleMenu}
         onMap={toggleMap}
         className="size-full"
+        hideRun={curtainShown}
       >
         <Scene3D
           errorCovers
+          hideLoading
           quality={forced}
           camera={{ position: [camStart.x - Math.sin(camStart.yaw) * 7, 4, camStart.z - Math.cos(camStart.yaw) * 7], fov: 50 }}
           lookAt={[camStart.x, 1.3, camStart.z]}
@@ -597,12 +624,14 @@ export function WorldPage() {
             onInside={setInside}
             onNearGate={setNearGate}
             onZoneReady={onZoneReady}
+            onZoneStage={onZoneStage}
             knowMasks={knowMasks}
             inside={inside}
             onNearestScroll={setScrollIdx}
           />
         </Scene3D>
 
+        {!curtainShown && (
         <MarketHud
           quest={questText}
           pages={pages}
@@ -612,6 +641,7 @@ export function WorldPage() {
           nearBoard={isNearBoard}
           map={<MiniMap geo={mapGeo} markers={miniMarkers} names={miniNames} api={api} inside={inside} rotate={settings.rotateMap} size={miniMapSize(touch, settings.largeText)} touch={touch} reducedMotion={settings.reducedMotion} onOpen={() => !mapLive.current.blocked && !mapLive.current.bigMap && openMap()} />}
         />
+        )}
 
         {/* Lời nhắc tương tác ở máy tính (điện thoại hiện trên nút ✋) */}
         {label && !session.paused && (
@@ -621,15 +651,6 @@ export function WorldPage() {
             </span>
           </div>
         )}
-        {/* Tới cổng làng mà vùng làng chưa dựng xong */}
-        {entering && (
-          <div data-hud className="pointer-events-none absolute inset-0 z-20 grid place-items-center">
-            <span className="rounded-nut bg-black/70 px-5 py-3 font-display text-xl font-extrabold text-white" role="status" data-testid="dang-vao-lang">
-              {ui.thegioi.dangVaoLang}
-            </span>
-          </div>
-        )}
-
         {/* Dấu chấm giữa màn hình khi đã khóa chuột (con trỏ bị ẩn) */}
         {session.lockMode && session.locked && <div data-hud aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-10 size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80 ring-1 ring-black/40" />}
       </WalkControls>
@@ -665,7 +686,8 @@ export function WorldPage() {
       {guide && <GuideDialog section={guide.section} onClose={closeGuide} />}
       {bigMap && <BigMap geo={mapGeo} markers={bigMarkers} names={mapNames} player={mapPlayer} progress={mapProgress} quest={questText} touch={touch} reducedMotion={settings.reducedMotion} onClose={closeMap} api={api} />}
 
-      <WalkLockOverlay session={session} hideMenu />
+      <WorldCurtain shown={curtainShown} place={curtainPlace} zonePercent={curtainZonePercent} reducedMotion={settings.reducedMotion} />
+      <WalkLockOverlay session={session} hideMenu hideHint={curtainShown} />
       <MarketMenu session={session} onGuide={() => openGuide()} extraItems={menuKnow} />
     </div>
   );

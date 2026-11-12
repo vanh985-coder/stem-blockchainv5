@@ -43,6 +43,8 @@ export interface Scene3DProps {
   onReady?: () => void;
   /** Cảnh lỗi thì hộp báo lỗi phủ kín cả màn hình (trang đi lại toàn màn hình: chợ, làng) */
   errorCovers?: boolean;
+  /** Không vẽ màn hình tải riêng (nơi dùng tự vẽ màn chờ phủ kín, ví dụ thế giới mở) */
+  hideLoading?: boolean;
 }
 
 /** Hướng camera về một điểm khi dựng cảnh (không cấp phát trong useFrame; chỉ chạy một lần). */
@@ -84,6 +86,7 @@ function Scene3DInner({
   shadowFollowPlayer = false,
   onQualityLowered,
   onReady,
+  hideLoading = false,
 }: Scene3DProps) {
   const { level } = useQuality(quality);
   const { settings } = useSettings();
@@ -127,7 +130,7 @@ function Scene3DInner({
           </Suspense>
         </QualityContext.Provider>
       </Canvas>
-      <LoadingScreen visible={!ready} />
+      {!hideLoading && <LoadingScreen visible={!ready} />}
     </div>
   );
 }

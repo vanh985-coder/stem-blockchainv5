@@ -651,12 +651,16 @@ export const ui = {
     choiTiep: 'Chơi tiếp: {man}',
   },
 
+  /** Màn chờ chung của thế giới mở khi vào chợ, vào làng (ảnh tranh phủ kín, tên nơi sắp vào, thanh tiến độ) */
+  manCho: {
+    tenCho: 'Chợ phiên',
+    dangVao: 'Em sắp vào',
+  },
+
   /** Thế giới mở ở /cho (mốc 2, bước W1): chợ và 4 làng trong một cảnh */
   thegioi: {
     /** Mặt sau biển chỉ đường ở lối ra chợ (người đi về chợ đọc được) */
     bienChoPhien: 'Chợ phiên',
-    /** Hiện ngắn khi tới cổng làng mà vùng làng chưa tải xong */
-    dangVaoLang: 'Đang vào làng…',
   },
 
   /** Trang /dev/walk (chỉ có khi chạy dev) */

@@ -30,6 +30,8 @@ export interface WalkControlsProps {
   /** Phím M: nơi gọi tự quyết định mở hay đóng bản đồ lớn (bỏ trống thì phím M không làm gì) */
   onMap?: () => void;
   className?: string;
+  /** Ẩn nút "Chạy nhanh" (màn chờ đang che cảnh) */
+  hideRun?: boolean;
   /** Khung 3D và các lớp giao diện (HUD...). Phần tử có thuộc tính `data-walk-ui` không bắt đầu kéo camera hay cần điều khiển. */
   children?: ReactNode;
 }
@@ -54,7 +56,7 @@ function isTyping(target: EventTarget | null): boolean {
  * - Nút "Chạy nhanh" (cả hai loại máy) bật tắt chạy nhanh; tạm dừng (hộp thoại, bản đồ lớn, hướng dẫn, menu) thì tự tắt.
  * Tạm dừng thì thả hết phím, cần điều khiển và tắt chạy nhanh.
  */
-export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockChange, onLockError, interactLabel, onInteract, onMenu, onMap, className = '', children }: WalkControlsProps) {
+export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockChange, onLockError, interactLabel, onInteract, onMenu, onMap, className = '', hideRun = false, children }: WalkControlsProps) {
   const root = useRef<HTMLDivElement>(null);
   const base = useRef<HTMLDivElement>(null);
   const knob = useRef<HTMLDivElement>(null);
@@ -293,6 +295,7 @@ export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockCh
   return (
     <div ref={root} className={`relative select-none overflow-hidden ${className}`} style={{ touchAction: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', overscrollBehavior: 'none' }}>
       {children}
+      {!hideRun && (
       <button
         type="button"
         data-walk-ui
@@ -312,6 +315,7 @@ export function WalkControls({ api, paused, lockMode, mouseSensitivity, onLockCh
       >
         {touchMode ? ui.dungDi.nutChayNhanh : ui.dungDi.nutChayNhanhPhim}
       </button>
+      )}
       {touchMode && (
         <>
           <div
