@@ -10,11 +10,11 @@ import type { WalkSession } from './useWalkSession';
  * `hideMenu`: nơi dùng tự vẽ menu riêng (chợ phiên: `MarketMenu`), chỉ giữ dòng nhắc.
  * `children` là các điều khiển thêm trong menu (ví dụ độ nhạy chuột); bấm vào chúng không khóa chuột.
  */
-export function WalkLockOverlay({ session, children, title = ui.dungDi.menuTieuDe, description = ui.dungDi.menuMoTa, hideMenu = false }: { session: WalkSession; children?: ReactNode; title?: string; description?: string; hideMenu?: boolean }) {
+export function WalkLockOverlay({ session, children, title = ui.dungDi.menuTieuDe, description = ui.dungDi.menuMoTa, hideMenu = false, hideHint = false }: { session: WalkSession; children?: ReactNode; title?: string; description?: string; hideMenu?: boolean; /** Chưa hiện dòng "Bấm để điều khiển" (màn chờ còn che cảnh) */ hideHint?: boolean }) {
   const { lockMode, showHint, menuOpen, lock, closeMenu } = session;
   return (
     <>
-      {showHint && (
+      {showHint && !hideHint && (
         <div className="pointer-events-none fixed inset-x-0 top-1/2 z-40 flex -translate-y-1/2 justify-center">
           <span className="rounded-nut bg-black/55 px-4 py-2 font-display text-base font-extrabold text-white" role="status">
             {ui.dungDi.baiDeDieuKhien}

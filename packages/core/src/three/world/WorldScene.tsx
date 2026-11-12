@@ -84,6 +84,8 @@ export interface WorldSceneProps {
   onNearGate: (gate: GateId | null) => void;
   /** Vùng làng đã dựng xong (từng phần dựng dần) */
   onZoneReady: (village: VillageId) => void;
+  /** Tiến độ dựng vùng làng (số phần đã xong, tổng số phần) */
+  onZoneStage?: (village: VillageId, stage: number, total: number) => void;
   /** Mặt nạ bit các thẻ "Em có biết?" đã nhặt của từng làng (bước X3); thẻ chưa nhặt hiện cuộn giấy và cột sáng */
   knowMasks: Readonly<Record<VillageId, number>>;
   /** Làng người chơi đang ở trong (đã qua cổng) và báo chỉ số thẻ chưa nhặt gần nhất của làng đó (−1: không có) */
@@ -125,6 +127,7 @@ export function WorldScene({
   onInside,
   onNearGate,
   onZoneReady,
+  onZoneStage,
   mission,
   knowMasks,
   inside,
@@ -207,6 +210,7 @@ export function WorldScene({
           animate={animate}
           prewarmed={prewarmed.has(v.id)}
           onReady={onZoneReady}
+          onStage={onZoneStage}
         />
       ))}
       {market.villagerPaths.map((path, i) => (

@@ -43,6 +43,8 @@ export interface VillageZoneProps {
   prewarmed: boolean;
   /** Gọi một lần khi mọi phần của vùng đã dựng xong */
   onReady: (village: VillageId) => void;
+  /** Báo mỗi khi dựng xong thêm một phần (số phần đã xong, tổng số phần): để màn chờ vẽ thanh tiến độ */
+  onStage?: (village: VillageId, stage: number, total: number) => void;
 }
 
 /** Model dân làng theo thứ tự đi lại (bà cụ, chú nông dân xen kẽ). */
@@ -102,7 +104,7 @@ function Companion({ def }: { def: VillageGuideDef }) {
  * trong một khung hình, để không khựng khi người chơi tới gần. Gỡ vùng (xa quá) thì mọi hình học, vật liệu riêng và texture biển được giải phóng bởi chính từng phần. Mặt đất, cổng và hình dáng nhìn từ xa
  * (bản xa) nằm ngoài vùng nên luôn có. Đặt trong <WalkWorld>.
  */
-export function VillageZone({ village, level, labels, icons, states, guideTalking, talkAt, villagerColliders, collected, animate, prewarmed, onReady }: VillageZoneProps) {
+export function VillageZone({ village, level, labels, icons, states, guideTalking, talkAt, villagerColliders, collected, animate, prewarmed, onReady, onStage }: VillageZoneProps) {
   const layout = village.layout;
   const byModel = useMemo(() => {
     const out: { id: string; items: Placement[] }[] = [];
@@ -140,6 +142,9 @@ export function VillageZone({ village, level, labels, icons, states, guideTalkin
       (w.__zoneLog ??= []).push([village.id, stage, performance.now()]);
     }
   }, [stage, village.id]);
+  useEffect(() => {
+    onStage?.(village.id, Math.min(stage, total), total);
+  }, [stage, total, village.id, onStage]);
   useEffect(() => {
     if (stage >= total && !ready.current) {
       ready.current = true;
