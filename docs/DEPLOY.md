@@ -11,7 +11,9 @@ Tài liệu này dành cho người làm tay trên **Windows Server** đã cài 
 | Làng Dệt | https://sb-lang-det.blockchainptit.com | 18083 |
 | Làng Khắc Dấu | https://sb-lang-khac-dau.blockchainptit.com | 18084 |
 | Làng Bạc | https://sb-lang-bac.blockchainptit.com | 18085 |
-| Đồ họa | https://sb-assets.blockchainptit.com | 18086 |
+| Đồ họa (tùy chọn) | https://sb-assets.blockchainptit.com | 18086 |
+
+**Một tên miền (nhánh `feat/mot-ten-mien`):** đồ họa cũng được phục vụ NGAY trên hub, đường dẫn `/do-hoa/*` (Caddy site 8081 phục vụ `assets-build/`, cùng quy tắc cache và kiểu file như site 8086), và `VITE_ASSETS_URL=/do-hoa` (đường dẫn tương đối, mẫu ở `deploy/.env.example`). Cùng một bản build mở bằng `localhost:18081`, `127.0.0.1:18081` hay `https://stem-block.blockchainptit.com` đều tải được ảnh, model, nhạc. **Tunnel chỉ cần MỘT dòng: `stem-block.blockchainptit.com` → `http://localhost:18081`.** `sb-assets` (18086) và 4 subdomain làng là TÙY CHỌN (giữ để link cũ vẫn chạy); `/do-hoa/` thiếu file thì trả 404 (không trả `index.html`). Nơi nào ở dưới còn nhắc "6 hostname" hay `VITE_ASSETS_URL` trỏ `sb-assets` thì đó là cách cũ, vẫn chạy nếu đặt `VITE_ASSETS_URL=https://sb-assets.blockchainptit.com`.
 
 Tất cả lệnh dưới đây chạy trong **PowerShell** trên server, trừ khi ghi khác.
 

@@ -2,9 +2,11 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { fmt } from '../content/characters';
 import { ui } from '../content/ui';
 import { devWarn } from '../lib/dev';
-import { lookupAsset, resolveAssetsUrl, type Manifest } from './manifest';
+import { joinAssetUrl, lookupAsset, resolveAssetsUrl, type Manifest } from './manifest';
 
 export const ASSETS_URL = resolveAssetsUrl(import.meta.env.VITE_ASSETS_URL, import.meta.env.DEV && typeof location !== 'undefined' ? location.hostname : undefined);
+
+const MANIFEST_URL = joinAssetUrl(ASSETS_URL, 'manifest.json');
 
 let manifest: Manifest | null = null;
 let loading: Promise<Manifest> | null = null;
@@ -12,13 +14,13 @@ const listeners = new Set<() => void>();
 
 /** Tải manifest một lần. Lỗi mạng hoặc thiếu file thì coi như manifest rỗng (mọi ảnh dùng hình thay thế). */
 export function loadManifest(): Promise<Manifest> {
-  loading ??= fetch(`${ASSETS_URL}/manifest.json`)
+  loading ??= fetch(MANIFEST_URL)
     .then((r) => {
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return r.json() as Promise<Manifest>;
     })
     .catch((e: unknown) => {
-      devWarn(fmt(ui.dev.manifestLoi, { path: `${ASSETS_URL}/manifest.json`, loi: String(e) }));
+      devWarn(fmt(ui.dev.manifestLoi, { path: MANIFEST_URL, loi: String(e) }));
       return {} as Manifest;
     })
     .then((m) => {
