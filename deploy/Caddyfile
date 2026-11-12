@@ -24,6 +24,31 @@
 		file_server
 	}
 
+	# Đồ họa cùng tên miền với web chính: /do-hoa/* phục vụ assets-build (cùng quy tắc với site 8086 bên dưới).
+	# Đặt TRƯỚC "handle" chung để /do-hoa/ thiếu file thì 404, không trả index.html.
+	handle_path /do-hoa/* {
+		root * /srv/assets
+		header {
+			Access-Control-Allow-Origin "*"
+			X-Content-Type-Options nosniff
+		}
+		@webp path *.webp
+		header @webp Content-Type "image/webp"
+		@glb path *.glb
+		header @glb Content-Type "model/gltf-binary"
+		@woff2 path *.woff2
+		header @woff2 Content-Type "font/woff2"
+		@mp3 path *.mp3
+		header @mp3 Content-Type "audio/mpeg"
+		@hashed path_regexp hashed \.[0-9a-f]{8}\.[a-z0-9]+$
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+		@unhashed {
+			not path_regexp hashed \.[0-9a-f]{8}\.[a-z0-9]+$
+		}
+		header @unhashed Cache-Control "no-cache"
+		file_server
+	}
+
 	# Mọi đường dẫn khác: có file thì trả file, không thì trả index.html (SPA). Luôn "no-cache" để bản mới có hiệu lực ngay.
 	handle {
 		header Cache-Control "no-cache"

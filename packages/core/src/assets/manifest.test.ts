@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hasAsset, isIpHostname, lookupAsset, normalizeAssetPath, resolveAssetsUrl, type Manifest } from './manifest';
+import { hasAsset, isIpHostname, joinAssetUrl, lookupAsset, normalizeAssetPath, resolveAssetsUrl, type Manifest } from './manifest';
 
 const manifest: Manifest = {
   'scenes/bai-hoc-lang-giay': { file: 'scenes/bai-hoc-lang-giay.f18abe56.webp', bytes: 139322, width: 1376, height: 768 },
@@ -96,5 +96,37 @@ describe('normalizeAssetPath / hasAsset / resolveAssetsUrl', () => {
     expect(isIpHostname('localhost')).toBe(false);
     expect(isIpHostname('mypc.local')).toBe(false);
     expect(isIpHostname('1.2.3')).toBe(false);
+  });
+});
+
+describe('joinAssetUrl / gốc đồ họa tương đối', () => {
+  it('ghép đúng với mọi dạng gốc, có hoặc không có "/" cuối, không có "//" thừa', () => {
+    const cases: Array<[string, string]> = [
+      ['/do-hoa', '/do-hoa/manifest.json'],
+      ['/do-hoa/', '/do-hoa/manifest.json'],
+      ['http://localhost:5180', 'http://localhost:5180/manifest.json'],
+      ['http://localhost:5180/', 'http://localhost:5180/manifest.json'],
+      ['https://x.vn/do-hoa', 'https://x.vn/do-hoa/manifest.json'],
+      ['https://x.vn/do-hoa/', 'https://x.vn/do-hoa/manifest.json'],
+    ];
+    for (const [base, want] of cases) {
+      expect(joinAssetUrl(base, 'manifest.json')).toBe(want);
+      expect(joinAssetUrl(base, '/manifest.json')).toBe(want);
+    }
+  });
+
+  it('resolveAssetsUrl giữ đường dẫn tương đối, kể cả khi mở bằng IP', () => {
+    expect(resolveAssetsUrl('/do-hoa')).toBe('/do-hoa');
+    expect(resolveAssetsUrl('/do-hoa/')).toBe('/do-hoa');
+    expect(resolveAssetsUrl('/do-hoa/', '192.168.0.5')).toBe('/do-hoa');
+    expect(resolveAssetsUrl('/do-hoa', 'localhost')).toBe('/do-hoa');
+  });
+
+  it('lookupAsset với gốc tương đối', () => {
+    const m: Manifest = { 'a/b': { file: 'a/b.12345678.webp', bytes: 1, width: 1, height: 1 } };
+    expect(lookupAsset(m, '/do-hoa', 'a/b')).toBe('/do-hoa/a/b.12345678.webp');
+    expect(lookupAsset(m, '/do-hoa/', 'a/b')).toBe('/do-hoa/a/b.12345678.webp');
+    expect(lookupAsset(m, 'https://x.vn/do-hoa', 'a/b')).toBe('https://x.vn/do-hoa/a/b.12345678.webp');
+    expect(lookupAsset(m, 'http://localhost:5180', 'a/b')).toBe('http://localhost:5180/a/b.12345678.webp');
   });
 });

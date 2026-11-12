@@ -21,12 +21,21 @@ export function normalizeAssetPath(path: string): string {
   return path.replace(/\\/g, '/').replace(/^\/+/, '').replace(KNOWN_EXT, '');
 }
 
+/**
+ * Hàm thuần: ghép địa chỉ gốc của đồ họa với đường dẫn file. Gốc có thể là URL đầy đủ (http://localhost:5180)
+ * hoặc đường dẫn tương đối cùng tên miền (/do-hoa); có hay không có "/" cuối đều ra đúng, không có "//" thừa.
+ * Không dùng new URL(path, base) vì base tương đối sẽ báo lỗi.
+ */
+export function joinAssetUrl(baseUrl: string, path: string): string {
+  return `${baseUrl.trim().replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`;
+}
+
 /** Hàm thuần: tra manifest, trả URL đầy đủ hoặc null nếu không có. */
 export function lookupAsset(manifest: Manifest | null | undefined, baseUrl: string, path: string): string | null {
   if (!manifest) return null;
   const key = normalizeAssetPath(path);
   if (!Object.prototype.hasOwnProperty.call(manifest, key)) return null;
-  return `${baseUrl.replace(/\/+$/, '')}/${encodeURI(manifest[key].file)}`;
+  return joinAssetUrl(baseUrl, encodeURI(manifest[key].file));
 }
 
 /** Hàm thuần: có mục trong manifest không (cả khi chưa tải xong thì trả false). */
@@ -45,7 +54,7 @@ export function isIpHostname(hostname: string): boolean {
 }
 
 /**
- * Hàm thuần: địa chỉ gốc của đồ họa, bỏ dấu "/" cuối; trống thì dùng cổng dev:assets.
+ * Hàm thuần: địa chỉ gốc của đồ họa, bỏ dấu "/" cuối; trống thì dùng cổng dev:assets. Đường dẫn tương đối (/do-hoa) giữ nguyên.
  * Chỉ khi chạy dev trên điện thoại: trang mở bằng **địa chỉ IP** (ví dụ http://192.168.0.5:5173 sau `pnpm dev:hub --host`) mà địa chỉ
  * đồ họa vẫn trỏ về localhost (điện thoại không có đồ họa ở "localhost" của nó) thì đổi tên máy thành IP của trang.
  * Không đổi trong mọi trường hợp khác: trang mở ở localhost, trang mở bằng tên miền (bản thật: stem-block.…, sb-lang-….), địa chỉ
@@ -54,6 +63,7 @@ export function isIpHostname(hostname: string): boolean {
  */
 export function resolveAssetsUrl(value: string | undefined, pageHostname?: string): string {
   const v = (value ?? '').trim();
+  if (v.startsWith('/')) return v.replace(/\/+$/, '');
   const base = (v === '' ? LOCAL_ASSETS_URL : v).replace(/\/+$/, '');
   if (!pageHostname || LOOPBACK.has(pageHostname.toLowerCase()) || !isIpHostname(pageHostname)) return base;
   try {

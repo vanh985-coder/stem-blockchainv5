@@ -172,7 +172,7 @@ File trong assets-build/ mang mã băm nội dung trong tên (ten.<hash8>.webp);
 | `VITE_SUPABASE_URL` | `https://xxxx.supabase.co` | Spec 02 |
 | `VITE_SUPABASE_ANON_KEY` | `eyJ…` | Khóa công khai, được phép để ở frontend |
 | `VITE_USERNAME_EMAIL_DOMAIN` | `hs.ten-mien.vn` | Spec 02: tên miền email nội bộ của tài khoản tên đăng nhập (`<ten>@…`); học sinh không thấy, không gửi email |
-| `VITE_ASSETS_URL` | `https://assets.ten-mien.vn` | Lúc dev: `http://localhost:5180` |
+| `VITE_ASSETS_URL` | `/do-hoa` | Đường dẫn tương đối cùng tên miền với hub (Caddy phục vụ `assets-build/` ở `/do-hoa/*`; khuyên dùng khi deploy) hoặc URL đầy đủ (`https://assets.ten-mien.vn`). Lúc dev: `http://localhost:5180`. Mọi chỗ ghép địa chỉ đồ họa đi qua `joinAssetUrl` (`packages/core/src/assets/manifest.ts`): có hay không có `/` cuối đều đúng |
 | `VITE_HUB_URL` | `https://ten-mien.vn` | |
 | `VITE_COOKIE_DOMAIN` | `.ten-mien.vn` | Để trống khi chạy localhost |
 | `VITE_MERGED` | `false` | `true` từ bước G1 (gộp web): 4 làng chạy trong hub và điều hướng nội bộ. `deploy/.env.example` đặt `true` |
@@ -188,7 +188,7 @@ File trong assets-build/ mang mã băm nội dung trong tên (ten.<hash8>.webp);
 | lang-det | `https://sb-lang-det.blockchainptit.com` | 18083 (`LANG_DET_PORT`) | 8083 |
 | lang-khac-dau | `https://sb-lang-khac-dau.blockchainptit.com` | 18084 (`LANG_KHAC_DAU_PORT`) | 8084 |
 | lang-bac | `https://sb-lang-bac.blockchainptit.com` | 18085 (`LANG_BAC_PORT`) | 8085 |
-| assets | `https://sb-assets.blockchainptit.com` | 18086 (`ASSETS_PORT`) | 8086 |
+| assets (tùy chọn) | `https://sb-assets.blockchainptit.com` | 18086 (`ASSETS_PORT`) | 8086 |
 
 **File liên quan:**
 - `Dockerfile` (gốc repo), 2 tầng:
@@ -196,12 +196,13 @@ File trong assets-build/ mang mã băm nội dung trong tên (ten.<hash8>.webp);
   - tầng chạy: `caddy:2-alpine` kèm `dist` của 5 app, `assets-build/` (không có `_preview/`) và `deploy/Caddyfile`.
 - `.dockerignore`: `node_modules`, `dist`, `assets/`, `.env*`, `assets-build/_preview/`, `.git`.
 - `deploy/Caddyfile`:
+  - một tên miền: site hub (8081) có `handle_path /do-hoa/*` phục vụ `assets-build/` (CORS `*`, mã băm 8 ký tự `immutable`, `manifest.json` `no-cache`, kiểu `.webp`, `.glb`, `.woff2`, `.mp3`), đặt trước quy tắc trả `index.html` nên `/do-hoa/` thiếu file thì 404. Tunnel chỉ cần `stem-block` → 18081; site 8086 và 4 subdomain làng là tùy chọn;
   - 5 app: đường dẫn không phải file thì trả `index.html`; `index.html` là `no-cache`; file trong `/assets/` (có mã băm) là `public, max-age=31536000, immutable`; nén zstd/gzip; header `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` tắt camera, micro, định vị;
   - từ bước G1, 4 site làng (8082 đến 8085) chỉ có `redir {$HUB_ORIGIN:https://stem-block.blockchainptit.com}{uri} 302` (bản cũ: `deploy/Caddyfile.truoc-gop`; deploy và quay về: `docs/DEPLOY.md` mục j);
   - assets: `Access-Control-Allow-Origin: *`; file có mã băm 8 ký tự là `immutable`, còn lại (như `manifest.json`) là `no-cache`; khai báo kiểu `.webp`, `.glb`, `.woff2` (giống `pnpm dev:assets`).
 - `deploy/docker-compose.yml`: 1 service, `restart: unless-stopped`, cổng trên server gắn vào `127.0.0.1` lấy từ `deploy/.env` (`HUB_PORT`, `LANG_GIAY_PORT`, `LANG_DET_PORT`, `LANG_KHAC_DAU_PORT`, `LANG_BAC_PORT`, `ASSETS_PORT`; mặc định 18081–18086 để khỏi trùng chương trình khác; cổng bên trong container giữ nguyên 8081–8086), build args lấy từ `deploy/.env` (không commit; mẫu ở `deploy/.env.example`), có healthcheck.
 
-**Biến môi trường khi deploy:** `VITE_HUB_URL`, 4 biến `VITE_LANG_*_URL`, `VITE_ASSETS_URL` là 6 địa chỉ ở bảng trên; `VITE_COOKIE_DOMAIN=.blockchainptit.com`; `VITE_USERNAME_EMAIL_DOMAIN=hs.blockchainptit.com` (cùng giá trị với secret `USERNAME_EMAIL_DOMAIN` của Edge Function, spec 09); `VITE_SUPABASE_URL` và `VITE_SUPABASE_ANON_KEY` (chỉ khóa công khai).
+**Biến môi trường khi deploy:** `VITE_HUB_URL`, 4 biến `VITE_LANG_*_URL`, `VITE_ASSETS_URL` là các địa chỉ ở bảng trên (riêng `VITE_ASSETS_URL` nên là `/do-hoa`, xem mục 6); `VITE_COOKIE_DOMAIN=.blockchainptit.com`; `VITE_USERNAME_EMAIL_DOMAIN=hs.blockchainptit.com` (cùng giá trị với secret `USERNAME_EMAIL_DOMAIN` của Edge Function, spec 09); `VITE_SUPABASE_URL` và `VITE_SUPABASE_ANON_KEY` (chỉ khóa công khai).
 
 **Cookie:** cookie phiên Supabase, `sc_guest` và `sc_pending` đều đặt `Domain=.blockchainptit.com`, `Path=/`, `SameSite=Lax` và `Secure` (khi trang chạy https). Cookie dùng chung cho mọi subdomain `*.blockchainptit.com` đã được chủ dự án chấp nhận (mọi dịch vụ khác trên tên miền này cũng thấy cookie đó). **Tài khoản admin và giáo viên nên dùng hồ sơ trình duyệt riêng** (Chrome Profile hoặc cửa sổ riêng), tách khỏi các việc khác trên tên miền.
 

@@ -9,7 +9,7 @@ export { ExternalRedirect } from './ui/ExternalRedirect';
 export { RequireStory, useStoryGate } from './ui/RequireStory';
 export { lazyRoute } from './ui/lazyRoute';
 export { asset, loadManifest, useManifest, ASSETS_URL } from './assets/store';
-export { lookupAsset, hasAsset, normalizeAssetPath, resolveAssetsUrl } from './assets/manifest';
+export { joinAssetUrl, lookupAsset, hasAsset, normalizeAssetPath, resolveAssetsUrl } from './assets/manifest';
 export type { Manifest, ManifestEntry } from './assets/manifest';
 export { AssetImage } from './assets/AssetImage';
 export { Portrait, PORTRAIT_IDS } from './assets/Portrait';
