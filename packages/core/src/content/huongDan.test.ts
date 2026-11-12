@@ -173,3 +173,23 @@ describe('hướng dẫn riêng của màn 8 và màn 12 (bước HD)', () => {
     expect(guideText(p, 'dt')).toMatch(/Chạm/);
   });
 });
+
+describe('guideText theo cờ mở khóa tất cả', () => {
+  const allPages = () => GUIDE_SECTIONS.flatMap((s) => [...s.trang] as GuidePage[]);
+
+  it('cờ bật: không còn câu nói về màn bị khóa, mờ hay chưa mở (cả máy tính lẫn điện thoại)', () => {
+    for (const p of allPages()) {
+      for (const dev of ['may', 'dt'] as const) {
+        expect(guideText(p, dev, true)).not.toMatch(/còn khóa|chưa mở|còn mờ/);
+      }
+    }
+  });
+
+  it('cờ tắt: giữ lời cũ; trang không có lời riêng thì giống nhau ở hai chế độ', () => {
+    const withAlt = allPages().filter((p) => p.moKhoa);
+    expect(withAlt.length).toBeGreaterThan(0);
+    for (const p of withAlt) expect(guideText(p, 'may', false)).toBe(p.may);
+    const plain = allPages().find((p) => !p.moKhoa)!;
+    expect(guideText(plain, 'may', true)).toBe(guideText(plain, 'may', false));
+  });
+});

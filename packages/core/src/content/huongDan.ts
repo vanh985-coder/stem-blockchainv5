@@ -9,6 +9,7 @@
  * Mỗi trang có lời cho máy tính (`may`) và cho điện thoại (`dt`, bỏ trống thì dùng chung lời `may`); hình cũng có thể khác theo thiết bị (`hinhDt`).
  */
 
+import { unlockConfig } from '../config/unlockConfig';
 import { HUONG_DAN_GAME } from './huongDanGame';
 
 /** Hình chụp thật từ game: đường dẫn trong assets là `ui/huong-dan/<id>` */
@@ -92,6 +93,8 @@ export interface GuidePage {
   /** 1 đến 2 câu ngắn cho máy tính (và điện thoại nếu không có `dt`) */
   may: string;
   dt?: string;
+  /** Lời thay thế khi `unlockConfig.moKhoaTatCa` bật (mọi màn đều mở nên không nói về màn bị khóa) */
+  moKhoa?: { may: string; dt?: string };
 }
 
 export interface GuideSection {
@@ -168,6 +171,10 @@ export const GUIDE_SECTIONS = [
         hinh: shot('bien-go'),
         may: 'Trong làng, đứng trước biển gỗ và bấm E để vào màn chơi. Biển còn mờ nghĩa là màn chưa mở. Bấm E ở bác An để nghe lời nhắc.',
         dt: 'Trong làng, đứng trước biển gỗ và bấm nút bàn tay để vào màn chơi. Biển còn mờ nghĩa là màn chưa mở. Bấm nút bàn tay ở bác An để nghe lời nhắc.',
+        moKhoa: {
+          may: 'Trong làng, đứng trước biển gỗ và bấm E để vào màn chơi. Màn nào em cũng vào được. Bấm E ở bác An để nghe lời nhắc.',
+          dt: 'Trong làng, đứng trước biển gỗ và bấm nút bàn tay để vào màn chơi. Màn nào em cũng vào được. Bấm nút bàn tay ở bác An để nghe lời nhắc.',
+        },
       },
     ],
   },
@@ -206,6 +213,7 @@ export const GUIDE_SECTIONS = [
       {
         hinh: shot('ban-do'),
         may: 'Bản đồ cho em xem các màn của bốn làng: màn đã xong, màn đang mở và màn còn khóa. Mở bản đồ từ menu.',
+        moKhoa: { may: 'Bản đồ cho em xem các màn của bốn làng: màn đã xong và màn chưa chơi. Mở bản đồ từ menu.' },
       },
       {
         hinh: art('bon-trang'),
@@ -273,6 +281,7 @@ export function guideFigure(page: GuidePage, device: GuideDevice): GuideFigure {
 }
 
 /** Lời của trang theo thiết bị (điện thoại dùng `dt` nếu có, không thì lời chung `may`) */
-export function guideText(page: GuidePage, device: GuideDevice): string {
-  return device === 'dt' && page.dt ? page.dt : page.may;
+export function guideText(page: GuidePage, device: GuideDevice, openAll: boolean = unlockConfig.moKhoaTatCa): string {
+  const p = openAll && page.moKhoa ? { ...page, ...page.moKhoa } : page;
+  return device === 'dt' && p.dt ? p.dt : p.may;
 }
