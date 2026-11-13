@@ -17,6 +17,8 @@ import { bai2Texts } from '@so-chung/core/content/lessons/bai-2';
 import { tutorialTexts } from '@so-chung/core/content/tutorial';
 import { formatNumber } from '@so-chung/core/lib/format';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
+import { demoProbe } from '@so-chung/core/demo/probe';
+import { TRON } from '@so-chung/core/demo/tron/data';
 import { explainCheck, generateMedium, type MediumPage, type MediumRound, type Proposal } from '@so-chung/core/lessons/bai-2/logic';
 import { Chan, tenGiua } from './nguoi';
 
@@ -59,7 +61,7 @@ const CHAIN_SLOT = 'pointer-events-none absolute -left-2 top-1/2 z-20 flex -tran
 export function Medium({ onComplete, onFail }: { onComplete: (r: StationResult) => void; onFail: (tip: string) => void }) {
   const realStartTime = useRef(performance.now());
 
-  const gameData = useMemo(() => generateMedium(createMulberry32((Date.now() ^ (Math.random() * 0x100000000)) >>> 0)), []);
+  const gameData = useMemo(() => generateMedium(createMulberry32(TRON ? TRON.man4.mediumSeed : (Date.now() ^ (Math.random() * 0x100000000)) >>> 0)), []);
 
   // Trạng thái Hướng dẫn focus và Làm thử (P8c)
   const [tutorialOpen, setTutorialOpen] = useState(true);
@@ -191,6 +193,9 @@ export function Medium({ onComplete, onFail }: { onComplete: (r: StationResult) 
       });
     }
   };
+
+  // Bot demo (chỉ bản build VITE_DEMO)
+  demoProbe('man4', { station: 'tb', tutorialOpen, feedbackOpen: feedback.isOpen, agree: currentRound ? currentRound.isValid : null, round: roundIndex });
 
   if (!currentRound) return null;
 

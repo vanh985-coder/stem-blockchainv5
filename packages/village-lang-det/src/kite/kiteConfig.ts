@@ -2,6 +2,8 @@
  * Số liệu của màn 6 "Diều đưa sổ" (spec 06, mục "Màn 6"). Đơn vị thời gian: GIÂY (mọi `dt`, đồng hồ, bộ đếm); khoảng cách: đơn vị thế giới của cảnh (vùng bay cao từ 0 tới 10), x tăng về phía diều bay.
  * Những chỗ spec chưa nói (đã chốt trong lời giao bước B8, ghi cả trong spec 06) được ghi chú "chốt B8"; chỗ tự chọn thêm ghi "tự chọn".
  */
+import { TRON } from '@so-chung/core/demo/tron/data';
+
 export const KITE_SPEC = {
   /** Mỗi lần bật lên, vận tốc đứng thành giá trị này; trọng lực; rơi nhanh nhất (vận tốc đứng thấp nhất, âm là đi xuống) */
   flapVelocity: 5.5,
@@ -58,7 +60,7 @@ export const KITE_SPEC = {
    * Cổng làng: sau khe thứ 6, 12, 18, 24 là cổng của làng thứ 1, 2, 3, 4. Cổng đặt giữa khe đó và khe kế (`offset` từ tâm khe, tự chọn = nửa khoảng cách). Tới cổng game dừng và hiện câu hỏi `quizSeconds` giây;
    * đúng +`correctPoints`; sai hay hết giờ mất 1 tim; cổng vẫn mở. Qua đủ 4 cổng là thắng.
    */
-  gates: { after: [6, 12, 18, 24] as readonly number[], offset: 2.5, quizSeconds: 20, correctPoints: 50 },
+  gates: { after: (TRON ? [TRON.man6.gateAfter] : [6, 12, 18, 24]) as readonly number[], offset: 2.5, quizSeconds: 20, correctPoints: 50 },
   /** Điểm = số khe × 10 + số trang bản sao × 5 + số câu đúng × 50 */
   points: { gap: 10, page: 5 },
 

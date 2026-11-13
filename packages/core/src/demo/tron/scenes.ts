@@ -2,6 +2,7 @@
 import type { DemoContext } from '../context';
 import type { SceneDef } from '../director';
 import { tronGiayCards, tronGiayM1, tronGiayM2, tronGiayM3, tronGiayTrao, tronGiayWalk, tronIntro } from './giay';
+import { tronDetM4, tronDetM5, tronDetM6, tronDetThe, tronDetTrao, tronDetVao } from './det';
 import { TRON_UNIT_META } from './starts';
 
 const RUN: Record<string, (ctx: DemoContext) => Promise<void>> = {
@@ -13,6 +14,14 @@ const RUN: Record<string, (ctx: DemoContext) => Promise<void>> = {
   'giay-man-3': async (ctx) => {
     await tronGiayM3(ctx);
     await tronGiayTrao(ctx);
+  },
+  'det-vao': tronDetVao,
+  'det-the': tronDetThe,
+  'det-man-4': tronDetM4,
+  'det-man-5': tronDetM5,
+  'det-man-6': async (ctx) => {
+    await tronDetM6(ctx);
+    await tronDetTrao(ctx);
   },
 };
 

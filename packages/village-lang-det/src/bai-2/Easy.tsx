@@ -17,7 +17,10 @@ import { bai2Texts } from '@so-chung/core/content/lessons/bai-2';
 import { tutorialTexts } from '@so-chung/core/content/tutorial';
 import { formatNumber } from '@so-chung/core/lib/format';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
-import { generateEasy, explainCheck, type Proposal } from '@so-chung/core/lessons/bai-2/logic';
+import { generateEasy, explainCheck, isValidProposal, type Proposal } from '@so-chung/core/lessons/bai-2/logic';
+import { demoProbe } from '@so-chung/core/demo/probe';
+import { TRON } from '@so-chung/core/demo/tron/data';
+import { tronEasyData } from '@so-chung/core/demo/tron/builders';
 import { Chan, tenNhan } from './nguoi';
 
 const T = bai2Texts;
@@ -40,7 +43,7 @@ interface Feedback {
 export function Easy({ onComplete, onFail }: { onComplete: (r: StationResult) => void; onFail: (tip: string) => void }) {
   const realStartTime = useRef(performance.now());
 
-  const gameData = useMemo(() => generateEasy(createMulberry32((Date.now() ^ (Math.random() * 0x100000000)) >>> 0)), []);
+  const gameData = useMemo(() => (TRON ? tronEasyData(TRON.man4.easy, isValidProposal) : generateEasy(createMulberry32((Date.now() ^ (Math.random() * 0x100000000)) >>> 0))), []);
 
   // Trạng thái Hướng dẫn focus và Làm thử (P8c)
   const [tutorialOpen, setTutorialOpen] = useState(true);
@@ -155,6 +158,9 @@ export function Easy({ onComplete, onFail }: { onComplete: (r: StationResult) =>
       });
     }
   };
+
+  // Bot demo (chỉ bản build VITE_DEMO)
+  demoProbe('man4', { station: 'de', tutorialOpen, feedbackOpen: feedback.isOpen, agree: currentRound ? currentRound.isValid : null, round: roundIndex });
 
   if (!currentRound) return null;
 

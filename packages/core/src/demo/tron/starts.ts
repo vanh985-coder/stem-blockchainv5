@@ -23,6 +23,11 @@ export const TRON_UNIT_META: readonly TronUnitMeta[] = [
   { id: 'giay-man-1', codes: ['G07', 'G08', 'G09', 'G10'], timeoutMs: 1_200_000, route: '/cho?tu=lang-giay', start: carded(0, []) },
   { id: 'giay-man-2', codes: ['G11', 'G12'], timeoutMs: 600_000, route: '/lang/lang-giay/man/2', start: carded(0, [1]) },
   { id: 'giay-man-3', codes: ['G13', 'G14', 'G15'], timeoutMs: 900_000, route: '/lang/lang-giay/man/3', start: carded(0, [1, 2]) },
+  { id: 'det-vao', codes: ['D01', 'D02'], timeoutMs: 600_000, route: '/cho', start: { prior: 1, ...none } },
+  { id: 'det-the', codes: ['D03'], timeoutMs: 600_000, route: '/cho?tu=lang-det', start: seen(1) },
+  { id: 'det-man-4', codes: ['D04', 'D05', 'D06', 'D07'], timeoutMs: 1_500_000, route: '/cho?tu=lang-det', start: carded(1, []) },
+  { id: 'det-man-5', codes: ['D08', 'D09'], timeoutMs: 600_000, route: '/lang/lang-det/man/5', start: carded(1, [4]) },
+  { id: 'det-man-6', codes: ['D10', 'D11', 'D12'], timeoutMs: 600_000, route: '/lang/lang-det/man/6', start: carded(1, [4, 5]) },
 ];
 
 export function metaOfCode(code: string): TronUnitMeta | null {

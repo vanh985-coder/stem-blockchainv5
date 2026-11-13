@@ -32,6 +32,21 @@ export const TRON_DATA = {
     fake: { prev: 31, content: 50, code: 99 },
     trayOrder: [1, 2, 0] as readonly number[],
   },
+  man5: {
+    /** 3 lượt câu hỏi (B2-03 từ chối, B2-04 đồng ý, B2-06 đa số đồng ý), chuột thường thưa hơn; thứ tự đáp án gốc của ngân hàng câu hỏi */
+    questions: ['B2-03', 'B2-04', 'B2-06'] as readonly string[],
+    bossEvery: 10,
+    spawn: 1.4,
+  },
+  man6: {
+    /** 1 cổng sau 6 khe; câu hỏi ở cổng B1-03 (mã trước 57, nội dung 36 → 50), thứ tự đáp án gốc (tự chọn) */
+    gateAfter: 6,
+    question: 'B1-03',
+  },
+  man8: {
+    /** Chỉ vòng 1 (4 cặp): khuôn 3, 5, 6, 7 ↔ mẫu 10, 20, 8, 17 (5^x mod 23) */
+    keys: [3, 5, 6, 7] as readonly number[],
+  },
   man4: {
     /**
      * Trạm Dễ: sổ 2 trang, mã bìa 5, nội dung 10 và 17 → mã 20, 57 (trang cuối mã 57). 5 vòng; mã đúng của vòng 1 là (57 × 2 + 36) mod 100 = 50.

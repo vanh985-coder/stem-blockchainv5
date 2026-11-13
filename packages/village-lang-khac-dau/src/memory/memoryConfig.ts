@@ -1,7 +1,9 @@
 /**
  * Số liệu của màn 8 "Lật thẻ tìm cặp khóa" (spec 07, mục "Màn 8").
  */
-export const MEMORY_SPEC = {
+import { TRON } from '@so-chung/core/demo/tron/data';
+
+const MEMORY_SPEC_REAL = {
   /**
    * Bộ khuôn tập gồm 12 số luyện tay của chú Dũng.
    * Không chứa bất kỳ khóa riêng thật nào của 6 nhân vật chính (12, 13, 15, 17, 19, 21).
@@ -33,6 +35,9 @@ export const MEMORY_SPEC = {
   /** Mốc điểm cả ván (tổng 3 vòng): Đồng, Bạc, Vàng (khai báo theo chuẩn màn 2, 3) */
   medals: [300, 550, 750] as const,
 } as const;
+
+/** Số liệu đang dùng. Ngoài demo là đúng bản thật; chế độ trọn chỉ chơi vòng 1 (4 cặp). */
+export const MEMORY_SPEC: typeof MEMORY_SPEC_REAL = TRON ? ({ ...MEMORY_SPEC_REAL, rounds: [MEMORY_SPEC_REAL.rounds[0]] } as unknown as typeof MEMORY_SPEC_REAL) : MEMORY_SPEC_REAL;
 
 export const PRACTICE_KEYS = MEMORY_SPEC.practiceKeys;
 export const MEMORY_ROUNDS = MEMORY_SPEC.rounds;

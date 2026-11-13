@@ -20,6 +20,8 @@ import { GAME_CONFIG } from '@so-chung/core/config/gameConfig';
 import { buildChain, pageCode } from '@so-chung/core/lib/chain';
 import { formatNumber } from '@so-chung/core/lib/format';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
+import { demoProbe } from '@so-chung/core/demo/probe';
+import { TRON } from '@so-chung/core/demo/tron/data';
 import {
   botVote,
   chiCreate,
@@ -114,10 +116,10 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
 
   // Đề của lượt chơi này: bộ sinh số ngẫu nhiên, mã bìa và 2 trang đầu của sổ chung
   const [initial] = useState(() => {
-    const rng = createMulberry32((Date.now() ^ (Math.random() * 0x100000000)) >>> 0);
-    const genesis = 10 + Math.floor(rng() * 80);
-    const c1 = 1 + Math.floor(rng() * 99);
-    const c2 = 1 + Math.floor(rng() * 99);
+    const rng = createMulberry32(TRON ? TRON.man4.hard.seed : (Date.now() ^ (Math.random() * 0x100000000)) >>> 0);
+    const genesis = TRON ? TRON.man4.hard.genesis : 10 + Math.floor(rng() * 80);
+    const c1 = TRON ? TRON.man4.hard.contents[0] : 1 + Math.floor(rng() * 99);
+    const c2 = TRON ? TRON.man4.hard.contents[1] : 1 + Math.floor(rng() * 99);
     const codes = buildChain(genesis, [c1, c2]);
     const pages: LedgerPage[] = [
       { content: c1, code: codes[0], isInvalid: false },
@@ -186,7 +188,8 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
 
     const creator = CFG.order[index] as PlayerId;
     const lastCode = lastLedgerCode;
-    const content = 1 + Math.floor(rngRef.current() * 99);
+    const drawn = 1 + Math.floor(rngRef.current() * 99);
+    const content = TRON && index === 0 ? TRON.man4.hard.firstContent : drawn;
     const pageNo = ledgerPages.length + 1;
 
     // Không đủ 30 điểm cọc thì bỏ lượt
@@ -311,6 +314,21 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
       },
     });
   }
+
+  // Bot demo (chỉ bản build VITE_DEMO): đáp án đúng của lượt hiện tại (tính bằng logic của bài)
+  demoProbe('man4', {
+    station: 'kho',
+    tutorialOpen,
+    hard: {
+      stage: turnState?.stage ?? null,
+      creator: turnState?.creator ?? null,
+      expectedCode: turnState ? pageCode(lastLedgerCode, turnState.content) : null,
+      proposalOk: turnState ? turnState.proposal.code === pageCode(turnState.proposal.prevCode, turnState.proposal.content) && turnState.proposal.prevCode === lastLedgerCode : null,
+      voted: !!turnState?.votes.em,
+      finished: gameFinished,
+      turn: turnIndex,
+    },
+  });
 
   // Lượt đầu tiên bắt đầu ngay khi vào trạm
   useEffect(() => {

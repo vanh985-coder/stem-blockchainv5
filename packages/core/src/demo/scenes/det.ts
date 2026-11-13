@@ -51,9 +51,22 @@ function tapNow(el: Element | null, type: 'pointerdown' | 'click'): void {
   fire(el, 'pointerup', c.x, c.y);
 }
 
-export async function man5(ctx: Ctx): Promise<void> {
+/** Chế độ trọn: móc vào các thời điểm của màn 5 để ghi mốc đoạn và giữ mức tối thiểu */
+export interface Man5Hooks {
+  onCard?: () => void;
+  onQuiz?: (n: number) => void;
+  beforeContinue?: (n: number) => Promise<void>;
+}
+
+export async function man5(ctx: Ctx, hooks: Man5Hooks = {}): Promise<void> {
   const { ctl } = ctx;
   if (!onPath('/lang/lang-det/man/5')) throw new Error('not on the level 5 route');
+  if (hooks.onCard) {
+    await ctl.waitFor(() => q('[data-testid="the-bat-dau"]'), 'game start card', 30000);
+    hooks.onCard();
+  }
+  let quizzes = 0;
+  let answerSeen = false;
   await startMiniGame(ctx);
   const probe = await ctl.waitFor(() => man5Probe(), 'whack probe', 60000);
   if (probe.tutorialActive) {
@@ -104,11 +117,18 @@ export async function man5(ctx: Ctx): Promise<void> {
   while (q('[data-testid="man5"]')) {
     await nextFrame(ctx);
     const s = man5Probe()?.state;
+    if (s?.phase === 'answer' && !answerSeen) {
+      answerSeen = true;
+      hooks.onQuiz?.(0);
+    }
     if (s?.phase === 'quiz') {
       // kết quả lượt đáp án: đọc lời giải rồi "Chơi tiếp"
       const next = await ctl.waitFor(() => buttonByText(whackUi.tiepTuc), 'whack quiz continue', 10000);
+      quizzes++;
+      hooks.onQuiz?.(quizzes);
       await dwell(ctx, document.querySelector('[role="dialog"]')?.textContent ?? '');
       await ctl.sleep(pace(1200));
+      if (hooks.beforeContinue) await hooks.beforeContinue(quizzes);
       await clickEl(ctx, next, { settle: 600 });
       brain.endRound();
       continue;

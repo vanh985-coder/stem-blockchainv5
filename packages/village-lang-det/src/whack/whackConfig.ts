@@ -6,6 +6,7 @@
  * làm tròn xuống số giây còn lại. Số "tự chọn" của bước này được ghi chú riêng ngay tại chỗ.
  */
 import { PACING, withOverrides } from '@so-chung/core/demo/pacing';
+import { TRON } from '@so-chung/core/demo/tron/data';
 
 export const WHACK_SPEC_REAL = {
   /** 4 làn */
@@ -75,12 +76,13 @@ export const WHACK_SPEC_REAL = {
  */
 export const WHACK_SPEC: typeof WHACK_SPEC_REAL = withOverrides(
   WHACK_SPEC_REAL,
-  PACING && {
+  (TRON && { spawnStart: TRON.man5.spawn, spawnEnd: TRON.man5.spawn, firstSpawn: TRON.man5.spawn, boss: { count: TRON.man5.questions.length, every: TRON.man5.bossEvery } }) ||
+    (PACING && {
     spawnStart: PACING.whack.spawnStart,
     spawnEnd: PACING.whack.spawnEnd,
     firstSpawn: PACING.whack.spawnStart,
     boss: { count: PACING.whack.bossCount, every: PACING.whack.bossEvery },
-  },
+  }),
 );
 
 export type MouseKind = 'thuong' | 'doiLan' | 'nhanh' | 'to';

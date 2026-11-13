@@ -63,6 +63,7 @@ await page.evaluateOnNewDocument(() => {
 console.log(`\n--- Demo trọn game${TU ? `, từ ${TU}` : ''}, kiểm ×${KIEM} ---`);
 const t0 = Date.now();
 let lastDbg = 0;
+let lastSnap = 0;
 await page.goto(`${BASE}/?demo=1&kieu=tron${TU ? `&tu=${TU}` : ''}${KIEM !== 1 ? `&kiem=${KIEM}` : ''}`, { waitUntil: 'domcontentloaded' });
 
 const shot1 = new Set();
@@ -72,6 +73,10 @@ for (;;) {
   await sleep(1000);
   const st = await page.evaluate(() => ({ marks: window.__tronMarks ?? [], log: window.__demoLog ?? [], done: window.__demoDone === true, path: location.pathname, w: window.__demoWorld ? { r: window.__demoWorld.ready, e: window.__demoWorld.entering, in: window.__demoWorld.inside, d: window.__demoWorld.dialogOpen, k: !!window.__demoWorld.know, n: window.__demoWorld.near?.kind, p: window.__demoWorld.api.player && [Math.round(window.__demoWorld.api.player.x), Math.round(window.__demoWorld.api.player.z)], ax: window.__demoWorld.api.input.keyAxis.y } : null })).catch(() => null);
   if (!st) continue;
+  if (process.env.SNAP && Date.now() - lastSnap > 20000) {
+    lastSnap = Date.now();
+    await page.screenshot({ path: process.env.SNAP, type: 'jpeg', quality: 40 }).catch(() => undefined);
+  }
   if (process.env.DEBUG && Date.now() - lastDbg > 8000 && (lastDbg = Date.now())) console.log('   . ' + st.path + ' w=' + JSON.stringify(st.w) + ' log=' + st.log.map((l) => l.id + ':' + l.status).join(','));
   while (marksSeen < st.marks.length) {
     const m = st.marks[marksSeen++];

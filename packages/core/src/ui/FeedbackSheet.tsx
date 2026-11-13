@@ -115,6 +115,7 @@ export function FeedbackSheet({
               variant={isCorrect ? 'primary' : 'danger'}
               size="md"
               onClick={onContinue}
+              data-demo="feedback-continue"
               className="w-full sm:w-auto"
             >
               {continueLabel}

@@ -19,6 +19,7 @@ import {
   type TutorialStep,
 } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
+import { demoProbe } from '@so-chung/core/demo/probe';
 import { Scene25D, isQualityChoice, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
 import { ModCalculator } from '../ui/ModCalculator';
@@ -408,6 +409,9 @@ export function MemoryGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   const portrait = frame === 'portrait';
   const textSize = portrait ? 'max(3.6cqw, 0.875rem)' : 'max(1.6cqw, 0.875rem)';
   const ready = warm && !!atlas && art.done;
+
+  // Bot demo (chỉ bản build VITE_DEMO): các thẻ (mã, loại, khóa cặp) để bot lật đúng cặp
+  demoProbe('man8', { phase: state.phase, tutorialActive, round: state.round, cards: state.cards.map((c) => ({ id: c.id, pairKey: c.pairKey, matched: c.isMatched, flipped: c.isFlipped })) });
 
   if (PROBE && typeof window !== 'undefined') {
     Object.assign(window, {

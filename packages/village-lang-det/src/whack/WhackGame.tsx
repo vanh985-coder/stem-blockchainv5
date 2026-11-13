@@ -20,6 +20,8 @@ import {
 import { PROBE } from '@so-chung/core/lib/dev';
 import { demoProbe } from '@so-chung/core/demo/probe';
 import { PACING } from '@so-chung/core/demo/pacing';
+import { TRON } from '@so-chung/core/demo/tron/data';
+import { tronQuestion } from '@so-chung/core/demo/tron/questions';
 import { setDemoQuestion, timeScale } from '@so-chung/core/demo/timeScale';
 import { WHACK_SPEC, type MouseKind } from './whackConfig';
 import { hintFor } from './whackHint';
@@ -202,7 +204,7 @@ export function WhackGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   const portrait = usePortrait();
 
   const seed = useMemo(() => newSeed(), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
-  const questions = useMemo(() => pickQuestions({ bai: [1, 2], soCau: WHACK_SPEC.boss.count, seed }), [seed]);
+  const questions = useMemo(() => (TRON ? TRON.man5.questions.map((id) => tronQuestion(id)) : pickQuestions({ bai: [1, 2], soCau: WHACK_SPEC.boss.count, seed })), [seed]);
   const state = useMemo(() => createWhackGame(seed, questions.map((q) => ({ correct: q.correctIndex, options: q.options.length }))), [seed, questions]);
 
   const [, bump] = useReducer((n: number) => n + 1, 0);

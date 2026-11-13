@@ -4,6 +4,7 @@
  * Mẫu công khai được tính bằng publicKey() có sẵn trong Bài 3 (p = 23, g = 5).
  */
 import { publicKey } from '@so-chung/core/lessons/bai-3/logic';
+import { TRON } from '@so-chung/core/demo/tron/data';
 import { createMulberry32, shuffle } from '@so-chung/core/lib/rng';
 import { medalOf, type Medal } from '@so-chung/core';
 import { MEMORY_SPEC, PRACTICE_KEYS } from './memoryConfig';
@@ -71,7 +72,7 @@ export interface MemoryState {
 export function makeDeck(rng: () => number, pairCount: number): MemoryCard[] {
   if (pairCount <= 0) return [];
   const count = Math.min(pairCount, PRACTICE_KEYS.length);
-  const chosenKeys = shuffle(PRACTICE_KEYS, rng).slice(0, count);
+  const chosenKeys = TRON && count === TRON.man8.keys.length ? [...TRON.man8.keys] : shuffle(PRACTICE_KEYS, rng).slice(0, count);
 
   const deck: MemoryCard[] = [];
   for (const x of chosenKeys) {

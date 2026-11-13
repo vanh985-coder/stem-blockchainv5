@@ -17,6 +17,9 @@ import {
   type TutorialStep,
 } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
+import { demoProbe } from '@so-chung/core/demo/probe';
+import { TRON } from '@so-chung/core/demo/tron/data';
+import { tronQuestion } from '@so-chung/core/demo/tron/questions';
 import { Scene25D, isQualityChoice, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
 import { KITE_SPEC as C } from './kiteConfig';
@@ -44,6 +47,7 @@ interface QuizUi {
   answered: null | boolean | 'timeout';
 }
 
+type KiteStateLike = ReturnType<typeof createKiteGame>;
 type Ending = null | 'hearts' | 'complete';
 
 /** Trái tim của HUD (hình vẽ bằng code, không chữ): đỏ là còn, xám là đã mất */
@@ -75,7 +79,8 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
   const forced = useMemo(forcedQuality, []);
   const state = useMemo(() => createKiteGame(newSeed()), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
   // 4 câu hỏi ôn Bài 1 và 2 cho 4 cổng (không lặp, đã trộn thứ tự đáp án; cách chọn như màn 5)
-  const questions = useMemo(() => pickQuestions({ bai: [1, 2], soCau: gateCounter(0).max, seed: state.seed }), [state]);
+  const questions = useMemo(() => (TRON ? [tronQuestion(TRON.man6.question)] : pickQuestions({ bai: [1, 2], soCau: gateCounter(0).max, seed: state.seed })), [state]);
+  const autopilot = useRef<((s: KiteStateLike) => void) | null>(null);
   const view = useRef<KiteView>(createView(state, reduced));
   const viewKey = useRef(state);
   if (viewKey.current !== state) {
@@ -233,6 +238,7 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
       v.shakeClock += dt;
       if (v.shake > 0) v.shake = Math.max(0, v.shake - dt / SHAKE_SECONDS);
       if (v.deliver.active) v.deliver.t += dt;
+      autopilot.current?.(state);
       const events = tickKite(state, dt, false);
       if (events.length > 0) handleEvents(events);
       // đồng hồ trả lời: chỉ đếm khi bảng câu hỏi mở và em chưa trả lời
@@ -317,6 +323,22 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
     ];
     onFinish(state.score, parts);
   }, [onFinish, state]);
+
+  // Bot demo (chỉ bản build VITE_DEMO): ván, bộ lái (tải khi cần), câu hỏi đang hiện
+  demoProbe('man6', {
+    state,
+    tutorialActive,
+    quizOpen: quiz !== null && quiz.answered === null,
+    quizDone: quiz !== null && quiz.answered !== null,
+    correctIndex: quiz && questions[quiz.index] ? questions[quiz.index].correctIndex : null,
+    setAutopilot: (fn: ((s: KiteStateLike) => void) | null) => {
+      autopilot.current = fn;
+    },
+    makeAutopilot: async () => {
+      const m = await import('./kiteBots');
+      return m.demoAutopilot;
+    },
+  });
 
   const onModeChange = useCallback((m: FrameMode) => setMode(m), []);
   if (PROBE && typeof window !== 'undefined') {
