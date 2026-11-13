@@ -2,6 +2,8 @@
  * Số liệu của màn 12 "Leo bậc gỗ" (spec 08, mục "Màn 12"). Đơn vị: thế giới của cảnh (khung dọc 9 × 16), thời gian: giây.
  * Mọi số ở đây là TỰ CHỌN trừ khi chú thích nói là của lời giao (số lá, số lựa chọn, tim, điểm, mốc, khóa 0,4 và 0,6 giây).
  */
+import { TRON } from '@so-chung/core/demo/tron/data';
+
 export interface ClimbRoundSpec {
   /** Số lá của cây (lời giao: 8, 8, 16) */
   leaves: number;
@@ -12,11 +14,14 @@ export interface ClimbRoundSpec {
 }
 
 export const CLIMB_SPEC = {
-  rounds: [
-    { leaves: 8, choices: 2, slide: 0 },
-    { leaves: 8, choices: 2, slide: 0.7 },
-    { leaves: 16, choices: 3, slide: 1.4 },
-  ] as readonly ClimbRoundSpec[],
+  // chế độ trọn (demo) chỉ chơi vòng 1
+  rounds: (TRON
+    ? [{ leaves: 8, choices: 2, slide: 0 }]
+    : [
+        { leaves: 8, choices: 2, slide: 0 },
+        { leaves: 8, choices: 2, slide: 0.7 },
+        { leaves: 16, choices: 3, slide: 1.4 },
+      ]) as readonly ClimbRoundSpec[],
   /** 3 tim cho cả game */
   hearts: 3,
   /** Khoảng cách giữa hai tầng bậc */

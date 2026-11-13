@@ -130,3 +130,44 @@ export function simulateMany(profile: ClimbBotProfile, games: number, thresholds
   out.meanMisses /= games;
   return out;
 }
+
+/**
+ * Bộ lái cho bot demo (chỉ dùng ở bản build VITE_DEMO): mỗi khung hình quyết định như bot giỏi (chờ `react` giây ở mỗi tầng, nhảy, rồi lái về bậc đúng lúc đang bay).
+ */
+export function makeDemoClimbPilot(): (s: ClimbState) => void {
+  let waitUntil = GOOD_BOT.react;
+  let plan: number | null = null;
+  let planLevel = -1;
+  let lastLevel = -1;
+  return (s) => {
+    if (s.phase !== 'playing') return;
+    if (s.level !== lastLevel) {
+      lastLevel = s.level;
+      plan = null;
+      waitUntil = s.time + GOOD_BOT.react;
+    }
+    const p = s.player;
+    if (s.mode !== 'free') {
+      setMove(s, 0);
+      plan = null;
+      waitUntil = s.time + GOOD_BOT.react;
+    } else if (p.grounded) {
+      setMove(s, 0);
+      if (s.time >= waitUntil && s.time >= s.lockUntil) {
+        if (plan === null || planLevel !== s.level) {
+          plan = s.choices.findIndex((c) => c.correct);
+          planLevel = s.level;
+        }
+        jump(s);
+      }
+    } else if (plan !== null) {
+      const c = s.choices[plan];
+      if (c) {
+        const t = timeToCross(p.y, p.vy, tierY(s.level + 1));
+        const future = choiceX({ slideClock: s.slideClock + (Number.isFinite(t) ? t : 0) * (s.slow ? CLIMB_SPEC.reducedSlideScale : 1), round: s.round, choices: s.choices }, c);
+        const dx = future - p.x;
+        setMove(s, Math.abs(dx) < 0.08 ? 0 : dx > 0 ? 1 : -1);
+      }
+    } else setMove(s, 0);
+  };
+}

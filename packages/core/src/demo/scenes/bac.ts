@@ -138,7 +138,7 @@ async function playHard(ctx: Ctx): Promise<void> {
   }
 }
 
-async function playMan10Station(ctx: Ctx, idx: number): Promise<void> {
+export async function playMan10Station(ctx: Ctx, idx: number): Promise<void> {
   const name = (['de', 'tb', 'kho'] as const)[idx];
   await ctx.ctl.waitFor(() => probe()?.station === name, `man 10 probe ${name}`, 20000);
   if (probe()?.tutorialActive) {

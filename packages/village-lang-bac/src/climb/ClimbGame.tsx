@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { BiAvatar, Button, Hearts, climbUi, fmt, hasSeenGameTip, sound, TutorialSpotlight, type TutorialStep, tutorialTexts, useGameHint, useProgress, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
+import { demoProbe } from '@so-chung/core/demo/probe';
 import { Scene25D, isQualityChoice, type ClipName, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
 import { drawRoundLabels, useClimbTextures, type ClimbLabels } from './climbArt';
@@ -123,6 +124,7 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
   const practiceAnim = useMemo<ClimbAnim>(() => newAnim(), [practice]);
   const anim = tutorialActive ? practiceAnim : realAnim;
   const [version, bump] = useReducer((n: number) => n + 1, 0);
+  const autopilot = useRef<((s: ClimbState) => void) | null>(null);
   const [frame, setFrame] = useState<ClimbFrame>('portrait');
   const [overlayRef, framePx] = useWidth();
   const [banner, setBanner] = useState<Banner>(null);
@@ -243,6 +245,7 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
       const locked = s.practice && tutorialStepRef.current < 3;
       const dir = locked ? 0 : (h.left || h.btnLeft ? -1 : 0) + (h.right || h.btnRight ? 1 : 0);
       setMove(s, dir as -1 | 0 | 1);
+      if (!s.practice) autopilot.current?.(s);
       const events = tickClimb(s, dt, pausedRef.current);
       if (events.length > 0) handleEvents(events);
       // clip theo trạng thái: đi bộ chạy, bay thì nhảy, còn lại đứng
@@ -370,6 +373,18 @@ export function ClimbGame({ paused, attempt, onFinish, setHint }: MiniGameRender
 
   const onModeChange = useCallback((m: FrameMode) => setFrame(m === 'landscape' ? 'landscape' : 'portrait'), []);
 
+  // Bot demo (chỉ bản build VITE_DEMO): ván thật, hướng dẫn, bộ lái (tải khi cần)
+  demoProbe('man12', {
+    state: real,
+    tutorialActive,
+    ready,
+    tip,
+    banner: banner !== null,
+    setAutopilot: (fn: ((s: ClimbState) => void) | null) => {
+      autopilot.current = fn;
+    },
+    makePilot: async () => (await import('./climbBots')).makeDemoClimbPilot(),
+  });
   if (PROBE && typeof window !== 'undefined') Object.assign(window, { __climbChoiceX: (i: number) => { const s = stateRef.current; const c = s.choices[i]; return c ? choiceX(s, c) : null; }, __climb: state, __climbReal: real, __climbUi: { ppu, fontPx: labels?.fontPx ?? 0, frame, banner, tip, ready, tutorialActive } });
 
   // Nhãn cho trình đọc màn hình: bậc em đang đứng và bậc anh em (đổi khi lên tầng, không đổi theo khung hình)

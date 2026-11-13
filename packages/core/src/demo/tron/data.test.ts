@@ -79,3 +79,28 @@ describe('số liệu khóa cứng: màn 4', () => {
     expect(a.rounds.filter((r) => r.kind === 'valid')).toHaveLength(2);
   });
 });
+
+import { buildTree, combine, DEFAULT_EASY_TXS, SAMPLE_HARD_CHALLENGE } from '../../lessons/bai-4/logic';
+
+describe('số liệu khóa cứng: màn 10', () => {
+  it('Dễ: lá 3, 7, 5, 2 → T12 37, T34 52, T21 73', () => {
+    const v = DEFAULT_EASY_TXS.map((t) => t.value);
+    expect(v).toEqual([3, 7, 5, 2]);
+    expect(combine(v[0], v[1])).toBe(37);
+    expect(combine(v[2], v[3])).toBe(52);
+    expect(combine(v[1], v[0])).toBe(73);
+  });
+  it('Trung bình: lá 4, 2, 6, 1 → 42, 61, gốc 481; T3 6 → 7: T34 71, gốc 491', () => {
+    const l = [...D.man10.mediumLeaves];
+    const t = buildTree(l);
+    expect([t[1][0], t[1][1], t[2][0]]).toEqual([42, 61, 481]);
+    const t2 = buildTree(l.map((x, i) => (i === 2 ? x + 1 : x)));
+    expect([t2[1][1], t2[2][0]]).toEqual([71, 491]);
+  });
+  it('Khó: đề mẫu lá 3 7 5 2 6 1 4 8; ô ẩn T6, T12, T34, T78, T5-8, gốc = 1, 37, 52, 48, 658, 4878; mảnh bẫy 25, 84', () => {
+    const c = SAMPLE_HARD_CHALLENGE;
+    const vals = c.hidden.map((h) => c.tree[h.level][h.index]);
+    expect(vals).toEqual([1, 52, 48, 658, 4878, 37]);
+    expect([...c.distractors].sort()).toEqual([25, 84]);
+  });
+});

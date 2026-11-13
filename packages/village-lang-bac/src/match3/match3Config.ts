@@ -11,6 +11,8 @@
  *  - tự chọn: ô cây lấp theo thứ tự chỉ số (ô trống nhỏ nhất cần đúng loại); lá giả cũng rơi theo trọng lực như lá khác; lá giả và ô gió bị xóa thêm không cộng điểm.
  */
 
+import { TRON } from '@so-chung/core/demo/tron/data';
+
 export interface Match3Round {
   /** Số ô lá trên cây: 4 hay 8 (lũy thừa của 2: cây nhị phân) */
   slots: number;
@@ -88,4 +90,7 @@ export function match3Variant(variant: Match3Variant, base: Match3Spec = BASE_MA
  * Mốc theo nghĩa (Vàng ≈ xong 3 cây, Bạc ≈ xong 2 cây, Đồng ≈ xong 1 cây): ≥ 85% ván xong k cây đạt mốc k và ≤ 15% ván xong ít hơn k cây đạt mốc k (gộp 900 ván của cả 3 bot). Thỏa: Đồng 1050 đến 1250,
  * Bạc 1450 đến 1600, Vàng 1800 đến 1900; chọn giữa khoảng thỏa (tự chọn): 1150 / 1550 / 1850.
  */
-export const MATCH3_SPEC: Match3Spec = { ...match3WithTurns(12, 15), medals: [1150, 1550, 1850] };
+const MATCH3_SPEC_REAL: Match3Spec = { ...match3WithTurns(12, 15), medals: [1150, 1550, 1850] };
+
+/** Số liệu đang dùng. Ngoài demo là đúng bản thật; chế độ trọn chỉ chơi vòng 1 (4 ô cây). */
+export const MATCH3_SPEC: Match3Spec = TRON ? { ...MATCH3_SPEC_REAL, rounds: [MATCH3_SPEC_REAL.rounds[0]] } : MATCH3_SPEC_REAL;

@@ -17,9 +17,10 @@ import {
 import { bai4Texts } from '@so-chung/core/content/lessons/bai-4';
 import { formatNumber } from '@so-chung/core/lib/format';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
-import { generateHard, type CellCoord, type HardTx } from '@so-chung/core/lessons/bai-4/logic';
+import { generateHard, SAMPLE_HARD_CHALLENGE, type CellCoord, type HardTx } from '@so-chung/core/lessons/bai-4/logic';
 import { CayMerkle } from './CayMerkle';
 import { demoProbe } from '@so-chung/core/demo/probe';
+import { TRON } from '@so-chung/core/demo/tron/data';
 import { PACING } from '@so-chung/core/demo/pacing';
 
 const T = bai4Texts.tramKho;
@@ -38,7 +39,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
   const challenge = useMemo(() => {
     const seed = (Date.now() ^ (Math.random() * 0x100000000)) >>> 0;
     const rng = createMulberry32(seed);
-    return generateHard(rng);
+    return TRON ? { ...SAMPLE_HARD_CHALLENGE } : generateHard(rng);
   }, []);
 
   const [txs] = useState<HardTx[]>(challenge.txs);

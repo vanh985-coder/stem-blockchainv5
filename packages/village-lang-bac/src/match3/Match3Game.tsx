@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { Button, fmt, match3Ui, sound, TutorialSpotlight, type TutorialStep, tutorialTexts, useGameHint, useSettings, type MiniGameRenderProps, type ScorePart } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
+import { demoProbe } from '@so-chung/core/demo/probe';
+import { TRON } from '@so-chung/core/demo/tron/data';
 import { Scene25D, isQualityChoice, type ClipName, type PoseRequest, type QualityChoice } from '@so-chung/core/three/index';
 import type { FrameMode } from '@so-chung/core/three/scene25d/layout25d';
 import { MATCH3_SPEC } from './match3Config';
@@ -64,7 +66,7 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
   const { settings } = useSettings();
   const reduced = settings.reducedMotion;
   const forced = useMemo(forcedQuality, []);
-  const state = useMemo(() => createMatch3Game(newSeed()), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
+  const state = useMemo(() => createMatch3Game(TRON ? TRON.man11.seed : newSeed()), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
   const engine = useMemo(() => new Man11Engine(state.board, state.slots.length), [state]);
   const [version, bump] = useReducer((n: number) => n + 1, 0);
   const [frame, setFrame] = useState<Man11Frame>('landscape');
@@ -407,6 +409,17 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
   }, [engine, finish, state, syncHud]);
 
   const onModeChange = useCallback((m: FrameMode) => setFrame(m === 'landscape' ? 'landscape' : 'portrait'), []);
+
+  // Bot demo (chỉ bản build VITE_DEMO): ván, thao tác đổi chỗ, nước tốt nhất (tải khi cần)
+  demoProbe('man11', {
+    state,
+    tutorialActive,
+    ready,
+    banner: banner !== null,
+    canAct: () => canAct(),
+    tryMove: (a: Pos, b: Pos) => tryMove(a, b),
+    bestMove: async () => (await import('./match3Bots')).demoBestMove(state),
+  });
 
   if (PROBE && typeof window !== 'undefined') {
     Object.assign(window, {

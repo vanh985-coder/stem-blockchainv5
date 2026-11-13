@@ -33,6 +33,7 @@ import { CayMerkle, type CellStatus } from './CayMerkle';
 import { SoiCay } from './SoiCay';
 import { portraitOf } from './nguoi';
 import { demoProbe } from '@so-chung/core/demo/probe';
+import { TRON } from '@so-chung/core/demo/tron/data';
 
 const T = bai4Texts.tramTb;
 
@@ -122,7 +123,11 @@ export function Medium({
   const mediumData = useMemo(() => {
     const seed = (Date.now() ^ (Math.random() * 0x100000000)) >>> 0;
     const rng = createMulberry32(seed);
-    return generateMedium(rng);
+    const g = generateMedium(rng);
+    if (!TRON) return g;
+    // chế độ trọn: lá cố định 4, 2, 6, 1; Tí đổi T3 từ 6 thành 7 (theo đúng quy tắc của bộ sinh: giá trị + 1)
+    const txs = g.txs.map((t, i) => ({ ...t, value: TRON!.man10.mediumLeaves[i] }));
+    return { txs, tamperedLeafIndex: g.tamperedLeafIndex, tamperedNewValue: txs[g.tamperedLeafIndex].value + 1 };
   }, []);
 
   const [partBTxs] = useState<EasyTx[]>(mediumData.txs);

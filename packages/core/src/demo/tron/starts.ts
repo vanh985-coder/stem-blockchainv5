@@ -33,6 +33,11 @@ export const TRON_UNIT_META: readonly TronUnitMeta[] = [
   { id: 'kd-man-7', codes: ['K03', 'K04', 'K05', 'K06'], timeoutMs: 1_800_000, route: '/cho?tu=lang-khac-dau', start: carded(2, []) },
   { id: 'kd-man-8', codes: ['K07'], timeoutMs: 900_000, route: '/lang/lang-khac-dau/man/8', start: carded(2, [7]) },
   { id: 'kd-man-9', codes: ['K08', 'K09', 'K10'], timeoutMs: 900_000, route: '/lang/lang-khac-dau/man/9', start: carded(2, [7, 8]) },
+  { id: 'bac-vao', codes: ['B01'], timeoutMs: 600_000, route: '/cho', start: { prior: 3, ...none } },
+  { id: 'bac-the', codes: ['B02'], timeoutMs: 600_000, route: '/cho?tu=lang-bac', start: seen(3) },
+  { id: 'bac-man-10', codes: ['B03', 'B04', 'B05', 'B06'], timeoutMs: 1_800_000, route: '/cho?tu=lang-bac', start: carded(3, []) },
+  { id: 'bac-man-11', codes: ['B07'], timeoutMs: 900_000, route: '/lang/lang-bac/man/11', start: carded(3, [10]) },
+  { id: 'bac-man-12', codes: ['B08', 'B09', 'B10', 'B11'], timeoutMs: 1_200_000, route: '/lang/lang-bac/man/12', start: carded(3, [10, 11]) },
 ];
 
 export function metaOfCode(code: string): TronUnitMeta | null {

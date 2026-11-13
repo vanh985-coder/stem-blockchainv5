@@ -22,6 +22,7 @@ import { generateEasy, combine, type EasyTx } from '@so-chung/core/lessons/bai-4
 import { portraitOf } from './nguoi';
 import { demoProbe } from '@so-chung/core/demo/probe';
 import { PACING } from '@so-chung/core/demo/pacing';
+import { TRON } from '@so-chung/core/demo/tron/data';
 
 const T = bai4Texts.tramDe;
 
@@ -41,7 +42,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
     // Lần đầu tải dùng bảng mặc định, nếu chơi lại dùng rng ngẫu nhiên
     const seed = (Date.now() ^ (Math.random() * 0x100000000)) >>> 0;
     const rng = createMulberry32(seed);
-    return generateEasy(rng, false);
+    return generateEasy(rng, !!TRON);
   }, []);
 
   const [txs] = useState<EasyTx[]>(data.txs);

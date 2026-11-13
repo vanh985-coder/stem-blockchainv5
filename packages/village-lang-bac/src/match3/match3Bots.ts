@@ -128,3 +128,8 @@ export function simulateMany(profile: Match3BotProfile, spec: Match3Spec = MATCH
     },
   };
 }
+
+/** Nước đi cho bot demo (chỉ dùng ở bản build VITE_DEMO): nước tốt nhất của bot giỏi. */
+export function demoBestMove(s: Match3State): Move | null {
+  return bestMove(s, Math.random);
+}

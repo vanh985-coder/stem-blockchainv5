@@ -56,6 +56,20 @@ export const TRON_DATA = {
     keys: [3, 5, 6] as readonly number[],
     rows: 3,
   },
+  man10: {
+    /** Dễ: dùng đề mặc định của bài: lá 3, 7, 5, 2 → T12 37, T34 52, T21 73. Trung bình: lá 4, 2, 6, 1 → 42, 61, gốc 481; Tí đổi T3 (6 → 7) → T34 71, gốc 491. Khó: đề mẫu của bài: lá 3 7 5 2 6 1 4 8, ô ẩn T6, T12, T34, T78, T5-8, gốc = 1, 37, 52, 48, 658, 4878; mảnh bẫy 25, 84. */
+    mediumLeaves: [4, 2, 6, 1] as readonly number[],
+  },
+  man11: {
+    /** Vòng 1 (4 ô cây), hạt giống cố định (tự chọn) */
+    seed: 11,
+  },
+  man12: {
+    /** Vòng 1: lá 3 7 5 2 6 1 4 8, T8 bị tráo từ 8 thành 9 → chọn 49, 659, 4879 (gốc cũ 4878) */
+    leaves: [3, 7, 5, 2, 6, 1, 4, 8] as readonly number[],
+    tamperedIndex: 7,
+    newDigit: 9,
+  },
   man4: {
     /**
      * Trạm Dễ: sổ 2 trang, mã bìa 5, nội dung 10 và 17 → mã 20, 57 (trang cuối mã 57). 5 vòng; mã đúng của vòng 1 là (57 × 2 + 36) mod 100 = 50.

@@ -9,6 +9,7 @@
  * với bậc từ `minOverlap` trở lên mới đứng được. Mỗi bước dt chia nhỏ tối đa `SUBSTEP` giây nên kết quả không phụ thuộc dt của màn hình.
  */
 import { buildTree, combine } from '@so-chung/core/lessons/bai-4/logic';
+import { TRON } from '@so-chung/core/demo/tron/data';
 import { medalOf, type Medal } from '@so-chung/core';
 import { createMulberry32, randInt, shuffle } from '@so-chung/core/lib/rng';
 import { CLIMB_SPEC, type ClimbRoundSpec } from './climbConfig';
@@ -270,7 +271,7 @@ function startRound(s: ClimbState, tree: ClimbTree, spec: ClimbRoundSpec): void 
 export function createClimbGame(seed: number, slow = false): ClimbState {
   const rng = createMulberry32(seed);
   const spec = CLIMB_SPEC.rounds[0];
-  const tree = generateTree(rng, spec.leaves);
+  const tree = TRON ? makeTree(TRON.man12.leaves, TRON.man12.tamperedIndex, TRON.man12.newDigit) : generateTree(rng, spec.leaves);
   const s = { seed, rng, round: 0, slow, hearts: CLIMB_SPEC.hearts, roundsDone: 0, mistakes: 0, practice: false } as ClimbState;
   startRound(s, tree, spec);
   return s;
