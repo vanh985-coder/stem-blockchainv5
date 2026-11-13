@@ -8,7 +8,7 @@ import { ui } from '../../content/ui';
 import { devWarn } from '../../lib/dev';
 import { CanvasErrorBoundary } from '../CanvasErrorBoundary';
 import { FpsGuard } from '../FpsGuard';
-import { LoadingScreen } from '../LoadingScreen';
+import { SceneLoading } from '../SceneLoading';
 import { QualityContext } from '../QualityContext';
 import { SceneWarmup } from '../SceneWarmup';
 import { StatsProbe } from '../StatsProbe';
@@ -345,7 +345,7 @@ function Scene25DInner({ background, sprites = [], children, overlay, allowPortr
           </div>
         </div>
       )}
-      <LoadingScreen visible={!ready || hold} />
+      <SceneLoading shown={!ready || hold} />
       {mode === 'rotate' && <RotatePrompt />}
     </div>
   );

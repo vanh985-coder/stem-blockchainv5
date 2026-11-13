@@ -1,6 +1,6 @@
 import { lazy, Suspense, type ComponentType, type LazyExoticComponent } from 'react';
 import { Route, Routes } from 'react-router';
-import { MERGED, RequireStory, accountRoutes, ui, useSceneMusic } from '@so-chung/core';
+import { LoadingScreen, MERGED, RequireStory, accountRoutes, useSceneMusic } from '@so-chung/core';
 import { Home } from './pages/Home';
 import { villageRouteObjects } from './villageRoutes';
 
@@ -26,7 +26,7 @@ const DevPortraits = import.meta.env.DEV ? lazy(() => import('@so-chung/core/thr
 
 function Lazy({ page: Page }: { page: LazyExoticComponent<ComponentType> }) {
   return (
-    <Suspense fallback={<p className="p-6">{ui.chung.dangTai}</p>}>
+    <Suspense fallback={<LoadingScreen />}>
       <Page />
     </Suspense>
   );

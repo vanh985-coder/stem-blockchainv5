@@ -12,6 +12,7 @@ import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
 import type { SaveStatus } from '../progress/manager';
 import { AutoCompleteButton, AutoCompletedPanel } from '../ui/AutoComplete';
+import { LoadingScreen } from '../ui/LoadingScreen';
 import { Button } from '../ui/Button';
 import { NenTrangTri } from '../ui/NenTrangTri';
 import { DialogueBox } from '../ui/DialogueBox';
@@ -250,7 +251,7 @@ export function LessonPage2D({ levelId, villageId, background, content, stations
     body = (
       <div ref={playArea}>
         <Panel padded={!fit} className={fit ? 'p-1' : 'p-2 sm:p-6'} key={`p${attempt}-${id}`}>
-          <Suspense fallback={<p role="status" className="p-6 text-center font-semibold">{ui.chung.dangTai}</p>}>
+          <Suspense fallback={<LoadingScreen title={level ? fmt(level.ten) : undefined} />}>
             {stations[id].render({
               onComplete: (r) => onStationComplete(stage.idx, r),
               onFail: (tip) => setStage({ kind: 'failed', idx: stage.idx, tip }),

@@ -1,13 +1,11 @@
 import { useProgress } from '@react-three/drei';
-import { useEffect, useRef, useState } from 'react';
-import { AssetImage } from '../../assets/AssetImage';
+import { useEffect, useState } from 'react';
 import { asset } from '../../assets/store';
-import { fmt } from '../../content/characters';
 import { ui } from '../../content/ui';
-import { ProgressBar } from '../../ui/ProgressBar';
+import { LoadingScreen } from '../../ui/LoadingScreen';
 import type { VillageId } from '../../village';
 
-/** Ảnh nền màn chờ: chợ phiên dùng ảnh "đang tải"; mỗi làng dùng ảnh tranh bài học của làng đó (có trong manifest.json) */
+/** Ảnh tranh của từng làng (có trong manifest.json); dùng để nạp sẵn khi làng đang được chuẩn bị. Màn chờ vẫn dùng một ảnh nền chung. */
 export const CURTAIN_IMAGE: Readonly<Record<VillageId | 'cho', string>> = {
   cho: 'ui/man-hinh-tai',
   'lang-giay': 'scenes/bai-hoc-lang-giay',
@@ -16,28 +14,20 @@ export const CURTAIN_IMAGE: Readonly<Record<VillageId | 'cho', string>> = {
   'lang-bac': 'scenes/bai-hoc-lang-bac',
 };
 
-/** Thời gian mờ dần khi ẩn màn chờ (ms) */
-export const CURTAIN_FADE_MS = 400;
-
-/** Hàm thuần: tên nơi sắp vào và ảnh nền; không biết làng thì là chợ phiên. */
-export function curtainTarget(place: VillageId | null): { name: string; image: string } {
-  return place ? { name: ui.lang[place], image: CURTAIN_IMAGE[place] } : { name: ui.manCho.tenCho, image: CURTAIN_IMAGE.cho };
+/** Hàm thuần: tên nơi sắp vào; không biết làng thì là chợ phiên. */
+export function curtainName(place: VillageId | null): string {
+  return place ? ui.lang[place] : ui.manCho.tenCho;
 }
 
-/** Nạp sẵn ảnh nền của một làng (làng đang được chuẩn bị) để màn chờ hiện ngay khi bước vào làng. Gọi nhiều lần cho cùng làng cũng chỉ nạp một lần. */
+/** Nạp sẵn ảnh nền chung của màn chờ để màn chờ hiện ngay khi bước vào làng. Gọi nhiều lần cũng chỉ nạp một lần. */
 const preloaded = new Set<string>();
-export function preloadCurtainImage(place: VillageId): void {
-  const url = asset(CURTAIN_IMAGE[place]);
+export function preloadCurtainImage(): void {
+  const url = asset(CURTAIN_IMAGE.cho);
   if (!url || preloaded.has(url) || typeof Image === 'undefined') return;
   preloaded.add(url);
   const img = new Image();
   img.decoding = 'async';
   img.src = url;
-}
-
-/** Hàm thuần: phần trăm không bao giờ lùi trong một lần hiện màn chờ, kẹp 0 đến 100. */
-export function nextPercent(prev: number, now: number): number {
-  return Math.round(Math.min(100, Math.max(prev, now, 0)));
 }
 
 /**
@@ -63,51 +53,16 @@ export function useSettled(cond: boolean, frames = 2): boolean {
 }
 
 export interface WorldCurtainProps {
-  /** Còn cần che không (false thì mờ dần trong 0,4 giây rồi nhường chuột cho cảnh) */
+  /** Còn cần che không (false thì lên 100% rồi mờ dần 0,4 giây) */
   shown: boolean;
   /** Làng sắp vào; null là chợ phiên */
   place: VillageId | null;
   /** Tiến độ dựng vùng làng (0 đến 100) khi đang vào làng; null thì lấy tiến độ tải cảnh của drei */
   zonePercent: number | null;
-  /** "Giảm chuyển động": ẩn ngay không mờ dần */
-  reducedMotion: boolean;
 }
 
-/**
- * Màn chờ chung của thế giới mở (vào chợ, vào làng): che kín toàn màn hình bằng ảnh tranh, tên nơi sắp vào, thanh tiến độ và phần trăm, trên một lớp tối nhẹ cho chữ dễ đọc.
- * Dùng viền và nền phẳng (không bóng, không lọc) vì phủ lên cảnh WebGL.
- */
-export function WorldCurtain({ shown, place, zonePercent, reducedMotion }: WorldCurtainProps) {
+/** Màn chờ của thế giới mở (vào chợ, vào làng): màn chờ chung kèm tên nơi sắp vào và tiến độ tải cảnh hay dựng vùng làng. */
+export function WorldCurtain({ shown, place, zonePercent }: WorldCurtainProps) {
   const sceneProgress = useProgress((s) => s.progress);
-  const best = useRef(0);
-  const wasShown = useRef(shown);
-  if (shown && !wasShown.current) best.current = 0; // lần hiện mới: tính lại từ 0
-  wasShown.current = shown;
-  // chưa xong hẳn thì tối đa 99% (tải model xong chưa có nghĩa là cảnh đã dựng và camera đã đặt); khi mờ dần mới là 100%
-  const percent = shown ? Math.min(99, nextPercent(best.current, zonePercent ?? sceneProgress)) : 100;
-  if (shown) best.current = percent;
-  const { name, image } = curtainTarget(place);
-  return (
-    <div
-      data-testid="man-cho-tai"
-      data-shown={shown ? 'true' : 'false'}
-      data-place={place ?? 'cho'}
-      aria-hidden={!shown}
-      className={`fixed inset-0 z-[60] grid place-items-center overflow-hidden bg-giay p-6 ${shown ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
-      style={{ transition: shown || reducedMotion ? 'none' : `opacity ${CURTAIN_FADE_MS}ms ease-out` }}
-    >
-      <AssetImage key={image} path={image} alt="" className="absolute inset-0 size-full object-cover" />
-      <div aria-hidden="true" className="absolute inset-0 bg-black/35" />
-      <div className="relative z-10 flex w-full max-w-sm flex-col items-center gap-3 rounded-bang border-2 border-white/40 bg-black/45 p-5 text-center text-white">
-        <p className="font-display text-base font-bold">{ui.manCho.dangVao}</p>
-        <h2 data-testid="man-cho-tai-ten" className="font-display text-3xl font-extrabold">
-          {name}
-        </h2>
-        <ProgressBar current={percent} max={100} />
-        <p role="status" className="font-display text-xl font-bold">
-          {fmt(ui.tai3d.phanTram, { so: percent })}
-        </p>
-      </div>
-    </div>
-  );
+  return <LoadingScreen shown={shown} subtitle={ui.manCho.dangVao} title={curtainName(place)} percent={zonePercent ?? sceneProgress} data={{ place: place ?? 'cho' }} />;
 }

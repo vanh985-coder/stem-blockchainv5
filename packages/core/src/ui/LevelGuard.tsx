@@ -8,6 +8,7 @@ import { ui } from '../content/ui';
 import { canEnterLevel } from '../progress/unlock';
 import { useProgress } from '../progress/ProgressProvider';
 import { Button } from './Button';
+import { LoadingScreen } from './LoadingScreen';
 import { Panel } from './Panel';
 
 /** Chờ kéo tiến độ từ máy chủ tối đa chừng này rồi mới quyết định (mất mạng thì dùng bản trên máy). */
@@ -31,7 +32,7 @@ export function LevelGuard({ levelId, children }: { levelId: number; children: R
   const unknownUser = loading || profileLoading || mode === 'loading';
   const stillPulling = mode === 'user' && !synced && !waited;
   if (unknownUser || stillPulling) {
-    return <p className="grid min-h-screen place-items-center p-6 text-center">{ui.chung.dangTai}</p>;
+    return <LoadingScreen title={levelById(levelId)?.ten ? fmt(levelById(levelId)?.ten ?? '') : undefined} />;
   }
 
   const state = unlock.levels.find((l) => l.id === levelId);

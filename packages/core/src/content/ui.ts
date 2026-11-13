@@ -440,8 +440,6 @@ export const ui = {
 
   /** Màn hình tải cảnh 3D */
   tai3d: {
-    /** Dòng chữ trên thanh tiến độ khi đang tải model và ảnh của cảnh */
-    dangTai: 'Đang tải cảnh…',
     /** Phần trăm đã tải */
     phanTram: '{so}%',
   },
@@ -655,6 +653,8 @@ export const ui = {
   manCho: {
     tenCho: 'Chợ phiên',
     dangVao: 'Em sắp vào',
+    /** Dòng nhỏ mặc định của màn chờ chung (mọi chỗ chờ tải) */
+    dangTai: 'Đang tải',
   },
 
   /** Thế giới mở ở /cho (mốc 2, bước W1): chợ và 4 làng trong một cảnh */

@@ -5,7 +5,7 @@ import { CanvasErrorBoundary } from './CanvasErrorBoundary';
 import { DayLight } from './DayLight';
 import { ForcedCrash, forcedCanvasCrash } from './ForcedCrash';
 import { FpsGuard } from './FpsGuard';
-import { LoadingScreen } from './LoadingScreen';
+import { SceneLoading } from './SceneLoading';
 import { QualityContext } from './QualityContext';
 import { Sky } from './Sky';
 import { effectiveDpr, type QualityChoice, type QualityLevel } from './quality';
@@ -130,7 +130,7 @@ function Scene3DInner({
           </Suspense>
         </QualityContext.Provider>
       </Canvas>
-      {!hideLoading && <LoadingScreen visible={!ready} />}
+      {!hideLoading && <SceneLoading shown={!ready} />}
     </div>
   );
 }

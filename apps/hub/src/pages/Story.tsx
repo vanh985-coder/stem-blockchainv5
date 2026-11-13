@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { STORY, VnDialog, fmt, storyTheme, ui, useAuth, useProgress, useStoryGate, type VnTurn } from '@so-chung/core';
+import { LoadingScreen, STORY, VnDialog, fmt, storyTheme, ui, useAuth, useProgress, useStoryGate, type VnTurn } from '@so-chung/core';
 import { StoryBackdrop } from './StoryBackdrop';
 
 /**
@@ -25,7 +25,7 @@ export default function Story() {
     markStoryRead();
     navigate('/cho');
   };
-  if (gate === 'wait') return <p className="p-6">{ui.chung.dangTai}</p>;
+  if (gate === 'wait') return <LoadingScreen />;
   return (
     <VnDialog
       turns={turns}

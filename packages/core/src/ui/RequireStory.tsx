@@ -1,8 +1,8 @@
+import { LoadingScreen } from './LoadingScreen';
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router';
 import { useAuth } from '../auth/AuthProvider';
 import { canSeeTeacherPage } from '../auth/roles';
-import { ui } from '../content/ui';
 import { useProgress } from '../progress/ProgressProvider';
 import { storyGate, type StoryGate } from '../progress/storyFlags';
 
@@ -21,7 +21,7 @@ export function useStoryGate(): StoryGate {
  */
 export function RequireStory({ children }: { children: ReactNode }) {
   const gate = useStoryGate();
-  if (gate === 'wait') return <p className="p-6">{ui.chung.dangTai}</p>;
+  if (gate === 'wait') return <LoadingScreen />;
   if (gate === 'read') return <Navigate to="/truyen" replace />;
   return <>{children}</>;
 }

@@ -14,6 +14,7 @@ import { CLIMAX_LEVEL, climaxPending } from '../progress/climaxState';
 import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
 import { AutoCompleteButton, AutoCompletedPanel } from './AutoComplete';
+import { LoadingTitleProvider } from './LoadingScreen';
 import { Button } from './Button';
 import { rich } from './rich';
 import { GuideDialog } from './GuideDialog';
@@ -207,7 +208,7 @@ export function MiniGameLevel({ levelId, medals, maxScore, renderGame, onLeave, 
     if (PROBE) Object.assign(window, { __miniFinish: (score?: number) => onFinish(score ?? medals[2]) });
     return (
       <div className="relative">
-        {renderGame({ paused, attempt, onFinish, setHint })}
+        <LoadingTitleProvider title={fmt(def?.ten ?? '')}>{renderGame({ paused, attempt, onFinish, setHint })}</LoadingTitleProvider>
         {!tabPaused && (
           <button
             type="button"

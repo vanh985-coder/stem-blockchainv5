@@ -545,7 +545,7 @@ export function WorldPage() {
   }, [ready, flagKnown, prewarmZones, data]);
   useEffect(() => {
     if (!manifest) return;
-    for (const id of VILLAGE_ORDER) if (prewarmZones[id]) preloadCurtainImage(id);
+    if (VILLAGE_ORDER.some((id) => prewarmZones[id])) preloadCurtainImage();
   }, [manifest, prewarmZones]);
   const warmVillage = warmQueue[0] ?? null;
   useEffect(() => {
@@ -686,7 +686,7 @@ export function WorldPage() {
       {guide && <GuideDialog section={guide.section} onClose={closeGuide} />}
       {bigMap && <BigMap geo={mapGeo} markers={bigMarkers} names={mapNames} player={mapPlayer} progress={mapProgress} quest={questText} touch={touch} reducedMotion={settings.reducedMotion} onClose={closeMap} api={api} />}
 
-      <WorldCurtain shown={curtainShown} place={curtainPlace} zonePercent={curtainZonePercent} reducedMotion={settings.reducedMotion} />
+      <WorldCurtain shown={curtainShown} place={curtainPlace} zonePercent={curtainZonePercent} />
       <WalkLockOverlay session={session} hideMenu hideHint={curtainShown} />
       <MarketMenu session={session} onGuide={() => openGuide()} extraItems={menuKnow} />
     </div>
