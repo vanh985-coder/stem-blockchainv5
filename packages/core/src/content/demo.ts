@@ -4,5 +4,7 @@ export const demoUi = {
   /** Màn chuyển giữa hai màn (chế độ danh sách màn): màn đen, tên màn chữ to */
   manChuyen: 'Màn {so}',
   /** Biểu tượng góc trên phải khi video hướng dẫn đang tua nhanh */
+  /** Nút cuối video của chế độ trọn: tải file mốc giây */
+  taiMoc: 'Tải mốc giây',
   tuaNhanh: '⏩ ×2,5',
 } as const;

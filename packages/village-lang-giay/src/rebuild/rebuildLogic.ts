@@ -10,6 +10,7 @@
 import { buildChain, pageCode, randomContents, randomGenesis, solutionSteps } from '@so-chung/core/lessons/bai-1/logic';
 import { createMulberry32, randInt } from '@so-chung/core/lib/rng';
 import { medalOf, type Medal } from '@so-chung/core';
+import { TRON } from '@so-chung/core/demo/tron/data';
 import { REBUILD_CODE_MAX, REBUILD_SPEC as SPEC } from './rebuildConfig';
 
 /** Kết quả một vòng đã xong, để liệt kê ở màn kết quả; tổng điểm các vòng bằng `rebuildScore`. */
@@ -172,7 +173,31 @@ function shuffledTray(real: readonly Card[], rng: () => number): Card[] {
 // ---------------------------------------------------------------------------
 // Ván chơi
 
+/** Chế độ trọn (demo): đề cố định của vòng hiện tại (3 trang; vòng 2 có trang giả), khay theo thứ tự cố định. */
+function tronRound(s: RebuildState): void {
+  const d = TRON!.man3;
+  const codes = buildChain(d.genesis, [...d.contents]);
+  const idPrefix = 'r' + String(s.round + 1);
+  const real: Card[] = [];
+  let prev = d.genesis;
+  for (let i = 0; i < d.contents.length; i++) {
+    real.push({ id: idPrefix + '-' + String(i), prev, content: d.contents[i], code: codes[i], isFake: false });
+    prev = codes[i];
+  }
+  const withFake = SPEC.rounds[s.round].fake;
+  s.deal = { genesis: d.genesis, real, fake: withFake ? { id: idPrefix + '-fake', ...d.fake, isFake: true } : null };
+  s.chain = [];
+  s.tray = d.trayOrder.map((i) => real[i]);
+  s.errors = 0;
+  s.fakeBinned = false;
+  s.phase = withFake ? 'villain' : 'play';
+}
+
 function startRound(s: RebuildState): void {
+  if (TRON) {
+    tronRound(s);
+    return;
+  }
   const r = SPEC.rounds[s.round];
   s.deal = generateDeal(s.rng, r.pages, r.fake, `r${s.round + 1}`);
   s.chain = [];
@@ -226,7 +251,7 @@ export function rebuildMedal(score: number): Medal {
 /** {phanDien} nhét trang giả vào khay (vòng 2), ở một chỗ ngẫu nhiên. Chỉ có tác dụng khi `phase` là 'villain'. */
 export function insertFake(s: RebuildState): boolean {
   if (s.phase !== 'villain' || !s.deal.fake) return false;
-  s.tray.splice(randInt(0, s.tray.length, s.rng), 0, s.deal.fake);
+  s.tray.splice(TRON ? 1 : randInt(0, s.tray.length, s.rng), 0, s.deal.fake);
   s.phase = 'play';
   return true;
 }

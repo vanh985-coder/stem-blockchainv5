@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import { fmt } from '../content/characters';
 import { demoUi } from '../content/demo';
 import { useProgress } from '../progress/ProgressProvider';
-import { DEMO_HD, DEMO_MEN, DEMO_SPEED, DEMO_START, exposeForDemo } from './config';
+import { DEMO_HD, DEMO_MEN, DEMO_SPEED, DEMO_START, DEMO_TRON, TRON_FROM, exposeForDemo } from './config';
 import { installFfBadge, removeFfBadge } from './ffBadge';
 import { DemoController } from './controller';
 import { removeCursor } from './cursor';
@@ -12,6 +12,9 @@ import { runDirector, type SceneLog } from './director';
 import { installFakePointerLock } from './pointerLock';
 import { buildScenes } from './scenes';
 import { buildListScenes } from './scenes/levels';
+import { getMarks, showMarksButton, tronReset } from './tron/marks';
+import { buildTronScenes } from './tron/scenes';
+import { metaOfCode } from './tron/starts';
 
 const COUNTDOWN_S = 5;
 
@@ -56,14 +59,20 @@ export default function DemoRunner() {
       window.__demoLog = [];
       window.__demoDone = false;
       if (DEMO_HD) installFfBadge();
-      const all = DEMO_MEN ? buildListScenes(DEMO_MEN) : buildScenes();
+      const all = DEMO_TRON ? buildTronScenes(TRON_FROM) : DEMO_MEN ? buildListScenes(DEMO_MEN) : buildScenes();
       const from = DEMO_START ? all.findIndex((s) => s.id === DEMO_START) : 0;
+      if (DEMO_TRON) {
+        tronReset();
+        const route = TRON_FROM ? metaOfCode(TRON_FROM)?.route : null;
+        if (route) nav.current(route);
+      }
       void runDirector(all.slice(Math.max(0, from)), { ctl: c, navigate: (to) => nav.current(to) }, (l) => {
         window.__demoLog?.push(l);
         console.info(`[demo] ${l.id} ${l.status} ${l.ms}ms${l.error ? ` ${l.error}` : ''}`);
       }).finally(() => {
         removeCursor();
         removeFfBadge();
+        if (DEMO_TRON && getMarks().length > 0) showMarksButton(demoUi.taiMoc);
         window.__demoDone = true;
       });
     }, 1000);

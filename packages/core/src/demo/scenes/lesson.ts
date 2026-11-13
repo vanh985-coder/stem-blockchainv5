@@ -19,6 +19,8 @@ export async function skipTutorial(ctx: Ctx, watchMs = PACING ? PACING.tutorialW
 export interface LessonDrive {
   /** Chơi trạm `idx` (0 Dễ, 1 Trung bình, 2 Khó) tới khi trang chuyển sang kết quả trạm */
   playStation: (ctx: Ctx, idx: number) => Promise<void>;
+  /** Chế độ trọn: gọi ngay trước khi bấm sang trạm kế (đứng chờ đủ mức tối thiểu của đoạn) */
+  beforeNext?: (ctx: Ctx, idx: number) => Promise<void>;
 }
 
 /** Chạy cả bài từ trạm hiện tại tới màn hoàn thành ('complete'). */
@@ -52,6 +54,7 @@ export async function driveLesson(ctx: Ctx, drive: LessonDrive): Promise<void> {
     } else if (stage === 'stationDone') {
       if (!PACING) await dwell(ctx, q('.lesson-screen h2')?.textContent ?? '');
       await ctl.sleep(pace(1500));
+      if (drive.beforeNext) await drive.beforeNext(ctx, station);
       const next = q<HTMLButtonElement>('[data-demo="station-next"]');
       if (next) await clickEl(ctx, next, { settle: 500 });
     } else {

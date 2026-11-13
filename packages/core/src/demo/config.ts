@@ -48,3 +48,12 @@ export const DEMO_SPEED: number = parseSpeed(readQuery()?.get('tocdo'));
 export function exposeForDemo(obj: Record<string, unknown>): void {
   if (DEMO_BUILD && typeof window !== 'undefined') Object.assign(window, obj);
 }
+
+/** `?kieu=tron` (cùng `?demo=1`): demo tự chơi TRỌN game theo KICH-BAN-VIDEO-TRON-GAME.md (nhánh feat/demo-tron, không bao giờ vào main). */
+export const DEMO_TRON: boolean = DEMO_ACTIVE && readQuery()?.get('kieu') === 'tron';
+
+/** `&tu=<mã đoạn>` (chế độ trọn): bắt đầu từ đoạn đó (dựng sẵn tiến độ cần thiết). */
+export const TRON_FROM: string | null = DEMO_TRON ? (readQuery()?.get('tu')?.toUpperCase() ?? null) : null;
+
+/** `&kiem=<hệ số>` (chỉ để chạy thử): chia nhỏ mức tối thiểu của mỗi đoạn để kiểm nhanh. Mặc định 1 (đúng kịch bản). */
+export const TRON_FLOOR_SCALE: number = DEMO_TRON ? Math.min(1, Math.max(0.01, Number(readQuery()?.get('kiem') ?? 1) || 1)) : 1;

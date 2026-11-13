@@ -63,6 +63,8 @@ export interface WalkOpts {
   run?: boolean;
   /** Tới sát đích trong khoảng này (đơn vị cảnh) thì dừng */
   arrive?: number;
+  /** Chế độ trọn: thay cách xử lý khi hộp thoại bật lên giữa đường (mặc định: lật hết hộp thoại) */
+  onDialog?: () => Promise<void>;
 }
 
 /** Đi theo đường tới nút `nodeId` của đồ thị thế giới. Dừng chờ khi có hộp thoại hay đang vào làng. */
@@ -86,7 +88,7 @@ export async function walkToNode(ctx: Ctx, nodeId: string, opts: WalkOpts = {}):
       if (s.dialogOpen || s.entering || s.guideOpen || s.know || s.bigMap || ctx.ctl.paused) {
         stopMoving(api);
         // Hộp thoại bật lên giữa đường (cảnh mở đầu làng...): xem hết rồi đi tiếp
-        if (s.dialogOpen) await playVnDialogs(ctx);
+        if (s.dialogOpen) await (opts.onDialog ? opts.onDialog() : playVnDialogs(ctx));
         else if (s.guideOpen) await dismissGuideIfOpen(ctx);
         stuckSince = performance.now();
         continue;
@@ -144,8 +146,8 @@ export async function walkToPoint(ctx: Ctx, x: number, z: number, arrive = 1.2, 
 }
 
 /** Đi tới nút rồi nhấn E khi vật tương tác gần nhất thỏa `match`; đi nhích thêm về phía vật nếu chưa đủ gần. */
-export async function walkAndInteract(ctx: Ctx, nodeId: string, match: (t: WorldTarget) => boolean, at: { x: number; z: number }): Promise<void> {
-  await walkToNode(ctx, nodeId);
+export async function walkAndInteract(ctx: Ctx, nodeId: string, match: (t: WorldTarget) => boolean, at: { x: number; z: number }, opts: WalkOpts & { before?: () => Promise<void> } = {}): Promise<void> {
+  await walkToNode(ctx, nodeId, opts);
   const near = () => {
     const n = demoWorld()?.near;
     return n && match(n) ? n : null;
@@ -153,5 +155,25 @@ export async function walkAndInteract(ctx: Ctx, nodeId: string, match: (t: World
   if (!near()) await walkToPoint(ctx, at.x, at.z, 0.8, 5000);
   await ctx.ctl.waitFor(near, `near target for ${nodeId}`, 6000);
   await ctx.ctl.sleep(500);
+  // chế độ trọn: đứng yên chờ cho đủ mức tối thiểu của đoạn trước
+  if (opts.before) await opts.before();
   await pressKey(ctx, 'KeyE');
+}
+
+/**
+ * Dịch chuyển bằng bản đồ lớn như người chơi: bấm M, bấm điểm đến (mã điểm: 'gate:det', 'scroll:lang-det:0'...), bấm "Đi tới". Mỗi bước dừng đủ lâu để người xem thấy thao tác.
+ */
+export async function teleportViaMap(ctx: Ctx, markerId: string, opts: { hold?: number } = {}): Promise<void> {
+  const { ctl } = ctx;
+  const hold = opts.hold ?? 1400;
+  await waitWorldReady(ctx);
+  if (!q('[data-testid="ban-do-lon"]')) await pressKey(ctx, 'KeyM');
+  await ctl.waitFor(() => q('[data-testid="ban-do-lon"]'), 'big map', 8000);
+  await ctl.sleep(hold);
+  const dot = await ctl.waitFor(() => q('[data-testid="teleport-' + markerId + '"]'), 'teleport marker ' + markerId, 8000);
+  await clickEl(ctx, dot, { settle: hold });
+  const go = await ctl.waitFor(() => q('[data-testid="nut-di-toi"]'), 'teleport confirm button', 8000);
+  await clickEl(ctx, go, { settle: 300 });
+  await ctl.waitFor(() => !q('[data-testid="ban-do-lon"]') && !q('[data-testid="fade-overlay"]'), 'map closed after teleport', 8000);
+  await ctl.sleep(600);
 }

@@ -17,6 +17,7 @@ import {
 import { bai1Texts } from '@so-chung/core/content/lessons/bai-1';
 import { demoProbe } from '@so-chung/core/demo/probe';
 import { PACING } from '@so-chung/core/demo/pacing';
+import { TRON } from '@so-chung/core/demo/tron/data';
 import { buildChain, easyRound, pageCode, solutionSteps, type Lesson1Data } from '@so-chung/core/lessons/bai-1/logic';
 
 const T = bai1Texts;
@@ -46,7 +47,7 @@ export function Easy({
   onChainBuilt: (data: Lesson1Data) => void;
 }) {
   const realStartTime = useRef(performance.now());
-  const { genesisCode, contents } = useRef(easyRound(Date.now())).current;
+  const { genesisCode, contents } = useRef(TRON ? { genesisCode: TRON.man1.easy.genesis, contents: [...TRON.man1.easy.contents] } : easyRound(Date.now())).current;
 
   // Trạng thái bài thật
   // Nhịp video (chỉ demo): các trang đầu điền sẵn, bot làm 1 lượt ở trang cuối

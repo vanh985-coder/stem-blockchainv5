@@ -25,7 +25,7 @@ export function dwell(ctx: Ctx, text: string): Promise<void> {
 export const vnNext = (): HTMLButtonElement | null => q<HTMLButtonElement>('[data-demo="vn-next"]:not([disabled])');
 
 /** Lật hết các lượt của hộp thoại kiểu truyện đang mở (và cả những hộp nối tiếp ngay sau đó). Trả số lượt đã lật. */
-export async function playVnDialogs(ctx: Ctx, opts: { extraDwell?: number } = {}): Promise<number> {
+export async function playVnDialogs(ctx: Ctx, opts: { extraDwell?: number; beforeLast?: () => Promise<void> } = {}): Promise<number> {
   let turns = 0;
   let idle = 0;
   const idleMax = PACING ? 2 : 8;
@@ -41,6 +41,8 @@ export async function playVnDialogs(ctx: Ctx, opts: { extraDwell?: number } = {}
     if (PACING) await ctx.ctl.sleep(PACING.dialogMs);
     else await dwell(ctx, text);
     if (opts.extraDwell) await ctx.ctl.sleep(opts.extraDwell);
+    // chế độ trọn: lượt cuối giữ nguyên hộp thoại cho tới khi đủ mức tối thiểu của đoạn
+    if (opts.beforeLast && next.getAttribute("data-demo-last") === "1") await opts.beforeLast();
     await clickEl(ctx, next, { settle: 300 });
     turns++;
   }
@@ -58,7 +60,7 @@ export async function dismissGuideIfOpen(ctx: Ctx): Promise<boolean> {
 }
 
 /** Trả lời thẻ "Em có biết?" đang mở: đọc thẻ, chọn/gõ đáp án ĐÚNG, đọc giải thích, bấm Cất vào sổ. */
-export async function answerKnowCard(ctx: Ctx, village: VillageId, index: number): Promise<void> {
+export async function answerKnowCard(ctx: Ctx, village: VillageId, index: number, opts: { beforeStash?: () => Promise<void> } = {}): Promise<void> {
   const quiz = knowQuizOf(village, index);
   if (!quiz) throw new Error(`no quiz for ${village}#${index}`);
   await ctx.ctl.waitFor(() => q('[data-testid="the-co-cau-hoi"]'), 'know dialog', 6000);
@@ -77,6 +79,7 @@ export async function answerKnowCard(ctx: Ctx, village: VillageId, index: number
   const fb = await ctx.ctl.waitFor(() => q('[data-testid="phan-hoi"]'), 'feedback', 4000);
   await dwell(ctx, fb.textContent ?? '');
   await ctx.ctl.sleep(500);
+  if (opts.beforeStash) await opts.beforeStash();
   const stash = await ctx.ctl.waitFor(() => q('[data-testid="nut-cat-vao-so"]'), 'stash button', 4000);
   await clickEl(ctx, stash, { settle: 600 });
 }

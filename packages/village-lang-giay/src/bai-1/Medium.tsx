@@ -31,6 +31,7 @@ import {
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { demoProbe } from '@so-chung/core/demo/probe';
 import { PACING } from '@so-chung/core/demo/pacing';
+import { TRON } from '@so-chung/core/demo/tron/data';
 
 const T = bai1Texts;
 
@@ -73,9 +74,9 @@ export function Medium({ onComplete, saved }: { onComplete: (r: StationResult) =
   const initialCodes = useRef(isValidSaved ? [...(saved as Lesson1Data).codes] : buildChain(genesisCode, initialContents)).current;
 
   // Trang k (trang 2 hoặc trang 3) bị sửa trộm, độ chênh an toàn
-  const tamperIndex = useRef(PACING ? PACING.lesson1.tamperIndex : rng() < 0.5 ? 1 : 2).current;
+  const tamperIndex = useRef(TRON ? TRON.man1.medium.tamperIndex : PACING ? PACING.lesson1.tamperIndex : rng() < 0.5 ? 1 : 2).current;
   const originalOld = initialContents[tamperIndex];
-  const tamperedNew = useRef(pickSafeContent(originalOld, rng)).current;
+  const tamperedNew = useRef(TRON ? TRON.man1.medium.newContent : pickSafeContent(originalOld, rng)).current;
 
   // Quản lý trạng thái Hướng dẫn focus và Làm thử (P8b)
   const [tutorialOpen, setTutorialOpen] = useState(true);

@@ -4,6 +4,8 @@ import { Scene3D, isQualityChoice, type QualityChoice } from '@so-chung/core/thr
 import { PROBE } from '@so-chung/core/lib/dev';
 import { demoProbe } from '@so-chung/core/demo/probe';
 import { PACING } from '@so-chung/core/demo/pacing';
+import { TRON } from '@so-chung/core/demo/tron/data';
+import { tronQuestion } from '@so-chung/core/demo/tron/questions';
 import { RUNNER_SPEC as SPEC } from './runnerConfig';
 import { SWIPE_MIN_PX, keyToCommand, swipeToCommand } from './runnerCommands';
 import { hintFor } from './runnerHint';
@@ -23,8 +25,8 @@ function forcedQuality(): QualityChoice | undefined {
 const newSeed = (): number => (Math.random() * 2 ** 31) >>> 0;
 
 // Nhịp video (chỉ demo): 1 vòng ngắn + 1 câu hỏi; ngoài demo là số của spec
-const ROUNDS: number = PACING ? PACING.runner.rounds : SPEC.rounds;
-const ROUND_SEC: number = PACING ? PACING.runner.roundSec : SPEC.roundSec;
+const ROUNDS: number = TRON ? TRON.man2.rounds : PACING ? PACING.runner.rounds : SPEC.rounds;
+const ROUND_SEC: number = TRON ? TRON.man2.roundSec : PACING ? PACING.runner.roundSec : SPEC.roundSec;
 const INITIAL_HUD: RunnerHud = { hearts: SPEC.hearts, pages: 0, coins: 0, meters: 0, round: 0, shield: 0, boots: 0, magnet: 0 };
 
 /** Trang sổ: biểu tượng nhỏ cho thanh trên (tờ giấy có gáy tím). */
@@ -149,7 +151,7 @@ export function RunnerGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   // mỗi lần chơi (attempt) là một ván mới với hạt giống mới
   const session = useMemo(() => new RunnerSession({ seed: newSeed(), rounds: ROUNDS, roundSec: ROUND_SEC }), [attempt]); // eslint-disable-line react-hooks/exhaustive-deps
   // 4 câu hỏi Bài 1 cho ván này (không lặp, đã trộn thứ tự đáp án)
-  const questions = useMemo(() => pickQuestions({ bai: 1, soCau: ROUNDS, seed: session.seed }), [session]);
+  const questions = useMemo(() => (TRON ? [tronQuestion(TRON.man2.question.id, TRON.man2.question.options)] : pickQuestions({ bai: 1, soCau: ROUNDS, seed: session.seed })), [session]);
   // chỉ bản dev và bản đo `VITE_PROBE`: để script kiểm đọc trạng thái ván (tốc độ, tim, điểm)
   if (PROBE && typeof window !== 'undefined') Object.assign(window, { __runner: session, __runnerQuestions: questions, __makeCell: makeCell });
   const pausedRef = useRef(paused);

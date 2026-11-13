@@ -5,7 +5,7 @@ import { tutorialTexts } from '../../content/tutorial';
 import { clickEl, dragEl, q, typeInto, type Ctx } from '../actions';
 import { getProbe } from '../probe';
 import { buttonByText, dwell, playVnDialogs } from '../ui';
-import { demoWorld, engageWorld, walkAndInteract, waitWorldReady } from '../world';
+import { demoWorld, engageWorld, walkAndInteract, waitWorldReady, type WalkOpts } from '../world';
 import { DEMO_HD, DEMO_MEN } from '../config';
 import { hdStationEnd, hdStationStart, hdTurn, startFastForward, stopFastForward } from '../hdStats';
 import { pace, PACING } from '../pacing';
@@ -25,22 +25,22 @@ interface Man1Probe {
   fixed?: number;
   networkAdded?: number;
 }
-const man1Probe = () => getProbe<Man1Probe>('man1');
+export const man1Probe = () => getProbe<Man1Probe>('man1');
 
 /** Từ làng đi tới biển màn `level` và nhấn E để vào màn (nếu chưa ở trang màn). */
-async function enterLevelFromVillage(ctx: Ctx, village: 'lang-giay', level: number): Promise<void> {
+export async function enterLevelFromVillage(ctx: Ctx, village: 'lang-giay', level: number, opts: WalkOpts & { before?: () => Promise<void> } = {}): Promise<void> {
   const path = `/lang/${village}/man/${level}`;
   if (onPath(path)) return;
   await waitWorldReady(ctx);
   await engageWorld(ctx);
   const board = demoWorld()?.world.villages.find((v) => v.id === village)?.layout.boards.find((b) => b.level === level);
   if (!board) throw new Error(`no board for level ${level}`);
-  await walkAndInteract(ctx, boardNodeId(level), (t) => t.kind === 'board' && t.level === level, { x: board.x, z: board.z });
+  await walkAndInteract(ctx, boardNodeId(level), (t) => t.kind === 'board' && t.level === level, { x: board.x, z: board.z }, opts);
   await ctx.ctl.waitFor(() => onPath(path), `route ${path}`, 15000);
 }
 
 /** Nhập đáp án đúng của trang đang làm rồi bấm Kiểm tra (hoặc Enter ở trạm Khó cho kịp giờ). Trả false nếu chưa có đề. */
-async function answerPage(ctx: Ctx, fast: boolean, range?: readonly [number, number], slow = false): Promise<boolean> {
+export async function answerPage(ctx: Ctx, fast: boolean, range?: readonly [number, number], slow = false): Promise<boolean> {
   const p = man1Probe();
   if (!p || p.expected === null) return false;
   const input = q<HTMLInputElement>('[data-tutorial="code-input"] input');
@@ -165,7 +165,7 @@ interface Man2Probe {
   tutorialActive: boolean;
   correctIndex: number | null;
 }
-const man2Probe = () => getProbe<Man2Probe>('man2');
+export const man2Probe = () => getProbe<Man2Probe>('man2');
 
 /** Bước mô phỏng cố định của ván chạy (giây); cùng giá trị với `FIXED_STEP` của runnerCommands */
 const RUNNER_STEP = 1 / 60;
@@ -174,7 +174,7 @@ const RUNNER_STEP = 1 / 60;
  * Bot lái ván chạy: bộ não bot giỏi quyết định MỖI bước mô phỏng (1/60 giây) rồi gửi lệnh như phím (trái/phải/nhảy/trượt) vào hàng đợi lệnh của ván. Quyết định theo từng bước chứ không theo từng khung hình
  * vẽ, để máy vẽ chậm cũng không nhảy trễ. Phím P tạm dừng cả ván. Luật và vật lý của ván không đổi.
  */
-function installRunnerAutopilot(ctx: Ctx, session: RunnerSessionLike, brain: RunnerBrain): void {
+export function installRunnerAutopilot(ctx: Ctx, session: RunnerSessionLike, brain: RunnerBrain): void {
   const original = session.update.bind(session);
   const events: unknown[] = [];
   session.update = (dt, paused) => {
@@ -204,7 +204,7 @@ function installRunnerAutopilot(ctx: Ctx, session: RunnerSessionLike, brain: Run
 }
 
 /** Câu hỏi giữa vòng: đọc, chọn đáp án đúng, đọc giải thích, bấm Chạy tiếp. */
-async function answerRunnerQuiz(ctx: Ctx): Promise<void> {
+export async function answerRunnerQuiz(ctx: Ctx): Promise<void> {
   const { ctl } = ctx;
   const panel = await ctl.waitFor(() => q('[data-testid="cau-hoi"]'), 'runner quiz panel', 8000);
   const opts = await ctl.waitFor(() => {
@@ -262,8 +262,8 @@ interface Man3Probe {
   fakeId: () => string | null;
   rightId: () => string | null;
 }
-const man3Probe = () => getProbe<Man3Probe>('man3');
-const cardEl = (id: string) => q(`[data-card-id="${id}"]`);
+export const man3Probe = () => getProbe<Man3Probe>('man3');
+export const cardEl = (id: string) => q(`[data-card-id="${id}"]`);
 
 export async function giayMan3(ctx: Ctx): Promise<void> {
   const { ctl } = ctx;

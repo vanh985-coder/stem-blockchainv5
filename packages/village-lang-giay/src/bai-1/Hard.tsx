@@ -30,12 +30,13 @@ import {
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { demoProbe } from '@so-chung/core/demo/probe';
 import { PACING } from '@so-chung/core/demo/pacing';
+import { TRON } from '@so-chung/core/demo/tron/data';
 import { timeScale } from '@so-chung/core/demo/timeScale';
 
 const T = bai1Texts;
 const C = GAME_CONFIG.lesson1;
 // Nhịp video (chỉ demo): ván ngắn, mạng sinh trang đều và nhanh
-const HARD_DURATION_MS = PACING ? PACING.lesson1.hardDurationMs : C.hardDurationMs;
+const HARD_DURATION_MS = TRON ? TRON.man1.hard.durationMs : PACING ? PACING.lesson1.hardDurationMs : C.hardDurationMs;
 
 // Dữ liệu làm thử cố định cho trạm Khó (P8b)
 const PRACTICE_GENESIS = 10;
@@ -118,17 +119,17 @@ function CountdownTimer({
 
 /** Trạm Khó: "Cuộc đua với cả mạng lưới". Mạng thêm trang mới đều đặn, em sửa cho kịp; hết 60 giây thì tổng kết. */
 export function Hard({ onComplete }: { onComplete: (r: StationResult) => void }) {
-  const rng = useRef(createMulberry32(Date.now())).current;
+  const rng = useRef(createMulberry32(TRON ? TRON.man1.hard.seed : Date.now())).current;
 
   // Chuỗi gốc 6 trang của mạng lưới
-  const genesisCode = useRef(randomGenesis(rng)).current;
-  const initialContents = useRef(randomContents(C.hardStartPages, rng)).current;
+  const genesisCode = useRef(TRON ? TRON.man1.hard.genesis : randomGenesis(rng)).current;
+  const initialContents = useRef(TRON ? [...TRON.man1.hard.contents] : randomContents(C.hardStartPages, rng)).current;
   const initialCodes = useRef(buildChain(genesisCode, initialContents)).current;
   const origChain = useRef({ contents: [...initialContents], codes: [...initialCodes] });
   const networkAdded = useRef(0);
 
   // Sổ của em: trang 2 bị sửa trộm
-  const tamperedContent = useRef(pickSafeContent(initialContents[C.hardTamperIndex], rng)).current;
+  const tamperedContent = useRef(TRON ? TRON.man1.hard.tamperedContent : pickSafeContent(initialContents[C.hardTamperIndex], rng)).current;
   const [pages, setPages] = useState<ChainPageData[]>(() =>
     initialContents.map((c, i) => ({ content: i === C.hardTamperIndex ? tamperedContent : c, code: initialCodes[i] })),
   );
@@ -255,7 +256,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void })
   // Mạng thêm trang bằng chuỗi setTimeout (không dùng setInterval), dọn sạch khi rời màn hoặc khi mở hướng dẫn.
   const scheduleNextSpawn = useCallback(() => {
     if (timeUpRef.current || tutorialOpen) return;
-    const delay = (PACING ? PACING.lesson1.hardSpawnMs : spawnDelayMs(spawnIndex.current, isFast.current)) / timeScale();
+    const delay = (TRON ? TRON.man1.hard.spawnMs : PACING ? PACING.lesson1.hardSpawnMs : spawnDelayMs(spawnIndex.current, isFast.current)) / timeScale();
     spawnIndex.current += 1;
     spawnTimeout.current = setTimeout(() => {
       if (timeUpRef.current || tutorialOpen) return;
