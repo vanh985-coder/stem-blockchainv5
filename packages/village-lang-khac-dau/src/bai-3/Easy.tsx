@@ -24,6 +24,8 @@ import { DanhBa } from './DanhBa';
 import { TheGiaoDich } from './TheGiaoDich';
 import { portraitOf, tenNhan, type PersonId } from './nguoi';
 
+import { demoProbe } from '@so-chung/core/demo/probe';
+
 const T = bai3Texts.tramDe;
 
 // 5 bạn trong Phần 2
@@ -298,6 +300,8 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
       }
     }, GAME_CONFIG.lesson3.verifyScanDelayMs);
   };
+
+  demoProbe('man7', { station: 'de', tutorialOpen: tutorialActive, part, p1Step });
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

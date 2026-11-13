@@ -15,6 +15,8 @@ import {
 } from '@so-chung/core';
 import { bai3Texts } from '@so-chung/core/content/lessons/bai-3';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
+import { demoProbe } from '@so-chung/core/demo/probe';
+import { TRON } from '@so-chung/core/demo/tron/data';
 import { generateMedium, verify, PEOPLE, STRANGER, type MediumTx } from '@so-chung/core/lessons/bai-3/logic';
 import { DanhBa } from './DanhBa';
 import { TheGiaoDich } from './TheGiaoDich';
@@ -38,7 +40,7 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
 
   // Tạo 4 giao dịch
   const [txList, setTxList] = useState<MediumTx[]>(() => {
-    const rng = createMulberry32(seedCounterRef.current);
+    const rng = createMulberry32(TRON ? TRON.man7.mediumSeed : seedCounterRef.current);
     return generateMedium(rng, myName);
   });
 
@@ -240,6 +242,9 @@ export function Medium({ onComplete }: { onComplete: (r: StationResult) => void;
   };
 
   // Kiểm tra xem đã chọn đủ 4 thẻ chưa
+  // Bot demo (chỉ bản build VITE_DEMO): các giao dịch hiện trên màn hình (người gửi, lời nhắn, chữ ký, khóa đính kèm)
+  demoProbe('man7', { station: 'tb', tutorialOpen: tutorialActive, txs: txList.map((t) => ({ id: t.id, senderId: t.senderId, message: t.message, sig: t.sig, attachedKey: t.attachedKey ?? null, isFake: t.isFake })), decided: Object.keys(decisions).length, feedbackOpen: feedback.isOpen, verifying: isVerifying, hasResult: verifyResult !== null });
+
   const isReadyToSubmit = useMemo(() => {
     return (
       txList.length === 4 &&

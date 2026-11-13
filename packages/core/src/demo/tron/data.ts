@@ -47,6 +47,15 @@ export const TRON_DATA = {
     /** Chỉ vòng 1 (4 cặp): khuôn 3, 5, 6, 7 ↔ mẫu 10, 20, 8, 17 (5^x mod 23) */
     keys: [3, 5, 6, 7] as readonly number[],
   },
+  man7: {
+    /** Trạm Trung bình: 4 giao dịch sinh bằng bộ sinh của bài với hạt giống cố định (tự chọn). Bảng khóa của spec 07: em 12 → 18; An 15 → 19; Bình 17 → 15; Tí 13 → 21. Trạm Khó tìm x từ khóa công khai 19 (x = 15). */
+    mediumSeed: 7,
+  },
+  man9: {
+    /** Đợt 1, ít trứng: khóa 3, 5, 6 → nạp trứng 10, 20, 8; bàn 3 hàng */
+    keys: [3, 5, 6] as readonly number[],
+    rows: 3,
+  },
   man4: {
     /**
      * Trạm Dễ: sổ 2 trang, mã bìa 5, nội dung 10 và 17 → mã 20, 57 (trang cuối mã 57). 5 vòng; mã đúng của vòng 1 là (57 × 2 + 36) mod 100 = 50.

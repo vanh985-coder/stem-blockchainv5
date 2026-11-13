@@ -17,6 +17,7 @@ import {
   type TutorialStep,
 } from '@so-chung/core';
 import { PROBE } from '@so-chung/core/lib/dev';
+import { demoProbe } from '@so-chung/core/demo/probe';
 import { SpriteCache, useBubbleImages } from './bubbleArt';
 import { slotOf, slotsOfPlan } from './bubbleSlots';
 import { createView, drawBubble, refreshAim, resetView, spawnFx, stepView, type BubbleView } from './bubbleCanvas';
@@ -361,6 +362,19 @@ export function BubbleGame({ paused, attempt, onFinish, setHint }: MiniGameRende
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [aimTo, fire, pickType]);
+
+  // Bot demo (chỉ bản build VITE_DEMO): ván, đặt góc ngắm, tính phát bắn tốt nhất (tải khi cần)
+  demoProbe('man9', {
+    state: game,
+    tutorialActive,
+    setAim: (a: number) => {
+      const v = view.current;
+      if (!v) return;
+      v.aim = clampAngle(a);
+      refreshAim(v, stateRef.current);
+    },
+    bestShot: async () => (await import('./bubbleBots')).demoBestShot(stateRef.current),
+  });
 
   // ----- nạp trứng
   const onPick = useCallback(

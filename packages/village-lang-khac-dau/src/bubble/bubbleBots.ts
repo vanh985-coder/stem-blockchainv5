@@ -127,3 +127,8 @@ export function simulateBubble(seed: number, bot: BubbleBot): BubbleRun {
   }
   return { state: s, score: bubbleScore(s), hearts: s.hearts };
 }
+
+/** Phát bắn tốt nhất của bot giỏi cho bot demo (chỉ dùng ở bản build VITE_DEMO). */
+export function demoBestShot(s: BubbleState): { type: number; angle: number } {
+  return bestShot(s, GOOD_BOT);
+}

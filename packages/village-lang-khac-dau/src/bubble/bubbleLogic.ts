@@ -7,6 +7,7 @@
  * Bàn lưới lục giác: hàng chẵn rộng 10 ô, hàng lẻ 9 ô (hàng đếm từ tấm trần). Hạ bàn là cả tấm trần cùng đàn trứng hạ xuống 1 hàng (`lowered` tăng 1), KHÔNG thêm trứng mới: ván hữu hạn, trứng tiến dần tới dây giới hạn.
  */
 import { publicKey } from '@so-chung/core/lessons/bai-3/logic';
+import { TRON } from '@so-chung/core/demo/tron/data';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { BUBBLE_SPEC, type BubbleSpec } from './bubbleConfig';
 
@@ -154,6 +155,7 @@ function drawPlan(rng: () => number, spec: BubbleSpec, nKeys: number, nextId: { 
   for (let k = lo; k <= hi; k++) pool.push(k);
   const keys: number[] = [];
   while (keys.length < nKeys) keys.push(pool.splice(Math.floor(rng() * pool.length), 1)[0]);
+  if (TRON && nKeys === TRON.man9.keys.length) keys.splice(0, keys.length, ...TRON.man9.keys);
   const values = keys.map(publicKey);
   const taken = new Set<number>(values);
   const tray: TrayEgg[] = values.map((value) => ({ id: nextId.v++, value, kind: 'dung' as const }));

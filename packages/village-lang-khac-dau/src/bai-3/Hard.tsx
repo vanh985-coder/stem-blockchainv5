@@ -24,6 +24,8 @@ import { modPow, startBrute, stepBrute, ESTIMATES, type BruteState } from '@so-c
 
 import { portraitOf } from './nguoi';
 
+import { demoProbe } from '@so-chung/core/demo/probe';
+
 const T = bai3Texts.tramKho;
 
 // 3 cấu hình cơ sở thử nghiệm brute force
@@ -397,6 +399,8 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
   const [p3WrongAnswers, setP3WrongAnswers] = useState<number[]>([]);
   const [p3Feedback, setP3Feedback] = useState<string | null>(null);
   const [p3IsCorrect, setP3IsCorrect] = useState<boolean>(false);
+  // Bot demo (chỉ bản build VITE_DEMO)
+  demoProbe('man7', { station: 'kho', tutorialOpen: tutorialActive, part, p1Found, p1Running: p1AutoRunning, p2Step, p2Found: p2History.some((h) => h.isMatch), bruteRunning, bruteDone: hasRunP1M, p3Done: p3IsCorrect });
 
   const P3_OPTIONS = [
     {

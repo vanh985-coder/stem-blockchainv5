@@ -73,9 +73,9 @@ for (;;) {
   await sleep(1000);
   const st = await page.evaluate(() => ({ marks: window.__tronMarks ?? [], log: window.__demoLog ?? [], done: window.__demoDone === true, path: location.pathname, w: window.__demoWorld ? { r: window.__demoWorld.ready, e: window.__demoWorld.entering, in: window.__demoWorld.inside, d: window.__demoWorld.dialogOpen, k: !!window.__demoWorld.know, n: window.__demoWorld.near?.kind, p: window.__demoWorld.api.player && [Math.round(window.__demoWorld.api.player.x), Math.round(window.__demoWorld.api.player.z)], ax: window.__demoWorld.api.input.keyAxis.y } : null })).catch(() => null);
   if (!st) continue;
-  if (process.env.SNAP && Date.now() - lastSnap > 20000) {
+  if (process.env.SNAP && Date.now() - lastSnap > Number(process.env.SNAP_MS || 20000)) {
     lastSnap = Date.now();
-    await page.screenshot({ path: process.env.SNAP, type: 'jpeg', quality: 40 }).catch(() => undefined);
+    await page.screenshot({ path: process.env.SNAP.endsWith('/') ? process.env.SNAP + 'snap-' + String(Math.round((Date.now() - t0) / 1000)).padStart(4, '0') + '.jpg' : process.env.SNAP, type: 'jpeg', quality: 35 }).catch(() => undefined);
   }
   if (process.env.DEBUG && Date.now() - lastDbg > 8000 && (lastDbg = Date.now())) console.log('   . ' + st.path + ' w=' + JSON.stringify(st.w) + ' log=' + st.log.map((l) => l.id + ':' + l.status).join(','));
   while (marksSeen < st.marks.length) {

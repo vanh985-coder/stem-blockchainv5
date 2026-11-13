@@ -1,5 +1,6 @@
 /** Việc chung của các làng sau Làng Giấy ở chế độ trọn: dịch chuyển bằng bản đồ, vào làng, nhặt thẻ, vào màn từ biển. */
 import { scrollNodeId } from '../../three/village/scrollTargets';
+import { boardNodeId } from '../../three/world/worldLayout';
 import type { VillageId } from '../../village';
 import { pressKey, q, type Ctx } from '../actions';
 import { answerKnowCard, playVnDialogs } from '../ui';
@@ -23,7 +24,7 @@ async function interactHere(ctx: Ctx, kind: 'scroll' | 'board', at: { x: number;
 }
 
 /** D01 / K01 / B01: bản đồ lớn, chọn cổng, "Đi tới"; rồi đi bộ vào làng để xem cảnh mở đầu (đoạn `introCode`). */
-export async function tronEnterVillage(ctx: Ctx, village: VillageId, gateId: string, teleCode: string, introCode: string): Promise<void> {
+export async function tronEnterVillage(ctx: Ctx, village: VillageId, gateId: string, teleCode: string, introCode: string | null): Promise<void> {
   const w0 = await waitWorldReady(ctx);
   await engageWorld(ctx);
   await endSeg(ctx);
@@ -32,7 +33,7 @@ export async function tronEnterVillage(ctx: Ctx, village: VillageId, gateId: str
   const first = w0.world.villages.find((v) => v.id === village)?.layout.scrolls?.[0];
   if (!first) throw new Error('no scrolls in ' + village);
   const onDialog = async () => {
-    await beginSeg(ctx, introCode);
+    if (introCode) await beginSeg(ctx, introCode);
     await playVnDialogs(ctx, { beforeLast: hold(ctx) });
   };
   await walkToNode(ctx, scrollNodeId(village, first.index), { run: false, onDialog });
@@ -71,7 +72,12 @@ export async function tronEnterLevel(ctx: Ctx, village: VillageId, level: number
   await engageWorld(ctx);
   const board = w.world.villages.find((v) => v.id === village)?.layout.boards.find((b) => b.level === level);
   if (!board) throw new Error('no board for level ' + level);
-  await teleportViaMap(ctx, 'board:' + village + ':' + level);
+  try {
+    await teleportViaMap(ctx, 'board:' + village + ':' + level);
+  } catch {
+    // bản đồ lớn không mở được (vừa vào bằng &tu=): đi bộ tới biển
+    await walkToNode(ctx, boardNodeId(level), { run: false });
+  }
   await interactHere(ctx, 'board', { x: board.x, z: board.z }, before);
   await ctx.ctl.waitFor(() => onPath(path), 'route ' + path, 15000);
 }

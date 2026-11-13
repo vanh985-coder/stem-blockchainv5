@@ -3,6 +3,7 @@ import type { DemoContext } from '../context';
 import type { SceneDef } from '../director';
 import { tronGiayCards, tronGiayM1, tronGiayM2, tronGiayM3, tronGiayTrao, tronGiayWalk, tronIntro } from './giay';
 import { tronDetM4, tronDetM5, tronDetM6, tronDetThe, tronDetTrao, tronDetVao } from './det';
+import { tronKdM7, tronKdM8, tronKdM9, tronKdThe, tronKdTrao, tronKdVao } from './khacdau';
 import { TRON_UNIT_META } from './starts';
 
 const RUN: Record<string, (ctx: DemoContext) => Promise<void>> = {
@@ -22,6 +23,14 @@ const RUN: Record<string, (ctx: DemoContext) => Promise<void>> = {
   'det-man-6': async (ctx) => {
     await tronDetM6(ctx);
     await tronDetTrao(ctx);
+  },
+  'kd-vao': tronKdVao,
+  'kd-the': tronKdThe,
+  'kd-man-7': tronKdM7,
+  'kd-man-8': tronKdM8,
+  'kd-man-9': async (ctx) => {
+    await tronKdM9(ctx);
+    await tronKdTrao(ctx);
   },
 };
 

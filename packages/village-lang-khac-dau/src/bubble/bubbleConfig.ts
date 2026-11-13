@@ -17,6 +17,8 @@ export interface BubbleRound {
   descendEvery: number;
 }
 
+import { TRON } from '@so-chung/core/demo/tron/data';
+
 export interface BubbleSpec {
   /** Bề rộng bàn (đơn vị trứng): hàng rộng 10 ô, hàng hẹp 9 ô */
   width: number;
@@ -47,7 +49,7 @@ export interface BubbleSpec {
   medals: readonly [number, number, number];
 }
 
-export const BUBBLE_SPEC: BubbleSpec = {
+const BUBBLE_SPEC_REAL: BubbleSpec = {
   width: 10,
   rowH: Math.sqrt(3) / 2,
   limitRow: 13,
@@ -68,6 +70,9 @@ export const BUBBLE_SPEC: BubbleSpec = {
   keyRange: [2, 15],
   medals: [1600, 2450, 2750],
 };
+
+/** Số liệu đang dùng. Ngoài demo là đúng bản thật; chế độ trọn chỉ chơi đợt 1 (3 khóa, ít hàng trứng). */
+export const BUBBLE_SPEC: BubbleSpec = TRON ? { ...BUBBLE_SPEC_REAL, rounds: [{ keys: TRON.man9.keys.length, rows: TRON.man9.rows, descendEvery: 12 }] } : BUBBLE_SPEC_REAL;
 
 /**
  * Điểm "tối đa" dùng cho chú thích "Kỷ lục từ phiên bản trước" (prop `maxScore` của `MiniGameLevel`): mọi trứng ban đầu đều rơi (20 điểm), cộng thưởng nạp, đợt, tim.
