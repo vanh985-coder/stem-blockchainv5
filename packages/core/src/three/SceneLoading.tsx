@@ -1,5 +1,6 @@
 import { useProgress } from '@react-three/drei';
-import { LoadingScreen } from '../ui/LoadingScreen';
+import { useContext, useLayoutEffect } from 'react';
+import { LoadingScreen, SceneLoadingReportContext } from '../ui/LoadingScreen';
 
 /**
  * Màn chờ của khung 3D và 2.5D: là màn chờ chung (`LoadingScreen`) phủ lên khung cha, tiến độ lấy từ `useProgress` của drei
@@ -7,5 +8,11 @@ import { LoadingScreen } from '../ui/LoadingScreen';
  */
 export function SceneLoading({ shown }: { shown: boolean }) {
   const progress = useProgress((s) => s.progress);
+  const report = useContext(SceneLoadingReportContext);
+  // báo cho khung màn chơi (trước khi vẽ) để nó ẩn nút "?" và các nút khác khi màn chờ còn hiện
+  useLayoutEffect(() => {
+    report?.(shown);
+    return () => report?.(false);
+  }, [shown, report]);
   return <LoadingScreen shown={shown} fullScreen={false} percent={progress} testId="man-cho-tai-canh" />;
 }

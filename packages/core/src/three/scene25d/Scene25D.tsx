@@ -340,7 +340,7 @@ function Scene25DInner({ background, sprites = [], children, overlay, allowPortr
               </Suspense>
             </QualityContext.Provider>
           </Canvas>
-          <div className="scene25d-overlay absolute inset-0" style={{ pointerEvents: ready && !hold ? 'auto' : 'none' }}>
+          <div className="scene25d-overlay absolute inset-0" style={{ pointerEvents: ready && !hold ? 'auto' : 'none', visibility: ready && !hold ? 'visible' : 'hidden' }}>
             {overlay}
           </div>
         </div>

@@ -20,6 +20,12 @@ export function useLoadingTitle(): string | undefined {
   return useContext(LoadingTitleContext);
 }
 
+/**
+ * Khung màn chơi (`MiniGameLevel`) cung cấp hàm này để biết khung 3D hay 2.5D bên trong còn đang hiện màn chờ không, rồi ẩn các nút của khung (nút "?") cho tới khi tải xong.
+ * Ngoài khung màn chơi thì không có (undefined).
+ */
+export const SceneLoadingReportContext = createContext<((loading: boolean) => void) | undefined>(undefined);
+
 export interface LoadingScreenProps {
   /** Còn hiện không (false thì lên 100% rồi mờ dần 0,4 giây và nhường chuột). Mặc định true: dùng làm fallback của Suspense thì không cần truyền. */
   shown?: boolean;

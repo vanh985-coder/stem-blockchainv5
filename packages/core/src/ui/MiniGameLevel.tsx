@@ -14,7 +14,7 @@ import { CLIMAX_LEVEL, climaxPending } from '../progress/climaxState';
 import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
 import { AutoCompleteButton, AutoCompletedPanel } from './AutoComplete';
-import { LoadingTitleProvider } from './LoadingScreen';
+import { LoadingTitleProvider, SceneLoadingReportContext } from './LoadingScreen';
 import { Button } from './Button';
 import { rich } from './rich';
 import { GuideDialog } from './GuideDialog';
@@ -95,6 +95,8 @@ function useTabHidden(): boolean {
  * `record` ghi vào máy ngay, đẩy lên máy chủ sau (như các trạm bài học). Tab bị ẩn thì tạm dừng và chờ em bấm "Tiếp tục".
  */
 export function MiniGameLevel({ levelId, medals, maxScore, renderGame, onLeave, finale }: MiniGameLevelProps) {
+  /** Khung 3D hay 2.5D bên trong còn hiện màn chờ: ẩn nút "?" (HUD của khung) cho tới khi tải xong */
+  const [sceneLoading, setSceneLoading] = useState(false);
   const { progress, record, saveNow } = useProgress();
   const navigate = useNavigate();
   const def = levelById(levelId);
@@ -208,8 +210,10 @@ export function MiniGameLevel({ levelId, medals, maxScore, renderGame, onLeave, 
     if (PROBE) Object.assign(window, { __miniFinish: (score?: number) => onFinish(score ?? medals[2]) });
     return (
       <div className="relative">
-        <LoadingTitleProvider title={fmt(def?.ten ?? '')}>{renderGame({ paused, attempt, onFinish, setHint })}</LoadingTitleProvider>
-        {!tabPaused && (
+        <SceneLoadingReportContext.Provider value={setSceneLoading}>
+          <LoadingTitleProvider title={fmt(def?.ten ?? '')}>{renderGame({ paused, attempt, onFinish, setHint })}</LoadingTitleProvider>
+        </SceneLoadingReportContext.Provider>
+        {!tabPaused && !sceneLoading && (
           <button
             type="button"
             onClick={hint === null ? openHint : closeHint}
