@@ -2,6 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ConeGeometry, ExtrudeGeometry, Path, Shape, Sprite, SpriteMaterial, type Group, type Texture } from 'three';
 import { asset, sound, useManifest } from '@so-chung/core';
+import { setDemoQuestion, timeScale } from '@so-chung/core/demo/timeScale';
 import {
   Character,
   DynamicBoxes,
@@ -99,7 +100,9 @@ function Driver({ session, paused, onHud, onQuiz, onOver, fx }: RunnerWorldProps
   }, [session]);
 
   useFrame((_, dt) => {
-    session.update(dt, pausedRef.current);
+    // Demo (video hướng dẫn): tua nhanh nhân dt với hệ số chung; ngoài demo là 1. Câu hỏi giữa vòng không tua.
+    setDemoQuestion(session.state.phase === 'quiz');
+    session.update(dt * timeScale(), pausedRef.current);
     session.refreshView();
     const s = session.state;
     shadowFocus.x = session.view.x;

@@ -19,6 +19,8 @@ import { formatNumber } from '@so-chung/core/lib/format';
 import { createMulberry32 } from '@so-chung/core/lib/rng';
 import { generateHard, type CellCoord, type HardTx } from '@so-chung/core/lessons/bai-4/logic';
 import { CayMerkle } from './CayMerkle';
+import { demoProbe } from '@so-chung/core/demo/probe';
+import { PACING } from '@so-chung/core/demo/pacing';
 
 const T = bai4Texts.tramKho;
 
@@ -46,13 +48,16 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
   const [distractors] = useState<number[]>(challenge.distractors);
 
   // Lưu trạng thái các ô bị ẩn: key `slot-${lvl}-${idx}` -> giá trị đang đặt (hoặc null)
-  const [placedPieces, setPlacedPieces] = useState<Record<string, number | null>>(() => {
+  // Nhịp video (chỉ demo): các ô đầu đã điền đúng sẵn, bot chỉ đặt vài ô cuối
+  const initialPlaced = useCallback((): Record<string, number | null> => {
     const init: Record<string, number | null> = {};
-    challenge.hidden.forEach((h) => {
-      init[`slot-${h.level}-${h.index}`] = null;
+    const keep = PACING ? Math.max(0, challenge.hidden.length - PACING.man10.hardPlace) : 0;
+    challenge.hidden.forEach((h, i) => {
+      init[`slot-${h.level}-${h.index}`] = i < keep ? challenge.tree[h.level][h.index] : null;
     });
     return init;
-  });
+  }, [challenge]);
+  const [placedPieces, setPlacedPieces] = useState<Record<string, number | null>>(initialPlaced);
 
   // Các ô đã kiểm tra và đúng (bị khóa lại)
   const [lockedSlots, setLockedSlots] = useState<Record<string, boolean>>({});
@@ -80,16 +85,12 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
     setTutorialActive(false);
     setIsRevisitingTutorial(false);
     // Reset lại bàn cờ về trạng thái ban đầu sạch
-    const init: Record<string, number | null> = {};
-    challenge.hidden.forEach((h) => {
-      init[`slot-${h.level}-${h.index}`] = null;
-    });
-    setPlacedPieces(init);
+    setPlacedPieces(initialPlaced());
     setLockedSlots({});
     setCheckCount(0);
     setNotice(null);
     startTimeRef.current = Date.now();
-  }, [challenge.hidden]);
+  }, [initialPlaced]);
 
   const handleOpenTutorial = useCallback(() => {
     sound.playClick();
@@ -429,6 +430,12 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
     ];
   }, []);
 
+  // Bot demo (chỉ bản build VITE_DEMO): ô nào cần mảnh nào, lấy từ cây đúng của đề
+  demoProbe('man10', {
+    station: 'kho',
+    tutorialActive,
+    plan: hidden.map((h) => ({ slot: `slot-${h.level}-${h.index}`, piece: `piece-${tree[h.level][h.index]}`, placed: placedPieces[`slot-${h.level}-${h.index}`] === tree[h.level][h.index] })),
+  });
   return (
     <TapOrDragContainer onDropOrPlace={handleDropOrPlace}>
       <div className="max-w-5xl mx-auto space-y-2 animate-in fade-in duration-200 md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,8fr)] md:items-start md:gap-x-3 md:gap-y-2 md:space-y-0">
@@ -506,7 +513,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
 
         {/* Nút bấm Kiểm tra: ngay sau cây khi màn hẹp; ở màn rộng nằm dưới khay (cột trái còn chỗ) để cả trạm gọn một màn hình */}
         <div id="tutorial-man10kho-check" className="flex justify-center md:col-start-1 md:row-start-3">
-          <Button variant="primary" size="md" onClick={handleCheck} className="min-w-[200px]">{T.kiemTraCayMerkle}</Button>
+          <Button variant="primary" size="md" data-demo="check" onClick={handleCheck} className="min-w-[200px]">{T.kiemTraCayMerkle}</Button>
         </div>
 
         {/* Khay mảnh ghép */}

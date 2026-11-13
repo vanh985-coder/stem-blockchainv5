@@ -135,6 +135,7 @@ export function DraggableCard({ id, disabled = false, children, className = '' }
         nodeRef.current = el;
         setNodeRef(el);
       }}
+      data-dnd-id={id}
       style={style}
       {...listeners}
       {...attributes}
@@ -172,6 +173,7 @@ export function DroppableSlot({ id, children, placeholder, className = '' }: Dro
   return (
     <div
       ref={setNodeRef}
+      data-dnd-id={id}
       onClick={() => selectedId && placeInSlot(id)}
       role="region"
       aria-label={placeholder || ui.keoTha.oDatThe}

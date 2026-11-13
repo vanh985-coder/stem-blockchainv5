@@ -56,6 +56,7 @@ import { assembleWorld, gateApproachSpawn, villageSpawn } from './worldLayout';
 import { effectivePages, lastGiver, targetNodeId } from './worldQuest';
 import { composeTargets, createWorldBase, createZoneTargets, parseWorldTarget, withoutCollectedScrolls, type WorldTarget } from './worldTargets';
 import { PROBE } from '../../lib/dev';
+import { exposeForDemo } from '../../demo/config';
 
 const DIRT_TEXTURE = 'ui/textures/duong-dat';
 const BRICK_TEXTURE = 'ui/textures/san-gach';
@@ -315,6 +316,25 @@ export function WorldPage() {
   };
   const label = near >= 0 ? labelOf(targets[near] ?? null) : null;
   const isNearBoard = near >= 0 && targets[near]?.kind === 'board';
+  // Chế độ demo: bot đọc trạng thái trang qua đây (chỉ có ở bản build VITE_DEMO)
+  exposeForDemo({
+    __demoWorld: {
+      api,
+      world,
+      ready,
+      inside,
+      entering,
+      near: near >= 0 ? (targets[near] ?? null) : null,
+      dialogOpen: dialog !== null,
+      know: know ? { village: know.village, scroll: know.scroll } : null,
+      guideOpen: guide !== null,
+      bigMap,
+      seq,
+      gated: insideGated,
+      nextBoard,
+      knowMasks,
+    },
+  });
 
   const nearRef = useRef(near);
   nearRef.current = near;

@@ -274,6 +274,7 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
                     height: pos.height,
                     transform: 'translate(-50%, -50%)',
                   }}
+                  data-demo-cell={`${lvl}-${idx}`}
                   onClick={() => onCellClick?.(lvl, idx)}
                   className={`
                     rounded-[14px] border-2 flex flex-col items-center justify-center p-1

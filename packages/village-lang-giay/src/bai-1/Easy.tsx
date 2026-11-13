@@ -15,7 +15,9 @@ import {
   type TutorialStep,
 } from '@so-chung/core';
 import { bai1Texts } from '@so-chung/core/content/lessons/bai-1';
-import { easyRound, pageCode, solutionSteps, type Lesson1Data } from '@so-chung/core/lessons/bai-1/logic';
+import { demoProbe } from '@so-chung/core/demo/probe';
+import { PACING } from '@so-chung/core/demo/pacing';
+import { buildChain, easyRound, pageCode, solutionSteps, type Lesson1Data } from '@so-chung/core/lessons/bai-1/logic';
 
 const T = bai1Texts;
 
@@ -47,8 +49,13 @@ export function Easy({
   const { genesisCode, contents } = useRef(easyRound(Date.now())).current;
 
   // Trạng thái bài thật
-  const [pages, setPages] = useState<ChainPageData[]>(() => contents.map((content) => ({ content, code: null })));
-  const [activeIdx, setActiveIdx] = useState(0);
+  // Nhịp video (chỉ demo): các trang đầu điền sẵn, bot làm 1 lượt ở trang cuối
+  const prefilled = PACING ? Math.min(PACING.lesson1.easyPrefilled, contents.length - 1) : 0;
+  const [pages, setPages] = useState<ChainPageData[]>(() => {
+    const codes = prefilled > 0 ? buildChain(genesisCode, contents) : [];
+    return contents.map((content, i) => ({ content, code: i < prefilled ? codes[i] : null }));
+  });
+  const [activeIdx, setActiveIdx] = useState(prefilled);
   const [codeVal, setCodeVal] = useState<number | null>(null);
   const [codeError, setCodeError] = useState<string | undefined>();
   const [mistakes, setMistakes] = useState(0);
@@ -203,6 +210,8 @@ export function Easy({
     }
   }, [contents, codeVal, activeIdx, genesisCode, pages, mistakes, pageMistakes, onChainBuilt, onComplete]);
 
+  // Bot demo (chỉ bản build VITE_DEMO): đáp án của trang đang làm, tính bằng đúng công thức của bài
+  demoProbe('man1', { station: 'de', tutorialOpen, expected: !tutorialOpen && activeIdx < 5 && (activeIdx === 0 || pages[activeIdx - 1].code !== null) ? pageCode(activeIdx === 0 ? genesisCode : (pages[activeIdx - 1].code as number), contents[activeIdx]) : null });
   // Cầu nối kiểm thử probe phục vụ script tự động
   if (typeof window !== 'undefined') {
     Object.assign(window, {

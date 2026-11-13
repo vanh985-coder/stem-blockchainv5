@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from 'react';
 import { useAuth } from '../auth/AuthProvider';
+import { DEMO_ACTIVE } from '../demo/config';
 import { IS_DEV_BUILD, canSeeTeacherPage, canUseAutoComplete } from '../auth/roles';
 import { ui } from '../content/ui';
 import { Button } from '../ui/Button';
@@ -71,7 +72,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   }, [loading, userId]);
 
   const isTeacher = canSeeTeacherPage(profile?.role);
-  const canAutoComplete = canUseAutoComplete(profile?.role, IS_DEV_BUILD);
+  const canAutoComplete = canUseAutoComplete(profile?.role, IS_DEV_BUILD && !DEMO_ACTIVE);
   // quyền dùng cờ tự hoàn thành đi theo vai trò hiện tại (đổi thì manager phát lại snapshot nên mở khóa bên dưới tính lại)
   useEffect(() => {
     progressManager.setAutoAllowed(canAutoComplete);

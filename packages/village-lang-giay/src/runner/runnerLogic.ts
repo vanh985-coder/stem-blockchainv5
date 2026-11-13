@@ -157,6 +157,8 @@ export interface RunnerState {
   nextGroup: number;
   // tùy chọn
   rounds: number;
+  /** Số giây của một vòng (mặc định `SPEC.roundSec`; chỉ nhịp video của demo đổi) */
+  roundSec: number;
   /** Test: không va, không mất tim */
   ghost: boolean;
   /** Test: tắt sinh đường chạy tự động (tự dựng `rows`) */
@@ -179,6 +181,7 @@ export interface RunnerInput {
 export interface RunnerOptions {
   seed: number;
   rounds?: number;
+  roundSec?: number;
   ghost?: boolean;
   autoSpawn?: boolean;
   recordRows?: boolean;
@@ -348,6 +351,7 @@ export function createRunner(opts: RunnerOptions): RunnerState {
     nextItemId: 1,
     nextGroup: 1,
     rounds: opts.rounds ?? SPEC.rounds,
+    roundSec: opts.roundSec ?? SPEC.roundSec,
     ghost: opts.ghost ?? false,
     autoSpawn: opts.autoSpawn ?? true,
     rowLog: opts.recordRows ? [] : null,
@@ -628,7 +632,7 @@ function sub(s: RunnerState, input: RunnerInput, dt: number): void {
   if (s.autoSpawn) spawnRows(s);
 
   // hết vòng
-  if (s.phase === 'run' && s.roundTime >= SPEC.roundSec) {
+  if (s.phase === 'run' && s.roundTime >= s.roundSec) {
     s.phase = 'slow';
     s.events.push({ type: 'roundEnd', round: s.round });
   } else if (s.phase === 'slow' && s.speedScale <= 0) {

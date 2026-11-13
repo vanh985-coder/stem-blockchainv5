@@ -9,6 +9,7 @@ Tài liệu này là hướng dẫn quy tắc đầy đủ nhất cho AI code; `
 
 ## 2. Lệnh
 - `pnpm install` · `pnpm test` · `pnpm typecheck` · `pnpm build` · `pnpm check:text` · `pnpm crop-portraits`
+- `pnpm dev:demo` (nhánh `feat/demo-bot`: chế độ demo quay video, bot tự chơi, mở `http://localhost:5873/?demo=1`; xem `docs/DEMO.md`)
 - `pnpm guide:capture` (chụp ảnh thật cho Hướng dẫn chơi vào `assets/ui/huong-dan`, rồi `pnpm assets:build`)
 - `pnpm dev:hub` (5173), `pnpm dev:lang-giay` (5174), `pnpm dev:lang-det` (5175), `pnpm dev:lang-khac-dau` (5176), `pnpm dev:lang-bac` (5177), `pnpm dev:assets` (5180)
 - `pnpm assets:build`: nén đồ họa vào `assets-build/` và tạo `manifest.json`. `pnpm rls:check`: kiểm RLS Supabase.

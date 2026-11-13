@@ -67,7 +67,7 @@ export function LevelIntro({
         )}
 
         <div className="mt-6 flex justify-center sm:justify-end">
-          <Button size="lg" onClick={onStart} fullWidth className="sm:w-auto">
+          <Button size="lg" data-demo="intro-start" onClick={onStart} fullWidth className="sm:w-auto">
             {startLabel}
           </Button>
         </div>
