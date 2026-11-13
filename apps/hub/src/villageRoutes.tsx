@@ -1,6 +1,6 @@
 import { lazy, Suspense, type ComponentType, type ReactElement } from 'react';
 import { Navigate, useRoutes, type RouteObject } from 'react-router';
-import { ui, VILLAGE_IDS, villageWorldUrl, URLS, type VillageId, type VillageModule } from '@so-chung/core';
+import { LoadingScreen, ui, VILLAGE_IDS, villageWorldUrl, URLS, type VillageId, type VillageModule } from '@so-chung/core';
 
 /**
  * Web đã gộp (spec 10 mục 2, `VITE_MERGED=true`): bốn gói làng là route LƯỜI của hub dưới `/lang/<id>`, cùng đường dẫn với vỏ làng riêng (`/lang/lang-giay/man/2`...). Mỗi làng chỉ tải khi vào làng đó (một chunk
@@ -34,7 +34,7 @@ export function villageRouteObjects(merged: boolean): { path: string; element: R
     return {
       path: `/lang/${id}/*`,
       element: (
-        <Suspense fallback={<p className="grid min-h-screen place-items-center p-6 text-center">{ui.chung.dangTai}</p>}>
+        <Suspense fallback={<LoadingScreen title={ui.lang[id]} />}>
           <Village />
         </Suspense>
       ),

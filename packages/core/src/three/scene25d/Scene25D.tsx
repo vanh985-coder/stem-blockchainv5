@@ -8,7 +8,7 @@ import { ui } from '../../content/ui';
 import { devWarn } from '../../lib/dev';
 import { CanvasErrorBoundary } from '../CanvasErrorBoundary';
 import { FpsGuard } from '../FpsGuard';
-import { LoadingScreen } from '../LoadingScreen';
+import { SceneLoading } from '../SceneLoading';
 import { QualityContext } from '../QualityContext';
 import { SceneWarmup } from '../SceneWarmup';
 import { StatsProbe } from '../StatsProbe';
@@ -340,12 +340,12 @@ function Scene25DInner({ background, sprites = [], children, overlay, allowPortr
               </Suspense>
             </QualityContext.Provider>
           </Canvas>
-          <div className="scene25d-overlay absolute inset-0" style={{ pointerEvents: ready && !hold ? 'auto' : 'none' }}>
+          <div className="scene25d-overlay absolute inset-0" style={{ pointerEvents: ready && !hold ? 'auto' : 'none', visibility: ready && !hold ? 'visible' : 'hidden' }}>
             {overlay}
           </div>
         </div>
       )}
-      <LoadingScreen visible={!ready || hold} />
+      <SceneLoading shown={!ready || hold} />
       {mode === 'rotate' && <RotatePrompt />}
     </div>
   );

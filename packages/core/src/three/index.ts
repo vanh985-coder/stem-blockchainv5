@@ -12,7 +12,7 @@ export { Model, useModel } from './Model';
 export type { ModelProps, ModelLod, UsedModel } from './Model';
 export { preloadModel, createPlaceholder } from './modelLoader';
 export type { ModelData } from './modelLoader';
-export { LoadingScreen } from './LoadingScreen';
+export { SceneLoading } from './SceneLoading';
 export { BlobShadow } from './BlobShadow';
 export { Character } from './Character';
 export type { CharacterProps, CharacterInfo, PoseRequest } from './Character';
