@@ -78,3 +78,31 @@ node scripts/demo-check.mjs
 ```
 
 (`pnpm dev:demo` đang chạy; `HEADED=1` mở cửa sổ thật; `TOCDO=1.5`; `CANH=<id>` kiểm riêng một cảnh với tiến độ đặt sẵn.) Chạy từ đầu tới hết đợt 1 ở 1920×1080, xác nhận không cảnh nào kẹt hay lỗi, không lỗi console, tiến độ cuối đúng (màn 1–3 xong, 4 thẻ, 1 Trang Sổ Vàng), in thời lượng từng cảnh, chụp ảnh vào `docs/screenshots/demo/`.
+
+## Demo trọn game (`?kieu=tron`)
+
+Nhánh `feat/demo-tron` (KHÔNG BAO GIỜ merge vào `main`, không deploy). Bot tự chơi trọn 4 làng theo `docs/demo/KICH-BAN-VIDEO-TRON-GAME.md`: S01 → B11. Chạy ở chế độ chơi thử (khách), tiến độ mới tinh, không đăng nhập, không ghi lên Supabase. Chỉ bật khi bản build có `VITE_DEMO=true` VÀ địa chỉ có `?demo=1&kieu=tron`; bản build không có `VITE_DEMO` không chứa mã demo.
+
+### Chạy để quay
+
+```bash
+pnpm dev:assets                                        # máy chủ đồ họa 5180 (hoặc: pnpm dev:demo chạy luôn cả hai)
+cd apps/hub && npx vite build --mode demo --outDir dist-demo
+npx vite preview --mode demo --outDir dist-demo --port 5874 --strictPort
+```
+
+Mở bằng Chrome (cửa sổ 1920×1080, trình duyệt chưa đăng nhập): `http://localhost:5874/?demo=1&kieu=tron`. Đếm ngược 5 giây rồi chạy. Hết video hiện nút "Tải mốc giây" tải `moc-giay.txt` ("S01 0:00", "S02 0:14"…; mốc tính từ khung hình đầu tiên của S01, tức lúc hết đếm ngược).
+
+- `&tu=<mã đoạn>`: bắt đầu từ đơn vị chứa đoạn đó (dựng sẵn tiến độ, vào đúng route). Ví dụ `&tu=G07` (màn 1), `&tu=D01` (Làng Dệt), `&tu=K03` (màn 7), `&tu=B08` (màn 12). Đoạn nào chỉ có ngay sau khi vừa chơi xong màn (G15, D12, K10, B10, B11) thì bắt đầu từ màn trước nó.
+- `&kiem=<0,01 đến 1>`: chia nhỏ mức tối thiểu của mọi đoạn để kiểm nhanh (mặc định 1 = đúng kịch bản). Không dùng khi quay.
+- Phím: `P` tạm dừng/tiếp, `N` bỏ qua cảnh hiện tại, `Esc` dừng.
+- Mỗi đoạn kéo dài tối thiểu = số chữ lời thuyết minh ÷ 2,5 giây (150 chữ/phút); xong sớm thì bot đứng chờ (nhân vật đứng yên, bảng vẫn mở). Làng Giấy đi bộ và đọc ở tốc độ thường; Làng Dệt, Khắc Dấu, Bạc dịch chuyển bằng bản đồ lớn và đọc, trả lời thẻ nhanh gấp 1,5 lần.
+- Số liệu khóa cứng và rút ngắn game phụ: `packages/core/src/demo/tron/data.ts`, báo cáo từng mã đoạn ở `docs/demo/SO-LIEU-DEMO-TRON.md`.
+
+### Kiểm tự động
+
+```bash
+node scripts/tron-check.mjs     # URL=... TU=G07 KIEM=0.1 STOP=D01 SHOTS=S03,G14 DEBUG=1 SNAP=<thư mục/> (HEADED=1 mở cửa sổ thật)
+```
+
+In bảng mốc giây, thời lượng từng đoạn so với mức tối thiểu và chụp ảnh (JPEG dưới 300 KB) vào `docs/screenshots/demo-tron/`. Trình duyệt không đầu (Chrome swiftshader) chạy 3D rất chậm nên thời lượng đo ở đó dài hơn máy thật.
