@@ -17,7 +17,7 @@ const T = bai2Texts;
 const VILLAGE = 'lang-det' as const;
 
 /** D01 bản đồ lớn + dịch chuyển tới cổng, D02 cảnh mở đầu của cụ Bình. */
-export const tronDetVao = (ctx: Ctx): Promise<void> => tronEnterVillage(ctx, VILLAGE, 'det', 'D01', 'D02');
+export const tronDetVao = (ctx: Ctx): Promise<void> => tronEnterVillage(ctx, VILLAGE, 'det', 'D01');
 
 /** D03 bốn thẻ "Em có biết?" của Làng Dệt. */
 export const tronDetThe = (ctx: Ctx): Promise<void> => tronTeleportCards(ctx, VILLAGE, 'D03');
@@ -240,8 +240,8 @@ export async function tronDetTrao(ctx: Ctx): Promise<void> {
     await ctl.waitFor(() => onPath('/cho'), 'back to the market page', 20000);
   }
   await waitWorldReady(ctx);
+  // cảnh trao Trang Sổ Vàng: bỏ qua ngay (vẫn trao trang)
   await ctl.waitFor(() => demoWorld()?.dialogOpen, 'golden page ceremony', 40000);
-  markSeg('D12');
-  await playVnDialogs(ctx, { beforeLast: hold(ctx) });
-  await ctl.sleep(2000);
+  await playVnDialogs(ctx);
+  await ctl.sleep(1500);
 }

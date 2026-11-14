@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { fmt } from '../content/characters';
 import { demoUi } from '../content/demo';
+import { hasSeenClimax } from '../progress/gameTips';
+import { progressManager } from '../progress/singleton';
 import { useProgress } from '../progress/ProgressProvider';
 import { DEMO_HD, DEMO_MEN, DEMO_SPEED, DEMO_START, DEMO_TRON, TRON_FROM, exposeForDemo } from './config';
 import { installFfBadge, removeFfBadge } from './ffBadge';
@@ -80,6 +82,11 @@ export default function DemoRunner() {
         removeCursor();
         removeFfBadge();
         if (DEMO_TRON && getMarks().length > 0) showMarksButton(demoUi.taiMoc);
+        if (DEMO_TRON) {
+          // đối chiếu sau khi bỏ qua các cảnh thoại: Trang Sổ Vàng vẫn được trao, cờ cao trào vẫn được ghi
+          const pr = progressManager.getSnapshot().progress;
+          console.info('[tron] progress ' + JSON.stringify({ goldenPages: pr.game.goldenPages, climaxSeen: hasSeenClimax(pr.game.data), levelsCompleted: Object.values(pr.levels).filter((l) => (l as { completed?: boolean }).completed).length }));
+        }
         window.__demoDone = true;
       });
     }, 1000);

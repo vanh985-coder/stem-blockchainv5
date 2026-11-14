@@ -35,7 +35,7 @@ export async function tronIntro(ctx: Ctx): Promise<void> {
   await ctl.waitFor(() => onPath('/truyen'), 'story page', 15000);
   markSeg('S02');
   // 14 trang truyện: dàn đều mức tối thiểu của đoạn ra các trang, trang cuối giữ cho đủ
-  await playVnDialogs(ctx, { beforeLast: hold(ctx) });
+  await playVnDialogs(ctx, { read: true, beforeLast: hold(ctx) });
   await ctl.waitFor(() => onPath('/cho'), 'market page', 30000);
   await waitWorldReady(ctx);
   await closeGuideQuick(ctx);
@@ -43,7 +43,7 @@ export async function tronIntro(ctx: Ctx): Promise<void> {
   await ctl.sleep(1000);
 }
 
-/** G01 đi bộ từ chợ về cổng Làng Giấy, G02 cảnh mở đầu của bác An. */
+/** G01 đi bộ từ chợ về cổng Làng Giấy (cảnh mở đầu của bác An bị bỏ qua). */
 export async function tronGiayWalk(ctx: Ctx): Promise<void> {
   const { ctl } = ctx;
   const w0 = await waitWorldReady(ctx);
@@ -52,9 +52,9 @@ export async function tronGiayWalk(ctx: Ctx): Promise<void> {
   markSeg('G01');
   const first = w0.world.villages.find((v) => v.id === 'lang-giay')?.layout.scrolls?.[0];
   if (!first) throw new Error('no scrolls in lang-giay');
+  // cảnh mở đầu làng (bác An) không quay: bỏ qua ngay
   const onDialog = async () => {
-    await beginSeg(ctx, 'G02');
-    await playVnDialogs(ctx, { beforeLast: hold(ctx) });
+    await playVnDialogs(ctx);
   };
   await walkToNode(ctx, gateNodeId('giay'), { run: false, onDialog });
   await walkToNode(ctx, scrollNodeId('lang-giay', first.index), { run: false, onDialog });
@@ -269,7 +269,7 @@ export async function tronGiayM3(ctx: Ctx): Promise<void> {
   await ctl.sleep(3000);
 }
 
-/** G15 bác An trao Trang Sổ Vàng thứ nhất. */
+/** Cảnh bác An trao Trang Sổ Vàng thứ nhất (bỏ qua ngay, không có mã đoạn). */
 export async function tronGiayTrao(ctx: Ctx): Promise<void> {
   const { ctl } = ctx;
   await endSeg(ctx);
@@ -279,9 +279,9 @@ export async function tronGiayTrao(ctx: Ctx): Promise<void> {
     await ctl.waitFor(() => onPath('/cho'), 'back to the market page', 20000);
   }
   await waitWorldReady(ctx);
+  // cảnh trao Trang Sổ Vàng: bỏ qua ngay (vẫn trao trang)
   await ctl.waitFor(() => demoWorld()?.dialogOpen, 'golden page ceremony', 40000);
-  markSeg('G15');
-  await playVnDialogs(ctx, { beforeLast: hold(ctx) });
-  await ctl.sleep(2000);
+  await playVnDialogs(ctx);
+  await ctl.sleep(1500);
 }
 

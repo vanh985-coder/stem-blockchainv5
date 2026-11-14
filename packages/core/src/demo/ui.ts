@@ -4,6 +4,7 @@ import { knowQuizOf } from '../lib/knowQuiz';
 import { parseNumberAnswer } from '../lib/knowQuiz';
 import type { VillageId } from '../village';
 import { clickEl, q, qa, typeInto, type Ctx } from './actions';
+import { DEMO_TRON } from './config';
 import { PACING } from './pacing';
 import { readTime } from './timing';
 
@@ -25,7 +26,28 @@ export function dwell(ctx: Ctx, text: string): Promise<void> {
 export const vnNext = (): HTMLButtonElement | null => q<HTMLButtonElement>('[data-demo="vn-next"]:not([disabled])');
 
 /** Lật hết các lượt của hộp thoại kiểu truyện đang mở (và cả những hộp nối tiếp ngay sau đó). Trả số lượt đã lật. */
-export async function playVnDialogs(ctx: Ctx, opts: { extraDwell?: number; beforeLast?: () => Promise<void> } = {}): Promise<number> {
+/**
+ * Chế độ trọn: lời nhân vật KHÔNG quay. Bấm "Bỏ qua" ngay khi hộp hiện (hộp không có nút này thì bấm "Tiếp" liên tục), không chờ đọc; xử lý cả các hộp nối tiếp nhau.
+ */
+export async function skipVnDialogs(ctx: Ctx): Promise<number> {
+  let n = 0;
+  let idle = 0;
+  while (idle < 6) {
+    const el = q<HTMLButtonElement>('[data-demo="vn-skip"]') ?? vnNext();
+    if (!el) {
+      idle++;
+      await ctx.ctl.sleep(100);
+      continue;
+    }
+    idle = 0;
+    await clickEl(ctx, el, { settle: 200 });
+    n++;
+  }
+  return n;
+}
+
+export async function playVnDialogs(ctx: Ctx, opts: { extraDwell?: number; beforeLast?: () => Promise<void>; /** chế độ trọn: vẫn đọc từng lượt (chỉ truyện mở đầu S02) */ read?: boolean } = {}): Promise<number> {
+  if (DEMO_TRON && !opts.read) return skipVnDialogs(ctx);
   let turns = 0;
   let idle = 0;
   const idleMax = PACING ? 2 : 8;

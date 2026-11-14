@@ -2,6 +2,8 @@
 
 Nguồn số: `packages/core/src/demo/tron/data.ts` (chỉ số đầu vào, ghi đè riêng chế độ demo). `data.test.ts` kiểm từng số trong kịch bản bằng logic sẵn có (`pageCode`, `buildChain`, `isValidProposal`, `publicKey`, `combine`, `buildTree`); bản thật không đổi. Bot luôn trả lời đúng. **"Khác kịch bản"** ghi rõ ở mỗi đoạn.
 
+**Không quay phần đọc thoại (cập nhật):** mọi hộp thoại lời nhân vật (cảnh mở đầu làng, lời người dẫn đầu và giữa bài học, cảnh trao Trang Sổ Vàng, cảnh cao trào) bị bot bấm "Bỏ qua" ngay khi hiện (hộp nào không có nút này thì bấm "Tiếp" liên tục), không chờ đọc. Trừ truyện mở đầu S02 (đọc từng trang). **Bỏ các mã đoạn G02, D02, G15, D12, K10, B10** (không ghi mốc, không áp mức tối thiểu); K01 và B01 chỉ còn phần dịch chuyển bằng bản đồ. Sau khi bỏ qua: Trang Sổ Vàng vẫn được trao (đo cuối lượt chạy: 4), cờ cao trào vẫn được ghi (`climaxSeen` = true), bot vẫn tới màn kết quả cuối (B11).
+
 ## Phần mở đầu
 
 | Mã | Trên màn hình |
@@ -14,7 +16,7 @@ Nguồn số: `packages/core/src/demo/tron/data.ts` (chỉ số đầu vào, ghi
 
 | Mã | Trên màn hình |
 |---|---|
-| G01–G02 | Đi bộ (không chạy nhanh) từ chợ vào cổng, cảnh bác An 2 lượt thoại |
+| G01 | Đi bộ (không chạy nhanh) từ chợ vào cổng; cảnh bác An (2 lượt thoại) bị bỏ qua ngay |
 | G03 | Thẻ 1: câu hỏi chọn đáp án A (theo `knowQuiz.ts`) |
 | G04 | Thẻ 2: đáp án B |
 | G05 | Thẻ 3: điền số **44** (43 × 2 + 58 = 144) |
@@ -27,14 +29,12 @@ Nguồn số: `packages/core/src/demo/tron/data.ts` (chỉ số đầu vào, ghi
 | G12 | Câu B1-01, mã trước 40, nội dung 25. Đáp án hiện A 50, B 105, C **5**, D 65 (bot chọn C) |
 | G13 | Màn 3 vòng 1: bìa 10, 3 thẻ (10/23/43; 43/45/31; 31/7/69), khay xáo cố định |
 | G14 | Vòng 2: cùng chuỗi + trang giả (mã trước 31, nội dung 50, mã 99; công thức ra 12). Bot bấm "Soi công thức" rồi kéo vào rổ |
-| G15 | Cảnh bác An trao Trang Sổ Vàng thứ nhất |
 
 ## Làng Dệt
 
 | Mã | Trên màn hình |
 |---|---|
-| D01 | Bản đồ lớn (phím M), bấm chấm cổng Làng Dệt, "Đi tới" (dịch chuyển) |
-| D02 | Cảnh cụ Bình |
+| D01 | Bản đồ lớn (phím M), bấm chấm cổng Làng Dệt, "Đi tới" (dịch chuyển); cảnh cụ Bình bị bỏ qua |
 | D03 | 4 thẻ, mỗi thẻ dịch chuyển bằng bản đồ tới cuộn giấy; đọc và trả lời nhanh gấp 1,5 lần (đáp án D, A, C, B theo `knowQuiz.ts`) |
 | D04 | Trạm Dễ: sổ bìa 5, nội dung 10 và 17 → mã 20, **57**. 5 vòng: Bình 36/50 **Đồng ý**; Chi 30/35 Từ chối; Tí 25/25 Đồng ý; Bình 30/80 Đồng ý (đúng ví dụ 25, 30, 80); Chi 47/66 Từ chối. **Khác kịch bản:** ví dụ "57, 36, 51 thì Từ chối" không hiện nguyên văn trên màn hình ở trạm Dễ (màn hình có mã 50); nó hiện ở màn 5 (B2-03) |
 | D05 | Trạm Trung bình: hạt giống 4 (tự chọn): sổ bìa 83, 3 trang mã 99, 20, 49. 5 vòng: Bình tampered (77/69/23, từ chối), Chi valid (49/73/71, đồng ý), Tí sai mã (71/87/23, từ chối), Bình valid (71/74/16, đồng ý), Chi sai mã (16/42/80, từ chối). **Khác kịch bản:** số cụ thể là ví dụ do bộ sinh của bài tạo, kịch bản để [SL] |
@@ -44,13 +44,12 @@ Nguồn số: `packages/core/src/demo/tron/data.ts` (chỉ số đầu vào, ghi
 | D09 | 3 câu: B2-03 (**Từ chối**: trang cuối 57; 57/36/51), B2-04 (**Đồng ý**: 25/30/80), B2-06 (**đa số đồng ý**) |
 | D10 | Màn 6: 1 cổng sau 6 khe |
 | D11 | Câu ở cổng: **B1-03** "mã trước 57, nội dung 36" → **50** (đáp án 50, 150, 93, 15). **Khác kịch bản:** câu do Claude Code chọn |
-| D12 | Cụ Bình trao Trang Sổ Vàng thứ hai |
 
 ## Làng Khắc Dấu
 
 | Mã | Trên màn hình |
 |---|---|
-| K01 | Dịch chuyển bằng bản đồ + cảnh chú Dũng |
+| K01 | Dịch chuyển bằng bản đồ (cảnh chú Dũng bị bỏ qua) |
 | K02 | 4 thẻ (đáp án A, 19, B, C); thẻ 19: 5^15 mod 23 |
 | K03 | Trạm Dễ: Phần 1 ký bằng khóa riêng 12 (khóa công khai 18), thả vào máy, Tí mạo danh bị bắt (khóa 13 → 21); Phần 2 ghép khuôn 3, 5, 6, 7, 9 với mẫu 10, 20, 8, 17, 11 (khay có 2 thẻ bẫy 16, 9) |
 | K04 | Trạm Trung bình: hạt giống 7 (tự chọn). 4 giao dịch: Chi "Chuyển 10 xu cho Em" **thật**; Bình "Chuyển 12 xu cho Em" **giả** (khóa đính kèm 3); Dũng "Chuyển 4 xu cho Em" **giả** (đính kèm 3); An "Chuyển 4 xu cho Em" **thật**. Bot kiểm bằng khóa công khai của người gửi trong danh bạ, không tin khóa đính kèm |
@@ -59,13 +58,12 @@ Nguồn số: `packages/core/src/demo/tron/data.ts` (chỉ số đầu vào, ghi
 | K07 | Màn 8 vòng 1 (4 cặp): khuôn **3, 5, 6, 7 ↔ mẫu 10, 20, 8, 17**. **Khác kịch bản:** thẻ xáo theo hạt giống của ván |
 | K08 | Màn 9 nạp trứng: khóa **3, 5, 6** → trứng **10, 20, 8**. **Khác kịch bản:** trứng nhiễu (có một trứng ghi chính số khóa riêng) do hạt giống của ván, kịch bản để [SL] |
 | K09 | Đợt 1 (3 hàng trứng): bot bắn bằng nước tốt nhất của bot giỏi |
-| K10 | Chú Dũng trao Trang Sổ Vàng thứ ba |
 
 ## Làng Bạc
 
 | Mã | Trên màn hình |
 |---|---|
-| B01 | Dịch chuyển bằng bản đồ + cảnh thầy Linh |
+| B01 | Dịch chuyển bằng bản đồ (cảnh thầy Linh bị bỏ qua) |
 | B02 | 4 thẻ (đáp án C, 288, A, D) |
 | B03 | Trạm Dễ: lá 3, 7, 5, 2 → T12 **37**, T34 **52**, T21 **73** |
 | B04 | Trạm Trung bình: lá 4, 2, 6, 1 → 42, 61, gốc **481**; Tí đổi T3 từ 6 thành 7 → T34 **71**, gốc **491** |
@@ -74,15 +72,15 @@ Nguồn số: `packages/core/src/demo/tron/data.ts` (chỉ số đầu vào, ghi
 | B07 | Màn 11 vòng 1 (4 ô cây), hạt giống 11 (tự chọn), 12 lượt; bot chọn nước tốt nhất của bot giỏi |
 | B08 | Màn 12 vòng 1: lá 3 7 5 2 6 1 4 8, T8 từ 8 thành 9 |
 | B09 | Leo 3 tầng: **49** (bẫy 94), **659** (bẫy 551), **4879** (bẫy 7012); gốc cũ 4878 |
-| B10 | Cảnh cao trào (chiếu tự động ngay sau ván màn 12, nhiều bước nối nhau) |
-| B11 | Màn kết quả cuối (trang màn 12 sau cảnh cao trào) |
+| B11 | Màn kết quả cuối (trang màn 12; cảnh cao trào chiếu tự động ngay sau ván và bị bỏ qua) |
 
 ## Chỗ khác kịch bản (tóm tắt)
 
 - Số thẻ "Em có biết?" và đáp án: theo `knowQuiz.ts` (không đổi).
 - D04: xem trên. D05, K04, K05, K08, B07: số do hạt giống hoặc logic của game, báo ở bảng.
-- `&tu=G15` bắt đầu từ màn 3, `&tu=D12` từ màn 6, `&tu=K10` từ màn 9, `&tu=B10`/`B11` từ màn 12: cảnh trao trang và cao trào chỉ có sau khi vừa chơi xong màn đó.
-- B09 đánh dấu lúc biển "xong vòng" hiện (đã leo tới gốc), B10 lúc cảnh cao trào bắt đầu.
+- `&tu=B11` bắt đầu từ màn 12 (màn kết quả cuối chỉ có sau khi vừa chơi xong màn 12). Các mã đã bỏ (G02, D02, G15, D12, K10, B10) không dùng được với `&tu=`.
+- B09 đánh dấu lúc biển "xong vòng" hiện (đã leo tới gốc).
+- Ghi chú: các game phụ rút ngắn theo kịch bản nên điểm có thể chưa tới mốc Đồng; đo cuối lượt chạy: 7 màn đánh dấu hoàn thành (4 bài học và 3 game), Trang Sổ Vàng 4. Bot vào từng màn trực tiếp từ biển nên không bị chặn bởi trạng thái này.
 
 ## Cách bot thao tác (cập nhật: mọi màn dùng sự kiện thật)
 

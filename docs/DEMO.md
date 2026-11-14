@@ -81,7 +81,7 @@ node scripts/demo-check.mjs
 
 ## Demo trọn game (`?kieu=tron`)
 
-Nhánh `feat/demo-tron` (KHÔNG BAO GIỜ merge vào `main`, không deploy). Bot tự chơi trọn 4 làng theo `docs/demo/KICH-BAN-VIDEO-TRON-GAME.md`: S01 → B11. Chạy ở chế độ chơi thử (khách), tiến độ mới tinh, không đăng nhập, không ghi lên Supabase. Chỉ bật khi bản build có `VITE_DEMO=true` VÀ địa chỉ có `?demo=1&kieu=tron`; bản build không có `VITE_DEMO` không chứa mã demo.
+Nhánh `feat/demo-tron` (KHÔNG BAO GIỜ merge vào `main`, không deploy). Bot tự chơi trọn 4 làng theo `docs/demo/KICH-BAN-VIDEO-TRON-GAME.md`: S01 → B11. Không quay phần đọc thoại: mọi hộp thoại lời nhân vật bị bỏ qua ngay (trừ truyện mở đầu S02), nên không có các mã G02, D02, G15, D12, K10, B10; K01 và B01 chỉ còn phần dịch chuyển bằng bản đồ. Chạy ở chế độ chơi thử (khách), tiến độ mới tinh, không đăng nhập, không ghi lên Supabase. Chỉ bật khi bản build có `VITE_DEMO=true` VÀ địa chỉ có `?demo=1&kieu=tron`; bản build không có `VITE_DEMO` không chứa mã demo.
 
 ### Chạy để quay
 
@@ -93,7 +93,7 @@ npx vite preview --mode demo --outDir dist-demo --port 5874 --strictPort
 
 Mở bằng Chrome (cửa sổ 1920×1080, trình duyệt chưa đăng nhập): `http://localhost:5874/?demo=1&kieu=tron`. Đếm ngược 5 giây rồi chạy. Giữ cửa sổ Chrome hiện rõ (không thu nhỏ). Hết video hiện nút "Tải mốc giây" tải `moc-giay.txt` ("S01 0:00", "S02 0:14"…; mốc tính từ khung hình đầu tiên của S01, tức lúc hết đếm ngược).
 
-- `&tu=<mã đoạn>`: bắt đầu từ đơn vị chứa đoạn đó (dựng sẵn tiến độ, vào đúng route). Ví dụ `&tu=G07` (màn 1), `&tu=D01` (Làng Dệt), `&tu=K03` (màn 7), `&tu=B08` (màn 12). Đoạn nào chỉ có ngay sau khi vừa chơi xong màn (G15, D12, K10, B10, B11) thì bắt đầu từ màn trước nó.
+- `&tu=<mã đoạn>`: bắt đầu từ đơn vị chứa đoạn đó (dựng sẵn tiến độ, vào đúng route). Ví dụ `&tu=G07` (màn 1), `&tu=D01` (Làng Dệt), `&tu=K03` (màn 7), `&tu=B08` (màn 12). `&tu=B11` bắt đầu từ màn 12.
 - `&kiem=<0,01 đến 1>`: chia nhỏ mức tối thiểu của mọi đoạn để kiểm nhanh (mặc định 1 = đúng kịch bản). Không dùng khi quay.
 - Phím: `P` tạm dừng/tiếp, `N` bỏ qua cảnh hiện tại, `Esc` dừng.
 - Mỗi đoạn kéo dài tối thiểu = số chữ lời thuyết minh ÷ 2,5 giây (150 chữ/phút); xong sớm thì bot đứng chờ (nhân vật đứng yên, bảng vẫn mở). Làng Giấy đi bộ và đọc ở tốc độ thường; Làng Dệt, Khắc Dấu, Bạc dịch chuyển bằng bản đồ lớn và đọc, trả lời thẻ nhanh gấp 1,5 lần.

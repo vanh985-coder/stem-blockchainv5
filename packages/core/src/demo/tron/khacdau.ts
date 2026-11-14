@@ -21,7 +21,7 @@ const M = bai3Texts.tramTb;
 const H = bai3Texts.tramKho;
 
 /** K01 dịch chuyển bằng bản đồ + cảnh chú Dũng. */
-export const tronKdVao = (ctx: Ctx): Promise<void> => tronEnterVillage(ctx, VILLAGE, 'khac-dau', 'K01', null);
+export const tronKdVao = (ctx: Ctx): Promise<void> => tronEnterVillage(ctx, VILLAGE, 'khac-dau', 'K01');
 
 /** K02 bốn thẻ "Em có biết?" của Làng Khắc Dấu. */
 export const tronKdThe = (ctx: Ctx): Promise<void> => tronTeleportCards(ctx, VILLAGE, 'K02');
@@ -341,10 +341,10 @@ export async function tronKdTrao(ctx: Ctx): Promise<void> {
     await ctl.waitFor(() => onPath('/cho'), 'back to the market page', 20000);
   }
   await waitWorldReady(ctx);
+  // cảnh trao Trang Sổ Vàng: bỏ qua ngay (vẫn trao trang)
   await ctl.waitFor(() => demoWorld()?.dialogOpen, 'golden page ceremony', 40000);
-  markSeg('K10');
-  await playVnDialogs(ctx, { beforeLast: hold(ctx) });
-  await ctl.sleep(2000);
+  await playVnDialogs(ctx);
+  await ctl.sleep(1500);
 }
 
 void answerReflection;

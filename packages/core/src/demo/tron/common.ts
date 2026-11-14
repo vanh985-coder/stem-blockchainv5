@@ -6,7 +6,7 @@ import { pressKey, q, type Ctx } from '../actions';
 import { answerKnowCard, playVnDialogs } from '../ui';
 import { demoWorld, engageWorld, teleportViaMap, waitWorldReady, walkToNode, walkToPoint } from '../world';
 import { onPath } from '../scenes/common';
-import { beginSeg, endSeg, markSeg } from './marks';
+import { endSeg, markSeg } from './marks';
 
 /** Hệ số nhịp đọc và trả lời thẻ ở ba làng sau (nhanh gấp 1,5 lần Làng Giấy) */
 export const CARD_SPEED = 1.5;
@@ -23,8 +23,8 @@ async function interactHere(ctx: Ctx, kind: 'scroll' | 'board', at: { x: number;
   await pressKey(ctx, 'KeyE');
 }
 
-/** D01 / K01 / B01: bản đồ lớn, chọn cổng, "Đi tới"; rồi đi bộ vào làng để xem cảnh mở đầu (đoạn `introCode`). */
-export async function tronEnterVillage(ctx: Ctx, village: VillageId, gateId: string, teleCode: string, introCode: string | null): Promise<void> {
+/** D01 / K01 / B01: bản đồ lớn, chọn cổng, "Đi tới" (đoạn dịch chuyển); rồi đi bộ vào làng, cảnh mở đầu làng bị bỏ qua. */
+export async function tronEnterVillage(ctx: Ctx, village: VillageId, gateId: string, teleCode: string): Promise<void> {
   const w0 = await waitWorldReady(ctx);
   await engageWorld(ctx);
   await endSeg(ctx);
@@ -32,9 +32,9 @@ export async function tronEnterVillage(ctx: Ctx, village: VillageId, gateId: str
   await teleportViaMap(ctx, 'gate:' + gateId);
   const first = w0.world.villages.find((v) => v.id === village)?.layout.scrolls?.[0];
   if (!first) throw new Error('no scrolls in ' + village);
+  // cảnh mở đầu làng (lời nhân vật) không quay: bỏ qua ngay
   const onDialog = async () => {
-    if (introCode) await beginSeg(ctx, introCode);
-    await playVnDialogs(ctx, { beforeLast: hold(ctx) });
+    await playVnDialogs(ctx);
   };
   await walkToNode(ctx, scrollNodeId(village, first.index), { run: false, onDialog });
   await ctx.ctl.waitFor(() => demoWorld()?.inside === village, 'inside ' + village, 30000);

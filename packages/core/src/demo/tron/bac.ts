@@ -13,7 +13,7 @@ import { endSeg, markSeg } from './marks';
 const VILLAGE = 'lang-bac' as const;
 
 /** B01 bản đồ lớn + cảnh thầy Linh. */
-export const tronBacVao = (ctx: Ctx): Promise<void> => tronEnterVillage(ctx, VILLAGE, 'bac', 'B01', null);
+export const tronBacVao = (ctx: Ctx): Promise<void> => tronEnterVillage(ctx, VILLAGE, 'bac', 'B01');
 
 /** B02 bốn thẻ "Em có biết?" của Làng Bạc. */
 export const tronBacThe = (ctx: Ctx): Promise<void> => tronTeleportCards(ctx, VILLAGE, 'B02');
@@ -162,20 +162,12 @@ export async function tronBacM12(ctx: Ctx): Promise<void> {
     if (d.jump) keyTap('Space', 40);
   });
   let marked = false;
-  let climaxMarked = false;
   let guard = 0;
   while (!q('[data-demo="game-leave"]') && guard++ < 4000) {
     await nextFrame(ctx);
     // hộp thoại: trước khi chơi là lời mở đầu của game; sau khi xong vòng là cảnh cao trào (chiếu tự động sau ván, nhiều bước nối nhau)
-    if (vnNext()) {
-      if (marked) {
-        if (!climaxMarked) {
-          climaxMarked = true;
-          await endSeg(ctx);
-          markSeg('B10');
-        }
-        await playVnDialogs(ctx, { beforeLast: hold(ctx) });
-      } else await playVnDialogs(ctx);
+    if (vnNext() || q('[data-demo="vn-skip"]')) {
+      await playVnDialogs(ctx);
       continue;
     }
     const p = probe12();

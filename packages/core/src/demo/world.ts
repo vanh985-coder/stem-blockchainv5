@@ -61,7 +61,7 @@ export async function waitWorldReady(ctx: Ctx): Promise<DemoWorldState> {
   return ctx.ctl.waitFor(() => {
     const w = demoWorld();
     return w && w.ready && w.api.player ? w : null;
-  }, 'world ready', 90000);
+  }, 'world ready', 240000);
 }
 
 /** Bấm vào khung 3D một cái để khóa chuột (giả) như người chơi thật. */
@@ -179,7 +179,15 @@ export async function teleportViaMap(ctx: Ctx, markerId: string, opts: { hold?: 
   const { ctl } = ctx;
   const hold = opts.hold ?? 1400;
   await waitWorldReady(ctx);
-  if (!q('[data-testid="ban-do-lon"]')) await pressKey(ctx, 'KeyM');
+  // phím M bị bỏ qua khi thế giới đang bận (hiệu ứng mở cổng, trao trang, hộp thoại): chờ rảnh rồi bấm, không mở thì bấm lại
+  await ctl.waitFor(() => {
+    const w = demoWorld();
+    return w && w.seq === 'idle' && !w.entering && !w.dialogOpen && !w.guideOpen && !w.know ? w : null;
+  }, 'world idle before opening the map', 120000);
+  for (let i = 0; i < 6 && !q('[data-testid="ban-do-lon"]'); i++) {
+    await pressKey(ctx, 'KeyM');
+    await ctl.sleep(1500);
+  }
   await ctl.waitFor(() => q('[data-testid="ban-do-lon"]'), 'big map', 8000);
   await ctl.sleep(hold);
   const dot = await ctl.waitFor(() => q('[data-testid="teleport-' + markerId + '"]'), 'teleport marker ' + markerId, 8000);
