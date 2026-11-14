@@ -1,4 +1,5 @@
 import { fmt } from '../content/characters';
+import { da } from '../demo/attr';
 import { ui } from '../content/ui';
 import { Button } from './Button';
 import { Panel } from './Panel';
@@ -67,7 +68,7 @@ export function LevelIntro({
         )}
 
         <div className="mt-6 flex justify-center sm:justify-end">
-          <Button size="lg" data-demo="intro-start" onClick={onStart} fullWidth className="sm:w-auto">
+          <Button size="lg" {...da('intro-start')} onClick={onStart} fullWidth className="sm:w-auto">
             {startLabel}
           </Button>
         </div>

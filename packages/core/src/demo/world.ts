@@ -5,6 +5,7 @@ import { createRouter, type RouteStep } from '../three/world/roadGraph';
 import type { assembleWorld } from '../three/world/worldLayout';
 import type { WorldTarget } from '../three/world/worldTargets';
 import { clickEl, pressKey, q, type Ctx } from './actions';
+import { keyDown, keyTap, keyUp } from './keys';
 import { turnToward } from './timing';
 import { dismissGuideIfOpen, playVnDialogs } from './ui';
 
@@ -35,10 +36,24 @@ const frame = (ctx: Ctx): Promise<number> =>
     return t as number;
   });
 
-function stopMoving(api: WalkApi): void {
-  api.input.keyAxis.x = 0;
-  api.input.keyAxis.y = 0;
-  api.input.keyRun = false;
+/** Phím đi bộ đang giữ (W tiến, Shift chạy): bot đi bằng sự kiện bàn phím thật, chỉ riêng hướng nhìn (camera) đặt trực tiếp vì chuột xoay camera bị khóa chuột. */
+const held = { forward: false, run: false };
+
+function setWalkKeys(forward: boolean, run: boolean): void {
+  if (forward !== held.forward) {
+    held.forward = forward;
+    if (forward) keyDown('KeyW');
+    else keyUp('KeyW');
+  }
+  if (run !== held.run) {
+    held.run = run;
+    if (run) keyDown('ShiftLeft');
+    else keyUp('ShiftLeft');
+  }
+}
+
+function stopMoving(_api: WalkApi): void {
+  setWalkKeys(false, false);
 }
 
 /** Chờ trang thế giới dựng xong (cảnh 3D sẵn sàng). */
@@ -102,9 +117,7 @@ export async function walkToNode(ctx: Ctx, nodeId: string, opts: WalkOpts = {}):
       let diff = want - api.camera.yaw;
       while (diff > Math.PI) diff -= 2 * Math.PI;
       while (diff < -Math.PI) diff += 2 * Math.PI;
-      api.input.keyAxis.x = 0;
-      api.input.keyAxis.y = Math.abs(diff) < 0.9 ? 1 : 0;
-      api.input.keyRun = opts.run ?? true;
+      setWalkKeys(Math.abs(diff) < 0.9, opts.run ?? true);
       // kẹt (đứng yên mà đang bấm tiến): nhảy và lệch hướng một lúc
       const moved = Math.hypot(p.x - stuckPos.x, p.z - stuckPos.z);
       if (moved > 0.4) {
@@ -112,7 +125,7 @@ export async function walkToNode(ctx: Ctx, nodeId: string, opts: WalkOpts = {}):
         stuckSince = performance.now();
         nudge = 0;
       } else if (performance.now() - stuckSince > 1500) {
-        api.input.jump = true;
+        keyTap('Space');
         nudge = nudge === 0 ? 0.7 : -nudge;
         stuckSince = performance.now();
       }
@@ -137,8 +150,7 @@ export async function walkToPoint(ctx: Ctx, x: number, z: number, arrive = 1.2, 
       if (!p || demoWorld()?.dialogOpen) continue;
       if (Math.hypot(x - p.x, z - p.z) < arrive || performance.now() - t0 > maxMs) return;
       api.camera.yaw = turnToward(api.camera.yaw, Math.atan2(x - p.x, z - p.z), 5 * dt);
-      api.input.keyAxis.y = 1;
-      api.input.keyRun = false;
+      setWalkKeys(true, false);
     }
   } finally {
     stopMoving(api);

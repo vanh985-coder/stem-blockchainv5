@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { dax } from '@so-chung/core/demo/attr';
 import { compactTree } from './compactTree';
 import { bai4Texts } from '@so-chung/core/content/lessons/bai-4';
 import { formatNumber } from '@so-chung/core/lib/format';
@@ -274,7 +275,7 @@ export const CayMerkle: React.FC<CayMerkleProps> = ({
                     height: pos.height,
                     transform: 'translate(-50%, -50%)',
                   }}
-                  data-demo-cell={`${lvl}-${idx}`}
+                  {...dax('cell', `${lvl}-${idx}`)}
                   onClick={() => onCellClick?.(lvl, idx)}
                   className={`
                     rounded-[14px] border-2 flex flex-col items-center justify-center p-1

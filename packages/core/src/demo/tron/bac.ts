@@ -1,6 +1,7 @@
 /** Chế độ trọn: Làng Bạc (B01 đến B11). Dịch chuyển bằng bản đồ lớn; thẻ nhanh gấp 1,5 lần Làng Giấy. Màn 10 dùng lại bot màn 10 có sẵn; màn 11 đổi chỗ bằng nước tốt nhất của bot giỏi; màn 12 bộ lái leo bậc. */
 import { tutorialTexts } from '../../content/tutorial';
-import { clickEl, q, type Ctx } from '../actions';
+import { clickAt, clickEl, q, type Ctx } from '../actions';
+import { keyDown, keyTap, keyUp } from '../keys';
 import { getProbe } from '../probe';
 import { buttonByText, dwell, playVnDialogs, vnNext } from '../ui';
 import { driveLesson, lessonStage } from '../scenes/lesson';
@@ -64,7 +65,6 @@ interface Man11Probe {
   ready: boolean;
   banner: boolean;
   canAct: () => boolean;
-  tryMove: (a: [number, number], b: [number, number]) => void;
   bestMove: () => Promise<{ a: [number, number]; b: [number, number] } | null>;
 }
 const probe11 = () => getProbe<Man11Probe>('man11');
@@ -110,8 +110,14 @@ export async function tronBacM11(ctx: Ctx): Promise<void> {
       await ctl.sleep(500);
       continue;
     }
-    p.tryMove(move.a, move.b);
-    await ctl.sleep(1200);
+    // chạm ô thứ nhất rồi chạm ô kề (như người chơi chạm bàn)
+    const board = await ctl.waitFor(() => q('[data-testid="man11-ban"]'), 'board', 5000);
+    const r = board.getBoundingClientRect();
+    const size = r.width / 7;
+    const at = (pos: [number, number]) => ({ x: r.left + (pos[1] + 0.5) * size, y: r.top + (pos[0] + 0.5) * size });
+    await clickAt(ctx, board, at(move.a), { settle: 500 });
+    await clickAt(ctx, board, at(move.b), { settle: 900 });
+    await ctl.sleep(800);
   }
   await ctl.waitFor(() => q('[data-demo="game-leave"]'), 'result screen', 20000);
   await ctl.sleep(2500);
@@ -140,9 +146,20 @@ export async function tronBacM12(ctx: Ctx): Promise<void> {
   const tip = q<HTMLButtonElement>('[role="dialog"] button');
   if (probe12()?.tip && tip) await clickEl(ctx, tip, { settle: 700 });
   const pilot = await probe12()!.makePilot();
+  // bot đọc trạng thái, bấm phím mũi tên (giữ) và Space (nhảy) thật như người chơi
+  const decide = pilot as unknown as (s: never) => { move: -1 | 0 | 1; jump: boolean };
+  let moving: -1 | 0 | 1 = 0;
   probe12()!.setAutopilot((s) => {
     if (ctl.paused) return;
-    pilot(s);
+    const d = decide(s);
+    if (d.move !== moving) {
+      if (moving === -1) keyUp('ArrowLeft');
+      if (moving === 1) keyUp('ArrowRight');
+      if (d.move === -1) keyDown('ArrowLeft');
+      if (d.move === 1) keyDown('ArrowRight');
+      moving = d.move;
+    }
+    if (d.jump) keyTap('Space', 40);
   });
   let marked = false;
   let climaxMarked = false;

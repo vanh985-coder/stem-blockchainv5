@@ -1,6 +1,7 @@
 /** Thao tác như người chơi: bấm, gõ số từng ký tự, nhấn phím, kéo thả. Mọi thao tác di con trỏ giả tới trước rồi gửi sự kiện pointer/mouse/click/keyboard thật. */
 import type { DemoController } from './controller';
 import { moveCursor, placeCursor, pressEffect } from './cursor';
+import { keyDown, keyOf, keyUp } from './keys';
 import { PACING } from './pacing';
 import { typingDelays } from './timing';
 
@@ -46,7 +47,7 @@ function setInputValue(input: HTMLInputElement, value: string): void {
   input.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-export function keyEvent(target: EventTarget, type: 'keydown' | 'keyup', code: string, key = code): void {
+export function keyEvent(target: EventTarget, type: 'keydown' | 'keyup', code: string, key = keyOf(code)): void {
   target.dispatchEvent(new KeyboardEvent(type, { bubbles: true, cancelable: true, code, key }));
 }
 
@@ -72,9 +73,11 @@ export async function typeInto(ctx: Ctx, input: HTMLInputElement, text: string, 
 
 /** Nhấn một phím như người (keydown rồi keyup sau `holdMs`). */
 export async function pressKey(ctx: Ctx, code: string, holdMs = 90, target: EventTarget = window): Promise<void> {
-  keyEvent(target, 'keydown', code);
+  if (target === window) keyDown(code);
+  else keyEvent(target, 'keydown', code);
   await ctx.ctl.sleep(holdMs);
-  keyEvent(target, 'keyup', code);
+  if (target === window) keyUp(code);
+  else keyEvent(target, 'keyup', code);
 }
 
 /** Kéo thả bằng con trỏ giả: pointerdown ở `from`, đi qua nhiều điểm (pointermove), pointerup ở `to`. */
@@ -113,4 +116,27 @@ export function q<T extends Element = HTMLElement>(sel: string): T | null {
 }
 export function qa<T extends Element = HTMLElement>(sel: string): T[] {
   return [...document.querySelectorAll<T>(sel)];
+}
+
+/** Bấm (pointerdown, pointerup, click) vào một phần tử tại điểm cho trước (tọa độ cửa sổ) bằng con trỏ giả: dùng cho khung vẽ không có phần tử riêng từng ô (bàn ghép lá, bàn bắn trứng). */
+export async function clickAt(ctx: Ctx, target: Element, at: { x: number; y: number }, opts: { settle?: number } = {}): Promise<void> {
+  const { ctl } = ctx;
+  await moveCursor(ctl, at);
+  await ctl.sleep(PACING ? 40 : 120);
+  await pressEffect(ctl);
+  fire(target, 'pointerover', at.x, at.y);
+  fire(target, 'pointermove', at.x, at.y);
+  fire(target, 'pointerdown', at.x, at.y, { buttons: 1 });
+  fire(target, 'mousedown', at.x, at.y, { buttons: 1 });
+  fire(target, 'pointerup', at.x, at.y);
+  fire(target, 'mouseup', at.x, at.y);
+  fire(target, 'click', at.x, at.y);
+  await ctl.sleep(opts.settle ?? 250);
+}
+
+/** Rê con trỏ tới điểm cho trước rồi gửi pointermove tại đó (không bấm): dùng để ngắm. */
+export async function hoverAt(ctx: Ctx, target: Element, at: { x: number; y: number }): Promise<void> {
+  await moveCursor(ctx.ctl, at);
+  fire(target, 'pointermove', at.x, at.y);
+  fire(target, 'mousemove', at.x, at.y);
 }

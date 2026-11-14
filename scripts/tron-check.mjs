@@ -20,7 +20,9 @@ if (!CHROME) {
 const TU = (process.env.TU || '').toUpperCase();
 const KIEM = Number(process.env.KIEM || 1);
 const STOP = (process.env.STOP || '').toUpperCase();
-const SHOTS = (process.env.SHOTS || '').split(',').map((s) => s.trim().toUpperCase()).filter(Boolean);
+// SHOTS=S03,G07+20: chụp khi đoạn bắt đầu (cộng thêm N giây nếu có +N)
+const SHOT_SPECS = (process.env.SHOTS || '').split(',').map((s) => s.trim().toUpperCase()).filter(Boolean).map((s) => ({ code: s.split('+')[0], delay: Number(s.split('+')[1] || 0), name: s.replace('+', '-') }));
+const SHOTS = SHOT_SPECS.map((x) => x.code);
 const TOTAL_MS = Number(process.env.TOTAL_MIN || 120) * 60 * 1000;
 
 // số chữ từng đoạn (để so thời lượng thực tế với mức tối thiểu)
@@ -45,10 +47,13 @@ const browser = await puppeteer.launch({
   executablePath: CHROME,
   headless: process.env.HEADED ? false : true,
   defaultViewport: { width: 1920, height: 1080 },
-  args: ['--no-sandbox', '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader', '--window-size=1920,1080', '--autoplay-policy=no-user-gesture-required'],
+  args: process.env.HEADED ? ['--window-size=1920,1080', '--disable-backgrounding-occluded-windows', '--disable-renderer-backgrounding', '--disable-background-timer-throttling'] : ['--no-sandbox', '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader', '--window-size=1920,1080', '--autoplay-policy=no-user-gesture-required'],
 });
 const page = await browser.newPage();
-await page.setViewport({ width: 1920, height: 1080 });
+await page.bringToFront().catch(() => undefined);
+const VP = (process.env.VIEWPORT || '1920x1080').split('x').map(Number);
+await page.setViewport({ width: VP[0], height: VP[1] });
+if (process.env.REDUCED) await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
 const errors = [];
 page.on('console', (m) => {
   const t = m.text();
@@ -56,7 +61,8 @@ page.on('console', (m) => {
   else if (m.type() === 'error') errors.push(t);
 });
 page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
-await page.evaluateOnNewDocument(() => {
+// DEFAULT_SETTINGS=1: không ghi đè cài đặt (như Chrome thật của người dùng: chất lượng tự động...). Mặc định ép mức Thấp cho chạy không đầu nhanh hơn.
+if (!process.env.DEFAULT_SETTINGS) await page.evaluateOnNewDocument(() => {
   localStorage.setItem('sochung.v3.settings', JSON.stringify({ soundEnabled: false, reducedMotion: false, largeText: false, rotateMap: false, quality: 'low' }));
 });
 
@@ -80,10 +86,10 @@ for (;;) {
   if (process.env.DEBUG && Date.now() - lastDbg > 8000 && (lastDbg = Date.now())) console.log('   . ' + st.path + ' w=' + JSON.stringify(st.w) + ' log=' + st.log.map((l) => l.id + ':' + l.status).join(','));
   while (marksSeen < st.marks.length) {
     const m = st.marks[marksSeen++];
-    if (SHOTS.includes(m.code) && !shot1.has(m.code)) {
-      shot1.add(m.code);
-      await sleep(1500);
-      await shot(page, `${m.code.toLowerCase()}`);
+    for (const sp of SHOT_SPECS.filter((x) => x.code === m.code && !shot1.has(x.name))) {
+      shot1.add(sp.name);
+      await sleep(1500 + sp.delay * 1000);
+      await shot(page, sp.name.toLowerCase());
     }
     if (STOP && m.code === STOP) stoppedAt = m.code;
   }

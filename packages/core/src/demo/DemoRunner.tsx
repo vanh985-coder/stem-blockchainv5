@@ -44,6 +44,13 @@ export default function DemoRunner() {
       else if (e.code === 'Escape') c.stop();
     };
     window.addEventListener('keydown', onKey, true);
+    // chế độ trọn: nếu game vẫn rơi vào hộp "Tạm dừng" (cửa sổ mất tiêu điểm) thì bot tự bấm "Tiếp tục", người quay không phải làm gì
+    const resume = DEMO_TRON
+      ? setInterval(() => {
+          const b = document.querySelector<HTMLButtonElement>('[data-demo="resume"]:not([disabled])');
+          if (b) b.click();
+        }, 700)
+      : null;
     let n = COUNTDOWN_S;
     setLeft(COUNTDOWN_S);
     const tick = setInterval(() => {
@@ -78,6 +85,7 @@ export default function DemoRunner() {
     }, 1000);
     return () => {
       clearInterval(tick);
+      if (resume) clearInterval(resume);
       window.removeEventListener('keydown', onKey, true);
     };
   }, []);

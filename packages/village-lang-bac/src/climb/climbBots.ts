@@ -132,15 +132,17 @@ export function simulateMany(profile: ClimbBotProfile, games: number, thresholds
 }
 
 /**
- * Bộ lái cho bot demo (chỉ dùng ở bản build VITE_DEMO): mỗi khung hình quyết định như bot giỏi (chờ `react` giây ở mỗi tầng, nhảy, rồi lái về bậc đúng lúc đang bay).
+ * Bộ quyết định cho bot demo (chỉ dùng ở bản build VITE_DEMO), mỗi khung hình: chờ một nhịp phản ứng ở mỗi tầng, nhảy, rồi lái về bậc đúng lúc đang bay (luật bot giỏi).
+ * Chỉ ĐỌC trạng thái và trả về việc cần làm; bot gửi phím mũi tên và Space thật tương ứng.
  */
-export function makeDemoClimbPilot(): (s: ClimbState) => void {
+export function makeDemoClimbPilot(): (s: ClimbState) => { move: -1 | 0 | 1; jump: boolean } {
   let waitUntil = GOOD_BOT.react;
   let plan: number | null = null;
   let planLevel = -1;
   let lastLevel = -1;
   return (s) => {
-    if (s.phase !== 'playing') return;
+    const none = { move: 0 as const, jump: false };
+    if (s.phase !== 'playing') return none;
     if (s.level !== lastLevel) {
       lastLevel = s.level;
       plan = null;
@@ -148,26 +150,29 @@ export function makeDemoClimbPilot(): (s: ClimbState) => void {
     }
     const p = s.player;
     if (s.mode !== 'free') {
-      setMove(s, 0);
       plan = null;
       waitUntil = s.time + GOOD_BOT.react;
-    } else if (p.grounded) {
-      setMove(s, 0);
+      return none;
+    }
+    if (p.grounded) {
       if (s.time >= waitUntil && s.time >= s.lockUntil) {
         if (plan === null || planLevel !== s.level) {
           plan = s.choices.findIndex((c) => c.correct);
           planLevel = s.level;
         }
-        jump(s);
+        return { move: 0 as const, jump: true };
       }
-    } else if (plan !== null) {
+      return none;
+    }
+    if (plan !== null) {
       const c = s.choices[plan];
       if (c) {
         const t = timeToCross(p.y, p.vy, tierY(s.level + 1));
         const future = choiceX({ slideClock: s.slideClock + (Number.isFinite(t) ? t : 0) * (s.slow ? CLIMB_SPEC.reducedSlideScale : 1), round: s.round, choices: s.choices }, c);
         const dx = future - p.x;
-        setMove(s, Math.abs(dx) < 0.08 ? 0 : dx > 0 ? 1 : -1);
+        return { move: Math.abs(dx) < 0.08 ? (0 as const) : dx > 0 ? (1 as const) : (-1 as const), jump: false };
       }
-    } else setMove(s, 0);
+    }
+    return none;
   };
 }

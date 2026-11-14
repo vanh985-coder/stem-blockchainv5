@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { dax } from '@so-chung/core/demo/attr';
 import { fmt } from '@so-chung/core';
 import { bai4Texts } from '@so-chung/core/content/lessons/bai-4';
 import { formatNumber } from '@so-chung/core/lib/format';
@@ -145,7 +146,7 @@ export function SoiCay({ recorded, inspected, last, canInspect, onInspect, pulse
                 <button
                   type="button"
                   aria-disabled={!open}
-                  data-demo-cell={`${c.level}-${c.index}`}
+                  {...dax('cell', `${c.level}-${c.index}`)}
                   aria-label={fmt(open ? T.soiNhanChuaSoi : T.soiNhanChuaMo, { nhan: name })}
                   onClick={() => open && onInspect(c)}
                   className={`${CELL_BASE} focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-muc-tim ${

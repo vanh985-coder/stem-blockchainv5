@@ -23,7 +23,7 @@ import { slotOf, slotsOfPlan } from './bubbleSlots';
 import { createView, drawBubble, refreshAim, resetView, spawnFx, stepView, type BubbleView } from './bubbleCanvas';
 import { BUBBLE_SPEC, type BubbleSpec } from './bubbleConfig';
 import { hintFor } from './bubbleHint';
-import { AIM_STEP, AIM_STEP_FINE, angleFromPoint, fitField, modeFor, type BubbleMode, type Fit } from './bubbleLayout';
+import { AIM_STEP, AIM_STEP_FINE, angleFromPoint, fitField, modeFor, pointFromAngle, type BubbleMode, type Fit } from './bubbleLayout';
 import {
   anchoredSet,
   bubbleScore,
@@ -367,11 +367,13 @@ export function BubbleGame({ paused, attempt, onFinish, setHint }: MiniGameRende
   demoProbe('man9', {
     state: game,
     tutorialActive,
-    setAim: (a: number) => {
-      const v = view.current;
-      if (!v) return;
-      v.aim = clampAngle(a);
-      refreshAim(v, stateRef.current);
+    // điểm trên màn hình (tọa độ cửa sổ) ứng với một góc ngắm: bot rê chuột tới đó rồi bấm như người chơi (chỉ ĐỌC hình học, không đổi trạng thái)
+    aimClient: (angle: number) => {
+      const c = canvasEl.current;
+      if (!c) return null;
+      const rect = c.getBoundingClientRect();
+      const p = pointFromAngle(geo.current.fit, angle);
+      return { canvas: c, x: rect.left + p.px, y: rect.top + p.py };
     },
     bestShot: async () => (await import('./bubbleBots')).demoBestShot(stateRef.current),
   });

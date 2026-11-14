@@ -319,10 +319,11 @@ export function replayRun(seed: number, gaps: number, actions: Uint8Array): Repl
   return { gaps: s.passed, hits: s.stats.hits, hearts: s.hearts, ticks };
 }
 
-/** Bộ lái cho bot demo (chỉ dùng ở bản build VITE_DEMO): mỗi khung hình, nếu độ cao dự đoán thấp hơn tâm khe kế tiếp một khoảng `margin` thì bật (cùng luật của bot giỏi). */
-export function demoAutopilot(s: KiteState): void {
-  if (s.phase !== 'play' && s.phase !== 'ready') return;
+/** Quyết định của bot demo (chỉ dùng ở bản build VITE_DEMO): có nên bật diều lúc này không (cùng luật bot giỏi). Chỉ ĐỌC trạng thái; việc bật diều do bot gửi phím Space thật. */
+export function demoShouldFlap(s: KiteState): boolean {
+  if (s.phase === 'ready') return true;
+  if (s.phase !== 'play') return false;
   const d = GOOD_BOT.delay;
   const predicted = s.y + s.vy * d - 0.5 * C.gravity * d * d;
-  if (s.phase === 'ready' || predicted < targetY(s) - GOOD_BOT.margin) flap(s);
+  return predicted < targetY(s) - GOOD_BOT.margin;
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { da } from '../demo/attr';
 import { sound } from '../audio/sound';
 import { ui } from '../content/ui';
 import { BottomSheet } from './BottomSheet';
@@ -115,7 +116,7 @@ export function FeedbackSheet({
               variant={isCorrect ? 'primary' : 'danger'}
               size="md"
               onClick={onContinue}
-              data-demo="feedback-continue"
+              {...da('feedback-continue')}
               className="w-full sm:w-auto"
             >
               {continueLabel}

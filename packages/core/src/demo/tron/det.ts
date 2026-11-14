@@ -2,6 +2,7 @@
 import { bai2Texts } from '../../content/lessons/bai-2';
 import { whackUi } from '../../content/games';
 import { clickEl, q, qa, typeInto, type Ctx } from '../actions';
+import { keyTap } from '../keys';
 import { getProbe } from '../probe';
 import { buttonByText, dwell, playVnDialogs } from '../ui';
 import { demoWorld, waitWorldReady } from '../world';
@@ -197,9 +198,10 @@ export async function tronDetM6(ctx: Ctx): Promise<void> {
     await clickEl(ctx, tut, { settle: 800 });
   }
   const pilot = await probe.makeAutopilot();
+  // bot đọc trạng thái diều và bấm phím Space thật khi cần bật
   probe.setAutopilot((s) => {
     if (ctl.paused) return;
-    pilot(s);
+    if ((pilot as unknown as (s: never) => boolean)(s)) keyTap('Space', 40);
   });
   let quizSeen = false;
   while (!q('[data-demo="game-leave"]')) {

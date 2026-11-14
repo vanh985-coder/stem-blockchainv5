@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import { da } from '../demo/attr';
 import { createPortal } from 'react-dom';
 import { Button } from './Button';
 import { useSettings } from '../settings/SettingsProvider';
@@ -367,7 +368,7 @@ export function TutorialSpotlight({
 
           {/* Viền sáng bao quanh vùng target */}
           <div
-            data-demo="tut-focus"
+            {...da('tut-focus')}
             className={`fixed z-40 pointer-events-none rounded-xl border-2 border-yellow-400 ring-2 ring-yellow-400/50 shadow-[0_0_15px_rgba(250,204,21,0.6)] ${
               reducedMotion ? '' : 'transition-all duration-150'
             }`}
@@ -430,7 +431,7 @@ export function TutorialSpotlight({
           <button
             ref={skipBtnRef}
             type="button"
-            data-demo="tut-skip"
+            {...da('tut-skip')}
             onClick={guarded(onSkip)}
             className="shrink-0 text-xs font-semibold text-chu/70 underline-offset-2 hover:text-chu hover:underline focus-visible:outline-2 focus-visible:outline-muc-tim"
           >

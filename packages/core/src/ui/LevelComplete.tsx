@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { da } from '../demo/attr';
 import { sound } from '../audio/sound';
 import { ui } from '../content/ui';
 import { AssetImage } from '../assets/AssetImage';
@@ -136,7 +137,7 @@ export function LevelComplete({
             {ui.hoanThanh.choiLai}
           </Button>
           {hasNextLevel ? (
-            <Button data-demo="complete-next" onClick={onNextLevel} fullWidth className="sm:w-auto">
+            <Button {...da('complete-next')} onClick={onNextLevel} fullWidth className="sm:w-auto">
               {nextLabel || ui.hoanThanh.manTiepTheo}
             </Button>
           ) : (
@@ -145,7 +146,7 @@ export function LevelComplete({
             </Button>
           )}
           {extraAction && (
-            <Button data-demo="complete-extra" onClick={extraAction.onClick} fullWidth className="sm:w-auto">
+            <Button {...da('complete-extra')} onClick={extraAction.onClick} fullWidth className="sm:w-auto">
               {extraAction.label}
             </Button>
           )}

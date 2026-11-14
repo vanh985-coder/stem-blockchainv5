@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { da } from '@so-chung/core/demo/attr';
 import {
   Avatar,
   Button,
@@ -507,7 +508,7 @@ export function Easy({ onComplete }: { onComplete: (r: StationResult) => void; o
             variant="primary"
             size="md"
             fullWidth
-            data-demo="check"
+            {...da('check')}
             onClick={handleCheck}
             disabled={isMerging}
           >{T.ghepGiaoDich}</Button>

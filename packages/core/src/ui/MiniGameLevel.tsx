@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { da } from '../demo/attr';
 import { useNavigate } from 'react-router';
 import { MERGED, URLS, openClimax, villageWorldUrl } from '../config/urls';
 import { climaxUi } from '../content/climax';
+import { DEMO_TRON } from '../demo/config';
 import { fmt } from '../content/characters';
 import { GAMES, gameUi } from '../content/games';
 import { gameHints } from '../content/gameHints';
@@ -78,8 +80,10 @@ type Stage = { kind: 'card' } | { kind: 'play' } | { kind: 'auto' } | ResultStag
 
 /** Theo dõi tab có đang bị ẩn không (đọc lại khi đổi trạng thái). */
 function useTabHidden(): boolean {
-  const [hidden, setHidden] = useState(() => typeof document !== 'undefined' && document.visibilityState === 'hidden');
+  const [hidden, setHidden] = useState(() => typeof document !== 'undefined' && document.visibilityState === 'hidden' && !DEMO_TRON);
   useEffect(() => {
+    // demo trọn game: không tạm dừng khi cửa sổ bị che hay mất tiêu điểm (người quay không phải bấm "Tiếp tục")
+    if (DEMO_TRON) return;
     const on = () => setHidden(document.visibilityState === 'hidden');
     document.addEventListener('visibilitychange', on);
     return () => document.removeEventListener('visibilitychange', on);
@@ -249,7 +253,7 @@ export function MiniGameLevel({ levelId, medals, maxScore, renderGame, onLeave, 
             <Panel className="w-full max-w-sm space-y-4 text-center">
               <h2 className="text-2xl">{gameUi.tamDung}</h2>
               <p>{gameUi.tamDungLoiNhac}</p>
-              <Button size="lg" fullWidth disabled={hidden} onClick={() => setHeld(false)}>
+              <Button size="lg" fullWidth disabled={hidden} {...da('resume')} onClick={() => setHeld(false)}>
                 {gameUi.tiepTuc}
               </Button>
             </Panel>
@@ -320,7 +324,7 @@ export function MiniGameLevel({ levelId, medals, maxScore, renderGame, onLeave, 
                   {gameUi.choiTiep}
                 </Button>
               )}
-              <Button size="lg" variant="secondary" data-demo="game-leave" onClick={leave}>
+              <Button size="lg" variant="secondary" {...da('game-leave')} onClick={leave}>
                 {gameUi.veLang}
               </Button>
               {finale && (finale.ready?.() ?? true) && (
@@ -375,7 +379,7 @@ export function MiniGameLevel({ levelId, medals, maxScore, renderGame, onLeave, 
             {huongDan.nut}
           </Button>
           <AutoCompleteButton levelId={levelId} onDone={toAuto} className="min-h-12 w-full sm:w-auto" />
-          <Button size="lg" fullWidth data-demo="game-start" className="sm:w-auto" onClick={start}>
+          <Button size="lg" fullWidth {...da('game-start')} className="sm:w-auto" onClick={start}>
             {gameUi.batDau}
           </Button>
         </div>

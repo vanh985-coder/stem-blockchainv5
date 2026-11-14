@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { da, dax } from '../demo/attr';
 import { useMusicDuck } from '../audio/useMusic';
 import { AssetImage } from '../assets/AssetImage';
 import { asset, useManifest } from '../assets/store';
@@ -274,7 +275,7 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
         {!noSkip && (
           <button
             type="button"
-            data-demo="vn-skip"
+            {...da('vn-skip')}
             onClick={() => handlers.current.skip()}
             className={`${smallBtn} absolute right-2 top-2 text-sm [@media(max-height:500px)]:static [@media(max-height:500px)]:order-3 [@media(max-height:500px)]:whitespace-nowrap`}
           >
@@ -287,7 +288,7 @@ export function VnDialog({ turns, onFinish, onSkip, noSkip = false, finishLabel,
         >
           {fmt(ui.vn.tienTrinh, { x: index + 1, n: turns.length })}
         </span>
-        <Button ref={nextRef} data-demo="vn-next" data-demo-last={isLast ? "1" : undefined} onClick={() => handlers.current.next()} className="[@media(max-height:500px)]:order-4 [@media(max-height:500px)]:whitespace-nowrap">
+        <Button ref={nextRef} {...da('vn-next')} {...dax('last', isLast ? '1' : undefined)} onClick={() => handlers.current.next()} className="[@media(max-height:500px)]:order-4 [@media(max-height:500px)]:whitespace-nowrap">
           {isLast && finishLabel ? finishLabel : ui.vn.tiep}
         </Button>
       </div>

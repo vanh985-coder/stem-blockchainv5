@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { da } from '@so-chung/core/demo/attr';
 import {
   Button,
   Card,
@@ -514,7 +515,7 @@ export function Hard({ onComplete }: { onComplete: (r: StationResult) => void; o
 
         {/* Nút bấm Kiểm tra: ngay sau cây khi màn hẹp; ở màn rộng nằm dưới khay (cột trái còn chỗ) để cả trạm gọn một màn hình */}
         <div id="tutorial-man10kho-check" className="flex justify-center md:col-start-1 md:row-start-3">
-          <Button variant="primary" size="md" data-demo="check" onClick={handleCheck} className="min-w-[200px]">{T.kiemTraCayMerkle}</Button>
+          <Button variant="primary" size="md" {...da('check')} onClick={handleCheck} className="min-w-[200px]">{T.kiemTraCayMerkle}</Button>
         </div>
 
         {/* Khay mảnh ghép */}

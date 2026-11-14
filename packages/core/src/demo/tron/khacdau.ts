@@ -2,7 +2,7 @@
 import { bai3Texts } from '../../content/lessons/bai-3';
 import { fmt } from '../../content/characters';
 import { PEOPLE, verify } from '../../lessons/bai-3/logic';
-import { clickEl, q, qa, typeInto, type Ctx } from '../actions';
+import { clickAt, clickEl, hoverAt, q, qa, typeInto, type Ctx } from '../actions';
 import { getProbe } from '../probe';
 import { buttonByText, dwell, playVnDialogs } from '../ui';
 import { demoWorld, waitWorldReady } from '../world';
@@ -280,7 +280,7 @@ export async function tronKdM8(ctx: Ctx): Promise<void> {
 interface Man9Probe {
   state: { phase: string; flying: unknown; hearts: number; board: unknown[] };
   tutorialActive: boolean;
-  setAim: (a: number) => void;
+  aimClient: (angle: number) => { canvas: HTMLCanvasElement; x: number; y: number } | null;
   bestShot: () => Promise<{ type: number; angle: number }>;
 }
 const probe9 = () => getProbe<Man9Probe>('man9');
@@ -314,9 +314,12 @@ export async function tronKdM9(ctx: Ctx): Promise<void> {
     const shot = await p.bestShot();
     const typeBtn = await ctl.waitFor(() => q<HTMLButtonElement>('[data-testid="nut-loai"][data-index="' + shot.type + '"]'), 'type button', 5000);
     await clickEl(ctx, typeBtn, { settle: 500 });
-    p.setAim(shot.angle);
-    await ctl.sleep(600);
-    await click(ctx, () => q<HTMLButtonElement>('[data-testid="nut-ban"]'), 'fire', 400);
+    // ngắm: rê chuột tới đúng góc trên bàn rồi bấm (thả chuột thì bắn)
+    const aim = p.aimClient(shot.angle);
+    if (!aim) throw new Error('no aim point');
+    await hoverAt(ctx, aim.canvas, aim);
+    await ctl.sleep(500);
+    await clickAt(ctx, aim.canvas, aim, { settle: 400 });
     await ctl.waitFor(() => !probe9()?.state.flying, 'shot landed', 15000);
     await ctl.sleep(500);
   }

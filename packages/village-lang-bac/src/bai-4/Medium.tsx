@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { da } from '@so-chung/core/demo/attr';
 import {
   Avatar,
   Button,
@@ -616,7 +617,7 @@ export function Medium({
                   autoFocus
                   className="w-36 text-center"
                 />
-                <Button variant="primary" size="md" data-demo="check" onClick={handleCheckPartB}>{T.xacNhan}</Button>
+                <Button variant="primary" size="md" {...da('check')} onClick={handleCheckPartB}>{T.xacNhan}</Button>
               </div>
 
               {selectedSlot === 'root' && !isChildrenReady && (
@@ -705,7 +706,7 @@ export function Medium({
                   <Button
                     variant="primary"
                     size="lg"
-                    data-demo="station-finish"
+                    {...da('station-finish')}
                     onClick={() => {
                       const totalMistakes = mistakesB;
                       const stars = starsFromMistakes(totalMistakes);

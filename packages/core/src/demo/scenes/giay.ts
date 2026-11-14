@@ -3,6 +3,7 @@ import { bai1Texts } from '../../content/lessons/bai-1';
 import { boardNodeId } from '../../three/world/worldLayout';
 import { tutorialTexts } from '../../content/tutorial';
 import { clickEl, dragEl, q, typeInto, type Ctx } from '../actions';
+import { keyTap } from '../keys';
 import { getProbe } from '../probe';
 import { buttonByText, dwell, playVnDialogs } from '../ui';
 import { demoWorld, engageWorld, walkAndInteract, waitWorldReady, type WalkOpts } from '../world';
@@ -189,9 +190,10 @@ export function installRunnerAutopilot(ctx: Ctx, session: RunnerSessionLike, bra
       // chỉ quyết định khi hàng đợi lệnh trống: một bước có thể chưa chạy (làm tròn thời gian) và lệnh cũ còn chờ, không để lệnh dồn lại
       if (session.queue.length === 0 && (st.phase === 'run' || st.phase === 'slow' || st.phase === 'resume')) {
         const i = brain.decide(st as never);
-        if (i.move) session.command(i.move > 0 ? 'left' : 'right');
-        if (i.jump) session.command('jump');
-        if (i.slide) session.command('slide');
+        // phím thật (mũi tên) tới window như người chơi; game tự đưa vào hàng đợi lệnh
+        if (i.move) keyTap(i.move > 0 ? 'ArrowLeft' : 'ArrowRight');
+        if (i.jump) keyTap('ArrowUp');
+        if (i.slide) keyTap('ArrowDown');
       }
       ran += original(chunk, false);
       for (const e of session.frameEvents) events.push(e);

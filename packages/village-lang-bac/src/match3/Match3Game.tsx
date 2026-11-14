@@ -417,7 +417,6 @@ export function Match3Game({ paused, attempt, onFinish, setHint }: MiniGameRende
     ready,
     banner: banner !== null,
     canAct: () => canAct(),
-    tryMove: (a: Pos, b: Pos) => tryMove(a, b),
     bestMove: async () => (await import('./match3Bots')).demoBestMove(state),
   });
 

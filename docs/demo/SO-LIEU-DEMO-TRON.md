@@ -83,3 +83,27 @@ Nguồn số: `packages/core/src/demo/tron/data.ts` (chỉ số đầu vào, ghi
 - D04: xem trên. D05, K04, K05, K08, B07: số do hạt giống hoặc logic của game, báo ở bảng.
 - `&tu=G15` bắt đầu từ màn 3, `&tu=D12` từ màn 6, `&tu=K10` từ màn 9, `&tu=B10`/`B11` từ màn 12: cảnh trao trang và cao trào chỉ có sau khi vừa chơi xong màn đó.
 - B09 đánh dấu lúc biển "xong vòng" hiện (đã leo tới gốc), B10 lúc cảnh cao trào bắt đầu.
+
+## Cách bot thao tác (cập nhật: mọi màn dùng sự kiện thật)
+
+Bot chỉ gửi sự kiện thật vào giao diện (pointer, click, bàn phím) và chỉ ĐỌC trạng thái qua cầu nối `__demoProbe` (chỉ có khi build `VITE_DEMO=true`). Không gọi hàm logic để "nhảy" kết quả. Con trỏ giả (mũi tên) lướt 0,4 đến 0,6 giây tới mục tiêu rồi có vòng sóng khi bấm; phím bấm hiện nhãn nhỏ ở góc dưới bên trái khoảng 0,6 giây.
+
+| Màn | Thao tác của bot |
+|---|---|
+| Đi bộ trong thế giới (G01–G02, thẻ ở Giấy) | Giữ phím **W** (tiến) và **Shift** (chạy, chỉ khi cần), **Space** khi kẹt, **E** tương tác; hướng nhìn của camera đặt trực tiếp (chuột xoay camera bị khóa chuột nên không có phím tương ứng) |
+| Bản đồ lớn (D01, K01, B01, thẻ, biển) | Phím **M**, bấm chấm điểm đến, bấm "Đi tới" |
+| 1, 4, 7, 10 (bài học) | Gõ số từng ký tự, bấm nút, chạm thẻ rồi chạm ô (màn 7), kéo thả (màn 10 trạm Khó) |
+| 2 (chạy) | Phím **← →** (đổi làn), **↑** (nhảy), **↓** (trượt) |
+| 3 (ghép sổ) | Kéo thả thẻ |
+| 5 (đập chuột) | Bấm nút làn |
+| 6 (diều) | Phím **Space** khi cần bật |
+| 8 (lật thẻ) | Bấm thẻ |
+| 9 (bắn trứng) | Bấm trứng ở khay nạp, bấm loại trứng, rê chuột tới đúng góc ngắm trên bàn rồi bấm (thả chuột thì bắn) |
+| 11 (ghép lá) | Chạm ô rồi chạm ô kề trên bàn |
+| 12 (leo bậc) | Giữ **← →**, **Space** để nhảy |
+
+## Nguyên nhân bot đứng im trên Chrome thật (đã sửa)
+
+Game phụ tự **tạm dừng** ("Trò chơi đã dừng vì em rời khỏi trang này") khi `document.visibilityState` là `hidden`, tức cửa sổ bị che hoặc thu nhỏ (ví dụ OBS hay cửa sổ khác phủ lên), và chỉ chạy tiếp khi bấm "Tiếp tục". Bot không bấm nút này nên đứng im; bản chạy không đầu không bao giờ rơi vào trạng thái đó. Sửa: chế độ trọn không tạm dừng khi cửa sổ ẩn, và bot tự bấm "Tiếp tục" nếu hộp tạm dừng vẫn hiện. Bot KHÔNG dùng các cầu nối `__memory`, `__bubble`, `__match3`, `__climb` (chỉ có khi dev hoặc `VITE_PROBE`).
+
+Chế độ trọn còn bỏ qua mọi phiên đăng nhập của trình duyệt (cấu hình Supabase tắt trong chế độ này): luôn chơi thử, không đọc hay ghi tài khoản.

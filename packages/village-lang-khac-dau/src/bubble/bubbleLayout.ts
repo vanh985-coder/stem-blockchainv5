@@ -61,6 +61,13 @@ export function angleFromPoint(fit: Fit, px: number, py: number): number {
   return clampAngle((Math.atan2(Math.max(0, dy), dx) * 180) / Math.PI);
 }
 
+/** Điểm ảnh (px, py) của canvas cách máy bắn `r` đơn vị trứng theo góc ngắm `angle` (độ): nghịch đảo của `angleFromPoint` (dùng cho bot demo rê chuột tới đúng góc) */
+export function pointFromAngle(fit: Fit, angle: number, r = 8): { px: number; py: number } {
+  const l = launcherPoint();
+  const a = (angle * Math.PI) / 180;
+  return { px: fit.ox + fit.scale * (l.x + r * Math.cos(a)), py: fit.oy + fit.scale * (l.y - r * Math.sin(a)) };
+}
+
 /** Cỡ chữ số trên trứng (điểm ảnh): không dưới 14 */
 export function eggFontPx(scale: number): number {
   return Math.max(14, Math.round(scale * 0.5));

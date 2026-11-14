@@ -67,10 +67,16 @@ export class DemoController {
   /** Chờ tới khi `fn` trả giá trị thật; hết `timeoutMs` thì báo lỗi nói rõ đang chờ gì. */
   async waitFor<T>(fn: () => T | null | undefined | false, label: string, timeoutMs = 20000): Promise<T> {
     const t0 = performance.now();
+    let warned = false;
     for (;;) {
       await this.checkpoint();
       const v = fn();
       if (v) return v;
+      // chờ lâu: ghi lên console để biết bot đang đợi gì (cho người quay đọc)
+      if (!warned && performance.now() - t0 > 8000) {
+        warned = true;
+        console.warn(`[demo] waiting: ${label}`);
+      }
       if (performance.now() - t0 > timeoutMs) throw new Error(`waitFor timeout: ${label}`);
       await new Promise((r) => setTimeout(r, 60));
     }

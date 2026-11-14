@@ -336,7 +336,7 @@ export function KiteGame({ paused, attempt, onFinish, setHint }: MiniGameRenderP
     },
     makeAutopilot: async () => {
       const m = await import('./kiteBots');
-      return m.demoAutopilot;
+      return m.demoShouldFlap;
     },
   });
 

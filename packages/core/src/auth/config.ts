@@ -1,3 +1,4 @@
+import { DEMO_TRON } from '../demo/config';
 export interface AuthEnv {
   VITE_SUPABASE_URL?: string;
   VITE_SUPABASE_ANON_KEY?: string;
@@ -49,7 +50,8 @@ export function sessionCookieOptions(cookieDomain: string | undefined, protocol:
 }
 
 // Vite thay chuỗi import.meta.env.VITE_* lúc build.
-export const AUTH_CONFIG: AuthConfig = readAuthConfig({
+// Demo trọn game (?demo=1&kieu=tron): luôn chơi thử (khách), bỏ qua mọi phiên đăng nhập của trình duyệt và không gọi Supabase
+export const AUTH_CONFIG: AuthConfig = readAuthConfig(DEMO_TRON ? {} : {
   VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
   VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
   VITE_USERNAME_EMAIL_DOMAIN: import.meta.env.VITE_USERNAME_EMAIL_DOMAIN,
